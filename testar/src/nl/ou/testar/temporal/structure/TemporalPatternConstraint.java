@@ -91,7 +91,7 @@ public class TemporalPatternConstraint {
         }
     }
 
-    public Map<Integer, Map<String, String>> getConstraintSets() {
+    public TreeMap<Integer, Map<String, String>> getConstraintSets() {
         return constraintSets;
     }
     public Map<String, String> getConstraintSetByIndex(int index) {

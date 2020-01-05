@@ -407,6 +407,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalLTLOracles = LTLTemporalOracles.csv" + Util.lineSep()
 					+"TemporalLTLPatterns = LTLTemporalPatterns.csv" + Util.lineSep()
 					+"TemporalLTLAPSelectorManager = LTLAPSelectorManager.json"+ Util.lineSep()
+					+"TemporalLTLPatternConstraints = LTLTemporalPatternConstraints.csv" + Util.lineSep()
+					+"TemporalLTLGeneratorTactics = 10;100"+ Util.lineSep()
 					+"TemporalDirectory = temporal" + Util.lineSep()
 					+"TemporalSubDirectories = true" + Util.lineSep()
 					+"TemporalSpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()

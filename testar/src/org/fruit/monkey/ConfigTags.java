@@ -128,6 +128,10 @@ public final class ConfigTags {
   public static final Tag<String> TemporalLTLOracles = Tag.from("TemporalLTLOracles", String.class);
   public static final Tag<String> TemporalLTLPatterns = Tag.from("TemporalLTLPatterns", String.class);
   public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
+  public static final Tag<String> TemporalLTLPatternConstraints = Tag.from("TemporalLTLPatternConstraints", String.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> TemporalLTLGeneratorTactics = Tag.from("TemporalLTLGeneratorTactics", (Class<List<String>>) (Class<?>) List.class);
+
   public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
   public static final Tag<Boolean> TemporalSubDirectories = Tag.from("TemporalSubDirectories", Boolean.class);
   public static final Tag<String> TemporalSpotFormulaParser = Tag.from("TemporalSpotFormulaParser", String.class);

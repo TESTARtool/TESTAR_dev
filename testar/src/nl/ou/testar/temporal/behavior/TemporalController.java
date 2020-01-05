@@ -13,6 +13,8 @@ import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -24,6 +26,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
@@ -283,6 +287,7 @@ public class TemporalController {
                     tModel.addStateEncoding(senc, false);
                 }
             }
+            resultSet.close();
             tModel.updateTransitions(); //update once. this is a costly operation
             for (StateEncoding stenc : tModel.getStateEncodings()
             ) {
@@ -495,12 +500,90 @@ public class TemporalController {
         }
 
     }
-    public List<TemporalOracle> generatepotentialoracles(TemporalModel tModel,TemporalPattern pattern, TemporalPatternConstraint patternConstraint,int tactic_oraclesPerPattern){
+
+    public List<TemporalOracle> generatePotentialOracles(TemporalModel tModel, List<TemporalPattern> patterns, List<TemporalPatternConstraint> patternConstraints, int tactic_oraclesPerPattern) {
         List<TemporalOracle> potentialOracleColl = new ArrayList<>();
-        Set<String> modelAPs;
+        TemporalOracle potentialOracle = new TemporalOracle();
 
+        int trylimitAssignment = 1000;
+        int trylimitConstraint = 100;
 
+        List<String> modelAPSet = new ArrayList<>(tModel.getModelAPs());
 
+        Random APRnd = new Random(5000000);
+        for (TemporalPattern pat : patterns
+        ) {
+            Map<String, String> ParamSubstitutions = null;
+            TemporalPatternConstraint patternConstraint = null;
+            int patcIndex;
+            TreeMap<Integer, Map<String, String>> constrainSets = null;
+            boolean passConstraint = false;
+            Random constraintRnd = new Random(6000000);
+            int cSetindex = -1;
+            Map<String, String> constraintSet = null;
+            patcIndex = patternConstraints.indexOf(pat.getPattern_Formula());
+            if (patcIndex != -1) {
+                patternConstraint = patternConstraints.get(patcIndex);
+            }
+            if (patternConstraint != null) {
+                constrainSets = patternConstraint.getConstraintSets();
+            }
+            for (int i = 0; i < trylimitAssignment; i++) {
+                if (constrainSets != null) {
+                    cSetindex = constraintRnd.nextInt(constrainSets.size());
+                    constraintSet = constrainSets.get(cSetindex);
+                }
+                for (String param : pat.getPattern_Parameters()
+                ) {
+                    boolean hasConstraint;
+                    hasConstraint = constraintSet.containsKey(param);
+                    Pattern regexPattern = null;
+                    if (hasConstraint) {
+                        regexPattern = CachedRegexPatterns.addAndGet(constraintSet.get(param));
+                    }
+                    for (int j = 0; j < trylimitConstraint; j++) {
+                        passConstraint = false;
+                        int paramindex = APRnd.nextInt(modelAPSet.size());
+                        String   provisionalParamSubstitution = modelAPSet.get(paramindex);
+                        boolean mat=false;
+                        if (hasConstraint) { // verify against constraints
+                            Matcher m = regexPattern.matcher(provisionalParamSubstitution);
+                            mat = m.matches();
+                        }
+                        if (!hasConstraint || mat){
+                            ParamSubstitutions.put(param, provisionalParamSubstitution);
+                            passConstraint = true;  //virtually true if !hasconstraints
+                            break;// go to next parameter
+                        }
+                    }
+                }
+                if (passConstraint) { //assignment found for all params.  save and go to next pattern
+                    break;
+                }
+                //limit reached, no assignment possible for current parameter
+                //try new constraintset
+
+            }//end of constraintloop
+            if (passConstraint) { //assignment found, save and go to next pattern
+
+                potentialOracle.setPatternBase(pat); //downcasting of pat
+                potentialOracle.setPattern_ConstraintSet(cSetindex);
+                potentialOracle.setOracle_verdict(Verdict.UNDEF);
+                MultiValuedMap<String, String> pattern_Substitutions = new HashSetValuedHashMap<>();
+                for (Map.Entry<String, String> paramsubst : ParamSubstitutions.entrySet()
+                ) {
+                    pattern_Substitutions.put(paramsubst.getKey(), paramsubst.getValue());
+                }
+                potentialOracle.setPattern_Substitutions(pattern_Substitutions);
+                potentialOracle.setApplicationName(tModel.getApplicationName());
+                potentialOracle.setApplicationVersion(tModel.getApplicationVersion());
+                potentialOracle.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
+                potentialOracle.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
+                potentialOracleColl.add(potentialOracle);
+            }
+        }
         return potentialOracleColl;
     }
 }
+
+

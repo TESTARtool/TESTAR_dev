@@ -2,23 +2,26 @@ package nl.ou.testar.temporal.ui;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
+import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
+import static org.fruit.monkey.ConfigTags.TemporalLTLGeneratorTactics;
 import static org.fruit.monkey.Main.outputDir;
 
 public class Temporalpanel2 {  //"extends JPanel" was manually added
@@ -76,6 +79,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JPanel visualizerPanel;
     private JCheckBox enableTemporalOfflineOraclesCheckBox;
     private JCheckBox enforceAbstractionEquality;
+    private JTextField patternConstraintsTextField;
 
     public Temporalpanel2() {
         $$$setupUI$$$();
@@ -205,6 +209,12 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 //     stateModelPanel.extractInformation(settings);
             }
         });
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textArea12.append("Generate behavior is not implemented yet");
+            }
+        });
     }
 
     public static Temporalpanel2 createTemporalPanel() {
@@ -298,7 +308,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         verboseCheckBox.setToolTipText("<html> When checked: keeps the intermediate files on disk ,<br>else these files are deleted after the Checker has run.\"\n</html>");
         setupPanel.add(verboseCheckBox, cc.xy(9, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
-        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:90px:noGrow,left:49dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
+        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:90px:noGrow,left:40dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
         tabbedPane1.addTab("Miner", minerPanel);
         final JLabel label5 = new JLabel();
         label5.setText("Oracles:");
@@ -330,7 +340,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         modelCheckButton.setToolTipText("<html>Perform a ModelCheck of the Potential Oracles. <BR>\nThe model is computed by applying the filters from the APSelectorManager to a model of the graph DB <BR>\nthe model is chosen by criteria: Application Name and version and Abstrations. <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
         minerPanel.add(modelCheckButton, cc.xyw(5, 10, 7));
         generateButton = new JButton();
-        generateButton.setEnabled(false);
+        generateButton.setEnabled(true);
         generateButton.setHorizontalTextPosition(0);
         generateButton.setMaximumSize(new Dimension(81, 30));
         generateButton.setText("<html>Generate</html>");
@@ -339,28 +349,28 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         final JLabel label8 = new JLabel();
         label8.setText("Pattern Constraints:");
         minerPanel.add(label8, cc.xy(1, 6, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JTextField textField4 = new JTextField();
-        minerPanel.add(textField4, cc.xyw(2, 6, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        patternConstraintsTextField = new JTextField();
+        minerPanel.add(patternConstraintsTextField, cc.xyw(2, 6, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JButton button4 = new JButton();
         button4.setText("...");
         minerPanel.add(button4, cc.xy(4, 6));
         comboBox2 = new JComboBox();
-        comboBox2.setEnabled(false);
+        comboBox2.setEnabled(true);
         comboBox2.setMaximumSize(new Dimension(130, 38));
         comboBox2.setMinimumSize(new Dimension(130, 38));
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
-        defaultComboBoxModel1.addElement("1PerPattern");
-        defaultComboBoxModel1.addElement("5PerPattern");
-        defaultComboBoxModel1.addElement("10PerPattern");
-        defaultComboBoxModel1.addElement("50PerPattern");
-        defaultComboBoxModel1.addElement("100PerPattern");
-        defaultComboBoxModel1.addElement("500PerPattern");
-        defaultComboBoxModel1.addElement("1000PerPattern");
+        defaultComboBoxModel1.addElement("1");
+        defaultComboBoxModel1.addElement("5");
+        defaultComboBoxModel1.addElement("10");
+        defaultComboBoxModel1.addElement("50");
+        defaultComboBoxModel1.addElement("100");
+        defaultComboBoxModel1.addElement("500");
+        defaultComboBoxModel1.addElement("1000");
         comboBox2.setModel(defaultComboBoxModel1);
         comboBox2.setPreferredSize(new Dimension(150, 38));
-        comboBox2.setToolTipText("tactic to generate oracles from the supplied Pattern collection");
+        comboBox2.setToolTipText("<HTML>tactic to generate oracles from the supplied Pattern collection.<BR>\nShows the number of potential oracles to generate per pattern\n</HTML>");
         comboBox2.setVerifyInputWhenFocusTarget(true);
-        minerPanel.add(comboBox2, cc.xyw(12, 8, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(comboBox2, cc.xy(12, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label9 = new JLabel();
         label9.setText("Generate:");
         minerPanel.add(label9, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -449,6 +459,11 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         textField7.setText(settings.get(ConfigTags.TemporalLTLOracles));
         textField5.setText(settings.get(ConfigTags.TemporalLTLPatterns));
         textField6.setText(settings.get(ConfigTags.TemporalLTLAPSelectorManager));
+        patternConstraintsTextField.setText(settings.get(ConfigTags.TemporalLTLPatternConstraints));
+
+        String[] comboBoxLabels = settings.get(TemporalLTLGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
+        DefaultComboBoxModel cbModel = new DefaultComboBoxModel(comboBoxLabels); // read only
+        comboBox2.setModel(cbModel);
         textField3.setText(settings.get(ConfigTags.TemporalSpotFormulaParser));
         textFieldPythonEnvironment.setText(settings.get(ConfigTags.TemporalPythonEnvironment));
         textFieldPythonVisualizer.setText(settings.get(ConfigTags.TemporalVisualizerServer));
@@ -466,6 +481,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
         settings.set(ConfigTags.TemporalLTLOracles, textField7.getText());
         settings.set(ConfigTags.TemporalLTLAPSelectorManager, textField6.getText());
+        settings.set(ConfigTags.TemporalLTLPatternConstraints, patternConstraintsTextField.getText());
         settings.set(ConfigTags.TemporalSpotFormulaParser, textField3.getText());
         settings.set(ConfigTags.TemporalPythonEnvironment, textFieldPythonEnvironment.getText());
         settings.set(ConfigTags.TemporalVisualizerServer, textFieldPythonVisualizer.getText());
@@ -594,6 +610,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
         textArea12.append("csv saved: ");
     }
+
     public void testPatternConstraintCSV() {
         textArea12.append("test: writing a pattern-constraint to CSV file\n");
         List<TemporalPatternConstraint> patconstraintcoll = TemporalPatternConstraint.getSampleConstraints();

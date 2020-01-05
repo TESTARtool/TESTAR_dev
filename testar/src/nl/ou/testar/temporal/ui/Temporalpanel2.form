@@ -269,7 +269,7 @@
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:90px:noGrow"/>
-            <colspec value="left:49dlu:noGrow"/>
+            <colspec value="left:40dlu:noGrow"/>
             <colspec value="left:33dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <constraints>
@@ -385,7 +385,7 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <enabled value="false"/>
+                  <enabled value="true"/>
                   <horizontalTextPosition value="0"/>
                   <maximumSize width="81" height="30"/>
                   <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
@@ -401,7 +401,7 @@
                   <text value="Pattern Constraints:"/>
                 </properties>
               </component>
-              <component id="f800a" class="javax.swing.JTextField" default-binding="true">
+              <component id="f800a" class="javax.swing.JTextField" binding="patternConstraintsTextField">
                 <constraints>
                   <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -424,24 +424,24 @@
               </component>
               <component id="480a9" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
                 <constraints>
-                  <grid row="7" column="11" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <enabled value="false"/>
+                  <enabled value="true"/>
                   <maximumSize width="130" height="38"/>
                   <minimumSize width="130" height="38"/>
                   <model>
-                    <item value="1PerPattern"/>
-                    <item value="5PerPattern"/>
-                    <item value="10PerPattern"/>
-                    <item value="50PerPattern"/>
-                    <item value="100PerPattern"/>
-                    <item value="500PerPattern"/>
-                    <item value="1000PerPattern"/>
+                    <item value="1"/>
+                    <item value="5"/>
+                    <item value="10"/>
+                    <item value="50"/>
+                    <item value="100"/>
+                    <item value="500"/>
+                    <item value="1000"/>
                   </model>
                   <preferredSize width="150" height="38"/>
-                  <toolTipText value="tactic to generate oracles from the supplied Pattern collection"/>
+                  <toolTipText value="&lt;HTML&gt;tactic to generate oracles from the supplied Pattern collection.&lt;BR&gt;&#10;Shows the number of potential oracles to generate per pattern&#10;&lt;/HTML&gt;"/>
                   <verifyInputWhenFocusTarget value="true"/>
                 </properties>
               </component>

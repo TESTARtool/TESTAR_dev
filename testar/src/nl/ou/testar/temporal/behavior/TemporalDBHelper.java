@@ -1,7 +1,5 @@
 package nl.ou.testar.temporal.behavior;
 
-import com.orientechnologies.orient.core.config.OContextConfiguration;
-import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -135,6 +133,7 @@ public  class TemporalDBHelper {
                 abstractStateModels.add(abstractStateModel);
             }
         }
+        resultSet.close();
 
         return abstractStateModels;
     }
@@ -189,6 +188,7 @@ public  class TemporalDBHelper {
         stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
+        resultSet.close();
         return resultSet;
     }
     public Set<String> getWidgetPropositions(String state, List<String> abstractionAttributes) {
@@ -217,6 +217,7 @@ public  class TemporalDBHelper {
                 }
             }
         }
+        resultSet.close();
         return propositions;
     }
     private List<WidgetFilter> getPassingWidgetFilters(OElement graphElement,  List<String> abstractionAttributes){
@@ -277,6 +278,7 @@ public  class TemporalDBHelper {
 
 
         }
+        resultSet.close();
         return trenclist;
     }
     //*********************************
@@ -328,8 +330,11 @@ public  class TemporalDBHelper {
                 trace.setTestSequenceNode(sequenceVertex.getIdentity().toString());
                 trace.setTraceEvents(fetchTraceEvents(trace));
                 traces.add(trace);
+                nodeResultSet.close();
             }
+
         }
+        resultSet.close();
         return traces;
     }
 
@@ -368,8 +373,10 @@ public  class TemporalDBHelper {
                         ConcreteStates.add(subele.getIdentity().toString());
                     }
                 }
+                subresultSet.close();
             }
         }
+        resultSet.close();
 
         stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class = 'SequenceStep'";
         //concreteActionId needs to be updated css 20190721
@@ -397,8 +404,10 @@ public  class TemporalDBHelper {
                         ConcreteActions.add(subele.getIdentity().toString());
                     }
                 }
+                subresultSet.close();
             }
         }
+        resultSet.close();
 
 
         if ((ConcreteStates.size() - ConcreteActions.size()) != 1) {
@@ -449,53 +458,12 @@ public  class TemporalDBHelper {
                 firstNode = firstsequenceNode.getIdentity().toString();
             }
         }
+        resultSet.close();
         return firstNode;
     }
 
 
-    /**
-     * This method fetches the test sequences for a given abstract state model.
-     *
-     * @param modelIdentifier
-     * @return
-     */
-   /* private List<TestSequence> fetchTestSequences(String modelIdentifier) {
-        List<TestSequence> sequenceList = new ArrayList<>();
-        //String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
-        String sequenceStmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
-        Map<String, Object> params = new HashMap<>();
-        params.put("identifier", modelIdentifier);
-        OResultSet resultSet = db.query(sequenceStmt, params);
-        while (resultSet.hasNext()) {
-            OResult sequenceResult = resultSet.next();
-            // we're expecting a vertex
-            if (sequenceResult.isVertex()) {
-                Optional<OVertex> sequenceOp = sequenceResult.getVertex();
-                if (!sequenceOp.isPresent()) continue;
-                OVertex sequenceVertex = sequenceOp.get();
 
-                // fetch the nr of nodes for the sequence
-                String nodeStmt = "SELECT COUNT(*) as nr FROM SequenceNode WHERE sequenceId = :sequenceId";
-                params = new HashMap<>();
-                params.put("sequenceId", getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId")));
-                OResultSet nodeResultSet = db.query(nodeStmt, params);
-                int nrOfNodes = 0;
-                if (nodeResultSet.hasNext()) {
-                    OResult nodeResult = nodeResultSet.next();
-                    nrOfNodes = (int) getConvertedValue(OType.INTEGER, nodeResult.getProperty("nr"));
-                    if (nrOfNodes > 0) {
-                        nrOfNodes--;
-                    }
-                }
-
-                String sequenceId = (String) getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId"));
-                Date startDateTime = (Date) getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"));
-                sequenceList.add(new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes)));
-            }
-        }
-        return sequenceList;
-    }
-*/
 
     /**
      * This method saves screenshots to disk.
@@ -607,25 +575,6 @@ public  class TemporalDBHelper {
             }
         }
         if (isWidget) {
-     /*       Map<String,String> attribmap=new HashMap<>();
-            passedWidgetFilters=null;
-            for (String attrib:abstractionAttributes
-                 ) {
-                Object prop = graphElement.getProperty(attrib);
-                if (prop == null) {
-                    System.out.println("Abstraction attribute: " + attrib + " not part of graphelement: " + graphElement.toString());
-                    //passedWidgetFilters=null;
-                    break;
-                } else {
-                    attribmap.put(attrib, graphElement.getProperty(attrib));
-                }
-            }
-                System.out.println("DEBUG: checking widgetfilters for graphelement: " + graphElement.getIdentity().toString()+"     time: "+System.nanoTime());
-                passedWidgetFilters = apSelectorManager.passWidgetFilters(attribmap);//
-                System.out.println("DEBUG: check done      time: "+System.nanoTime());
-*/
-
-
 
             if (passedWidgetFilters != null && passedWidgetFilters.size() > 0) {
                 for (WidgetFilter wf : passedWidgetFilters) // add the filter specific elected attributes and expressions
@@ -668,8 +617,7 @@ public  class TemporalDBHelper {
 
         for (String stm : stmtlist
         ) {
-            //Map<String, Object> params = new HashMap<>();
-            //OResultSet resultSet = db.query(stmt, params);
+
             OResultSet resultSet = db.query(stm, params);
             String source = "";
             String target = "";
@@ -730,6 +678,7 @@ public  class TemporalDBHelper {
 
                 }
             }
+            resultSet.close();
 
         }
         GraphML_DocGraph graph = new GraphML_DocGraph(graphXMLID, nodes, edges);
