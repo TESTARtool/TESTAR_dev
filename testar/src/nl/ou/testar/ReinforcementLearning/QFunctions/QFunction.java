@@ -1,15 +1,20 @@
 package nl.ou.testar.ReinforcementLearning.QFunctions;
 
-import org.fruit.alayer.Action;
+
+import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.alayer.State;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+/**
+ * Interface for a Q-function
+ */
 public interface QFunction {
 
     /**
-     * Gets the q-value based on the reward, the default is 0
+     * Gets the q-value based on the reward
      */
-    public double getQValue(double qValue, double maxQvalue, double reward);
+    double getQValue(@Nullable final AbstractState outgoingState, @Nullable final State incomingState, @Nullable final AbstractAction executedAction);
 
 }

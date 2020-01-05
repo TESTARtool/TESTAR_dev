@@ -1,4 +1,4 @@
-package nl.ou.testar.ReinforcementLearning;
+package nl.ou.testar.ReinforcementLearning.ActionSelectors;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -7,6 +7,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
 
+/**
+ * Interface for action selector implementations
+ */
 public interface ActionSelector {
 
     /**
@@ -16,10 +19,5 @@ public interface ActionSelector {
      * @return Selected action to execute
      */
     @Nullable
-    public Action selectAction(@Nonnull State state, @Nonnull Set<Action> actions);
-
-    /**
-     * Upates the q-value
-     */
-    public void updateQValue(@Nullable State beginState, @Nullable State endState, @Nullable Action action);
+    Action selectAction(@Nonnull State state, @Nonnull Set<Action> actions);
 }

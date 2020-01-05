@@ -20,10 +20,10 @@ public class ModelManager implements StateModelManager {
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
-    private AbstractAction actionUnderExecution;
+    protected AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
@@ -259,6 +259,7 @@ public class ModelManager implements StateModelManager {
         concreteActionUnderExecution = null;
         sequenceManager.stopSequence();
     }
+<<<<<<< HEAD
 
     @Override
     public void notifyTestSequenceInterruptedByUser() {
@@ -270,4 +271,6 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+=======
+>>>>>>> 3fbe4f2f... POC reinforcement learning
 }
