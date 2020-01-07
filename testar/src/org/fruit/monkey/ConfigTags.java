@@ -127,4 +127,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
+
+  public static final Tag<Boolean> Automate = Tag.from("Automate", Boolean.class);
+  public static final Tag<Boolean> CreateAttributes = Tag.from("CreateAttributes", Boolean.class);
 }

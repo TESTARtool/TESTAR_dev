@@ -189,6 +189,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean nonSuitableAction = false;
 
 	protected boolean exceptionThrown = false;
+	protected boolean interruptedBeforeStart = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -667,6 +668,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
 
+		// check first if we even need to run
+		if (!stateModelManager.modelIsDeterministic() && exitOnNonDeterministicModel) {
+			if (mode() != Modes.Quit) {
+				System.out.println("Quitting because the state model is non-deterministic.");
+				setMode(Modes.Quit);
+				interruptedBeforeStart = true;
+			}
+		}
+
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
@@ -767,7 +777,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
-		if (mode() == Modes.Quit && !exceptionThrown) {
+		if (mode() == Modes.Quit && !exceptionThrown && !interruptedBeforeStart) {
 			// the user initiated the shutdown
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}

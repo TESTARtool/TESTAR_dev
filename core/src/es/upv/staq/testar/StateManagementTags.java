@@ -281,8 +281,8 @@ public class StateManagementTags {
 //            add(WidgetWindowHandle); // this property changes between different executions of the sut
             add(WidgetIsEnabled);
             add(WidgetTitle);
-            add(WidgetHelpText);
-            add(WidgetAutomationId);
+//            add(WidgetHelpText);
+//            add(WidgetAutomationId);
             add(WidgetClassName);
             add(WidgetFrameworkId);
             add(WidgetOrientationId);
@@ -290,26 +290,27 @@ public class StateManagementTags {
             add(WidgetIsControlElement);
             add(WidgetHasKeyboardFocus);
             add(WidgetIsKeyboardFocusable);
-            add(WidgetItemType);
-            add(WidgetItemStatus);
-            add(WidgetPath);
+//            add(WidgetItemType);
+//            add(WidgetItemStatus);
+//            add(WidgetPath);
             add(WidgetBoundary);
             // new
-            add(WidgetAccelatorKey);
-            add(WidgetAccessKey);
-            add(WidgetAriaProperties);
-            add(WidgetAriaRole);
+//            add(WidgetAccelatorKey);
+//            add(WidgetAccessKey);
+//            add(WidgetAriaProperties);
+//            add(WidgetAriaRole);
 //            add(WidgetIsDialog); (deactived for now, because the UIA API does not seem to recognize it)
             add(WidgetIsPassword);
             add(WidgetIsPeripheral);
-            add(WidgetIsRequiredForForm);
-            add(WidgetLandmarkType);
+//            add(WidgetIsRequiredForForm);
+//            add(WidgetLandmarkType);
             add(WidgetGroupLevel);
-            add(WidgetLiveSetting);
+//            add(WidgetLiveSetting);
             add(WidgetSetPosition);
             add(WidgetSetSize);
             add(WidgetRotation);
             add(WidgetZIndex);
+            add(WidgetIsOffscreen);
 
             // patterns
             add(WidgetAnnotationPattern);
@@ -421,6 +422,9 @@ public class StateManagementTags {
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
+        settingsMap.put(WidgetZIndex, "WidgetZIndex");
+        settingsMap.put(WidgetBoundary, "WidgetBoundary");
+        settingsMap.put(WidgetIsOffscreen, "WidgetIsOffscreen");
     }
 
     // a mapping of a tag to its group
@@ -457,6 +461,8 @@ public class StateManagementTags {
             put(WidgetSetSize, Group.General);
             put(WidgetRotation, Group.General);
             put(WidgetZIndex, Group.General);
+            put(WidgetIsOffscreen, Group.General);
+            put(WidgetBoundary, Group.General);
             put(WidgetAnnotationPattern, Group.ControlPattern);
             put(WidgetDockPattern, Group.ControlPattern);
             put(WidgetDragPattern, Group.ControlPattern);

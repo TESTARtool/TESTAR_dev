@@ -40,6 +40,7 @@ import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.StateModel.automation.Manager;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
@@ -54,10 +55,12 @@ import java.net.URLClassLoader;
 import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.fruit.alayer.windows.UIATags;
 
 import static java.lang.System.exit;
+import static java.lang.System.out;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -103,7 +106,9 @@ public class Main {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
+
+		Arrays.stream(args).forEach(System.out::println);
 
 		isValidJavaEnvironment();
 
@@ -114,9 +119,40 @@ public class Main {
 
 		Settings settings = loadTestarSettings(args, testSettingsFileName);
 
+		System.out.println("Automate: " + settings.get(Automate));
+		out.println("CreateAttributes: " + settings.get(CreateAttributes));
+		System.out.println("Settings dir: " + settingsDir + SSE_ACTIVATED);
+
+		if (settings.get(Automate)) {
+			System.out.println("Starting automated test runs");
+			// we have to manually set the click filter file and the run mode
+			Settings.setSettingsPath(settingsDir + SSE_ACTIVATED);
+			settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
+			// start with a fresh model
+			settings.set(ResetDataStore, true);
+			// number of runs and sequences
+			settings.set(Sequences, 1);
+			settings.set(SequenceLength, 2);
+
+			Manager manager = new Manager(settings);
+			if (settings.get(CreateAttributes)) {
+				// we first have to insert the attributes into the database
+				manager.fillDataStoreWithAttributes();
+			}
+
+			for (Set<String> atts : manager.getAttributeLists()) {
+				settings.set(AbstractStateAttributes, new ArrayList<>(atts));
+				System.out.println("Starting run");
+				setTestarDirectory(settings);
+				initCodingManager(settings);
+				startTestar(settings, testSettingsFileName);
+				System.out.println("Ending run");
+			}
+		}
+
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
-		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
+		else if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
 			setTestarDirectory(settings);
 
@@ -137,6 +173,8 @@ public class Main {
 				initCodingManager(settings);
 
 				startTestar(settings, testSettingsFileName);
+
+				System.out.println("it finished!");
 			}
 		}
 
@@ -468,6 +506,10 @@ public class Main {
 					add("WidgetControlType");
 				}
 			}));
+
+			// for automating testar run sequences
+			defaults.add(Pair.from(Automate, false));
+			defaults.add(Pair.from(CreateAttributes, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

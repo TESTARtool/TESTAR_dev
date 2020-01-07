@@ -115,7 +115,7 @@ GraphDBPassword = testar
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = plocal
+DataStoreType = remote
 DataStoreServer = localhost
 DataStoreDirectory = C:\\orientdb\\databases
 DataStoreDB = testar
@@ -125,7 +125,7 @@ DataStoreMode = instant
 ApplicationName = Notepad
 ApplicationVersion = 1.0.0
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ExitOnNonDeterminism = true
 
 #################################################################

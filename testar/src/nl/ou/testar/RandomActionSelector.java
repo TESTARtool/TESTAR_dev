@@ -38,8 +38,11 @@ import java.util.Set;
 public class RandomActionSelector {
 
     public static Action selectAction(Set<Action> actions) {
+        if (actions.size() == 0) {
+            return null;
+        }
         long graphTime = System.currentTimeMillis();
         Random rnd = new Random(graphTime);
-        return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+        return new ArrayList<>(actions).get(rnd.nextInt(actions.size()));
     }
 }
