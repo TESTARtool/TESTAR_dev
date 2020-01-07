@@ -133,17 +133,17 @@ public class TemporalPatternConstraint {
         c=new TemporalPatternConstraint();
         c.pattern_Formula ="!p1 U p0";
         Map<String,String> constraintset1 = new HashMap<>();
-        constraintset1.put("p1","\\*Untitled - Notepad_.*UIAWindow.*_Blocked__");
+        constraintset1.put("p1","\\\\*Untitled - Notepad_.*UIAWindow.*_Blocked__"); //double backslash (java also consumes one!)
         constraintset1.put("p0","UIAButton.*Desc_textmatch_(?i:CLOSE)__");
         c.addConstraintSet(1,constraintset1);
 
         Map<String,String> constraintset2= new HashMap<>();
-        constraintset2.put("p1","UIAWindow");
-        constraintset2.put("p0","UIAButton");
+        constraintset2.put("p1",".*UIAWindow.*");
+        constraintset2.put("p0",".*UIAButton.*");
         c.addConstraintSet(2,constraintset2);
 
         Map<String,String> constraintset3= new HashMap<>();
-        constraintset3.put("p0","UIAButton");
+        constraintset3.put("p0",".*UIAButton.*");
         c.addConstraintSet(3,constraintset3);
         c.addComments("Format Version: "+version);
         c.addComments("Sample of a constraint on a temporal pattern. constraint key and value must be aligned with the APEncodedModel.json");

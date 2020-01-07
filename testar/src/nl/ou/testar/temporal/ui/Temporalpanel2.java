@@ -2,16 +2,13 @@ package nl.ou.testar.temporal.ui;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
-import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -20,7 +17,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 import static org.fruit.monkey.ConfigTags.TemporalLTLGeneratorTactics;
 import static org.fruit.monkey.Main.outputDir;
 
@@ -202,17 +198,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         graphMLButton1.addActionListener(this::testgraphml);
 
 
-        panel1.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                super.focusGained(e);
-                //     stateModelPanel.extractInformation(settings);
-            }
-        });
         generateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textArea12.append("Generate behavior is not implemented yet");
+                generateOracles(e);
             }
         });
     }
@@ -503,6 +492,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
     }
 
+    private void generateOracles(ActionEvent e) {
+        tcontrol.generateOraclesFromPatterns(textField6.getText(),textField5.getText(), patternConstraintsTextField.getText(), Integer.parseInt(comboBox2.getSelectedItem().toString()));
+    }
+
 
     private void startTemporalWebAnalyzer(ActionEvent evt) {
 
@@ -568,7 +561,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
-        tcontrol.dumpTemporalModel(textField6.getText());
+        tcontrol.makeTemporalModel(textField6.getText(),verboseCheckBox.isSelected());
 
     }
 
