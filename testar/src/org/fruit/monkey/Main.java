@@ -129,7 +129,7 @@ public class Main {
 			Settings.setSettingsPath(settingsDir + SSE_ACTIVATED);
 			settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
 			// start with a fresh model
-//			settings.set(ResetDataStore, true);
+			settings.set(ResetDataStore, true);
 			// number of runs and sequences
 			settings.set(Sequences, 2);
 			settings.set(SequenceLength, 50);
@@ -147,6 +147,9 @@ public class Main {
 				initCodingManager(settings);
 				startTestar(settings, testSettingsFileName);
 				System.out.println("Ending run");
+				if (settings.get(ResetDataStore)) {
+					settings.set(ResetDataStore, false);
+				}
 			}
 		}
 
