@@ -129,10 +129,10 @@ public class Main {
 			Settings.setSettingsPath(settingsDir + SSE_ACTIVATED);
 			settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
 			// start with a fresh model
-			settings.set(ResetDataStore, true);
+//			settings.set(ResetDataStore, true);
 			// number of runs and sequences
-			settings.set(Sequences, 1);
-			settings.set(SequenceLength, 2);
+			settings.set(Sequences, 2);
+			settings.set(SequenceLength, 50);
 
 			Manager manager = new Manager(settings);
 			if (settings.get(CreateAttributes)) {
