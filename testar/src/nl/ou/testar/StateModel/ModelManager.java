@@ -76,10 +76,14 @@ public class ModelManager implements StateModelManager {
      */
     private void init() {
         // check if the model is deterministic
-        boolean modelIsDeterministic = persistenceManager.modelIsDeterministic(abstractStateModel);
-        System.out.println("Model is deterministic: " + persistenceManager.modelIsDeterministic(abstractStateModel));
+//        boolean modelIsDeterministic = persistenceManager.modelIsDeterministic(abstractStateModel);
+        boolean modelIsDeterministic = abstractStateModel.isDeterministic();
+
+        System.out.println("Model is deterministic: " + modelIsDeterministic);
         if (!modelIsDeterministic) {
-            nrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+//            nrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+            nrOfNonDeterministicActions = abstractStateModel.getNrOfNonDeterministicActions();
+
         }
     }
 
@@ -162,7 +166,8 @@ public class ModelManager implements StateModelManager {
             System.out.println("Model check - nr of non-deterministic actions: " + abstractStateModel.getNrOfNonDeterministicActions());
         }
 
-        int currentNrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+//        int currentNrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+        int currentNrOfNonDeterministicActions = abstractStateModel.getNrOfNonDeterministicActions();
         if (currentNrOfNonDeterministicActions > nrOfNonDeterministicActions) {
             System.out.println("Non-deterministic action was executed!");
             sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution, SequenceError.NON_DETERMINISTIC_ACTION);
