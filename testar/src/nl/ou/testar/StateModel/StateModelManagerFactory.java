@@ -66,15 +66,11 @@ public class StateModelManagerFactory {
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-<<<<<<< HEAD
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
-=======
-        if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled)) {
-            return new ModelManagerReinforcementLearning(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager);
+        if (true || settings.get(ConfigTags.StateModelReinforcementLearningEnabled)) {
+            return new ModelManagerReinforcementLearning(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         }
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager);
->>>>>>> 3fbe4f2f... POC reinforcement learning
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
     }
 
 }

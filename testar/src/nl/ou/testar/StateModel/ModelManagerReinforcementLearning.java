@@ -28,8 +28,8 @@ public class ModelManagerReinforcementLearning extends ModelManager implements S
      * @param concreteStateTags
      * @param sequenceManager
      */
-    public ModelManagerReinforcementLearning(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager) {
-        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager);
+    public ModelManagerReinforcementLearning(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
+        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
     }
 
     /**
