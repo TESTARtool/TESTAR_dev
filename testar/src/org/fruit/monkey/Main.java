@@ -131,8 +131,8 @@ public class Main {
 			// start with a fresh model
 			settings.set(ResetDataStore, true);
 			// number of runs and sequences
-			settings.set(Sequences, 2);
-			settings.set(SequenceLength, 50);
+//			settings.set(Sequences, 2);
+//			settings.set(SequenceLength, 50);
 
 			Manager manager = new Manager(settings);
 			if (settings.get(CreateAttributes)) {
