@@ -17,6 +17,9 @@ public class RandomActionSelector implements ActionSelector{
         long graphTime = System.currentTimeMillis();
         Random rnd = new Random(graphTime);
         Set<String> actionIds = currentState.getActionIds();
+        if (actionIds.isEmpty()) { // otherwise the random function fails
+            return null;
+        }
         String actionId  = (new ArrayList<>(actionIds)).get(rnd.nextInt(actionIds.size()));
         return currentState.getAction(actionId);
     }
