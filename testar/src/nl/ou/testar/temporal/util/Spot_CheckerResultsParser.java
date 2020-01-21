@@ -91,11 +91,11 @@ public class Spot_CheckerResultsParser {
             formularesults.remove(0); // dispose the === Automaton separator
             formularesults.remove(formularesults.size() - 1);
 
-
-            if (formularesults.size() != oracleColl.size()) {
+            if ((formularesults.size() != oracleColl.size()) ) {
                 return null;
             }
             int i = 0;
+            boolean toggle=false;
             for (String fResult : formularesults
             ) {
                 TemporalOracle Oracle = oracleColl.get(i);
@@ -185,7 +185,7 @@ public class Spot_CheckerResultsParser {
                     }
                     Oracle.setExampleRun_Prefix_States(prefixStateList);
                     Oracle.setExampleRun_Prefix_Transitions(prefixTransitionList); //test only
-
+                    Oracle.addComments("Encoded Formula: "+encodedFormula);
                     for (int j = 0; j < cycleStateList.size(); j++) {
                         String targetState ;
                         String sourceState = cycleStateList.get(j);
@@ -202,7 +202,7 @@ public class Spot_CheckerResultsParser {
                         ) {
                             if (t.getEncodedAPConjunct().equals(cycleAPConjunctList.get(j)) &&
                                     t.getTargetState().equals(targetState)) {
-                                //check target stae as model can be non-deterministic
+                                //check target state as model can be non-deterministic
                                 cycleTransitionList.add(t.getTransition());
                                 break;
                             }
