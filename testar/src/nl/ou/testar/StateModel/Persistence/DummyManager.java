@@ -88,4 +88,9 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
         return 0;
     }
+
+    @Override
+    public int getTotalNrOfStepsExecuted(AbstractStateModel abstractStateModel) {
+        return 0;
+    }
 }

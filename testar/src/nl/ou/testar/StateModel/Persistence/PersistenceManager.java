@@ -100,4 +100,6 @@ public interface PersistenceManager {
      */
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
 
+    int getTotalNrOfStepsExecuted(AbstractStateModel abstractStateModel);
+
 }

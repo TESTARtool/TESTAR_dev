@@ -285,4 +285,9 @@ public class ModelManager implements StateModelManager {
     public boolean modelIsDeterministic() {
         return nrOfNonDeterministicActions == 0;
     }
+
+    @Override
+    public int getTotalStepsExecuted() {
+        return persistenceManager.getTotalNrOfStepsExecuted(abstractStateModel);
+    }
 }

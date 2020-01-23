@@ -183,4 +183,9 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     public void setListening(boolean listening) {
         this.listening = listening;
     }
+
+    @Override
+    public int getTotalNrOfStepsExecuted(AbstractStateModel abstractStateModel) {
+        return delegateManager.getTotalNrOfStepsExecuted(abstractStateModel);
+    }
 }

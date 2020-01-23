@@ -67,6 +67,7 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.StateModel.automation.TestRunSync;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -667,9 +668,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param system
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
+		TestRunSync.resetInstance();
 
 		// check first if we even need to run
 		if (!stateModelManager.modelIsDeterministic() && exitOnNonDeterministicModel) {
+			TestRunSync.getInstance().setModelIsDeterministic(false);
 			if (mode() != Modes.Quit) {
 				System.out.println("Quitting because the state model is non-deterministic.");
 				setMode(Modes.Quit);
@@ -781,6 +784,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// the user initiated the shutdown
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
+
+		TestRunSync.getInstance().setNrOfStepsExecuted(stateModelManager.getTotalStepsExecuted());
 
 
 		// notify the statemodelmanager that the testing has finished
@@ -1561,6 +1566,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// check if the model is non-deterministic and we should continue
 		if (!stateModelManager.modelIsDeterministic() && exitOnNonDeterministicModel) {
+			TestRunSync.getInstance().setModelIsDeterministic(false);
 			if (mode() != Modes.Quit) {
 				System.out.println("Quitting because the state model is non-deterministic.");
 				setMode(Modes.Quit);

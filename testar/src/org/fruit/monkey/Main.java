@@ -40,7 +40,11 @@ import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import jdk.nashorn.internal.ir.SplitNode;
 import nl.ou.testar.StateModel.automation.Manager;
+import nl.ou.testar.StateModel.automation.SqlManager;
+import nl.ou.testar.StateModel.automation.TestRun;
+import nl.ou.testar.StateModel.automation.TestRunSync;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
@@ -124,32 +128,53 @@ public class Main {
 		System.out.println("Settings dir: " + settingsDir + SSE_ACTIVATED);
 
 		if (settings.get(Automate)) {
+			SqlManager sqlManager = new SqlManager();
+			if (settings.get(CreateAttributes)) {
+				sqlManager.initDatabase();
+			}
+
+			if (settings.get(InitTests)) {
+				sqlManager.initTest1();
+
+				if (settings.get(InitTestsOnly)) {
+					System.exit(1);
+				}
+			}
 			System.out.println("Starting automated test runs");
 			// we have to manually set the click filter file and the run mode
 			Settings.setSettingsPath(settingsDir + SSE_ACTIVATED);
 			settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
-			// start with a fresh model
-			settings.set(ResetDataStore, true);
-			// number of runs and sequences
-//			settings.set(Sequences, 2);
-//			settings.set(SequenceLength, 50);
 
-			Manager manager = new Manager(settings);
-			if (settings.get(CreateAttributes)) {
-				// we first have to insert the attributes into the database
-				manager.fillDataStoreWithAttributes();
-			}
+			for(TestRun testRun : sqlManager.getTestRuns()) {
+				out.println(testRun.getTestRunId());
+				out.println(testRun.getNrOfSequences());
+				out.println(testRun.getNrOfSteps());
+				out.println(testRun.isResetDbBeforeRun());
+				for(String widget : testRun.getWidgets()) {
+					out.println(widget);
+				}
+				out.println("--------------------------------------");
+				out.println();
 
-			for (Set<String> atts : manager.getAttributeLists()) {
-				settings.set(AbstractStateAttributes, new ArrayList<>(atts));
+				// process some of the settings
+				settings.set(Sequences, testRun.getNrOfSequences());
+				settings.set(SequenceLength, testRun.getNrOfSteps());
+				settings.set(ResetDataStore, testRun.isResetDbBeforeRun());
+				settings.set(AbstractStateAttributes, new ArrayList<>(testRun.getWidgets()));
+
 				System.out.println("Starting run");
 				setTestarDirectory(settings);
 				initCodingManager(settings);
+				testRun.setStartingMS(System.currentTimeMillis());
+
 				startTestar(settings, testSettingsFileName);
+
+				// at this point the run has ended.
+				// we collect data and store it
+				testRun.setModelIsDeterministic(TestRunSync.getInstance().isModelIsDeterministic());
+				testRun.setNrOfStepsExecuted(TestRunSync.getInstance().getNrOfStepsExecuted());
+				testRun.setEndingMS(System.currentTimeMillis());
 				System.out.println("Ending run");
-				if (settings.get(ResetDataStore)) {
-					settings.set(ResetDataStore, false);
-				}
 			}
 		}
 
@@ -513,6 +538,8 @@ public class Main {
 			// for automating testar run sequences
 			defaults.add(Pair.from(Automate, false));
 			defaults.add(Pair.from(CreateAttributes, false));
+			defaults.add(Pair.from(InitTests, false));
+			defaults.add(Pair.from(InitTestsOnly, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

@@ -51,4 +51,9 @@ public class DummyModelManager implements StateModelManager{
     public boolean modelIsDeterministic() {
         return true;
     }
+
+    @Override
+    public int getTotalStepsExecuted() {
+        return 0;
+    }
 }

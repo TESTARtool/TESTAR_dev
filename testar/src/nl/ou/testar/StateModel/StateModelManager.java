@@ -23,4 +23,6 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedBySystem(String message);
 
     boolean modelIsDeterministic();
+
+    int getTotalStepsExecuted();
 }
