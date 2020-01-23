@@ -145,6 +145,9 @@ public class Main {
 			Settings.setSettingsPath(settingsDir + SSE_ACTIVATED);
 			settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
 
+			boolean resetDbFirst = settings.get(ResetDbFirst);
+			boolean firstRun = true;
+
 			for(TestRun testRun : sqlManager.getTestRuns()) {
 				out.println(testRun.getTestRunId());
 				out.println(testRun.getNrOfSequences());
@@ -159,7 +162,12 @@ public class Main {
 				// process some of the settings
 				settings.set(Sequences, testRun.getNrOfSequences());
 				settings.set(SequenceLength, testRun.getNrOfSteps());
-				settings.set(ResetDataStore, testRun.isResetDbBeforeRun());
+				if (resetDbFirst && firstRun) {
+					settings.set(ResetDataStore, true);
+				}
+				else {
+					settings.set(ResetDataStore, testRun.isResetDbBeforeRun());
+				}
 				settings.set(AbstractStateAttributes, new ArrayList<>(testRun.getWidgets()));
 
 				System.out.println("Starting run");
@@ -171,6 +179,7 @@ public class Main {
 
 				// at this point the run has ended.
 				// we collect data and store it
+				firstRun = false;
 				testRun.setModelIsDeterministic(TestRunSync.getInstance().isModelIsDeterministic());
 				testRun.setNrOfStepsExecuted(TestRunSync.getInstance().getNrOfStepsExecuted());
 				testRun.setEndingMS(System.currentTimeMillis());
@@ -541,6 +550,7 @@ public class Main {
 			defaults.add(Pair.from(CreateAttributes, false));
 			defaults.add(Pair.from(InitTests, false));
 			defaults.add(Pair.from(InitTestsOnly, false));
+			defaults.add(Pair.from(ResetDbFirst, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
