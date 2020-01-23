@@ -783,7 +783,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
 
-		TestRunSync.getInstance().setNrOfStepsExecuted(stateModelManager.getTotalStepsExecuted());
+		int totalStepsExecuted = stateModelManager.getTotalStepsExecuted();
+		System.out.println("Nr of steps executed: " + totalStepsExecuted);
+		TestRunSync.getInstance().setNrOfStepsExecuted(totalStepsExecuted);
 
 
 		// notify the statemodelmanager that the testing has finished

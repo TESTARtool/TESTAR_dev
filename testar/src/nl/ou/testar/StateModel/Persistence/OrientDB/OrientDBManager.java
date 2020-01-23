@@ -690,7 +690,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         String query  = "SELECT COUNT(*) as total FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
             Map<Object, Object> params = new HashMap<>();
-            params.put("modelIdentifier", abstractStateModel.getModelIdentifier());
+            params.put("identifier", abstractStateModel.getModelIdentifier());
             OResultSet resultSet = db.query(query, params);
             if (!resultSet.hasNext()) {
                 resultSet.close();

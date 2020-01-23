@@ -115,7 +115,7 @@ GraphDBPassword = testar
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
+DataStoreType = plocal
 DataStoreServer = localhost
 DataStoreDirectory = C:\\orientdb\\databases
 DataStoreDB = testar
