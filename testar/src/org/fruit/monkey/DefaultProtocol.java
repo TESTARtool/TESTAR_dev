@@ -68,6 +68,7 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -1072,6 +1073,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// notify the statemodelmanager
 			stateModelManager.notifyTestSequencedStarted();
+			
+			lastState = getState(system);
 		}
 		//else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
 
@@ -1128,6 +1131,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				saveActionInfoInLogs(state, recordedAction, "RecordedAction");
 				lastExecutedAction = recordedAction;
+				lastState = state;
 				actionCount++;
 			}
 
@@ -1960,6 +1964,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					this.wait(100);
 				} catch (InterruptedException e) {}
 			}
+			
+			if(!getState(system).equals(state))
+				lastState = state;
+			
 			state = getState(system);
 
 			cv.begin(); Util.clear(cv);
@@ -1972,8 +1980,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// Update the current abstract state.
 			// Not detected User actions could modify the state and change the abstract state
-			if (userEvent == null && !actionStatus.isUserEventAction())
-				stateModelManager.notifyConcurrenceStateReached(state, actions);
+			if (userEvent == null && !actionStatus.isUserEventAction()) {
+		    	
+		    	// Create unknown Action event to create a temporal transition
+		    	// Should be replaced or removed if the correct Actions was found later
+		    	Action unknown = new UnknownEventAction();
+		    	unknown.set(Tags.Role, Roles.System);
+		    	unknown.set(Tags.OriginWidget, lastState);
+		    	unknown.set(Tags.Desc, "Unknown Event Action");
+		    	
+		    	CodingManager.buildIDs(state, new HashSet<Action>(Arrays.asList(unknown)));
+		    	
+				stateModelManager.notifyConcurrenceStateReached(state, actions, unknown);
+			}
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
 			if(visualizationOn) visualizeActions(cv, state, actions);
@@ -2009,8 +2028,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// because map fail and the State Model is not synchronized with the SUT
 				Set<Action> actions = deriveActions(system,state);
 				CodingManager.buildIDs(state, actions);
+				
+				// Create unknown Action event to create a temporal transition
+		    	// Should be replaced or removed if the correct Actions was found later
+		    	Action unknown = new UnknownEventAction();
+		    	unknown.set(Tags.Role, Roles.System);
+		    	unknown.set(Tags.OriginWidget, lastState);
+		    	unknown.set(Tags.Desc, "Unknown Event Action");
+		    	
+		    	CodingManager.buildIDs(state, new HashSet<Action>(Arrays.asList(unknown)));
 
-				stateModelManager.notifyConcurrenceStateReached(state, actions);
+				stateModelManager.notifyConcurrenceStateReached(state, actions, unknown);
 
 				return null;
 			}

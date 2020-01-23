@@ -11,6 +11,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.actions.UnknownEventAction;
 
 import java.util.*;
 
@@ -190,7 +191,7 @@ public class ModelManager implements StateModelManager {
      * @param actions
      */
     @Override
-    public void notifyConcurrenceStateReached(State newState, Set<Action> actions) {
+    public void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown) {
     	
     	// If we the surface State still being the Model State, no concurrence occurred, just end this
     	if(currentAbstractState.getId().equals(newState.get(Tags.AbstractIDCustom)))
@@ -200,6 +201,7 @@ public class ModelManager implements StateModelManager {
         // also this is not an initial State
     	actionUnderExecution = null;
     	concreteActionUnderExecution = null;
+    	notifyActionExecution(unknown);
     	
     	// check if we are dealing with a new state or an existing one
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
@@ -230,12 +232,29 @@ public class ModelManager implements StateModelManager {
         	throw new RuntimeException("An error occurred while adding a new abstract state to the model");
         }
         
+        // an action is being executed
+        // that means we need to have a current abstract state already set
+        if (currentAbstractState == null) {
+            throw new RuntimeException("An action was being executed without a recorded current state");
+        }
+
+        //add a transition to the statemodel
+        try {
+            abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
+        } catch (StateModelException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Encountered a problem adding a state transition into the statemodel");
+        }
+        
         // we now store this state to be the current abstract state
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state and possibly the action
         ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
         persistenceManager.persistConcreteState(newConcreteState);
+        
+        ConcreteStateTransition concreteStateTransition = new ConcreteStateTransition(currentConcreteState, newConcreteState, concreteActionUnderExecution);
+        persistenceManager.persistConcreteStateTransition(concreteStateTransition);
 
         // check if non-determinism was introduced into the model
         int currentNrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
@@ -259,6 +278,10 @@ public class ModelManager implements StateModelManager {
         ).count() + " unvisited actions left");
         System.out.println("----------------------------");
         System.out.println();
+        
+        // reset actions
+    	actionUnderExecution = null;
+    	concreteActionUnderExecution = null;
 
     }
 

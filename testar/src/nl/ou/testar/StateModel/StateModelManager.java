@@ -8,7 +8,7 @@ import java.util.Set;
 public interface StateModelManager {
     void notifyNewStateReached(State newState, Set<Action> actions);
     
-    void notifyConcurrenceStateReached(State newState, Set<Action> actions);
+    void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown);
 
     void notifyActionExecution(Action action);
     

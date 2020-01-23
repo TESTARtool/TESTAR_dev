@@ -14,7 +14,7 @@ public class DummyModelManager implements StateModelManager{
     }
 
 	@Override
-	public void notifyConcurrenceStateReached(State newState, Set<Action> actions) {
+	public void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown) {
 	
 	}
 
