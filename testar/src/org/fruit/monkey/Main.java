@@ -174,6 +174,7 @@ public class Main {
 				testRun.setModelIsDeterministic(TestRunSync.getInstance().isModelIsDeterministic());
 				testRun.setNrOfStepsExecuted(TestRunSync.getInstance().getNrOfStepsExecuted());
 				testRun.setEndingMS(System.currentTimeMillis());
+				sqlManager.saveTestStats(testRun);
 				System.out.println("Ending run");
 			}
 		}

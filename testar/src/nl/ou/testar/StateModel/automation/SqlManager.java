@@ -144,7 +144,7 @@ public class SqlManager {
         return testRuns;
     }
 
-    private void saveTestStats(TestRun testRun) {
+    public void saveTestStats(TestRun testRun) {
         try {
             String insertQuery = "UPDATE automated_test_run " +
                     "SET starting_time_ms     = ?," +
