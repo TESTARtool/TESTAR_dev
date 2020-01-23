@@ -1941,12 +1941,55 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	//TODO move to ManualRecording helper class??
 	//	/**
-	//	 * Records user action (for example for Generate-Manual)
+	//	 * Waits for an user UI action.
+	//	 * Requirement: Mode must be Record mode.
+	//	 */
+	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
+		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
+			if (userEvent != null){
+				Action mapAction = mapUserEvent(system, state);
+				//Only set the Action if was found on widget tree map
+				if(mapAction != null) {
+					actionStatus.setAction(mapAction);
+					actionStatus.setUserEventAction((actionStatus.getAction() != null));
+				}
+				userEvent = null;
+			}
+			synchronized(this){
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {}
+			}
+			state = getState(system);
+
+			cv.begin(); Util.clear(cv);
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+
+			Set<Action> actions = deriveActions(system,state);
+			CodingManager.buildIDs(state, actions);
+
+			// Update the current abstract state.
+			// Not detected User actions could modify the state and change the abstract state
+			if (userEvent == null && !actionStatus.isUserEventAction())
+				stateModelManager.notifyConcurrenceStateReached(state, actions);
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) visualizeActions(cv, state, actions);
+
+			cv.end();
+		}
+	}
+
+	//TODO move to ManualRecording helper class??
+	//	/**
+	//	 * Records user action (for example for Record mode)
 	//	 *
 	//	 * @param state
 	//	 * @return
 	//	 */
-	protected Action mapUserEvent(State state){
+	protected Action mapUserEvent(SUT system, State state){
 		Assert.notNull(userEvent);
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
 			double x = ((Double)userEvent[1]).doubleValue();
@@ -1961,10 +2004,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
 			} catch (WidgetNotFoundException we){
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-				
-				//TODO: Here we have to update the current abstract state,
-				//because map fail and the State Model is not synchronized with the SUT
-				
+
+				// Update the current abstract state.
+				// because map fail and the State Model is not synchronized with the SUT
+				Set<Action> actions = deriveActions(system,state);
+				CodingManager.buildIDs(state, actions);
+
+				stateModelManager.notifyConcurrenceStateReached(state, actions);
+
 				return null;
 			}
 		} else if (userEvent[0] instanceof KBKeys) // key events
@@ -1983,43 +2030,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 		return null;
-	}
-
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Waits for an user UI action.
-	//	 * Requirement: Mode must be GenerateManual.
-	//	 */
-	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
-				Action mapAction = mapUserEvent(state);
-				//Only set the Action if was found on widget tree map
-				if(mapAction != null) {
-					actionStatus.setAction(mapAction);
-					actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				}
-				userEvent = null;
-			}
-			synchronized(this){
-				try {
-					this.wait(100);
-				} catch (InterruptedException e) {}
-			}
-			state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-
-			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) visualizeActions(cv, state, actions);
-
-			cv.end();
-		}
 	}
 
 	protected int escAttempts = 0;

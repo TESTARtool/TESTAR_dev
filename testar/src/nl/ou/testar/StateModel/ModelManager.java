@@ -179,6 +179,88 @@ public class ModelManager implements StateModelManager {
         System.out.println("----------------------------");
         System.out.println();
     }
+    
+    /**
+     * Listening mode notification to synchronize surface State and Model State
+     * 
+     * This method should be called once when a concurrence problem occurs at the surface
+     * and we need to add or update the current State of the Model that represents the
+     * State of the surface SUT.
+     * @param newState
+     * @param actions
+     */
+    @Override
+    public void notifyConcurrenceStateReached(State newState, Set<Action> actions) {
+    	
+    	// If we the surface State still being the Model State, no concurrence occurred, just end this
+    	if(currentAbstractState.getId().equals(newState.get(Tags.AbstractIDCustom)))
+    		return;
+    	
+        // surface SUT state changes due to concurrence but no action was executed
+        // also this is not an initial State
+    	actionUnderExecution = null;
+    	concreteActionUnderExecution = null;
+    	
+    	// check if we are dealing with a new state or an existing one
+        String abstractStateId = newState.get(Tags.AbstractIDCustom);
+        AbstractState newAbstractState;
+
+        // fetch or create an abstract state
+        if (abstractStateModel.containsState(abstractStateId)) {
+            try {
+                newAbstractState = abstractStateModel.getState(abstractStateId);
+                // update the abstract state
+                AbstractStateService.updateAbstractStateActions(newAbstractState, actions);
+            }
+            catch (StateModelException ex) {
+                ex.printStackTrace();
+                throw new RuntimeException("An error occurred while retrieving abstract state from the state model");
+            }
+        } else {
+            newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
+        }
+        
+        // add the concrete state id to the abstract state
+        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+
+        try {
+        	abstractStateModel.addState(newAbstractState);
+        } catch (StateModelException e) {
+        	e.printStackTrace();
+        	throw new RuntimeException("An error occurred while adding a new abstract state to the model");
+        }
+        
+        // we now store this state to be the current abstract state
+        currentAbstractState = newAbstractState;
+
+        // and then we store the concrete state and possibly the action
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
+        persistenceManager.persistConcreteState(newConcreteState);
+
+        // check if non-determinism was introduced into the model
+        int currentNrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+        if (currentNrOfNonDeterministicActions > nrOfNonDeterministicActions) {
+            System.out.println("Non-deterministic action was executed!");
+            sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution, SequenceError.NON_DETERMINISTIC_ACTION);
+            nrOfNonDeterministicActions = currentNrOfNonDeterministicActions;
+        }
+        else {
+            sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution);
+        }
+
+        currentConcreteState = newConcreteState;
+
+        // temporarily output the nr of states in the model
+        System.out.println(abstractStateModel.getStates().size() + " abstract states in the model");
+
+        // temporarily output the number of unvisited actions still left
+        System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
+                Collection::stream
+        ).count() + " unvisited actions left");
+        System.out.println("----------------------------");
+        System.out.println();
+
+    }
 
     /**
      * This method should be called when an action is about to be executed.
