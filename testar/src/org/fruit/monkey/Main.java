@@ -184,6 +184,7 @@ public class Main {
 				testRun.setNrOfStepsExecuted(TestRunSync.getInstance().getNrOfStepsExecuted());
 				testRun.setEndingMS(System.currentTimeMillis());
 				sqlManager.saveTestStats(testRun);
+				TestRunSync.resetInstance();
 				System.out.println("Ending run");
 			}
 		}

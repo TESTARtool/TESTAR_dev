@@ -668,8 +668,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param system
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
-		TestRunSync.resetInstance();
-
 		// check first if we even need to run
 		if (!stateModelManager.modelIsDeterministic() && exitOnNonDeterministicModel) {
 			TestRunSync.getInstance().setModelIsDeterministic(false);
