@@ -578,12 +578,14 @@ public final class Windows{
 	public static final long ULW_ALPHA = 2;
 	public static final long HWND_TOPMOST = -1;
 	public static final long SW_SHOWNOACTIVATE = 4;
-	public static final long MONITOR_DEFAULTTOPRIMARY = 1;
 	public static final long PM_NOREMOVE = 0x0000;
 
 	public static final long STILL_ACTIVE = 259;
 
-
+	/* Possible dwFlags for MonitorFromWindow */
+	public static final long MONITOR_DEFAULTTONULL = 0x00000000;
+	public static final long MONITOR_DEFAULTTOPRIMARY = 0x00000001;
+	public static final long MONITOR_DEFAULTTONEAREST = 0x00000002;
 
 	/* COM Constants */
 	public static final long CLSCTX_INPROC_SERVER            = 0x1;
@@ -797,6 +799,29 @@ public final class Windows{
 	public static native long IUnknown_Release(long pIUnknown);
 	public static native void CoUninitialize();
 
+	/**
+	 * Gets the scale factor for the given monitor.
+	 * @param hMon The monitor handle.
+	 * @return The first element in the array indicates the result code, on success the second element contains the
+	 * scale factor.
+	 */
+	public static native long[] GetScaleFactorForMonitor(long hMon);
+
+	/**
+	 * Gets the Monitor handle based on the window handle.
+	 * @param hwnd	The window handle.
+	 * @param dwFlags
+	 * @return On success the monitor handle, on failure the defined value based on dwFlags.
+	 */
+	public static native long MonitorFromWindow(long hwnd, long dwFlags);
+
+	/**
+	 * Returns the dots per inch (dpi) value for the associated window.
+	 * @param hwnd The window you want to get information about.
+	 * @return The DPI for the window which depends on the DPI_AWARENESS of the window. See the Remarks for more
+	 * information. An invalid hwnd value will result in a return value of 0.
+	 */
+	public static native int GetDpiForWindow(long hwnd);
 
 	/* ApplicationActivationManager */
 	public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options) throws UIAException; // by wcoux

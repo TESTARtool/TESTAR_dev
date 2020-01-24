@@ -50,7 +50,8 @@ public class AWTCanvasExample {
 	public static void main(String[] args) throws IOException, ClassNotFoundException{
 
 		final int xres = 1024, yres = 768;
-		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(0, 0, xres, yres));
+		// NOTE: Provide a fake windowHandle for now, when this example code is used it must be replaced by a real handle.
+		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(0, 0, xres, yres), 0);
 		AWTCanvas pic = AWTCanvas.fromFile("/Users/guitest/Desktop/fruit_logo.png");
 		//pic = AWTImage.FromScreenshot(new Rect(0, 0, xres, yres));
 		
