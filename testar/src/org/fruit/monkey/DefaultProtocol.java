@@ -840,6 +840,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(actions.isEmpty()){
 				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
 					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+					setMode(Modes.Quit);
+					continue;
 				}
 				//----------------------------------
 				// THERE MUST ALMOST BE ONE ACTION!
