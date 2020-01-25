@@ -88,14 +88,6 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
-    	if(settings.get(ConfigTags.ForceForeground) && System.getProperty("os.name").contains("Windows")) {
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		if(WinProcess.procName(pid).contains("chrome")) {
-    			system.set(Tags.HWND, hwnd);
-    			system.set(Tags.PID, pid);
-    		}
-    	}
     }
     
     /**
@@ -110,7 +102,24 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     protected State getState(SUT system) throws StateBuildException {
     	
     	WdDriver.waitDocumentReady();
-    	
+
+    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+		// webdriver in the constructor of WdDriver.
+		// A possible solution could be creating a snapshot of the running browser processes before and after
+		if(settings.get(ConfigTags.ForceForeground) && System.getProperty("os.name").contains("Windows")
+				&& system.get(Tags.HWND, null) == null) {
+			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+			// window handle. The running browser needs to be in the foreground when we reach this part.
+			long hwnd = Windows.GetForegroundWindow();
+			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+			// Safe to set breakpoints again.
+			if (WinProcess.procName(pid).contains("chrome")) {
+				system.set(Tags.HWND, hwnd);
+				system.set(Tags.PID, pid);
+				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+			}
+		}
+
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
