@@ -775,13 +775,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				// test run sync notification
 				TestRunSync.getInstance().setExceptionThrown(true);
-				TestRunSync.getInstance().setExceptionMessage(e.getMessage());
+				if (e.getMessage() != null) {
+					TestRunSync.getInstance().setExceptionMessage(e.getMessage());
+				}
+				else {
+					TestRunSync.getInstance().setExceptionMessage(e.toString());
+				}
 				TestRunSync.getInstance().setTrackTrace(stackTrace.toString());
 
 				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;
-
-
 
 				e.printStackTrace();
 				emergencyTerminateTestSequence(system, e);
