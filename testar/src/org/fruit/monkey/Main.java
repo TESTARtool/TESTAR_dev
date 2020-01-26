@@ -182,6 +182,9 @@ public class Main {
 				firstRun = false;
 				testRun.setModelIsDeterministic(TestRunSync.getInstance().isModelIsDeterministic());
 				testRun.setNrOfStepsExecuted(TestRunSync.getInstance().getNrOfStepsExecuted());
+				testRun.setExceptionThrown(TestRunSync.getInstance().isExceptionThrown());
+				testRun.setExceptionMessage(TestRunSync.getInstance().getExceptionMessage());
+				testRun.setTrackTrace(TestRunSync.getInstance().getTrackTrace());
 				testRun.setEndingMS(System.currentTimeMillis());
 				sqlManager.saveTestStats(testRun);
 				TestRunSync.resetInstance();

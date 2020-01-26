@@ -151,6 +151,9 @@ public class SqlManager {
                     "    ending_time_ms       = ?," +
                     "    deterministic_model  = ?," +
                     "    nr_of_steps_executed = ?" +
+                    " exception_thrown = ?" +
+                    " exception_message = ?" +
+                    " stack_trace = ?" +
                     " WHERE test_run_id = ?";
             Connection connection = getConnection();
             PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
@@ -159,7 +162,10 @@ public class SqlManager {
             insertStatement.setLong(2, testRun.getEndingMS());
             insertStatement.setInt(3, testRun.isModelIsDeterministic() ? 1 : 0);
             insertStatement.setInt(4, testRun.getNrOfStepsExecuted());
-            insertStatement.setInt(5, testRun.getTestRunId());
+            insertStatement.setInt(5, testRun.isExceptionThrown() ? 1 : 0);
+            insertStatement.setString(6, testRun.getExceptionMessage());
+            insertStatement.setString(7, testRun.getTrackTrace());
+            insertStatement.setInt(8, testRun.getTestRunId());
             insertStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();

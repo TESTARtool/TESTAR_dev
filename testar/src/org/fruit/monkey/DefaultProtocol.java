@@ -67,6 +67,7 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.StateModel.automation.TestRun;
 import nl.ou.testar.StateModel.automation.TestRunSync;
 import org.fruit.Assert;
 import org.fruit.Drag;
@@ -773,6 +774,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;
+
+				// test run sync notification
+				TestRunSync.getInstance().setExceptionThrown(true);
+				TestRunSync.getInstance().setExceptionMessage(message);
+				TestRunSync.getInstance().setTrackTrace(stackTrace.toString());
+
 				e.printStackTrace();
 				emergencyTerminateTestSequence(system, e);
 			}

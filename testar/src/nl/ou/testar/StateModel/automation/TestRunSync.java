@@ -19,9 +19,15 @@ public class TestRunSync {
     }
 
 
-    private boolean modelIsDeterministic;
+    private boolean modelIsDeterministic = true;
 
-    private int nrOfStepsExecuted;
+    private int nrOfStepsExecuted = 0;
+
+    private boolean exceptionThrown = false;
+
+    private String exceptionMessage = "";
+
+    private String trackTrace = "";
 
     public boolean isModelIsDeterministic() {
         return modelIsDeterministic;
@@ -37,5 +43,29 @@ public class TestRunSync {
 
     public void setNrOfStepsExecuted(int nrOfStepsExecuted) {
         this.nrOfStepsExecuted = nrOfStepsExecuted;
+    }
+
+    public boolean isExceptionThrown() {
+        return exceptionThrown;
+    }
+
+    public void setExceptionThrown(boolean exceptionThrown) {
+        this.exceptionThrown = exceptionThrown;
+    }
+
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
+    }
+
+    public String getTrackTrace() {
+        return trackTrace;
+    }
+
+    public void setTrackTrace(String trackTrace) {
+        this.trackTrace = trackTrace;
     }
 }
