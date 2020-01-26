@@ -32,7 +32,7 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 3
 
 #################################################################
 # Oracles based on suspicious titles
@@ -98,10 +98,25 @@ ProtocolClass = desktop_qlearning/Protocol_desktop_reinforcement_learning
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBEnabled = true
+GraphDBUrl = remote:/localhost/testar
+GraphDBUser = testar
+GraphDBPassword = testar
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = localhost
+DataStoreDirectory = D:\\orientdb\\databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = delayed
+ApplicationName = Notepad
+ApplicationVersion = 1.0.0
 
 #################################################################
 # State identifier attributes
