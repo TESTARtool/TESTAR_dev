@@ -772,13 +772,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
 				stackTrace.add(message);
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
-				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
-				exceptionThrown = true;
 
 				// test run sync notification
 				TestRunSync.getInstance().setExceptionThrown(true);
-				TestRunSync.getInstance().setExceptionMessage(message);
+				TestRunSync.getInstance().setExceptionMessage(e.getMessage());
 				TestRunSync.getInstance().setTrackTrace(stackTrace.toString());
+
+				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+				exceptionThrown = true;
+
+
 
 				e.printStackTrace();
 				emergencyTerminateTestSequence(system, e);
