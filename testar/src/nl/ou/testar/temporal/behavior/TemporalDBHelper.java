@@ -159,6 +159,7 @@ public  class TemporalDBHelper {
         return abstractStateModel;
     }
     public AbstractStateModel selectAbstractStateModelByModelId(String ModelIdentifier) {
+        dbReopen();
         List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
         AbstractStateModel abstractStateModel = null;
         if (abstractStateModels.size() == 0) {
@@ -175,6 +176,7 @@ public  class TemporalDBHelper {
                 System.out.println("ERROR: Model with identifier : "+ModelIdentifier+" was not found in the graph database " + db.getName());
             }
         }
+        dbClose();
         return abstractStateModel;
     }
 
@@ -596,6 +598,7 @@ public  class TemporalDBHelper {
 
     public boolean saveToGraphMLFile(AbstractStateModel abstractStateModel,String file,boolean excludeWidget) {
         //init
+        dbReopen();
         String graphXMLID=dbConfig.getDatabase();
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
@@ -681,6 +684,7 @@ public  class TemporalDBHelper {
             resultSet.close();
 
         }
+        dbClose();
         GraphML_DocGraph graph = new GraphML_DocGraph(graphXMLID, nodes, edges);
         Set<GraphML_DocKey> tempset = new LinkedHashSet<GraphML_DocKey>();
         docnodekeys.add(new GraphML_DocKey("labelV", "node", "labelV", "string"));

@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -174,7 +175,7 @@ public class Spot_CheckerResultsParser {
                                     .orElse(null);
                             for (TransitionEncoding t : sEnc.getTransitionColl()
                             ) {
-                                if (t.getEncodedAPConjunct().equals(prefixAPConjunctList.get(j)) &&
+                                if (t.getEncodedTransitionAPConjunct().equals(prefixAPConjunctList.get(j)) &&
                                         t.getTargetState().equals(targetState)) {
                                     //check target stae as model can be non-deterministic
                                     prefixTransitionList.add(t.getTransition());
@@ -185,7 +186,7 @@ public class Spot_CheckerResultsParser {
                     }
                     Oracle.setExampleRun_Prefix_States(prefixStateList);
                     Oracle.setExampleRun_Prefix_Transitions(prefixTransitionList); //test only
-                    Oracle.addComments("Encoded Formula: "+encodedFormula);
+                    Oracle.set_comments(new ArrayList<>(Arrays.asList("Encoded Formula: "+encodedFormula)));
                     for (int j = 0; j < cycleStateList.size(); j++) {
                         String targetState ;
                         String sourceState = cycleStateList.get(j);
@@ -200,7 +201,7 @@ public class Spot_CheckerResultsParser {
                                 .orElse(null);
                         for (TransitionEncoding t : sEnc.getTransitionColl()
                         ) {
-                            if (t.getEncodedAPConjunct().equals(cycleAPConjunctList.get(j)) &&
+                            if (t.getEncodedTransitionAPConjunct().equals(cycleAPConjunctList.get(j)) &&
                                     t.getTargetState().equals(targetState)) {
                                 //check target state as model can be non-deterministic
                                 cycleTransitionList.add(t.getTransition());

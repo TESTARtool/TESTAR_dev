@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvBindAndSplitByName;
@@ -123,11 +124,11 @@ public class TemporalBean {
     public TemporalMeta getMetaData() {
         return metaData;
     }
-
     public void setMetaData(TemporalMeta metaData) {
         this.metaData = metaData;
     }
 
+    @JsonIgnore
     public void set_comments(List < String > _comments) {
         metaData.set_comments(_comments);
     }
@@ -137,17 +138,11 @@ public class TemporalBean {
     public String get_modifieddate() {
         return metaData.get_modifieddate();
     }
-
+    @JsonIgnore
     public void set_modifieddate(String _modifieddate){
         metaData.set_modifieddate( _modifieddate);
     }
-    public List<String> getApplication_log() {
-        return metaData.get_log();
-    }
 
-    public void setApplication_log(List < String > application_log) {
-        metaData.set_log(application_log);
-    }
     public void addLog ( String  log) {
         metaData.addLog(log);
     }

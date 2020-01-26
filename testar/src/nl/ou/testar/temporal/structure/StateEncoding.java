@@ -8,6 +8,7 @@ public class StateEncoding {
     private String state;
     private List<TransitionEncoding> transitionColl;
     private Set<String> stateAPs;
+    private String encodedStateAPConjunct;
 
     public StateEncoding(String state) {
         this.state = state;
@@ -28,6 +29,7 @@ public class StateEncoding {
 
     public void setTransitionColl(List<TransitionEncoding> transitionColl) {
         this.transitionColl = transitionColl;
+
     }
 
     public void addtransition(TransitionEncoding tenc){
@@ -36,6 +38,15 @@ public class StateEncoding {
     public void removetransition(TransitionEncoding tenc){
         transitionColl.remove(tenc);
     }
+
+    public String getEncodedStateAPConjunct() {
+        return encodedStateAPConjunct;
+    }
+
+    public void setEncodedStateAPConjunct(String encodedStateAPConjunct) {
+        this.encodedStateAPConjunct = encodedStateAPConjunct;
+    }
+
 
     public Set<String> getStateAPs() {
         return stateAPs;
@@ -51,7 +62,7 @@ public class StateEncoding {
         String result = "";
         for (TransitionEncoding trans : transitionColl) {
             String strippedDecodedTrans = decodedAPConjunct.replace(prefix, "");
-            if (strippedDecodedTrans.equals(trans.getEncodedAPConjunct())) {
+            if (strippedDecodedTrans.equals(trans.getEncodedTransitionAPConjunct())) {
                 result = trans.getTransition();
                 break;
             }
@@ -66,12 +77,29 @@ public class StateEncoding {
         }
             return edgeAPS;
     }
-    public void updateAllTransitionConjuncts(Set<String> modelAPs) {
+    public void updateAPConjuncts(Set<String> modelAPs) {
 
         for (TransitionEncoding trans : transitionColl) {
             trans.setEncodedTransitionConjunct(modelAPs, stateAPs);
-
         }
+        Set<String> transitionAPs=retrieveAllTransitionAPs();
+        StringBuilder encodedresult= new StringBuilder();
+        int i=0;
+        for (String modelAP: modelAPs                 ) {
+            boolean b = stateAPs.stream().anyMatch(str -> str.trim().equals(modelAP));
+            if (b){
+                encodedresult.append(i); }
+            else{
+                boolean be = transitionAPs.stream().anyMatch(str -> str.trim().equals(modelAP));
+                if(be){
+                    encodedresult.append(i);}
+                else{
+                    encodedresult.append("!").append(i);}
+            }
+            i++;
+            if(i<modelAPs.size()) encodedresult.append("&");
+        }
+        encodedStateAPConjunct =encodedresult.toString();
     }
 }
 

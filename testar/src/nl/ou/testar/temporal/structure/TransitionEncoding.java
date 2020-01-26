@@ -6,7 +6,7 @@ public class TransitionEncoding {
     private String transition;
     private Set<String > transitionAPs;
     private String targetState;
-    private String encodedAPConjunct;
+    private String encodedTransitionAPConjunct;
 
     public String getTargetState() {
         return targetState;
@@ -43,12 +43,12 @@ public class TransitionEncoding {
         this.transitionAPs = transitionAPs;
     }
 
-    public String getEncodedAPConjunct() {
-        return encodedAPConjunct;
+    public String getEncodedTransitionAPConjunct() {
+        return encodedTransitionAPConjunct;
     }
 
-    public void setEncodedAPConjunct(String encodedAPConjunct) {
-        this.encodedAPConjunct = encodedAPConjunct;
+    public void setEncodedTransitionAPConjunct(String encodedTransitionAPConjunct) {
+        this.encodedTransitionAPConjunct = encodedTransitionAPConjunct;
 
     }
     public void setEncodedTransitionConjunct(Set<String> modelAPs, Set<String> stateAPs){
@@ -70,7 +70,7 @@ public class TransitionEncoding {
             if(i<modelAPs.size()) encodedresult.append("&");
         }
         //encodedresult.append("]");
-        encodedAPConjunct=encodedresult.toString();
+        encodedTransitionAPConjunct =encodedresult.toString();
 
     }
 }

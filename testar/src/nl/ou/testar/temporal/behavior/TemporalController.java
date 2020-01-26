@@ -191,11 +191,11 @@ public class TemporalController {
 
 
     // @TODO: 2019-12-29 refactor db operations to dbhelper
-    public void dbClose() {
+    private void dbClose() {
         tDBHelper.dbClose();
     }
 
-    public void dbReopen() {
+    private void dbReopen() {
         tDBHelper.dbReopen();
     }
 
@@ -293,13 +293,13 @@ public class TemporalController {
                 }
             }
             resultSet.close();
-            tModel.updateTransitions(); //update once. this is a costly operation
+            tModel.finalizeTransitions(); //update once. this is a costly operation
             for (StateEncoding stenc : tModel.getStateEncodings()
             ) {
                 List<String> encodedConjuncts = new ArrayList<>();
                 for (TransitionEncoding tren : stenc.getTransitionColl()
                 ) {
-                    String enc = tren.getEncodedAPConjunct();
+                    String enc = tren.getEncodedTransitionAPConjunct();
                     if (encodedConjuncts.contains(enc)) {
                         tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
                     } else encodedConjuncts.add(enc);
@@ -313,7 +313,7 @@ public class TemporalController {
                 initStates.add(traceevent.getState());
             }
             tModel.setInitialStates(initStates);
-            tModel.setAPSeperator(apSelectorManager.getApEncodingSeparator());
+            tModel.setAPSeparator(apSelectorManager.getApEncodingSeparator());
 
             for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
             ) {
@@ -327,16 +327,11 @@ public class TemporalController {
     }
 
 
-    private AbstractStateModel
-    getAbstractStateModel() {
+    private AbstractStateModel    getAbstractStateModel() {
         AbstractStateModel abstractStateModel;
-
-        //abstractStateModel = tDBHelper.selectAbstractStateModel(ApplicationName, ApplicationVersion);
         abstractStateModel = tDBHelper.selectAbstractStateModelByModelId(Modelidentifier);
-
         if (abstractStateModel == null) {
             tModel.addLog("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database " + dbConfig.getDatabase());
-
         }
         return abstractStateModel;
     }
@@ -359,6 +354,10 @@ public class TemporalController {
             saveModelAsHOA(file);
             b = true;
         }
+        if (tmptype.equals(TemporalType.CTL)) {
+            saveModelAsETF(file);
+            b = true;
+        }
         return b;
     }
 
@@ -378,6 +377,23 @@ public class TemporalController {
         }
 
     }
+    private void saveModelAsETF(String file) {
+
+        String contents = tModel.makeETFOutput();
+        try {
+            File output = new File(file);
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
+                writer.append(contents);
+                writer.close();
+            }
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     ;
 
@@ -406,10 +422,6 @@ public class TemporalController {
     public void ModelCheck(TemporalType tType, String pathToExecutable, String APSelectorFile, String oracleFile, boolean verbose) {
         try {
             System.out.println(tType + " model-checking started \n");
-            //tDBHelper.dbReopen();
-            //AbstractStateModel abstractStateModel = getAbstractStateModel();
-            //setTemporalModelMetaData(abstractStateModel);
-            //loadApSelectorManager(APSelectorFile);
             String strippedFile;
             String APCopy = "copy_of_used_" + Paths.get(APSelectorFile).getFileName().toString();
             String OracleCopy = "copy_of_used_" + Paths.get(oracleFile).getFileName().toString();
@@ -424,16 +436,15 @@ public class TemporalController {
             if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
             else strippedFile = filename;
 
-            File automatonFile = new File(outputDir + "LTL_model.hoa");
+            File automatonFile = new File(outputDir + "Model.hoa");
+            File ETFautomatonFile = new File(outputDir + "Model.etf");
+
             File formulaFile = new File(outputDir + "LTL_formulas.txt");
             File resultsFile = new File(outputDir + "LTL_results.txt");
             File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
             File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
             makeTemporalModel(APSelectorFile,verbose);
 
-            //System.out.println(tType + " starting to  compute the temporal model \n");
-            //computeTemporalModel(abstractStateModel);
-            //System.out.println(tType + " completed computing the temporal model \n");
             List<TemporalOracle> fromcoll;
             fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
             if (fromcoll == null) {
@@ -448,6 +459,8 @@ public class TemporalController {
             //from here on LTL specific logic
             //if (tType==TemporalType.LTL){}
             saveModelForChecker(TemporalType.LTL, automatonFile.getAbsolutePath());
+            saveModelForChecker(TemporalType.CTL, ETFautomatonFile.getAbsolutePath());
+
             String aliveprop = gettModel().getAliveProposition("!dead");
             System.out.println(tType + " invoking the backend model-checker \n");
             Helper.LTLModelCheck(pathToExecutable, toWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
@@ -485,23 +498,20 @@ public class TemporalController {
     public void makeTemporalModel(String APSelectorFile, boolean verbose) {
         try {
             System.out.println(" compute temporal model started \n");
-            tDBHelper.dbReopen();
+
             AbstractStateModel abstractStateModel = getAbstractStateModel();
             setTemporalModelMetaData(abstractStateModel);
             if (APSelectorFile.equals("")) {
                 setDefaultAPSelectormanager();
                 saveAPSelectorManager("default_APSelectorManager.json");
-            } else {
-                loadApSelectorManager(APSelectorFile);
-                String APCopy = "copy_" + Paths.get(APSelectorFile).getFileName().toString();
-                Files.copy((new File(APSelectorFile).toPath()),
-                        new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
+            tDBHelper.dbReopen();
             computeTemporalModel(abstractStateModel);
+            tDBHelper.dbClose();
             if(verbose) {
                 saveModelAsJSON("APEncodedModel.json");
             }
-            tDBHelper.dbClose();
+
             System.out.println(" compute temporal model completed \n");
         } catch (Exception f) {
             f.printStackTrace();
