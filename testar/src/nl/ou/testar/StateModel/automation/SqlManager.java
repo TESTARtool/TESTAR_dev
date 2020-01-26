@@ -150,9 +150,9 @@ public class SqlManager {
                     "SET starting_time_ms     = ?," +
                     "    ending_time_ms       = ?," +
                     "    deterministic_model  = ?," +
-                    "    nr_of_steps_executed = ?" +
-                    " exception_thrown = ?" +
-                    " exception_message = ?" +
+                    "    nr_of_steps_executed = ?," +
+                    " exception_thrown = ?," +
+                    " exception_message = ?," +
                     " stack_trace = ?" +
                     " WHERE test_run_id = ?";
             Connection connection = getConnection();
