@@ -30,18 +30,58 @@
 
 package org.testar.json.object;
 
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public class StateModelJsonObject {
 
+	String timestamp;
+	SutJsonObject sut;
+	ToolJsonObject tool;
+	String stateModelIdentifier;
+	String stateModelAppName;
+	String stateModelAppVersion;
 	String abstractionId;
 	boolean deterministic;
-	int unvisitedActions;
-	int edges;
-	int vertex;
-	
-	public StateModelJsonObject(String abstractionId, boolean deterministic, int unvisitedActions) {
+	long unvisitedAbstractActions;
+	long numberAbstractStates;
+	long numberAbstractActions;
+	long numberConcreteStates;
+	long numberConcreteActions;
+	boolean storeWidgets;
+	long numberWidgets;
+	long edges;
+	long vertex;
+	long numberTestSequences;
+	Set<StateModelTestSequenceJsonObject> testSequences;
+
+	@JsonCreator
+	public StateModelJsonObject(String timestamp, SutJsonObject sut, ToolJsonObject tool,
+			String stateModelAppName, String stateModelAppVersion, String stateModelIdentifier,
+			String abstractionId, boolean deterministic, long unvisitedAbstractActions,
+			long numberAbstractStates, long numberAbstractActions, long numberConcreteStates, long numberConcreteActions,
+			boolean storeWidgets, long numberWidgets, long numberTestSequences) {
+		this.timestamp = timestamp;
+		this.sut = sut;
+		this.tool = tool;
+		this.stateModelIdentifier = stateModelIdentifier;
+		this.stateModelAppName = stateModelAppName;
+		this.stateModelAppVersion = stateModelAppVersion;
 		this.abstractionId = abstractionId;
 		this.deterministic = deterministic;
-		this.unvisitedActions = unvisitedActions;
+		this.unvisitedAbstractActions = unvisitedAbstractActions;
+		this.numberAbstractStates = numberAbstractStates;
+		this.numberAbstractActions = numberAbstractActions;
+		this.numberConcreteStates = numberConcreteStates;
+		this.numberConcreteActions = numberConcreteActions;
+		this.storeWidgets = storeWidgets;
+		this.numberWidgets = numberWidgets;
+		this.numberTestSequences = numberTestSequences;
+	}
+	
+	public void setTestSequences(Set<StateModelTestSequenceJsonObject> testSequences) {
+		this.testSequences = testSequences;
 	}
 	
 }

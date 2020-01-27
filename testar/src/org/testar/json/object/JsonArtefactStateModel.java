@@ -32,18 +32,37 @@ package org.testar.json.object;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Set;
 
+import org.fruit.monkey.SettingsDialog;
+import org.testar.OutputStructure;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import es.upv.staq.testar.NativeLinker;
 
 public class JsonArtefactStateModel {
 	
 	private JsonArtefactStateModel() {}
 	
+	@JsonCreator
 	public static void createStateModelArtefact(String outputPath, String applicationName, String applicationVersion,
 			String abstractionId, boolean deterministic, int unvisitedActions) {
 		
-		StateModelJsonObject modelJson = new StateModelJsonObject(abstractionId, deterministic, unvisitedActions);
+		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
+				NativeLinker.getOsName());
+
+		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
+				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
+				NativeLinker.getOsName());
+		
+		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
+				sutJson, toolJson, applicationName, applicationVersion, "a",
+				abstractionId, deterministic, unvisitedActions,
+				0, 0, 0, 0,
+				false, 0, 0);
 		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -55,6 +74,43 @@ public class JsonArtefactStateModel {
 			gson.toJson(modelJson, fileWriter);
 			fileWriter.flush();
 			fileWriter.close();
+		}catch(Exception e){
+			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
+		}
+	}
+	
+	@JsonCreator
+	public static void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
+			String abstractionId, boolean deterministic, long unvisitedActions,
+			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
+			boolean storeWidgets, long widgets, long testSequences, Set<StateModelTestSequenceJsonObject> testSequenceObject) {
+		
+		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
+				NativeLinker.getOsName());
+
+		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
+				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
+				NativeLinker.getOsName());
+		
+		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
+				sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
+				abstractionId, deterministic, unvisitedActions,
+				abstractStates, abstractActions, concreteStates, concreteActions,
+				storeWidgets, widgets, testSequences);
+		
+		modelJson.setTestSequences(testSequenceObject);
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+		String outputFile = OutputStructure.outerLoopOutputDir + File.separator +
+				"ArtefactStateModelSummary_" + modelIdentifier + "_" + OutputStructure.startOuterLoopDateString + ".json";
+		
+		try{
+			FileWriter fileWriter = new FileWriter(outputFile);
+			gson.toJson(modelJson, fileWriter);
+			fileWriter.flush();
+			fileWriter.close();
+			System.out.println("Created JSON State Model artefact: " + outputFile);
 		}catch(Exception e){
 			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
 		}
