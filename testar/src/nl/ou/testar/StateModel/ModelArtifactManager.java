@@ -30,7 +30,6 @@
 
 package nl.ou.testar.StateModel;
 
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,9 +50,7 @@ import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
-import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.StateModel.Sequence.SequenceVerdict;
 
 public class ModelArtifactManager {
 
@@ -141,9 +138,15 @@ public class ModelArtifactManager {
 	}
 
 	private static String getAbstractStateModelIdentifier(ODatabaseSession sessionDB, String appName, String appVer) {
-		OResultSet resultSet = sessionDB.query("SELECT FROM AbstractStateModel where applicationName=\"" + appName
-				+ "\" and applicationVersion=\"" + appVer + "\"");
+		
+		String stmt = "SELECT FROM AbstractStateModel where applicationName = :appName"
+				+ " and applicationVersion = :appVer";
 
+        Map<String, Object> params = new HashMap<>();
+        params.put("appName", appName);
+        params.put("appVer", appVer);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+		
 		while (resultSet.hasNext()) {
 			OResult result = resultSet.next();
 			// we're expecting a vertex
@@ -161,8 +164,12 @@ public class ModelArtifactManager {
 	}
 	
 	private static String getStateModelAbstractionLevel(ODatabaseSession sessionDB, String stateModelIdentifier) {
-		OResultSet resultSet = sessionDB.query("SELECT FROM AbstractStateModel where modelIdentifier=\""
-				+ stateModelIdentifier + "\"");
+		
+		String stmt = "SELECT FROM AbstractStateModel where modelIdentifier = :identifier";
+		
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
 
 		while (resultSet.hasNext()) {
 			OResult result = resultSet.next();
@@ -187,10 +194,12 @@ public class ModelArtifactManager {
 	private static long getStateModelNumberOfUnvisitedActions(ODatabaseSession sessionDB, String stateModelIdentifier) {
 		long numberUnvisitedActions = 0;
     	
-    	String stmt = "SELECT count(*) FROM UnvisitedAbstractAction WHERE modelIdentifier = \""
-    			+ stateModelIdentifier + "\"";
-    	
-    	OResultSet resultSet = sessionDB.query(stmt);
+		String stmt = "SELECT count(*) FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
+		
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberUnvisitedActions = result.getProperty("count(*)");
         resultSet.close();
@@ -216,10 +225,12 @@ public class ModelArtifactManager {
 	private static long getStateModelNumberOfAbstractStates(ODatabaseSession sessionDB, String stateModelIdentifier) {
 		long numberAbstractStates = 0;
     	
-    	String stmt = "SELECT count(*) FROM AbstractState WHERE modelIdentifier = \""
-    			+ stateModelIdentifier + "\"";
-    	
-    	OResultSet resultSet = sessionDB.query(stmt);
+		String stmt = "SELECT count(*) FROM AbstractState WHERE modelIdentifier = :identifier";
+		
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberAbstractStates = result.getProperty("count(*)");
         resultSet.close();
@@ -230,10 +241,12 @@ public class ModelArtifactManager {
 	private static long getStateModelNumberOfAbstractActions(ODatabaseSession sessionDB, String stateModelIdentifier) {
 		long numberAbstractActions = 0;
     	
-    	String stmt = "SELECT count(*) FROM AbstractAction WHERE modelIdentifier = \""
-    			+ stateModelIdentifier + "\"";
-    	
-    	OResultSet resultSet = sessionDB.query(stmt);
+		String stmt = "SELECT count(*) FROM AbstractAction WHERE modelIdentifier = :identifier";
+		
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberAbstractActions = result.getProperty("count(*)");
         resultSet.close();
@@ -245,10 +258,13 @@ public class ModelArtifactManager {
 		long numberConcreteStates = 0;
     	
 		String stmt = "SELECT count(*) FROM (TRAVERSE in() FROM (SELECT FROM AbstractState "
-				+ "WHERE modelIdentifier = \"" + stateModelIdentifier + "\")) "
+				+ "WHERE modelIdentifier = :identifier)) "
 				+ "WHERE @class = 'ConcreteState'";
     	
-    	OResultSet resultSet = sessionDB.query(stmt);
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberConcreteStates = result.getProperty("count(*)");
         resultSet.close();
@@ -260,10 +276,13 @@ public class ModelArtifactManager {
 		long numberConcreteActions = 0;
 		
 		String stmt = "SELECT count(*) FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT "
-				+ "FROM AbstractState WHERE modelIdentifier = \"" + stateModelIdentifier + "\")) "
+				+ "FROM AbstractState WHERE modelIdentifier = :identifier)) "
 				+ "WHERE @class = 'ConcreteAction'";
     	
-    	OResultSet resultSet = sessionDB.query(stmt);
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberConcreteActions = result.getProperty("count(*)");
         resultSet.close();
@@ -274,12 +293,17 @@ public class ModelArtifactManager {
 	private static long getStateModelNumberOfWidgets(ODatabaseSession sessionDB, String stateModelIdentifier) {
 		long numberWidgets = 0;
 		
-		/*String stmt = "";
+		String stmt = "SELECT count(*) FROM (TRAVERSE in() FROM (SELECT FROM AbstractState "
+				+ "WHERE modelIdentifier = :identifier)) "
+				+ "WHERE @class = 'Widget'";
     	
-    	OResultSet resultSet = sessionDB.query(stmt);
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+        
         OResult result = resultSet.next();
         numberWidgets = result.getProperty("count(*)");
-        resultSet.close();*/
+        resultSet.close();
         
 		return numberWidgets;
 	}
@@ -287,10 +311,13 @@ public class ModelArtifactManager {
 	private static long getStateModelNumberOfTestSequences(ODatabaseSession sessionDB, String stateModelIdentifier) {
 		long numberTestSequences = 0;
 		
-		String stmt = "SELECT count(*) FROM TestSequence WHERE modelIdentifier = \"" + stateModelIdentifier + "\" "
-				+ "ORDER BY startDateTime ASC";
+		String stmt = "SELECT count(*) FROM TestSequence WHERE modelIdentifier = :identifier"
+				+ " ORDER BY startDateTime ASC";
     	
-    	OResultSet resultSet = sessionDB.query(stmt);
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", stateModelIdentifier);
+        OResultSet resultSet = sessionDB.query(stmt, params);
+
         OResult result = resultSet.next();
         numberTestSequences = result.getProperty("count(*)");
         resultSet.close();

@@ -37,6 +37,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public class StateModelJsonObject {
 
 	String timestamp;
+	String url;
 	SutJsonObject sut;
 	ToolJsonObject tool;
 	String stateModelIdentifier;
@@ -51,18 +52,17 @@ public class StateModelJsonObject {
 	long numberConcreteActions;
 	boolean storeWidgets;
 	long numberWidgets;
-	long edges;
-	long vertex;
 	long numberTestSequences;
 	Set<StateModelTestSequenceJsonObject> testSequences;
 
 	@JsonCreator
-	public StateModelJsonObject(String timestamp, SutJsonObject sut, ToolJsonObject tool,
+	public StateModelJsonObject(String timestamp, String url, SutJsonObject sut, ToolJsonObject tool,
 			String stateModelAppName, String stateModelAppVersion, String stateModelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedAbstractActions,
 			long numberAbstractStates, long numberAbstractActions, long numberConcreteStates, long numberConcreteActions,
 			boolean storeWidgets, long numberWidgets, long numberTestSequences) {
 		this.timestamp = timestamp;
+		this.url = url;
 		this.sut = sut;
 		this.tool = tool;
 		this.stateModelIdentifier = stateModelIdentifier;

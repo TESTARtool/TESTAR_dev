@@ -46,6 +46,8 @@ import es.upv.staq.testar.NativeLinker;
 public class JsonArtefactTestResults {
 	
 	private JsonArtefactTestResults() {}
+	
+	private static String url = "https://testar.org/images/models/";
 
 	public static void createTestResultsArtefact(Settings settings, Set<String> sequencesOutputDir, Set<String> logsOutputDir,
 			Set<String> htmlOutputDir, Set<String> sequencesVerdicts) {
@@ -60,7 +62,7 @@ public class JsonArtefactTestResults {
 				NativeLinker.getOsName());
 
 		TestResultsJsonObject resultsJson = new TestResultsJsonObject(OutputStructure.startOuterLoopDateString,
-				"https://www.testar.org/models/", sutJson, toolJson, settingJson);
+				url, sutJson, toolJson, settingJson);
 		
 		if(!sequencesOutputDir.isEmpty())
 			resultsJson.setSequencesResult(sequencesOutputDir);
@@ -74,7 +76,8 @@ public class JsonArtefactTestResults {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		String outputPath = OutputStructure.outerLoopOutputDir + File.separator +
-				"ArtefactTestResults_" + OutputStructure.startOuterLoopDateString + ".json";
+				"ArtefactTestResults_"  + OutputStructure.executedSUTname + "_" +
+				OutputStructure.startOuterLoopDateString + ".json";
 
 		try{
 			FileWriter fileWriter = new FileWriter(outputPath);

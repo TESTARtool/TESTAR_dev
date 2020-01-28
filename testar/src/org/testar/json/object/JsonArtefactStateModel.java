@@ -47,6 +47,8 @@ public class JsonArtefactStateModel {
 	
 	private JsonArtefactStateModel() {}
 	
+	private static String url = "https://testar.org/images/models/";
+	
 	@JsonCreator
 	public static void createStateModelArtefact(String outputPath, String applicationName, String applicationVersion,
 			String abstractionId, boolean deterministic, int unvisitedActions) {
@@ -59,7 +61,7 @@ public class JsonArtefactStateModel {
 				NativeLinker.getOsName());
 		
 		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
-				sutJson, toolJson, applicationName, applicationVersion, "a",
+				url, sutJson, toolJson, applicationName, applicationVersion, "a",
 				abstractionId, deterministic, unvisitedActions,
 				0, 0, 0, 0,
 				false, 0, 0);
@@ -93,7 +95,7 @@ public class JsonArtefactStateModel {
 				NativeLinker.getOsName());
 		
 		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
-				sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
+				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
 				abstractionId, deterministic, unvisitedActions,
 				abstractStates, abstractActions, concreteStates, concreteActions,
 				storeWidgets, widgets, testSequences);
@@ -103,7 +105,8 @@ public class JsonArtefactStateModel {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		String outputFile = OutputStructure.outerLoopOutputDir + File.separator +
-				"ArtefactStateModelSummary_" + modelIdentifier + "_" + OutputStructure.startOuterLoopDateString + ".json";
+				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + "_" +
+				modelIdentifier + "_" + OutputStructure.startOuterLoopDateString + ".json";
 		
 		try{
 			FileWriter fileWriter = new FileWriter(outputFile);
