@@ -455,6 +455,9 @@ public class Main {
 			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, false));
 			defaults.add(Pair.from(TemporalLTLChecker, ""));
 			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
+			defaults.add(Pair.from(TemporalCTLChecker, ""));
+			defaults.add(Pair.from(TemporalCTLCheckerWSL, false));
+			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
 			defaults.add(Pair.from(TemporalLTLVerbose, false));
 			defaults.add(Pair.from(TemporalLTLOracles, ""));
 			defaults.add(Pair.from(TemporalLTLPatterns, ""));
@@ -468,7 +471,7 @@ public class Main {
 			}));
 			defaults.add(Pair.from(TemporalDirectory, "temporal"));
 			defaults.add(Pair.from(TemporalSubDirectories, true));
-			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
+			defaults.add(Pair.from(TemporalCTLChecker, ""));
 			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
 			defaults.add(Pair.from(TemporalVisualizerServer, ""));
 			defaults.add(Pair.from(TemporalVisualizerURL, ""));

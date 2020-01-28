@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.behavior;
 
-import nl.ou.testar.temporal.util.TemporalType;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -25,14 +24,9 @@ public class TemporalExecutor {
     }
 
 
-    public void LTLModelCheck() {
+    public void ModelCheck() {
         if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
-            // tcontrol.setDefaultAPSelectormanager();
-            tcontrol.ModelCheck(TemporalType.LTL,
-                    settings.get(ConfigTags.TemporalLTLChecker),
-                    settings.get(ConfigTags.TemporalLTLAPSelectorManager),
-                    settings.get(ConfigTags.TemporalLTLOracles),
-                    settings.get(ConfigTags.TemporalLTLVerbose));
+            tcontrol.MCheck();
         }
     }
 }

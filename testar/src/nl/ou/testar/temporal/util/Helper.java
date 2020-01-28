@@ -1,16 +1,17 @@
 package nl.ou.testar.temporal.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 
@@ -106,6 +107,31 @@ public class Helper {
 
         Helper.RunOSChildProcess(cli);
     }
+    public static  void CTLModelCheck(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile,  String resultsFile) {
+        //String cli = "ubuntu1804 run ~/bin/ltsminv3.0.2/etf3lts-sym  --ctl='A[](E<>(ap123=="true")))' --ctl='E<>(!ap321=="false")' -- ctl='...' model.etf &> results.txt;
+        String  cli = pathToExecutable;
+        File rFile = new File(formulaFile);
+        StringBuilder sb = new StringBuilder();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(formulaFile),StandardCharsets.UTF_8);
+            for (String line : lines)  { sb.append("--ctl='").append(line).append("' "); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //formulafile to --ctl strings
+        String formulalist=sb.toString();
+        cli = cli + " "+formulalist;
+        if(toWslPath) {
+            cli = cli+  toWSLPath(automatonFile);
+            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
+        }else{
+            cli = cli  + (automatonFile) ;
+            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
+        }
+        Helper.RunOSChildProcess(cli);
+    }
+
     public static String CurrentDateToFolder(){
         Date aDate = Calendar.getInstance().getTime();
         return DateToFolder(aDate);

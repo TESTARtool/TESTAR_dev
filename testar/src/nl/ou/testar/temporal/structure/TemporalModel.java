@@ -191,10 +191,18 @@ public class TemporalModel extends TemporalBean{
     }
 
     public String makeETFOutput(){
-        //see http://adl.github.io/hoaf/
+        //see https://ltsmin.utwente.nl/assets/man/etf.html
         StringBuilder result=new StringBuilder();
         result.append("%tool: \"TESTAR-CSS20200126\"\n");
-        result.append("%name: \""+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\"\n");
+        result.append("%name: \"" + "app= ").
+                append(this.getApplicationName()).
+                append(", ver=").
+                append(this.getApplicationVersion()).
+                append(", modelid= ").
+                append(this.getApplication_ModelIdentifier()).
+                append(", abstraction= ").
+                append(this.getApplication_AbstractionAttributes()).
+                append("\"\n");
         result.append("%modified: ").append(get_modifieddate()).append("\n");
         result.append("%\n");
         result.append("begin state\n");
@@ -213,8 +221,10 @@ public class TemporalModel extends TemporalBean{
         result.append("transition:transition\n");
         result.append("end edge\n");
         result.append("begin init\n");
+        Set<String> initialStatesSet = new HashSet<>(InitialStates);
 
-        for (String initstate : InitialStates
+
+        for (String initstate : initialStatesSet
         ) {
 
             for (StateEncoding stenc : stateEncodings

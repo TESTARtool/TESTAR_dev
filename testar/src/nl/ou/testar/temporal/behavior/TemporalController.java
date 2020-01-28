@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
@@ -40,29 +41,60 @@ public class TemporalController {
     private String ApplicationName;
     private String ApplicationVersion;
     private String Modelidentifier;
+
+
+
     private String outputDir;
-    private boolean toWSLPath;
+    private boolean ltlToWSLPath;
+    private boolean ctlToWSLPath;
+    private String ltlMCCommand;
+    private String ctlMCCommand;
+    private String APSelectorFile;
+    private String oracleFile;
+    private boolean verbose;
+    private boolean instrumentDeadlockState;
+
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
     private TemporalModel tModel;
     private TemporalDBHelper tDBHelper;
     private List<TemporalOracle> oracleColl;
 
-    public TemporalController(final Settings settings) {
+    public TemporalController(final Settings settings, String outputDir) {
         this.ApplicationName = settings.get(ConfigTags.ApplicationName);
         this.ApplicationVersion = settings.get(ConfigTags.ApplicationVersion);
         setModelidentifier(settings);
         dbConfig = makeConfig(settings);
-        String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
-                dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
+        //String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
+        //        dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
-        this.outputDir = makeOutputDir(settings);
+        if (outputDir.equals("")){
+            this.outputDir = makeOutputDir(settings);
+        }
+        else {
+            this.outputDir = outputDir;
+        }
+
         tDBHelper = new TemporalDBHelper(settings);
         tModel = new TemporalModel();
-        toWSLPath = settings.get(ConfigTags.TemporalLTLCheckerWSL);
+        ltlToWSLPath = settings.get(ConfigTags.TemporalLTLCheckerWSL);
+        ctlToWSLPath = settings.get(ConfigTags.TemporalCTLCheckerWSL);
+        ltlMCCommand=settings.get(ConfigTags.TemporalLTLChecker);
+        ctlMCCommand=settings.get(ConfigTags.TemporalCTLChecker);
+        APSelectorFile=settings.get(ConfigTags.TemporalLTLAPSelectorManager);
+        oracleFile= settings.get(ConfigTags.TemporalLTLOracles);
+        verbose=settings.get(ConfigTags.TemporalLTLVerbose);
+        instrumentDeadlockState=settings.get(ConfigTags.TemporalInstrumentDeadlockState);
+
         setDefaultAPSelectormanager();
 
+    }
+    public TemporalController(final Settings settings) {
+        this(settings,"");
+    }
 
+    public String getOutputDir() {
+        return outputDir;
     }
 
     public void setTemporalModelMetaData(AbstractStateModel abstractStateModel) {
@@ -215,16 +247,24 @@ public class TemporalController {
             }
         }
         tDBHelper.dbClose();
-        return sb.toString();
+        String dbfilename=outputDir+"Databasemodels.txt";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbfilename))) {
+            bw.write(sb.toString());
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "inspect file: "+dbfilename;
     }
 
 
     //*********************************
-    public void computeTemporalModel(AbstractStateModel abstractStateModel) {
+    private void computeTemporalModel(AbstractStateModel abstractStateModel, boolean instrumentDeadState) {
 
         OResultSet resultSet = tDBHelper.getConcreteStatesFromOrientDb(abstractStateModel);
 
         if (abstractStateModel != null) {
+
 
             //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
             boolean firstDeadState = true;
@@ -240,16 +280,15 @@ public class TemporalController {
                     OVertex stateVertex = op.get();
                     StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
                     Set<String> propositions = new LinkedHashSet<>();
-
-
                     boolean deadstate = false;
-
                     Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
                     Iterator<OEdge> edgeiter = outedges.iterator();
                     deadstate = !edgeiter.hasNext();
 
                     if (deadstate) {
-                        if (firstDeadState) {
+                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
+                        if (instrumentDeadState && firstDeadState)
+                        {
                             //add stateenc for 'Dead', inclusive dead transition selfloop;
                             deadStateEnc = new StateEncoding("#dead");
                             Set<String> deadStatePropositions = new LinkedHashSet<>();
@@ -268,16 +307,14 @@ public class TemporalController {
                             tModel.addStateEncoding(deadStateEnc, false);
                             firstDeadState = false;
                         }
-                        stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
-
-                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
+                        if (!instrumentDeadState) stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
                         tDBHelper.computeProps(propertyName, stateVertex, propositions, null, false, false);
                     }
                     propositions.addAll(tDBHelper.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
-                    senc.setStateAPs(propositions); // to be decided:  whether to include current AP's on a deadstate
-                    if (deadstate) {
+                    senc.setStateAPs(propositions);
+                    if (instrumentDeadState && deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
                         deadTrenc.setTransition("#dead_" + stateVertex.getIdentity().toString());
                         deadTrenc.setTargetState("#dead");
@@ -287,7 +324,8 @@ public class TemporalController {
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
                         senc.setTransitionColl(deadTrencList);
-                    } else senc.setTransitionColl(tDBHelper.getTransitions(senc.getState()));
+                    }
+                    else senc.setTransitionColl(tDBHelper.getTransitions(senc.getState()));
 
                     tModel.addStateEncoding(senc, false);
                 }
@@ -419,10 +457,20 @@ public class TemporalController {
 
     }
 
-    public void ModelCheck(TemporalType tType, String pathToExecutable, String APSelectorFile, String oracleFile, boolean verbose) {
+    public void MCheck() {
+
+        MCheck(ltlMCCommand,APSelectorFile,oracleFile,verbose,instrumentDeadlockState,ctlMCCommand,ltlToWSLPath,ctlToWSLPath);
+    }
+
+
+    public void MCheck(String ltlMCCommand, String APSelectorFile, String oracleFile, boolean verbose, boolean instrumentDeadState, String ctlMCCommand, boolean ltlWSLPath, boolean ctlWSLPath) {
         try {
-            System.out.println(tType + " model-checking started \n");
-            String strippedFile;
+            System.out.println(" model-checking started \n");
+            //tDBHelper.dbReopen();
+            tModel = new TemporalModel();
+            AbstractStateModel abstractStateModel = getAbstractStateModel();
+            setTemporalModelMetaData(abstractStateModel);
+            loadApSelectorManager(APSelectorFile);
             String APCopy = "copy_of_used_" + Paths.get(APSelectorFile).getFileName().toString();
             String OracleCopy = "copy_of_used_" + Paths.get(oracleFile).getFileName().toString();
             if (verbose) {
@@ -431,71 +479,97 @@ public class TemporalController {
                 Files.copy((new File(oracleFile).toPath()),
                         new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-
-            String filename = Paths.get(oracleFile).getFileName().toString();
-            if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
-            else strippedFile = filename;
-
-            File automatonFile = new File(outputDir + "Model.hoa");
-            File ETFautomatonFile = new File(outputDir + "Model.etf");
-
-            File formulaFile = new File(outputDir + "LTL_formulas.txt");
-            File resultsFile = new File(outputDir + "LTL_results.txt");
-            File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
-            File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-            makeTemporalModel(APSelectorFile,verbose);
-
-            List<TemporalOracle> fromcoll;
-            fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
+            List<TemporalOracle>   fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
             if (fromcoll == null) {
                 System.err.println("Error: verify the file at location '" + oracleFile + "'");
             } else {
                 setOracleColl(fromcoll);
                 updateOracleCollMetaData(false);
-                saveFormulaFiles(fromcoll, formulaFile);
-                CSVHandler.save(fromcoll, inputvalidatedFile.getAbsolutePath());
             }
+            String strippedFile;
+            String filename = Paths.get(oracleFile).getFileName().toString();
+            if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
+            else strippedFile = filename;
+            File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
+            File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
 
-            //from here on LTL specific logic
-            //if (tType==TemporalType.LTL){}
-            saveModelForChecker(TemporalType.LTL, automatonFile.getAbsolutePath());
-            saveModelForChecker(TemporalType.CTL, ETFautomatonFile.getAbsolutePath());
+            Map<TemporalType, List<TemporalOracle>> oracleTypedMap=
+                    fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
-            String aliveprop = gettModel().getAliveProposition("!dead");
-            System.out.println(tType + " invoking the backend model-checker \n");
-            Helper.LTLModelCheck(pathToExecutable, toWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
-            System.out.println(tType + " starting to verify the results form the backend model-checker \n");
-            Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), fromcoll);//decode results
-            List<TemporalOracle> modelCheckedOracles = sParse.parse(resultsFile);
-            if (modelCheckedOracles == null) {
-                System.err.println("Error detected in obtained results from the model-checker");
-            } else {
-                updateOracleCollMetaData(true);
-                CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
-
-            }
-            //above is LTL specific logic
-
-            System.out.println(tType + " starting post processing output files \n");
+            makeTemporalModel(APSelectorFile,verbose, instrumentDeadState);
             if (verbose) {
+                System.out.println(" exporting model files\n");
                 saveToGraphMLFile("GraphML.XML", false);
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true);
                 saveModelAsJSON("APEncodedModel.json");
-            } else {
-                Files.delete(automatonFile.toPath());
-                Files.delete(resultsFile.toPath());
-                Files.delete(formulaFile.toPath());
-                Files.delete(inputvalidatedFile.toPath());
             }
-            tDBHelper.dbClose();
-            System.out.println(tType + " model-checking completed \n");
+            List<TemporalOracle> initialoraclelist=new ArrayList<>();
+            List<TemporalOracle> finaloraclelist=new ArrayList<>();
+
+            for (Map.Entry<TemporalType, List<TemporalOracle>> oracleentry:oracleTypedMap.entrySet()
+                 ) {
+                List<TemporalOracle> modelCheckedOracles=null;
+                File automatonFile=null;
+                String oracleType = oracleentry.getKey().name();
+                List<TemporalOracle> oracleList =oracleentry.getValue();
+
+                File formulaFile = new File(outputDir + oracleType+"_formulas.txt");
+                File resultsFile = new File(outputDir + oracleType+"_results.txt");
+                saveFormulaFiles(oracleList, formulaFile);
+                initialoraclelist.addAll(oracleList);
+                System.out.println(oracleType + " invoking the "+"backend model-checker \n");
+                if (oracleType.equals(TemporalType.LTL.name())){
+                    automatonFile = new File(outputDir + "Model.hoa");
+                    saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
+                    String aliveprop = gettModel().getAliveProposition("!dead");
+
+                    Helper.LTLModelCheck(ltlMCCommand, ltlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
+                    Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), oracleList);//decode results
+                    modelCheckedOracles = sParse.parse(resultsFile);
+                }
+                else if (oracleType.equals(TemporalType.CTL.name())){
+                    automatonFile = new File(outputDir + "Model.etf");
+                    saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
+                    Helper.CTLModelCheck(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
+                    Ltsmin_CheckerResultsParser sParse = new Ltsmin_CheckerResultsParser(gettModel(), oracleList);//decode results
+                    modelCheckedOracles = sParse.parse(resultsFile);
+                }
+                else{
+                    System.err.println(oracleType+" Error this oracle type is not implemented");}
+                System.out.println(oracleType + " verifying the results form the backend model-checker \n");
+                if (modelCheckedOracles == null) {
+                    System.err.println(oracleType+" Error detected in obtained results from the model-checker");
+                } else {
+                    //updateOracleCollMetaData(true);
+                    finaloraclelist.addAll(modelCheckedOracles);
+                    CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
+                }
+
+                if (!verbose)  {
+                    Files.delete(automatonFile.toPath());
+                    Files.delete(resultsFile.toPath());
+                    Files.delete(formulaFile.toPath());
+                    Files.delete(inputvalidatedFile.toPath());
+                }
+
+                System.out.println(oracleType + " model-checking completed \n");
+            }
+            CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
+            if (finaloraclelist == null || finaloraclelist.size()!=fromcoll.size()) {
+                System.err.println(" Error detected in obtained results from one of the model-checkers (less oracle verdicts received than asked for)");
+            } else {
+                //updateOracleCollMetaData(true);
+                CSVHandler.save(finaloraclelist, modelCheckedFile.getAbsolutePath());
+            }
+
+            System.out.println(" model-checking completed \n");
         } catch (Exception f) {
             f.printStackTrace();
         }
 
     }
 
-    public void makeTemporalModel(String APSelectorFile, boolean verbose) {
+    public void makeTemporalModel(String APSelectorFile, boolean verbose, boolean instrumentDeadState) {
         try {
             System.out.println(" compute temporal model started \n");
 
@@ -506,7 +580,7 @@ public class TemporalController {
                 saveAPSelectorManager("default_APSelectorManager.json");
             }
             tDBHelper.dbReopen();
-            computeTemporalModel(abstractStateModel);
+            computeTemporalModel(abstractStateModel, instrumentDeadState);
             tDBHelper.dbClose();
             if(verbose) {
                 saveModelAsJSON("APEncodedModel.json");
@@ -522,7 +596,7 @@ public class TemporalController {
     public void generateOraclesFromPatterns(String APSelectorfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
         try {
             System.out.println(" potential Oracle generator started \n");
-            makeTemporalModel(APSelectorfile,false);
+            makeTemporalModel(APSelectorfile,false, true);
             List<TemporalPattern> patterns = CSVHandler.load(patternFile, TemporalPattern.class);
             List<TemporalPatternConstraint> patternConstraints=null;
             if (!patternConstraintFile.equals("")){

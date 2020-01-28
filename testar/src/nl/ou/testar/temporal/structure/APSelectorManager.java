@@ -24,15 +24,14 @@ public class APSelectorManager {
         stateFilter = new APSelector();
         transitionFilter = new APSelector();
         widgetfilters = new LinkedHashSet<>();
+        comments.add(" Apkey is must be a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
         comments.add(" !!!!ONLY EMPTY 'selectedattributes' or' valuedexpression' will be enriched with 'Enabled,Role,IsDeadState' attributes and 'exists__' and isblank__' expressions");
        comments.add(" second widget filter lists the default protperties");
        comments.add(" EMPTY widget <ROLE-PATH-TITLE> filters will result in acceptance of  <ALL ROLE- ALL PATH -ALL TITLE>");
         comments.add("Consider when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
         comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and is NOT listed in the map of modelAp's");
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
-       // comments.add(" Apkey is considered read-only and is a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
-        comments.add("this enables to distinguish 2 buttons with the same title in the relative window in 2 different states");
-        comments.add("this is not functional yet. CSS 20190630");
+
     }
     public APSelectorManager(boolean initializeWithDefaults) {
          this(initializeWithDefaults,null);
@@ -41,7 +40,7 @@ public class APSelectorManager {
     public APSelectorManager(boolean initializeWithDefaults,List<String> APKey) {
         this();
         if (initializeWithDefaults){
-            updateFreeFormatText("This is a Sample APSelectorManager with two widget filters");
+            updateFreeFormatText("This is a Sample APSelectorManager with two widget filters.");
             stateFilter = new APSelector();
             transitionFilter = new APSelector();
             stateFilter.setSelectedStateAttributes(APSelector.useMinimalAttributes());
