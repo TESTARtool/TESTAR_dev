@@ -530,8 +530,10 @@ public class TemporalController {
                 else if (oracleType.equals(TemporalType.CTL.name())){
                     automatonFile = new File(outputDir + "Model.etf");
                     saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
-                    Helper.CTLModelCheck(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
-                    Ltsmin_CheckerResultsParser sParse = new Ltsmin_CheckerResultsParser(gettModel(), oracleList);//decode results
+                    //v2 is the ITS-CTL checker: not using witness because this is  difficult to understand and to parse and present.
+                    //LTSMIN version works, but Ltsmin command has a bug : gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
+                    Helper.CTLModelCheckV2(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
+                    ITSctl_CheckerResultsParser sParse = new ITSctl_CheckerResultsParser(gettModel(), oracleList);//decode results
                     modelCheckedOracles = sParse.parse(resultsFile);
                 }
                 else{

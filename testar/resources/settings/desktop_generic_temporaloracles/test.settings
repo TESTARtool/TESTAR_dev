@@ -133,7 +133,10 @@ TemporalOffLineEnabled = false
 TemporalConcreteEqualsAbstract = true
 TemporalLTLChecker = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
 TemporalLTLCheckerWSL = true
-TemporalCTLChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-sym
+
+#TemporalCTLChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-sym
+#TemporalCTLCheckerWSL = true
+TemporalCTLChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ctl
 TemporalCTLCheckerWSL = true
 TemporalLTLVerbose = true
 TemporalInstrumentDeadlockState = true

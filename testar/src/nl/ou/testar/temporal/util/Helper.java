@@ -108,7 +108,9 @@ public class Helper {
         Helper.RunOSChildProcess(cli);
     }
     public static  void CTLModelCheck(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile,  String resultsFile) {
-        //String cli = "ubuntu1804 run ~/bin/ltsminv3.0.2/etf3lts-sym  --ctl='A[](E<>(ap123=="true")))' --ctl='E<>(!ap321=="false")' -- ctl='...' model.etf &> results.txt;
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-sym  --ctl='A[](E<>(ap123=="true")))' --ctl='E<>(!ap321=="false")' -- ctl='...' model.etf &> results.txt;
+
+
         String  cli = pathToExecutable;
         File rFile = new File(formulaFile);
         StringBuilder sb = new StringBuilder();
@@ -127,6 +129,18 @@ public class Helper {
             if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
         }else{
             cli = cli  + (automatonFile) ;
+            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
+        }
+        Helper.RunOSChildProcess(cli);
+    }
+    public static  void CTLModelCheckV2(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile,  String resultsFile) {
+        //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
+        String  cli = pathToExecutable;
+        if(toWslPath) {
+            cli = cli+ " -i "+ toWSLPath(automatonFile)+" -t ETF -ctl "+toWSLPath(formulaFile);
+            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
+        }else{
+            cli = cli+ " -i "+ automatonFile+" -t ETF -ctl "+formulaFile;
             if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
         }
         Helper.RunOSChildProcess(cli);

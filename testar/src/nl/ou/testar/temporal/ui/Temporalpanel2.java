@@ -459,7 +459,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         textFieldPythonVisualizer.setText(settings.get(ConfigTags.TemporalVisualizerServer));
         VisualizerURL = settings.get(ConfigTags.TemporalVisualizerURL);
         VisualizerURLStop = settings.get(ConfigTags.TemporalVisualizerURLStop);
-        tcontrol = new TemporalController(settings);// look for better location
+        if (outputDir!=null && !outputDir.equals("")){// when triggered by save button on the general panel
+            tcontrol = new TemporalController(settings,outputDir);// look for better location
+        }else
+            tcontrol = new TemporalController(settings);
         outputDir=tcontrol.getOutputDir();
     }
 
