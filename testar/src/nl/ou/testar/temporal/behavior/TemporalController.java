@@ -466,7 +466,6 @@ public class TemporalController {
     public void MCheck(String ltlMCCommand, String APSelectorFile, String oracleFile, boolean verbose, boolean instrumentDeadState, String ctlMCCommand, boolean ltlWSLPath, boolean ctlWSLPath) {
         try {
             System.out.println(" model-checking started \n");
-            //tDBHelper.dbReopen();
             tModel = new TemporalModel();
             AbstractStateModel abstractStateModel = getAbstractStateModel();
             setTemporalModelMetaData(abstractStateModel);
@@ -521,10 +520,12 @@ public class TemporalController {
                 if (oracleType.equals(TemporalType.LTL.name())){
                     automatonFile = new File(outputDir + "Model.hoa");
                     saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
-                    String aliveprop = gettModel().getAliveProposition("!dead");
+                    String aliveprop = gettModel().getAliveProposition("!dead"); //instrumentDeadState will determine whether this return value is ""
 
                     Helper.LTLModelCheck(ltlMCCommand, ltlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
-                    Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), oracleList);//decode results
+                    Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser();//decode results
+                    sParse.setTmodel(gettModel());
+                    sParse.setOracleColl(oracleList);
                     modelCheckedOracles = sParse.parse(resultsFile);
                 }
                 else if (oracleType.equals(TemporalType.CTL.name())){
@@ -533,7 +534,9 @@ public class TemporalController {
                     //v2 is the ITS-CTL checker: not using witness because this is  difficult to understand and to parse and present.
                     //LTSMIN version works, but Ltsmin command has a bug : gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
                     Helper.CTLModelCheckV2(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
-                    ITSctl_CheckerResultsParser sParse = new ITSctl_CheckerResultsParser(gettModel(), oracleList);//decode results
+                    ITSctl_CheckerResultsParser sParse = new ITSctl_CheckerResultsParser();//decode results
+                    sParse.setTmodel(gettModel());
+                    sParse.setOracleColl(oracleList);
                     modelCheckedOracles = sParse.parse(resultsFile);
                 }
                 else{
@@ -542,9 +545,8 @@ public class TemporalController {
                 if (modelCheckedOracles == null) {
                     System.err.println(oracleType+" Error detected in obtained results from the model-checker");
                 } else {
-                    //updateOracleCollMetaData(true);
                     finaloraclelist.addAll(modelCheckedOracles);
-                    CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
+                 //   CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
                 }
 
                 if (!verbose)  {
@@ -553,22 +555,19 @@ public class TemporalController {
                     Files.delete(formulaFile.toPath());
                     Files.delete(inputvalidatedFile.toPath());
                 }
-
                 System.out.println(oracleType + " model-checking completed \n");
             }
             CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
-            if (finaloraclelist == null || finaloraclelist.size()!=fromcoll.size()) {
+            if (finaloraclelist.size()!=fromcoll.size()) {
                 System.err.println(" Error detected in obtained results from one of the model-checkers (less oracle verdicts received than asked for)");
             } else {
-                //updateOracleCollMetaData(true);
+                updateOracleCollMetaData(true);
                 CSVHandler.save(finaloraclelist, modelCheckedFile.getAbsolutePath());
             }
-
             System.out.println(" model-checking completed \n");
         } catch (Exception f) {
             f.printStackTrace();
         }
-
     }
 
     public void makeTemporalModel(String APSelectorFile, boolean verbose, boolean instrumentDeadState) {
