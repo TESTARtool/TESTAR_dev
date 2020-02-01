@@ -223,7 +223,7 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getOutgoingTransitionsForState(String stateId) {
-        return stateTransitionsBySource.get(stateId);
+        return stateTransitionsBySource.getOrDefault(stateId, new HashSet<>());
     }
 
     /**
@@ -232,7 +232,7 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getIncomingTransitionsForState(String stateId) {
-        return stateTransitionsByTarget.get(stateId);
+        return stateTransitionsByTarget.getOrDefault(stateId, new HashSet<>());
     }
 
     /**

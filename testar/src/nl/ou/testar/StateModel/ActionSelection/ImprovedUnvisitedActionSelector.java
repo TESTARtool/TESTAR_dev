@@ -6,12 +6,16 @@ import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.ActionSelection.Model.SelectorNode;
 import nl.ou.testar.StateModel.ActionSelection.Model.SelectorTree;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ImprovedUnvisitedActionSelector implements ActionSelector {
+
+    Logger logger;
 
     /**
      * A list of actions to execute in order.
@@ -34,43 +38,60 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     ImprovedUnvisitedActionSelector() {
         executionPath = new LinkedList<>();
         nrOfFlowAlterations = 0;
+        logger = LoggerFactory.getLogger(ImprovedUnvisitedActionSelector.class);
+        System.out.println("Class: " + ImprovedUnvisitedActionSelector.class);
     }
 
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
+        logger.debug("Calling selectionAction");
+        logger.debug("stateId: {}", currentState.getStateId());
+        logger.debug("nr of visited actions: {}", currentState.getVisitedActions().size());
+        logger.debug("nr of unvisited actions: {}", currentState.getUnvisitedActions().size());
+        logger.debug("nr of items in execution path: {}", executionPath.size());
+        logger.debug("nr of flow alterations: {}", nrOfFlowAlterations);
         // if the flow was altered, this could be because of non-determinism in the model
         // when that is the case, this action selector is not really useful anymore, because it can get stuck in a loop
         // there are several smart ways to fix this, but we opt for an easy one for now:
         // we throw an exception, so the random action selection algorithm can take over
         if (nrOfFlowAlterations >= MAX_FLOW_ALTERATIONS) {
             System.out.println("Too many alterations in the flow. Throwing exception.");
+            logger.debug("Too many alterations in the flow. Throwing exception.");
             throw new ActionNotFoundException();
         }
 
         // check if we currently have an active execution path that we are on
         if (!executionPath.isEmpty()) {
+            logger.debug("Retrieving action from execution path");
             // check if the first action is available in the current state
             // if not, our model did not match the situation that Testar encountered during execution
             AbstractAction nextInLine = executionPath.removeFirst();
+            logger.debug("Retrieved action id: {}", nextInLine.getActionId());
             if (currentState.getActionIds().contains(nextInLine.getActionId())) {
+                logger.debug("Returning retrieved action");
                 return nextInLine;
             }
 
             // something went wrong, output a message
             System.out.println("Action selection expected to be able to return action with id: " + nextInLine.getActionId() + " , but the flow was altered");
+            logger.debug("Action selection expected to be able to return action with id: " + nextInLine.getActionId() + " , but the flow was altered");
             nrOfFlowAlterations++;
             executionPath = new LinkedList<>();
         }
 
         // retrieve a new execution path
+        logger.debug("Fetching new execution path");
         SelectorNode rootNode = new SelectorNode(currentState, null, 0, null);
+        logger.debug("Root node state id: {}", rootNode.getAbstractState().getStateId());
         SelectorTree tree = new SelectorTree(rootNode);
         executionPath = retrieveUnvisitedActions(tree, abstractStateModel, new HashSet<>());
 
         if (executionPath.isEmpty()) {
+            logger.debug("Could not find an execution path.");
             throw new ActionNotFoundException();
         }
         System.out.println("New execution path: " + executionPath.stream().map(AbstractAction::getActionId).reduce("", (base, next) -> base + ", " + next));
+        logger.debug("New execution path: " + executionPath.stream().map(AbstractAction::getActionId).reduce("", (base, next) -> base + ", " + next));
         // remove the first action in the execution path
         return executionPath.removeFirst();
     }
@@ -83,11 +104,12 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
      * @return
      */
     private LinkedList<AbstractAction> retrieveUnvisitedActions(SelectorTree tree, AbstractStateModel abstractStateModel, Set<String> visitedStateIds) {
-
+        logger.debug("Retrieving unvisited actions");
         // check if one of the tree's leaves currently has unvisited abstract actions
         // if so, we want to retrieve the entire path of actions that has to be taken to arrive at that unvisited abstract action
         List<LinkedList<SelectorNode>> nodePaths = tree.getLeafNodes().stream().filter(node -> node.getAbstractState() != null && !node.getAbstractState().getUnvisitedActions().isEmpty())
                 .map(SelectorNode::getNodePath).collect(Collectors.toList());
+        logger.debug("Nr of nodepaths found: {}", nodePaths.size());
 
         if (!nodePaths.isEmpty()) {
             // we have found some paths to abstract states with unvisited abstract actions
@@ -98,7 +120,9 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
                 return sizeOfB - sizeOfA;
             });
 
+
             LinkedList<SelectorNode> nodePath = nodePaths.get(0);
+            logger.debug("First nodepath has {} nodes", nodePath.size());
             // collect a random unvisited action and append it to the path we need to traverse to get to the state where
             // it is executable
             Stream<AbstractAction> actionStream = nodePath.stream().map(SelectorNode::getAbstractAction).filter(Objects::nonNull);

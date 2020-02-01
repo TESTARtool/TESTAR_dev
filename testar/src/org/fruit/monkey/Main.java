@@ -35,6 +35,10 @@
  */
 package org.fruit.monkey;
 
+import ch.qos.logback.access.joran.JoranConfigurator;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -62,6 +66,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.fruit.alayer.windows.UIATags;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -111,7 +116,6 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-
 		Arrays.stream(args).forEach(System.out::println);
 
 		isValidJavaEnvironment();
@@ -555,6 +559,7 @@ public class Main {
 			defaults.add(Pair.from(InitTests, false));
 			defaults.add(Pair.from(InitTestsOnly, false));
 			defaults.add(Pair.from(ResetDbFirst, false));
+			defaults.add(Pair.from(DebugEnabled, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

@@ -3,12 +3,13 @@ package nl.ou.testar.StateModel;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.Persistable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AbstractState extends AbstractEntity implements Persistable {
+public class AbstractState extends AbstractEntity implements Persistable, Serializable {
 
     // list of possible actions that can be executed from this state
     private Map<String, AbstractAction> actions;

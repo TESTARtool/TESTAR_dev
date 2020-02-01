@@ -204,6 +204,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
+	org.slf4j.Logger logger = LoggerFactory.getLogger(DefaultProtocol.class);
+
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -862,6 +864,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
 				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 				CodingManager.buildEnvironmentActionIDs(state, escAction);
+				logger.debug("Adding escape key to action list.");
 				actions.add(escAction);
 				escAttempts++;
 			} else
@@ -1716,6 +1719,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Action a = KillProcess.byName(this.forceKillProcess, 0);
 			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
 			CodingManager.buildEnvironmentActionIDs(state, a);
+			logger.debug("Adding killing the process as action.");
 			this.forceKillProcess = null;
 			return a;
 		}
@@ -1727,6 +1731,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
 			CodingManager.buildEnvironmentActionIDs(state, a);
+			logger.debug("Adding bringing the system to the foreground as action");
 			this.forceToForeground = false;
 			return a;
 		}
@@ -1738,6 +1743,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			CodingManager.buildEnvironmentActionIDs(state, a);
+			logger.debug("Adding pressing the escape key as action.");
 			this.forceNextActionESC = false;
 			return a;
 		} else
