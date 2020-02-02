@@ -107,6 +107,66 @@ public class SqlManager {
         }
     }
 
+    public void initTest2() {
+        try {
+            Connection connection = this.getConnection();
+            // fetch the application
+            String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
+            Statement appStatement = connection.createStatement();
+            ResultSet resultSet1 = appStatement.executeQuery(fetchApplicationQuery);
+            resultSet1.first();
+            int applicationId = resultSet1.getInt("application_id");
+
+
+            // now fetch the widgets
+            String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
+            Statement widgetStatement = connection.createStatement();
+            ResultSet resultSet2 = widgetStatement.executeQuery(fetchWidgetQuery);
+
+            // in test 1, we create tests with just a single widget
+            String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
+                    "VALUES(?, ?, ?, ?)";
+            PreparedStatement preparedStatement1 = connection.prepareStatement(testRunInsertQuery, Statement.RETURN_GENERATED_KEYS);
+
+            String widgetAttachQuery = "INSERT INTO test_run_widget(test_run_id, widget_id) VALUES(?, ?)";
+            PreparedStatement widgetAttachStatement = connection.prepareStatement(widgetAttachQuery);
+
+            // in the second test, we make combinations of widgets
+            List<Integer> widgetIds = new ArrayList<>();
+            while (resultSet2.next()) {
+                widgetIds.add(resultSet2.getInt("widget_id"));
+            }
+
+            // now create the combinations
+            List<int[]> combinations = generateCombinations(widgetIds, 2);
+            System.out.println("Number of combinations: " + combinations.size());
+
+            // for each combination, we insert a test run
+            for (int[] combination : combinations) {
+                preparedStatement1.setInt(1, applicationId);
+                preparedStatement1.setInt(2, 4);
+                preparedStatement1.setInt(3, 50);
+                preparedStatement1.setInt(4, 0);
+                preparedStatement1.execute();
+
+                // fetch the generated test run id
+                ResultSet keys = preparedStatement1.getGeneratedKeys();
+                keys.next();
+                int testRunId = keys.getInt(1);
+
+                for (int widgetId: combination) {
+                    widgetAttachStatement.setInt(1, testRunId);
+                    widgetAttachStatement.setInt(2, widgetId);
+                    widgetAttachStatement.execute();
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<TestRun> getTestRuns() {
         List<TestRun> testRuns = new ArrayList<>();
         try {
@@ -172,6 +232,23 @@ public class SqlManager {
             System.exit(1);
         }
 
+    }
+
+    private List<int[]> generateCombinations(List<Integer> input, int r) {
+        List<int[]> combinations = new ArrayList<>();
+        helper(combinations, new int[r], 0, input.size() -1, 0, input);
+        return combinations;
+    }
+
+    private void helper(List<int[]> combinations, int[] data, int start, int end, int index, List<Integer> input) {
+        if (index == data.length) {
+            int[] combination = data.clone();
+            combinations.add(combination);
+        } else if (start <= end) {
+            data[index] = input.get(start);
+            helper(combinations, data, start + 1, end, index + 1, input);
+            helper(combinations, data, start + 1, end, index, input);
+        }
     }
 
 }
