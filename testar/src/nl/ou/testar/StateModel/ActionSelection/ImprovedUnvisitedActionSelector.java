@@ -25,7 +25,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     /**
      * The maximum nr of times that the flow can be altered.
      */
-    private final int MAX_FLOW_ALTERATIONS = 1;
+    private final int MAX_FLOW_ALTERATIONS = 5;
 
     /**
      * The number of times that the flow was altered.

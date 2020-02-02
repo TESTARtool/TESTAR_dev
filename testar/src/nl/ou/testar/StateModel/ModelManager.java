@@ -235,7 +235,14 @@ public class ModelManager implements StateModelManager {
             return null;
         }
         try {
-            String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
+            AbstractAction abstractAction = actionSelector.selectAction(currentAbstractState, abstractStateModel);
+            if (abstractAction == null) {
+                String message = "The action selector could not retrieve an action for state " + currentAbstractState.getStateId();
+                System.out.println(message);
+                errorMessages.add(message);
+                return null;
+            }
+            String abstractIdCustom = abstractAction.getActionId();
             System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
             for(Action action : actions) {
             	try {
