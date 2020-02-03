@@ -68,6 +68,7 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -117,6 +118,8 @@ import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
+
+import com.google.common.collect.Sets;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -823,9 +826,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
-			for(Action a : actions)
-				if(a.get(Tags.AbstractIDCustom, null) == null)
-					CodingManager.buildEnvironmentActionIDs(state, a);
 			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
@@ -874,9 +874,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
-		for(Action a : actions)
-			if(a.get(Tags.AbstractIDCustom, null) == null)
-				CodingManager.buildEnvironmentActionIDs(state, a);
 		
 		stateModelManager.notifyNewStateReached(state, actions);
 
@@ -1083,6 +1080,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// notify the statemodelmanager
 			stateModelManager.notifyTestSequencedStarted();
+			
+			lastState = getState(system);
 		}
 		//else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
 
@@ -1123,13 +1122,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
 
-				CodingManager.buildIDs(state, actionStatus.getAction());
+				Action recordedAction = actionStatus.getAction();
+				
+				// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
+				for(Action a : actions)
+					if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None")))
+						recordedAction = a;
+				
+				// If something went wrong trying to find the action, we need to create the AbstractIDCustom
+				if(recordedAction.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
+				
+				//notify the state model manager of the Recorded action
+				stateModelManager.notifyRecordedAction(recordedAction);
 
-				//notify the state model manager of the executed action
-				stateModelManager.notifyActionExecution(actionStatus.getAction());
-
-				saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
-				lastExecutedAction = actionStatus.getAction();
+				saveActionInfoInLogs(state, recordedAction, "RecordedAction");
+				lastExecutedAction = recordedAction;
+				lastState = state;
 				actionCount++;
 			}
 
@@ -1689,22 +1698,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if (this.forceKillProcess != null){
 			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionKillProcess = KillProcess.byName(this.forceKillProcess, 0);
+			actionKillProcess.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildEnvironmentActionIDs(state, actionKillProcess);
 			this.forceKillProcess = null;
-			return a;
+			return actionKillProcess;
 		}
 		//If deriveActions indicated that the SUT should be put back in the foreground
 		//Then here we will select the action to do that
 
 		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionActivateSystem = new ActivateSystem();
+			actionActivateSystem.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildEnvironmentActionIDs(state, actionActivateSystem);
 			this.forceToForeground = false;
-			return a;
+			return actionActivateSystem;
 		}
 
 		//TODO: This seems not to be used yet...
@@ -1712,10 +1721,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		else if (this.forceNextActionESC){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionEscape = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildEnvironmentActionIDs(state, actionEscape);
 			this.forceNextActionESC = false;
-			return a;
+			return actionEscape;
 		} else
 			return null;
 	}
@@ -1943,12 +1952,70 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	//TODO move to ManualRecording helper class??
 	//	/**
-	//	 * Records user action (for example for Generate-Manual)
+	//	 * Waits for an user UI action.
+	//	 * Requirement: Mode must be Record mode.
+	//	 */
+	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
+		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
+			if (userEvent != null){
+				Action mapAction = mapUserEvent(system, state);
+				//Only set the Action if was found on widget tree map
+				if(mapAction != null) {
+					actionStatus.setAction(mapAction);
+					actionStatus.setUserEventAction((actionStatus.getAction() != null));
+				}
+				userEvent = null;
+			}
+			synchronized(this){
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {}
+			}
+			
+			if(!getState(system).equals(state))
+				lastState = state;
+			
+			state = getState(system);
+
+			cv.begin(); Util.clear(cv);
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+
+			Set<Action> actions = deriveActions(system,state);
+			CodingManager.buildIDs(state, actions);
+
+			// Update the current abstract state.
+			// Not detected User actions could modify the state and change the abstract state
+			if (userEvent == null && !actionStatus.isUserEventAction()) {
+		    	
+		    	// Create unknown Action event to create a temporal transition
+		    	// Should be replaced or removed if the correct Actions was found later
+		    	Action unknown = new UnknownEventAction();
+		    	unknown.set(Tags.Role, Roles.System);
+		    	unknown.set(Tags.OriginWidget, lastState);
+		    	unknown.set(Tags.Desc, "Unknown Event Action");
+		    	
+		    	CodingManager.buildIDs(state, new HashSet<Action>(Arrays.asList(unknown)));
+		    	
+				stateModelManager.notifyConcurrenceStateReached(state, actions, unknown);
+			}
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) visualizeActions(cv, state, actions);
+
+			cv.end();
+		}
+	}
+
+	//TODO move to ManualRecording helper class??
+	//	/**
+	//	 * Records user action (for example for Record mode)
 	//	 *
 	//	 * @param state
 	//	 * @return
 	//	 */
-	protected Action mapUserEvent(State state){
+	protected Action mapUserEvent(SUT system, State state){
 		Assert.notNull(userEvent);
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
 			double x = ((Double)userEvent[1]).doubleValue();
@@ -1963,6 +2030,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
 			} catch (WidgetNotFoundException we){
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+
+				// Update the current abstract state.
+				// because map fail and the State Model is not synchronized with the SUT
+				Set<Action> actions = deriveActions(system,state);
+				CodingManager.buildIDs(state, actions);
+				
+				// Create unknown Action event to create a temporal transition
+		    	// Should be replaced or removed if the correct Actions was found later
+		    	Action unknown = new UnknownEventAction();
+		    	unknown.set(Tags.Role, Roles.System);
+		    	unknown.set(Tags.OriginWidget, lastState);
+		    	unknown.set(Tags.Desc, "Unknown Event Action");
+		    	
+		    	CodingManager.buildIDs(state, new HashSet<Action>(Arrays.asList(unknown)));
+
+				stateModelManager.notifyConcurrenceStateReached(state, actions, unknown);
+
 				return null;
 			}
 		} else if (userEvent[0] instanceof KBKeys) // key events
@@ -1981,39 +2065,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 		return null;
-	}
-
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Waits for an user UI action.
-	//	 * Requirement: Mode must be GenerateManual.
-	//	 */
-	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
-				actionStatus.setAction(mapUserEvent(state));
-				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				userEvent = null;
-			}
-			synchronized(this){
-				try {
-					this.wait(100);
-				} catch (InterruptedException e) {}
-			}
-			state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-
-			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) visualizeActions(cv, state, actions);
-
-			cv.end();
-		}
 	}
 
 	protected int escAttempts = 0;

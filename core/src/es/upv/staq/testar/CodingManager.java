@@ -233,6 +233,7 @@ public class CodingManager {
 	
 	/**
 	 * Builds IDs (abstract, concrete, precise) for an environment action.
+	 * These actions do not have an associated widget
 	 * @param action An action.
 	 */
 	public static synchronized void buildEnvironmentActionIDs(State state, Action action){		

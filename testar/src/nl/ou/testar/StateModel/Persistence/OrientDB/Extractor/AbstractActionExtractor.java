@@ -47,6 +47,18 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         for (String concreteActionId : concreteActionIds) {
             action.addConcreteActionId(concreteActionId);
         }
+        
+        // get user interest value if exist
+        PropertyValue userInterestValue = entity.getPropertyValue("userInterest");
+        
+        if(userInterestValue != null) {
+        	//Hydrated INTEGER auto converted to String ??
+        	if (userInterestValue.getType() != OType.STRING) {
+                throw new ExtractionException("String set was expected for user interest. " + userInterestValue.getType().toString() + " was given.");
+            }
+        	action.setUserInterest(Integer.parseInt((String) userInterestValue.getValue()));
+        }
+
         return action;
     }
 }

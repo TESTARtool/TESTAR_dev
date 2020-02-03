@@ -64,5 +64,8 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         if (!((AbstractAction) source).getConcreteActionIds().isEmpty()) {
             edgeEntity.addPropertyValue(concreteActionIds.getPropertyName(), new PropertyValue(concreteActionIds.getPropertyType(), ((AbstractAction) source).getConcreteActionIds()));
         }
+        
+        // add the user interest
+        edgeEntity.addPropertyValue("userInterest", new PropertyValue(OType.INTEGER, ((AbstractAction) source).getUserInterest()));
     }
 }
