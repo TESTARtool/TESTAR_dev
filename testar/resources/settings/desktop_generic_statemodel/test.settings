@@ -22,8 +22,8 @@ Mode = Spy
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnector = SUT_WINDOW_TITLE
+SUTConnectorValue = CODEO
 
 #################################################################
 # Sequences

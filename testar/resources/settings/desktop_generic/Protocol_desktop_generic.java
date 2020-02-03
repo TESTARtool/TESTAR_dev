@@ -29,8 +29,13 @@
  *******************************************************************************************************/
 
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
 import java.util.Set;
 import org.fruit.alayer.*;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
@@ -101,7 +106,16 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+		State state = super.getState(system);
+		
+		/*for(Widget w : state){
+			System.out.println("\n NEW WIDGET");
+			for (Tag<?> t : w.tags()) {
+				System.out.println("Tag: "+ t + " Value: " + w.get(t, null));
+			}
+		}*/
+		
+		return state;
 	}
 
 	/**
@@ -137,26 +151,65 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
+		
+		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
 
+        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+        for(Widget w : getTopWidgets(state)){
 
-		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+                continue; // skip this iteration of the for-loop
+            }
 
-		if(actions.size()==0){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+            // Only consider enabled and non-blocked widgets
+            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+                // Do not build actions for widgets on the blacklist
+                // The blackListed widgets are those that have been filtered during the SPY mode with the
+                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+                if (!blackListed(w)){
+
+                    //For widgets that are:
+                    // - clickable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of left clicking on them
+                    if(isClickable(w) && isUnrecognizedCheckBox(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.leftClickAt(w));
+                    }
+
+                    //For widgets that are:
+                    // - typeable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of typing into them
+                    if(isTypeable(w) && !isUnrecognizedCheckBox(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a type action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                    }
+                    //Add sliding actions (like scroll, drag and drop) to the derived actions
+                    //method defined below.
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                }
+            }
+        }
+        return actions;
+	}
+	
+	//CheckBox from project configuration panel
+	private boolean isUnrecognizedCheckBox(Widget w) {
+		if(w.parent()!=null &&
+        		w.get(Tags.Role).toString().contains("UIAText") &&
+        		w.parent().get(Tags.Role).toString().contains("ListItem")) {
+			return true;
 		}
-
-		//return the set of derived actions
-		return actions;
+		return false;
 	}
 
 	/**
