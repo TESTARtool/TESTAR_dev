@@ -109,11 +109,13 @@ GraphDBPassword = testar
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = localhost
-DataStoreDB = testar
+DataStoreServer = 10.101.0.238
+DataStoreDB = codeo
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
+StateModelStoreWidgets = false
+ActionSelectionAlgorithm = unvisited
 
 #################################################################
 # State identifier attributes

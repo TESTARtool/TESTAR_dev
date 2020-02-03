@@ -50,7 +50,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected double delay = Double.MIN_VALUE;
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
-    protected boolean visualizationOn = false;
+    protected boolean visualizationOn = true;
 
     public enum Modes{
         Spy,

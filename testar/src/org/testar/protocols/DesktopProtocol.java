@@ -125,7 +125,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 					// - unFiltered by any of the regular expressions in the Filter-tab, or
 					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					// We want to create actions that consist of left clicking on them
-					if(isClickable(w) && isUnrecognizedCheckBox(w) && (isUnfiltered(w) || whiteListed(w))) {
+					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a left click action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.leftClickAt(w));
 					}
@@ -136,7 +136,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 					// - unFiltered by any of the regular expressions in the Filter-tab, or
 					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && !isUnrecognizedCheckBox(w) && (isUnfiltered(w) || whiteListed(w))) {
+					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
@@ -147,16 +147,6 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 			}
 		}
 		return actions;
-	}
-	
-	//CheckBox from project configuration panel
-	private boolean isUnrecognizedCheckBox(Widget w) {
-		if(w.parent()!=null &&
-				w.get(Tags.Role).toString().contains("UIAText") &&
-				w.parent().get(Tags.Role).toString().contains("ListItem")) {
-			return true;
-		}
-		return false;
 	}
 
 	/**

@@ -75,6 +75,17 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
 		return state;
 	}
+	
+	
+	//CheckBox from project configuration panel
+	private boolean isUnrecognizedCheckBox(Widget w) {
+		if(w.parent()!=null &&
+				w.get(Tags.Role).toString().contains("UIAText") &&
+				w.parent().get(Tags.Role).toString().contains("ListItem")) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
