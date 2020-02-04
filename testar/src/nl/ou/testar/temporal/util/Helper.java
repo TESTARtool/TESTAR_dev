@@ -92,17 +92,17 @@ public class Helper {
             e.printStackTrace();
         }
     }
-    public static  void LTLModelCheck(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
+    public static  void LTLMC_BySPOT(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead --o results.txt";
         String  cli = pathToExecutable;
         if(toWslPath) {
             cli = cli + " --a " + toWSLPath(automatonFile) + " --ff " + toWSLPath(formulaFile);
             if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
-            if (!resultsFile.equals("")) cli = cli + " --o " + toWSLPath(resultsFile);
+            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
         }else{
             cli = cli + " --a " + (automatonFile) + " --ff " + (formulaFile);
             if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
-            if (!resultsFile.equals("")) cli = cli + " --o " + (resultsFile);
+            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
         }
 
         Helper.RunOSChildProcess(cli);
@@ -133,7 +133,7 @@ public class Helper {
         }
         Helper.RunOSChildProcess(cli);
     }
-    public static  void CTLModelCheckV2(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile,  String resultsFile) {
+    public static  void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
         String  cli = pathToExecutable;
         if(toWslPath) {
@@ -141,6 +141,19 @@ public class Helper {
             if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
         }else{
             cli = cli+ " -i "+ automatonFile+" -t ETF -ctl "+formulaFile;
+            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
+        }
+        Helper.RunOSChildProcess(cli);
+    }
+
+    public static  void LTLMC_ByITS(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/its/its-ltl -i model.etf -t ETF  -ltl formula.ltl -c -e &> results.txt;
+        String  cli = pathToExecutable;
+        if(toWslPath) {
+            cli = cli+ " -i "+ toWSLPath(automatonFile)+" -t ETF -ltl "+toWSLPath(formulaFile)+ "-c -e";
+            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
+        }else{
+            cli = cli+ " -i "+ automatonFile+" -t ETF -ltl "+formulaFile+ "-c -e";
             if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
         }
         Helper.RunOSChildProcess(cli);

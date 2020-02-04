@@ -60,19 +60,16 @@
             <rowspec value="center:d:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:37px:noGrow"/>
-            <rowspec value="top:6dlu:noGrow"/>
-            <rowspec value="center:d:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:d:noGrow"/>
-            <colspec value="fill:d:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:118px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="left:149px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:88px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="right:95px:noGrow"/>
-            <colspec value="left:9dlu:noGrow"/>
-            <colspec value="fill:132px:noGrow"/>
+            <colspec value="fill:104px:noGrow"/>
+            <colspec value="left:6dlu:noGrow"/>
+            <colspec value="right:66px:noGrow"/>
+            <colspec value="fill:116px:noGrow"/>
             <constraints>
               <tabbedpane title="Setup"/>
             </constraints>
@@ -87,11 +84,11 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="LTL Checker:"/>
+                  <text value="SPOT LTL Checker:"/>
                   <toolTipText value="Used for LTL model check. the usual command to invoke is:  spot_checker"/>
                 </properties>
               </component>
-              <component id="947fb" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+              <component id="947fb" class="javax.swing.JTextField" binding="spotLTLChecker">
                 <constraints>
                   <grid row="4" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -102,63 +99,7 @@
                   <toolTipText value="&lt;html&gt;Command to invoke the SPOT-based LTL model checker&lt;br&gt;&#10;(counterexamples will be computed)"/>
                 </properties>
               </component>
-              <component id="b3b24" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Python Env. :"/>
-                  <toolTipText value="Path to Active Virtual environment"/>
-                </properties>
-              </component>
-              <component id="40d6f" class="javax.swing.JTextField" binding="textFieldPythonEnvironment">
-                <constraints>
-                  <grid row="8" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="bc9fd" class="javax.swing.JButton" binding="button9" default-binding="true">
-                <constraints>
-                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="5222b" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Visualizer:"/>
-                  <toolTipText value="Usually this is the path to run.py"/>
-                </properties>
-              </component>
-              <component id="bc8ad" class="javax.swing.JTextField" binding="textFieldPythonVisualizer">
-                <constraints>
-                  <grid row="10" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="9972d" class="javax.swing.JButton" binding="button10" default-binding="true">
-                <constraints>
-                  <grid row="10" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="3f853" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTL">
+              <component id="3f853" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLSpot">
                 <constraints>
                   <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -174,11 +115,11 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="CTL Checker:"/>
-                  <toolTipText value="Used for CTL model check. the usual command to invoke is:  etf2lts-sym"/>
+                  <text value="ITS CTL Checker:"/>
+                  <toolTipText value="Used for CTL model check. the usual command to invoke is:  its-ctl"/>
                 </properties>
               </component>
-              <component id="bbeae" class="javax.swing.JTextField" binding="textField3" default-binding="true">
+              <component id="bbeae" class="javax.swing.JTextField" binding="itsCTLChecker">
                 <constraints>
                   <grid row="6" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -186,7 +127,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <toolTipText value="&lt;html&gt;Command to invoke the LTSMIN-based CTL model checker.&lt;br&gt;&#10;(no counterexample possible)&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based CTL model checker.&lt;br&gt;&#10;(no visualization of counterexample possible)&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="6ddd2" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
@@ -233,14 +174,14 @@
               </component>
               <component id="8bf16" class="javax.swing.JButton" binding="testDbButton">
                 <constraints>
-                  <grid row="4" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Show DB Models"/>
                 </properties>
               </component>
-              <component id="90cb5" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTL">
+              <component id="90cb5" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLITS">
                 <constraints>
                   <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -248,6 +189,38 @@
                 <properties>
                   <text value="WSL?"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="dc921" class="javax.swing.JTextField" binding="itsLTLchecker">
+                <constraints>
+                  <grid row="8" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value=""/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                </properties>
+              </component>
+              <component id="75b8e" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLITS">
+                <constraints>
+                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="WSL?"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="bc30b" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="ITS LTL Checker:"/>
+                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
                 </properties>
               </component>
             </children>
@@ -512,23 +485,83 @@
             </children>
           </grid>
           <grid id="6ba44" binding="visualizerPanel" layout-manager="FormLayout">
+            <rowspec value="center:49px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="right:40px:noGrow"/>
             <colspec value="left:100dlu:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="left:128px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
             <constraints>
               <tabbedpane title="Visualizer"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
+              <component id="9feb2" class="javax.swing.JTextField" binding="textFieldPythonEnvironment">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="7ccbb" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Python Env. :"/>
+                  <toolTipText value="Path to Active Virtual environment"/>
+                </properties>
+              </component>
+              <component id="a122d" class="javax.swing.JButton" binding="button9" default-binding="true">
+                <constraints>
+                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="c8ede" class="javax.swing.JTextField" binding="textFieldPythonVisualizer">
+                <constraints>
+                  <grid row="2" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="3b168" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Visualizer:"/>
+                  <toolTipText value="Usually this is the path to run.py"/>
+                </properties>
+              </component>
+              <component id="db977" class="javax.swing.JButton" binding="button10" default-binding="true">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
               <component id="6a418" class="javax.swing.JButton" binding="startAnalyzerButton" default-binding="true">
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -537,7 +570,7 @@
               </component>
               <component id="c1d7b" class="javax.swing.JButton" binding="stopAnalyzerButton" default-binding="true">
                 <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>

@@ -3,6 +3,7 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
+import nl.ou.testar.temporal.util.TemporalSubType;
 import nl.ou.testar.temporal.util.ValStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.ant.types.selectors.SelectSelector;
@@ -208,6 +209,7 @@ public class TemporalModel extends TemporalBean{
         result.append("begin state\n");
         int chunk=25;
         int i=0;
+        result.append("stateid:stateid\n");
         for (String ap: modelAPs) {
             result.append(APPrefix).append(i).append(":bool ");
             if (i>0 && (i%chunk)==0){
@@ -226,10 +228,11 @@ public class TemporalModel extends TemporalBean{
 
         for (String initstate : initialStatesSet
         ) {
-
+            int stateid=0;
             for (StateEncoding stenc : stateEncodings
             ) {
                 if (stenc.getState().equals(initstate)) {
+                    result.append(""+stateid+" ");
                     String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
                     for (String ap : stateaps
                     ) {
@@ -241,11 +244,13 @@ public class TemporalModel extends TemporalBean{
                     }
                     result.append("\n");
                 }
+                stateid++;
             }
         }
         result.append("end init\n");
 
         result.append("begin trans\n");
+        int stateid=0;
         for (StateEncoding stenc : stateEncodings
         ) {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
@@ -253,6 +258,7 @@ public class TemporalModel extends TemporalBean{
             int transindex = 0;
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
+                result.append(""+stateid+" ");
                 String targetstate = trenc.getTargetState();
                 StateEncoding targetenc=null;
                 for (StateEncoding stenc1 : stateEncodings
@@ -281,7 +287,7 @@ public class TemporalModel extends TemporalBean{
                 result.append(" " + transindex).append("\n");
                 transindex++;
             }
-
+        stateid++;
         }
         result.append("end trans\n");
         result.append("begin sort transition\n");
@@ -289,10 +295,16 @@ public class TemporalModel extends TemporalBean{
         for (String transid: transitionList) {
             result.append("\"").append(transid).append("\"\n");
          }
-         result.append("end sort\n");
+
+        result.append("end sort\n");
+        result.append("begin sort stateid\n");
+        for (StateEncoding stenc : stateEncodings){
+            result.append("\"").append(stenc.getState()).append("\"\n");
+        }
+        result.append("end sort\n");
         result.append("begin sort bool\n");
-        result.append("\"false\"\n");
-        result.append("\"true\"\n");
+        result.append("\"0\"\n"); //"false" an d"true are common alternatives
+        result.append("\"1\"\n");
         result.append("end sort\n");
         return result.toString();
     }
@@ -345,11 +357,17 @@ public class TemporalModel extends TemporalBean{
                 formula= candidateOracle.getPatternBase().getPattern_Formula();
                 // will certainly fail during model-check, because parameters are not prefixed with 'ap'
             }else{
-                formula= StringUtils.replaceEach(candidateOracle.getPatternBase().getPattern_Formula(),
-                        sortedparameters.toArray(new String[0]),
-                        apindex.toArray(new String[0]));
+                String rawFormula=candidateOracle.getPatternBase().getPattern_Formula();
+                TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
+                String lineenrichedformula=rawFormula+tst.line_append;
+                String finallyenrichedformula=StringUtils.replace(lineenrichedformula,
+                        tst.finally_replace.getLeft(),tst.finally_replace.getRight());
+                String globalyenrichedformula=StringUtils.replace(finallyenrichedformula,
+                        tst.globally_replace.getLeft(),tst.globally_replace.getRight());
+                apindex.replaceAll(s ->  tst.ap_prepend+ s + tst.ap_append+")");
+                formula= StringUtils.replaceEach(globalyenrichedformula,
+                        sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
             }
-
             Formulas.append(formula);
             Formulas.append("\n");
         }
