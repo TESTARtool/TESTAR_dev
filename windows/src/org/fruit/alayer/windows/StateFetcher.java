@@ -520,6 +520,8 @@ public class StateFetcher implements Callable<UIAState>{
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
 
+		parent.set(Tags.HWND, hwnd);
+		
 		long[] vmidAC;
 		if (vmid == 0)
 			vmidAC = Windows.GetAccessibleContext(hwnd);

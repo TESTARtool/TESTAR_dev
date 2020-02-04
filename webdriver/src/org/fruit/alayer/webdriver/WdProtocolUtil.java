@@ -54,7 +54,7 @@ public class WdProtocolUtil extends ProtocolUtil {
         state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
     Rect rect = Rect.from(0, 0, width, height);
     AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), screenshot);
+    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
   }
 
   @Override
@@ -86,7 +86,7 @@ public class WdProtocolUtil extends ProtocolUtil {
     Rect rect = Rect.from(
         actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
     AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
+    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
   }
   
   @Override
