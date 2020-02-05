@@ -122,19 +122,21 @@ public final class ConfigTags {
   // temporal oracles config tags
   public static final Tag<Boolean> TemporalOffLineEnabled = Tag.from("TemporalOffLineEnabled", Boolean.class);
   public static final Tag<Boolean> TemporalConcreteEqualsAbstract= Tag.from("TemporalConcreteEqualsAbstract", Boolean.class);
-  public static final Tag<String> TemporalLTLChecker = Tag.from("TemporalLTLChecker", String.class);
-  public static final Tag<Boolean> TemporalLTLCheckerWSL = Tag.from("TemporalLTLCheckerWSL", Boolean.class);
-  public static final Tag<String> TemporalCTLChecker = Tag.from("TemporalCTLChecker", String.class);
-  public static final Tag<Boolean> TemporalCTLCheckerWSL = Tag.from("TemporalCTLCheckerWSL", Boolean.class);
+  public static final Tag<String> TemporalLTL_SPOTChecker = Tag.from("TemporalLTL_SPOTChecker", String.class);
+  public static final Tag<Boolean> TemporalLTL_SPOTCheckerWSL = Tag.from("TemporalLTL_SPOTCheckerWSL", Boolean.class);
+  public static final Tag<String> TemporalCTL_ITSChecker = Tag.from("TemporalCTL_ITSChecker", String.class);
+  public static final Tag<Boolean> TemporalCTL_ITSCheckerWSL = Tag.from("TemporalCTL_ITSCheckerWSL", Boolean.class);
+  public static final Tag<String> TemporalLTL_ITSChecker = Tag.from("TemporalLTL_ITSChecker", String.class);
+  public static final Tag<Boolean> TemporalLTL_ITSCheckerWSL = Tag.from("TemporalLTL_ITSCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalInstrumentDeadlockState= Tag.from("TemporalInstrumentDeadlockState", Boolean.class);
 
-  public static final Tag<Boolean> TemporalLTLVerbose = Tag.from("TemporalLTLVerbose", Boolean.class);
-  public static final Tag<String> TemporalLTLOracles = Tag.from("TemporalLTLOracles", String.class);
-  public static final Tag<String> TemporalLTLPatterns = Tag.from("TemporalLTLPatterns", String.class);
-  public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
-  public static final Tag<String> TemporalLTLPatternConstraints = Tag.from("TemporalLTLPatternConstraints", String.class);
+  public static final Tag<Boolean> TemporalVerbose = Tag.from("TemporalVerbose", Boolean.class);
+  public static final Tag<String> TemporalOracles = Tag.from("TemporalOracles", String.class);
+  public static final Tag<String> TemporalPatterns = Tag.from("TemporalPatterns", String.class);
+  public static final Tag<String> TemporalAPSelectorManager = Tag.from("TemporalAPSelectorManager", String.class);
+  public static final Tag<String> TemporalPatternConstraints = Tag.from("TemporalPatternConstraints", String.class);
   @SuppressWarnings("unchecked")
-  public static final Tag<List<String>> TemporalLTLGeneratorTactics = Tag.from("TemporalLTLGeneratorTactics", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<List<String>> TemporalGeneratorTactics = Tag.from("TemporalGeneratorTactics", (Class<List<String>>) (Class<?>) List.class);
 
   public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
   public static final Tag<Boolean> TemporalSubDirectories = Tag.from("TemporalSubDirectories", Boolean.class);

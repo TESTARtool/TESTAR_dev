@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.fruit.monkey.ConfigTags.TemporalLTLGeneratorTactics;
+import static org.fruit.monkey.ConfigTags.TemporalGeneratorTactics;
 
 public class Temporalpanel2 {  //"extends JPanel" was manually added
     //****custom
@@ -50,7 +50,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton stopAnalyzerButton;
     private JButton modelCheckButton;
     private JButton temporalModelButton;
-
     private JTextField spotLTLChecker;
     private JCheckBox WSLCheckBoxLTLSpot;
     private JTextField itsCTLChecker;
@@ -58,12 +57,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton button9;
     private JTextField textFieldPythonVisualizer;
     private JButton button10;
-
-
     private JButton testDbButton;
-
     private JComboBox comboBox2;
-
     private JTextField APSelectorManagerTESTJSONTextField;
     private JTextField temporalOracleTESTCsvTextField;
     private JButton defaultSelectorButton1;
@@ -79,7 +74,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JCheckBox WSLCheckBoxCTLITS;
     private JCheckBox instrumentDeadlockStatesCheckBox;
     private JCheckBox WSLCheckBoxLTLITS;
-    private JTextField itsLTLchecker;
+    private JTextField itsLTLChecker;
 
     public Temporalpanel2() {
         $$$setupUI$$$();
@@ -279,10 +274,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         WSLCheckBoxCTLITS.setText("WSL?");
         WSLCheckBoxCTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
         setupPanel.add(WSLCheckBoxCTLITS, cc.xy(7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        itsLTLchecker = new JTextField();
-        itsLTLchecker.setText("");
-        itsLTLchecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
-        setupPanel.add(itsLTLchecker, cc.xyw(3, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        itsLTLChecker = new JTextField();
+        itsLTLChecker.setText("");
+        itsLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
+        setupPanel.add(itsLTLChecker, cc.xyw(3, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLITS = new JCheckBox();
         WSLCheckBoxLTLITS.setText("WSL?");
         WSLCheckBoxLTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
@@ -452,20 +447,22 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     //***********TESTAR generic panel code
     public void populateFrom(final Settings settings) {
 
-        spotLTLChecker.setText(settings.get(ConfigTags.TemporalLTLChecker));
-        WSLCheckBoxLTLSpot.setSelected(settings.get(ConfigTags.TemporalLTLCheckerWSL));
-        itsCTLChecker.setText(settings.get(ConfigTags.TemporalCTLChecker));
-        WSLCheckBoxCTLITS.setSelected(settings.get(ConfigTags.TemporalCTLCheckerWSL));
+        spotLTLChecker.setText(settings.get(ConfigTags.TemporalLTL_SPOTChecker));
+        WSLCheckBoxLTLSpot.setSelected(settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL));
+        itsCTLChecker.setText(settings.get(ConfigTags.TemporalCTL_ITSChecker));
+        WSLCheckBoxCTLITS.setSelected(settings.get(ConfigTags.TemporalCTL_ITSCheckerWSL));
+        itsLTLChecker.setText(settings.get(ConfigTags.TemporalLTL_ITSChecker));
+        WSLCheckBoxLTLITS.setSelected(settings.get(ConfigTags.TemporalLTL_ITSCheckerWSL));
         instrumentDeadlockStatesCheckBox.setSelected(settings.get(ConfigTags.TemporalInstrumentDeadlockState));
-        verboseCheckBox.setSelected(settings.get(ConfigTags.TemporalLTLVerbose));
+        verboseCheckBox.setSelected(settings.get(ConfigTags.TemporalVerbose));
         enableTemporalOfflineOraclesCheckBox.setSelected(settings.get(ConfigTags.TemporalOffLineEnabled));
         enforceAbstractionEquality.setSelected(settings.get(ConfigTags.TemporalConcreteEqualsAbstract));
-        textField7.setText(settings.get(ConfigTags.TemporalLTLOracles));
-        textField5.setText(settings.get(ConfigTags.TemporalLTLPatterns));
-        textField6.setText(settings.get(ConfigTags.TemporalLTLAPSelectorManager));
-        patternConstraintsTextField.setText(settings.get(ConfigTags.TemporalLTLPatternConstraints));
+        textField7.setText(settings.get(ConfigTags.TemporalOracles));
+        textField5.setText(settings.get(ConfigTags.TemporalPatterns));
+        textField6.setText(settings.get(ConfigTags.TemporalAPSelectorManager));
+        patternConstraintsTextField.setText(settings.get(ConfigTags.TemporalPatternConstraints));
 
-        String[] comboBoxLabels = settings.get(TemporalLTLGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
+        String[] comboBoxLabels = settings.get(TemporalGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
         DefaultComboBoxModel cbModel = new DefaultComboBoxModel(comboBoxLabels); // read only
         comboBox2.setModel(cbModel);
 
@@ -482,16 +479,18 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
 
     public void extractInformation(final Settings settings) {
-        settings.set(ConfigTags.TemporalLTLChecker, spotLTLChecker.getText());
-        settings.set(ConfigTags.TemporalLTLCheckerWSL, WSLCheckBoxLTLSpot.isSelected());
-        settings.set(ConfigTags.TemporalLTLVerbose, verboseCheckBox.isSelected());
+        settings.set(ConfigTags.TemporalLTL_SPOTChecker, spotLTLChecker.getText());
+        settings.set(ConfigTags.TemporalLTL_SPOTCheckerWSL, WSLCheckBoxLTLSpot.isSelected());
+        settings.set(ConfigTags.TemporalVerbose, verboseCheckBox.isSelected());
         settings.set(ConfigTags.TemporalOffLineEnabled, enableTemporalOfflineOraclesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
-        settings.set(ConfigTags.TemporalLTLOracles, textField7.getText());
-        settings.set(ConfigTags.TemporalLTLAPSelectorManager, textField6.getText());
-        settings.set(ConfigTags.TemporalLTLPatternConstraints, patternConstraintsTextField.getText());
-        settings.set(ConfigTags.TemporalCTLChecker, itsCTLChecker.getText());
-        settings.set(ConfigTags.TemporalCTLCheckerWSL, WSLCheckBoxCTLITS.isSelected());
+        settings.set(ConfigTags.TemporalOracles, textField7.getText());
+        settings.set(ConfigTags.TemporalAPSelectorManager, textField6.getText());
+        settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsTextField.getText());
+        settings.set(ConfigTags.TemporalCTL_ITSChecker, itsCTLChecker.getText());
+        settings.set(ConfigTags.TemporalCTL_ITSCheckerWSL, WSLCheckBoxCTLITS.isSelected());
+        settings.set(ConfigTags.TemporalLTL_ITSChecker, itsLTLChecker.getText());
+        settings.set(ConfigTags.TemporalLTL_ITSCheckerWSL, WSLCheckBoxLTLITS.isSelected());
         settings.set(ConfigTags.TemporalInstrumentDeadlockState, instrumentDeadlockStatesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalPythonEnvironment, textFieldPythonEnvironment.getText());
         settings.set(ConfigTags.TemporalVisualizerServer, textFieldPythonVisualizer.getText());
@@ -510,9 +509,14 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
     private void ModelCheck(ActionEvent e) {
 
-        tcontrol.MCheck(spotLTLChecker.getText(), textField6.getText(), textField7.getText(), verboseCheckBox.isSelected(),
-                instrumentDeadlockStatesCheckBox.isSelected(), itsCTLChecker.getText(),
-                WSLCheckBoxLTLSpot.isSelected(), WSLCheckBoxCTLITS.isSelected());
+        tcontrol.MCheck(
+                textField6.getText(),
+                textField7.getText(),
+                verboseCheckBox.isSelected(),
+                instrumentDeadlockStatesCheckBox.isSelected(),
+                spotLTLChecker.getText(), WSLCheckBoxLTLSpot.isSelected(),
+                itsCTLChecker.getText(), WSLCheckBoxCTLITS.isSelected(),
+            itsLTLChecker.getText(),WSLCheckBoxLTLITS.isSelected());
     }
 
     private void generateOracles(ActionEvent e) {

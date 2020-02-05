@@ -453,17 +453,19 @@ public class Main {
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(TemporalOffLineEnabled, false));
 			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, false));
-			defaults.add(Pair.from(TemporalLTLChecker, ""));
-			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
-			defaults.add(Pair.from(TemporalCTLChecker, ""));
-			defaults.add(Pair.from(TemporalCTLCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTL_SPOTChecker, ""));
+			defaults.add(Pair.from(TemporalLTL_SPOTCheckerWSL, false));
+			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
+			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
+			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
+			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
-			defaults.add(Pair.from(TemporalLTLVerbose, false));
-			defaults.add(Pair.from(TemporalLTLOracles, ""));
-			defaults.add(Pair.from(TemporalLTLPatterns, ""));
-			defaults.add(Pair.from(TemporalLTLAPSelectorManager, ""));
-			defaults.add(Pair.from(TemporalLTLPatternConstraints,""));
-			defaults.add(Pair.from(TemporalLTLGeneratorTactics,new ArrayList<String>() {
+			defaults.add(Pair.from(TemporalVerbose, false));
+			defaults.add(Pair.from(TemporalOracles, ""));
+			defaults.add(Pair.from(TemporalPatterns, ""));
+			defaults.add(Pair.from(TemporalAPSelectorManager, ""));
+			defaults.add(Pair.from(TemporalPatternConstraints,""));
+			defaults.add(Pair.from(TemporalGeneratorTactics,new ArrayList<String>() {
 				{
 					add("10");
 					add("100");
@@ -471,7 +473,6 @@ public class Main {
 			}));
 			defaults.add(Pair.from(TemporalDirectory, "temporal"));
 			defaults.add(Pair.from(TemporalSubDirectories, true));
-			defaults.add(Pair.from(TemporalCTLChecker, ""));
 			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
 			defaults.add(Pair.from(TemporalVisualizerServer, ""));
 			defaults.add(Pair.from(TemporalVisualizerURL, ""));

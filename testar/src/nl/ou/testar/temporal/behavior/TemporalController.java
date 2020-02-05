@@ -45,10 +45,10 @@ public class TemporalController {
 
 
     private String outputDir;
-    private boolean ltlToWSLPath;
-    private boolean ctlToWSLPath;
-    private String ltlMCCommand;
-    private String ctlMCCommand;
+    private boolean ltlSPOTToWSLPath;
+    private boolean ctlITSToWSLPath;
+    private String ltlSPOTMCCommand;
+    private String ctlITSMCCommand;
     private String APSelectorFile;
     private String oracleFile;
     private boolean verbose;
@@ -77,13 +77,13 @@ public class TemporalController {
 
         tDBHelper = new TemporalDBHelper(settings);
         tModel = new TemporalModel();
-        ltlToWSLPath = settings.get(ConfigTags.TemporalLTLCheckerWSL);
-        ctlToWSLPath = settings.get(ConfigTags.TemporalCTLCheckerWSL);
-        ltlMCCommand=settings.get(ConfigTags.TemporalLTLChecker);
-        ctlMCCommand=settings.get(ConfigTags.TemporalCTLChecker);
-        APSelectorFile=settings.get(ConfigTags.TemporalLTLAPSelectorManager);
-        oracleFile= settings.get(ConfigTags.TemporalLTLOracles);
-        verbose=settings.get(ConfigTags.TemporalLTLVerbose);
+        ltlSPOTToWSLPath = settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL);
+        ctlITSToWSLPath = settings.get(ConfigTags.TemporalCTL_ITSCheckerWSL);
+        ltlSPOTMCCommand =settings.get(ConfigTags.TemporalLTL_SPOTChecker);
+        ctlITSMCCommand =settings.get(ConfigTags.TemporalCTL_ITSChecker);
+        APSelectorFile=settings.get(ConfigTags.TemporalAPSelectorManager);
+        oracleFile= settings.get(ConfigTags.TemporalOracles);
+        verbose=settings.get(ConfigTags.TemporalVerbose);
         instrumentDeadlockState=settings.get(ConfigTags.TemporalInstrumentDeadlockState);
 
         setDefaultAPSelectormanager();
@@ -439,12 +439,19 @@ public class TemporalController {
 
     public void MCheck() {
 
-        MCheck(ltlMCCommand,APSelectorFile,oracleFile,verbose,instrumentDeadlockState,ctlMCCommand,ltlToWSLPath,ctlToWSLPath);
+        MCheck(APSelectorFile, oracleFile, verbose, instrumentDeadlockState, ltlSPOTMCCommand, ltlSPOTToWSLPath, ctlITSMCCommand, ctlITSToWSLPath,"",true);
+    }
+    public void MCheck1() {
+
+        MCheck(APSelectorFile, oracleFile, verbose, instrumentDeadlockState, ltlSPOTMCCommand, ltlSPOTToWSLPath, ctlITSMCCommand, ctlITSToWSLPath,"",true);
     }
 
 
-    public void MCheck(String ltlMCCommand, String APSelectorFile, String oracleFile, boolean verbose, boolean instrumentDeadState, String ctlMCCommand, boolean ltlWSLPath, boolean ctlWSLPath) {
+    public void MCheck(String APSelectorFile, String oracleFile, boolean verbose, boolean instrumentDeadState, String ltlSpotMCCommand,
+                       boolean ltlSpotWSLPath, String ctlItsMCCommand, boolean ctlItsWSLPath, String ltlItsMCCommand, boolean ltlItsWSLPath) {
         try {
+
+
             System.out.println(" model-checking started \n");
             tModel = new TemporalModel();
             AbstractStateModel abstractStateModel = getAbstractStateModel();
@@ -501,7 +508,7 @@ public class TemporalController {
                     automatonFile = new File(outputDir + "Model.hoa");
                     saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
                     String aliveprop = gettModel().getAliveProposition("!dead"); //instrumentDeadState will determine whether this return value is ""
-                    Helper.LTLMC_BySPOT(ltlMCCommand, ltlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
+                    Helper.LTLMC_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
                     Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser();//decode results
                     sParse.setTmodel(gettModel());
                     sParse.setOracleColl(oracleList);
@@ -511,7 +518,7 @@ public class TemporalController {
                     automatonFile = new File(outputDir + "Model.etf");
                     saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
                     //formula ltl model variant converter
-                    Helper.LTLMC_ByITS(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
+                    Helper.LTLMC_ByITS(ctlItsMCCommand, ctlItsWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
                     CheckerResultsParser sParse = new ITSltl_CheckerResultsParser();//decode results
                     sParse.setTmodel(gettModel());
                     sParse.setOracleColl(oracleList);
@@ -523,7 +530,7 @@ public class TemporalController {
                     saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
                     //v2 is the ITS-CTL checker: not using witness because this is  difficult to understand and to parse and present.
                     //LTSMIN version works, but Ltsmin command has a bug : gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
-                    Helper.CTLMC_ByITS(ctlMCCommand, ctlWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
+                    Helper.CTLMC_ByITS(ctlItsMCCommand, ctlItsWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
                     ITSctl_CheckerResultsParser sParse = new ITSctl_CheckerResultsParser();//decode results
                     sParse.setTmodel(gettModel());
                     sParse.setOracleColl(oracleList);
