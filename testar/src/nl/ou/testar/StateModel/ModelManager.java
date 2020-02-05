@@ -259,7 +259,6 @@ public class ModelManager implements StateModelManager {
         concreteActionUnderExecution = null;
         sequenceManager.stopSequence();
     }
-<<<<<<< HEAD
 
     @Override
     public void notifyTestSequenceInterruptedByUser() {
@@ -270,7 +269,4 @@ public class ModelManager implements StateModelManager {
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
     }
-
-=======
->>>>>>> 3fbe4f2f... POC reinforcement learning
 }

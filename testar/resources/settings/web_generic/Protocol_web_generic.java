@@ -91,8 +91,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 		return state;
 		
 	}
-
-
+	
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create

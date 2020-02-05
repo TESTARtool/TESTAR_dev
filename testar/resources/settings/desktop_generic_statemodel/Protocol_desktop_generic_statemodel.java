@@ -62,14 +62,12 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
 		// top level (highest Z-index) widgets of the GUI:
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
 		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
@@ -78,7 +76,7 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		//return the set of derived actions
 		return actions;
 	}
-
+	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *

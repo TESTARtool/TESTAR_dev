@@ -597,6 +597,14 @@ public class EntityManager {
             case STRING:
                 convertedValue = OType.convert(valueToConvert, String.class);
                 break;
+                
+            case DOUBLE:
+            	convertedValue = OType.convert(valueToConvert, Double.class);
+                break;
+                
+            case INTEGER:
+            	convertedValue = OType.convert(valueToConvert, Integer.class);
+                break;
 
             case LINKBAG:
                 // we don't process these as a separate attribute

@@ -75,7 +75,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
-
+	
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create

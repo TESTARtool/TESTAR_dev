@@ -341,8 +341,21 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
+
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -358,10 +371,6 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 
-					// create left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
-
 					// create double left click
 					if(whiteListed(w) || isDoubleClickable(w)){
 						if(browser == BROWSER_FIREFOX)
@@ -369,14 +378,6 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 						else if (browser == BROWSER_IEXPLORER)
 							actions.add(ac.dropDownAt(w));
 					}
-
-					// type into text boxes
-					if(isTypeable(w)){
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-
-					// slides
-					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w,state);
 
 				}
 

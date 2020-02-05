@@ -114,7 +114,6 @@ public class Protocol_web_orientdb extends DesktopProtocol {
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
 		// top level (highest Z-index) widgets of the GUI:
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);

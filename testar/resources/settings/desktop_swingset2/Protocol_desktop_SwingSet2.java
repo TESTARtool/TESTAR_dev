@@ -58,14 +58,24 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-
+	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
 		
 		//----------------------
 		// BUILD CUSTOM ACTIONS
@@ -77,14 +87,6 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 				
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
-					
-					// left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
-	
-					// type into text boxes
-					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it

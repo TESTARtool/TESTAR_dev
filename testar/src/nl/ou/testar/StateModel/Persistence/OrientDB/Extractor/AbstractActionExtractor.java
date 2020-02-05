@@ -11,6 +11,9 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 
 import java.util.Set;
 
+import nl.ou.testar.ReinforcementLearning.RLTags;
+import org.fruit.alayer.Tag;
+
 public class AbstractActionExtractor implements EntityExtractor<AbstractAction> {
 
 
@@ -47,6 +50,24 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         for (String concreteActionId : concreteActionIds) {
             action.addConcreteActionId(concreteActionId);
         }
+        
+        for(Tag<?> t : RLTags.getReinforcementLearningTags()) {
+        	
+        	PropertyValue valueRL = entity.getPropertyValue(t.name());
+        	
+        	if(valueRL == null) {
+        		continue;
+        	}
+        	
+        	if (valueRL.getType() != OType.DOUBLE) {
+        		throw new ExtractionException("ERROR retrieving RL value from State Model. " + valueRL.getType().toString() + " was given.");
+        	}
+        	action.addAttribute(t, (Double) valueRL.getValue());
+        	
+        	System.out.println(String.format("Extracted RLTag %s with value %s for the Action %s",
+        			t.name(), valueRL.getValue().toString(), actionId));
+        }
+        
         return action;
     }
 }
