@@ -9,9 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 
@@ -27,7 +25,7 @@ public class Helper {
         return wslpath.toString();
     }
 
-    public static void HTTPGet(String url){
+    public static void HTTPGet(String url) {
         // HTTP GET request from https://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         URL obj = null;
         try {
@@ -92,78 +90,112 @@ public class Helper {
             e.printStackTrace();
         }
     }
-    public static  void LTLMC_BySPOT(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
-        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead --o results.txt";
-        String  cli = pathToExecutable;
-        if(toWslPath) {
-            cli = cli + " --a " + toWSLPath(automatonFile) + " --ff " + toWSLPath(formulaFile);
-            if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
-            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
-        }else{
-            cli = cli + " --a " + (automatonFile) + " --ff " + (formulaFile);
-            if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
-            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
-        }
 
+    public static void LTLMC_BySPOT(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                    String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead ";
+        String cli = pathToExecutable;
+        cli = cli + " --a " + toWSLPath(automatonFile) + " --ff " + ((toWslPath) ? toWSLPath(formulaFile) : formulaFile);
+        if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
+        if (counterExamples) cli = cli + " --witness ";
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }
-    public static  void CTLModelCheck(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile,  String resultsFile) {
-        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-sym  --ctl='A[](E<>(ap123=="true")))' --ctl='E<>(!ap321=="false")' -- ctl='...' model.etf &> results.txt;
+
+    public static void LTLVerifyFormula_BySPOT(String pathToExecutable, boolean toWslPath, String formulaFile, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
+        String cli = pathToExecutable;
+        cli = cli + " --fonly --ff " + ((toWslPath) ? toWSLPath(formulaFile) : formulaFile);
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
+        Helper.RunOSChildProcess(cli);
+    }
+
+    public static String LTLParse_VerifiedFormula_BySPOT(String resultsFile, boolean keepLTLFModelVariant) {
+        Scanner scanner = new Scanner(resultsFile);
+        scanner.useDelimiter("\\s*===\\s*");
+
+        if (scanner.hasNext()) {
+            scanner.next();
+            scanner.next(); //throw away 2 headerlines
+        }
+        String formulaline = "";
+        String formula = "";
+
+        StringBuilder formulasParsed = new StringBuilder();
+
+        while (scanner.hasNext()) {
+            String testtoken = scanner.next();
+            if (testtoken.startsWith("Formula")) {
+                String endline = scanner.nextLine();
+                if (endline.contains("LTL model-check End")) {
+                    break;
+                }
+                formulaline = endline; //not the end but a new formula
+                int indexmodel = formulaline.lastIndexOf("[LTLF Model]");
+                int indextrace = formulaline.lastIndexOf("[LTLF G&V]");
+                if (keepLTLFModelVariant) {
+                    formula = indexmodel != -1 ? formulaline.substring(indexmodel) : formulaline.substring(0, indextrace - 1);
+                } else {
+                    formula = formulaline.substring(indextrace,indexmodel - 1);//keep the trace variant
+                }
+                formulasParsed.append(formula).append("\n");
+            }
+            System.out.println("unexpected token <" + testtoken + "> to parse in File: " + resultsFile);
+        }
+        return formulasParsed.toString();
+    }
 
 
-        String  cli = pathToExecutable;
+    public static void CTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, String automatonFile,
+                                      String formulaFile, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
+        //LTSMIN does not provide counter examles for CTL, does not allow the implies ('->') operator, crashes on some ETF models.
+        String cli = pathToExecutable;
         File rFile = new File(formulaFile);
         StringBuilder sb = new StringBuilder();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(formulaFile),StandardCharsets.UTF_8);
-            for (String line : lines)  { sb.append("--ctl='").append(line).append("' "); }
+        try {//formulafile to --ctl strings
+            List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
+            for (String line : lines) {
+                sb.append("--ctl='").append(line).append("' ");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //formulafile to --ctl strings
-        String formulalist=sb.toString();
-        cli = cli + " "+formulalist;
-        if(toWslPath) {
-            cli = cli+  toWSLPath(automatonFile);
-            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
-        }else{
-            cli = cli  + (automatonFile) ;
-            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
-        }
+        String formulalist = sb.toString();
+        cli = cli + " " + formulalist;
+        cli = cli + ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }
-    public static  void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String resultsFile) {
+
+    public static void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                   String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
-        String  cli = pathToExecutable;
-        if(toWslPath) {
-            cli = cli+ " -i "+ toWSLPath(automatonFile)+" -t ETF -ctl "+toWSLPath(formulaFile);
-            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
-        }else{
-            cli = cli+ " -i "+ automatonFile+" -t ETF -ctl "+formulaFile;
-            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
-        }
+        //counterexamples are not shown in the vizualizer. as they are
+        //not well documented, hard to parse, not complete traces and difficult to understand
+        String cli = pathToExecutable;
+        cli = cli + " -i " + toWSLPath(automatonFile) + " -t ETF -ctl " +
+                ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) + (counterExamples ? " --witness " : "");
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }
 
-    public static  void LTLMC_ByITS(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String resultsFile) {
+    public static void LTLMC_ByITS(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                   String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/its/its-ltl -i model.etf -t ETF  -ltl formula.ltl -c -e &> results.txt;
-        String  cli = pathToExecutable;
-        if(toWslPath) {
-            cli = cli+ " -i "+ toWSLPath(automatonFile)+" -t ETF -ltl "+toWSLPath(formulaFile)+ "-c -e";
-            if (!resultsFile.equals("")) cli = cli + " &> " + toWSLPath(resultsFile);
-        }else{
-            cli = cli+ " -i "+ automatonFile+" -t ETF -ltl "+formulaFile+ "-c -e";
-            if (!resultsFile.equals("")) cli = cli + " &> " + (resultsFile);
-        }
+        String cli = pathToExecutable;
+        cli = cli + " -i " + toWSLPath(automatonFile) + " -t ETF -ltl " + ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) +
+                "-c " + (counterExamples ? "-e" : "");
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }
 
-    public static String CurrentDateToFolder(){
+    public static String CurrentDateToFolder() {
         Date aDate = Calendar.getInstance().getTime();
         return DateToFolder(aDate);
     }
-    public static String DateToFolder(Date aDate){
+
+    public static String DateToFolder(Date aDate) {
         // inspired from https://alvinalexander.com/java/simpledateformat-convert-date-to-string-formatted-parse
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
         return formatter.format(aDate);

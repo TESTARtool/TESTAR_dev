@@ -138,6 +138,7 @@ TemporalCTL_ITSCheckerWSL = true
 TemporalLTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
 TemporalLTL_ITSCheckerWSL = true
 TemporalVerbose = true
+TemporalCounterExamples = true
 TemporalInstrumentDeadlockState = true
 #TemporalOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
 #TemporalPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv

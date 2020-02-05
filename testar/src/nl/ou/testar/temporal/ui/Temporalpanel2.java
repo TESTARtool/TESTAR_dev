@@ -19,168 +19,121 @@ import java.util.concurrent.TimeUnit;
 
 import static org.fruit.monkey.ConfigTags.TemporalGeneratorTactics;
 
-public class Temporalpanel2 {  //"extends JPanel" was manually added
+public class Temporalpanel2 {
     //****custom
     private Process webAnalyzerProcess = null;
-
     private String VisualizerURL;
     private String VisualizerURLStop;
     private StreamConsumer webAnalyzerErr;
     private StreamConsumer webAnalyzerOut;
     TemporalController tcontrol;
-    private Settings mirrored_settings;
     private String outputDir;
-
     //**** custom
 
 
-    private JPanel panel1;
-    private JTabbedPane tabbedPane1;
-    private JTextArea textArea12;
-    private JButton clearButton;
-    private JTextField textField1;
-    private JTextField textField5;
-    private JTextField textField6;
-    private JButton button1;
-    private JButton button2;
-    private JTextField textField7;
-    private JButton button3;
-    private JButton generateButton;
-    private JButton startAnalyzerButton;
-    private JButton stopAnalyzerButton;
-    private JButton modelCheckButton;
-    private JButton temporalModelButton;
+    private JPanel mainTemporalPanel;
+    private JTabbedPane containerTab;
+    private JTextArea logArea;
+    private JButton clearBtn;
+    private JTextField patternFile;
+    private JTextField ApSelectorManagerFile;
+    private JButton selectFilePatterns;
+    private JButton selectFileOracles;
+    private JTextField oracleFile;
+    private JButton selectFileApSelectorManager;
+    private JButton generateBtn;
+    private JButton startAnalyzerBtn;
+    private JButton stopAnalyzerBtn;
+    private JButton modelCheckBtn;
+    private JButton ModelOnlyBtn;
     private JTextField spotLTLChecker;
     private JCheckBox WSLCheckBoxLTLSpot;
     private JTextField itsCTLChecker;
-    private JTextField textFieldPythonEnvironment;
-    private JButton button9;
-    private JTextField textFieldPythonVisualizer;
-    private JButton button10;
+    private JTextField PythonEnv_Path;
+    private JButton selectFilePython_ENV;
+    private JTextField PythonVisualizer_Path;
+    private JButton selectFilePython_VIZ;
     private JButton testDbButton;
-    private JComboBox comboBox2;
-    private JTextField APSelectorManagerTESTJSONTextField;
-    private JTextField temporalOracleTESTCsvTextField;
-    private JButton defaultSelectorButton1;
-    private JButton sampleOracleButton1;
-    private JButton graphMLButton1;
+    private JComboBox tacticComboBox;
+    private JButton defaultSelectorBtn;
+    private JButton sampleOracleBtn;
+    private JButton graphMLBtn;
     private JCheckBox verboseCheckBox;
     private JPanel setupPanel;
     private JPanel minerPanel;
     private JPanel visualizerPanel;
     private JCheckBox enableTemporalOfflineOraclesCheckBox;
     private JCheckBox enforceAbstractionEquality;
-    private JTextField patternConstraintsTextField;
+    private JTextField patternConstraintsFile;
     private JCheckBox WSLCheckBoxCTLITS;
     private JCheckBox instrumentDeadlockStatesCheckBox;
     private JCheckBox WSLCheckBoxLTLITS;
     private JTextField itsLTLChecker;
+    private JCheckBox CounterExamples;
+    private JButton selectFilePatternConstraints;
 
     public Temporalpanel2() {
         $$$setupUI$$$();
 
 
-        startAnalyzerButton.addActionListener(this::startTemporalWebAnalyzer);
-        stopAnalyzerButton.addActionListener(this::stopTemporalWebAnalyzer);
-        clearButton.addActionListener(new ActionListener() {
+        startAnalyzerBtn.addActionListener(this::startTemporalWebAnalyzer);
+        stopAnalyzerBtn.addActionListener(this::stopTemporalWebAnalyzer);
+        clearBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textArea12.setText("cleared");
+                logArea.setText("cleared");
             }
         });
-
-
-        temporalModelButton.addActionListener(new ActionListener() {
-                                                  @Override
-                                                  public void actionPerformed(ActionEvent e) {
-                                                      exportTemporalmodel(e);
-                                                  }
-                                              }
+        ModelOnlyBtn.addActionListener(new ActionListener() {
+               @Override
+        public void actionPerformed(ActionEvent e) {
+            exportTemporalmodel(e);
+        }
+    }
         );
-
-
         testDbButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 testdbconnection(e);
             }
         });
-
-
-        button9.addActionListener(new ActionListener() {
+        selectFilePython_ENV.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //
-                JFileChooser fd = new JFileChooser();
-                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fd.setCurrentDirectory(new File("./" + outputDir));//.getParentFile());
-
-                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
-                    String file = fd.getSelectedFile().getAbsolutePath();
-                    textFieldPythonEnvironment.setText(file);
-                }
-                //
+                chooserHelper(PythonEnv_Path);
             }
         });
-        button10.addActionListener(new ActionListener() {
+        selectFilePython_VIZ.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //
-                JFileChooser fd = new JFileChooser();
-                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fd.setCurrentDirectory(new File("./" + outputDir));//.getParentFile());
-
-                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
-                    String file = fd.getSelectedFile().getAbsolutePath();
-                    textFieldPythonVisualizer.setText(file);
-                }
-                //
+                chooserHelper(PythonVisualizer_Path);
             }
         });
-        button3.addActionListener(new ActionListener() {
+        selectFileApSelectorManager.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //
-                JFileChooser fd = new JFileChooser();
-                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fd.setCurrentDirectory(new File("./" + outputDir));//.getParentFile());
-
-                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
-                    String file = fd.getSelectedFile().getAbsolutePath();
-                    textField6.setText(file);
-                }
-                //
+                chooserHelper(ApSelectorManagerFile);
             }
         });
-        button2.addActionListener(new ActionListener() {
+        selectFileOracles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //
-                JFileChooser fd = new JFileChooser();
-                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fd.setCurrentDirectory(new File("./" + outputDir));//.getParentFile());
-
-                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
-                    String file = fd.getSelectedFile().getAbsolutePath();
-                    textField7.setText(file);
-                }
-                //
+                chooserHelper(oracleFile);
             }
         });
-
-        modelCheckButton.addActionListener(new ActionListener() {
+        modelCheckBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ModelCheck(e);
             }
         });
-        defaultSelectorButton1.addActionListener(new ActionListener() {
+        defaultSelectorBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 testSaveDefaultApSelectionManagerJSON();
             }
         });
-        sampleOracleButton1.addActionListener(new ActionListener() {
+        sampleOracleBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 testOracleCSV();
@@ -188,20 +141,29 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 testPatternConstraintCSV();
             }
         });
-        graphMLButton1.addActionListener(this::testgraphml);
-
-
-        generateButton.addActionListener(new ActionListener() {
+        graphMLBtn.addActionListener(this::testgraphml);
+        generateBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 generateOracles(e);
+            }
+        });
+        selectFilePatterns.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chooserHelper(patternFile);
+            }
+        });
+        selectFilePatternConstraints.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chooserHelper(patternConstraintsFile);
             }
         });
     }
 
     public static Temporalpanel2 createTemporalPanel() {
         Temporalpanel2 panel = new Temporalpanel2();
-        panel.initialize();
         return panel;
     }
 
@@ -214,23 +176,23 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
      * @noinspection ALL
      */
     private void $$$setupUI$$$() {
-        panel1 = new JPanel();
-        panel1.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:257px:noGrow,top:82px:noGrow"));
-        panel1.setPreferredSize(new Dimension(621, 340));
-        panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null));
+        mainTemporalPanel = new JPanel();
+        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:257px:noGrow,top:82px:noGrow"));
+        mainTemporalPanel.setPreferredSize(new Dimension(621, 340));
+        mainTemporalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null));
         final JSeparator separator1 = new JSeparator();
         CellConstraints cc = new CellConstraints();
-        panel1.add(separator1, cc.xyw(1, 1, 3, CellConstraints.FILL, CellConstraints.FILL));
-        tabbedPane1 = new JTabbedPane();
-        tabbedPane1.setMinimumSize(new Dimension(617, 275));
-        tabbedPane1.setPreferredSize(new Dimension(617, 275));
-        tabbedPane1.setRequestFocusEnabled(true);
-        tabbedPane1.setVisible(true);
-        panel1.add(tabbedPane1, cc.xyw(1, 2, 16));
+        mainTemporalPanel.add(separator1, cc.xyw(1, 1, 3, CellConstraints.FILL, CellConstraints.FILL));
+        containerTab = new JTabbedPane();
+        containerTab.setMinimumSize(new Dimension(617, 275));
+        containerTab.setPreferredSize(new Dimension(617, 275));
+        containerTab.setRequestFocusEnabled(true);
+        containerTab.setVisible(true);
+        mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
         setupPanel.setLayout(new FormLayout("fill:118px:noGrow,left:4dlu:noGrow,left:149px:noGrow,left:4dlu:noGrow,fill:104px:noGrow,left:6dlu:noGrow,right:66px:noGrow,fill:116px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(true);
-        tabbedPane1.addTab("Setup", setupPanel);
+        setupPanel.setVisible(false);
+        containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
         label1.setToolTipText("Used for LTL model check. the usual command to invoke is:  spot_checker");
@@ -286,57 +248,62 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         label3.setText("ITS LTL Checker:");
         label3.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
         setupPanel.add(label3, cc.xy(1, 9));
+        CounterExamples = new JCheckBox();
+        CounterExamples.setText("Counter Examples?");
+        CounterExamples.setToolTipText("<html>Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).<BR>\n(not all implemented modelcheckers can produce such traces) </html>");
+        setupPanel.add(CounterExamples, cc.xyw(7, 1, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
         minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:90px:noGrow,left:40dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
-        tabbedPane1.addTab("Miner", minerPanel);
+        containerTab.addTab("Miner", minerPanel);
         final JLabel label4 = new JLabel();
         label4.setText("Oracles:");
         minerPanel.add(label4, cc.xy(1, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label5 = new JLabel();
         label5.setText("Oracle Patterns:");
         minerPanel.add(label5, cc.xy(1, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        textField7 = new JTextField();
-        minerPanel.add(textField7, cc.xyw(2, 10, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
-        textField5 = new JTextField();
-        minerPanel.add(textField5, cc.xyw(2, 8, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        oracleFile = new JTextField();
+        minerPanel.add(oracleFile, cc.xyw(2, 10, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        patternFile = new JTextField();
+        patternFile.setText("");
+        minerPanel.add(patternFile, cc.xyw(2, 8, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label6 = new JLabel();
         label6.setText("APSelectorManager:");
         minerPanel.add(label6, cc.xy(1, 4, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        textField6 = new JTextField();
-        minerPanel.add(textField6, cc.xyw(2, 4, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
-        button2 = new JButton();
-        button2.setText("...");
-        minerPanel.add(button2, cc.xy(4, 10));
-        button1 = new JButton();
-        button1.setText("...");
-        minerPanel.add(button1, cc.xy(4, 8));
-        button3 = new JButton();
-        button3.setText("...");
-        minerPanel.add(button3, cc.xy(4, 4));
-        modelCheckButton = new JButton();
-        modelCheckButton.setHorizontalTextPosition(0);
-        modelCheckButton.setText("Model Check");
-        modelCheckButton.setToolTipText("<html>Perform a ModelCheck of the Potential Oracles. <BR>\nThe model is computed by applying the filters from the APSelectorManager to a model of the graph DB <BR>\nthe model is chosen by criteria: Application Name and version and Abstrations. <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
-        minerPanel.add(modelCheckButton, cc.xyw(5, 10, 7));
-        generateButton = new JButton();
-        generateButton.setEnabled(true);
-        generateButton.setHorizontalTextPosition(0);
-        generateButton.setMaximumSize(new Dimension(81, 30));
-        generateButton.setText("<html>Generate</html>");
-        generateButton.setToolTipText("<html>Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. \n<BR>The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html>");
-        minerPanel.add(generateButton, cc.xyw(5, 8, 7));
+        ApSelectorManagerFile = new JTextField();
+        minerPanel.add(ApSelectorManagerFile, cc.xyw(2, 4, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        selectFileOracles = new JButton();
+        selectFileOracles.setText("...");
+        minerPanel.add(selectFileOracles, cc.xy(4, 10));
+        selectFilePatterns = new JButton();
+        selectFilePatterns.setText("...");
+        minerPanel.add(selectFilePatterns, cc.xy(4, 8));
+        selectFileApSelectorManager = new JButton();
+        selectFileApSelectorManager.setText("...");
+        minerPanel.add(selectFileApSelectorManager, cc.xy(4, 4));
+        modelCheckBtn = new JButton();
+        modelCheckBtn.setHorizontalTextPosition(0);
+        modelCheckBtn.setText("Model Check");
+        modelCheckBtn.setToolTipText("<html>Perform a ModelCheck of the Potential Oracles. <BR>\nThe model is computed by applying the filters from the APSelectorManager to a model of the graph DB <BR>\nthe model is chosen by criteria: Application Name and version and Abstrations. <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
+        minerPanel.add(modelCheckBtn, cc.xyw(5, 10, 7));
+        generateBtn = new JButton();
+        generateBtn.setEnabled(true);
+        generateBtn.setHorizontalTextPosition(0);
+        generateBtn.setMaximumSize(new Dimension(81, 30));
+        generateBtn.setText("<html>Generate</html>");
+        generateBtn.setToolTipText("<html>Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. \n<BR>The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html>");
+        minerPanel.add(generateBtn, cc.xyw(5, 8, 7));
         final JLabel label7 = new JLabel();
         label7.setText("Pattern Constraints:");
         minerPanel.add(label7, cc.xy(1, 6, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        patternConstraintsTextField = new JTextField();
-        minerPanel.add(patternConstraintsTextField, cc.xyw(2, 6, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JButton button4 = new JButton();
-        button4.setText("...");
-        minerPanel.add(button4, cc.xy(4, 6));
-        comboBox2 = new JComboBox();
-        comboBox2.setEnabled(true);
-        comboBox2.setMaximumSize(new Dimension(130, 38));
-        comboBox2.setMinimumSize(new Dimension(130, 38));
+        patternConstraintsFile = new JTextField();
+        minerPanel.add(patternConstraintsFile, cc.xyw(2, 6, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        selectFilePatternConstraints = new JButton();
+        selectFilePatternConstraints.setText("...");
+        minerPanel.add(selectFilePatternConstraints, cc.xy(4, 6));
+        tacticComboBox = new JComboBox();
+        tacticComboBox.setEnabled(true);
+        tacticComboBox.setMaximumSize(new Dimension(130, 38));
+        tacticComboBox.setMinimumSize(new Dimension(130, 38));
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         defaultComboBoxModel1.addElement("1");
         defaultComboBoxModel1.addElement("5");
@@ -345,90 +312,90 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         defaultComboBoxModel1.addElement("100");
         defaultComboBoxModel1.addElement("500");
         defaultComboBoxModel1.addElement("1000");
-        comboBox2.setModel(defaultComboBoxModel1);
-        comboBox2.setPreferredSize(new Dimension(150, 38));
-        comboBox2.setToolTipText("<HTML>tactic to generate oracles from the supplied Pattern collection.<BR>\nShows the number of potential oracles to generate per pattern\n</HTML>");
-        comboBox2.setVerifyInputWhenFocusTarget(true);
-        minerPanel.add(comboBox2, cc.xy(12, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        tacticComboBox.setModel(defaultComboBoxModel1);
+        tacticComboBox.setPreferredSize(new Dimension(150, 38));
+        tacticComboBox.setToolTipText("<HTML>tactic to generate oracles from the supplied Pattern collection.<BR>\nShows the number of potential oracles to generate per pattern\n</HTML>");
+        tacticComboBox.setVerifyInputWhenFocusTarget(true);
+        minerPanel.add(tacticComboBox, cc.xy(12, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label8 = new JLabel();
         label8.setText("Generate:");
         minerPanel.add(label8, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        defaultSelectorButton1 = new JButton();
-        defaultSelectorButton1.setMaximumSize(new Dimension(130, 38));
-        defaultSelectorButton1.setMinimumSize(new Dimension(130, 38));
-        defaultSelectorButton1.setPreferredSize(new Dimension(130, 38));
-        defaultSelectorButton1.setText("Default Selector");
-        defaultSelectorButton1.setToolTipText("Generate a default APSelectionManager");
-        minerPanel.add(defaultSelectorButton1, cc.xy(2, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        sampleOracleButton1 = new JButton();
-        sampleOracleButton1.setPreferredSize(new Dimension(110, 38));
-        sampleOracleButton1.setText("Sample Oracle");
-        sampleOracleButton1.setToolTipText("Generate files with a sample Oracle and a sample Pattern.");
-        sampleOracleButton1.putClientProperty("html.disable", Boolean.FALSE);
-        minerPanel.add(sampleOracleButton1, cc.xyw(3, 3, 2, CellConstraints.LEFT, CellConstraints.CENTER));
-        graphMLButton1 = new JButton();
-        graphMLButton1.setMaximumSize(new Dimension(83, 38));
-        graphMLButton1.setPreferredSize(new Dimension(90, 38));
-        graphMLButton1.setText("GraphML");
-        graphMLButton1.setToolTipText("<html>Make a model from the graphDB. Requires APSelectorManagerTEST.json file in directory temporal.\n <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
-        minerPanel.add(graphMLButton1, cc.xy(11, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        temporalModelButton = new JButton();
-        temporalModelButton.setPreferredSize(new Dimension(78, 38));
-        temporalModelButton.setText("Model");
-        temporalModelButton.setToolTipText("<html>Exports/transforms the first model from the graphDB  into intermediate (JSON) format and then to HOA format. HOA can be loaded in LTL model checker SPOT. <br>Requires APSelectorManager file for filtering and<br>oracle file to instantiate LTL formulas\n <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
-        minerPanel.add(temporalModelButton, cc.xy(12, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        defaultSelectorBtn = new JButton();
+        defaultSelectorBtn.setMaximumSize(new Dimension(130, 38));
+        defaultSelectorBtn.setMinimumSize(new Dimension(130, 38));
+        defaultSelectorBtn.setPreferredSize(new Dimension(130, 38));
+        defaultSelectorBtn.setText("Default Selector");
+        defaultSelectorBtn.setToolTipText("Generate a default APSelectionManager");
+        minerPanel.add(defaultSelectorBtn, cc.xy(2, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        sampleOracleBtn = new JButton();
+        sampleOracleBtn.setPreferredSize(new Dimension(110, 38));
+        sampleOracleBtn.setText("Sample Oracle");
+        sampleOracleBtn.setToolTipText("Generate files with a sample Oracle and a sample Pattern.");
+        sampleOracleBtn.putClientProperty("html.disable", Boolean.FALSE);
+        minerPanel.add(sampleOracleBtn, cc.xyw(3, 3, 2, CellConstraints.LEFT, CellConstraints.CENTER));
+        graphMLBtn = new JButton();
+        graphMLBtn.setMaximumSize(new Dimension(83, 38));
+        graphMLBtn.setPreferredSize(new Dimension(90, 38));
+        graphMLBtn.setText("GraphML");
+        graphMLBtn.setToolTipText("<html>Make a model from the graphDB. Requires APSelectorManagerTEST.json file in directory temporal.\n <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
+        minerPanel.add(graphMLBtn, cc.xy(11, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        ModelOnlyBtn = new JButton();
+        ModelOnlyBtn.setPreferredSize(new Dimension(78, 38));
+        ModelOnlyBtn.setText("Model");
+        ModelOnlyBtn.setToolTipText("<html>Exports/transforms the first model from the graphDB  into intermediate (JSON) format and then to HOA format. HOA can be loaded in LTL model checker SPOT. <br>Requires APSelectorManager file for filtering and<br>oracle file to instantiate LTL formulas\n <BR><BR>\nEnsure that the parameter values on General panel and State model panel are saved before invoking this function!!! </html> ");
+        minerPanel.add(ModelOnlyBtn, cc.xy(12, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         visualizerPanel = new JPanel();
         visualizerPanel.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:100dlu:noGrow,left:4dlu:noGrow,left:128px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:49px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        tabbedPane1.addTab("Visualizer", visualizerPanel);
-        textFieldPythonEnvironment = new JTextField();
-        visualizerPanel.add(textFieldPythonEnvironment, cc.xyw(3, 1, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        containerTab.addTab("Visualizer", visualizerPanel);
+        PythonEnv_Path = new JTextField();
+        visualizerPanel.add(PythonEnv_Path, cc.xyw(3, 1, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label9 = new JLabel();
         label9.setText("Python Env. :");
         label9.setToolTipText("Path to Active Virtual environment");
         visualizerPanel.add(label9, cc.xy(1, 1));
-        button9 = new JButton();
-        button9.setText("...");
-        visualizerPanel.add(button9, cc.xy(7, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        textFieldPythonVisualizer = new JTextField();
-        visualizerPanel.add(textFieldPythonVisualizer, cc.xyw(3, 3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        selectFilePython_ENV = new JButton();
+        selectFilePython_ENV.setText("...");
+        visualizerPanel.add(selectFilePython_ENV, cc.xy(7, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        PythonVisualizer_Path = new JTextField();
+        visualizerPanel.add(PythonVisualizer_Path, cc.xyw(3, 3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label10 = new JLabel();
         label10.setText("Visualizer:");
         label10.setToolTipText("Usually this is the path to run.py");
         visualizerPanel.add(label10, cc.xy(1, 3));
-        button10 = new JButton();
-        button10.setText("...");
-        visualizerPanel.add(button10, cc.xy(7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        startAnalyzerButton = new JButton();
-        startAnalyzerButton.setText("Start Analyzer");
-        visualizerPanel.add(startAnalyzerButton, cc.xy(1, 5));
-        stopAnalyzerButton = new JButton();
-        stopAnalyzerButton.setText("Stop Analyzer");
-        visualizerPanel.add(stopAnalyzerButton, cc.xy(5, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        clearButton = new JButton();
-        clearButton.setHorizontalAlignment(0);
-        clearButton.setMaximumSize(new Dimension(-1, -1));
-        clearButton.setMinimumSize(new Dimension(-1, -1));
-        clearButton.setPreferredSize(new Dimension(60, 38));
-        clearButton.setText("Clr");
-        clearButton.setToolTipText("Clear the Log");
-        panel1.add(clearButton, cc.xyw(13, 3, 4, CellConstraints.DEFAULT, CellConstraints.CENTER));
+        selectFilePython_VIZ = new JButton();
+        selectFilePython_VIZ.setText("...");
+        visualizerPanel.add(selectFilePython_VIZ, cc.xy(7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        startAnalyzerBtn = new JButton();
+        startAnalyzerBtn.setText("Start Analyzer");
+        visualizerPanel.add(startAnalyzerBtn, cc.xy(1, 5));
+        stopAnalyzerBtn = new JButton();
+        stopAnalyzerBtn.setText("Stop Analyzer");
+        visualizerPanel.add(stopAnalyzerBtn, cc.xy(5, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        clearBtn = new JButton();
+        clearBtn.setHorizontalAlignment(0);
+        clearBtn.setMaximumSize(new Dimension(-1, -1));
+        clearBtn.setMinimumSize(new Dimension(-1, -1));
+        clearBtn.setPreferredSize(new Dimension(60, 38));
+        clearBtn.setText("Clr");
+        clearBtn.setToolTipText("Clear the Log");
+        mainTemporalPanel.add(clearBtn, cc.xyw(13, 3, 4, CellConstraints.DEFAULT, CellConstraints.CENTER));
         final JScrollPane scrollPane1 = new JScrollPane();
-        panel1.add(scrollPane1, cc.xyw(1, 3, 11, CellConstraints.FILL, CellConstraints.FILL));
-        textArea12 = new JTextArea();
-        textArea12.setEnabled(true);
-        textArea12.setMaximumSize(new Dimension(1, 20));
-        textArea12.setMinimumSize(new Dimension(1, 30));
-        textArea12.setOpaque(false);
-        textArea12.setPreferredSize(new Dimension(1, 30));
-        textArea12.setRows(0);
-        scrollPane1.setViewportView(textArea12);
+        mainTemporalPanel.add(scrollPane1, cc.xyw(1, 3, 11, CellConstraints.FILL, CellConstraints.FILL));
+        logArea = new JTextArea();
+        logArea.setEnabled(true);
+        logArea.setMaximumSize(new Dimension(1, 20));
+        logArea.setMinimumSize(new Dimension(1, 30));
+        logArea.setOpaque(false);
+        logArea.setPreferredSize(new Dimension(1, 30));
+        logArea.setRows(0);
+        scrollPane1.setViewportView(logArea);
     }
 
     /**
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
-        return panel1;
+        return mainTemporalPanel;
     }
 
     private void createUIComponents() {
@@ -436,17 +403,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     }
 
 
-    private void initialize() {
-        /// customize
-        //CSS: alpha panels are for debugging only
-        // tabbedPane1.remove(alphaExplorePanel);
-        // tabbedPane1.remove(alphaLTLPanel);
-
-    }
-
     //***********TESTAR generic panel code
     public void populateFrom(final Settings settings) {
-
         spotLTLChecker.setText(settings.get(ConfigTags.TemporalLTL_SPOTChecker));
         WSLCheckBoxLTLSpot.setSelected(settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL));
         itsCTLChecker.setText(settings.get(ConfigTags.TemporalCTL_ITSChecker));
@@ -455,19 +413,18 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         WSLCheckBoxLTLITS.setSelected(settings.get(ConfigTags.TemporalLTL_ITSCheckerWSL));
         instrumentDeadlockStatesCheckBox.setSelected(settings.get(ConfigTags.TemporalInstrumentDeadlockState));
         verboseCheckBox.setSelected(settings.get(ConfigTags.TemporalVerbose));
+        CounterExamples.setSelected(settings.get(ConfigTags.TemporalCounterExamples));
         enableTemporalOfflineOraclesCheckBox.setSelected(settings.get(ConfigTags.TemporalOffLineEnabled));
         enforceAbstractionEquality.setSelected(settings.get(ConfigTags.TemporalConcreteEqualsAbstract));
-        textField7.setText(settings.get(ConfigTags.TemporalOracles));
-        textField5.setText(settings.get(ConfigTags.TemporalPatterns));
-        textField6.setText(settings.get(ConfigTags.TemporalAPSelectorManager));
-        patternConstraintsTextField.setText(settings.get(ConfigTags.TemporalPatternConstraints));
-
+        oracleFile.setText(settings.get(ConfigTags.TemporalOracles));
+        patternFile.setText(settings.get(ConfigTags.TemporalPatterns));
+        ApSelectorManagerFile.setText(settings.get(ConfigTags.TemporalAPSelectorManager));
+        patternConstraintsFile.setText(settings.get(ConfigTags.TemporalPatternConstraints));
         String[] comboBoxLabels = settings.get(TemporalGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
         DefaultComboBoxModel cbModel = new DefaultComboBoxModel(comboBoxLabels); // read only
-        comboBox2.setModel(cbModel);
-
-        textFieldPythonEnvironment.setText(settings.get(ConfigTags.TemporalPythonEnvironment));
-        textFieldPythonVisualizer.setText(settings.get(ConfigTags.TemporalVisualizerServer));
+        tacticComboBox.setModel(cbModel);
+        PythonEnv_Path.setText(settings.get(ConfigTags.TemporalPythonEnvironment));
+        PythonVisualizer_Path.setText(settings.get(ConfigTags.TemporalVisualizerServer));
         VisualizerURL = settings.get(ConfigTags.TemporalVisualizerURL);
         VisualizerURLStop = settings.get(ConfigTags.TemporalVisualizerURLStop);
         if (outputDir != null && !outputDir.equals("")) {// when triggered by save button on the general panel
@@ -482,65 +439,70 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         settings.set(ConfigTags.TemporalLTL_SPOTChecker, spotLTLChecker.getText());
         settings.set(ConfigTags.TemporalLTL_SPOTCheckerWSL, WSLCheckBoxLTLSpot.isSelected());
         settings.set(ConfigTags.TemporalVerbose, verboseCheckBox.isSelected());
+        settings.set(ConfigTags.TemporalCounterExamples, CounterExamples.isSelected());
         settings.set(ConfigTags.TemporalOffLineEnabled, enableTemporalOfflineOraclesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
-        settings.set(ConfigTags.TemporalOracles, textField7.getText());
-        settings.set(ConfigTags.TemporalAPSelectorManager, textField6.getText());
-        settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsTextField.getText());
+        settings.set(ConfigTags.TemporalOracles, oracleFile.getText());
+        settings.set(ConfigTags.TemporalAPSelectorManager, ApSelectorManagerFile.getText());
+        settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsFile.getText());
         settings.set(ConfigTags.TemporalCTL_ITSChecker, itsCTLChecker.getText());
         settings.set(ConfigTags.TemporalCTL_ITSCheckerWSL, WSLCheckBoxCTLITS.isSelected());
         settings.set(ConfigTags.TemporalLTL_ITSChecker, itsLTLChecker.getText());
         settings.set(ConfigTags.TemporalLTL_ITSCheckerWSL, WSLCheckBoxLTLITS.isSelected());
         settings.set(ConfigTags.TemporalInstrumentDeadlockState, instrumentDeadlockStatesCheckBox.isSelected());
-        settings.set(ConfigTags.TemporalPythonEnvironment, textFieldPythonEnvironment.getText());
-        settings.set(ConfigTags.TemporalVisualizerServer, textFieldPythonVisualizer.getText());
+        settings.set(ConfigTags.TemporalPythonEnvironment, PythonEnv_Path.getText());
+        settings.set(ConfigTags.TemporalVisualizerServer, PythonVisualizer_Path.getText());
 
     }
-    //***********TESTAR****************
-
 
     //******************Eventhandlers
-    private void performLTLFormulaCheck(ActionEvent evt) {
-        String cli = itsCTLChecker.getText() + " '" + textField1.getText() + "'";
-        Helper.RunOSChildProcess(cli);
-        textArea12.append("check console output for the result\n");
-    }
 
+    private void chooserHelper(JTextField textfield) {
+        JFileChooser fd = new JFileChooser();
+        fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fd.setCurrentDirectory(new File(textfield.getText()).getParentFile());
+        if (fd.showOpenDialog(mainTemporalPanel) == JFileChooser.APPROVE_OPTION) {
+            String file = fd.getSelectedFile().getAbsolutePath();
+            textfield.setText(file);
+        }
+    }
 
     private void ModelCheck(ActionEvent e) {
 
         tcontrol.MCheck(
-                textField6.getText(),
-                textField7.getText(),
+                ApSelectorManagerFile.getText(),
+                oracleFile.getText(),
                 verboseCheckBox.isSelected(),
+                CounterExamples.isSelected(),
                 instrumentDeadlockStatesCheckBox.isSelected(),
                 spotLTLChecker.getText(), WSLCheckBoxLTLSpot.isSelected(),
                 itsCTLChecker.getText(), WSLCheckBoxCTLITS.isSelected(),
-            itsLTLChecker.getText(),WSLCheckBoxLTLITS.isSelected());
+                itsLTLChecker.getText(), WSLCheckBoxLTLITS.isSelected());
     }
 
     private void generateOracles(ActionEvent e) {
 
-        tcontrol.generateOraclesFromPatterns(textField6.getText(), textField5.getText(), patternConstraintsTextField.getText(), Integer.parseInt(comboBox2.getSelectedItem().toString()));
+        tcontrol.generateOraclesFromPatterns(
+                ApSelectorManagerFile.getText(),
+                patternFile.getText(),
+                patternConstraintsFile.getText(),
+                Integer.parseInt(tacticComboBox.getSelectedItem().toString()));
     }
 
 
     private void startTemporalWebAnalyzer(ActionEvent evt) {
-
-        String cli = textFieldPythonEnvironment.getText() + " " + textFieldPythonVisualizer.getText();
-
-        textArea12.setText("invoking : \n");
-        textArea12.append(cli + "\n");
+        String cli = PythonEnv_Path.getText() + " " + PythonVisualizer_Path.getText();
+        logArea.setText("invoking : \n");
+        logArea.append(cli + "\n");
         // call the external program
         try {
             if (webAnalyzerProcess == null) {
                 webAnalyzerProcess = Runtime.getRuntime().exec(cli);
-                textArea12.append("Visualizer Started. goto " + VisualizerURL);
-                textArea12.append("\n");
+                logArea.append("Visualizer Started. goto " + VisualizerURL);
+                logArea.append("\n");
                 Desktop desktop = Desktop.getDesktop();
                 URI uri = new URI(VisualizerURL);
                 desktop.browse(uri);
-
                 webAnalyzerErr = new StreamConsumer(webAnalyzerProcess.getErrorStream(), "ERROR");
                 webAnalyzerOut = new StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
                 // kick them off
@@ -548,11 +510,11 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 webAnalyzerOut.start();
 
             } else {
-                textArea12.append("Visualizer was already running. goto " + VisualizerURL + "\n");
+                logArea.append("Visualizer was already running. goto " + VisualizerURL + "\n");
             }
         } catch (Exception e) {
             System.err.println("Error on exec() method");
-            textArea12.append("Error on exec() method\n");
+            logArea.append("Error on exec() method\n");
             e.printStackTrace();
         }
     }
@@ -563,20 +525,20 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
             boolean ret = false;
             // in case the python is invoked via a OS batch command , the above may leave the command running.
-            // conversely: killing just the OS batch process, may leave then the python process( is a server0 running)
+            // equivalently:  killing just the OS batch process, may leave then the python process( which is a server) running)
             if (webAnalyzerProcess != null) webAnalyzerProcess.waitFor(1, TimeUnit.SECONDS);
             if (webAnalyzerProcess != null) {
                 webAnalyzerProcess.destroyForcibly();
-                textArea12.append("Forcing Visualizer  to Stop.\n");
+                logArea.append("Forcing Visualizer  to Stop.\n");
                 ret = webAnalyzerProcess.waitFor(2, TimeUnit.SECONDS);  //gently wait
             }
-            textArea12.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
+            logArea.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
             if (ret) webAnalyzerProcess = null;
             webAnalyzerErr.stop();
             webAnalyzerOut.stop();
         } catch (Exception e) {
             System.err.println("Error on stopping Analyzer");
-            textArea12.append("Error on stopping Analyzer\n");
+            logArea.append("Error on stopping Analyzer\n");
 
             e.printStackTrace();
         }
@@ -584,92 +546,65 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     }
 
     private void testdbconnection(ActionEvent evt) {
-
-        textArea12.append(tcontrol.pingDB() + "\n");
-
+        logArea.append(tcontrol.pingDB() + "\n");
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
-
-        tcontrol.makeTemporalModel(textField6.getText(), verboseCheckBox.isSelected(), true);
-
+        tcontrol.makeTemporalModel(ApSelectorManagerFile.getText(), verboseCheckBox.isSelected(), true);
     }
 
     private void testgraphml(ActionEvent evt) {
         try {
 
-            textArea12.append("connecting to: db\n");
-            //tcontrol.dbReopen();
-            textArea12.repaint();
+            logArea.append("connecting to: db\n");
+            logArea.repaint();
             boolean res;
             res = tcontrol.saveToGraphMLFile("GraphML.XML", false);
             res = tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
 
-            textArea12.append(" saving to  graphml file done with result:" + res + "\n\n");
+            logArea.append(" saving to  graphml file done with result:" + res + "\n\n");
             //tcontrol.dbClose();
         } catch (Exception e) {
-            System.err.println("Error on testing db");
-            textArea12.append("Error on testing db\n");
-            textArea12.append("\n");
+            System.err.println("Error on connecting to db");
+            logArea.append("Error on connecting to db\n");
+            logArea.append("\n");
             e.printStackTrace();
         }
 
     }
 
     public void testOracleCSV() {
-        textArea12.append("test: writing an oracle to CSV file\n");
+        logArea.append("test: writing an oracle to CSV file\n");
         TemporalOracle to = TemporalOracle.getSampleLTLOracle();
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
         CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
-        textArea12.append("csv saved: \n");
+        logArea.append("csv saved: \n");
     }
 
     public void testPatternCSV() {
-        textArea12.append("test: writing a pattern to CSV file\n");
+        logArea.append("test: writing a pattern to CSV file\n");
         TemporalPattern pat = TemporalPattern.getSamplePattern();
         List<TemporalPattern> patcoll = new ArrayList<>();
         patcoll.add(pat);
         CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
-        textArea12.append("csv saved: ");
+        logArea.append("csv saved: ");
     }
 
     public void testPatternConstraintCSV() {
-        textArea12.append("test: writing a pattern-constraint to CSV file\n");
+        logArea.append("test: writing a pattern-constraint to CSV file\n");
         List<TemporalPatternConstraint> patconstraintcoll = TemporalPatternConstraint.getSampleConstraints();
         CSVHandler.save(patconstraintcoll, outputDir + "temporalPatternConstraintSample.csv");
-        textArea12.append("csv saved: ");
+        logArea.append("csv saved: ");
     }
 
     public void testSaveDefaultApSelectionManagerJSON() {
-
-        textArea12.append("test: writing an Selectionmanager.JSON\n");
+        logArea.append("test: writing a APSelectionManager.JSON\n");
         tcontrol.setDefaultAPSelectormanager();
         tcontrol.saveAPSelectorManager("APSelectorManager_Default.json");
-        textArea12.append("json saved: \n");
-    }
-
-
-    public APSelectorManager loadApSelectionManagerJSON(String file) {
-
-        APSelectorManager APmgr1;
-        APmgr1 = (APSelectorManager) JSONHandler.load(file, APSelectorManager.class);
-
-        if (APmgr1 == null) {
-            textArea12.append("verify the file at location '" + file + "' \n");
-            System.out.println("verify the file at location '" + file + "' \n");
-
-        } else {
-            textArea12.append("json loaded: \n");
-            Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();
-            Iterator<WidgetFilter> wfiter = wfset.iterator();
-            WidgetFilter wf = wfiter.next();
-            textArea12.append("widgetroles that were read from file: " + wf.getWidgetFilterParts().toString() + "\n");
-        }
-        return APmgr1;
+        logArea.append("json saved: \n");
     }
 
 //*******************Eventhandlers
-
 
 }

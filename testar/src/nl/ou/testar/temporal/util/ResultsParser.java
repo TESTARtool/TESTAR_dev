@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CheckerResultsParser {
+public abstract class ResultsParser {
 
     protected TemporalModel tmodel;
     protected List<TemporalOracle> oracleColl;
 
-    public CheckerResultsParser() { }
+    public ResultsParser() { }
 
 
     public void setTmodel(TemporalModel tmodel) {  this.tmodel = tmodel;   }

@@ -457,10 +457,11 @@ public class Main {
 			defaults.add(Pair.from(TemporalLTL_SPOTCheckerWSL, false));
 			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
 			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
-			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
-			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTL_ITSChecker, ""));
+			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, false));
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
 			defaults.add(Pair.from(TemporalVerbose, false));
+			defaults.add(Pair.from(TemporalCounterExamples, true));
 			defaults.add(Pair.from(TemporalOracles, ""));
 			defaults.add(Pair.from(TemporalPatterns, ""));
 			defaults.add(Pair.from(TemporalAPSelectorManager, ""));

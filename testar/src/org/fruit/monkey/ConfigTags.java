@@ -129,8 +129,9 @@ public final class ConfigTags {
   public static final Tag<String> TemporalLTL_ITSChecker = Tag.from("TemporalLTL_ITSChecker", String.class);
   public static final Tag<Boolean> TemporalLTL_ITSCheckerWSL = Tag.from("TemporalLTL_ITSCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalInstrumentDeadlockState= Tag.from("TemporalInstrumentDeadlockState", Boolean.class);
-
   public static final Tag<Boolean> TemporalVerbose = Tag.from("TemporalVerbose", Boolean.class);
+  public static final Tag<Boolean> TemporalCounterExamples = Tag.from("TemporalCounterExamples", Boolean.class);
+
   public static final Tag<String> TemporalOracles = Tag.from("TemporalOracles", String.class);
   public static final Tag<String> TemporalPatterns = Tag.from("TemporalPatterns", String.class);
   public static final Tag<String> TemporalAPSelectorManager = Tag.from("TemporalAPSelectorManager", String.class);

@@ -3,22 +3,17 @@ package nl.ou.testar.temporal.util;
 import nl.ou.testar.temporal.structure.StateEncoding;
 import nl.ou.testar.temporal.structure.TemporalOracle;
 import nl.ou.testar.temporal.structure.TransitionEncoding;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class ITSltl_CheckerResultsParser extends CheckerResultsParser{
+public class SPOT_LTL_ResultsParser extends ResultsParser {
 
 
     public List<TemporalOracle> parse(String rawInput) {
-        if (!rawInput.equals("not implemented")){
-            return null;
-        }
-//an accepting run exists false
-// Formula 0 is TRUE no accepting run found.
+
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
         scanner.useDelimiter("\\s*=== Automaton\\s*");
