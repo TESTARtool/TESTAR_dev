@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.smartclient.com/smartgwt/showcase/"
+SUTConnectorValue = "D:\\TESTAR\\chromedriver_win32\\chromedriver.exe" "1920x900+0+0" "https://www.kuveytturk.com.tr/en/"
 
 #################################################################
 # Sequences
@@ -44,7 +44,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*Error.*|.*[eE]xcepti[o?]n.*|.*404.*|.*403.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
+ProtocolClass = webdriver_kuveyt_turk/Protocol_webdriver_kuveyt_turk
 
 #################################################################
 # Graphdatabase settings (experimental)

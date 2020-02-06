@@ -30,9 +30,13 @@
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.ActionSelectionUtils;
+
 import org.fruit.Pair;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
@@ -43,41 +47,40 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
+import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_gwt extends WebdriverProtocol {
-  // Classes that are deemed clickable by the web framework
-  private static List<String> clickableClasses = Arrays.asList(
-      // Dropdown op top right
-      "selectItemLiteText",
-      // Menu items on the left
-      "etreeCell", "etreeCellSelected", "etreeCellSelectedOver",
-      // Checkboxes
-      "checkboxFalse", "checkboxFalseOver", "checkboxTrue", "checkboxTrueOver",
-      // Tiles
-      "showcaseTileIcon",
-      // Scrolling stuff
-      "vScrollStart", "vScrollEnd"
-      );
+public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
+	// Classes that are deemed clickable by the web framework
+	private static List<String> clickableClasses = Arrays.asList(
+			"owl-dot", "participation", "rdMaturity");
 
-  // Disallow links and pages with these extensions
-  // Set to null to ignore this feature
-  private static List<String> deniedExtensions = Arrays.asList(
-      "pdf", "jpg", "png", "jsp");
+	private static List<String> clickableLabels = Arrays.asList(
+			"rdParticipation", "rdInvestment", "rdMaturityDay", "rdMaturityMonth");
+	// Disallow links and pages with these extensions
+	// Set to null to ignore this feature
+	private static List<String> deniedExtensions = Arrays.asList(
+			"pdf", "jpg", "png", "vsf");
 
-  // Define a whitelist of allowed domains for links and pages
-  // An empty list will be filled with the domain from the sut connector
-  // Set to null to ignore this feature
-  private static List<String> domainsAllowed =
-      Arrays.asList("www.smartclient.com");
+	// Define a whitelist of allowed domains for links and pages
+	// An empty list will be filled with the domain from the sut connector
+	// Set to null to ignore this feature
+	private static List<String> domainsAllowed = Arrays.asList(
+			"www.kuveytturk.com.tr", "isube.kuveytturk.com.tr", "internetbranchtest");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
-  private static boolean followLinks = true;
+  private static boolean followLinks = false;
 
   // URL + form name, username input id + value, password input id + value
   // Set login to null to disable this feature
@@ -90,7 +93,8 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
   // Set to null to disable this feature
   private static Map<String, String> policyAttributes =
       new HashMap<String, String>() {{
-        put("class", "iAgreeButton");
+        put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+    	//put("name","BtnOK");
       }};
 
   /**
@@ -107,6 +111,8 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 
     // Propagate followLinks setting
     WdDriver.followLinks = followLinks;
+    
+    WdDriver.fullScreen = true;
 
     // Override ProtocolUtil to allow WebDriver screenshots
     protocolUtil = new WdProtocolUtil();
@@ -118,7 +124,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
    * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    * out what executable to run)
    * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuratio files etc.)
+   * the SUT's configuration files etc.)
    * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    * seconds until they have finished loading)
    *
@@ -126,7 +132,172 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-	  return super.startSystem();
+	  SUT sut = super.startSystem();
+	  
+	  /**
+	   * If you are experiencing problems with the coordinates of the executed actions.
+	   * Please activate the following functionalities, capture the mouse (if you have the option disabled),
+	   * and if it continues, contact us https://testar.org/contact/
+	   */
+	  //visualizationOn = true;
+	  //mouse.setCursorDisplayScale(1.0);
+	  
+	  return sut;
+  }
+
+  /**
+   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+   * This can be used for example for bypassing a login screen by filling the username and password
+   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+   * the SUT's configuration files etc.)
+   */
+	@Override
+	protected void beginSequence(SUT system, State state){
+		// this is an example how to use database connection to Microsoft SQL to get input:
+
+		// Create a variable for the connection string.
+		String connectionUrl = "jdbc:sqlserver://addYourSqlServerAddressHere:addYourSqlServerPortHere;databaseName=addYourDatabaseNameHere;user=addYourUsernameHere;password=addYourPasswordHere";
+
+		System.out.println("DEBUG: MS SQL: Trying to connect: " + connectionUrl);
+		
+		try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+			
+			System.out.println("DEBUG: MS SQL: Connection successful!");
+			
+			String SQL = "SELECT TOP 10 * FROM Person.Contact";
+			ResultSet rs = stmt.executeQuery(SQL);
+
+			System.out.println("DEBUG: MS SQL: Executing SQL Query: " + SQL);
+			
+			// Iterate through the data in the result set and display it.
+			while (rs.next()) {
+				System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
+			}
+		}
+		// Handle any errors that may have occurred.
+		catch (SQLException e) {
+			System.out.println("DEBUG: MS SQL: ERROR trying to connect: " + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		/**
+		 * TODO: Customize the credentials obtained from DB
+		 */
+		
+		// This login sequence is based on the information on: https://isube.kuveytturk.com.tr/Login/InitialLogin
+        // But the username and password works only in internal development environment of Kuveyt Turk
+
+        System.out.println("DEBUG 1: looking for BtnOK (expecting a pop-up info screen)");
+        //iterating through all widgets of the state:
+        for(Widget widget: state){
+            // Finding the OK button of popup dialog:
+            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("BtnOK")){
+                //preparing action compiler:
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                System.out.println("DEBUG 1: left mouse click on BtnOK");
+                // Left mouse click on OK button:
+                executeAction(system,state,ac.leftClickAt(widget));
+                Util.pause(1);
+            }
+        }
+        // Updating the GUI state after popup dialog has been closed:
+        state = getState(system);
+
+        System.out.println("DEBUG 2: changing language to English (expecting to be in Turkish login screen)");
+        for(Widget widget: state){
+            // Finding the OK button of popup dialog:
+            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("english") && 
+            		widget.get(Tags.ValuePattern, "not available").equalsIgnoreCase("/Login/InitialLoginEnglish")){
+                //preparing action compiler:
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                System.out.println("DEBUG 2: left mouse click on english");
+                // Left mouse click on OK button:
+                executeAction(system,state,ac.leftClickAt(widget));
+                Util.pause(1);
+            }
+        }
+        // Updating the GUI state after clicking on English:
+        state = getState(system);
+
+        System.out.println("DEBUG 3: looking for password field");
+        //iterating through all widgets of the state:
+        for(Widget widget: state){
+            // Finding the password field:
+            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("Password")){
+                //preparing action compiler:
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                System.out.println("DEBUG 3: typing into password field");
+                // Typing the password into the password field:
+                executeAction(system,state,ac.clickTypeInto(widget,"12121212", true));
+                Util.pause(1);
+
+                System.out.println("DEBUG 3: moving to previous field");
+                //preparing and executing an action to press SHIFT+TAB to select the previous widget that was Username field:
+                new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT),0.2)
+                        .add(new KeyDown(KBKeys.VK_TAB),0.2)
+                        .add(new KeyUp(KBKeys.VK_TAB),0.2)
+                        .add(new KeyUp(KBKeys.VK_SHIFT),0.2).build().run(system,state,0.2);
+
+                System.out.println("DEBUG 3: typing username");
+                //preparing and executing an action to type the username:
+                new CompoundAction.Builder().add(new Type("94444281"),1)
+                        .build().run(system,state,0.2);
+                Util.pause(1);
+            }
+        }
+
+        System.out.println("DEBUG 3: looking for login/next button");
+        //iterating through all widgets of the state:
+        for(Widget widget: state){
+            // Finding the Login / Next button:
+            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("Login")){
+                //preparing action compiler:
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                System.out.println("DEBUG 3: left mouse click on login/next button");
+                // Left mouse click on Login button:
+                executeAction(system,state,ac.leftClickAt(widget));
+                Util.pause(1);
+            }
+        }
+
+		super.beginSequence(system, state);
+	}
+
+  /**
+   * This method is called when TESTAR requests the state of the SUT.
+   * Here you can add additional information to the SUT's state or write your
+   * own state fetching routine. The state should have attached an oracle
+   * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+   * state is erroneous and if so why.
+   *
+   * @return the current state of the SUT with attached oracle.
+   */
+  @Override
+  protected State getState(SUT system) throws StateBuildException {
+    State state = super.getState(system);
+
+    return state;
+  }
+
+  /**
+   * This is a helper method used by the default implementation of <code>buildState()</code>
+   * It examines the SUT's current state and returns an oracle verdict.
+   *
+   * @return oracle verdict, which determines whether the state is erroneous and why.
+   */
+  @Override
+  protected Verdict getVerdict(State state) {
+
+    Verdict verdict = super.getVerdict(state); // by urueda
+    // system crashes, non-responsiveness and suspicious titles automatically detected!
+
+    //-----------------------------------------------------------------------------
+    // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
+    //-----------------------------------------------------------------------------
+
+    // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
+
+    return verdict;
   }
 
   /**
@@ -164,8 +335,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
       }
 
       // slides can happen, even though the widget might be blocked
-      // addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,
-      //     state);
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
@@ -239,9 +409,12 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
               password.left(), "value", password.right()), 1);
         }
       }
-      // Submit form
-      builder.add(new WdSubmitAction(login.right()), 1);
-      return new HashSet<>(Collections.singletonList(builder.build()));
+      // Submit form, but only if user and pass are filled
+      builder.add(new WdSubmitAction(login.right()), 2);
+      CompoundAction actions = builder.build();
+      if (actions.getActions().size() >= 3) {
+        return new HashSet<>(Collections.singletonList(actions));
+      }
     }
 
     return null;
@@ -423,13 +596,11 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-      /*
       // Input type are special...
       if (role.equals(WdRoles.WdINPUT)) {
         String type = ((WdWidget) widget).element.type;
         return WdRoles.clickableInputTypes().contains(type);
       }
-      */
       return true;
     }
 
@@ -456,5 +627,113 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
     }
 
     return false;
+  }
+
+  /**
+   * Select one of the possible actions (e.g. at random)
+   *
+   * @param state   the SUT's current state
+   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+   * @return the selected action (non-null!)
+   */
+	/**
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action (non-null!)
+	 */
+	private Set<Action> executedActions = new HashSet<Action> ();
+	private Set<Action> previousActions;
+
+	@Override
+	protected Action selectAction(State state, Set<Action> actions){
+
+		System.out.println("DEBUG: *** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
+		Set<Action> prioritizedActions = new HashSet<Action> ();
+		//checking if it is the first round of actions:
+		if(previousActions==null) {
+			//all actions are new actions:
+			System.out.println("DEBUG: the first round of actions");
+			prioritizedActions = actions;
+		}else{
+			//if not the first round, get the new actions compared to previous state:
+			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, previousActions);
+		}
+		if(prioritizedActions.size()>0){
+			//there are new actions to choose from, checking if they have been already executed:
+			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, executedActions);
+		}
+		if(prioritizedActions.size()>0){
+			// found new actions that have not been executed before - choose randomly
+			System.out.println("DEBUG: found NEW actions that have not been executed before");
+		}else{
+			// no new unexecuted actions, checking if any unexecuted actions:
+			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions);
+		}
+		if(prioritizedActions.size()>0){
+			// found actions that have not been executed before - choose randomly
+			System.out.println("DEBUG: found actions that have not been executed before");
+		}else{
+			// no unexecuted actions, choose randomly on any of the available actions:
+			System.out.println("DEBUG: NO actions that have not been executed before");
+			prioritizedActions = actions;
+		}
+		//saving the current actions for the next round:
+		previousActions = actions;
+
+		return(super.selectAction(state, prioritizedActions));
+
+	}
+
+	/**
+	 * Execute the selected action.
+	 *
+	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
+	 *
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @param action the action to execute
+	 * @return whether or not the execution succeeded
+	 */
+	@Override
+	protected boolean executeAction(SUT system, State state, Action action){
+		executedActions.add(action);
+		System.out.println("DEBUG: executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
+		return super.executeAction(system, state, action);
+	}
+
+  /**
+   * TESTAR uses this method to determine when to stop the generation of actions for the
+   * current sequence. You could stop the sequence's generation after a given amount of executed
+   * actions or after a specific time etc.
+   *
+   * @return if <code>true</code> continue generation, else stop
+   */
+  @Override
+  protected boolean moreActions(State state) {
+    return super.moreActions(state);
+  }
+
+  /**
+   * This method is invoked each time after TESTAR finished the generation of a sequence.
+   */
+  @Override
+  protected void finishSequence() {
+    super.finishSequence();
+  }
+
+  /**
+   * TESTAR uses this method to determine when to stop the entire test.
+   * You could stop the test after a given amount of generated sequences or
+   * after a specific time etc.
+   *
+   * @return if <code>true</code> continue test, else stop
+   */
+  @Override
+  protected boolean moreSequences() {
+    return super.moreSequences();
   }
 }
