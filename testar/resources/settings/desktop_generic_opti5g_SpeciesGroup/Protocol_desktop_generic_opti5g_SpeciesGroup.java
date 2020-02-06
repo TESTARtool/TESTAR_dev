@@ -220,7 +220,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends PonsseDesktopP
 	protected Action selectAction(State state, Set<Action> actions){
 		//checking if the state is in "SpeciesGroupsWindow"
 		boolean isSpeciesGroupsWindow = false;
-		if(widgetWithAutomationIdFound("SpeciesGroupsWindow",state)){
+		if(widgetWithAutomationIdFound("SpeciesGroupsWindow",state)&&!(widgetWithAutomationIdFound("popUpDialog",state))){
 			System.out.println("GUI is in SpeciesGroupsWindow - filtering back button");
 			isSpeciesGroupsWindow=true;
 		}
@@ -251,6 +251,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends PonsseDesktopP
 	@Override
 	protected void stopSystem(SUT system) {
 		//super.stopSystem(system);
+		System.out.println("stopSystem - trying to gracefully logout.");
 		// pushing back button until in logout screen:
 		State state = getState(system);
 		while(
