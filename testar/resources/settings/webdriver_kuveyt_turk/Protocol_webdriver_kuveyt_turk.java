@@ -63,7 +63,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 	// Classes that are deemed clickable by the web framework
 	private static List<String> clickableClasses = Arrays.asList(
-			"owl-dot", "participation", "rdMaturity");
+			"owl-dot", "participation", "rdMaturity", "link");
 
 	private static List<String> clickableLabels = Arrays.asList(
 			"rdParticipation", "rdInvestment", "rdMaturityDay", "rdMaturityMonth");
@@ -259,6 +259,8 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
                 Util.pause(1);
             }
         }
+        
+        state = getState(system);
 
 		super.beginSequence(system, state);
 	}
