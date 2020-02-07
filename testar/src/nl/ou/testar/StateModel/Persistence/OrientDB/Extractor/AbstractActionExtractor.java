@@ -60,9 +60,11 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         	if(valueRL == null) {
         		continue;
         	}
-
-        	if (valueRL.getType() != TypeConvertor.getInstance().getOrientDBType(t.getClass())) {
-        		throw new ExtractionException("ERROR retrieving State Model value from State Model. " + valueRL.getType().toString() + " was given.");
+        	
+        	if (valueRL.getType() != TypeConvertor.getInstance().getOrientDBType(t.type())) {
+        		throw new ExtractionException(String.format("ERROR retrieving State Model value from State Model."
+        				+ " %s was expected, but %s was given",
+        				TypeConvertor.getInstance().getOrientDBType(t.type()), valueRL.getType()));
         	}
         	action.addAttribute(t, valueRL.getValue());
 

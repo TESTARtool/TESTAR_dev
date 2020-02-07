@@ -159,7 +159,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
         	actionUnderExecution.addAttribute(StateModelTags.UserInterest, 1);
         } else {
         	int currentInterest = actionUnderExecution.getAttributes().get(StateModelTags.UserInterest);
-        	int increasedInterest = currentInterest++;
+        	int increasedInterest = currentInterest + 1;
         	actionUnderExecution.addAttribute(StateModelTags.UserInterest, increasedInterest);
         }
         
