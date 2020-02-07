@@ -35,6 +35,7 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import javafx.util.Pair;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
 import org.fruit.alayer.exceptions.NoSuchTagException;
@@ -50,6 +51,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.regex.Pattern;
@@ -84,12 +87,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnView;
   private JButton btnRecord;
 
-  private GeneralPanel generalPanel;
-  private FilterPanel filterPanel;
-  private OraclePanel oraclePanel;
-  private TimingPanel timingPanel;
-  private MiscPanel miscPanel;
-  private StateModelPanel stateModelPanel;
+  private static final int GENERAL_TAB_INDEX = 1;
+  private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
    * Starts the settings Dialog.
@@ -196,7 +195,7 @@ public class SettingsDialog extends JFrame implements Observer {
       settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettings.FileName));
     }
 
-    miscPanel.checkSettings();
+    settingPanels.forEach((k,v) -> v.getValue().checkSettings());
   }
 
   private void saveCurrentSettings() {
@@ -236,21 +235,11 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void populateInformation(Settings settings) {
-    generalPanel.populateFrom(settings);
-    filterPanel.populateFrom(settings);
-    oraclePanel.populateFrom(settings);
-    timingPanel.populateFrom(settings);
-    miscPanel.populateFrom(settings);
-    stateModelPanel.populateFrom(settings);
+    settingPanels.forEach((k,v) -> v.getValue().populateFrom(settings));
   }
 
   private void extractInformation(Settings settings) {
-    generalPanel.extractInformation(settings);
-    filterPanel.extractInformation(settings);
-    oraclePanel.extractInformation(settings);
-    timingPanel.extractInformation(settings);
-    miscPanel.extractInformation(settings);
-    stateModelPanel.extractInformation(settings);
+    settingPanels.forEach((k,v) -> v.getValue().extractInformation(settings));
   }
 
   private void initComponents() throws IOException {
@@ -261,21 +250,16 @@ public class SettingsDialog extends JFrame implements Observer {
     btnView = getBtnView();
     btnRecord = getBtnRecord();
 
-
     JTabbedPane jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
-    generalPanel = new GeneralPanel(this);
-    jTabsPane.addTab("General Settings", generalPanel);
-    filterPanel = new FilterPanel();
-    jTabsPane.addTab("Filters", filterPanel);
-    oraclePanel = new OraclePanel();
-    jTabsPane.addTab("Oracles", oraclePanel);
-    timingPanel = new TimingPanel();
-    jTabsPane.addTab("Time Settings", timingPanel);
-    miscPanel = new MiscPanel();
-    jTabsPane.addTab("Misc", miscPanel);
-    stateModelPanel = StateModelPanel.createStateModelPanel();
-    jTabsPane.addTab("State Model", stateModelPanel);
+    settingPanels.put(GENERAL_TAB_INDEX, new Pair<>("General Settings", new GeneralPanel(this)));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Filters", new FilterPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
+
+    settingPanels.forEach((k,v) -> jTabsPane.add(v.getKey(),v.getValue()));
 
     setLayout(jTabsPane);
     pack();
@@ -298,7 +282,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void setLayout(JTabbedPane jTabsPane) {
-    jTabsPane.setSelectedComponent(generalPanel);
+    jTabsPane.setSelectedIndex(GENERAL_TAB_INDEX);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("TESTAR " + TESTAR_VERSION);
