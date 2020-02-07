@@ -10,7 +10,10 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactoryBuilder;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.fruit.monkey.Settings;
+
+import com.orientechnologies.orient.server.handler.OAutomaticBackup.MODE;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,6 +68,10 @@ public class StateModelManagerFactory {
 
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
+        
+        //At the moment we assume that Record mode will be used for the listening mode
+        if(settings.get(ConfigTags.Mode) == Modes.Record)
+        	 return new ModelManagerListeningMode(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
 
         return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
     }

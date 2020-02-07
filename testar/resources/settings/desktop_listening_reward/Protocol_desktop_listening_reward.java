@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.StateModel.StateModelTags;
+
 import org.fruit.Drag;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
@@ -101,7 +103,7 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 			System.out.println("\n ******* These interesting Actions come from State Model");
 			for(Action a : interestingModelActions) {
 				System.out.println("Description: " + a.get(Tags.Desc, "No description"));
-				System.out.println("User Interest: " +a.get(Tags.UserInterest, 0));
+				System.out.println("User Interest: " +a.get(StateModelTags.UserInterest, 0));
 				highAction = a;
 			}
 			System.out.println("******* END of interesting Actions \n");

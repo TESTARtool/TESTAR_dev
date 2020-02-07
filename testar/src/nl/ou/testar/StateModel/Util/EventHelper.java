@@ -34,12 +34,6 @@ public class EventHelper {
                 }
                 break;
                 
-            case ABSTRACT_ACTION_UPDATED:
-            	if (!(event.getPayload() instanceof AbstractAction)) {
-                    throw new InvalidEventException();
-                }
-                break;
-
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 if (!(event.getPayload() instanceof AbstractStateModel)) {
                     throw new InvalidEventException();

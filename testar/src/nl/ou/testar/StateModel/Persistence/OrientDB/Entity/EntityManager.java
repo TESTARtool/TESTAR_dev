@@ -588,25 +588,33 @@ public class EntityManager {
      * @return
      */
     private Object getConvertedValue(OType oType, Object valueToConvert) {
-        Object convertedValue = null;
-        switch (oType) {
-            case BOOLEAN:
-                convertedValue = OType.convert(valueToConvert, Boolean.class);
-                break;
+    	Object convertedValue = null;
+    	switch (oType) {
+    	case BOOLEAN:
+    		convertedValue = OType.convert(valueToConvert, Boolean.class);
+    		break;
 
-            case STRING:
-                convertedValue = OType.convert(valueToConvert, String.class);
-                break;
+    	case STRING:
+    		convertedValue = OType.convert(valueToConvert, String.class);
+    		break;
 
-            case LINKBAG:
-                // we don't process these as a separate attribute
-                break;
+    	case DOUBLE:
+    		convertedValue = OType.convert(valueToConvert, Double.class);
+    		break;
 
-            case EMBEDDEDSET:
-                convertedValue = OType.convert(valueToConvert, Set.class);
-                break;
-        }
-        return  convertedValue;
+    	case INTEGER:
+    		convertedValue = OType.convert(valueToConvert, Integer.class);
+    		break;
+
+    	case LINKBAG:
+    		// we don't process these as a separate attribute
+    		break;
+
+    	case EMBEDDEDSET:
+    		convertedValue = OType.convert(valueToConvert, Set.class);
+    		break;
+    	}
+    	return  convertedValue;
     }
 
     /**

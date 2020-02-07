@@ -186,20 +186,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public void persistAbstractAction(AbstractAction abstractAction) {
 
     }
-    
-    @Override
-    public void updateAbstractAction(AbstractAction abstractAction) {
-    	
-    	System.out.println("**** ORIENT DB MANAGER *****");
-    	System.out.println("*** updateAbstractAction ***");
-    	
-        String query = " UPDATE AbstractAction SET userInterest = '"+abstractAction.getUserInterest()+"' WHERE actionId='"+abstractAction.getActionId()+"'";
-        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-           db.command(query);
-        }
-        
-        System.out.println(query);
-    }
 
     @Override
     public void persistConcreteState(ConcreteState concreteState) {
@@ -367,10 +353,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(actionEntity);
-        
-        //Update the User Interest for recorded actions
-        if(abstractStateTransition.getAction().getUserInterest() > 0)
-        	updateAbstractAction(abstractStateTransition.getAction());
     }
 
     @Override

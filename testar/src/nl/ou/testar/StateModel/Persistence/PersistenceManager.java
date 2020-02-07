@@ -36,12 +36,6 @@ public interface PersistenceManager {
      * @param abstractAction
      */
     void persistAbstractAction(AbstractAction abstractAction);
-    
-    /**
-     * This method updates an abstract action
-     * @param abstractAction
-     */
-    void updateAbstractAction(AbstractAction abstractAction);
 
     /**
      * This method persists an abstract state transition
