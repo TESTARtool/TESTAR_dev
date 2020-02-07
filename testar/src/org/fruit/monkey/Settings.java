@@ -407,6 +407,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalCTL_ITSCheckerWSL = true" + Util.lineSep()
 					+"TemporalLTL_ITSChecker = ubuntu1804 run ~/its/its-ltl" + Util.lineSep()
 					+"TemporalLTL_ITSCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_LTSMINChecker = ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-seq" + Util.lineSep()
+					+"TemporalLTL_LTSMINCheckerWSL = true" + Util.lineSep()
 					+"TemporalInstrumentDeadlockState = true" + Util.lineSep()
 					+"TemporalVerbose = true" + Util.lineSep()
 					+"TemporalCounterExamples = true" + Util.lineSep()

@@ -71,6 +71,8 @@ public class Temporalpanel2 {
     private JTextField itsLTLChecker;
     private JCheckBox CounterExamples;
     private JButton selectFilePatternConstraints;
+    private JTextField ltsminLTLChecker;
+    private JCheckBox WSLCheckBoxLTLLTSMIN;
 
     public Temporalpanel2() {
         $$$setupUI$$$();
@@ -85,11 +87,11 @@ public class Temporalpanel2 {
             }
         });
         ModelOnlyBtn.addActionListener(new ActionListener() {
-               @Override
-        public void actionPerformed(ActionEvent e) {
-            exportTemporalmodel(e);
-        }
-    }
+                                           @Override
+                                           public void actionPerformed(ActionEvent e) {
+                                               exportTemporalmodel(e);
+                                           }
+                                       }
         );
         testDbButton.addActionListener(new ActionListener() {
             @Override
@@ -190,8 +192,8 @@ public class Temporalpanel2 {
         containerTab.setVisible(true);
         mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
-        setupPanel.setLayout(new FormLayout("fill:118px:noGrow,left:4dlu:noGrow,left:149px:noGrow,left:4dlu:noGrow,fill:104px:noGrow,left:6dlu:noGrow,right:66px:noGrow,fill:116px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(false);
+        setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        setupPanel.setVisible(true);
         containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
@@ -199,76 +201,88 @@ public class Temporalpanel2 {
         setupPanel.add(label1, cc.xy(1, 5));
         spotLTLChecker = new JTextField();
         spotLTLChecker.setToolTipText("<html>Command to invoke the SPOT-based LTL model checker<br>\n(counterexamples will be computed)");
-        setupPanel.add(spotLTLChecker, cc.xyw(3, 5, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        setupPanel.add(spotLTLChecker, cc.xyw(2, 5, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLSpot = new JCheckBox();
         WSLCheckBoxLTLSpot.setText("WSL?");
         WSLCheckBoxLTLSpot.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxLTLSpot, cc.xy(7, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(WSLCheckBoxLTLSpot, cc.xy(6, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label2 = new JLabel();
         label2.setText("ITS CTL Checker:");
         label2.setToolTipText("Used for CTL model check. the usual command to invoke is:  its-ctl");
         setupPanel.add(label2, cc.xy(1, 7));
         itsCTLChecker = new JTextField();
         itsCTLChecker.setToolTipText("<html>Command to invoke the ITS-based CTL model checker.<br>\n(no visualization of counterexample possible)</html>");
-        setupPanel.add(itsCTLChecker, cc.xyw(3, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        setupPanel.add(itsCTLChecker, cc.xyw(2, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         enableTemporalOfflineOraclesCheckBox = new JCheckBox();
         enableTemporalOfflineOraclesCheckBox.setText("Enable Temporal Offline Oracles?");
         enableTemporalOfflineOraclesCheckBox.setToolTipText("Temporal oracles are automatically evaluated after each TESTAR run by using the settigns supplied in this form.");
-        setupPanel.add(enableTemporalOfflineOraclesCheckBox, cc.xyw(1, 1, 3));
+        setupPanel.add(enableTemporalOfflineOraclesCheckBox, cc.xyw(1, 1, 2));
         enforceAbstractionEquality = new JCheckBox();
         enforceAbstractionEquality.setSelected(true);
         enforceAbstractionEquality.setText("Enforce Abstraction equality");
         enforceAbstractionEquality.setToolTipText("<html>Concrete Abstraction attributes in new models are the same as on the Abstract Layer.<br>\n(this overrules the ConcreteStateAttributes parameter in the settings file and <br>\nthe default setting that uses ALL StateAttributes as ConcreteStateAttributes)<br>\nIt is advised to leave this setting enabled.</html>");
-        setupPanel.add(enforceAbstractionEquality, cc.xyw(1, 3, 4));
-        verboseCheckBox = new JCheckBox();
-        verboseCheckBox.setSelected(true);
-        verboseCheckBox.setText("Verbose?");
-        verboseCheckBox.setToolTipText("<html> When checked: keeps the intermediate files on disk ,<br>else these files are deleted after the Checker has run.\"\n</html>");
-        setupPanel.add(verboseCheckBox, cc.xy(5, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(enforceAbstractionEquality, cc.xyw(1, 3, 3));
         instrumentDeadlockStatesCheckBox = new JCheckBox();
         instrumentDeadlockStatesCheckBox.setText("Instrument deadlock states?");
         instrumentDeadlockStatesCheckBox.setToolTipText("<html> In case that the Graph-model has deadlock states (~ no outgoing transitions):<BR>\n1. A new state with atomic property 'dead==true' with a selfloop is added<BR>\n2. forall deadlock states, a transition will be added to that newly created state.<BR>\nThe additions wil be added to the model that will be provided to the model-checker.<BR>\n(not the Graph-model) </html>");
-        setupPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(5, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(4, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         testDbButton = new JButton();
         testDbButton.setText("Show DB Models");
-        setupPanel.add(testDbButton, cc.xy(8, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(testDbButton, cc.xy(7, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         WSLCheckBoxCTLITS = new JCheckBox();
         WSLCheckBoxCTLITS.setText("WSL?");
         WSLCheckBoxCTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxCTLITS, cc.xy(7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(WSLCheckBoxCTLITS, cc.xy(6, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         itsLTLChecker = new JTextField();
         itsLTLChecker.setText("");
         itsLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
-        setupPanel.add(itsLTLChecker, cc.xyw(3, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        setupPanel.add(itsLTLChecker, cc.xyw(2, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLITS = new JCheckBox();
         WSLCheckBoxLTLITS.setText("WSL?");
         WSLCheckBoxLTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxLTLITS, cc.xy(7, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(WSLCheckBoxLTLITS, cc.xy(6, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label3 = new JLabel();
         label3.setText("ITS LTL Checker:");
         label3.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
         setupPanel.add(label3, cc.xy(1, 9));
+        final JLabel label4 = new JLabel();
+        label4.setText("LTSMIN LTL Checker:");
+        label4.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
+        setupPanel.add(label4, cc.xy(1, 11));
+        ltsminLTLChecker = new JTextField();
+        ltsminLTLChecker.setText("");
+        ltsminLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
+        setupPanel.add(ltsminLTLChecker, cc.xyw(2, 11, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        WSLCheckBoxLTLLTSMIN = new JCheckBox();
+        WSLCheckBoxLTLLTSMIN.setText("WSL?");
+        WSLCheckBoxLTLLTSMIN.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        setupPanel.add(WSLCheckBoxLTLLTSMIN, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        verboseCheckBox = new JCheckBox();
+        verboseCheckBox.setSelected(true);
+        verboseCheckBox.setText("Verbose?");
+        verboseCheckBox.setToolTipText("<html> When checked: keeps the intermediate files on disk ,<br>else these files are deleted after the Checker has run.\"\n</html>");
+        setupPanel.add(verboseCheckBox, cc.xy(7, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         CounterExamples = new JCheckBox();
         CounterExamples.setText("Counter Examples?");
         CounterExamples.setToolTipText("<html>Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).<BR>\n(not all implemented modelcheckers can produce such traces) </html>");
-        setupPanel.add(CounterExamples, cc.xyw(7, 1, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(CounterExamples, cc.xyw(4, 1, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
         minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:90px:noGrow,left:40dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
         containerTab.addTab("Miner", minerPanel);
-        final JLabel label4 = new JLabel();
-        label4.setText("Oracles:");
-        minerPanel.add(label4, cc.xy(1, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label5 = new JLabel();
-        label5.setText("Oracle Patterns:");
-        minerPanel.add(label5, cc.xy(1, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        label5.setText("Oracles:");
+        minerPanel.add(label5, cc.xy(1, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label6 = new JLabel();
+        label6.setText("Oracle Patterns:");
+        minerPanel.add(label6, cc.xy(1, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         oracleFile = new JTextField();
         minerPanel.add(oracleFile, cc.xyw(2, 10, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         patternFile = new JTextField();
         patternFile.setText("");
         minerPanel.add(patternFile, cc.xyw(2, 8, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label6 = new JLabel();
-        label6.setText("APSelectorManager:");
-        minerPanel.add(label6, cc.xy(1, 4, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label7 = new JLabel();
+        label7.setText("APSelectorManager:");
+        minerPanel.add(label7, cc.xy(1, 4, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         ApSelectorManagerFile = new JTextField();
         minerPanel.add(ApSelectorManagerFile, cc.xyw(2, 4, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         selectFileOracles = new JButton();
@@ -292,9 +306,9 @@ public class Temporalpanel2 {
         generateBtn.setText("<html>Generate</html>");
         generateBtn.setToolTipText("<html>Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. \n<BR>The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html>");
         minerPanel.add(generateBtn, cc.xyw(5, 8, 7));
-        final JLabel label7 = new JLabel();
-        label7.setText("Pattern Constraints:");
-        minerPanel.add(label7, cc.xy(1, 6, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label8 = new JLabel();
+        label8.setText("Pattern Constraints:");
+        minerPanel.add(label8, cc.xy(1, 6, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         patternConstraintsFile = new JTextField();
         minerPanel.add(patternConstraintsFile, cc.xyw(2, 6, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         selectFilePatternConstraints = new JButton();
@@ -317,9 +331,9 @@ public class Temporalpanel2 {
         tacticComboBox.setToolTipText("<HTML>tactic to generate oracles from the supplied Pattern collection.<BR>\nShows the number of potential oracles to generate per pattern\n</HTML>");
         tacticComboBox.setVerifyInputWhenFocusTarget(true);
         minerPanel.add(tacticComboBox, cc.xy(12, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label8 = new JLabel();
-        label8.setText("Generate:");
-        minerPanel.add(label8, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        final JLabel label9 = new JLabel();
+        label9.setText("Generate:");
+        minerPanel.add(label9, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         defaultSelectorBtn = new JButton();
         defaultSelectorBtn.setMaximumSize(new Dimension(130, 38));
         defaultSelectorBtn.setMinimumSize(new Dimension(130, 38));
@@ -349,19 +363,19 @@ public class Temporalpanel2 {
         containerTab.addTab("Visualizer", visualizerPanel);
         PythonEnv_Path = new JTextField();
         visualizerPanel.add(PythonEnv_Path, cc.xyw(3, 1, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label9 = new JLabel();
-        label9.setText("Python Env. :");
-        label9.setToolTipText("Path to Active Virtual environment");
-        visualizerPanel.add(label9, cc.xy(1, 1));
+        final JLabel label10 = new JLabel();
+        label10.setText("Python Env. :");
+        label10.setToolTipText("Path to Active Virtual environment");
+        visualizerPanel.add(label10, cc.xy(1, 1));
         selectFilePython_ENV = new JButton();
         selectFilePython_ENV.setText("...");
         visualizerPanel.add(selectFilePython_ENV, cc.xy(7, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         PythonVisualizer_Path = new JTextField();
         visualizerPanel.add(PythonVisualizer_Path, cc.xyw(3, 3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label10 = new JLabel();
-        label10.setText("Visualizer:");
-        label10.setToolTipText("Usually this is the path to run.py");
-        visualizerPanel.add(label10, cc.xy(1, 3));
+        final JLabel label11 = new JLabel();
+        label11.setText("Visualizer:");
+        label11.setToolTipText("Usually this is the path to run.py");
+        visualizerPanel.add(label11, cc.xy(1, 3));
         selectFilePython_VIZ = new JButton();
         selectFilePython_VIZ.setText("...");
         visualizerPanel.add(selectFilePython_VIZ, cc.xy(7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
@@ -411,6 +425,9 @@ public class Temporalpanel2 {
         WSLCheckBoxCTLITS.setSelected(settings.get(ConfigTags.TemporalCTL_ITSCheckerWSL));
         itsLTLChecker.setText(settings.get(ConfigTags.TemporalLTL_ITSChecker));
         WSLCheckBoxLTLITS.setSelected(settings.get(ConfigTags.TemporalLTL_ITSCheckerWSL));
+        ltsminLTLChecker.setText(settings.get(ConfigTags.TemporalLTL_LTSMINChecker));
+        WSLCheckBoxLTLLTSMIN.setSelected(settings.get(ConfigTags.TemporalLTL_LTSMINCheckerWSL));
+
         instrumentDeadlockStatesCheckBox.setSelected(settings.get(ConfigTags.TemporalInstrumentDeadlockState));
         verboseCheckBox.setSelected(settings.get(ConfigTags.TemporalVerbose));
         CounterExamples.setSelected(settings.get(ConfigTags.TemporalCounterExamples));
@@ -449,6 +466,9 @@ public class Temporalpanel2 {
         settings.set(ConfigTags.TemporalCTL_ITSCheckerWSL, WSLCheckBoxCTLITS.isSelected());
         settings.set(ConfigTags.TemporalLTL_ITSChecker, itsLTLChecker.getText());
         settings.set(ConfigTags.TemporalLTL_ITSCheckerWSL, WSLCheckBoxLTLITS.isSelected());
+        settings.set(ConfigTags.TemporalLTL_LTSMINChecker, ltsminLTLChecker.getText());
+        settings.set(ConfigTags.TemporalLTL_LTSMINCheckerWSL, WSLCheckBoxLTLLTSMIN.isSelected());
+
         settings.set(ConfigTags.TemporalInstrumentDeadlockState, instrumentDeadlockStatesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalPythonEnvironment, PythonEnv_Path.getText());
         settings.set(ConfigTags.TemporalVisualizerServer, PythonVisualizer_Path.getText());
@@ -477,7 +497,8 @@ public class Temporalpanel2 {
                 instrumentDeadlockStatesCheckBox.isSelected(),
                 spotLTLChecker.getText(), WSLCheckBoxLTLSpot.isSelected(),
                 itsCTLChecker.getText(), WSLCheckBoxCTLITS.isSelected(),
-                itsLTLChecker.getText(), WSLCheckBoxLTLITS.isSelected());
+                itsLTLChecker.getText(), WSLCheckBoxLTLITS.isSelected(),
+                ltsminLTLChecker.getText(),WSLCheckBoxLTLLTSMIN.isSelected());
     }
 
     private void generateOracles(ActionEvent e) {

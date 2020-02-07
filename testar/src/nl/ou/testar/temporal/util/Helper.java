@@ -148,10 +148,9 @@ public class Helper {
 
     public static void CTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, String automatonFile,
                                       String formulaFile, String resultsFile) {
-        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
         //LTSMIN does not provide counter examles for CTL, does not allow the implies ('->') operator, crashes on some ETF models.
         String cli = pathToExecutable;
-        File rFile = new File(formulaFile);
         StringBuilder sb = new StringBuilder();
         try {//formulafile to --ctl strings
             List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
@@ -168,6 +167,27 @@ public class Helper {
         Helper.RunOSChildProcess(cli);
     }
 
+    public static void LTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                   String automatonFile, String formulaFile, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..' --ltl='..n..'  model.etf &> results.txt;
+        String cli = pathToExecutable;
+        StringBuilder sb = new StringBuilder();
+        try {//formulafile to --ltl strings
+            List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
+            for (String line : lines) {
+                sb.append("--ltl='").append(line).append("' ");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String formulalist = sb.toString();
+        cli = cli + " " + formulalist;
+        cli = cli + ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
+        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
+        Helper.RunOSChildProcess(cli);
+    }
+
+
     public static void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, boolean counterExamples,
                                    String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
@@ -175,7 +195,7 @@ public class Helper {
         //not well documented, hard to parse, not complete traces and difficult to understand
         String cli = pathToExecutable;
         cli = cli + " -i " + toWSLPath(automatonFile) + " -t ETF -ctl " +
-                ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) + (counterExamples ? " --witness " : "");
+                ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) + (counterExamples ? "" : "");// no witness
         if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }
@@ -184,8 +204,8 @@ public class Helper {
                                    String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/its/its-ltl -i model.etf -t ETF  -ltl formula.ltl -c -e &> results.txt;
         String cli = pathToExecutable;
-        cli = cli + " -i " + toWSLPath(automatonFile) + " -t ETF -ltl " + ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) +
-                "-c " + (counterExamples ? "-e" : "");
+        cli = cli + " -i " + toWSLPath(automatonFile) + " -t ETF -LTL " + ((toWslPath) ? toWSLPath(formulaFile) : formulaFile) +
+                " -c " + (counterExamples ? "-e" : "");
         if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
         Helper.RunOSChildProcess(cli);
     }

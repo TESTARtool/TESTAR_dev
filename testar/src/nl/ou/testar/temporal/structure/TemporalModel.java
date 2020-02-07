@@ -11,7 +11,7 @@ import org.apache.tools.ant.types.selectors.SelectSelector;
 import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
-public class TemporalModel extends TemporalBean{
+public class TemporalModel extends TemporalBean {
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
     private List<String> InitialStates;
@@ -19,23 +19,26 @@ public class TemporalModel extends TemporalBean{
     private List<String> stateList;
 
 
-
     private List<String> transitionList;
     private Set<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion="20200104";
+    private String formatVersion = "20200104";
     private static String APPrefix = "ap";
-    private  String APSeparator;
 
 
 
+    private static String deadProposition = "dead";
 
-    public  TemporalModel(){
-    super(); // needed ?
-    this.stateEncodings = new ArrayList<>();
-    this.stateList = new ArrayList<>();
-    this.transitionList = new ArrayList<>();
-    this.modelAPs = new LinkedHashSet<>();  //must maintain order
-}
+
+    private String APSeparator;
+
+
+    public TemporalModel() {
+        super(); // needed ?
+        this.stateEncodings = new ArrayList<>();
+        this.stateList = new ArrayList<>();
+        this.transitionList = new ArrayList<>();
+        this.modelAPs = new LinkedHashSet<>();  //must maintain order
+    }
 
 
     public List<String> getInitialStates() {
@@ -61,6 +64,7 @@ public class TemporalModel extends TemporalBean{
     public void setStateList(List<String> stateList) {
         this.stateList = stateList;
     }
+
     public List<String> getTransitionList() {
         return transitionList;
     }
@@ -69,7 +73,7 @@ public class TemporalModel extends TemporalBean{
         this.transitionList = transitionList;
     }
 
-    public  String getAPSeparator() {
+    public String getAPSeparator() {
         return APSeparator;
     }
 
@@ -77,6 +81,9 @@ public class TemporalModel extends TemporalBean{
         APSeparator = APSeperator;
     }
 
+    public static String getDeadProposition() {
+        return deadProposition;
+    }
     public List<TemporalTrace> getTraces() {
         return traces;
     }
@@ -93,12 +100,12 @@ public class TemporalModel extends TemporalBean{
 
         this.stateEncodings = stateEncodings;
         stateList.clear();
-        for (StateEncoding stateEnc: stateEncodings) {
+        for (StateEncoding stateEnc : stateEncodings) {
             this.modelAPs.addAll(stateEnc.getStateAPs());
             this.modelAPs.addAll(stateEnc.retrieveAllTransitionAPs());
             stateList.add(stateEnc.getState());
-            for (TransitionEncoding trenc:stateEnc.getTransitionColl()
-                 ) {
+            for (TransitionEncoding trenc : stateEnc.getTransitionColl()
+            ) {
                 transitionList.add(trenc.getTransition());
             }
 
@@ -108,9 +115,13 @@ public class TemporalModel extends TemporalBean{
     }
 
 
-    public String get_formatVersion() {        return formatVersion;   }
+    public String get_formatVersion() {
+        return formatVersion;
+    }
 
-    public void set_formatVersion(String _formatVersion) {    this.formatVersion = _formatVersion;    }
+    public void set_formatVersion(String _formatVersion) {
+        this.formatVersion = _formatVersion;
+    }
 
 
     //custom
@@ -120,14 +131,16 @@ public class TemporalModel extends TemporalBean{
         this.modelAPs.addAll(stateEncoding.getStateAPs());
         this.modelAPs.addAll(stateEncoding.retrieveAllTransitionAPs());
         stateList.add(stateEncoding.getState());
-        for (TransitionEncoding trenc:stateEncoding.getTransitionColl()
+        for (TransitionEncoding trenc : stateEncoding.getTransitionColl()
         ) {
             transitionList.add(trenc.getTransition());
         }
 
         if (updateTransitionsImmediate) {
-            finalizeTransitions();        }
+            finalizeTransitions();
+        }
     }
+
     public void finalizeTransitions() {
         for (StateEncoding stateEnc : stateEncodings) {// observer pattern?
             stateEnc.updateAPConjuncts(modelAPs);
@@ -136,30 +149,28 @@ public class TemporalModel extends TemporalBean{
     }
 
 
-
-
-    public String makeHOAOutput(){
+    public String makeHOAOutput() {
         //see http://adl.github.io/hoaf/
-        StringBuilder result=new StringBuilder();
+        StringBuilder result = new StringBuilder();
         result.append("HOA: v1\n");
         result.append("tool: \"TESTAR-CSS20190914\"\n");
-        result.append("name: \""+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\"\n");
+        result.append("name: \"" + "app= " + this.getApplicationName() + ", ver=" + this.getApplicationVersion() + ", modelid= " + this.getApplication_ModelIdentifier() + ", abstraction= " + this.getApplication_AbstractionAttributes() + "\"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
-        int stateindex=-1;
+        int stateindex = -1;
         for (String initialState : initialStatesSet
         ) {
             stateindex = stateList.indexOf(initialState);
-            assert stateindex==-1:"initial state not in statelist";
+            assert stateindex == -1 : "initial state not in statelist";
             result.append("Start: ").append(stateindex).append("\n");
         }
         result.append("Acceptance: 1 Inf(0)\n");  //==Buchi
         result.append("AP: ");
         result.append(modelAPs.size());
-        int i=0;
-        for (String ap: modelAPs) {
+        int i = 0;
+        for (String ap : modelAPs) {
             result.append(" \"").append(APPrefix);
             result.append(i);
             result.append("\"");
@@ -169,18 +180,18 @@ public class TemporalModel extends TemporalBean{
         result.append("--BODY--\n");
 
 
-        int s=0;
-        for (StateEncoding stateenc: stateEncodings) {
+        int s = 0;
+        for (StateEncoding stateenc : stateEncodings) {
             result.append("State: ");
             result.append(s);
             result.append("\n");
-            for (TransitionEncoding trans:stateenc.getTransitionColl()  ) {
+            for (TransitionEncoding trans : stateenc.getTransitionColl()) {
                 result.append("[");
                 result.append(trans.getEncodedTransitionAPConjunct());
                 result.append("]");
                 String targetState = trans.getTargetState();
-                int targetStateindex =stateList.indexOf(targetState);
-                assert targetStateindex==-1:"target  state not in statelist";
+                int targetStateindex = stateList.indexOf(targetState);
+                assert targetStateindex == -1 : "target  state not in statelist";
                 result.append(" ").append(targetStateindex);
                 result.append(" {0}\n");  //all are in the same buchi acceptance set
             }
@@ -191,9 +202,9 @@ public class TemporalModel extends TemporalBean{
         return result.toString();
     }
 
-    public String makeETFOutput(){
+    public String makeETFOutput() {
         //see https://ltsmin.utwente.nl/assets/man/etf.html
-        StringBuilder result=new StringBuilder();
+        StringBuilder result = new StringBuilder();
         result.append("%tool: \"TESTAR-CSS20200126\"\n");
         result.append("%name: \"" + "app= ").
                 append(this.getApplicationName()).
@@ -207,12 +218,12 @@ public class TemporalModel extends TemporalBean{
         result.append("%modified: ").append(get_modifieddate()).append("\n");
         result.append("%\n");
         result.append("begin state\n");
-        int chunk=25;
-        int i=0;
-        result.append("stateid:stateid\n");
-        for (String ap: modelAPs) {
+        int chunk = 25;
+        int i = 0;
+     //   result.append("stateid:stateid\n");
+        for (String ap : modelAPs) {
             result.append(APPrefix).append(i).append(":bool ");
-            if (i>0 && (i%chunk)==0){
+            if (i > 0 && (i % chunk) == 0) {
                 result.append("\n");
             }
             i++;
@@ -228,11 +239,11 @@ public class TemporalModel extends TemporalBean{
 
         for (String initstate : initialStatesSet
         ) {
-            int stateid=0;
+            int stateid = 0;
             for (StateEncoding stenc : stateEncodings
             ) {
                 if (stenc.getState().equals(initstate)) {
-                    result.append(""+stateid+" ");
+         //           result.append("" + stateid + " ");
                     String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
                     for (String ap : stateaps
                     ) {
@@ -250,7 +261,7 @@ public class TemporalModel extends TemporalBean{
         result.append("end init\n");
 
         result.append("begin trans\n");
-        int stateid=0;
+        int stateid = 0;
         for (StateEncoding stenc : stateEncodings
         ) {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
@@ -258,9 +269,9 @@ public class TemporalModel extends TemporalBean{
             int transindex = 0;
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
-                result.append(""+stateid+" ");
+         //       result.append("" + stateid + " ");
                 String targetstate = trenc.getTargetState();
-                StateEncoding targetenc=null;
+                StateEncoding targetenc = null;
                 for (StateEncoding stenc1 : stateEncodings
                 ) {
                     if (targetstate.equals(stenc1.getState())) {
@@ -287,20 +298,20 @@ public class TemporalModel extends TemporalBean{
                 result.append(" " + transindex).append("\n");
                 transindex++;
             }
-        stateid++;
+            stateid++;
         }
         result.append("end trans\n");
         result.append("begin sort transition\n");
 
-        for (String transid: transitionList) {
+        for (String transid : transitionList) {
             result.append("\"").append(transid).append("\"\n");
-         }
+        }
 
         result.append("end sort\n");
         result.append("begin sort stateid\n");
-        for (StateEncoding stenc : stateEncodings){
-            result.append("\"").append(stenc.getState()).append("\"\n");
-        }
+//        for (StateEncoding stenc : stateEncodings) {
+//            result.append("\"").append(stenc.getState()).append("\"\n");
+//        }
         result.append("end sort\n");
         result.append("begin sort bool\n");
         result.append("\"0\"\n"); //"false" an d"true are common alternatives
@@ -310,22 +321,19 @@ public class TemporalModel extends TemporalBean{
     }
 
 
+    public String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
 
-
-
-    public String validateAndMakeFormulas(List<TemporalOracle> oracleColl) {
-
-        StringBuilder Formulas=new StringBuilder();
+        StringBuilder Formulas = new StringBuilder();
         for (TemporalOracle candidateOracle : oracleColl) {
             String formula;
             List<String> sortedparameters = candidateOracle.getPatternBase().getPattern_Parameters();
             Collections.sort(sortedparameters);
-            List<String> sortedsubstitionvalues =  new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
+            List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
             sortedsubstitionvalues.removeAll(Arrays.asList(""));  // discard empty substitutions
 
 
             boolean importStatus;
-                importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
+            importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
             if (!importStatus) {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
@@ -335,38 +343,54 @@ public class TemporalModel extends TemporalBean{
 
             if (!importStatus) {
                 candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
-                for (String subst:sortedsubstitionvalues
-                     ) {
-                    if (!getModelAPs().contains(subst))  candidateOracle.addLog("not found: "+ subst);
+                for (String subst : sortedsubstitionvalues
+                ) {
+                    if (!getModelAPs().contains(subst)) candidateOracle.addLog("not found: " + subst);
                 }
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             }
             HashBiMap<Integer, String> aplookup = HashBiMap.create();
             aplookup.putAll(getSimpleModelMap());
-            ArrayList<String> apindex=new ArrayList<>();
+            ArrayList<String> apindex = new ArrayList<>();
+            if (doTransformation) {
 
-            for (String v:sortedsubstitionvalues
-                 ) {
-                if(aplookup.inverse().containsKey(v)){
-                    apindex.add(APPrefix+aplookup.inverse().get(v));
-                }else
-                    apindex.add(APPrefix+"_indexNotFound");
+                String deadprop = getPropositionIndex(deadProposition,true);
+                if (!deadprop.equals("")){ // model has 'dead' as an atomic  property
+                    sortedsubstitionvalues.add(deadProposition);
+                    sortedparameters.add(deadProposition); // consider 'dead' as a kind of parameter
+                }
 
-            }
-            if (!importStatus) {
-                formula= candidateOracle.getPatternBase().getPattern_Formula();
-                // will certainly fail during model-check, because parameters are not prefixed with 'ap'
-            }else{
-                String rawFormula=candidateOracle.getPatternBase().getPattern_Formula();
-                TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
-                String lineenrichedformula=rawFormula+tst.line_append;
-                String finallyenrichedformula=StringUtils.replace(lineenrichedformula,
-                        tst.finally_replace.getLeft(),tst.finally_replace.getRight());
-                String globalyenrichedformula=StringUtils.replace(finallyenrichedformula,
-                        tst.globally_replace.getLeft(),tst.globally_replace.getRight());
-                apindex.replaceAll(s ->  tst.ap_prepend+ s + tst.ap_append+")");
-                formula= StringUtils.replaceEach(globalyenrichedformula,
-                        sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
+                for (String v : sortedsubstitionvalues
+                ) {
+                    if (aplookup.inverse().containsKey(v)) {
+                        apindex.add(APPrefix + aplookup.inverse().get(v));
+                    } else
+                        apindex.add(APPrefix + "_indexNotFound");
+                    // will certainly fail if during model-check, because parameters are not prefixed with 'ap'
+
+                }
+
+                {
+                    String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
+                    TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
+                    String formulalvl1 = rawFormula + tst.line_append;
+                    String formulalvl2 = StringUtils.replace(formulalvl1,
+                            tst.finally_replace.getLeft(), tst.finally_replace.getRight());
+                    String formulalvl3 = StringUtils.replace(formulalvl2,
+                            tst.globally_replace.getLeft(), tst.globally_replace.getRight());
+                    String formulalvl4 = StringUtils.replace(formulalvl3,
+                            tst.and_replace.getLeft(), tst.and_replace.getRight());
+                    String formulalvl5 = StringUtils.replace(formulalvl4,
+                            tst.or_replace.getLeft(), tst.or_replace.getRight());
+
+
+                    apindex.replaceAll(s -> tst.ap_prepend + s + tst.ap_append);
+                    formula = StringUtils.replaceEach(formulalvl5,
+                            sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
+
+                }
+            } else {
+                formula = candidateOracle.getPatternBase().getPattern_Formula();
             }
             Formulas.append(formula);
             Formulas.append("\n");
@@ -375,49 +399,41 @@ public class TemporalModel extends TemporalBean{
         return Formulas.toString();
 
     }
-    public String getAliveProposition(String alive){
+
+    public String getPropositionIndex(String proposition) {
+
+        return getPropositionIndex(proposition, false);
+    }
+    public String getPropositionIndex(String proposition,boolean raw) {
         HashBiMap<Integer, String> aplookup = HashBiMap.create();
         aplookup.putAll(getSimpleModelMap());
-        String encodedAliveAP = "";
+        String encodedAP = "";
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
-        if (alive.startsWith("!") && aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
-            encodedAliveAP= "!"+APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
+        if (proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase().substring(1))) {
+            encodedAP = "!" + (!raw?APPrefix:"") + aplookup.inverse().get(proposition.toLowerCase().substring(1));
         }
-        if (!alive.startsWith("!") && aplookup.inverse().containsKey(alive.toLowerCase())){
-            encodedAliveAP= APPrefix+aplookup.inverse().get(alive.toLowerCase());
+        if (!proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase())) {
+            encodedAP = (!raw?APPrefix:"") + aplookup.inverse().get(proposition.toLowerCase());
         }
-         return  encodedAliveAP;
-    };
-
-
-    public List<TemporalOracle> ReadModelCheckerResults(String results){
-        List<TemporalOracle> oracleresults = new ArrayList<>();
-        TemporalOracle oracleresult=new TemporalOracle();
-
-// add to log file.
-        // parse header block
-        //parseformulablock
-       // while (formulablock){ }
-
-
-
-    return oracleresults ;
+        return encodedAP;
     }
 
-    @JsonGetter("modelAPs")
-    private LinkedHashMap<Integer,String> getSimpleModelMap(){
-        LinkedHashMap<Integer,String> map = new LinkedHashMap<>();
 
-        int i=0;
-        for (String ap:modelAPs         ) {
-                map.put(i, ap);
-                i++;
+    @JsonGetter("modelAPs")
+    private LinkedHashMap<Integer, String> getSimpleModelMap() {
+        LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+
+        int i = 0;
+        for (String ap : modelAPs) {
+            map.put(i, ap);
+            i++;
         }
         return map;
     }
+
     @JsonSetter("modelAPs")
-    private void setFromSimpleModelMap(LinkedHashMap<Integer,String> map){
+    private void setFromSimpleModelMap(LinkedHashMap<Integer, String> map) {
         this.modelAPs.addAll(map.values());
     }
 }

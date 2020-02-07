@@ -459,6 +459,10 @@ public class Main {
 			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
 			defaults.add(Pair.from(TemporalLTL_ITSChecker, ""));
 			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTL_LTSMINChecker, ""));
+			defaults.add(Pair.from(TemporalLTL_LTSMINCheckerWSL, false));
+
+
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
 			defaults.add(Pair.from(TemporalVerbose, false));
 			defaults.add(Pair.from(TemporalCounterExamples, true));

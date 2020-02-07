@@ -138,7 +138,21 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
 
     public TemporalOracle clone() throws            CloneNotSupportedException
     {
-        return (TemporalOracle)super.clone();
+        TemporalOracle cloned=(TemporalOracle)super.clone();
+        cloned.setPatternBase((TemporalPatternBase)cloned.getPatternBase().clone());
+        cloned.exampleRun_Cycle_States= new ArrayList<>(exampleRun_Cycle_States);
+        cloned.exampleRun_Cycle_Transitions=new ArrayList<>(exampleRun_Cycle_Transitions);
+        cloned.exampleRun_Prefix_States= new ArrayList<>(exampleRun_Prefix_States);
+        cloned.exampleRun_Prefix_Transitions=new ArrayList<>(exampleRun_Prefix_Transitions);
+        // needs refactoring, until now it is not a complete deep clone.
+        // substitutions are not concurently in use , so there is no real harm done .... for now atleast.
+/*        MultiValuedMap<String,String> mvmap = new HashSetValuedHashMap<>();
+        for (Map.Entry<String,String> entry :pattern_Substitutions.entries()
+             ) {
+            mvmap.put(entry.getKey(),entry.getValue());
+        }
+        cloned.setPattern_Substitutions(mvmap);*/
+        return cloned;
     }
 
     public static TemporalOracle getSampleLTLOracle(){

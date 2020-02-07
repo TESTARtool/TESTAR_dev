@@ -1,8 +1,12 @@
 package nl.ou.testar.temporal.behavior;
 
+import com.orientechnologies.common.log.OLogManager;
+import com.orientechnologies.orient.core.config.OContextConfiguration;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.db.OrientDBConfigBuilder;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
@@ -48,9 +52,11 @@ public  class TemporalDBHelper {
     private void initOrientDb() {
         String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
                 dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
+        OLogManager logmanager=OLogManager.instance();
+        logmanager.setConsoleLevel("WARNING");
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
-        this.orientDB = orientDB;
+
     }
 
     public void setDb(ODatabaseSession db) {

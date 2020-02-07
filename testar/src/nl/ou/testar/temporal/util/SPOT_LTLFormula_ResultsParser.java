@@ -6,13 +6,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class SPOT_LTLFormula_ResultsParser {
 
 
-    public static  String parse(File rawInput, boolean keepLTLFModelVariant) {
+    public static List<String> parse(File rawInput, boolean keepLTLFModelVariant) {
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
@@ -22,13 +23,7 @@ public class SPOT_LTLFormula_ResultsParser {
         } catch (IOException f) {
             f.printStackTrace();
         }
-        return parse(contentBuilder.toString(),keepLTLFModelVariant);
-
-    }
-
-
-    public  static String parse(String resultsFile, boolean keepLTLFModelVariant) {
-        Scanner scanner = new Scanner(resultsFile);
+        Scanner scanner = new Scanner(contentBuilder.toString());
         scanner.useDelimiter("\\s*===\\s*");
 
         if (scanner.hasNext()) {
@@ -38,29 +33,38 @@ public class SPOT_LTLFormula_ResultsParser {
         String formulaline = "";
         String formula = "";
 
-        StringBuilder formulasParsed = new StringBuilder();
+        List<String> formulasParsed = new ArrayList<>();
 
         while (scanner.hasNext()) {
             String testtoken = scanner.next();
             if (testtoken.startsWith("Formula")) {
-                String endline = scanner.nextLine();
+                String endline = scanner.next();
                 if (endline.contains("LTL model-check End")) {
                     break;
                 }
                 formulaline = endline; //not the end but a new formula
-                int indexmodel = formulaline.lastIndexOf("[LTLF Model]");
-                int indextrace = formulaline.lastIndexOf("[LTLF G&V]");
+                String modelVariant = "[LTLF Modelvariant: ";
+                String traceVariant = "[LTLF G&V-2013 variant: ";
+
+                int indexmodel = formulaline.lastIndexOf(modelVariant);
+                int indextrace = formulaline.lastIndexOf(traceVariant);
                 if (keepLTLFModelVariant) {
-                    formula = indexmodel != -1 ? formulaline.substring(indexmodel) : formulaline.substring(0, indextrace - 1);
+                    formula = indexmodel != -1 ? formulaline.substring(indexmodel+modelVariant.length()) : formulaline.substring(0, indextrace - 1);
                 } else {
-                    formula = formulaline.substring(indextrace,indexmodel - 1);//keep the trace variant
+                    formula = formulaline.substring(indextrace+traceVariant.length(), indexmodel - 1);//keep the trace variant
                 }
-                formulasParsed.append(formula).append("\n");
+                formula=formula.substring(0,formula.length()-1);
+
+                formulasParsed.add(formula);
+                scanner.next(); // read the verdict and throw away
             }
-            System.out.println("unexpected token <" + testtoken + "> to parse in File: " + resultsFile);
+            else {
+                System.out.println("unexpected token <" + testtoken + "> to parse in File:" + rawInput.getName());
+            }
         }
-        return formulasParsed.toString();
+        return formulasParsed;
     }
-
-
 }
+
+
+
