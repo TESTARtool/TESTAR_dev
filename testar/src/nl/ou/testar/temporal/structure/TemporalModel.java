@@ -25,7 +25,6 @@ public class TemporalModel extends TemporalBean {
     private static String APPrefix = "ap";
 
 
-
     private static String deadProposition = "dead";
 
 
@@ -84,6 +83,7 @@ public class TemporalModel extends TemporalBean {
     public static String getDeadProposition() {
         return deadProposition;
     }
+
     public List<TemporalTrace> getTraces() {
         return traces;
     }
@@ -108,9 +108,7 @@ public class TemporalModel extends TemporalBean {
             ) {
                 transitionList.add(trenc.getTransition());
             }
-
         }
-
         finalizeTransitions();
     }
 
@@ -220,7 +218,7 @@ public class TemporalModel extends TemporalBean {
         result.append("begin state\n");
         int chunk = 25;
         int i = 0;
-     //   result.append("stateid:stateid\n");
+        //   result.append("stateid:stateid\n");
         for (String ap : modelAPs) {
             result.append(APPrefix).append(i).append(":bool ");
             if (i > 0 && (i % chunk) == 0) {
@@ -243,7 +241,7 @@ public class TemporalModel extends TemporalBean {
             for (StateEncoding stenc : stateEncodings
             ) {
                 if (stenc.getState().equals(initstate)) {
-         //           result.append("" + stateid + " ");
+                    //           result.append("" + stateid + " ");
                     String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
                     for (String ap : stateaps
                     ) {
@@ -269,7 +267,7 @@ public class TemporalModel extends TemporalBean {
             int transindex = 0;
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
-         //       result.append("" + stateid + " ");
+                //       result.append("" + stateid + " ");
                 String targetstate = trenc.getTargetState();
                 StateEncoding targetenc = null;
                 for (StateEncoding stenc1 : stateEncodings
@@ -326,20 +324,16 @@ public class TemporalModel extends TemporalBean {
         StringBuilder Formulas = new StringBuilder();
         for (TemporalOracle candidateOracle : oracleColl) {
             String formula;
-            List<String> sortedparameters = candidateOracle.getPatternBase().getPattern_Parameters();
+            List<String> sortedparameters = new ArrayList<>(candidateOracle.getPatternBase().getPattern_Parameters());//clone list
             Collections.sort(sortedparameters);
-            TreeMap tm = candidateOracle.getSortedPattern_Substitutions();
-            Object tmval = tm.values();
             List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
             sortedsubstitionvalues.removeAll(Collections.singletonList(""));  // discard empty substitutions
-
-
+            TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
 
             boolean importStatus;
             importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
             if (!importStatus) {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
-                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             }
             if (importStatus)
                 importStatus = getModelAPs().containsAll(sortedsubstitionvalues);
@@ -350,53 +344,63 @@ public class TemporalModel extends TemporalBean {
                 ) {
                     if (!getModelAPs().contains(subst)) candidateOracle.addLog("not found: " + subst);
                 }
+            }
+            if (!importStatus) {
+                String falseFormula="false";
+                candidateOracle.addLog("setting formula to 'false'");
+                String  formulalvl6= StringUtils.replace(falseFormula,tst.false_replace.getLeft(), tst.false_replace.getRight()) + tst.line_append;;
+                Formulas.append(formulalvl6);
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
-            }
-            HashBiMap<Integer, String> aplookup = HashBiMap.create();
-            aplookup.putAll(getSimpleModelMap());
-            ArrayList<String> apindex = new ArrayList<>();
-            if (doTransformation) {
-
-                String deadprop = getPropositionIndex(deadProposition,true);
-                if (!deadprop.equals("")){ // model has 'dead' as an atomic  property
-                    sortedsubstitionvalues.add(deadProposition);
-                    sortedparameters.add(deadProposition); // consider 'dead' as a kind of parameter
-                }
-
-                for (String v : sortedsubstitionvalues
-                ) {
-                    if (aplookup.inverse().containsKey(v)) {
-                        apindex.add(APPrefix + aplookup.inverse().get(v));
-                    } else
-                        apindex.add(APPrefix + "_indexNotFound");
-                    // will certainly fail if during model-check, because parameters are not prefixed with 'ap'
-
-                }
-
-                {
-                    String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
-                    TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
-                    String formulalvl1 = rawFormula + tst.line_append;
-                    String formulalvl2 = StringUtils.replace(formulalvl1,
-                            tst.finally_replace.getLeft(), tst.finally_replace.getRight());
-                    String formulalvl3 = StringUtils.replace(formulalvl2,
-                            tst.globally_replace.getLeft(), tst.globally_replace.getRight());
-                    String formulalvl4 = StringUtils.replace(formulalvl3,
-                            tst.and_replace.getLeft(), tst.and_replace.getRight());
-                    String formulalvl5 = StringUtils.replace(formulalvl4,
-                            tst.or_replace.getLeft(), tst.or_replace.getRight());
-
-
-                    apindex.replaceAll(s -> tst.ap_prepend + s + tst.ap_append);
-                    formula = StringUtils.replaceEach(formulalvl5,
-                            sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
-
-                }
             } else {
-                formula = candidateOracle.getPatternBase().getPattern_Formula();
+
+                HashBiMap<Integer, String> aplookup = HashBiMap.create();
+                aplookup.putAll(getSimpleModelMap());
+                ArrayList<String> apindex = new ArrayList<>();
+                if (doTransformation) {
+
+                    String deadprop = getPropositionIndex(deadProposition, true);
+                    if (!deadprop.equals("")) { // model has 'dead' as an atomic  property
+                        sortedsubstitionvalues.add(deadProposition);
+                        sortedparameters.add(deadProposition); // consider 'dead' as a kind of parameter
+                    }
+
+                    for (String v : sortedsubstitionvalues
+                    ) {
+                        if (aplookup.inverse().containsKey(v)) {
+                            apindex.add(APPrefix + aplookup.inverse().get(v));
+                        } else
+                            apindex.add(APPrefix + "_indexNotFound");
+                        // will certainly fail if during model-check, because parameters are not prefixed with 'ap'
+
+                    }
+
+                    {
+                        String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
+                        String formulalvl1 = rawFormula + tst.line_append;
+                        String formulalvl2 = StringUtils.replace(formulalvl1,
+                                tst.finally_replace.getLeft(), tst.finally_replace.getRight());
+                        String formulalvl3 = StringUtils.replace(formulalvl2,
+                                tst.globally_replace.getLeft(), tst.globally_replace.getRight());
+                        String formulalvl4 = StringUtils.replace(formulalvl3,
+                                tst.and_replace.getLeft(), tst.and_replace.getRight());
+                        String formulalvl5 = StringUtils.replace(formulalvl4,
+                                tst.or_replace.getLeft(), tst.or_replace.getRight());
+                        String formulalvl6 = StringUtils.replace(formulalvl5,
+                                tst.false_replace.getLeft(), tst.false_replace.getRight());
+
+                        apindex.replaceAll(s -> tst.ap_prepend + s + tst.ap_append);
+
+                        formula = StringUtils.replaceEach(formulalvl6,
+                                sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
+
+                    }
+                } else {
+                    formula = candidateOracle.getPatternBase().getPattern_Formula();
+                }
+                Formulas.append(formula);
             }
-            Formulas.append(formula);
-            Formulas.append("\n");
+            Formulas.append("\n"); //always a new line . if formula is not validated a blank line appears
+
         }
 
         return Formulas.toString();
@@ -407,17 +411,18 @@ public class TemporalModel extends TemporalBean {
 
         return getPropositionIndex(proposition, false);
     }
-    public String getPropositionIndex(String proposition,boolean raw) {
+
+    public String getPropositionIndex(String proposition, boolean raw) {
         HashBiMap<Integer, String> aplookup = HashBiMap.create();
         aplookup.putAll(getSimpleModelMap());
         String encodedAP = "";
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
         if (proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase().substring(1))) {
-            encodedAP = "!" + (!raw?APPrefix:"") + aplookup.inverse().get(proposition.toLowerCase().substring(1));
+            encodedAP = "!" + (!raw ? APPrefix : "") + aplookup.inverse().get(proposition.toLowerCase().substring(1));
         }
         if (!proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase())) {
-            encodedAP = (!raw?APPrefix:"") + aplookup.inverse().get(proposition.toLowerCase());
+            encodedAP = (!raw ? APPrefix : "") + aplookup.inverse().get(proposition.toLowerCase());
         }
         return encodedAP;
     }

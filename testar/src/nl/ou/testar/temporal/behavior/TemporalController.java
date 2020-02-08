@@ -22,6 +22,7 @@ import org.fruit.monkey.Settings;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -547,7 +548,11 @@ public class TemporalController {
                         ResultsParser sParse = new SPOT_LTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
+                        System.out.println(LocalTime.now() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
+                        if (modelCheckedOracles == null) {
+                            System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                        }
                     } else if ((ltlItsEnabled && TemporalType.valueOf(oracleType) == TemporalType.LTL_ITS) ||
                             (ltlltsminEnabled && TemporalType.valueOf(oracleType) == TemporalType.LTL_LTSMIN)) {
                         automatonFile = new File(outputDir + "Model.etf");
@@ -590,7 +595,11 @@ public class TemporalController {
 
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
+                        System.out.println(LocalTime.now() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
+                        if (modelCheckedOracles == null) {
+                            System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                        }
                     } else if (ctlItsEnabled &&  (TemporalType.valueOf(oracleType) == TemporalType.CTL ||
                                                 TemporalType.valueOf(oracleType) == TemporalType.CTL_ITS)) {
                         automatonFile = new File(outputDir + "Model.etf");
@@ -603,16 +612,18 @@ public class TemporalController {
                         ResultsParser sParse = new ITS_CTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
+                        System.out.println(LocalTime.now() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
+                        if (modelCheckedOracles == null) {
+                            System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                        }
                     } else {
-                        System.err.println(LocalTime.now() + " | " + oracleType + " ** Error this oracle type is not implemented");
+                        System.err.println(LocalTime.now() + " | " + oracleType + " Warning:  this oracle type is not implemented or disabled");
                     }
-                    System.out.println(LocalTime.now() + " | " + oracleType + " verifying the results form the backend model-checker");
-                    if (modelCheckedOracles == null) {
-                        System.err.println(LocalTime.now() + " | " + oracleType + " ** Error detected in obtained results from the model-checker");
-                    } else {
+                    if (modelCheckedOracles != null) {
                         finaloraclelist.addAll(modelCheckedOracles);
                     }
+
 
                     if (!verbose) {
                         Files.delete(automatonFile.toPath());
@@ -626,7 +637,8 @@ public class TemporalController {
                 }
                 CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
                 if (finaloraclelist.size() != fromcoll.size()) {
-                    System.err.println(LocalTime.now() + " | " + "** Error detected in obtained results from one of the Temporal model-checkers (less oracle verdicts received than asked for)");
+                    System.err.println(LocalTime.now() + " | " + "** Warning: less oracle verdicts received than in original collection");
+                    System.err.println(LocalTime.now() + " | " + "from file: "+ Paths.get(oracleFile).getFileName());
                 }
                 CSVHandler.save(finaloraclelist, modelCheckedFile.getAbsolutePath());
             }
