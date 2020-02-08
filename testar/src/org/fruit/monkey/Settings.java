@@ -399,17 +399,22 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Temporal Oracle settings\n"
 					+"#################################################################\n"
-					+"TemporalOffLineEnabled = false" + Util.lineSep()
-					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
+
 					+"TemporalLTL_SPOTChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
 					+"TemporalLTL_SPOTCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_SPOTChecker_Enabled = false" + Util.lineSep()
 					+"TemporalCTL_ITSChecker = ubuntu1804 run ~/its/its-ctl" + Util.lineSep()
 					+"TemporalCTL_ITSCheckerWSL = true" + Util.lineSep()
+					+"TemporalCTL_ITSChecker_Enabled = false" + Util.lineSep()
 					+"TemporalLTL_ITSChecker = ubuntu1804 run ~/its/its-ltl" + Util.lineSep()
 					+"TemporalLTL_ITSCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_ITSChecker_Enabled = false" + Util.lineSep()
 					+"TemporalLTL_LTSMINChecker = ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-seq" + Util.lineSep()
 					+"TemporalLTL_LTSMINCheckerWSL = true" + Util.lineSep()
-					+"TemporalInstrumentDeadlockState = true" + Util.lineSep()
+					+"TemporalLTL_LTSMINChecker_Enabled = false" + Util.lineSep()
+					+"TemporalOffLineEnabled = false" + Util.lineSep()
+					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
+					+"TemporalInstrumentDeadlockState = false" + Util.lineSep()
 					+"TemporalVerbose = true" + Util.lineSep()
 					+"TemporalCounterExamples = true" + Util.lineSep()
 					+"TemporalOracles = LTLTemporalOracles.csv" + Util.lineSep()

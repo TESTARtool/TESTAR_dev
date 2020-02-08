@@ -79,7 +79,8 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public TreeMap<String,String> getSortedPattern_Substitutions(){
         TreeMap<String, String> treeMap = new TreeMap<>();
         for(String str : pattern_Substitutions.keySet()){
-            treeMap.put(str, ((List<String>) pattern_Substitutions.get(str)).get(0));
+            List<String> valueList=new ArrayList<String>(pattern_Substitutions.get(str));
+            treeMap.put(str, valueList.get(0)); // first list entry
         }
       return treeMap;
     }
@@ -144,14 +145,12 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
         cloned.exampleRun_Cycle_Transitions=new ArrayList<>(exampleRun_Cycle_Transitions);
         cloned.exampleRun_Prefix_States= new ArrayList<>(exampleRun_Prefix_States);
         cloned.exampleRun_Prefix_Transitions=new ArrayList<>(exampleRun_Prefix_Transitions);
-        // needs refactoring, until now it is not a complete deep clone.
-        // substitutions are not concurently in use , so there is no real harm done .... for now atleast.
-/*        MultiValuedMap<String,String> mvmap = new HashSetValuedHashMap<>();
+        MultiValuedMap<String,String> mvmap = new HashSetValuedHashMap<>();
         for (Map.Entry<String,String> entry :pattern_Substitutions.entries()
              ) {
             mvmap.put(entry.getKey(),entry.getValue());
         }
-        cloned.setPattern_Substitutions(mvmap);*/
+        cloned.setPattern_Substitutions(mvmap);
         return cloned;
     }
 

@@ -1,5 +1,7 @@
 package nl.ou.testar.temporal.util;
 
+import nl.ou.testar.temporal.behavior.TemporalController;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -136,7 +138,7 @@ public class Helper {
                 if (keepLTLFModelVariant) {
                     formula = indexmodel != -1 ? formulaline.substring(indexmodel) : formulaline.substring(0, indextrace - 1);
                 } else {
-                    formula = formulaline.substring(indextrace,indexmodel - 1);//keep the trace variant
+                    formula = formulaline.substring(indextrace, indexmodel - 1);//keep the trace variant
                 }
                 formulasParsed.append(formula).append("\n");
             }
@@ -167,26 +169,55 @@ public class Helper {
         Helper.RunOSChildProcess(cli);
     }
 
+    //    public static void LTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+//                                   String automatonFile, String formulaFile, String resultsFile) {
+//        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..' --ltl='..n..'  model.etf &> results.txt;
+//        String cli = pathToExecutable;
+//        StringBuilder sb = new StringBuilder();
+//        try {//formulafile to --ltl strings
+//            List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
+//            for (String line : lines) {
+//                sb.append("--ltl='").append(line).append("' ");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        String formulalist = sb.toString();
+//        cli = cli + " " + formulalist;
+//        cli = cli + ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
+//        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
+//        Helper.RunOSChildProcess(cli);
+//    }
     public static void LTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                   String automatonFile, String formulaFile, String resultsFile) {
-        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..' --ltl='..n..'  model.etf &> results.txt;
-        String cli = pathToExecutable;
-        StringBuilder sb = new StringBuilder();
-        try {//formulafile to --ltl strings
-            List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
-            for (String line : lines) {
-                sb.append("--ltl='").append(line).append("' ");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+                                      String automatonFile, String formulaFile, String resultsFile) {
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
+        //repeat for each formula: inefficient as the automaton has to be loaded again for very formula.
+        if (pathToExecutable.equals("")) {
+            String message = " **error ERROR : This modelchecker was not enabled";
+            File messageFile = new File(resultsFile);
+            TemporalController.saveStringToFile(message, messageFile);
         }
-        String formulalist = sb.toString();
-        cli = cli + " " + formulalist;
-        cli = cli + ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
-        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
-        Helper.RunOSChildProcess(cli);
-    }
+        else {
 
+            try {
+                List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
+                boolean first = true;
+                String cli = "";
+                String cli_automaton = ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
+                String cli_resultsfile = " " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
+                for (String line : lines) {
+                    cli = pathToExecutable + " --ltl='" + line + "' " + cli_automaton;
+                    if (!resultsFile.equals("")) {
+                        cli = cli + (first ? " &> " : "&>>") + cli_resultsfile;
+                        first = false;
+                    }
+                    Helper.RunOSChildProcess(cli);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, boolean counterExamples,
                                    String automatonFile, String formulaFile, String resultsFile) {

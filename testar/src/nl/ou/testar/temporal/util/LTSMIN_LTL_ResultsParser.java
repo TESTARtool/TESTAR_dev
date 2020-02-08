@@ -48,7 +48,7 @@ public class LTSMIN_LTL_ResultsParser extends ResultsParser {
             }
             else {
                 if (fResult.contains(nothold)) {
-                    formulaStatus = "PASS";
+                    formulaStatus = "FAIL";
                     encodedFormula = fResult.split("\\r?\\n")[0];
                 }
                 else {

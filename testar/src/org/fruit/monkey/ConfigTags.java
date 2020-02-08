@@ -124,12 +124,19 @@ public final class ConfigTags {
   public static final Tag<Boolean> TemporalConcreteEqualsAbstract= Tag.from("TemporalConcreteEqualsAbstract", Boolean.class);
   public static final Tag<String> TemporalLTL_SPOTChecker = Tag.from("TemporalLTL_SPOTChecker", String.class);
   public static final Tag<Boolean> TemporalLTL_SPOTCheckerWSL = Tag.from("TemporalLTL_SPOTCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalLTL_SPOTChecker_Enabled = Tag.from("TemporalLTL_SPOTChecker_Enabled", Boolean.class);
+
   public static final Tag<String> TemporalCTL_ITSChecker = Tag.from("TemporalCTL_ITSChecker", String.class);
   public static final Tag<Boolean> TemporalCTL_ITSCheckerWSL = Tag.from("TemporalCTL_ITSCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalCTL_ITSChecker_Enabled = Tag.from("TemporalCTL_ITSChecker_Enabled", Boolean.class);
+
   public static final Tag<String> TemporalLTL_ITSChecker = Tag.from("TemporalLTL_ITSChecker", String.class);
   public static final Tag<Boolean> TemporalLTL_ITSCheckerWSL = Tag.from("TemporalLTL_ITSCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalLTL_ITSChecker_Enabled = Tag.from("TemporalLTL_ITSChecker_Enabled", Boolean.class);
+
   public static final Tag<String> TemporalLTL_LTSMINChecker = Tag.from("TemporalLTL_LTSMINChecker", String.class);
   public static final Tag<Boolean> TemporalLTL_LTSMINCheckerWSL = Tag.from("TemporalLTL_LTSMINCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalLTL_LTSMINChecker_Enabled = Tag.from("TemporalLTL_LTSMINChecker_Enabled", Boolean.class);
 
 
   public static final Tag<Boolean> TemporalInstrumentDeadlockState= Tag.from("TemporalInstrumentDeadlockState", Boolean.class);

@@ -328,8 +328,11 @@ public class TemporalModel extends TemporalBean {
             String formula;
             List<String> sortedparameters = candidateOracle.getPatternBase().getPattern_Parameters();
             Collections.sort(sortedparameters);
+            TreeMap tm = candidateOracle.getSortedPattern_Substitutions();
+            Object tmval = tm.values();
             List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
-            sortedsubstitionvalues.removeAll(Arrays.asList(""));  // discard empty substitutions
+            sortedsubstitionvalues.removeAll(Collections.singletonList(""));  // discard empty substitutions
+
 
 
             boolean importStatus;

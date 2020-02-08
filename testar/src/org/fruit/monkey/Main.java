@@ -451,20 +451,23 @@ public class Main {
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
-			defaults.add(Pair.from(TemporalOffLineEnabled, false));
-			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, false));
+
 			defaults.add(Pair.from(TemporalLTL_SPOTChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_SPOTCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTL_SPOTCheckerWSL, true));
+			defaults.add(Pair.from(TemporalLTL_SPOTChecker_Enabled, false));
 			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
-			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, false));
+			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, true));
+			defaults.add(Pair.from(TemporalCTL_ITSChecker_Enabled, false));
 			defaults.add(Pair.from(TemporalLTL_ITSChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, true));
+			defaults.add(Pair.from(TemporalLTL_ITSChecker_Enabled, false));
 			defaults.add(Pair.from(TemporalLTL_LTSMINChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_LTSMINCheckerWSL, false));
-
-
+			defaults.add(Pair.from(TemporalLTL_LTSMINCheckerWSL, true));
+			defaults.add(Pair.from(TemporalLTL_LTSMINChecker_Enabled, false));
+			defaults.add(Pair.from(TemporalOffLineEnabled, false));
+			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, true));
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
-			defaults.add(Pair.from(TemporalVerbose, false));
+			defaults.add(Pair.from(TemporalVerbose, true));
 			defaults.add(Pair.from(TemporalCounterExamples, true));
 			defaults.add(Pair.from(TemporalOracles, ""));
 			defaults.add(Pair.from(TemporalPatterns, ""));
@@ -482,6 +485,7 @@ public class Main {
 			defaults.add(Pair.from(TemporalVisualizerServer, ""));
 			defaults.add(Pair.from(TemporalVisualizerURL, ""));
 			defaults.add(Pair.from(TemporalVisualizerURLStop, ""));
+
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
