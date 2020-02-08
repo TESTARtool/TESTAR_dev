@@ -1,18 +1,25 @@
 package nl.ou.testar.StateModel.automation;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import es.upv.staq.testar.StateManagementTags;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.lang.System.exit;
+import static java.lang.System.in;
 
 public class SqlManager {
 
+    public static final String TEMP_DIR = "c:\\temp";
+    public static final String IMPORT_SUB_DIR = "results_import";
+    public static final String AUTOMATED_TEST_RUN_CSV = "automated_test_run.csv";
+    public static final String TEST_RUN_WIDGET_CSV = "test_run_widget.csv";
     private final String database = "testar";
     private final String user = "testar";
     private final String password = "testar";
@@ -258,7 +265,7 @@ public class SqlManager {
     }
 
     public void exportTestResultsToFile(String directoryName, boolean quoteExportData) {
-        File tempDir = new File("c:\\temp");
+        File tempDir = new File(TEMP_DIR);
         if (tempDir.exists() && !tempDir.isDirectory()) {
             System.out.println("The configured temp directory is not a directory atm. Exiting TESTAR");
             exit(1);
@@ -294,7 +301,7 @@ public class SqlManager {
             ResultSet resultSet1 = statement1.executeQuery(atrQuery);
 
             // open a file writer
-            File atrFile = new File(exportDir, "automated_test_run");
+            File atrFile = new File(exportDir, AUTOMATED_TEST_RUN_CSV);
             try (FileWriter fileWriter = new FileWriter(atrFile.getAbsoluteFile())) {
                 try (CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
                     csvWriter.writeAll(resultSet1, true, false, quoteExportData);
@@ -305,7 +312,7 @@ public class SqlManager {
             String trwQuery = "SELECT * FROM test_run_widget";
             Statement statement2 = connection.createStatement();
             ResultSet resultSet2 = statement2.executeQuery(trwQuery);
-            File trwFile = new File(exportDir, "test_run_widget");
+            File trwFile = new File(exportDir, TEST_RUN_WIDGET_CSV);
             try (FileWriter fileWriter = new FileWriter(trwFile.getAbsoluteFile())) {
                 try (CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
                     csvWriter.writeAll(resultSet2, true, false, quoteExportData);
@@ -319,6 +326,228 @@ public class SqlManager {
         }
 
         System.out.println("Succesfully exported test run data.");
+    }
+
+    public void importTestResults(boolean clearOldResults) {
+
+        Connection connection = getConnection();
+        if (clearOldResults) {
+            String query1 = "TRUNCATE TABLE test_run_widget";
+            String query2 = "DELETE FROM automated_test_run";
+            String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+            String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+            Stream.of(query1, query2, query3, query4).forEach(query -> {
+                try {
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                    exit(1);
+                }
+            });
+        }
+
+        // now, clear the import tables
+        String query5 = "TRUNCATE TABLE automated_test_run_import";
+        String query6 = "TRUNCATE TABLE test_run_widget_import";
+        Stream.of(query5, query6).forEach(query -> {
+            try {
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(query);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error occurred while cleaning the import tables. Exiting TESTAR.");
+                exit(1);
+            }
+        });
+
+        // now, we look in the temp directory for an import folder
+        File tempDir = new File(TEMP_DIR);
+        if (!tempDir.exists() || !tempDir.isDirectory()) {
+            System.out.println("Temp directory does not exist. Exiting TESTAR.");
+            exit(1);
+        }
+
+        File importDir = new File(tempDir, IMPORT_SUB_DIR);
+        if (!importDir.exists() || !importDir.isDirectory()) {
+            System.out.println("Import folder does not exist. Exiting TESTAR");
+            exit(1);
+        }
+
+        // the import folder should contain sub folders that contain two files, one for the runs and one for the widgets attached to the runs
+        Arrays.stream(Objects.requireNonNull(importDir.listFiles(File::isDirectory))).forEach(resultDir -> {
+            File atrFile = new File(resultDir, AUTOMATED_TEST_RUN_CSV);
+            File trwFile = new File(resultDir, TEST_RUN_WIDGET_CSV);
+            if (!atrFile.exists() || !trwFile.exists()) {
+                System.out.println("Missing import files. Exiting TESTAR");
+                exit(1);
+            }
+
+            try {
+                FileReader fileReader = new FileReader(atrFile);
+                HeaderColumnNameMappingStrategy<AutomatedTestRunPojo> mappingStrategy = new HeaderColumnNameMappingStrategy<>();
+                mappingStrategy.setType(AutomatedTestRunPojo.class);
+
+                // first we import the testruns
+                CsvToBean<AutomatedTestRunPojo> csvToBean = new CsvToBeanBuilder<AutomatedTestRunPojo>(fileReader)
+                        .withSeparator(';')
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withType(AutomatedTestRunPojo.class)
+                        .withMappingStrategy(mappingStrategy)
+                        .build();
+                List<AutomatedTestRunPojo> atrs = csvToBean.parse();
+                System.out.println("Parsed " + atrs.size() + " nr of test results");
+
+                String query = "INSERT INTO automated_test_run_import(test_run_id, application_id, configured_sequences, configured_steps, reset_data_store_before_run, starting_time_ms, ending_time_ms, nr_of_steps_executed, deterministic_model, exception_thrown, exception_message, stack_trace) " +
+                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try {
+                    PreparedStatement insertAtrStatement = connection.prepareStatement(query);
+
+                    atrs.forEach(atr -> {
+                        try {
+                            insertAtrStatement.setInt(1, atr.getTestRunId());
+                            insertAtrStatement.setInt(2, atr.getApplicationId());
+                            insertAtrStatement.setInt(3, atr.getConfiguredSequences());
+                            insertAtrStatement.setInt(4, atr.getConfiguredSteps());
+                            insertAtrStatement.setInt(5, booleanStringToIntHelper(atr.getResetDataStoreBeforeRun()));
+                            insertAtrStatement.setLong(6, Long.parseLong(atr.getStartingTimeMs()));
+                            insertAtrStatement.setLong(7, Long.parseLong(atr.getEndingTimeMs()));
+                            insertAtrStatement.setInt(8, atr.getNrOfStepsExecuted());
+                            insertAtrStatement.setInt(9, booleanStringToIntHelper(atr.getDeterministicModel()));
+                            insertAtrStatement.setInt(10, booleanStringToIntHelper(atr.getExceptionThrown()));
+                            insertAtrStatement.setString(11, atr.getExceptionMessage());
+                            insertAtrStatement.setString(12, atr.getStrackTrace());
+                            insertAtrStatement.execute();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.out.println("An error occurred during test result db insertion. Exiting TESTAR");
+                            exit(1);
+                        }
+                    });
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("An error occurred during test result db insertion. Exiting TESTAR");
+                    exit(1);
+                }
+
+                // next we import the test_run_widget file
+                fileReader = new FileReader(trwFile);
+                HeaderColumnNameMappingStrategy<TestRunWidget> mappingStrategy2 = new HeaderColumnNameMappingStrategy<>();
+                mappingStrategy2.setType(TestRunWidget.class);
+
+                // first we import the testruns
+                CsvToBean<TestRunWidget> csvToBean2 = new CsvToBeanBuilder<TestRunWidget>(fileReader)
+                        .withSeparator(';')
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withType(TestRunWidget.class)
+                        .withMappingStrategy(mappingStrategy2)
+                        .build();
+                List<TestRunWidget> atrs2 = csvToBean2.parse();
+                System.out.println("Parsed " + atrs2.size() + " nr of test run widget combo's");
+
+                query = "INSERT INTO test_run_widget_import(test_run_id, widget_id) VALUES(? , ?)";
+                try {
+                    PreparedStatement insertTrwStatement = connection.prepareStatement(query);
+                    atrs2.forEach(atr -> {
+                        try {
+                            insertTrwStatement.setInt(1, atr.getTestRunId());
+                            insertTrwStatement.setInt(2, atr.getWidgetId());
+                            insertTrwStatement.execute();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.out.println("An error occurred during test result db insertion. Exiting TESTAR");
+                            exit(1);
+                        }
+
+                    });
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("An error occurred during test result db insertion. Exiting TESTAR");
+                    exit(1);
+                }
+
+                mergeImport(connection);
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        System.out.println("Succesfully imported test results");
+    }
+
+    private void mergeImport(Connection connection) {
+        String query1 = "SELECT COUNT(*) FROM automated_test_run_import";
+        String query2 = "SELECT COUNT(*) FROM test_run_widget_import";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet1 = statement.executeQuery(query1);
+            if (!resultSet1.next()) {
+                System.out.println("No runs were imported. Exiting TESTAR");
+                exit(1);
+            }
+            int count = resultSet1.getInt(1);
+            if (count <= 0) {
+                System.out.println("No runs were imported. Exiting TESTAR");
+                exit(1);
+            }
+
+            ResultSet resultSet2 = statement.executeQuery(query2);
+            if (!resultSet2.next()) {
+                System.out.println("No widget combos were imported. Exiting TESTAR");
+                exit(1);
+            }
+            count = resultSet2.getInt(1);
+            if (count <= 0) {
+                System.out.println("No widget combos were imported. Exiting TESTAR");
+                exit(1);
+            }
+
+            String query3 = "SELECT IFNULL(MAX(test_run_id), 0) from automated_test_run";
+            String query4 = "SELECT MIN(test_run_id) from automated_test_run_import";
+            ResultSet resultSet3 = statement.executeQuery(query3);
+            resultSet3.next();
+            int currentMaxTestRunId = resultSet3.getInt(1);
+            ResultSet resultSet4 = statement.executeQuery(query4);
+            resultSet4.next();
+            int minImportTestRunId = resultSet4.getInt(1);
+            System.out.println("current max test run id = " + currentMaxTestRunId);
+            System.out.println("min import test run id = " + minImportTestRunId);
+            System.out.println("Porting import test run ids");
+
+            int targetStartingTestRunId = currentMaxTestRunId + 1;
+            int difference = targetStartingTestRunId - minImportTestRunId;
+            if (difference != 0) {
+                // we need to change the test run ids in the import tables
+                String alterQueryAtr = "UPDATE automated_test_run_import SET test_run_id = test_run_id" + (difference > 0 ? " + " : " - ") + Math.abs(difference);
+                String alterQueryTrw = "UPDATE test_run_widget_import SET test_run_id = test_run_id" + (difference > 0 ? " + " : " - ") + Math.abs(difference);
+                Statement statement1 = connection.createStatement();
+                statement1.executeUpdate(alterQueryAtr);
+                statement1.executeUpdate(alterQueryTrw);
+            }
+
+            // finally, insert the values from the import tables
+            String query5 = "INSERT INTO automated_test_run(test_run_id, application_id, configured_sequences, configured_steps, reset_data_store_before_run, starting_time_ms, ending_time_ms, nr_of_steps_executed, deterministic_model, exception_thrown, exception_message, stack_trace) " +
+                    "SELECT * FROM automated_test_run_import";
+            String query6 = "INSERT INTO test_run_widget(test_run_id, widget_id) " +
+                    "SELECT test_run_id, widget_id FROM test_run_widget_import";
+            statement.execute(query5);
+            statement.execute(query6);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error while merging the imports. Exiting TESTAR");
+            exit(1);
+        }
+
+    }
+
+    private int booleanStringToIntHelper(String toConvert) {
+        return toConvert.equals("false") ? 0 : 1;
     }
 
 }

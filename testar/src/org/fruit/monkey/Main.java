@@ -131,6 +131,13 @@ public class Main {
 				exit(1);
 			}
 
+			// check if we need to import test results into our database
+			if (settings.get(ImportTestResults)) {
+				out.println("Processing request to import test results.");
+				sqlManager.importTestResults(settings.get(ClearResults));
+				exit(1);
+			}
+
 			if (settings.get(CreateAttributes)) {
 				sqlManager.initDatabase();
 			}
@@ -560,6 +567,8 @@ public class Main {
 			defaults.add(Pair.from(DebugEnabled, false));
 			defaults.add(Pair.from(ExportDirName, ""));
 			defaults.add(Pair.from(QuoteExportData, false));
+			defaults.add(Pair.from(ImportTestResults, false));
+			defaults.add(Pair.from(ClearResults, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

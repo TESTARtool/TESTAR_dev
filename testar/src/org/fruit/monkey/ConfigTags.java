@@ -136,4 +136,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> DebugEnabled = Tag.from("DebugEnabled", Boolean.class);
   public static final Tag<String> ExportDirName = Tag.from("ExportDirName", String.class);
   public static final Tag<Boolean> QuoteExportData = Tag.from("QuoteExportData", Boolean.class);
+  public static final Tag<Boolean> ImportTestResults = Tag.from("ImportTestResults", Boolean.class);
+  public static final Tag<Boolean> ClearResults = Tag.from("ClearResults", Boolean.class);
 }
