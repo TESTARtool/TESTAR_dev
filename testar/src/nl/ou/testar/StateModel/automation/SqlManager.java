@@ -1,9 +1,15 @@
 package nl.ou.testar.StateModel.automation;
 
+import com.opencsv.CSVWriter;
 import es.upv.staq.testar.StateManagementTags;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+
+import static java.lang.System.exit;
 
 public class SqlManager {
 
@@ -21,7 +27,7 @@ public class SqlManager {
             return DriverManager.getConnection(connectionString, user, password);
         } catch (SQLException e) {
             e.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
         return null;
     }
@@ -198,7 +204,7 @@ public class SqlManager {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
 
         return testRuns;
@@ -229,7 +235,7 @@ public class SqlManager {
             insertStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
 
     }
@@ -249,6 +255,70 @@ public class SqlManager {
             helper(combinations, data, start + 1, end, index + 1, input);
             helper(combinations, data, start + 1, end, index, input);
         }
+    }
+
+    public void exportTestResultsToFile(String directoryName, boolean quoteExportData) {
+        File tempDir = new File("c:\\temp");
+        if (tempDir.exists() && !tempDir.isDirectory()) {
+            System.out.println("The configured temp directory is not a directory atm. Exiting TESTAR");
+            exit(1);
+        }
+
+        if (!tempDir.exists()) {
+            System.out.println("Creating temporary directory: " + tempDir.getAbsolutePath());
+            boolean success = tempDir.mkdir();
+            if (!success) {
+                System.out.println("Could not create temporary directory. Exiting TESTAR");
+                exit(1);
+            }
+            System.out.println("Successfully created temporary directory.");
+        }
+
+        // create the subdirectory
+        File exportDir = new File(tempDir, directoryName);
+        if (!exportDir.exists()) {
+            System.out.println("Creating output directory: " + exportDir.getAbsolutePath());
+            boolean success = exportDir.mkdir();
+            if (!success) {
+                System.out.println("Unable to create output directory. Exiting TESTAR");
+                exit(1);
+            }
+        }
+
+        // we want to export the automated_test_run and the test_run_widget tables
+        Connection connection = this.getConnection();
+        String atrQuery = "SELECT * FROM automated_test_run";
+        try {
+            // first the automated_test_run table
+            Statement statement1 = connection.createStatement();
+            ResultSet resultSet1 = statement1.executeQuery(atrQuery);
+
+            // open a file writer
+            File atrFile = new File(exportDir, "automated_test_run");
+            try (FileWriter fileWriter = new FileWriter(atrFile.getAbsoluteFile())) {
+                try (CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
+                    csvWriter.writeAll(resultSet1, true, false, quoteExportData);
+                }
+            }
+
+            // then the test_run_widget_table
+            String trwQuery = "SELECT * FROM test_run_widget";
+            Statement statement2 = connection.createStatement();
+            ResultSet resultSet2 = statement2.executeQuery(trwQuery);
+            File trwFile = new File(exportDir, "test_run_widget");
+            try (FileWriter fileWriter = new FileWriter(trwFile.getAbsoluteFile())) {
+                try (CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
+                    csvWriter.writeAll(resultSet2, true, false, quoteExportData);
+                }
+            }
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+            System.out.println("Could not retrieve data. Exiting TESTAR");
+            exit(1);
+        }
+
+        System.out.println("Succesfully exported test run data.");
     }
 
 }

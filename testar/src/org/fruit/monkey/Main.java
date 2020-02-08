@@ -35,17 +35,11 @@
  */
 package org.fruit.monkey;
 
-import ch.qos.logback.access.joran.JoranConfigurator;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import jdk.nashorn.internal.ir.SplitNode;
-import nl.ou.testar.StateModel.automation.Manager;
 import nl.ou.testar.StateModel.automation.SqlManager;
 import nl.ou.testar.StateModel.automation.TestRun;
 import nl.ou.testar.StateModel.automation.TestRunSync;
@@ -53,20 +47,13 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.fruit.alayer.windows.UIATags;
-import org.slf4j.LoggerFactory;
 
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -127,12 +114,23 @@ public class Main {
 
 		Settings settings = loadTestarSettings(args, testSettingsFileName);
 
+		///////// IMPORTANT ////////
+		// the following automation code is nowhere near production worthy and is just intended for personal tests
+		// it should not be merged into Development or Master under any circumstances.
 		System.out.println("Automate: " + settings.get(Automate));
 		out.println("CreateAttributes: " + settings.get(CreateAttributes));
 		System.out.println("Settings dir: " + settingsDir + SSE_ACTIVATED);
 
 		if (settings.get(Automate)) {
 			SqlManager sqlManager = new SqlManager();
+
+			// check if we need to export the test results
+			if (!settings.get(ExportDirName).isEmpty()) {
+				out.println("Processing request to export test results to file: " + settings.get(ExportDirName));
+				sqlManager.exportTestResultsToFile(settings.get(ExportDirName), settings.get(QuoteExportData));
+				exit(1);
+			}
+
 			if (settings.get(CreateAttributes)) {
 				sqlManager.initDatabase();
 			}
@@ -560,6 +558,8 @@ public class Main {
 			defaults.add(Pair.from(InitTestsOnly, false));
 			defaults.add(Pair.from(ResetDbFirst, false));
 			defaults.add(Pair.from(DebugEnabled, false));
+			defaults.add(Pair.from(ExportDirName, ""));
+			defaults.add(Pair.from(QuoteExportData, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

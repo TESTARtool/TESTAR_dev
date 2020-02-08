@@ -134,4 +134,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> InitTestsOnly = Tag.from("InitTestsOnly", Boolean.class);
   public static final Tag<Boolean> ResetDbFirst = Tag.from("ResetDbFirst", Boolean.class);
   public static final Tag<Boolean> DebugEnabled = Tag.from("DebugEnabled", Boolean.class);
+  public static final Tag<String> ExportDirName = Tag.from("ExportDirName", String.class);
+  public static final Tag<Boolean> QuoteExportData = Tag.from("QuoteExportData", Boolean.class);
 }
