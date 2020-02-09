@@ -158,10 +158,12 @@ public class Main {
 			boolean firstRun = true;
 
 			for(TestRun testRun : sqlManager.getTestRuns()) {
-				out.println(testRun.getTestRunId());
-				out.println(testRun.getNrOfSequences());
-				out.println(testRun.getNrOfSteps());
-				out.println(testRun.isResetDbBeforeRun());
+				out.println();
+				out.println("--------------------------------------");
+				out.println("test run id: " + testRun.getTestRunId());
+				out.println("configured nr of sequences: " + testRun.getNrOfSequences());
+				out.println("configured nr of steps: " + testRun.getNrOfSteps());
+				out.println("reset the db before each sequence: " + testRun.isResetDbBeforeRun());
 				for(String widget : testRun.getWidgets()) {
 					out.println(widget);
 				}
