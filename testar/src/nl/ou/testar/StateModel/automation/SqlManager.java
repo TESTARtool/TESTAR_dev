@@ -204,10 +204,9 @@ public class SqlManager {
                 ResultSet resultSet2 = fetchWidgetStatement.executeQuery(fetchWidgetQuery);
                 Set<String> widgets = new HashSet<>();
                 while (resultSet2.next()) {
-
-                    testRuns.add(new TestRun(testRunId, nrOfSequences, nrOfSteps, resetBeforeRun, widgets));
                     widgets.add(resultSet2.getString("widget_config_name"));
                 }
+                testRuns.add(new TestRun(testRunId, nrOfSequences, nrOfSteps, resetBeforeRun, widgets));
 
             }
 
