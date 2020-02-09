@@ -248,7 +248,7 @@ public class SqlManager {
             for (int[] combination : combinations) {
                 preparedStatement1.setInt(1, applicationId);
                 preparedStatement1.setInt(2, 4);
-                preparedStatement1.setInt(3, 50);
+                preparedStatement1.setInt(3, 100);
                 preparedStatement1.setInt(4, 0);
                 preparedStatement1.execute();
 
