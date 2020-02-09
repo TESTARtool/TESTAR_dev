@@ -318,6 +318,154 @@ public class TemporalModel extends TemporalBean {
         return result.toString();
     }
 
+    public String makeGALOutput() {
+        //see https://lip6.github.io/ITSTools-web/galmm.html
+        StringBuilder result = new StringBuilder();
+        result.append("//tool: \"TESTAR-CSS20200126\"\n");
+        result.append("//name: \"" + "app= ").
+                append(this.getApplicationName()).
+                append(", ver=").
+                append(this.getApplicationVersion()).
+                append(", modelid= ").
+                append(this.getApplication_ModelIdentifier()).
+                append(", abstraction= ").
+                append(this.getApplication_AbstractionAttributes()).
+                append("\"\n");
+        result.append("//modified: ").append(get_modifieddate()).append("\n");
+        result.append("//\n");
+
+        result.append("gal TESTAR {\n");
+        int chunk = 25;
+        int i = 0;
+        result.append("int ");
+        String artifical_StartState=""+ Math.pow(2,20); //assume max 1 million states
+        result.append("stateindex = "+artifical_StartState +" ;\n");
+
+        for (String ap : modelAPs) {
+            result.append("int ");
+            result.append(APPrefix).append(i).append( " = 0 ; ");
+            if (i > 0 && (i % chunk) == 0) {
+                result.append("\n");
+            }
+            i++;
+        }
+        result.append("\n");
+        //result.append("begin init\n");
+        Set<String> initialStatesSet = new HashSet<>(InitialStates);
+
+        result.append("// BEGIN artificial initial states\n");
+        for (String initstate : initialStatesSet
+        ) {
+            for (StateEncoding stenc : stateEncodings
+            ) {
+                if (stenc.getState().equals(initstate)) {
+
+                    String artificalEdge = "artificial_init_transition_to_" + stateList.indexOf(stenc.getState());
+                    result.append("    transition ").append(artificalEdge).
+                            append(" [ stateindex == ").append(artifical_StartState).append(" ] label \"").
+                            append(artificalEdge).append("\" {\n");
+                    result.append("        stateindex = ").
+                            append(stateList.indexOf(stenc.getState())).append(" ;\n");
+
+                    String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+                    int j = 0;
+                    int chunk1 = 25;
+                    result.append("        ");
+                    for (String ap : stateaps
+                    ) {
+                        if (ap.startsWith("!")) {
+                            result.append(APPrefix).append(j).append(" = 0").append(" ; ");
+                        } else {
+                            result.append(APPrefix).append(j).append(" = 1").append(" ; ");
+                        }
+                        if (j > 0 && (j % chunk1) == 0) {
+                            result.append("\n");
+                            result.append("        ");
+                        }
+                        j++;
+
+                    }
+                    result.append("    }\n");
+                }
+            }
+        }
+        result.append("// END artificial initial states\n");
+
+
+        result.append("//BEGIN explicit transitions\n");
+        int stateid = 0;
+        for (StateEncoding stenc : stateEncodings
+        ) {
+            String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+
+            int transindex = 0;
+            for (TransitionEncoding trenc : stenc.getTransitionColl()
+            ) {
+                //       result.append("" + stateid + " ");
+                String targetstate = trenc.getTargetState();
+                StateEncoding targetenc = null;
+                for (StateEncoding stenc1 : stateEncodings
+                ) {
+                    if (targetstate.equals(stenc1.getState())) {
+                        targetenc = stenc1;
+                        break;
+                    }
+                }
+                String artificalEdge = "_F"+trenc.getTransition().replace("#","_").replace(":","_");
+                StringBuilder condition=new StringBuilder();
+                StringBuilder assignment=new StringBuilder();
+
+                condition.append("[ stateindex == "+stateList.indexOf(stenc.getState())+ " ");
+
+
+                String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
+                int idex = 0;
+                int chunk2 = 25;
+                assignment.append("        stateindex = ").append(stateList.indexOf(targetenc.getState())).append(" ;\n");
+                assignment .append("        ");
+
+                for (String ap : stateaps
+                ) {
+                    if (ap.startsWith("!")) {
+                        condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
+                    } else {
+                        condition.append(" &&  ").append(APPrefix).append(idex).append(" == 1").append(" ");
+                    }
+                    if (idex> 0 && (idex % chunk2) == 0) {
+                        condition.append("\n");
+                        condition.append("        ");
+                    }
+
+
+                    if (targetaps[idex].startsWith("!")) {
+                        assignment.append(APPrefix).append(idex).append(" = 0").append(" ; ");
+                    } else {
+                        assignment.append(APPrefix).append(idex).append(" = 1").append(" ; ");
+                    }
+                    if (idex> 0 && (idex % chunk2) == 0) {
+                        assignment.append("\n");
+                        assignment.append("        ");
+                    }
+
+                    idex++;
+                }
+                condition.append(" ]\n");
+                result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+"{\n");
+                result.append(assignment.toString());
+                result.append("    }\n");
+
+
+                //result.append(" " + transindex).append("\n");
+                transindex++;
+            }
+            stateid++;
+        }
+
+        result.append("}\n\n");
+        result.append("main TESTAR;\n");
+        return result.toString();
+    }
+
 
     public String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
 
