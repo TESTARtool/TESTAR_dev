@@ -9,10 +9,10 @@ import es.upv.staq.testar.StateManagementTags;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 public class SqlManager {
 
@@ -39,7 +39,7 @@ public class SqlManager {
         return null;
     }
 
-    public void initDatabase() {
+    public void initDatabase(String applicationName, String applicationVersion) {
         try {
             Connection connection = this.getConnection();
             String insertQuery = "INSERT INTO widget (widget_config_name, widget_description, use_in_abstraction) VALUES(?, ?, ?)";
@@ -62,8 +62,10 @@ public class SqlManager {
             // init application
             String insertApplicationQuery = "INSERT INTO application(application_name, application_version) VALUES (?, ?)";
             PreparedStatement applicationStatement = connection.prepareStatement(insertApplicationQuery);
-            applicationStatement.setString(1, "Notepad");
-            applicationStatement.setString(2, "1.0.0");
+            applicationName = applicationName.isEmpty() ? "Notepad" : applicationName;
+            applicationVersion = applicationVersion.isEmpty() ? "1.0.0" : applicationVersion;
+            applicationStatement.setString(1, applicationName);
+            applicationStatement.setString(2, applicationVersion);
             applicationStatement.execute();
 
 
@@ -329,6 +331,8 @@ public class SqlManager {
     }
 
     public void importTestResults(boolean clearOldResults) {
+        final List<Integer> testRunTotal = new ArrayList<>();
+        final List<Integer> testRunWidgetTotal = new ArrayList<>();
 
         Connection connection = getConnection();
         if (clearOldResults) {
@@ -348,20 +352,6 @@ public class SqlManager {
             });
         }
 
-        // now, clear the import tables
-        String query5 = "TRUNCATE TABLE automated_test_run_import";
-        String query6 = "TRUNCATE TABLE test_run_widget_import";
-        Stream.of(query5, query6).forEach(query -> {
-            try {
-                Statement statement = connection.createStatement();
-                statement.executeUpdate(query);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Error occurred while cleaning the import tables. Exiting TESTAR.");
-                exit(1);
-            }
-        });
-
         // now, we look in the temp directory for an import folder
         File tempDir = new File(TEMP_DIR);
         if (!tempDir.exists() || !tempDir.isDirectory()) {
@@ -377,12 +367,27 @@ public class SqlManager {
 
         // the import folder should contain sub folders that contain two files, one for the runs and one for the widgets attached to the runs
         Arrays.stream(Objects.requireNonNull(importDir.listFiles(File::isDirectory))).forEach(resultDir -> {
+            System.out.println("Processing directory: " + resultDir.getAbsolutePath());
             File atrFile = new File(resultDir, AUTOMATED_TEST_RUN_CSV);
             File trwFile = new File(resultDir, TEST_RUN_WIDGET_CSV);
             if (!atrFile.exists() || !trwFile.exists()) {
                 System.out.println("Missing import files. Exiting TESTAR");
                 exit(1);
             }
+
+            // now, clear the import tables
+            String query5 = "TRUNCATE TABLE automated_test_run_import";
+            String query6 = "TRUNCATE TABLE test_run_widget_import";
+            Stream.of(query5, query6).forEach(query -> {
+                try {
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("Error occurred while cleaning the import tables. Exiting TESTAR.");
+                    exit(1);
+                }
+            });
 
             try {
                 FileReader fileReader = new FileReader(atrFile);
@@ -398,6 +403,7 @@ public class SqlManager {
                         .build();
                 List<AutomatedTestRunPojo> atrs = csvToBean.parse();
                 System.out.println("Parsed " + atrs.size() + " nr of test results");
+                testRunTotal.add(atrs.size());
 
                 String query = "INSERT INTO automated_test_run_import(test_run_id, application_id, configured_sequences, configured_steps, reset_data_store_before_run, starting_time_ms, ending_time_ms, nr_of_steps_executed, deterministic_model, exception_thrown, exception_message, stack_trace) " +
                         " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -434,18 +440,19 @@ public class SqlManager {
 
                 // next we import the test_run_widget file
                 fileReader = new FileReader(trwFile);
-                HeaderColumnNameMappingStrategy<TestRunWidget> mappingStrategy2 = new HeaderColumnNameMappingStrategy<>();
-                mappingStrategy2.setType(TestRunWidget.class);
+                HeaderColumnNameMappingStrategy<TestRunWidgetPojo> mappingStrategy2 = new HeaderColumnNameMappingStrategy<>();
+                mappingStrategy2.setType(TestRunWidgetPojo.class);
 
                 // first we import the testruns
-                CsvToBean<TestRunWidget> csvToBean2 = new CsvToBeanBuilder<TestRunWidget>(fileReader)
+                CsvToBean<TestRunWidgetPojo> csvToBean2 = new CsvToBeanBuilder<TestRunWidgetPojo>(fileReader)
                         .withSeparator(';')
                         .withIgnoreLeadingWhiteSpace(true)
-                        .withType(TestRunWidget.class)
+                        .withType(TestRunWidgetPojo.class)
                         .withMappingStrategy(mappingStrategy2)
                         .build();
-                List<TestRunWidget> atrs2 = csvToBean2.parse();
+                List<TestRunWidgetPojo> atrs2 = csvToBean2.parse();
                 System.out.println("Parsed " + atrs2.size() + " nr of test run widget combo's");
+                testRunWidgetTotal.add(atrs2.size());
 
                 query = "INSERT INTO test_run_widget_import(test_run_id, widget_id) VALUES(? , ?)";
                 try {
@@ -475,7 +482,16 @@ public class SqlManager {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+
+            System.out.println("Imported a total of " + testRunTotal.stream().mapToInt(i -> i).sum() + " test runs");
+            System.out.println("Imported a total of " + testRunWidgetTotal.stream().mapToInt(i -> i).sum() + " test run widgets");
+
+
+
         });
+
+        // process the test results
+        calculateTestResults(connection, clearOldResults);
 
         System.out.println("Succesfully imported test results");
     }
@@ -548,6 +564,117 @@ public class SqlManager {
 
     private int booleanStringToIntHelper(String toConvert) {
         return toConvert.equals("false") ? 0 : 1;
+    }
+
+    private void calculateTestResults(Connection connection, boolean clearResults) {
+        System.out.println("Calculating test results");
+        if (clearResults) {
+            System.out.println("Clearing old results.");
+            String clearQuery = "DELETE FROM test_run_result";
+            try {
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(clearQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String insertResultsQuery = "INSERT INTO test_run_result(widget_combo, widget_names, average_runtime_seconds, nr_of_steps_series,\n" +
+                "                            steps_executed_total, steps_executed_average)\n" +
+                "\n" +
+                "SELECT test_run_base.widget_combo,\n" +
+                "       test_run_base.widget_names,\n" +
+                "       ROUND(AVG(test_run_base.runtime_ms) / 1000)                                                                 as average_runtime_seconds,\n" +
+                "       GROUP_CONCAT(test_run_base.nr_of_steps_executed ORDER BY test_run_base.nr_of_steps_executed SEPARATOR\n" +
+                "                    ', ')                                                                                          as steps_cumulative,\n" +
+                "       SUM(test_run_base.nr_of_steps_executed)                                                                     as total_steps_executed,\n" +
+                "\n" +
+                "       AVG(test_run_base.nr_of_steps_executed)                                                                     as steps_executed_average\n" +
+                "\n" +
+                "FROM (\n" +
+                "         SELECT trw.test_run_id,\n" +
+                "                atr.ending_time_ms - atr.starting_time_ms                                       as runtime_ms,\n" +
+                "                atr.nr_of_steps_executed,\n" +
+                "                GROUP_CONCAT(trw.widget_id ORDER BY trw.widget_id SEPARATOR '-')                as widget_combo,\n" +
+                "                GROUP_CONCAT(w.widget_config_name ORDER BY w.widget_config_name SEPARATOR ', ') as widget_names\n" +
+                "\n" +
+                "         FROM test_run_widget trw\n" +
+                "\n" +
+                "                  JOIN automated_test_run atr USING (test_run_id)\n" +
+                "\n" +
+                "                  JOIN widget w USING (widget_id)\n" +
+                "\n" +
+                "         GROUP BY trw.test_run_id\n" +
+                "     ) as test_run_base\n" +
+                "\n" +
+                "GROUP BY test_run_base.widget_combo\n" +
+                "\n" +
+                "ORDER BY SUM(test_run_base.nr_of_steps_executed) DESC";
+        try {
+            System.out.println("Calculating and inserting test results.");
+            Statement statement = connection.createStatement();
+            statement.execute(insertResultsQuery);
+
+            // we calculate the median in Java, as it is much more complicated to do in MySql.
+            System.out.println("Calculating the median value for steps executed");
+            String fetchTestRunResultsQuery = "SELECT\n" +
+                    "\ttrw.test_run_id,\n" +
+                    "\tatr.nr_of_steps_executed,\n" +
+                    "\tGROUP_CONCAT( trw.widget_id ORDER BY trw.widget_id SEPARATOR '-' ) AS widget_combo \n" +
+                    "FROM\n" +
+                    "\ttest_run_widget trw\n" +
+                    "\tJOIN automated_test_run atr USING ( test_run_id )\n" +
+                    "\tJOIN widget w USING ( widget_id ) \n" +
+                    "GROUP BY\n" +
+                    "\ttrw.test_run_id";
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(fetchTestRunResultsQuery);
+            List<TestRunStepsResultPojo> testRunStepsResultPojos = new ArrayList<>();
+            while (resultSet.next()) {
+                TestRunStepsResultPojo pojo = new TestRunStepsResultPojo();
+                pojo.setNrOfStepsExecuted(resultSet.getInt(2));
+                pojo.setComboIdentifier(resultSet.getString(3));
+                testRunStepsResultPojos.add(pojo);
+            }
+
+            System.out.println("Nr of test run results found: " + testRunStepsResultPojos.size());
+
+            // group the test results by the widget combo id
+            Map<String, List<TestRunStepsResultPojo>> comboResultMapping = testRunStepsResultPojos.stream().collect(Collectors.groupingBy(TestRunStepsResultPojo::getComboIdentifier));
+            String updateTestResultQuery = "UPDATE test_run_result \n" +
+                    "SET steps_executed_median = ? \n" +
+                    "WHERE\n" +
+                    "\twidget_combo = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(updateTestResultQuery);
+            comboResultMapping.keySet().stream().forEach(widgetCombo -> {
+                double stepsExecutedMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfStepsExecuted).collect(Collectors.toList()));
+                // update the test result table and insert the median
+
+                try {
+                    preparedStatement.setDouble(1, stepsExecutedMedian);
+                    preparedStatement.setString(2, widgetCombo);
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            });
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private double calculateMedian(List<Integer> input) {
+        int[] inputValues = input.stream().mapToInt(Integer::intValue).toArray();
+        Arrays.sort(inputValues);
+        int nrOfEntries = inputValues.length;
+        if ((nrOfEntries % 2) != 0) {
+            // uneven number, pick the entry in the middle
+            return inputValues[nrOfEntries / 2];
+        }
+
+        return (double) (inputValues[(nrOfEntries - 1) / 2] + inputValues[nrOfEntries / 2]) / 2.0;
     }
 
 }

@@ -139,7 +139,7 @@ public class Main {
 			}
 
 			if (settings.get(CreateAttributes)) {
-				sqlManager.initDatabase();
+				sqlManager.initDatabase(settings.get(NewApplicationName), settings.get(NewApplicationVersion));
 			}
 
 			if (settings.get(InitTests)) {
@@ -569,6 +569,9 @@ public class Main {
 			defaults.add(Pair.from(QuoteExportData, false));
 			defaults.add(Pair.from(ImportTestResults, false));
 			defaults.add(Pair.from(ClearResults, false));
+			defaults.add(Pair.from(NewApplicationName, ""));
+			defaults.add(Pair.from(NewApplicationVersion, ""));
+			defaults.add(Pair.from(CalculateMedian, false));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

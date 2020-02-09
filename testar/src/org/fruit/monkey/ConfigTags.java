@@ -138,4 +138,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> QuoteExportData = Tag.from("QuoteExportData", Boolean.class);
   public static final Tag<Boolean> ImportTestResults = Tag.from("ImportTestResults", Boolean.class);
   public static final Tag<Boolean> ClearResults = Tag.from("ClearResults", Boolean.class);
+  public static final Tag<String> NewApplicationName = Tag.from("NewApplicationName", String.class);
+  public static final Tag<String> NewApplicationVersion = Tag.from("NewApplicationVersion", String.class);
+  public static final Tag<Boolean> CalculateMedian = Tag.from("CalculateMedian", Boolean.class);
 }

@@ -2,7 +2,7 @@ package nl.ou.testar.StateModel.automation;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class TestRunWidget {
+public class TestRunWidgetPojo {
 
     @CsvBindByName(column = "combi_id")
     private int combiId;
