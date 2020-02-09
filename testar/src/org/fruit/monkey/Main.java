@@ -182,7 +182,7 @@ public class Main {
 				System.out.println("Starting run");
 				setTestarDirectory(settings);
 				initCodingManager(settings);
-				testRun.setStartingMS(System.currentTimeMillis());
+				testRun.setStartingMS(0);
 
 				startTestar(settings, testSettingsFileName);
 
@@ -194,7 +194,7 @@ public class Main {
 				testRun.setExceptionThrown(TestRunSync.getInstance().isExceptionThrown());
 				testRun.setExceptionMessage(TestRunSync.getInstance().getExceptionMessage());
 				testRun.setTrackTrace(TestRunSync.getInstance().getTrackTrace());
-				testRun.setEndingMS(System.currentTimeMillis());
+				testRun.setEndingMS(0);
 				sqlManager.saveTestStats(testRun);
 				TestRunSync.resetInstance();
 				System.out.println("Ending run");
