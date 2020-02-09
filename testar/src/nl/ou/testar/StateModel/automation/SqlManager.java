@@ -182,6 +182,97 @@ public class SqlManager {
         }
     }
 
+    public void initTest3(boolean clearOldResults) {
+        Connection connection = getConnection();
+        if (clearOldResults) {
+            String query1 = "TRUNCATE TABLE test_run_widget";
+            String query2 = "DELETE FROM automated_test_run";
+            String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+            String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+            Stream.of(query1, query2, query3, query4).forEach(query -> {
+                try {
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                    exit(1);
+                }
+            });
+        }
+
+        // fetch the application
+        try {
+            String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
+            Statement appStatement = connection.createStatement();
+            ResultSet resultSet1 = appStatement.executeQuery(fetchApplicationQuery);
+            resultSet1.first();
+            int applicationId = resultSet1.getInt("application_id");
+
+
+            // update the widgets to a subset of useable combos
+            String updateWidgetQuery = "UPDATE widget \n" +
+                    "SET use_in_abstraction = 0;\n" +
+                    "UPDATE widget \n" +
+                    "SET use_in_abstraction = 1 \n" +
+                    "WHERE\n" +
+                    "\twidget_config_name IN ( 'WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary' );";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery);
+
+            // in test 1, we create tests with just a single widget
+            String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
+                    "VALUES(?, ?, ?, ?)";
+            PreparedStatement preparedStatement1 = connection.prepareStatement(testRunInsertQuery, Statement.RETURN_GENERATED_KEYS);
+
+            String widgetAttachQuery = "INSERT INTO test_run_widget(test_run_id, widget_id) VALUES(?, ?)";
+            PreparedStatement widgetAttachStatement = connection.prepareStatement(widgetAttachQuery);
+
+            // now fetch the widgets
+            String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
+            Statement widgetStatement = connection.createStatement();
+            ResultSet resultSet2 = widgetStatement.executeQuery(fetchWidgetQuery);
+
+            // in the second test, we make combinations of widgets
+            List<Integer> widgetIds = new ArrayList<>();
+            while (resultSet2.next()) {
+                widgetIds.add(resultSet2.getInt("widget_id"));
+            }
+
+            // now create the combinations
+            List<int[]> combinations = generateCombinations(widgetIds, 3);
+            System.out.println("Number of combinations: " + combinations.size());
+
+            // for each combination, we insert a test run
+            for (int[] combination : combinations) {
+                preparedStatement1.setInt(1, applicationId);
+                preparedStatement1.setInt(2, 4);
+                preparedStatement1.setInt(3, 50);
+                preparedStatement1.setInt(4, 0);
+                preparedStatement1.execute();
+
+                // fetch the generated test run id
+                ResultSet keys = preparedStatement1.getGeneratedKeys();
+                keys.next();
+                int testRunId = keys.getInt(1);
+
+                for (int widgetId: combination) {
+                    widgetAttachStatement.setInt(1, testRunId);
+                    widgetAttachStatement.setInt(2, widgetId);
+                    widgetAttachStatement.execute();
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
+
     public List<TestRun> getTestRuns() {
         List<TestRun> testRuns = new ArrayList<>();
         try {
@@ -674,6 +765,63 @@ public class SqlManager {
         }
 
         return (double) (inputValues[(nrOfEntries - 1) / 2] + inputValues[nrOfEntries / 2]) / 2.0;
+    }
+
+    public void analysisOfTopResults(int limit) {
+        // this will examine the top results, as determined by total steps executed (supposing an equal nr of tests)
+        // and will print how often each widget is used in these top results
+        String query = "SELECT\n" +
+                "\t* \n" +
+                "FROM\n" +
+                "\ttest_run_result \n" +
+                "ORDER BY\n" +
+                "\tsteps_executed_total DESC \n" +
+                "\tLIMIT " + limit;
+
+        String getWidgetQuery = "Select * from widget";
+
+        Connection connection = getConnection();
+        try {
+            // get the widgets first
+            Map<Integer, String> widgets = new HashMap<>();
+            Statement widgetStatement = connection.createStatement();
+            ResultSet widgetResultSet = widgetStatement.executeQuery(getWidgetQuery);
+            while(widgetResultSet.next()) {
+                widgets.put(widgetResultSet.getInt(1), widgetResultSet.getString(2));
+            }
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            // now, we want to break up the combo id string into separate parts
+            Map<Integer, Integer> counter = new HashMap<>();
+            while(resultSet.next()) {
+                String widgetComboIds = resultSet.getString(1);
+                String[] ids = widgetComboIds.trim().split("-");
+                Arrays.stream(ids).mapToInt(Integer::parseInt).forEach(i -> counter.merge(i, 1, Integer::sum));
+            }
+
+            // so now each id is mapped to the number of occurrences.
+            // order these from high to low by nr of occurrence
+            Map<Integer, List<Integer>> nrToId = new HashMap<>();
+            counter.keySet().forEach(widgetId -> {
+                int occurrences = counter.get(widgetId);
+                if (!nrToId.containsKey(occurrences)) {
+                    nrToId.put(occurrences, new ArrayList<>());
+                }
+                nrToId.get(occurrences).add(widgetId);
+            });
+
+            Stream<Integer> counterDesc = counter.values().stream().sorted(Comparator.reverseOrder()).distinct();
+
+            counterDesc.forEach(occurrences -> {
+                nrToId.get(occurrences).forEach(widgetId -> System.out.println(widgets.get(widgetId) + " : " + occurrences + " occurrences."));
+            });
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -124,6 +124,11 @@ public class Main {
 		if (settings.get(Automate)) {
 			SqlManager sqlManager = new SqlManager();
 
+			if (settings.get(AnalyseTopResults)) {
+				sqlManager.analysisOfTopResults(settings.get(TopResultsLimit));
+				exit(1);
+			}
+
 			// check if we need to export the test results
 			if (!settings.get(ExportDirName).isEmpty()) {
 				out.println("Processing request to export test results to file: " + settings.get(ExportDirName));
@@ -143,7 +148,7 @@ public class Main {
 			}
 
 			if (settings.get(InitTests)) {
-				sqlManager.initTest2();
+				sqlManager.initTest3(settings.get(ClearResults));
 
 				if (settings.get(InitTestsOnly)) {
 					System.exit(1);
@@ -574,6 +579,8 @@ public class Main {
 			defaults.add(Pair.from(NewApplicationName, ""));
 			defaults.add(Pair.from(NewApplicationVersion, ""));
 			defaults.add(Pair.from(CalculateMedian, false));
+			defaults.add(Pair.from(AnalyseTopResults, false));
+			defaults.add(Pair.from(TopResultsLimit, 0));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

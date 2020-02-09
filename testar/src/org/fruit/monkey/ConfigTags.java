@@ -141,4 +141,6 @@ public final class ConfigTags {
   public static final Tag<String> NewApplicationName = Tag.from("NewApplicationName", String.class);
   public static final Tag<String> NewApplicationVersion = Tag.from("NewApplicationVersion", String.class);
   public static final Tag<Boolean> CalculateMedian = Tag.from("CalculateMedian", Boolean.class);
+  public static final Tag<Boolean> AnalyseTopResults = Tag.from("AnalyseTopResults", Boolean.class);
+  public static final Tag<Integer> TopResultsLimit = Tag.from("TopResultsLimit", Integer.class);
 }
