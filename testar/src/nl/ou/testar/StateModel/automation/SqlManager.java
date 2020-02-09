@@ -211,14 +211,15 @@ public class SqlManager {
 
 
             // update the widgets to a subset of useable combos
-            String updateWidgetQuery = "UPDATE widget \n" +
-                    "SET use_in_abstraction = 0;\n" +
-                    "UPDATE widget \n" +
-                    "SET use_in_abstraction = 1 \n" +
-                    "WHERE\n" +
-                    "\twidget_config_name IN ( 'WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary' );";
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0";
+            String updateWidgetQuery2 = "UPDATE widget " +
+                    "SET use_in_abstraction = 1 " +
+                    "WHERE" +
+                    " widget_config_name IN ('WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary' );";
             Statement updateWidgetStatement = connection.createStatement();
-            updateWidgetStatement.executeUpdate(updateWidgetQuery);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
 
             // in test 1, we create tests with just a single widget
             String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
