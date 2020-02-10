@@ -148,7 +148,7 @@ public class Main {
 			}
 
 			if (settings.get(InitTests)) {
-				sqlManager.initTest3(settings.get(ClearResults));
+				sqlManager.initTest4(settings.get(ClearResults));
 
 				if (settings.get(InitTestsOnly)) {
 					System.exit(1);
