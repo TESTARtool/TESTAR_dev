@@ -188,79 +188,32 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         // But the username and password works only in internal development environment of Kuveyt Turk
 
         System.out.println("DEBUG 1: looking for BtnOK (expecting a pop-up info screen)");
-        //iterating through all widgets of the state:
-        for(Widget widget: state){
-            // Finding the OK button of popup dialog:
-            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("BtnOK")){
-                //preparing action compiler:
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                System.out.println("DEBUG 1: left mouse click on BtnOK");
-                // Left mouse click on OK button:
-                executeAction(system,state,ac.leftClickAt(widget));
-                Util.pause(1);
-            }
-        }
-        // Updating the GUI state after popup dialog has been closed:
-        state = getState(system);
-
+        waitAndClickButtonByTitle("BtnOK", state, system, 5);
+        
         System.out.println("DEBUG 2: changing language to English (expecting to be in Turkish login screen)");
-        for(Widget widget: state){
-            // Finding the OK button of popup dialog:
-            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("english") && 
-            		widget.get(Tags.ValuePattern, "not available").equalsIgnoreCase("/Login/InitialLoginEnglish")){
-                //preparing action compiler:
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                System.out.println("DEBUG 2: left mouse click on english");
-                // Left mouse click on OK button:
-                executeAction(system,state,ac.leftClickAt(widget));
-                Util.pause(1);
-            }
-        }
-        // Updating the GUI state after clicking on English:
-        state = getState(system);
+        waitAndClickButtonByTitle("english", state, system, 5);
+        // widget.get(Tags.ValuePattern, "not available").equalsIgnoreCase("/Login/InitialLoginEnglish"))
 
         System.out.println("DEBUG 3: looking for password field");
-        //iterating through all widgets of the state:
-        for(Widget widget: state){
-            // Finding the password field:
-            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("Password")){
-                //preparing action compiler:
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                System.out.println("DEBUG 3: typing into password field");
-                // Typing the password into the password field:
-                executeAction(system,state,ac.clickTypeInto(widget,"12121212", true));
-                Util.pause(1);
+        waitAndClickAtAndTypeByTitle("Password", "12121212", state, system, 5);
 
-                System.out.println("DEBUG 3: moving to previous field");
-                //preparing and executing an action to press SHIFT+TAB to select the previous widget that was Username field:
-                new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT),0.2)
-                        .add(new KeyDown(KBKeys.VK_TAB),0.2)
-                        .add(new KeyUp(KBKeys.VK_TAB),0.2)
-                        .add(new KeyUp(KBKeys.VK_SHIFT),0.2).build().run(system,state,0.2);
-
-                System.out.println("DEBUG 3: typing username");
-                //preparing and executing an action to type the username:
-                new CompoundAction.Builder().add(new Type("94444281"),1)
-                        .build().run(system,state,0.2);
-                Util.pause(1);
-            }
-        }
-
-        System.out.println("DEBUG 3: looking for login/next button");
-        //iterating through all widgets of the state:
-        for(Widget widget: state){
-            // Finding the Login / Next button:
-            if(widget.get(Tags.Title, "not available").equalsIgnoreCase("Login")){
-                //preparing action compiler:
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                System.out.println("DEBUG 3: left mouse click on login/next button");
-                // Left mouse click on Login button:
-                executeAction(system,state,ac.leftClickAt(widget));
-                Util.pause(1);
-            }
-        }
+        Util.pause(1);
         
-        state = getState(system);
+        new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT),0.2)
+        .add(new KeyDown(KBKeys.VK_TAB),0.2)
+        .add(new KeyUp(KBKeys.VK_TAB),0.2)
+        .add(new KeyUp(KBKeys.VK_SHIFT),0.2).build().run(system,state,0.2);
+
+        Util.pause(1);
+        
+        new CompoundAction.Builder().add(new Type("94444281"),1)
+        .build().run(system,state,0.2);
+        
+        Util.pause(1);
+
+
+        System.out.println("DEBUG 4: looking for login/next button");
+        waitAndClickButtonByTitle("Login", state, system, 5);
 
 		super.beginSequence(system, state);
 	}
@@ -738,4 +691,71 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
   protected boolean moreSequences() {
     return super.moreSequences();
   }
+  
+  /** KuveytTurk: This method clicks a button*/
+  protected boolean waitAndClickButtonByTitle(String title, State state, SUT system, int maxNumberOfRetries){
+      boolean uiElementFound = false;
+      int numberOfRetries = 0;
+      while(!uiElementFound && numberOfRetries<maxNumberOfRetries){
+          for(Widget widget:state){
+              if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)){
+                  uiElementFound=true;
+                  StdActionCompiler ac = new AnnotatingActionCompiler();
+                  System.out.println("DEBUG: waitAndClickButtonByTitle: left mouse click on " + title);
+                  Action a = ac.leftClickAt(widget);
+                  nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
+                  executeAction(system,state, a);
+                  Util.pause(1);
+                  Util.clear(cv);
+                  
+                  state = getState(system);
+                  
+                  return true;
+              }
+          }
+          if(!uiElementFound){
+              Util.pause(1);
+              state = getState(system);
+              numberOfRetries++;
+          }
+      }
+      
+      state = getState(system);
+      
+      return false;
+  }
+  
+  /** KuveytTurk: This method type a button*/
+  protected boolean waitAndClickAtAndTypeByTitle(String title, String textInput, State state, SUT system, int maxNumberOfRetries){
+      boolean uiElementFound = false;
+      int numberOfRetries = 0;
+      while(!uiElementFound && numberOfRetries<maxNumberOfRetries){
+          for(Widget widget:state){
+              if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)){
+                  uiElementFound=true;
+                  StdActionCompiler ac = new AnnotatingActionCompiler();
+                  System.out.println("DEBUG: waitAndClickButtonByTitle: left mouse click on " + title);
+                  Action a = ac.clickTypeInto(widget, textInput, true);
+                  nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
+                  executeAction(system,state, a);
+                  Util.pause(1);
+                  Util.clear(cv);
+                  
+                  state = getState(system);
+                  
+                  return true;
+              }
+          }
+          if(!uiElementFound){
+              Util.pause(1);
+              state = getState(system);
+              numberOfRetries++;
+          }
+      }
+      
+      state = getState(system);
+      
+      return false;
+  }
+  
 }
