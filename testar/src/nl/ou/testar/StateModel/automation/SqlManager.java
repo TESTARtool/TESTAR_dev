@@ -338,7 +338,7 @@ public class SqlManager {
             // in this test, we take the 3 most succesful widgets and add all the combos of 2 from the other 16 to them
             List<Integer> widgetIds = new ArrayList<>();
             while (resultSet3.next()) {
-                widgetIds.add(resultSet2.getInt("widget_id"));
+                widgetIds.add(resultSet3.getInt("widget_id"));
             }
 
             // now create the combinations
