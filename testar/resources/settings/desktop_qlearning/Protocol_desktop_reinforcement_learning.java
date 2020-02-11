@@ -34,6 +34,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
@@ -59,6 +60,9 @@ public class Protocol_desktop_reinforcement_learning extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(@Nonnull final Settings settings){
+		//Create Abstract Model with Reinforcement Learning Implementation
+		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+		
 		// TODO replace with factory
 		actionSelector = new ReinforcementLearningActionSelector(new GuiStateGraphForQlearning());
 		super.initialize(settings);

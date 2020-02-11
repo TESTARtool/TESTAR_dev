@@ -3,6 +3,8 @@ package nl.ou.testar.StateModel.Persistence.OrientDB;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -26,6 +28,8 @@ import nl.ou.testar.StateModel.Util.HydrationHelper;
 import nl.ou.testar.StateModel.Widget;
 
 import java.util.*;
+
+import org.fruit.alayer.Tag;
 
 import static java.lang.System.exit;
 
@@ -354,6 +358,30 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
         entityManager.saveEntity(actionEntity);
     }
+    
+    @Override
+    public void persistAbstractActionAttributeUpdated(AbstractAction abstractAction) {
+    	if (abstractAction == null) {
+    		System.out.println("Objects missing in abstract action attribute update");
+    		return;
+    	}
+
+    	for(Tag<Double> t : RLTags.getReinforcementLearningTags()) {
+    		if(abstractAction.getAttributes().get(t, null) != null) {
+
+    			//TODO: quotes are going to save the RL value as String
+				// Implement a correct query to save the RL value as Double
+    			String query = "UPDATE AbstractAction SET " + t.name()
+    			+ " = '" + abstractAction.getAttributes().get(t) + "'"
+    			+" WHERE actionId = '"+ abstractAction.getActionId() +"'";
+
+    			try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+    				db.command(query);
+    			}
+
+    		}
+    	}
+    }
 
     @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
@@ -655,6 +683,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 //@todo the abstract action changed event needs to just update the action attributes
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
+                
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+            	persistAbstractActionAttributeUpdated((AbstractAction) (event.getPayload()));
+            	break; 
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));

@@ -59,13 +59,18 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         		continue;
         	}
         	
-        	if (valueRL.getType() != OType.DOUBLE) {
+        	if (valueRL.getType() != OType.DOUBLE && valueRL.getType() != OType.STRING) {
         		throw new ExtractionException("ERROR retrieving RL value from State Model. " + valueRL.getType().toString() + " was given.");
         	}
-        	action.addAttribute(t, (Double) valueRL.getValue());
+        	
+        	if (valueRL.getType().equals(OType.DOUBLE)) {
+	        	action.addAttribute(t, (Double) valueRL.getValue());
+        	} else if (valueRL.getType().equals(OType.STRING)) {
+        		action.addAttribute(t, Double.parseDouble((String) valueRL.getValue()));
+        	}
         	
         	System.out.println(String.format("Extracted RLTag %s with value %s for the Action %s",
-        			t.name(), valueRL.getValue().toString(), actionId));
+        			t.name(), action.getAttributes().get(t).toString(), actionId));
         }
         
         return action;

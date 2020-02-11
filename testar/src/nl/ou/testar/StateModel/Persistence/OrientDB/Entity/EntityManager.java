@@ -489,8 +489,10 @@ public class EntityManager {
     			for(Tag<?> t : RLTags.getReinforcementLearningTags()) {
     				if(t.name().contains(propertyName)){
 
+    					//TODO: quotes are going to save the RL value as String
+    					// Implement a correct query to save the RL value as Double
     					String query = "UPDATE AbstractAction SET " + propertyName
-    							+ " = " + entity.getPropertyValue(propertyName).getValue()
+    							+ " = '" + entity.getPropertyValue(propertyName).getValue() + "'"
     							+" WHERE actionId = '"+ entity.getPropertyValue("actionId").getValue() +"'";
 
     					db.command(query);
