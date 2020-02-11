@@ -203,6 +203,9 @@ public class CodingManager {
 						System.out.println("No origin widget found for action role: ");
 						System.out.println(action.get(Tags.Role));
 						System.out.println(action.get(Tags.Desc));
+						if(action.get(Tags.Role).equals(ActionRoles.HitKey)) {
+							buildEnvironmentActionIDs(state, action);
+						}
 						return false;
 					}
 				}).
