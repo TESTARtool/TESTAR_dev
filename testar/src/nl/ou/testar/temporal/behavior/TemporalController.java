@@ -409,7 +409,7 @@ public class TemporalController {
     public boolean saveModelForChecker(TemporalType tmptype, String file) {
         boolean b = false;
         String contents = "";
-        String contents1 = "";
+
 
         if (tmptype.equals(TemporalType.LTL) || tmptype.equals(TemporalType.LTL_SPOT)) {
             contents = tModel.makeHOAOutput();
@@ -418,9 +418,10 @@ public class TemporalController {
         if (tmptype.equals(TemporalType.CTL) || tmptype.equals(TemporalType.LTL_ITS) || tmptype.equals(TemporalType.LTL_LTSMIN)) {
 
 //            **under construction
-//            contents1 =tModel.makeGALOutput();
-//            File output = new File(file+".gal");
-//            saveStringToFile(contents1,output);
+            String contents1 = "";
+            contents1 =tModel.makeGALOutput();
+            File output = new File(file+".gal");
+            saveStringToFile(contents1,output);
             contents = tModel.makeETFOutput();
             b = true;
         }

@@ -281,6 +281,23 @@ public class TemporalModel extends TemporalBean {
                 int idex = 0;
                 for (String ap : stateaps
                 ) {
+//                    String step="";
+//                    if (ap.startsWith("!")) {
+//                        step=("0/");
+//                    } else {
+//                        step=("1/");
+//                    }
+//                    if (targetaps[idex].startsWith("!")) {
+//                        step=step+("0 ");
+//                    } else {
+//                        step=step+("1 ");
+//                    }
+//                    if (!step.equals("0/0 ") && !step.equals("1/1 ")){
+//                        result.append(step);
+//                    }
+//                    else
+//                        result.append("* ");
+
                     if (ap.startsWith("!")) {
                         result.append("0/");
                     } else {
@@ -291,6 +308,8 @@ public class TemporalModel extends TemporalBean {
                     } else {
                         result.append("1 ");
                     }
+
+
                     idex++;
                 }
                 result.append(" " + transindex).append("\n");
@@ -306,11 +325,11 @@ public class TemporalModel extends TemporalBean {
         }
 
         result.append("end sort\n");
-        result.append("begin sort stateid\n");
+//        result.append("begin sort stateid\n");
 //        for (StateEncoding stenc : stateEncodings) {
 //            result.append("\"").append(stenc.getState()).append("\"\n");
 //        }
-        result.append("end sort\n");
+//        result.append("end sort\n");
         result.append("begin sort bool\n");
         result.append("\"0\"\n"); //"false" an d"true are common alternatives
         result.append("\"1\"\n");
@@ -338,7 +357,7 @@ public class TemporalModel extends TemporalBean {
         int chunk = 25;
         int i = 0;
         result.append("int ");
-        String artifical_StartState=""+ Math.pow(2,20); //assume max 1 million states
+        String artifical_StartState=""+ (int)Math.pow(2,20); //assume max 1 million states
         result.append("stateindex = "+artifical_StartState +" ;\n");
 
         for (String ap : modelAPs) {
@@ -427,7 +446,7 @@ public class TemporalModel extends TemporalBean {
                 for (String ap : stateaps
                 ) {
                     if (ap.startsWith("!")) {
-                        condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
+                  //      condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
                     } else {
                         condition.append(" &&  ").append(APPrefix).append(idex).append(" == 1").append(" ");
                     }
@@ -450,7 +469,9 @@ public class TemporalModel extends TemporalBean {
                     idex++;
                 }
                 condition.append(" ]\n");
-                result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+"{\n");
+               // result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+" {\n");
+                result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( " {\n");
+
                 result.append(assignment.toString());
                 result.append("    }\n");
 
