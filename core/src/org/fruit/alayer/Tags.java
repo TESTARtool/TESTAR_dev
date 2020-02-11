@@ -216,9 +216,4 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
-	/**
-	 * The interest that user has to execute an action
-	 */
-	public static final Tag<Integer> UserInterest = from("UserInterest", Integer.class);
-	
 }

@@ -33,6 +33,7 @@ import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.json.object.JsonArtefactStateModel;
 import org.testar.json.object.JsonArtefactTestResults;
@@ -56,6 +57,18 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	Set<String> logsOutputDir = new HashSet<>();
 	Set<String> sequencesVerdicts = new HashSet<>();
 
+	/**
+	 * Initialize TESTAR with the given settings:
+	 *
+	 * @param settings
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		//Set before initialize StateModel
+		settings.set(ConfigTags.ListeningMode, true);
+		super.initialize(settings);
+	}
+	
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your

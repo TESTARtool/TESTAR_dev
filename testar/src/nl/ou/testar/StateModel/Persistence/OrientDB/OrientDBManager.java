@@ -27,6 +27,8 @@ import nl.ou.testar.StateModel.Widget;
 
 import java.util.*;
 
+import org.fruit.alayer.Tag;
+
 import static java.lang.System.exit;
 
 
@@ -185,20 +187,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     @Override
     public void persistAbstractAction(AbstractAction abstractAction) {
 
-    }
-    
-    @Override
-    public void updateAbstractAction(AbstractAction abstractAction) {
-    	
-    	System.out.println("**** ORIENT DB MANAGER *****");
-    	System.out.println("*** updateAbstractAction ***");
-    	
-        String query = " UPDATE AbstractAction SET userInterest = '"+abstractAction.getUserInterest()+"' WHERE actionId='"+abstractAction.getActionId()+"'";
-        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-           db.command(query);
-        }
-        
-        System.out.println(query);
     }
 
     @Override
@@ -367,11 +355,29 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(actionEntity);
-        
-        //Update the User Interest for recorded actions
-        if(abstractStateTransition.getAction().getUserInterest() > 0)
-        	updateAbstractAction(abstractStateTransition.getAction());
     }
+    
+	@Override
+	public void persistAbstractActionAttributeUpdated(AbstractAction abstractAction) {
+        if (abstractAction == null) {
+            System.out.println("Objects missing in abstract action attribute update");
+            return;
+        }
+        
+        for(Tag<?> t : StateModelTags.getStateModelTags()) {
+          	if(abstractAction.getAttributes().get(t, null) != null) {
+          		
+          		String query = "UPDATE AbstractAction SET " + t.name()
+						+ " = " + abstractAction.getAttributes().get(t)
+						+" WHERE actionId = '"+ abstractAction.getActionId() +"'";
+          		
+          		try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          			db.command(query);
+          		}
+          		
+          	}
+        }
+	}
 
     @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {

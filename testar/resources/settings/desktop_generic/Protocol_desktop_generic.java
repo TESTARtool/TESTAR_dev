@@ -37,6 +37,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
@@ -53,7 +54,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
+		//Set before initialize StateModel
+		settings.set(ConfigTags.ListeningMode, true);
 		super.initialize(settings);
 	}
 

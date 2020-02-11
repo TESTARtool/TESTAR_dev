@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.StateModel.StateModelTags;
+
 import org.fruit.Drag;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
@@ -46,6 +48,8 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 import static org.fruit.alayer.Tags.Blocked;
@@ -55,6 +59,18 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_desktop_listening_reward extends DesktopProtocol {
 
 	private double userInterestReward = 2.5;
+	
+	/**
+	 * Initialize TESTAR with the given settings:
+	 *
+	 * @param settings
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		//Set before initialize StateModel
+		settings.set(ConfigTags.ListeningMode, true);
+		super.initialize(settings);
+	}
 	
 	/**
 	 * Select one of the available actions (e.g. at random)
@@ -97,11 +113,11 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 		
 		Action highAction = null;
 		
-		if(interestingModelActions != null) {
+		if(!interestingModelActions.isEmpty()) {
 			System.out.println("\n ******* These interesting Actions come from State Model");
 			for(Action a : interestingModelActions) {
 				System.out.println("Description: " + a.get(Tags.Desc, "No description"));
-				System.out.println("User Interest: " +a.get(Tags.UserInterest, 0));
+				System.out.println("User Interest: " +a.get(StateModelTags.UserInterest, 0));
 				highAction = a;
 			}
 			System.out.println("******* END of interesting Actions \n");

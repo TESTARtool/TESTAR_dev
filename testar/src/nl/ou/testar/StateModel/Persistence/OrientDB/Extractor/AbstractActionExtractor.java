@@ -3,13 +3,17 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Extractor;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractStateModel;
+import nl.ou.testar.StateModel.StateModelTags;
 import nl.ou.testar.StateModel.Exception.ExtractionException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 
 import java.util.Set;
+
+import org.fruit.alayer.Tag;
 
 public class AbstractActionExtractor implements EntityExtractor<AbstractAction> {
 
@@ -48,15 +52,24 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
             action.addConcreteActionId(concreteActionId);
         }
         
-        // get user interest value if exist
-        PropertyValue userInterestValue = entity.getPropertyValue("userInterest");
-        
-        if(userInterestValue != null) {
-        	//Hydrated INTEGER auto converted to String ??
-        	if (userInterestValue.getType() != OType.STRING) {
-                throw new ExtractionException("String set was expected for user interest. " + userInterestValue.getType().toString() + " was given.");
-            }
-        	action.setUserInterest(Integer.parseInt((String) userInterestValue.getValue()));
+        // get existing State Model Tags
+        for(Tag<?> t : StateModelTags.getStateModelTags()) {
+
+        	PropertyValue valueRL = entity.getPropertyValue(t.name());
+
+        	if(valueRL == null) {
+        		continue;
+        	}
+        	
+        	if (valueRL.getType() != TypeConvertor.getInstance().getOrientDBType(t.type())) {
+        		throw new ExtractionException(String.format("ERROR retrieving State Model value from State Model."
+        				+ " %s was expected, but %s was given",
+        				TypeConvertor.getInstance().getOrientDBType(t.type()), valueRL.getType()));
+        	}
+        	action.addAttribute(t, valueRL.getValue());
+
+        	System.out.println(String.format("Extracted State Model Tag %s with value %s for the Action %s",
+        			t.name(), valueRL.getValue().toString(), actionId));
         }
 
         return action;
