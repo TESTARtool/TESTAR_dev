@@ -10,10 +10,7 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactoryBuilder;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.fruit.monkey.Settings;
-
-import com.orientechnologies.orient.server.handler.OAutomaticBackup.MODE;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,6 +55,25 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
+        
+        if(settings.get(ConfigTags.ListeningMode, false)) {
+
+        	// create the abstract state model and then the state model manager
+        	AbstractStateModelListener abstractStateModelListener = new AbstractStateModelListener(modelIdentifier,
+        			settings.get(ConfigTags.ApplicationName),
+        			settings.get(ConfigTags.ApplicationVersion),
+        			settings.get(ConfigTags.Mode),
+        			abstractTags,
+        			persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
+        	ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+
+        	// should we store widgets?
+        	boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
+
+        	return new ModelManagerListeningMode(abstractStateModelListener, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+
+        }
+        
         // create the abstract state model and then the state model manager
         AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
                 settings.get(ConfigTags.ApplicationName),
@@ -68,10 +84,6 @@ public class StateModelManagerFactory {
 
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
-        
-        //At the moment we assume that Record mode will be used for the listening mode
-        if(settings.get(ConfigTags.Mode) == Modes.Record)
-        	 return new ModelManagerListeningMode(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
 
         return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
     }

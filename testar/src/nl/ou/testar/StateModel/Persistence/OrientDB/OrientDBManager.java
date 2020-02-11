@@ -27,6 +27,8 @@ import nl.ou.testar.StateModel.Widget;
 
 import java.util.*;
 
+import org.fruit.alayer.Tag;
+
 import static java.lang.System.exit;
 
 
@@ -354,6 +356,28 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
         entityManager.saveEntity(actionEntity);
     }
+    
+	@Override
+	public void persistAbstractActionAttributeUpdated(AbstractAction abstractAction) {
+        if (abstractAction == null) {
+            System.out.println("Objects missing in abstract action attribute update");
+            return;
+        }
+        
+        for(Tag<?> t : StateModelTags.getStateModelTags()) {
+          	if(abstractAction.getAttributes().get(t, null) != null) {
+          		
+          		String query = "UPDATE AbstractAction SET " + t.name()
+						+ " = " + abstractAction.getAttributes().get(t)
+						+" WHERE actionId = '"+ abstractAction.getActionId() +"'";
+          		
+          		try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          			db.command(query);
+          		}
+          		
+          	}
+        }
+	}
 
     @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {

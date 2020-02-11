@@ -39,6 +39,12 @@ public class EventHelper {
                     throw new InvalidEventException();
                 }
                 break;
+                
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+            	if (!(event.getPayload() instanceof AbstractAction)) {
+            		throw new InvalidEventException();
+            	}
+            	break;
 
             case SEQUENCE_STARTED:
             case SEQUENCE_ENDED:

@@ -483,7 +483,7 @@ public class EntityManager {
         edge.save();
     }
 
-    public void updateAbstractActionEntity(DocumentEntity entity, ODatabaseSession db) {
+    private void updateAbstractActionEntity(DocumentEntity entity, ODatabaseSession db) {
     	for (String propertyName : entity.getPropertyNames()) {
     		if(entity.getPropertyValue(propertyName) != null) {
     			for(Tag<?> t : StateModelTags.getStateModelTags()) {
