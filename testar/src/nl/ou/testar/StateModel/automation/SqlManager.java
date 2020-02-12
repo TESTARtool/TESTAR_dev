@@ -526,12 +526,12 @@ public class SqlManager {
 
     }
 
-    public List<TestRun> getTestRuns() {
+    public List<TestRun> getTestRuns(Integer limit) {
         List<TestRun> testRuns = new ArrayList<>();
         try {
             Connection connection = this.getConnection();
             // fetch the test runs
-            String fetchRunQuery = "SELECT * FROM automated_test_run WHERE starting_time_ms IS NULL";
+            String fetchRunQuery = "SELECT * FROM automated_test_run WHERE starting_time_ms IS NULL LIMIT " + limit;
             Statement fetchRunStatement = connection.createStatement();
             ResultSet resultSet1 = fetchRunStatement.executeQuery(fetchRunQuery);
 

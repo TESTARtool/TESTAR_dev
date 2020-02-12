@@ -177,7 +177,7 @@ public class Main {
 			boolean resetDbFirst = settings.get(ResetDbFirst);
 			boolean firstRun = true;
 
-			for(TestRun testRun : sqlManager.getTestRuns()) {
+			for(TestRun testRun : sqlManager.getTestRuns(settings.get(NrOfTestsToRun))) {
 				out.println();
 				out.println("--------------------------------------");
 				out.println("test run id: " + testRun.getTestRunId());
@@ -599,6 +599,7 @@ public class Main {
 			defaults.add(Pair.from(AddPatternWidgets, false));
 			defaults.add(Pair.from(RemovePatternWidgets, false));
 			defaults.add(Pair.from(UpdateWidgetTable, false));
+			defaults.add(Pair.from(NrOfTestsToRun, 10000));
 
 
 			//Overwrite the default settings with those from the file
