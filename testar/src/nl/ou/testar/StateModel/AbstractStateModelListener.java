@@ -43,7 +43,7 @@ public class AbstractStateModelListener extends AbstractStateModel {
                     
                     //Listening + Record will create the event to update the Action Attributes
                     if(this.mode.equals(Modes.Record))
-                    	emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_ATTRIBUTE_UPDATED, executedAction));
+                    	emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_ATTRIBUTE_UPDATED, stateTransition));
                     
                     return;
                 }

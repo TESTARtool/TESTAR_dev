@@ -41,7 +41,7 @@ public class EventHelper {
                 break;
                 
             case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
-            	if (!(event.getPayload() instanceof AbstractAction)) {
+            	if (!(event.getPayload() instanceof AbstractStateTransition)) {
             		throw new InvalidEventException();
             	}
             	break;
