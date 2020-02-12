@@ -90,17 +90,16 @@ public class ModelManagerReinforcementLearning extends ModelManager implements S
     		return 1.0;
     	}
 
-    	double qValue = absAction.getAttributes().get(RLTags.SarsaValue, 0.0);
-
-    	if(qValue != 0.0) {
-    		System.out.println(String.format("Action %s has a Q-Value of %s", action.get(Tags.AbstractIDCustom,""), qValue));
-    		return qValue;
-    	}
-
-    	else {
+    	if(absAction.getAttributes().get(RLTags.SarsaValue, null) == null) {
     		// Not Q-Value associated, Max Q-Value ?
     		System.out.println(String.format("Action %s has not a Q-Value associated, returning X value", action.get(Tags.AbstractIDCustom,"")));
     		return 1.0;
+    	}
+    	
+    	else {
+        	double qValue = absAction.getAttributes().get(RLTags.SarsaValue);
+    		System.out.println(String.format("Action %s has a Q-Value of %s", action.get(Tags.AbstractIDCustom,""), qValue));
+    		return qValue;
     	}
     }
 

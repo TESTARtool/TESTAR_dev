@@ -40,7 +40,7 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     }
     
     @Override
-	public void persistAbstractActionAttributeUpdated(AbstractAction abstractAction) {
+	public void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition) {
 
 	}
 

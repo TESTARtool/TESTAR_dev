@@ -385,7 +385,7 @@ public class EntityManager {
             		setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
             		//We need to update in the database the dynamic State Model Tag Value
             		if(entity.getEntityClass().getClassName().equals("AbstractAction")) {
-            			updateAbstractActionEntity(entity, db);
+            			updateAbstractActionEntity(edge, entity, db);
             		}
             	}
 
@@ -483,21 +483,15 @@ public class EntityManager {
         edge.save();
     }
     
-    private void updateAbstractActionEntity(DocumentEntity entity, ODatabaseSession db) {
+    private void updateAbstractActionEntity(OEdge edge, DocumentEntity entity, ODatabaseSession db) {
     	for (String propertyName : entity.getPropertyNames()) {
     		if(entity.getPropertyValue(propertyName) != null) {
     			for(Tag<?> t : RLTags.getReinforcementLearningTags()) {
     				if(t.name().contains(propertyName)){
-
-    					//TODO: quotes are going to save the RL value as String
-    					// Implement a correct query to save the RL value as Double
-    					String query = "UPDATE AbstractAction SET " + propertyName
-    							+ " = '" + entity.getPropertyValue(propertyName).getValue() + "'"
-    							+" WHERE actionId = '"+ entity.getPropertyValue("actionId").getValue() +"'";
-
-    					db.command(query);
+    					setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
     				}
     			}
+    			edge.save();
     		}
     	}
     }
@@ -633,6 +627,10 @@ public class EntityManager {
             case INTEGER:
             	convertedValue = OType.convert(valueToConvert, Integer.class);
                 break;
+                
+            case FLOAT:
+            	convertedValue = OType.convert(valueToConvert, Float.class);
+            	break;
 
             case LINKBAG:
                 // we don't process these as a separate attribute

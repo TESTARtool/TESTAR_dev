@@ -37,7 +37,7 @@ public class AbstractStateModelReinforcementLearning extends AbstractStateModel 
                     emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_CHANGED, stateTransition));
 
                     //Event to update Reinforcement Learning Tags Values associated with this AbstractAction
-                    emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_ATTRIBUTE_UPDATED, executedAction));
+                    emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_ATTRIBUTE_UPDATED, stateTransition));
 
                     return;
                 }

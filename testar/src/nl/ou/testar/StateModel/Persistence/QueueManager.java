@@ -88,8 +88,8 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
     
     @Override
-    public void persistAbstractActionAttributeUpdated(AbstractAction abstractAction) {
-    	processRequest(() -> delegateManager.persistAbstractActionAttributeUpdated(abstractAction), abstractAction);
+    public void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition) {
+    	processRequest(() -> delegateManager.persistAbstractActionAttributeUpdated(abstractStateTransition), abstractStateTransition);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
                 break;
                 
             case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
-            	persistAbstractActionAttributeUpdated((AbstractAction) (event.getPayload()));
+            	persistAbstractActionAttributeUpdated((AbstractStateTransition) (event.getPayload()));
             	break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:

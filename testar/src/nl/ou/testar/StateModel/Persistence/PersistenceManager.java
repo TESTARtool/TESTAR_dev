@@ -44,10 +44,11 @@ public interface PersistenceManager {
     void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition);
 
     /**
-     * This method persists an abstract action attribute update
-     * @param abstractAction
+     * This method obtains from the abstract state transition the abstract action
+     * and persists an abstract action attribute update
+     * @param abstractStateTransition
      */
-    void persistAbstractActionAttributeUpdated(AbstractAction abstractAction);
+    void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition);
     
     /**
      * This method persists a concrete state.
