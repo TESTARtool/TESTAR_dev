@@ -559,8 +559,8 @@ public class Temporalpanel2 {
                 logArea.append("Visualizer was already running. goto " + VisualizerURL + "\n");
             }
         } catch (Exception e) {
-            System.err.println("Error on exec() method");
-            logArea.append("Error on exec() method\n");
+            System.err.println("Error on starting Visualizer");
+            logArea.append("Error on starting Visualizer");
             e.printStackTrace();
         }
     }
@@ -610,8 +610,8 @@ public class Temporalpanel2 {
 
             logArea.append(" saving to  graphml file done with result:" + res + "\n\n");
         } catch (Exception e) {
-            System.err.println("Error on connecting to db");
-            logArea.append("Error on connecting to db\n");
+            System.err.println("Error connecting to db");
+            logArea.append("Error connecting to db\n");
             logArea.append("\n");
             e.printStackTrace();
         }
@@ -623,30 +623,26 @@ public class Temporalpanel2 {
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
         CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
-        logArea.append("csv saved: \n");
     }
 
     public void testPatternCSV() {
-        logArea.append("Wwriting a pattern to CSV file\n");
+        logArea.append("Writing a pattern to CSV file\n");
         TemporalPattern pat = TemporalPattern.getSamplePattern();
         List<TemporalPattern> patcoll = new ArrayList<>();
         patcoll.add(pat);
         CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
-        logArea.append("csv saved: ");
     }
 
     public void testPatternConstraintCSV() {
         logArea.append("Writing a pattern-constraint to CSV file\n");
         List<TemporalPatternConstraint> patconstraintcoll = TemporalPatternConstraint.getSampleConstraints();
         CSVHandler.save(patconstraintcoll, outputDir + "temporalPatternConstraintSample.csv");
-        logArea.append("csv saved: ");
     }
 
     public void testSaveDefaultApSelectionManagerJSON() {
         logArea.append("Writing a APSelectionManager.JSON\n");
         tcontrol.setDefaultAPSelectormanager();
         tcontrol.saveAPSelectorManager("APSelectorManager_Default.json");
-        logArea.append("json saved: \n");
     }
 
 //*******************Eventhandlers

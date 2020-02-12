@@ -3,11 +3,9 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
-import nl.ou.testar.temporal.util.TemporalSubType;
+import nl.ou.testar.temporal.util.TemporalType;
 import nl.ou.testar.temporal.util.ValStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.types.selectors.SelectSelector;
-
 import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
@@ -499,7 +497,7 @@ public class TemporalModel extends TemporalBean {
             Collections.sort(sortedparameters);
             List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
             sortedsubstitionvalues.removeAll(Collections.singletonList(""));  // discard empty substitutions
-            TemporalSubType tst = TemporalSubType.valueOf(candidateOracle.getPatternTemporalType().name());
+            TemporalType tst = TemporalType.valueOf(candidateOracle.getPatternTemporalType().name());
 
             boolean importStatus;
             importStatus = sortedparameters.size() == sortedsubstitionvalues.size();

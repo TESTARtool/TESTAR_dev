@@ -169,29 +169,11 @@ public class Helper {
         Helper.RunOSChildProcess(cli);
     }
 
-    //    public static void LTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-//                                   String automatonFile, String formulaFile, String resultsFile) {
-//        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..' --ltl='..n..'  model.etf &> results.txt;
-//        String cli = pathToExecutable;
-//        StringBuilder sb = new StringBuilder();
-//        try {//formulafile to --ltl strings
-//            List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
-//            for (String line : lines) {
-//                sb.append("--ltl='").append(line).append("' ");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        String formulalist = sb.toString();
-//        cli = cli + " " + formulalist;
-//        cli = cli + ((toWslPath) ? toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
-//        if (!resultsFile.equals("")) cli = cli + " &> " + ((toWslPath) ? toWSLPath(resultsFile) : resultsFile);
-//        Helper.RunOSChildProcess(cli);
-//    }
+
     public static void LTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, boolean counterExamples,
                                       String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
-        //repeat for each formula: inefficient as the automaton has to be loaded again for very formula.
+        //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.
         if (pathToExecutable.equals("")) {
             String message = " **error ERROR : This modelchecker was not enabled";
             File messageFile = new File(resultsFile);
