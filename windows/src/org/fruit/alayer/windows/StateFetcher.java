@@ -59,6 +59,13 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean accessBridgeEnabled;
 	
 	private static Pattern sutProcessesMatcher;
+	
+	//PID of Running OS processes
+	private static List<Long> OSProcesses = Util.newArrayList();
+	//PID of Running processes of the SUT, allow TESTAR to work with multiple processes apps
+	private static List<Long> runningSUTProcesses = Util.newArrayList();
+	//Current number of Windows that make up the SUT
+	private static List<Long> currentVisibleSUTWindows = Util.newArrayList();
 
 	private List<Map<String , String>> mappedValues;
 
@@ -75,6 +82,37 @@ public class StateFetcher implements Callable<UIAState>{
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
 
 		mappedValues = new ArrayList<>();
+	}
+	
+	/**
+	 * Update the different PID processes of the SUT and the OS
+	 */
+	private static void updateProcesses() {
+
+		List<Long> newOSProcesses = Util.newArrayList();
+		List<Long> newSUTProcesses = Util.newArrayList();
+
+		for(long pid : Windows.EnumProcesses()){
+			if(pid != 0) {
+				newOSProcesses.add(pid);
+			}
+		}
+
+		//Check if the running SUT processes still existing
+		for(long pid : runningSUTProcesses)
+			if(newOSProcesses.contains(pid))
+				newSUTProcesses.add(pid);
+
+		//Compare last OSProcesses with the currents running processes to update running SUT processes
+		for(long pid : newOSProcesses) {
+			if(!OSProcesses.contains(pid))
+				newSUTProcesses.add(pid);
+		}
+
+		//Update the running SUT processes
+		runningSUTProcesses = newSUTProcesses;
+		//Update the old OS running processes
+		OSProcesses = newOSProcesses;
 	}
 	
 	// by urueda (refactor)
@@ -145,12 +183,22 @@ public class StateFetcher implements Callable<UIAState>{
 			return uiaRoot;
 
 		uiaRoot.pid = system.get(Tags.PID);
-		//uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
-		
-		// find all visible top level windows on the desktop
+
+		// find all visible top level windows on the desktop, and update currentVisibleSUTWindows List
 		Iterable<Long> visibleTopLevelWindowHandles = this.getVisibleTopLevelWindowHandles();
-		
-		UIAElement modalElement = null; // by urueda
+
+		//Update the visible SUT windows if his PID is one of the running processes
+		List<Long> newVisibleSUTWindows = Util.newArrayList();
+
+		for(long p : visibleTopLevelWindowHandles)
+			if(WinProcess.startSUTProcesses.contains(Windows.GetWindowProcessId(p))) {
+				newVisibleSUTWindows.add(p);
+			}
+
+		currentVisibleSUTWindows = newVisibleSUTWindows;
+
+
+		UIAElement modalElement = null;
 
 		// descend the root windows which belong to our process, using UIAutomation
 		uiaRoot.children = new ArrayList<UIAElement>();
@@ -184,6 +232,19 @@ public class StateFetcher implements Callable<UIAState>{
 														 uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
 					modalElement = modalE;
 				// end by urueda
+			}
+		}
+		
+		// Associate multi processes windows/elements into the current uiaRoot Element
+		for(long hwnd : currentVisibleSUTWindows){				
+			if(!uiaRoot.windowHandleMap.containsKey(hwnd)){
+
+				UIAElement modalE;
+
+				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
+					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+					modalElement = modalE;
+
 			}
 		}
 

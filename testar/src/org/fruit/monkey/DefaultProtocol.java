@@ -1654,10 +1654,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// If the system is in the background, we need to force it into the foreground!
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
-		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+		/*if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			this.forceToForeground = true;
 			return actions;
-		}
+		}*/
 
 		//Note this list is always empty in this deriveActions.
 		return actions;
@@ -1691,14 +1691,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//If deriveActions indicated that the SUT should be put back in the foreground
 		//Then here we will select the action to do that
 
-		else if (this.forceToForeground){
+		/*else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
 			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceToForeground = false;
 			return a;
-		}
+		}*/
 
 		//TODO: This seems not to be used yet...
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)

@@ -31,7 +31,7 @@ SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https:
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 10
 SequenceLength = 100
 
 #################################################################
@@ -76,7 +76,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[cC]lose.*|.*[cC]errar.*|.*[mM]aximi[sz]e.*|.*[mM]aximizar.*|.*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[aA]rchivo.*|.*[mM]inimi[sz]e.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*[lL]ogout.*|.*[tT]ab.*|.*[hH]elp.*
 
 #################################################################
 # Processfilter
@@ -127,13 +127,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.5
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

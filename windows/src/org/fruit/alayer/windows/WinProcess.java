@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,12 +36,15 @@ package org.fruit.alayer.windows;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.FruitException;
+import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.AutomationCache;
 import org.fruit.alayer.SUT;
@@ -59,7 +63,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public final class WinProcess extends SUTBase {
 
-	private static final String EMPTY_STRING = ""; // by wcoux
+	private static final String EMPTY_STRING = "";
 
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
@@ -109,7 +113,6 @@ public final class WinProcess extends SUTBase {
 		throw new SystemStartException("Process '" + processName + "' not found!");
 	}
 	
-	// by urueda
 	public static List<SUT> fromAll(){
 		List<WinProcHandle> processes = runningProcesses();
 		if (processes == null || processes.isEmpty())
@@ -129,52 +132,81 @@ public final class WinProcess extends SUTBase {
 
 			//Disabled with browsers, only allow it with desktop applications executed with command_line
 			if(!ProcessListenerEnabled) {
-
+				
+				startSUTProcesses = Util.newArrayList();
+				//PID of running processes before the execution of the SUT
+				List<WinProcHandle> beforeProcesses = runningProcesses();
+				List<Long> beforePID = Util.newArrayList();
+				for(WinProcHandle winp : beforeProcesses)
+					beforePID.add(winp.pid());
+				
+				//Create the SUT process, with the executable app of the selected path
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
-				long processHandle = handles[0];
-				long threadHandle = handles[1];
-				Windows.CloseHandle(threadHandle);
+				long hProcess = handles[0];
+				long hThread = handles[1];
+				Windows.CloseHandle(hThread);
+				
+				//Wait for the SUT process until it is ready
+				if(path.contains("java -jar"))
+					Util.pause(2);
+				else
+					Windows.WaitForInputIdle(hProcess);
+				
+				WinProcess ret = new WinProcess(hProcess, true);
+				
+				//System.out.println("WinProcess Status: "+ret.getStatus());
 
-				WinProcess ret = new WinProcess(processHandle, true);
+				//Read the running processes after the execution of the SUT
+				//This allow us to obtain the potential PID of SUT running processes
+				List<WinProcHandle> runningProcesses = runningProcesses();
+				for(WinProcHandle winp : runningProcesses) {
+					if(!beforePID.contains(winp.pid()))
+						startSUTProcesses.add(winp.pid());
+				}
+				
+				//TODO: Think about create extra conditions to make sure that we are working with SUT process
+				/*if(startSUTProcesses!=null) {
+					for(Long info : startSUTProcesses)
+						System.out.println("Potential SUT PID: "+info);
+				}*/
+
 				ret.set(Tags.Desc, path);
 				return ret;
 			}
 			
 			//Associate Output / Error from SUT
 
-			final Process process = Runtime.getRuntime().exec(path);
-			Field field = process.getClass().getDeclaredField("handle");
-			field.setAccessible(true);
+			final Process p = Runtime.getRuntime().exec(path);
+			Field f = p.getClass().getDeclaredField("handle");
+			f.setAccessible(true);
 			
-			long processHandle = field.getLong(process);
+			long procHandle = f.getLong(p);
 			
 			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
 			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
 			if(path.contains("java -jar"))
 				Util.pause(5);
 			else
-				Windows.WaitForInputIdle(processHandle);
+				Windows.WaitForInputIdle(procHandle);
 			
-			long pid = Windows.GetProcessId(processHandle);
+			long pid = Windows.GetProcessId(procHandle);
 			
-			WinProcess returnProcess = fromPID(pid);
+			WinProcess ret = fromPID(pid);
 			
-			returnProcess.set(Tags.StdErr,process.getErrorStream());
-			returnProcess.set(Tags.StdOut, process.getInputStream());
-			returnProcess.set(Tags.StdIn, process.getOutputStream());
+			ret.set(Tags.StdErr,p.getErrorStream());
+			ret.set(Tags.StdOut, p.getInputStream());
+			ret.set(Tags.StdIn, p.getOutputStream());
 		    
 			//Investigate why this cause issue with cpu
 		    //Windows.CloseHandle(procHandle);
 			
-			returnProcess.set(Tags.Path, path);
-			returnProcess.set(Tags.Desc, path);
-			return returnProcess;
+			ret.set(Tags.Path, path);
+			ret.set(Tags.Desc, path);
+			return ret;
 		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
 		}
 	}
-
-	// begin by wcoux
 	
 	public static WinProcess fromExecutableUwp(String appUserModelId) throws SystemStartException{
 		try{
@@ -222,8 +254,6 @@ public final class WinProcess extends SUTBase {
 
 			return ret;
 
-		}catch(WinApiException we){
-			throw new WinApiException(we.getMessage());
 		}catch(FruitException fe){
 			LogSerialiser.log(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
 			System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
@@ -236,7 +266,7 @@ public final class WinProcess extends SUTBase {
 	public static boolean isForeground(long pid){
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("foreground pid wanted: " + pid + "- windowHandle: " + windowHandle + " - wpid: " + wpid);
+		//System.out.println("foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
 		return !Windows.IsIconic(hwnd) && (wpid == pid);
 	}
 
@@ -271,8 +301,10 @@ public final class WinProcess extends SUTBase {
 	public static List<WinProcHandle> runningProcesses(){
 		List<WinProcHandle> ret = Util.newArrayList();
 		for(long pid : Windows.EnumProcesses()){
-			if(pid != 0)
+			if(pid != 0) {
 				ret.add(new WinProcHandle(pid));
+				startOSPidProcesses.add(pid);
+			}
 		}
 		return ret;
 	}
@@ -310,12 +342,16 @@ public final class WinProcess extends SUTBase {
 	final Keyboard kbd = AWTKeyboard.build();
 	final Mouse mouse = AWTMouse.build();
 	final long pid;
+	static String pName;
+	static List<Long> startSUTProcesses = Util.newArrayList();
+	static List<Long> startOSPidProcesses = Util.newArrayList();
 	transient static long pApplicationActivationManager; // by wcoux
 
 	private WinProcess(long hProcess, boolean stopProcess){
 		this.hProcess = hProcess;
 		this.stopProcess = stopProcess;
 		pid = pid();
+		pName = new WinProcHandle(pid).name();
 	}
 
 	public void finalize(){
@@ -401,7 +437,7 @@ public final class WinProcess extends SUTBase {
 	}
 	
 	public String getStatus(){
-		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] ... " + this.get(Tags.Desc,"");
+		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] & " +" NAME [ "+ pName+" ] ... "+ this.get(Tags.Desc,"");
 	}
 
 	@Override
@@ -410,7 +446,7 @@ public final class WinProcess extends SUTBase {
 			@Override
 			public void nativeReleaseAutomationElement(long elementPtr){
 				/*long refCount =*/ Windows.IUnknown_Release(elementPtr);
-				//System.out.println("Released automation uiaElement <" + elementPtr + " > reference count: " + refCount);
+				//System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
 			}
 			@Override
 			public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr){
