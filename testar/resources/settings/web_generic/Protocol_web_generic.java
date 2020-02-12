@@ -86,43 +86,51 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 		SUT sut = super.startSystem();
 
+		return sut;
+
+	}
+
+	@Override
+	protected void beginSequence(SUT system, State state) {
+		
 		//wait a bit to give the UI some time and get focus
 		Util.pause(2);
 
-		//Enter username on .add(new Type(""),0.1)
-		new CompoundAction.Builder()   
-		.add(new Type(""),0.1)    
-		.add(new KeyDown(KBKeys.VK_TAB),0.5)
-		.build()
-		.run(sut,null, 0.1); //assume next focusable field is pass   
-
-		//wait a bit to give the UI some time and get focus
-		Util.pause(1);
-
-		//Enter password on .add(new Type(""),0.1)
-		new CompoundAction.Builder()
-		.add(new Type(""),0.1)
-		.build()
-		.run(sut, null, 0.1); 
-
-		Util.pause(1);
+		for(Widget w : state) {
+			if(w.get(Tags.Title, "").equals("Usuario")){
+                 StdActionCompiler ac = new AnnotatingActionCompiler();
+                 Action a = ac.clickTypeInto(w, "username", true);
+                 executeAction(system,state, a);
+                 Util.pause(1);
+			}
+		}
+		
+		for(Widget w : state) {
+			if(w.get(Tags.Title, "").equals("Password")){
+                 StdActionCompiler ac = new AnnotatingActionCompiler();
+                 Action a = ac.clickTypeInto(w, "password", true);
+                 executeAction(system,state, a);
+                 Util.pause(1);
+			}
+		}
 
 		//login is performed by ENTER 
 		new CompoundAction.Builder()
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5)
 		.build()
-		.run(sut, null, 0.1);
+		.run(system, null, 0.1);
 
 		Util.pause(2);
 
-		State state = getState(sut);
+		state = getState(system);
+		
 		//Execute IExplorer on maximized windows (-k flags hide the url information)
-		for(Widget w : getState(sut)) {
+		for(Widget w : getState(system)) {
 			if(w.get(Tags.Title,"").contains("Maximise")) {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(sut, state, ac.leftClickAt(w));
+					executeAction(system, state, ac.leftClickAt(w));
 				}
 			}
 		}
@@ -130,10 +138,12 @@ public class Protocol_web_generic extends DesktopProtocol {
 		//Don't save any previous executed actions by TESTAR ¿Bug?
 		userEvent = null;
 
-		return sut;
-
+		Util.pause(2);
+		
+		state = getState(system);
+		
 	}
-
+	
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -146,6 +156,11 @@ public class Protocol_web_generic extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 
 		State state = super.getState(system);
+		
+		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+			WinProcess.toForeground(system.get(Tags.PID), 0.5, 100);
+			state = super.getState(system);
+		}
 
 		for(Widget w : state){
 			Role role = w.get(Tags.Role, Roles.Widget);
@@ -157,6 +172,8 @@ public class Protocol_web_generic extends DesktopProtocol {
 				w.set(Tags.Enabled,false);
 			if(w.get(Tags.Title,"").toString().contains("LOGOUT"))
 				w.set(Tags.Enabled,false);
+			if(w.get(Tags.Title,"").toString().contains("Logout"))
+				w.set(Tags.Enabled,false);
 			if(w.get(Tags.Title,"").toString().contains("No es seguro"))
 				w.set(Tags.Enabled,false);
 			if(w.get(Tags.Title,"").toString().contains("Export to Pdf"))
@@ -164,10 +181,6 @@ public class Protocol_web_generic extends DesktopProtocol {
 			if(w.get(Tags.Title,"").toString().contains("POSIDONIA"))
 				w.set(Tags.Enabled,false);
 
-		}
-
-		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			WinProcess.toForeground(system.get(Tags.PID), 0.3, 5);
 		}
 
 		return state;
@@ -183,7 +196,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
+		for(Widget w : getTopWidgets(state)){
 			//optional: iterate through top level widgets based on Z-index:
 			//for(Widget w : getTopWidgets(state)){
 

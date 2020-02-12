@@ -70,6 +70,9 @@ public final class WinProcess extends SUTBase {
 	}
 	
 	public static void toForeground(long pid) throws WinApiException{
+		for(long p : startSUTProcesses)
+			if(isForeground(p))
+				return;
 		toForeground(pid, 0.3, 100);
 	}
 
@@ -89,8 +92,8 @@ public final class WinProcess extends SUTBase {
 			Util.pause(foregroundEstablishTime);
 		}	
 
-		if(!isForeground(pid) && isRunning(pid))
-			throw new WinApiException("Unable to bring process to foreground!");
+		/*if(!isForeground(pid) && isRunning(pid))
+			throw new WinApiException("Unable to bring process to foreground!");*/
 	}
 
 	public static WinProcess fromPID(long pid) throws SystemStartException{

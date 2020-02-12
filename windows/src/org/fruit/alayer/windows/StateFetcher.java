@@ -478,6 +478,7 @@ public class StateFetcher implements Callable<UIAState>{
 		// In time, these hard-coded attributes should be refactored away.
 		uiaElement.set(UIATags.UIAControlType, uiaElement.ctrlId);
 		uiaElement.set(UIATags.UIANativeWindowHandle, uiaElement.windowHandle);
+		uiaElement.set(Tags.HWND,uiaElement.windowHandle);
 		uiaElement.set(UIATags.UIAIsEnabled, uiaElement.enabled);
 		uiaElement.set(UIATags.UIAName, uiaElement.name);
 		uiaElement.set(UIATags.UIAHelpText, uiaElement.helpText);
