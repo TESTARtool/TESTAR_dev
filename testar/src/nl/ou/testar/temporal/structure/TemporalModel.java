@@ -229,7 +229,7 @@ public class TemporalModel extends TemporalBean {
         result.append("\n");
         result.append("end state\n");
         result.append("begin edge\n");
-        result.append("transition:transition\n");
+        //result.append("transition:transition\n");
         result.append("end edge\n");
         result.append("begin init\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
@@ -312,19 +312,21 @@ public class TemporalModel extends TemporalBean {
 
                     idex++;
                 }
-                result.append(" " + transindex).append("\n");
+            //   result.append(" " + transindex).append("\n");
+                result.append("\n");
                 transindex++;
             }
             stateid++;
         }
+        result.append("\n");
         result.append("end trans\n");
-        result.append("begin sort transition\n");
-
-        for (String transid : transitionList) {
-            result.append("\"").append(transid).append("\"\n");
-        }
-
-        result.append("end sort\n");
+//        result.append("begin sort transition\n");
+//
+//        for (String transid : transitionList) {
+//            result.append("\"").append(transid).append("\"\n");
+//        }
+//
+//        result.append("end sort\n");
 //        result.append("begin sort stateid\n");
 //        for (StateEncoding stenc : stateEncodings) {
 //            result.append("\"").append(stenc.getState()).append("\"\n");
