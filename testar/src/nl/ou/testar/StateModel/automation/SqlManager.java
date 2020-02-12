@@ -43,7 +43,7 @@ public class SqlManager {
     public void initDatabase(String applicationName, String applicationVersion) {
         try {
             Connection connection = this.getConnection();
-            String insertQuery = "INSERT INTO widget (widget_config_name, widget_description, use_in_abstraction) VALUES(?, ?, ?)";
+            String insertQuery = "INSERT INTO widget (widget_config_name, widget_description, use_in_abstraction, widget_group) VALUES(?, ?, ?, ?)";
             PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
 
             StateManagementTags.getAllTags().forEach(tag -> {
@@ -52,6 +52,7 @@ public class SqlManager {
                         insertStatement.setString(1, StateManagementTags.getSettingsStringFromTag(tag));
                         insertStatement.setString(2, tag.name());
                         insertStatement.setInt(3, 1);
+                        insertStatement.setString(4, "general");
                         insertStatement.execute();
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -70,6 +71,42 @@ public class SqlManager {
             applicationStatement.execute();
 
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addPatternWidgets() {
+        try {
+            Connection connection = this.getConnection();
+            String insertQuery = "INSERT INTO widget (widget_config_name, widget_description, use_in_abstraction, widget_group) VALUES(?, ?, ?, ?)";
+            PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+
+            StateManagementTags.getAllTags().forEach(tag -> {
+                if (StateManagementTags.getTagGroup(tag) == StateManagementTags.Group.ControlPattern) {
+                    try {
+                        insertStatement.setString(1, StateManagementTags.getSettingsStringFromTag(tag));
+                        insertStatement.setString(2, tag.name());
+                        insertStatement.setInt(3, 1);
+                        insertStatement.setString(4, "pattern");
+                        insertStatement.execute();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removePatternWidgets() {
+        try {
+            Connection connection = this.getConnection();
+            String deleteQuery = "DELETE FROM widget WHERE widget_group = 'pattern'";
+            PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
+            deleteStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -379,6 +416,112 @@ public class SqlManager {
         }
 
 
+
+
+    }
+
+    public void initTest5(boolean clearOldResults) {
+        Connection connection = getConnection();
+        if (clearOldResults) {
+            String query1 = "TRUNCATE TABLE test_run_widget";
+            String query2 = "DELETE FROM automated_test_run";
+            String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+            String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+            Stream.of(query1, query2, query3, query4).forEach(query -> {
+                try {
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(query);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                    exit(1);
+                }
+            });
+        }
+
+        try {
+            String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
+            Statement appStatement = connection.createStatement();
+            ResultSet resultSet1 = appStatement.executeQuery(fetchApplicationQuery);
+            resultSet1.first();
+            int applicationId = resultSet1.getInt("application_id");
+
+            // update the widgets to a subset of useable combos
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0 WHERE widget_group = 'general'";
+            String updateWidgetQuery2 = "UPDATE widget " +
+                    "SET use_in_abstraction = 1 " +
+                    "WHERE" +
+                    " widget_config_name IN ('WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary' );";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
+
+            // in test 1, we create tests with just a single widget
+            String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
+                    "VALUES(?, ?, ?, ?)";
+            PreparedStatement preparedStatement1 = connection.prepareStatement(testRunInsertQuery, Statement.RETURN_GENERATED_KEYS);
+
+            String widgetAttachQuery = "INSERT INTO test_run_widget(test_run_id, widget_id) VALUES(?, ?)";
+            PreparedStatement widgetAttachStatement = connection.prepareStatement(widgetAttachQuery);
+
+
+            // now fetch the widgets
+            String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1 AND widget_group = 'general'";
+            Statement widgetStatement = connection.createStatement();
+            ResultSet resultSet2 = widgetStatement.executeQuery(fetchWidgetQuery);
+            List<Integer> mainWidgetIds = new ArrayList<>();
+            while (resultSet2.next()) {
+                mainWidgetIds.add(resultSet2.getInt("widget_id"));
+            }
+
+            String alternateWidgetQuery = "SELECT * FROM widget WHERE widget_group = 'pattern'";
+            Statement alternateWidgetStatement = connection.createStatement();
+            ResultSet resultSet3 = alternateWidgetStatement.executeQuery(alternateWidgetQuery);
+
+
+            // in this test, we take the 3 most succesful widgets and add all combos of 2 from the control patterns to them
+            List<Integer> alternateWidgetIds = new ArrayList<>();
+            while (resultSet3.next()) {
+                alternateWidgetIds.add(resultSet3.getInt("widget_id"));
+            }
+
+            // now create the combinations
+            List<int[]> combinations = generateCombinations(alternateWidgetIds, 2);
+            System.out.println("Number of combinations: " + combinations.size());
+            // add the 3 main widgets to all the combinations
+            List<int[]> mergedCombinations = new ArrayList<>();
+            for (int[] combination : combinations) {
+                IntStream stream1 = Arrays.stream(combination);
+                IntStream stream2 = mainWidgetIds.stream().mapToInt(i -> i);
+                IntStream combinedStream = IntStream.concat(stream1, stream2);
+                mergedCombinations.add(combinedStream.toArray());
+            }
+
+            // for each combination, we insert a test run
+            for (int[] combination : mergedCombinations) {
+                preparedStatement1.setInt(1, applicationId);
+                preparedStatement1.setInt(2, 4);
+                preparedStatement1.setInt(3, 100);
+                preparedStatement1.setInt(4, 0);
+                preparedStatement1.execute();
+
+                // fetch the generated test run id
+                ResultSet keys = preparedStatement1.getGeneratedKeys();
+                keys.next();
+                int testRunId = keys.getInt(1);
+
+                for (int widgetId: combination) {
+                    widgetAttachStatement.setInt(1, testRunId);
+                    widgetAttachStatement.setInt(2, widgetId);
+                    widgetAttachStatement.execute();
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -929,6 +1072,20 @@ public class SqlManager {
             });
 
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void modifyWidgetTable() {
+        try {
+            String alterQuery = "alter table widget " +
+                    " add `widget_group` ENUM('general', 'pattern') not null;";
+            String updateQuery = "update widget SET `widget_group` = 'general'";
+            Connection connection = getConnection();
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(alterQuery);
+            statement.executeUpdate(updateQuery);
         } catch (SQLException e) {
             e.printStackTrace();
         }

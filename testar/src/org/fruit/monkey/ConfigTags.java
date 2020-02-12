@@ -143,4 +143,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> CalculateMedian = Tag.from("CalculateMedian", Boolean.class);
   public static final Tag<Boolean> AnalyseTopResults = Tag.from("AnalyseTopResults", Boolean.class);
   public static final Tag<Integer> TopResultsLimit = Tag.from("TopResultsLimit", Integer.class);
+  public static final Tag<Boolean> AddPatternWidgets = Tag.from("AddPatternWidgets", Boolean.class);
+  public static final Tag<Boolean> RemovePatternWidgets = Tag.from("RemovePatternWidgets", Boolean.class);
+  public static final Tag<Boolean> UpdateWidgetTable = Tag.from("UpdateWidgetTable", Boolean.class);
 }

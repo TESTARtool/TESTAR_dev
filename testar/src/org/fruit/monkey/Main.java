@@ -124,6 +124,21 @@ public class Main {
 		if (settings.get(Automate)) {
 			SqlManager sqlManager = new SqlManager();
 
+			if (settings.get(UpdateWidgetTable)) {
+				sqlManager.modifyWidgetTable();
+				exit(1);
+			}
+
+			if (settings.get(AddPatternWidgets)) {
+				sqlManager.addPatternWidgets();
+				exit(1);
+			}
+
+			if (settings.get(RemovePatternWidgets)) {
+				sqlManager.removePatternWidgets();
+				exit(1);
+			}
+
 			if (settings.get(AnalyseTopResults)) {
 				sqlManager.analysisOfTopResults(settings.get(TopResultsLimit));
 				exit(1);
@@ -148,7 +163,7 @@ public class Main {
 			}
 
 			if (settings.get(InitTests)) {
-				sqlManager.initTest4(settings.get(ClearResults));
+				sqlManager.initTest5(settings.get(ClearResults));
 
 				if (settings.get(InitTestsOnly)) {
 					System.exit(1);
@@ -581,6 +596,10 @@ public class Main {
 			defaults.add(Pair.from(CalculateMedian, false));
 			defaults.add(Pair.from(AnalyseTopResults, false));
 			defaults.add(Pair.from(TopResultsLimit, 0));
+			defaults.add(Pair.from(AddPatternWidgets, false));
+			defaults.add(Pair.from(RemovePatternWidgets, false));
+			defaults.add(Pair.from(UpdateWidgetTable, false));
+
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
