@@ -417,11 +417,20 @@ public class TemporalController {
         }
         if (tmptype.equals(TemporalType.CTL) || tmptype.equals(TemporalType.LTL_ITS) || tmptype.equals(TemporalType.LTL_LTSMIN)) {
 
-//            **under construction
-            String contents1 = "";
-            contents1 =tModel.makeGALOutput();
-            File output = new File(file+".gal");
-            saveStringToFile(contents1,output);
+//            **under construction ITS-GAL
+//            String contents1 = "";
+//            contents1 =tModel.makeGALOutput();
+//            String strippedFile;
+//            String filename = Paths.get(file).getFileName().toString();
+//            if (filename.contains(".")){
+//                strippedFile = file.substring(0, filename.lastIndexOf("."));
+//            }
+//            else {
+//                strippedFile = file;
+//            }
+//            File output = new File(strippedFile+".gal");
+//            saveStringToFile(contents1,output);
+
             contents = tModel.makeETFOutput();
             b = true;
         }
