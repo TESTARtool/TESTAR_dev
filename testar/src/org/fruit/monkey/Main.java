@@ -39,7 +39,12 @@ import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.*;
+import nl.ou.testar.TagVisualization.ConcreteTagFilter;
+import nl.ou.testar.TagVisualization.TagFilter;
+import org.fruit.Assert;
+import org.fruit.Pair;
+import org.fruit.UnProc;
+import org.fruit.Util;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
@@ -97,6 +102,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
+
+		initTagVisualization();
 
 		initTestarSSE(args);
 
@@ -674,5 +681,9 @@ public class Main {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
+	}
+
+    private static void initTagVisualization() {
+		TagFilter.setInstance(new ConcreteTagFilter());
 	}
 }

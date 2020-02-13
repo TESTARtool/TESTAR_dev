@@ -228,4 +228,76 @@ public final class Tags extends TagsBase {
 		return generalStringVerdictTags;
 	}
 	
+	private static Set<Tag> baseTags;
+	static{
+		Set<Tag> tmpList = new HashSet<>();
+		tmpList.add(HitTester);
+		tmpList.add(Shape);
+		tmpList.add(Rendered);
+		tmpList.add(Desc);
+		tmpList.add(Enabled);
+		tmpList.add(IsRunning);
+		tmpList.add(Blocked);
+		tmpList.add(Foreground);
+		tmpList.add(Title);
+		tmpList.add(ZIndex);
+		tmpList.add(MaxZIndex);
+		tmpList.add(MinZIndex);
+		tmpList.add(Slider);
+		tmpList.add(NotResponding);
+		tmpList.add(Role);
+		tmpList.add(ToolTipText);
+		tmpList.add(Modal);
+		tmpList.add(Angle);
+		tmpList.add(Text);
+		tmpList.add(ValuePattern);
+		tmpList.add(WidgetMap);
+		tmpList.add(UID);
+		tmpList.add(Path);
+		tmpList.add(ConcreteID);
+		tmpList.add(AbstractID);
+		tmpList.add(Abstract_R_ID);
+		tmpList.add(Abstract_R_T_ID);
+		tmpList.add(Abstract_R_T_P_ID);
+		tmpList.add(ConcreteIDCustom);
+		tmpList.add(AbstractIDCustom);
+		tmpList.add(DynDesc);
+		tmpList.add(Visualizer);
+		tmpList.add(Targets);
+		tmpList.add(TargetID);
+		tmpList.add(PID);
+		tmpList.add(HWND);
+		tmpList.add(HANDLE);
+		tmpList.add(TimeStamp);
+		tmpList.add(ScreenshotPath);
+		tmpList.add(OracleVerdict);
+		tmpList.add(StandardMouse);
+		tmpList.add(StandardKeyboard);
+		tmpList.add(HasStandardMouse);
+		tmpList.add(HasStandardKeyboard);
+		tmpList.add(StdOut);
+		tmpList.add(StdErr);
+		tmpList.add(StdIn);
+		tmpList.add(SystemState);
+		tmpList.add(ActionSet);
+		tmpList.add(ExecutedAction);
+		tmpList.add(ActionDuration);
+		tmpList.add(ActionDelay);
+		tmpList.add(UsedResources);
+		tmpList.add(Representation);
+		tmpList.add(ProcessHandles);
+		tmpList.add(RunningProcesses);
+		tmpList.add(SystemActivator);
+		tmpList.add(OriginWidget);
+		baseTags = Collections.unmodifiableSet(tmpList);
+	}
+
+	/**
+	 * Get all the base tags.
+	 * @return The base tags.
+	 */
+	public static Set<Tag> getAllBaseTags()
+	{
+		return baseTags;
+	}
 }

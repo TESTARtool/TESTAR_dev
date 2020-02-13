@@ -252,6 +252,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(settingPanels.size() + 1, new Pair("Time Settings", new TimingPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair("Misc", new MiscPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair("State Model", StateModelPanel.createStateModelPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair("Spy mode", new SpyModePanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.getKey(),v.getValue()));
 
