@@ -279,22 +279,7 @@ public class TemporalModel extends TemporalBean {
                 int idex = 0;
                 for (String ap : stateaps
                 ) {
-//                    String step="";
-//                    if (ap.startsWith("!")) {
-//                        step=("0/");
-//                    } else {
-//                        step=("1/");
-//                    }
-//                    if (targetaps[idex].startsWith("!")) {
-//                        step=step+("0 ");
-//                    } else {
-//                        step=step+("1 ");
-//                    }
-//                    if (!step.equals("0/0 ") && !step.equals("1/1 ")){
-//                        result.append(step);
-//                    }
-//                    else
-//                        result.append("* ");
+
 
                     if (ap.startsWith("!")) {
                         result.append("0/");
