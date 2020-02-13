@@ -43,6 +43,7 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
 
 import es.upv.staq.testar.NativeLinker;
@@ -93,13 +94,19 @@ public class Protocol_web_generic extends DesktopProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		
+		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+			WinProcess.toForeground(system.get(Tags.PID), 0.5, 100);
+			state = super.getState(system);
+		}
+
 		//wait a bit to give the UI some time and get focus
 		Util.pause(2);
 
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").equals("Usuario")){
                  StdActionCompiler ac = new AnnotatingActionCompiler();
-                 Action a = ac.clickTypeInto(w, "username", true);
+                 //Action a = ac.clickTypeInto(w, "username", true);
+                 Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginUsername, "NoUsername"), true);
                  executeAction(system,state, a);
                  Util.pause(1);
 			}
@@ -108,7 +115,8 @@ public class Protocol_web_generic extends DesktopProtocol {
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").equals("Password")){
                  StdActionCompiler ac = new AnnotatingActionCompiler();
-                 Action a = ac.clickTypeInto(w, "password", true);
+                 //Action a = ac.clickTypeInto(w, "password", true);
+                 Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginPassword, "NoPassword"), true);
                  executeAction(system,state, a);
                  Util.pause(1);
 			}
@@ -158,7 +166,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 		State state = super.getState(system);
 		
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			WinProcess.toForeground(system.get(Tags.PID), 0.5, 100);
+			WinProcess.toForeground(system.get(Tags.PID), 0.5, 5);
 			state = super.getState(system);
 		}
 
@@ -196,14 +204,16 @@ public class Protocol_web_generic extends DesktopProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : getTopWidgets(state)){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
+		for(Widget w : (settings.get(ConfigTags.TopWidgetsState, false) ? getTopWidgets(state) : state)){
 
 			//Check current browser tab, to close possible undesired tabs
-			if(w.get(Tags.Title,"").toString().contains("Address and search")) {
-				if(!w.get(Tags.ValuePattern,"").toString().contains("prodevelop")
-						|| w.get(Tags.ValuePattern,"").toString().contains("exportarPdf")) {
+			if(settings.get(ConfigTags.Mode, Modes.Spy).equals(Modes.Generate) && 
+					w.get(Tags.Title,"").contains("Address and search")) {
+				
+				if(!w.get(Tags.ValuePattern,"").contains("prodevelop")
+						|| !w.get(UIATags.UIAValueValue,"").contains("prodevelop")
+						|| w.get(Tags.ValuePattern,"").contains("exportarPdf")
+						|| w.get(UIATags.UIAValueValue,"").contains("exportarPdf")) {
 
 					Keyboard kb = AWTKeyboard.build();
 					CompoundAction cAction = new CompoundAction(new KeyDown(KBKeys.VK_CONTROL),new KeyDown(KBKeys.VK_W));

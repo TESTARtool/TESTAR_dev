@@ -128,4 +128,8 @@ public final class ConfigTags {
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
   
   public static final Tag<String> TestCaseName = Tag.from("TestCaseName", String.class);
+  public static final Tag<String> LoginUsername = Tag.from("LoginUsername", String.class);
+  public static final Tag<String> LoginPassword = Tag.from("LoginPassword", String.class);
+  public static final Tag<Boolean> TopWidgetsState = Tag.from("TopWidgetsState", Boolean.class);
+  
 }

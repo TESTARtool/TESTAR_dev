@@ -461,7 +461,13 @@ public class Main {
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			
 			defaults.add(Pair.from(TestCaseName, "RandomTest"));
+			defaults.add(Pair.from(LoginUsername, "DefaultUsername"));
+			defaults.add(Pair.from(LoginPassword, "DefaultPassword"));
+			defaults.add(Pair.from(TopWidgetsState, true));
+			
+			
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

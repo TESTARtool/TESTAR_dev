@@ -96,6 +96,16 @@ SUTProcesses =
 ProtocolClass = web_generic/Protocol_web_generic
 
 #################################################################
+# Protocol Configuration Values
+#
+# Settings configurations used in the Protocol.
+#################################################################
+
+LoginUsername = username
+LoginPassword = password
+TopWidgetsState = true
+
+#################################################################
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
