@@ -27,9 +27,11 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-
+import nl.ou.testar.temporal.behavior.TemporalExecutor;
+import nl.ou.testar.temporal.behavior.TemporalExecutorFactory;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 import java.util.Set;
@@ -43,7 +45,24 @@ import java.util.Set;
  *
  *  It only changes the selectAction() method.
  */
+
+
 public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
+	protected TemporalExecutor temporalExecutor;
+
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+				super.initialize(settings);
+		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
+			temporalExecutor = TemporalExecutorFactory.getTemporalExecutor(settings);
+		}
+
+	}
 
 
 	/**
