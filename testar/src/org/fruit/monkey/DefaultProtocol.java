@@ -68,6 +68,8 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.temporal.behavior.TemporalExecutor;
+import nl.ou.testar.temporal.behavior.TemporalExecutorFactory;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -193,6 +195,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
+	protected TemporalExecutor temporalExecutor;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -368,6 +371,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+
+		}
+		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
+			temporalExecutor = TemporalExecutorFactory.getTemporalExecutor(settings);
 		}
 
 		try {
@@ -807,7 +814,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runRecordLoop(system);
 			}
 
-			// getState() including getVerdict() that is saved into the state:
+			// getState() including getOracle_verdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
 			//Not visualizing the widget info under cursor while in Generate-mode:
@@ -1519,7 +1526,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * This method gets the state of the SUT
-	 * It also call getVerdict() and saves it into the state
+	 * It also call getOracle_verdict() and saves it into the state
 	 *
 	 * @param system
 	 * @return

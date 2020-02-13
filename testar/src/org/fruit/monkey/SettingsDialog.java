@@ -35,8 +35,8 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDBPanel;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
+import nl.ou.testar.temporal.ui.Temporalpanel2;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -90,6 +90,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private StateModelPanel stateModelPanel;
+  private Temporalpanel2 temporalPanel;
 
   /**
    * Starts the settings Dialog.
@@ -195,13 +196,29 @@ public class SettingsDialog extends JFrame implements Observer {
 
     miscPanel.checkSettings();
   }
+/*  private void aveCurrentSettings() {
 
-  private void saveCurrentSettings() {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
       Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
+    } catch (IOException e1) {
+      LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
+    }
+  }*/
+
+
+  // css: it was annoying to constantly toggle the protocol combobox to enforce a save
+  // interactive testing for temporal oracles, requires altering settings
+  // i added a save button on the general panel, made this method public and invoke a refresh of the temporal panel.
+    public  void saveCurrentSettings() {
+    extractInformation(settings);
+    try {
+      Util.saveToFile(settings.toFileString(), settingsFile);
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
+      System.out.println("Saved current settings to <" + settingsFile + ">");
+      temporalPanel.populateFrom(settings);//refresh panel
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
     }
@@ -239,6 +256,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
     stateModelPanel.populateFrom(settings);
+    temporalPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -248,6 +266,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     stateModelPanel.extractInformation(settings);
+    temporalPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -273,6 +292,9 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
+    temporalPanel = Temporalpanel2.createTemporalPanel();
+    jTabsPane.addTab("Temporal Oracles", temporalPanel.$$$getRootComponent$$$());
+
 
     setLayout(jTabsPane);
     pack();

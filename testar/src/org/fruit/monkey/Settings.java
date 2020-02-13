@@ -34,17 +34,6 @@
  */
 package org.fruit.monkey;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -54,7 +43,13 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.toList;
+import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
+import static org.fruit.monkey.ConfigTags.TemporalConcreteEqualsAbstract;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -402,12 +397,46 @@ public class Settings extends TaggableBase implements Serializable {
 					+"StateModelStoreWidgets =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Temporal Oracle settings\n"
+					+"#################################################################\n"
+
+					+"TemporalLTL_SPOTChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
+					+"TemporalLTL_SPOTCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_SPOTChecker_Enabled = false" + Util.lineSep()
+					+"TemporalCTL_ITSChecker = ubuntu1804 run ~/its/its-ctl" + Util.lineSep()
+					+"TemporalCTL_ITSCheckerWSL = true" + Util.lineSep()
+					+"TemporalCTL_ITSChecker_Enabled = false" + Util.lineSep()
+					+"TemporalLTL_ITSChecker = ubuntu1804 run ~/its/its-ltl" + Util.lineSep()
+					+"TemporalLTL_ITSCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_ITSChecker_Enabled = false" + Util.lineSep()
+					+"TemporalLTL_LTSMINChecker = ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-seq" + Util.lineSep()
+					+"TemporalLTL_LTSMINCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTL_LTSMINChecker_Enabled = false" + Util.lineSep()
+					+"TemporalOffLineEnabled = false" + Util.lineSep()
+					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
+					+"TemporalInstrumentDeadlockState = false" + Util.lineSep()
+					+"TemporalVerbose = true" + Util.lineSep()
+					+"TemporalCounterExamples = true" + Util.lineSep()
+					+"TemporalOracles = LTLTemporalOracles.csv" + Util.lineSep()
+					+"TemporalPatterns = LTLTemporalPatterns.csv" + Util.lineSep()
+					+"TemporalAPSelectorManager = LTLAPSelectorManager.json"+ Util.lineSep()
+					+"TemporalPatternConstraints = LTLTemporalPatternConstraints.csv" + Util.lineSep()
+					+"TemporalGeneratorTactics = 10;100"+ Util.lineSep()
+					+"TemporalDirectory = temporal" + Util.lineSep()
+					+"TemporalSubDirectories = true" + Util.lineSep()
+					+"TemporalPythonEnvironment = python.exe" + Util.lineSep()
+					+"TemporalVisualizerServer = run.py --port 8050"+ Util.lineSep()
+					+"TemporalVisualizerURL = localhost:8050" + Util.lineSep()
+					+"TemporalVisualizerURLStop = localhost:8050/shutdown" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
                     +"#################################################################\n"
 			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"ConcreteStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"
@@ -467,7 +496,7 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)
+		return tag.equals(ConfigTags.AbstractStateAttributes)||tag.equals(ConfigTags.ConcreteStateAttributes)
 				? "," : ";";
 	}
 }
