@@ -634,12 +634,12 @@ public class TemporalController {
 
 
                     if (!verbose) {
-                        Files.delete(automatonFile.toPath());
-                        Files.delete(resultsFile.toPath());
-                        Files.delete(formulaFile.toPath());
-                        Files.delete(syntaxformulaFile.toPath());
-                        Files.delete(convertedformulaFile.toPath());
-                        Files.delete(inputvalidatedFile.toPath());
+                        if (automatonFile.exists()) Files.delete(automatonFile.toPath());
+                        if (resultsFile.exists())Files.delete(resultsFile.toPath());
+                        if (formulaFile.exists())Files.delete(formulaFile.toPath());
+                        if (syntaxformulaFile.exists())Files.delete(syntaxformulaFile.toPath());
+                        if (convertedformulaFile.exists())Files.delete(convertedformulaFile.toPath());
+                        if (inputvalidatedFile.exists())Files.delete(inputvalidatedFile.toPath());
                     }
                     System.out.println(LocalTime.now() + " | " + oracleType + " model-checking completed");
                 }
