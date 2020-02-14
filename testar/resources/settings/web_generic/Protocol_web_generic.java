@@ -35,6 +35,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
+import org.fruit.alayer.actions.KeyUp;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.Type;
 import org.fruit.alayer.devices.AWTKeyboard;
@@ -46,7 +47,10 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
+import nl.ou.testar.RandomActionSelector;
+
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
@@ -93,32 +97,45 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state) {
-		
+
+		// Bring IExplorer to the foreground
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			WinProcess.toForeground(system.get(Tags.PID), 0.5, 100);
 			state = super.getState(system);
 		}
 
-		//wait a bit to give the UI some time and get focus
-		Util.pause(2);
+		//Execute IExplorer on maximized windows (-k flags hide the url information)
+		for(Widget w : state) {
+			if(w.get(Tags.Title,"").contains("Maximise")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(system, state, ac.leftClickAt(w));
+
+					Util.pause(2);
+
+					state = getState(system);
+				}
+			}
+		}
 
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").equals("Usuario")){
-                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                 //Action a = ac.clickTypeInto(w, "username", true);
-                 Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginUsername, "NoUsername"), true);
-                 executeAction(system,state, a);
-                 Util.pause(1);
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				//Action a = ac.clickTypeInto(w, "username", true);
+				Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginUsername, "NoUsername"), true);
+				executeAction(system,state, a);
+				Util.pause(1);
 			}
 		}
-		
+
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").equals("Password")){
-                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                 //Action a = ac.clickTypeInto(w, "password", true);
-                 Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginPassword, "NoPassword"), true);
-                 executeAction(system,state, a);
-                 Util.pause(1);
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				//Action a = ac.clickTypeInto(w, "password", true);
+				Action a = ac.clickTypeInto(w, settings.get(ConfigTags.LoginPassword, "NoPassword"), true);
+				executeAction(system,state, a);
+				Util.pause(1);
 			}
 		}
 
@@ -130,28 +147,13 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 		Util.pause(2);
 
-		state = getState(system);
-		
-		//Execute IExplorer on maximized windows (-k flags hide the url information)
-		for(Widget w : getState(system)) {
-			if(w.get(Tags.Title,"").contains("Maximise")) {
-				Role role = w.get(Tags.Role, Roles.Widget);
-				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
-					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(system, state, ac.leftClickAt(w));
-				}
-			}
-		}
-
 		//Don't save any previous executed actions by TESTAR ¿Bug?
 		userEvent = null;
 
-		Util.pause(2);
-		
 		state = getState(system);
-		
+
 	}
-	
+
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -164,7 +166,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 
 		State state = super.getState(system);
-		
+
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			WinProcess.toForeground(system.get(Tags.PID), 0.5, 5);
 			state = super.getState(system);
@@ -172,22 +174,29 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 		for(Widget w : state){
 			Role role = w.get(Tags.Role, Roles.Widget);
-			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
+			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
 				browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+			}
 
-			//Disable specific widgets (test.settings doesn't filtering properly)
-			if(w.get(Tags.Title,"").toString().contains("Help"))
+			//Disable specific widgets (protocol is prioritized over test.settings)
+			if(w.get(Tags.Title,"").contains("Help")) {
 				w.set(Tags.Enabled,false);
-			if(w.get(Tags.Title,"").toString().contains("LOGOUT"))
+			}
+			if(w.get(Tags.Title,"").contains("LOGOUT")) {
 				w.set(Tags.Enabled,false);
-			if(w.get(Tags.Title,"").toString().contains("Logout"))
+			}
+			if(w.get(Tags.Title,"").contains("Logout")) {
 				w.set(Tags.Enabled,false);
-			if(w.get(Tags.Title,"").toString().contains("No es seguro"))
+			}
+			if(w.get(Tags.Title,"").contains("No es seguro")) {
 				w.set(Tags.Enabled,false);
-			if(w.get(Tags.Title,"").toString().contains("Export to Pdf"))
+			}
+			if(w.get(Tags.Title,"").contains("Export to Pdf")) {
 				w.set(Tags.Enabled,false);
-			if(w.get(Tags.Title,"").toString().contains("POSIDONIA"))
+			}
+			if(w.get(Tags.Title,"").contains("POSIDONIA")) {
 				w.set(Tags.Enabled,false);
+			}
 
 		}
 
@@ -205,25 +214,6 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
 		for(Widget w : (settings.get(ConfigTags.TopWidgetsState, false) ? getTopWidgets(state) : state)){
-
-			//Check current browser tab, to close possible undesired tabs
-			if(settings.get(ConfigTags.Mode, Modes.Spy).equals(Modes.Generate) && 
-					w.get(Tags.Title,"").contains("Address and search")) {
-				
-				if(!w.get(Tags.ValuePattern,"").contains("prodevelop")
-						|| !w.get(UIATags.UIAValueValue,"").contains("prodevelop")
-						|| w.get(Tags.ValuePattern,"").contains("exportarPdf")
-						|| w.get(UIATags.UIAValueValue,"").contains("exportarPdf")) {
-
-					Keyboard kb = AWTKeyboard.build();
-					CompoundAction cAction = new CompoundAction(new KeyDown(KBKeys.VK_CONTROL),new KeyDown(KBKeys.VK_W));
-
-					executeAction(system, state, cAction);
-
-					kb.release(KBKeys.VK_CONTROL);
-					kb.release(KBKeys.VK_W);
-				}
-			}
 
 			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
 				// filtering out actions on menu-containers (that would add an action in the middle of the menu)
@@ -295,6 +285,46 @@ public class Protocol_web_generic extends DesktopProtocol {
 			return true;
 		else
 			return false;		
+	}
+
+	@Override
+	protected Action selectAction(State state, Set<Action> actions){
+
+		for(Widget w : state){
+			//Check current browser tab, to close possible undesired tabs
+			if(settings.get(ConfigTags.Mode, Modes.Spy).equals(Modes.Generate) && 
+					w.get(Tags.Title,"").contains("Address and search")) {
+
+				if(!w.get(Tags.ValuePattern,"").contains("prodevelop")
+						|| !w.get(UIATags.UIAValueValue,"").contains("prodevelop")
+						|| w.get(Tags.ValuePattern,"").contains("exportarPdf")
+						|| w.get(UIATags.UIAValueValue,"").contains("exportarPdf")) {
+
+					Action closeTab = new CompoundAction.Builder()  
+							.add(new KeyDown(KBKeys.VK_CONTROL), 0.5)
+							.add(new KeyDown(KBKeys.VK_W), 0.5)
+							.add(new KeyUp(KBKeys.VK_CONTROL), 0.5)
+							.add(new KeyUp(KBKeys.VK_W),0.5).build();
+					closeTab.set(Tags.Desc, "Close Non Desired Tab: Control + W");
+					CodingManager.buildEnvironmentActionIDs(state, closeTab);
+					return closeTab;
+				}
+			}
+		}
+
+		return super.selectAction(state, actions);
+	}
+
+	@Override
+	protected boolean executeAction(SUT system, State state, Action action){
+
+		boolean executed = super.executeAction(system, state, action);
+
+		Keyboard kb = AWTKeyboard.build();
+		kb.release(KBKeys.VK_CONTROL);
+		kb.release(KBKeys.VK_W);
+
+		return executed;
 	}
 
 }

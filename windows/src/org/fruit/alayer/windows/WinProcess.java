@@ -70,13 +70,17 @@ public final class WinProcess extends SUTBase {
 	}
 	
 	public static void toForeground(long pid) throws WinApiException{
-		for(long p : startSUTProcesses)
-			if(isForeground(p))
-				return;
 		toForeground(pid, 0.3, 100);
 	}
 
 	public static void toForeground(long pid, double foregroundEstablishTime, int maxTries) throws WinApiException{
+		
+		for(Long p : startSUTProcesses) {
+			if(isForeground(p)) {
+				return;
+			}
+		}
+		
 		Keyboard kb = AWTKeyboard.build();
 
 		int cnt = 0;

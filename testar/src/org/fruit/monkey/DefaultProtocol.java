@@ -1717,6 +1717,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
+		
+		protocolUtil.getActionshot(state,action);
+		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
@@ -1731,8 +1734,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
-
-			protocolUtil.getActionshot(state,action);
 
 			//Save the executed action information into the logs
 			saveActionInfoInLogs(state, action, "ExecutedAction");
