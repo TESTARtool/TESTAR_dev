@@ -227,6 +227,10 @@ public class HtmlSequenceReport {
         write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
+    
+    public void addInformation(String information){
+        write("<p>" + information + "</p>");
+    }
 
     
     public void close() {

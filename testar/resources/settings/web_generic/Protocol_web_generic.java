@@ -49,6 +49,7 @@ import org.fruit.alayer.windows.WinProcess;
 
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.RandomActionSelector;
 
 import org.fruit.monkey.ConfigTags;
@@ -318,6 +319,14 @@ public class Protocol_web_generic extends DesktopProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 
+		for(Widget w: state) {
+			if(w.get(Tags.Title,"").contains("Address and search")) {
+				LogSerialiser.log(String.format("URL: %s \n", w.get(UIATags.UIAValueValue, "No URL detected")));
+				htmlReport.addInformation(String.format("URL: %s", w.get(UIATags.UIAValueValue, "No URL detected")));
+			}
+		}
+		
+		
 		boolean executed = super.executeAction(system, state, action);
 
 		Keyboard kb = AWTKeyboard.build();
