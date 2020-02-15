@@ -118,6 +118,9 @@ public final class ConfigTags {
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
   public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
+  public static final Tag<Boolean> UsePreviousStateInId = Tag.from("UsePreviousStateInId", Boolean.class);
+  public static final Tag<Boolean> UseAllStatesInId = Tag.from("UseAllStatesInId", Boolean.class);
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   public static final Tag<Boolean> ExitOnNonDeterminism = Tag.from("ExitOnNonDeterminism", Boolean.class);
