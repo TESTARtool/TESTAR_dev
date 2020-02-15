@@ -53,13 +53,20 @@ public class ModelManager implements StateModelManager {
     // should the widgets of concrete states be stored in the model?
     private boolean storeWidgets;
 
+    private AbstractStateIdExtractor abstractStateIdExtractor;
+
     /**
      * Constructor
      * @param abstractStateModel
      * @param actionSelector
      */
-    public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
-                        Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
+    public ModelManager(AbstractStateModel abstractStateModel,
+                        ActionSelector actionSelector,
+                        PersistenceManager persistenceManager,
+                        Set<Tag<?>> concreteStateTags,
+                        SequenceManager sequenceManager,
+                        boolean storeWidgets,
+                        AbstractStateIdExtractor abstractStateIdExtractor) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
@@ -68,6 +75,7 @@ public class ModelManager implements StateModelManager {
         errorMessages = new StringJoiner(", ");
         nrOfNonDeterministicActions = 0;
         this.storeWidgets = storeWidgets;
+        this.abstractStateIdExtractor = abstractStateIdExtractor;
         init();
     }
 
@@ -92,7 +100,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         // check if we are dealing with a new state or an existing one
-        String abstractStateId = newState.get(Tags.AbstractIDCustom);
+        String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState);
         AbstractState newAbstractState;
 
         // fetch or create an abstract state
@@ -107,7 +115,7 @@ public class ModelManager implements StateModelManager {
                 throw new RuntimeException("An error occurred while retrieving abstract state from the state model");
             }
         } else {
-            newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
+            newAbstractState = AbstractStateFactory.createAbstractState(abstractStateId, actions);
         }
 
         // add the concrete state id to the abstract state

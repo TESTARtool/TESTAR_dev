@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel;
 
 import es.upv.staq.testar.CodingManager;
+import nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -66,7 +67,19 @@ public class StateModelManagerFactory {
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+        // provide the state model manager with an abstract state id extractor
+        ExtractionMode extractionMode;
+        if (settings.get(ConfigTags.UsePreviousStateInId)) {
+            extractionMode = ExtractionMode.PREVIOUS_STATE;
+        }
+        else if (settings.get(ConfigTags.UseAllStatesInId)) {
+            extractionMode = ExtractionMode.ALL_STATES;
+        }
+        else {
+            extractionMode = ExtractionMode.SINGLE_STATE;
+        }
+
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, new AbstractStateIdExtractor(extractionMode));
     }
 
 }
