@@ -5,6 +5,7 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import es.upv.staq.testar.StateManagementTags;
+import nl.ou.testar.StateModel.Widget;
 
 import java.io.*;
 import java.sql.*;
@@ -21,6 +22,7 @@ public class SqlManager {
     public static final String IMPORT_SUB_DIR = "results_import";
     public static final String AUTOMATED_TEST_RUN_CSV = "automated_test_run.csv";
     public static final String TEST_RUN_WIDGET_CSV = "test_run_widget.csv";
+    public static final String WIDGET_CSV = "widget.csv";
     private final String database = "testar";
     private final String user = "testar";
     private final String password = "testar";
@@ -664,6 +666,17 @@ public class SqlManager {
                 }
             }
 
+            // finally, the widget table
+            String wQuery = "SELECT * FROM widget";
+            Statement statement3 = connection.createStatement();
+            ResultSet resultset3 = statement3.executeQuery(wQuery);
+            File wFile = new File(exportDir, WIDGET_CSV);
+            try (FileWriter fileWriter = new FileWriter(wFile.getAbsoluteFile())) {
+                try (CSVWriter csvWriter = new CSVWriter(fileWriter, ';', CSVWriter.DEFAULT_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END)) {
+                    csvWriter.writeAll(resultset3, true, false, quoteExportData);
+                }
+            }
+
         } catch (SQLException | IOException e) {
             e.printStackTrace();
             System.out.println("Could not retrieve data. Exiting TESTAR");
@@ -708,12 +721,13 @@ public class SqlManager {
             exit(1);
         }
 
-        // the import folder should contain sub folders that contain two files, one for the runs and one for the widgets attached to the runs
+        // the import folder should contain sub folders that contain three files, one for the runs and one for the widgets attached to the runs and one for the widget file so we can map to the local widgets
         Arrays.stream(Objects.requireNonNull(importDir.listFiles(File::isDirectory))).forEach(resultDir -> {
             System.out.println("Processing directory: " + resultDir.getAbsolutePath());
             File atrFile = new File(resultDir, AUTOMATED_TEST_RUN_CSV);
             File trwFile = new File(resultDir, TEST_RUN_WIDGET_CSV);
-            if (!atrFile.exists() || !trwFile.exists()) {
+            File wFile = new File(resultDir, WIDGET_CSV);
+            if (!atrFile.exists() || !trwFile.exists() || !wFile.exists()) {
                 System.out.println("Missing import files. Exiting TESTAR");
                 exit(1);
             }
@@ -721,7 +735,8 @@ public class SqlManager {
             // now, clear the import tables
             String query5 = "TRUNCATE TABLE automated_test_run_import";
             String query6 = "TRUNCATE TABLE test_run_widget_import";
-            Stream.of(query5, query6).forEach(query -> {
+            String query7 = "TRUNCATE TABLE widget_import";
+            Stream.of(query5, query6, query7).forEach(query -> {
                 try {
                     Statement statement = connection.createStatement();
                     statement.executeUpdate(query);
@@ -733,11 +748,47 @@ public class SqlManager {
             });
 
             try {
-                FileReader fileReader = new FileReader(atrFile);
+                // import the widgets
+                FileReader fileReader = new FileReader(wFile);
+                HeaderColumnNameMappingStrategy<WidgetPojo> widgetMappingStrategy = new HeaderColumnNameMappingStrategy<>();
+                widgetMappingStrategy.setType(WidgetPojo.class);
+
+                CsvToBean<WidgetPojo> widgetCsvToBean = new CsvToBeanBuilder<WidgetPojo>(fileReader)
+                        .withSeparator(';')
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withType(WidgetPojo.class)
+                        .withMappingStrategy(widgetMappingStrategy)
+                        .build();
+                List<WidgetPojo> importedWidgets = widgetCsvToBean.parse();
+                System.out.println("Parsed " + importedWidgets.size() + " nr of widgets");
+                String widgetImportQuery = "INSERT INTO widget_import(widget_id, widget_config_name, widget_description, use_in_abstraction, widget_group) VALUES(?, ?, ? , ? , ?)";
+                try {
+                    PreparedStatement widgetImportStatement = connection.prepareStatement(widgetImportQuery);
+                    importedWidgets.forEach(widgetImport -> {
+                        try {
+                            widgetImportStatement.setInt(1, widgetImport.getWidgetId());
+                            widgetImportStatement.setString(2, widgetImport.getWidgetConfigName());
+                            widgetImportStatement.setString(3, widgetImport.getWidgetDescription());
+                            widgetImportStatement.setInt(4, booleanStringToIntHelper(widgetImport.getUseInAbstraction()));
+                            widgetImportStatement.setString(5, widgetImport.getWidgetGroup());
+                            widgetImportStatement.execute();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.out.println("An error occurred during widget db insertion. Exiting TESTAR");
+                            exit(1);
+                        }
+                    });
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("An error occurred during widget db insertion. Exiting TESTAR");
+                    exit(1);
+                }
+
+                // next we import the testruns
+                fileReader = new FileReader(atrFile);
                 HeaderColumnNameMappingStrategy<AutomatedTestRunPojo> mappingStrategy = new HeaderColumnNameMappingStrategy<>();
                 mappingStrategy.setType(AutomatedTestRunPojo.class);
 
-                // first we import the testruns
                 CsvToBean<AutomatedTestRunPojo> csvToBean = new CsvToBeanBuilder<AutomatedTestRunPojo>(fileReader)
                         .withSeparator(';')
                         .withIgnoreLeadingWhiteSpace(true)
@@ -819,6 +870,9 @@ public class SqlManager {
                     exit(1);
                 }
 
+                // the widget id's need to be converted to the local widget ids
+                mapWidgetIds(connection);
+                // next merge the import into the test results
                 mergeImport(connection);
 
 
@@ -837,6 +891,72 @@ public class SqlManager {
         calculateTestResults(connection, clearOldResults);
 
         System.out.println("Succesfully imported test results");
+    }
+
+    private void mapWidgetIds(Connection connection) {
+// we need a config mapping that maps our local widget config names to their id, so we can use it as lookup for the imported widgets
+        String configMappingQuery = "SELECT widget_id, widget_config_name FROM widget";
+        Map<String, Integer> widgetConfigMapping = new HashMap<>();
+        try {
+            Statement configMappingStatement = connection.createStatement();
+            ResultSet configResultSet = configMappingStatement.executeQuery(configMappingQuery);
+            while(configResultSet.next()) {
+                String configName = configResultSet.getString(2);
+                int widgetId = configResultSet.getInt(1);
+                if (configName.isEmpty()) {
+                    System.out.println("Invalid config name found for widget. Exiting TESTAR");
+                    exit(1);
+                }
+                widgetConfigMapping.put(configName, widgetId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Unable to collect widget info. Exiting TESTAR");
+            exit(1);
+        }
+
+        if (widgetConfigMapping.isEmpty()) {
+            System.out.println("Did not import the widget config mapping correctly. Exiting TESTAR");
+            exit(1);
+        }
+
+        String trwQuery = "SELECT * FROM test_run_widget_import";
+        String trwUpdateQuery = "UPDATE test_run_widget_import SET widget_id = ? WHERE combi_id = ?";
+        String widgetSelectQuery = "SELECT * FROM widget_import WHERE widget_id = ?";
+        try {
+            PreparedStatement updateStatement = connection.prepareStatement(trwUpdateQuery);
+            PreparedStatement widgetSelectStatement = connection.prepareStatement(widgetSelectQuery);
+            Statement trwStatement = connection.createStatement();
+            ResultSet trwResultSet = trwStatement.executeQuery(trwQuery);
+
+            // fetch all the widgets that are attached to test runs and loop through them
+            while (trwResultSet.next()) {
+                // fetch the widget and combi id for the row
+
+                int widgetId = trwResultSet.getInt("widget_id");
+                int combiId = trwResultSet.getInt("combi_id");
+
+                // look up the widget config name from the import
+                widgetSelectStatement.setInt(1, widgetId);
+                ResultSet widgetResultSet = widgetSelectStatement.executeQuery();
+                widgetResultSet.next();
+                String widgetConfigName = widgetResultSet.getString("widget_config_name");
+
+                // look up the local widget id for the config name
+                if (!widgetConfigMapping.containsKey(widgetConfigName)) {
+                    System.out.println("Missing config name during widget config mapping. Exiting TESTAR");
+                    exit(1);
+                }
+                int newWidgetId = widgetConfigMapping.get(widgetConfigName);
+
+                // now set the new value
+                updateStatement.setInt(1, newWidgetId);
+                updateStatement.setInt(2, combiId);
+                updateStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("An error occurred while mapping the widget ids. Exiting TESTAR.");
+            exit(1);
+        }
     }
 
     private void mergeImport(Connection connection) {
