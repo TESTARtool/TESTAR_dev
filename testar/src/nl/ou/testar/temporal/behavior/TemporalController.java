@@ -11,7 +11,14 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.temporal.structure.*;
+import nl.ou.testar.temporal.foundation.ValStatus;
+import nl.ou.testar.temporal.ioutils.CSVHandler;
+import nl.ou.testar.temporal.ioutils.JSONHandler;
+import nl.ou.testar.temporal.model.*;
+import nl.ou.testar.temporal.modelcheck.*;
+import nl.ou.testar.temporal.oracle.*;
+import nl.ou.testar.temporal.selector.APSelectorManager;
+import nl.ou.testar.temporal.foundation.TagBean;
 import nl.ou.testar.temporal.util.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -22,7 +29,6 @@ import org.fruit.monkey.Settings;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -181,7 +187,7 @@ public class TemporalController {
         outputDir = outputDir + settings.get(ConfigTags.TemporalDirectory);
 
         if (settings.get(ConfigTags.TemporalSubDirectories)) {
-            String runFolder = Helper.CurrentDateToFolder();
+            String runFolder = Common.CurrentDateToFolder();
             outputDir = outputDir + File.separator + runFolder;
         }
         new File(outputDir).mkdirs();
@@ -406,16 +412,16 @@ public class TemporalController {
         JSONHandler.save(tModel, outputDir + toFile);
     }
 
-    public boolean saveModelForChecker(TemporalType tmptype, String file) {
+    public boolean saveModelForChecker(TemporalFormalism tmptype, String file) {
         boolean b = false;
         String contents = "";
 
 
-        if (tmptype.equals(TemporalType.LTL) || tmptype.equals(TemporalType.LTL_SPOT)) {
+        if (tmptype.equals(TemporalFormalism.LTL) || tmptype.equals(TemporalFormalism.LTL_SPOT)) {
             contents = tModel.makeHOAOutput();
             b = true;
         }
-        if (tmptype.equals(TemporalType.CTL) || tmptype.equals(TemporalType.LTL_ITS) || tmptype.equals(TemporalType.LTL_LTSMIN)) {
+        if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.LTL_ITS) || tmptype.equals(TemporalFormalism.LTL_LTSMIN)) {
 
 //            **under construction ITS-GAL
 //            String contents1 = "";
@@ -519,7 +525,7 @@ public class TemporalController {
                 File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
 
-                Map<TemporalType, List<TemporalOracle>> oracleTypedMap =
+                Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =
                         fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 makeTemporalModel(APSelectorFile, verbose, instrumentDeadState);
@@ -532,7 +538,7 @@ public class TemporalController {
                 List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
 
-                for (Map.Entry<TemporalType, List<TemporalOracle>> oracleentry : oracleTypedMap.entrySet()
+                for (Map.Entry<TemporalFormalism, List<TemporalOracle>> oracleentry : oracleTypedMap.entrySet()
                 ) {
                     List<TemporalOracle> modelCheckedOracles = null;
                     File automatonFile = null;
@@ -546,12 +552,12 @@ public class TemporalController {
 
                     initialoraclelist.addAll(oracleList);
                     System.out.println(LocalTime.now() + " | " + oracleType + " invoking the " + "backend model-checker");
-                    if (ltlSpotEnabled && (TemporalType.valueOf(oracleType) == TemporalType.LTL || TemporalType.valueOf(oracleType) == TemporalType.LTL_SPOT)) {
+                    if (ltlSpotEnabled && (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL || TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_SPOT)) {
                         automatonFile = new File(outputDir + "Model.hoa");
-                        saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
+                        saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
                         String aliveprop = gettModel().getPropositionIndex("!" + TemporalModel.getDeadProposition()); //instrumentDeadState will determine whether this return value is ""
                         saveFormulaFiles(oracleList, formulaFile);
-                        Helper.LTLMC_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, counterExamples, automatonFile.getAbsolutePath(),
+                        Checker.LTLMC_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, counterExamples, automatonFile.getAbsolutePath(),
                                 formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
                         ResultsParser sParse = new SPOT_LTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
@@ -561,10 +567,10 @@ public class TemporalController {
                         if (modelCheckedOracles == null) {
                             System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
-                    } else if ((ltlItsEnabled && TemporalType.valueOf(oracleType) == TemporalType.LTL_ITS) ||
-                            (ltlltsminEnabled && TemporalType.valueOf(oracleType) == TemporalType.LTL_LTSMIN)) {
+                    } else if ((ltlItsEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_ITS) ||
+                            (ltlltsminEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_LTSMIN)) {
                         automatonFile = new File(outputDir + "Model.etf");
-                        saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
+                        saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
 
                         //formula ltl model variant converter
                         // instrumentDeadState will determine whether this return value is ""
@@ -572,7 +578,7 @@ public class TemporalController {
                         if (!aliveprop.equals("")) {
                             saveFormulaFiles(oracleList, formulaFile, false);
 
-                            Helper.LTLVerifyFormula_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, formulaFile.getAbsolutePath(), syntaxformulaFile.getAbsolutePath());
+                            Checker.LTLVerifyFormula_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, formulaFile.getAbsolutePath(), syntaxformulaFile.getAbsolutePath());
                             List<String> tmpformulas = SPOT_LTLFormula_ResultsParser.parse(syntaxformulaFile, true);
                             List<TemporalOracle> tmporacleList = new ArrayList<>();
                             int j = 0;
@@ -590,12 +596,12 @@ public class TemporalController {
                             saveFormulaFiles(oracleList, formulaFile, true);
                         }
                         ResultsParser sParse = null;
-                        if (ltlItsEnabled && TemporalType.valueOf(oracleType) == TemporalType.LTL_ITS) {
-                            Helper.LTLMC_ByITS(ltlItsMCCommand, ltlItsWSLPath, counterExamples, automatonFile.getAbsolutePath(),
+                        if (ltlItsEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_ITS) {
+                            Checker.LTLMC_ByITS(ltlItsMCCommand, ltlItsWSLPath, counterExamples, automatonFile.getAbsolutePath(),
                                     formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
                             sParse = new ITS_LTL_ResultsParser();//decode results
                         } else {
-                            Helper.LTLMC_ByLTSMIN(ltlLtsminMCCommand, ltlLtsminWSLPath, counterExamples,
+                            Checker.LTLMC_ByLTSMIN(ltlLtsminMCCommand, ltlLtsminWSLPath, counterExamples,
                                     automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
                             sParse = new LTSMIN_LTL_ResultsParser();//decode results
 
@@ -608,14 +614,14 @@ public class TemporalController {
                         if (modelCheckedOracles == null) {
                             System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
-                    } else if (ctlItsEnabled &&  (TemporalType.valueOf(oracleType) == TemporalType.CTL ||
-                                                TemporalType.valueOf(oracleType) == TemporalType.CTL_ITS)) {
+                    } else if (ctlItsEnabled &&  (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL ||
+                                                TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL_ITS)) {
                         automatonFile = new File(outputDir + "Model.etf");
-                        saveModelForChecker(TemporalType.valueOf(oracleType), automatonFile.getAbsolutePath());
+                        saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
                         //ITS-CTL checker: not using witness because this is  difficult to understand and to parse and show.
                         //LTSMIN-CTL bug: gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
                         saveFormulaFiles(oracleList, formulaFile);
-                        Helper.CTLMC_ByITS(ctlItsMCCommand, ctlItsWSLPath, counterExamples, automatonFile.getAbsolutePath(),
+                        Checker.CTLMC_ByITS(ctlItsMCCommand, ctlItsWSLPath, counterExamples, automatonFile.getAbsolutePath(),
                                 formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
                         ResultsParser sParse = new ITS_CTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());

@@ -3,7 +3,11 @@ package nl.ou.testar.temporal.ui;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import nl.ou.testar.temporal.behavior.TemporalController;
-import nl.ou.testar.temporal.structure.*;
+import nl.ou.testar.temporal.ioutils.CSVHandler;
+import nl.ou.testar.temporal.ioutils.StreamConsumer;
+import nl.ou.testar.temporal.oracle.TemporalOracle;
+import nl.ou.testar.temporal.oracle.TemporalPattern;
+import nl.ou.testar.temporal.oracle.TemporalPatternConstraint;
 import nl.ou.testar.temporal.util.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -567,7 +571,7 @@ public class Temporalpanel2 {
 
     private void stopTemporalWebAnalyzer(ActionEvent evt) {
         try {
-            Helper.HTTPGet(VisualizerURLStop);
+            Common.HTTPGet(VisualizerURLStop);
 
             boolean ret = false;
             // in case the python is invoked via a OS batch command , the above stopcommand may leave the command running.

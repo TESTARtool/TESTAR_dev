@@ -1,12 +1,9 @@
 package nl.ou.testar.temporal.behavior;
 
 import com.orientechnologies.common.log.OLogManager;
-import com.orientechnologies.orient.core.config.OContextConfiguration;
-import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.db.OrientDBConfigBuilder;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
@@ -18,8 +15,13 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.temporal.structure.*;
-import nl.ou.testar.temporal.util.*;
+import nl.ou.testar.temporal.graphml.*;
+import nl.ou.testar.temporal.ioutils.XMLHandler;
+import nl.ou.testar.temporal.model.TemporalTrace;
+import nl.ou.testar.temporal.model.TemporalTraceEvent;
+import nl.ou.testar.temporal.model.TransitionEncoding;
+import nl.ou.testar.temporal.selector.WidgetFilter;
+import nl.ou.testar.temporal.selector.APSelectorManager;
 import org.fruit.alayer.Tags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
