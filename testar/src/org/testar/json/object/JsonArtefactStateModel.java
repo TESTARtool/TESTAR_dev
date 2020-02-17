@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ package org.testar.json.object;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.fruit.monkey.SettingsDialog;
 import org.testar.OutputStructure;
@@ -85,7 +85,7 @@ public class JsonArtefactStateModel {
 	public static void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
-			boolean storeWidgets, long widgets, long testSequences, Set<StateModelTestSequenceJsonObject> testSequenceObject) {
+			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
 		
 		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
 				NativeLinker.getOsName());

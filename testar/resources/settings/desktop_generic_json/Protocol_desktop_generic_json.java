@@ -30,8 +30,9 @@
 
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -49,10 +50,10 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic_json extends DesktopProtocol {
 
-	Set<String> sequencesOutputDir = new HashSet<>();
-	Set<String> htmlOutputDir = new HashSet<>();
-	Set<String> logsOutputDir = new HashSet<>();
-	Set<String> sequencesVerdicts = new HashSet<>();
+	SortedSet<String> sequencesOutputDir = new TreeSet<>();
+	SortedSet<String> htmlOutputDir = new TreeSet<>();
+	SortedSet<String> logsOutputDir = new TreeSet<>();
+	SortedSet<String> sequencesVerdicts = new TreeSet<>();
 	
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.

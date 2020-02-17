@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,8 @@
 
 package org.testar.json.object;
 
-import java.util.Set;
+
+import java.util.SortedSet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
@@ -53,7 +54,7 @@ public class StateModelJsonObject {
 	boolean storeWidgets;
 	long numberWidgets;
 	long numberTestSequences;
-	Set<StateModelTestSequenceJsonObject> testSequences;
+	SortedSet<StateModelTestSequenceJsonObject> testSequences;
 
 	@JsonCreator
 	public StateModelJsonObject(String timestamp, String url, SutJsonObject sut, ToolJsonObject tool,
@@ -80,7 +81,7 @@ public class StateModelJsonObject {
 		this.numberTestSequences = numberTestSequences;
 	}
 	
-	public void setTestSequences(Set<StateModelTestSequenceJsonObject> testSequences) {
+	public void setTestSequences(SortedSet<StateModelTestSequenceJsonObject> testSequences) {
 		this.testSequences = testSequences;
 	}
 	

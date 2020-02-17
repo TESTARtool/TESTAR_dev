@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,16 +30,16 @@
 
 package org.testar.json.object;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 public class TestResultsJsonObject {
 	
 	String timestamp;
 	String url;
-	Set<String> sequencesResult;
-	Set<String> htmlsResult;
-	Set<String> logsResult;
-	Set<String> sequencesVerdicts;
+	SortedSet<String> sequencesResult;
+	SortedSet<String> htmlsResult;
+	SortedSet<String> logsResult;
+	SortedSet<String> sequencesVerdicts;
 	SutJsonObject sut;
 	ToolJsonObject tool;
 	SettingsJsonObject settings;
@@ -52,19 +52,19 @@ public class TestResultsJsonObject {
 		this.settings = settings;
 	}
 	
-	public void setSequencesResult(Set<String> sequencesResult) {
+	public void setSequencesResult(SortedSet<String> sequencesResult) {
 		this.sequencesResult = sequencesResult;
 	}
 
-	public void setHtmlsResult(Set<String> htmlsResult) {
+	public void setHtmlsResult(SortedSet<String> htmlsResult) {
 		this.htmlsResult = htmlsResult;
 	}
 
-	public void setLogsResult(Set<String> logsResult) {
+	public void setLogsResult(SortedSet<String> logsResult) {
 		this.logsResult = logsResult;
 	}
 	
-	public void setSequencesVerdicts(Set<String> sequencesVerdicts) {
+	public void setSequencesVerdicts(SortedSet<String> sequencesVerdicts) {
 		this.sequencesVerdicts = sequencesVerdicts;
 	}
 	

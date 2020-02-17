@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,24 +32,29 @@ package nl.ou.testar.StateModel;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.json.object.JsonArtefactStateModel;
 import org.testar.json.object.StateModelTestSequenceJsonObject;
+import org.testar.json.object.StateModelTestSequenceStepJsonObject;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ODirection;
+import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
+import nl.ou.testar.StateModel.Analysis.Representation.ActionViz;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 public class ModelArtifactManager {
@@ -62,19 +67,20 @@ public class ModelArtifactManager {
 	// orient db configuration object
 	private static Config dbConfig;
 
-	public static String connectionStuff(String storeType, String storeServer, String root, String passField,
-			String database) {
+	public static void connectionStuff(String storeType, String storeServer, String root, String passField,
+			String database, String databaseDirectory) {
 		dbConfig = new Config();
 		dbConfig.setConnectionType(storeType);
 		dbConfig.setServer(storeServer);
 		dbConfig.setUser(root);
 		dbConfig.setPassword(passField);
 		dbConfig.setDatabase(database);
+		dbConfig.setDatabaseDirectory(databaseDirectory);
+		
+        String connectionString = dbConfig.getConnectionType() + ":" + (dbConfig.getConnectionType().equals("remote") ?
+                dbConfig.getServer() : dbConfig.getDatabaseDirectory()) + "/";
 
-		orientDB = new OrientDB(dbConfig.getConnectionType() + ":" + dbConfig.getServer(), 
-				dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
-
-		return dbConfig.getConnectionType() + ":" + dbConfig.getServer() + "/database/" + dbConfig.getDatabase();
+		orientDB = new OrientDB(connectionString, dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 	}
 
 	public static void closeOrientDB() {
@@ -89,6 +95,7 @@ public class ModelArtifactManager {
 		String root = settings.get(ConfigTags.DataStoreUser);
 		String passField = settings.get(ConfigTags.DataStorePassword);
 		String database = settings.get(ConfigTags.DataStoreDB);
+		String databaseDirectory = settings.get(ConfigTags.DataStoreDirectory);
 		String appName = settings.get(ConfigTags.ApplicationName);
 		String appVersion = settings.get(ConfigTags.ApplicationVersion);
 		boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
@@ -99,9 +106,9 @@ public class ModelArtifactManager {
 			return;
 		}
 
-		String dbConnection = connectionStuff(storeType, storeServer, root, passField, database);
+		connectionStuff(storeType, storeServer, root, passField, database, databaseDirectory);
 
-		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, dbConfig.getUser(), dbConfig.getPassword())){
+		try (ODatabaseSession sessionDB = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())){
 
 			// Search and get the State Model identifier to start the queries
 			String stateModelId = getAbstractStateModelIdentifier(sessionDB, appName, appVersion);
@@ -121,7 +128,7 @@ public class ModelArtifactManager {
 			long numberOfWidgets = getStateModelNumberOfWidgets(sessionDB, stateModelId);
 			
 			long numberOfTestSequences = getStateModelNumberOfTestSequences(sessionDB, stateModelId);
-			Set<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
+			SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
             System.out.println("Creating JSON State Model artefact...");
         	JsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
@@ -325,8 +332,8 @@ public class ModelArtifactManager {
 		return numberTestSequences;
 	}
 	
-	private static Set<StateModelTestSequenceJsonObject> getStateModelTestSequencesObject(ODatabaseSession sessionDB, String stateModelIdentifier) {
-		Set<StateModelTestSequenceJsonObject> testSequences = new HashSet<>();
+	private static SortedSet<StateModelTestSequenceJsonObject> getStateModelTestSequencesObject(ODatabaseSession sessionDB, String stateModelIdentifier) {
+		SortedSet<StateModelTestSequenceJsonObject> testSequences = new TreeSet<>();
 		String sequenceId;
 		int numberSequenceNodes;
 		String startDateTime;
@@ -364,8 +371,11 @@ public class ModelArtifactManager {
                 
                 numberSequenceNodes = nrOfNodes;
                 sequenceId = (String) getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId"));
-                startDateTime = ((Date)getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"))).toString();
 
+                if(getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime")) != null) {
+                	startDateTime = ((Date) getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"))).toString();
+                } else {startDateTime = "unknown";}
+                
                 // not the best piece of code, but it works for now
                 verdict = (String) getConvertedValue(OType.ANY.STRING, sequenceVertex.getProperty("verdict"));
 
@@ -403,13 +413,85 @@ public class ModelArtifactManager {
                 
                 sequenceDeterministic = sequenceIsDeterministic;
 
+                // Map all existing Actions of this Sequence
+                SortedSet<StateModelTestSequenceStepJsonObject> sequenceActionSteps =
+                		getStateModelTestSequenceActionStepsObject (sessionDB, sequenceId);
+                
                 testSequences.add(new StateModelTestSequenceJsonObject(sequenceId, numberSequenceNodes, startDateTime,
-                		verdict, foundErrors, numberErrors, sequenceDeterministic));
+                		verdict, foundErrors, numberErrors, sequenceDeterministic, sequenceActionSteps));
             }
         }
         resultSet.close();
         
 		return testSequences;
+	}
+	
+	private static SortedSet<StateModelTestSequenceStepJsonObject> getStateModelTestSequenceActionStepsObject(ODatabaseSession sessionDB, String sequenceId) {
+		SortedSet<StateModelTestSequenceStepJsonObject> actionSteps = new TreeSet<>();
+		String actionDescription;
+		String timestamp;
+		
+		String sequenceStmt = "SELECT FROM(TRAVERSE out(\"FirstNode\") FROM ( SELECT FROM TestSequence WHERE sequenceId = :sequenceId)) WHERE @class = \"SequenceNode\"";
+        Map<String, Object> params = new HashMap<>();
+        params.put("sequenceId", sequenceId);
+        OResultSet resultSet = sessionDB.query(sequenceStmt, params);
+
+        if (!resultSet.hasNext()) {
+            return actionSteps; // no sequence node found
+        }
+
+        OResult nodeResult = resultSet.next();
+        if (!nodeResult.isVertex()) return actionSteps;
+        Optional<OVertex> nodeVertexOptional = nodeResult.getVertex();
+        if (!nodeVertexOptional.isPresent()) {
+            return actionSteps;
+        }
+
+        OVertex nodeVertex = nodeVertexOptional.get();
+        int counterSource = 1;
+        int counterTarget = 2;
+
+        while(true) {
+        	
+            OEdge sequenceStepEdge = null;
+            for(OEdge edge : nodeVertex.getEdges(ODirection.OUT, "SequenceStep")) {
+                sequenceStepEdge = edge;
+                break; // there should at most be one edge
+            }
+
+            if (sequenceStepEdge == null) {
+                break; // nothing left to do
+            }
+
+            // next, get the vertex that is at the received end of the step edge
+            OVertex targetVertex = sequenceStepEdge.getTo();
+            // now, fetch the concrete states for both the vertices
+            OVertex sourceState = null;
+            OVertex targetState = null;
+            for(OEdge edge : nodeVertex.getEdges(ODirection.OUT, "Accessed")) {
+                sourceState = edge.getTo();
+                break; // there should at most be one edge
+            }
+            for(OEdge edge: targetVertex.getEdges(ODirection.OUT, "Accessed")) {
+                targetState = edge.getTo();
+                break; // there should at most be one edge
+            }
+
+            actionDescription = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("actionDescription"));
+           
+            if(getConvertedValue(OType.DATETIME, sequenceStepEdge.getProperty("timestamp")) != null) {
+            	timestamp = ((Date) getConvertedValue(OType.DATETIME, sequenceStepEdge.getProperty("timestamp"))).toString();
+            } else {timestamp = "unknown";}
+            
+            nodeVertex = targetVertex;
+            counterSource++;
+            counterTarget++;
+            
+            actionSteps.add(new StateModelTestSequenceStepJsonObject(actionDescription, timestamp));
+        }
+        resultSet.close();
+		
+		return actionSteps;
 	}
 
 	// this helper method formats the @RID property into something that can be used in a web frontend
