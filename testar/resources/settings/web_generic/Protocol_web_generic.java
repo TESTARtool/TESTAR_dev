@@ -98,10 +98,21 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state) {
-
+		super.beginSequence(system, state);
+		forceLoginMaxTries(system, 5);
+	}
+	
+	private void forceLoginMaxTries(SUT system, int maxTries) {
+		
+		State state = super.getState(system);
+		
+		int count = 0;
+		
+		while(count < maxTries && authenticationUnsuccessful (state)) {
+		
 		// Bring IExplorer to the foreground
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			WinProcess.toForeground(system.get(Tags.PID), 0.5, 100);
+			WinProcess.toForeground(system.get(Tags.PID), 0.5, 20);
 			state = super.getState(system);
 		}
 
@@ -115,7 +126,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 					Util.pause(2);
 
-					state = getState(system);
+					state = super.getState(system);
 				}
 			}
 		}
@@ -147,13 +158,21 @@ public class Protocol_web_generic extends DesktopProtocol {
 		.run(system, null, 0.1);
 
 		Util.pause(2);
-
-		//Don't save any previous executed actions by TESTAR ¿Bug?
-		userEvent = null;
-
-		state = getState(system);
-
+		
+		count = count + 1;
+		
+		}
 	}
+	
+	private boolean authenticationUnsuccessful(State state) {
+		for(Widget w : state) {
+			if(w.get(Tags.Title, "").contains("authentication is unsuccessful")){
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
@@ -167,6 +186,13 @@ public class Protocol_web_generic extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 
 		State state = super.getState(system);
+		
+		for(Widget w : state){
+			if(w.get(Tags.Title, "").contains("authentication is unsuccessful")) {
+				forceLoginMaxTries(system, 2);
+				state = super.getState(system);
+			}
+		}
 
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			WinProcess.toForeground(system.get(Tags.PID), 0.5, 5);
@@ -335,5 +361,4 @@ public class Protocol_web_generic extends DesktopProtocol {
 
 		return executed;
 	}
-
 }

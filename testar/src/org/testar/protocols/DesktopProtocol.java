@@ -63,6 +63,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
+        latestState = null;
     }
 
     /**
