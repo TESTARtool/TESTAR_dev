@@ -188,7 +188,8 @@ public class Protocol_web_generic extends DesktopProtocol {
 		State state = super.getState(system);
 		
 		for(Widget w : state){
-			if(w.get(Tags.Title, "").contains("authentication is unsuccessful")) {
+			if(settings.get(ConfigTags.Mode, Modes.Spy).equals(Modes.Generate)
+					&& w.get(Tags.Title, "").contains("authentication is unsuccessful")) {
 				forceLoginMaxTries(system, 2);
 				state = super.getState(system);
 			}
