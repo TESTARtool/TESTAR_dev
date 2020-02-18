@@ -36,7 +36,7 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
     protected boolean widgetWithAutomationIdFound(String automationId, State state){
         for(Widget widget:state){
             if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
-                System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
+                //System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
                 return true;
             }
         }

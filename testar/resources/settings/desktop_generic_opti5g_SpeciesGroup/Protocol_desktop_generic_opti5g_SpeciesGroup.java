@@ -221,7 +221,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends PonsseDesktopP
 		//checking if the state is in "SpeciesGroupsWindow"
 		boolean isSpeciesGroupsWindow = false;
 		if(widgetWithAutomationIdFound("SpeciesGroupsWindow",state)&&!(widgetWithAutomationIdFound("popUpDialog",state))){
-			System.out.println("GUI is in SpeciesGroupsWindow - filtering back button");
+			//System.out.println("GUI is in SpeciesGroupsWindow - filtering back button");
 			isSpeciesGroupsWindow=true;
 		}
 
