@@ -1,61 +1,56 @@
 /**
-
  * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
-
+ * <p>
  * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
-
- *
-
+ * <p>
+ * <p>
+ * <p>
  * Redistribution and use in source and binary forms, with or without
-
+ * <p>
  * modification, are permitted provided that the following conditions are met:
-
- *
-
+ * <p>
+ * <p>
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
-
+ * <p>
  * this list of conditions and the following disclaimer.
-
+ * <p>
  * 2. Redistributions in binary form must reproduce the above copyright
-
+ * <p>
  * notice, this list of conditions and the following disclaimer in the
-
+ * <p>
  * documentation and/or other materials provided with the distribution.
-
+ * <p>
  * 3. Neither the name of the copyright holder nor the names of its
-
+ * <p>
  * contributors may be used to endorse or promote products derived from
-
+ * <p>
  * this software without specific prior written permission.
-
- *
-
+ * <p>
+ * <p>
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-
+ * <p>
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-
+ * <p>
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-
+ * <p>
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-
+ * <p>
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-
+ * <p>
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-
+ * <p>
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-
+ * <p>
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-
+ * <p>
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-
+ * <p>
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-
+ * <p>
  * POSSIBILITY OF SUCH DAMAGE.
-
- *
-
  */
-
 
 
 import es.upv.staq.testar.NativeLinker;
@@ -63,7 +58,6 @@ import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import nl.ou.testar.ActionSelectionUtils;
-
 
 
 import org.fruit.Pair;
@@ -95,7 +89,6 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 
-
 import java.sql.Connection;
 
 import java.sql.DriverManager;
@@ -109,7 +102,6 @@ import java.sql.Statement;
 import java.util.*;
 
 
-
 import static org.fruit.alayer.Tags.Blocked;
 
 import static org.fruit.alayer.Tags.Enabled;
@@ -119,267 +111,136 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-
-
-
 public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
     // Classes that are deemed clickable by the web framework
-
-    private static List<String> clickableClasses = Arrays.asList(
-
-            "owl-dot", "participation", "rdMaturity", "link");
+    private static List<String> clickableClasses = Arrays.asList("owl-dot", "participation", "rdMaturity", "link");
 
 
-
-    private static List<String> clickableLabels = Arrays.asList(
-
-            "rdParticipation", "rdInvestment", "rdMaturityDay", "rdMaturityMonth");
+    private static List<String> clickableLabels = Arrays.asList("rdParticipation", "rdInvestment", "rdMaturityDay", "rdMaturityMonth");
 
     // Disallow links and pages with these extensions
-
     // Set to null to ignore this feature
-
-    private static List<String> deniedExtensions = Arrays.asList(
-
-            "pdf", "jpg", "png", "vsf");
-
+    private static List<String> deniedExtensions = Arrays.asList("pdf", "jpg", "png", "vsf");
 
 
     // Define a whitelist of allowed domains for links and pages
-
     // An empty list will be filled with the domain from the sut connector
-
     // Set to null to ignore this feature
 
-    private static List<String> domainsAllowed = Arrays.asList(
-
-            "www.kuveytturk.com.tr", "isube.kuveytturk.com.tr", "internetbranchtest");
-
+    private static List<String> domainsAllowed = Arrays.asList("www.kuveytturk.com.tr", "isube.kuveytturk.com.tr", "internetbranchtest");
 
 
     // If true, follow links opened in new tabs
-
     // If false, stay with the original (ignore links opened in new tabs)
-
     private static boolean followLinks = false;
 
 
-
     // URL + form name, username input id + value, password input id + value
-
     // Set login to null to disable this feature
-
-    private static Pair<String, String> login = Pair.from(
-
-            "https://login.awo.ou.nl/SSO/login", "OUinloggen");
-
-    private static Pair<String, String> username = Pair.from("username", "");
-
-    private static Pair<String, String> password = Pair.from("password", "");
-
+    private static Pair<String, String> login = null; //Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+    private static Pair<String, String> username = null; //Pair.from("username", "");
+    private static Pair<String, String> password = null; //Pair.from("password", "");
 
 
     // List of atributes to identify and close policy popups
-
     // Set to null to disable this feature
-
-    private static Map<String, String> policyAttributes =
-
-            new HashMap<String, String>() {{
-
+    private static Map<String, String> policyAttributes = new HashMap<String, String>() {{
                 put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
-
                 //put("name","BtnOK");
-
             }};
 
 
-
     /**
-
      * Called once during the life time of TESTAR
-
      * This method can be used to perform initial setup work
-
      *
-
      * @param settings the current TESTAR settings as specified by the user.
-
      */
-
     @Override
-
     protected void initialize(Settings settings) {
-
         NativeLinker.addWdDriverOS();
-
         super.initialize(settings);
-
         ensureDomainsAllowed();
 
-
-
         // Propagate followLinks setting
-
         WdDriver.followLinks = followLinks;
-
-
-
         WdDriver.fullScreen = true;
 
-
-
         // Override ProtocolUtil to allow WebDriver screenshots
-
         protocolUtil = new WdProtocolUtil();
-
     }
 
 
-
     /**
-
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
-
      * take care of
-
      * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-
      * out what executable to run)
-
      * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-
      * the SUT's configuration files etc.)
-
      * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-
      * seconds until they have finished loading)
-
      *
-
      * @return a started SUT, ready to be tested.
-
      */
-
     @Override
-
     protected SUT startSystem() throws SystemStartException {
-
         SUT sut = super.startSystem();
 
-
-
         /**
-
          * If you are experiencing problems with the coordinates of the executed actions.
-
          * Please activate the following functionalities, capture the mouse (if you have the option disabled),
-
          * and if it continues, contact us https://testar.org/contact/
-
          */
-
         //visualizationOn = true;
-
         //mouse.setCursorDisplayScale(1.0);
 
-
-
         return sut;
-
     }
 
-
-
     /**
-
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-
      * This can be used for example for bypassing a login screen by filling the username and password
-
      * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-
      * the SUT's configuration files etc.)
-
      */
-
     @Override
-
-    protected void beginSequence(SUT system, State state){
-
+    protected void beginSequence(SUT system, State state) {
         // this is an example how to use database connection to Microsoft SQL to get input:
-
-
-
         // Create a variable for the connection string.
-
         String connectionUrl = "jdbc:sqlserver://srvtest\\atlas;databaseName=BOA;user=BTTester;password=Test_2014";
-
-
 
         System.out.println("DEBUG: MS SQL: Trying to connect: " + connectionUrl);
 
-
-
         try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
-
-
-
             System.out.println("DEBUG: MS SQL: Connection successful!");
-
-
-
             String SQL = "SELECT TOP 10 * FROM Person.Contact";
-
             ResultSet rs = stmt.executeQuery(SQL);
-
-
-
             System.out.println("DEBUG: MS SQL: Executing SQL Query: " + SQL);
 
-
-
             // Iterate through the data in the result set and display it.
-
             while (rs.next()) {
-
                 System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName"));
-
             }
-
         }
-
         // Handle any errors that may have occurred.
-
         catch (SQLException e) {
-
             System.out.println("DEBUG: MS SQL: ERROR trying to connect: " + e.getMessage());
-
             e.printStackTrace();
-
         }
-
 
 
         /**
-
          * TODO: Customize the credentials obtained from DB
-
          */
 
 
-
         // This login sequence is based on the information on: https://isube.kuveytturk.com.tr/Login/InitialLogin
-
         // But the username and password works only in internal development environment of Kuveyt Turk
-
-
-
         System.out.println("DEBUG 1: looking for BtnOK (expecting a pop-up info screen)");
 
         waitAndClickButtonByTitle("BtnOK", state, system, 5);
-
 
 
         System.out.println("DEBUG 2: changing language to English (expecting to be in Turkish login screen)");
@@ -389,47 +250,37 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         // widget.get(Tags.ValuePattern, "not available").equalsIgnoreCase("/Login/InitialLoginEnglish"))
 
 
-
         System.out.println("DEBUG 3: looking for password field");
 
         waitAndClickAtAndTypeByTitle("Password", "12121212", state, system, 5);
 
 
-
         Util.pause(1);
 
 
+        new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT), 0.2)
 
-        new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT),0.2)
+                .add(new KeyDown(KBKeys.VK_TAB), 0.2)
 
-                .add(new KeyDown(KBKeys.VK_TAB),0.2)
+                .add(new KeyUp(KBKeys.VK_TAB), 0.2)
 
-                .add(new KeyUp(KBKeys.VK_TAB),0.2)
-
-                .add(new KeyUp(KBKeys.VK_SHIFT),0.2).build().run(system,state,0.2);
-
-
-
-        Util.pause(1);
-
-
-
-        new CompoundAction.Builder().add(new Type("94444281"),1)
-
-                .build().run(system,state,0.2);
-
+                .add(new KeyUp(KBKeys.VK_SHIFT), 0.2).build().run(system, state, 0.2);
 
 
         Util.pause(1);
 
 
+        new CompoundAction.Builder().add(new Type("94444281"), 1)
 
+                .build().run(system, state, 0.2);
+
+
+        Util.pause(1);
 
 
         System.out.println("DEBUG 4: looking for login/next button");
 
         waitAndClickButtonByTitle("Login", state, system, 5);
-
 
 
         state = getState(system);
@@ -438,11 +289,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
         System.out.println("DEBUG 5: clicking login button");
 
-        for(Widget widget:state){
+        for (Widget widget : state) {
 
 
-
-            if(widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("login")){
+            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("login")) {
 
                 StdActionCompiler ac = new AnnotatingActionCompiler();
 
@@ -452,18 +302,16 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                 nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
 
-                executeAction(system,state, a);
+                executeAction(system, state, a);
 
                 Util.pause(1);
 
                 Util.clear(cv);
 
 
-
             }
 
         }
-
 
 
         state = getState(system);
@@ -472,11 +320,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
         System.out.println("DEBUG 6: entering smspassword field");
 
-        for(Widget widget:state){
+        for (Widget widget : state) {
 
 
-
-            if(widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("SmsPassword")){
+            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("SmsPassword")) {
 
                 StdActionCompiler ac = new AnnotatingActionCompiler();
 
@@ -486,12 +333,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                 nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
 
-                executeAction(system,state, a);
+                executeAction(system, state, a);
 
                 Util.pause(1);
 
                 Util.clear(cv);
-
 
 
             }
@@ -499,12 +345,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
-        for(Widget widget:state){
-
+        for (Widget widget : state) {
 
 
-            if(widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("OtpLoginButton")){
+            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("OtpLoginButton")) {
 
                 StdActionCompiler ac = new AnnotatingActionCompiler();
 
@@ -514,12 +358,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                 nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
 
-                executeAction(system,state, a);
+                executeAction(system, state, a);
 
                 Util.pause(1);
 
                 Util.clear(cv);
-
 
 
             }
@@ -527,13 +370,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
-
-
         super.beginSequence(system, state);
 
     }
-
 
 
     /**
@@ -561,11 +400,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         State state = super.getState(system);
 
 
-
         return state;
 
     }
-
 
 
     /**
@@ -585,11 +422,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
     protected Verdict getVerdict(State state) {
 
 
-
         Verdict verdict = super.getVerdict(state); // by urueda
 
         // system crashes, non-responsiveness and suspicious titles automatically detected!
-
 
 
         //-----------------------------------------------------------------------------
@@ -599,15 +434,12 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         //-----------------------------------------------------------------------------
 
 
-
         // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
 
 
         return verdict;
 
     }
-
 
 
     /**
@@ -643,13 +475,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         Set<Action> actions = super.deriveActions(system, state);
 
 
-
         // create an action compiler, which helps us create actions
 
         // such as clicks, drag&drop, typing ...
 
         StdActionCompiler ac = new AnnotatingActionCompiler();
-
 
 
         // Check if forced actions are needed to stay within allowed domains
@@ -661,7 +491,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return forcedActions;
 
         }
-
 
 
         // iterate through all widgets
@@ -677,11 +506,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             }
 
 
-
             // slides can happen, even though the widget might be blocked
 
             addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
-
 
 
             // If the element is blocked, Testar can't click on or type in the widget
@@ -693,7 +520,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             }
 
 
-
             // type into text boxes
 
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
@@ -701,7 +527,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
                 actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 
             }
-
 
 
             // left clicks, but ignore links outside domain
@@ -717,7 +542,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             }
 
         }
-
 
 
         return actions;
@@ -743,7 +567,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         actions = detectForcedLogin(state);
 
         if (actions != null && actions.size() > 0) {
@@ -753,7 +576,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         actions = detectForcedPopupClick(state, ac);
 
         if (actions != null && actions.size() > 0) {
@@ -761,7 +583,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return actions;
 
         }
-
 
 
         return null;
@@ -783,7 +604,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return null;
 
         }
-
 
 
         // Check if the current page is a login page
@@ -809,16 +629,13 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
                 }
 
 
-
                 if (username.left().equals(wdWidget.getAttribute("id"))) {
 
                     builder.add(new WdAttributeAction(
 
                             username.left(), "value", username.right()), 1);
 
-                }
-
-                else if (password.left().equals(wdWidget.getAttribute("id"))) {
+                } else if (password.left().equals(wdWidget.getAttribute("id"))) {
 
                     builder.add(new WdAttributeAction(
 
@@ -841,7 +658,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             }
 
         }
-
 
 
         return null;
@@ -867,7 +683,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         for (Widget widget : state) {
 
             // Only enabled, visible widgets
@@ -877,7 +692,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
                 continue;
 
             }
-
 
 
             WdElement element = ((WdWidget) widget).element;
@@ -901,7 +715,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         return null;
 
     }
@@ -917,7 +730,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
     private Set<Action> detectForcedDeniedUrl() {
 
         String currentUrl = WdDriver.getCurrentUrl();
-
 
 
         // Don't get caught in PDFs etc. and non-whitelisted domains
@@ -943,7 +755,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         return null;
 
     }
@@ -967,13 +778,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         if (deniedExtensions == null || deniedExtensions.size() == 0) {
 
             return false;
 
         }
-
 
 
         // Deny if the extension is in the list
@@ -1003,7 +812,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // Always allow local file
 
         if (currentUrl.startsWith("file:///")) {
@@ -1013,7 +821,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // User wants to allow all
 
         if (domainsAllowed == null) {
@@ -1021,7 +828,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return false;
 
         }
-
 
 
         // Only allow pre-approved domains
@@ -1045,7 +851,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         String linkUrl = widget.get(Tags.ValuePattern, "");
 
 
-
         // Not a link or local file, allow
 
         if (linkUrl == null || linkUrl.startsWith("file:///")) {
@@ -1053,7 +858,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return false;
 
         }
-
 
 
         // Deny the link based on extension
@@ -1065,7 +869,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // Mail link, deny
 
         if (linkUrl.startsWith("mailto:")) {
@@ -1073,7 +876,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return true;
 
         }
-
 
 
         // Not a web link (or link to the same domain), allow
@@ -1085,7 +887,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // User wants to allow all
 
         if (domainsAllowed == null) {
@@ -1093,7 +894,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return false;
 
         }
-
 
 
         // Only allow pre-approved domains if
@@ -1121,7 +921,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // When serving from file, 'domain' is filesystem
 
         if (url.startsWith("file://")) {
@@ -1129,7 +928,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return "file://";
 
         }
-
 
 
         url = url.replace("https://", "").replace("http://", "").replace("file://", "");
@@ -1155,7 +953,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
             return;
 
         }
-
 
 
         String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
@@ -1185,13 +982,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         // Widget must be completely visible on viewport for screenshots
 
         return widget.get(WdTags.WebIsFullOnScreen, false);
 
     }
-
 
 
     @Override
@@ -1217,7 +1012,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         WdElement element = ((WdWidget) widget).element;
 
         if (element.isClickable) {
@@ -1227,7 +1021,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         Set<String> clickSet = new HashSet<>(clickableClasses);
 
         clickSet.retainAll(element.cssClasses);
@@ -1235,7 +1028,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         return clickSet.size() > 0;
 
     }
-
 
 
     @Override
@@ -1261,11 +1053,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         return false;
 
     }
-
 
 
     /**
@@ -1296,29 +1086,27 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
      * @param actions the set of derived actions
 
-     * @return  the selected action (non-null!)
+     * @return the selected action (non-null!)
 
      */
 
-    private Set<Action> executedActions = new HashSet<Action> ();
+    private Set<Action> executedActions = new HashSet<Action>();
 
     private Set<Action> previousActions;
 
 
-
     @Override
 
-    protected Action selectAction(State state, Set<Action> actions){
+    protected Action selectAction(State state, Set<Action> actions) {
 
 
+        System.out.println("DEBUG: *** Sequence " + sequenceCount + ", Action " + actionCount() + " ***");
 
-        System.out.println("DEBUG: *** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
-
-        Set<Action> prioritizedActions = new HashSet<Action> ();
+        Set<Action> prioritizedActions = new HashSet<Action>();
 
         //checking if it is the first round of actions:
 
-        if(previousActions==null) {
+        if (previousActions == null) {
 
             //all actions are new actions:
 
@@ -1326,7 +1114,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
             prioritizedActions = actions;
 
-        }else{
+        } else {
 
             //if not the first round, get the new actions compared to previous state:
 
@@ -1334,7 +1122,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
         }
 
-        if(prioritizedActions.size()>0){
+        if (prioritizedActions.size() > 0) {
 
             //there are new actions to choose from, checking if they have been already executed:
 
@@ -1342,13 +1130,13 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
         }
 
-        if(prioritizedActions.size()>0){
+        if (prioritizedActions.size() > 0) {
 
             // found new actions that have not been executed before - choose randomly
 
             System.out.println("DEBUG: found NEW actions that have not been executed before");
 
-        }else{
+        } else {
 
             // no new unexecuted actions, checking if any unexecuted actions:
 
@@ -1356,13 +1144,13 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
         }
 
-        if(prioritizedActions.size()>0){
+        if (prioritizedActions.size() > 0) {
 
             // found actions that have not been executed before - choose randomly
 
             System.out.println("DEBUG: found actions that have not been executed before");
 
-        }else{
+        } else {
 
             // no unexecuted actions, choose randomly on any of the available actions:
 
@@ -1377,13 +1165,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         previousActions = actions;
 
 
-
-        return(super.selectAction(state, prioritizedActions));
-
+        return (super.selectAction(state, prioritizedActions));
 
 
     }
-
 
 
     /**
@@ -1408,16 +1193,15 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
     @Override
 
-    protected boolean executeAction(SUT system, State state, Action action){
+    protected boolean executeAction(SUT system, State state, Action action) {
 
         executedActions.add(action);
 
-        System.out.println("DEBUG: executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
+        System.out.println("DEBUG: executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable"));
 
         return super.executeAction(system, state, action);
 
     }
-
 
 
     /**
@@ -1443,7 +1227,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
     }
 
 
-
     /**
 
      * This method is invoked each time after TESTAR finished the generation of a sequence.
@@ -1457,7 +1240,6 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         super.finishSequence();
 
     }
-
 
 
     /**
@@ -1483,22 +1265,21 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
     }
 
 
-
     /** KuveytTurk: This method clicks a button*/
 
-    protected boolean waitAndClickButtonByTitle(String title, State state, SUT system, int maxNumberOfRetries){
+    protected boolean waitAndClickButtonByTitle(String title, State state, SUT system, int maxNumberOfRetries) {
 
         boolean uiElementFound = false;
 
         int numberOfRetries = 0;
 
-        while(!uiElementFound && numberOfRetries<maxNumberOfRetries){
+        while (!uiElementFound && numberOfRetries < maxNumberOfRetries) {
 
-            for(Widget widget:state){
+            for (Widget widget : state) {
 
-                if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)){
+                if (widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)) {
 
-                    uiElementFound=true;
+                    uiElementFound = true;
 
                     StdActionCompiler ac = new AnnotatingActionCompiler();
 
@@ -1508,16 +1289,14 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                     nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
 
-                    executeAction(system,state, a);
+                    executeAction(system, state, a);
 
                     Util.pause(1);
 
                     Util.clear(cv);
 
 
-
                     state = getState(system);
-
 
 
                     return true;
@@ -1526,7 +1305,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
             }
 
-            if(!uiElementFound){
+            if (!uiElementFound) {
 
                 Util.pause(1);
 
@@ -1539,9 +1318,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         state = getState(system);
-
 
 
         return false;
@@ -1549,22 +1326,21 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
     }
 
 
-
     /** KuveytTurk: This method type a button*/
 
-    protected boolean waitAndClickAtAndTypeByTitle(String title, String textInput, State state, SUT system, int maxNumberOfRetries){
+    protected boolean waitAndClickAtAndTypeByTitle(String title, String textInput, State state, SUT system, int maxNumberOfRetries) {
 
         boolean uiElementFound = false;
 
         int numberOfRetries = 0;
 
-        while(!uiElementFound && numberOfRetries<maxNumberOfRetries){
+        while (!uiElementFound && numberOfRetries < maxNumberOfRetries) {
 
-            for(Widget widget:state){
+            for (Widget widget : state) {
 
-                if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)){
+                if (widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)) {
 
-                    uiElementFound=true;
+                    uiElementFound = true;
 
                     StdActionCompiler ac = new AnnotatingActionCompiler();
 
@@ -1574,16 +1350,14 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                     nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
 
-                    executeAction(system,state, a);
+                    executeAction(system, state, a);
 
                     Util.pause(1);
 
                     Util.clear(cv);
 
 
-
                     state = getState(system);
-
 
 
                     return true;
@@ -1592,7 +1366,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
             }
 
-            if(!uiElementFound){
+            if (!uiElementFound) {
 
                 Util.pause(1);
 
@@ -1605,15 +1379,12 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
         }
 
 
-
         state = getState(system);
-
 
 
         return false;
 
     }
-
 
 
 }

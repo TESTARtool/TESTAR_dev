@@ -64,8 +64,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed =
-      Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+  private List<String> domainsAllowed = new ArrayList<String> (
+      Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl") );
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -120,7 +120,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-	  return super.startSystem();
+      System.out.println("DEBUG: startSystem()");
+      SUT sut = super.startSystem();
+      String currentUrl = WdDriver.getCurrentUrl();
+      System.out.println("DEBUG: current URL="+currentUrl);
+      if(isUrlDenied(currentUrl)){
+          System.out.println("DEBUG: the starting URL is not in allowed domains - adding it to the list");
+          domainsAllowed.add(currentUrl);
+      }
+	  return sut;
   }
 
   /**
@@ -131,7 +139,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
+      System.out.println("DEBUG: beginSequence()");
+      super.beginSequence(system, state);
   }
 
   /**
@@ -145,9 +154,9 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
-
-    return state;
+      System.out.println("DEBUG: getState()");
+      State state = super.getState(system);
+      return state;
   }
 
   /**
@@ -158,17 +167,14 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected Verdict getVerdict(State state) {
-
-    Verdict verdict = super.getVerdict(state); // by urueda
+      System.out.println("DEBUG: getVerdict()");
+      Verdict verdict = super.getVerdict(state);
     // system crashes, non-responsiveness and suspicious titles automatically detected!
-
     //-----------------------------------------------------------------------------
     // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
     //-----------------------------------------------------------------------------
-
     // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-    return verdict;
+      return verdict;
   }
 
   /**
@@ -183,8 +189,9 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * @return a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state)
-      throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+      System.out.println("DEBUG: deriveActions()");
+
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
 
@@ -233,6 +240,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
+      System.out.println("DEBUG: detectForcedActions()");
     Set<Action> actions = detectForcedDeniedUrl();
     if (actions != null && actions.size() > 0) {
       return actions;
@@ -255,6 +263,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Detect and perform login if defined
    */
   private Set<Action> detectForcedLogin(State state) {
+      System.out.println("DEBUG: detectForcedLogin()");
     if (login == null || username == null || password == null) {
       return null;
     }
@@ -294,8 +303,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   /*
    * Force closing of Policies Popup
    */
-  private Set<Action> detectForcedPopupClick(State state,
-                                             StdActionCompiler ac) {
+  private Set<Action> detectForcedPopupClick(State state, StdActionCompiler ac) {
+      System.out.println("DEBUG: detectForcedPopupClick()");
     if (policyAttributes == null || policyAttributes.size() == 0) {
       return null;
     }
@@ -324,16 +333,19 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Force back action due to disallowed domain or extension
    */
   private Set<Action> detectForcedDeniedUrl() {
+      System.out.println("DEBUG: detectForcedDeniedUrl()");
     String currentUrl = WdDriver.getCurrentUrl();
 
     // Don't get caught in PDFs etc. and non-whitelisted domains
     if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
       // If opened in new tab, close it
       if (WdDriver.getWindowHandles().size() > 1) {
+          System.out.println("DEBUG: detectForcedDeniedUrl() - closing browser tab");
         return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
       }
       // Single tab, go back to previous page
       else {
+          System.out.println("DEBUG: detectForcedDeniedUrl() - browser back action");
         return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
       }
     }
@@ -345,6 +357,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Check if the current address has a denied extension (PDF etc.)
    */
   private boolean isExtensionDenied(String currentUrl) {
+      System.out.println("DEBUG: isExtensionDenied()");
     // If the current page doesn't have an extension, always allow
     if (!currentUrl.contains(".")) {
       return false;
@@ -364,6 +377,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Check if the URL is denied
    */
   private boolean isUrlDenied(String currentUrl) {
+      System.out.println("DEBUG: isUrlDenied()");
     if (currentUrl.startsWith("mailto:")) {
       return true;
     }
@@ -387,6 +401,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * Check if the widget has a denied URL as hyperlink
    */
   private boolean isLinkDenied(Widget widget) {
+      System.out.println("DEBUG: isLinkDenied()");
     String linkUrl = widget.get(Tags.ValuePattern, "");
 
     // Not a link or local file, allow
@@ -440,6 +455,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * If domainsAllowed not set, allow the domain from the SUT Connector
    */
   private void ensureDomainsAllowed() {
+      System.out.println("DEBUG: ensureDomainsAllowed()");
     // Not required or already defined
     if (domainsAllowed == null || domainsAllowed.size() > 0) {
       return;
@@ -509,6 +525,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected Action selectAction(State state, Set<Action> actions) {
+      System.out.println("DEBUG: selectAction()");
     return super.selectAction(state, actions);
   }
 
@@ -522,6 +539,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected boolean executeAction(SUT system, State state, Action action) {
+      System.out.println("DEBUG: executeAction()");
     return super.executeAction(system, state, action);
   }
 
