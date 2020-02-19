@@ -35,6 +35,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -317,5 +318,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         }
         return actions;
     }
+
+
 
 }

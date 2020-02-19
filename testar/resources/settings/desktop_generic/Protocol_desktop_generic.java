@@ -30,6 +30,8 @@
 
 
 import java.util.Set;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
@@ -85,6 +87,30 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
+	 	if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"File", state, system, 5, 1)){
+	 		System.out.println("Left click on File menu was successful.");
+		}
+		 if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"file", state, system, 1, 0.5)){
+			 System.out.println("Left click on file was successful.");
+		 }else{
+			 System.out.println("Left click on file failed, as expected. Should print out widgets with a Title value.");
+		 }
+		 Util.pause(1);
+
+	 	//This one throws exception, because Role cannot be casted into String
+	 	try {
+			if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Role, "UIAEdit", "text to type", state, system, 5, 1)) {
+				System.out.println("Typing into the text area was successful.");
+			}
+		}
+		catch (Exception e){
+	 		e.printStackTrace();
+		}
+		 Util.pause(1);
+		 if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Role,"UIAEdit", "is this replacing or appending?", state, system, 5, 1)){
+			 System.out.println("Typing into the text area was successful.");
+		 }
+		 Util.pause(1);
 	 	super.beginSequence(system, state);
 	}
 

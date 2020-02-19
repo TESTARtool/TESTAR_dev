@@ -41,7 +41,6 @@ import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -72,27 +71,7 @@ import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
@@ -106,7 +85,6 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -2054,5 +2032,116 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             }
         }
     }
+
+	/**
+	 * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
+	 * If a matching widget is found, left mouse button is clicked on it and return value is true.
+	 * Else returns false
+	 *
+	 * @param tag for example: org.fruit.alayer.Tags.Title
+	 * @param value
+	 * @param state
+	 * @param system needed for updating the state between retries
+	 * @param maxNumberOfRetries int number of times
+	 * @param waitBetween double in seconds
+	 * @return
+	 */
+	protected boolean waitAndLeftClickWidgetWithMatchingTag(Tag tag, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+		int numberOfRetries = 0;
+		while(numberOfRetries<maxNumberOfRetries){
+			//looking for a widget with matching tag value:
+			Widget widget = getWidgetWithMatchingTag(tag,value,state);
+			if(widget!=null){
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				//System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+				executeAction(system,state,ac.leftClickAt(widget));
+				// is waiting needed after the action has been executed?
+				return true;
+			}
+			else{
+				Util.pause(waitBetween);
+				state = getState(system);
+				numberOfRetries++;
+			}
+		}
+		System.out.println("Matching widget was not found, "+tag.toString()+"=" + value);
+		printTagValuesOfWidgets(tag,state);
+		return false;
+	}
+
+	/**
+	 * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
+	 * If a matching widget is found, left mouse button is clicked on it, the given text is typed into it, and return value is true.
+	 * Else returns false
+	 *
+	 * @param tag for example: org.fruit.alayer.Tags.Title
+	 * @param value
+	 * @param textToType types the given text by replacing the existing text
+	 * @param state
+	 * @param system needed for updating the state between retries
+	 * @param maxNumberOfRetries int number of times
+	 * @param waitBetween double in seconds
+	 * @return
+	 */
+	protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tag tag, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+		int numberOfRetries = 0;
+		while(numberOfRetries<maxNumberOfRetries){
+			//looking for a widget with matching tag value:
+			Widget widget = getWidgetWithMatchingTag(tag,value,state);
+			if(widget!=null){
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+				// is waiting needed after the action has been executed?
+				return true;
+			}
+			else{
+				Util.pause(waitBetween);
+				state = getState(system);
+				numberOfRetries++;
+			}
+		}
+		System.out.println("Matching widget was not found, "+tag.toString()+"=" + value);
+		printTagValuesOfWidgets(tag,state);
+		return false;
+	}
+
+
+	/**
+	 * Iterates the widgets of the state until a widget with matching tag value is found.
+	 * The value is case sensitive.
+	 *
+	 * @param tag
+	 * @param value
+	 * @param state
+	 * @return the matching widget if found, null if not found
+	 */
+	protected Widget getWidgetWithMatchingTag(Tag tag, String value, State state){
+		for(Widget widget:state){
+			if(widget.get(tag, null)==null){
+				// this widget did not have a value for the given tag
+			}
+			else if(widget.get(tag, null).toString().equals(value)){
+				return widget;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Prints to system out all the widgets that have some value in the given tag.
+	 *
+	 * @param tag
+	 * @param state
+	 */
+	protected void printTagValuesOfWidgets(Tag tag, State state){
+		for(Widget widget:state){
+			if(widget.get(tag, null)==null){
+				// this widget did not have a value for the given tag
+			}
+			else{
+				System.out.println(tag.toString()+"=" + widget.get(tag, null).toString()+ "; Description of the widget="+widget.get(Tags.Desc));
+			}
+		}
+	}
 
 }
