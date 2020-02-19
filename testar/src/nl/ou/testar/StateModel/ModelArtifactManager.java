@@ -30,6 +30,10 @@
 
 package nl.ou.testar.StateModel;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +44,7 @@ import java.util.TreeSet;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.OutputStructure;
 import org.testar.json.object.JsonArtefactStateModel;
 import org.testar.json.object.StateModelTestSequenceJsonObject;
 import org.testar.json.object.StateModelTestSequenceStepJsonObject;
@@ -51,10 +56,10 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
-import nl.ou.testar.StateModel.Analysis.Representation.ActionViz;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 public class ModelArtifactManager {
@@ -428,6 +433,7 @@ public class ModelArtifactManager {
 	
 	private static SortedSet<StateModelTestSequenceStepJsonObject> getStateModelTestSequenceActionStepsObject(ODatabaseSession sessionDB, String sequenceId) {
 		SortedSet<StateModelTestSequenceStepJsonObject> actionSteps = new TreeSet<>();
+		byte[] screenshot = "Empty".getBytes();
 		String actionDescription;
 		String timestamp;
 		
@@ -476,6 +482,9 @@ public class ModelArtifactManager {
                 targetState = edge.getTo();
                 break; // there should at most be one edge
             }
+            
+            String concreteActionExecuted = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("concreteActionId"));
+            screenshot = screenshotBytesConcreteAction(sessionDB, concreteActionExecuted);
 
             actionDescription = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("actionDescription"));
            
@@ -487,11 +496,90 @@ public class ModelArtifactManager {
             counterSource++;
             counterTarget++;
             
-            actionSteps.add(new StateModelTestSequenceStepJsonObject(actionDescription, timestamp));
+            actionSteps.add(new StateModelTestSequenceStepJsonObject(concreteActionExecuted, screenshot, actionDescription, timestamp));
         }
         resultSet.close();
 		
 		return actionSteps;
+	}
+	
+	private static byte[] screenshotBytesConcreteAction(ODatabaseSession sessionDB, String concreteActionId) {
+		
+		byte[] screenshot = "Empty".getBytes();
+		
+		String stmt = "SELECT FROM ConcreteAction WHERE actionId = :actionId LIMIT 1";
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("actionId", concreteActionId);
+		
+		OResultSet resultSet = sessionDB.query(stmt, params);
+
+		if (resultSet.hasNext()) {
+			OResult result = resultSet.next();
+			// we're expecting a vertex
+			if (result.isEdge()) {
+				Optional<OEdge> op = result.getEdge();
+				if (!op.isPresent()) return screenshot;
+				OEdge modelEdge = op.get();
+				
+				OVertex concreteStateVertex = modelEdge.getVertex(ODirection.OUT);
+
+				screenshot = ((ORecordBytes) concreteStateVertex.getProperty("screenshot")).toStream();
+				
+				//processScreenShot((ORecordBytes) concreteStateVertex.getProperty("screenshot"), concreteActionId);
+				
+			}
+		}
+		
+		resultSet.close();
+		
+		return screenshot;
+	}
+	
+	/**
+	 * This method saves screenshots to disk.
+	 * @param recordBytes
+	 * @param identifier
+	 */
+	private static String processScreenShot(ORecordBytes recordBytes, String identifier) {
+		// see if we have a directory for the screenshots yet
+		File screenshotDir = new File(OutputStructure.outerLoopOutputDir + File.separator + "ArtifactJsonImages" + File.separator);
+
+		if (!screenshotDir.exists()) {
+			screenshotDir.mkdir();
+		}
+
+		// save the file to disk
+		File screenshotFile = new File( screenshotDir, identifier + ".png");
+		if (screenshotFile.exists()) {
+			try {
+				return screenshotFile.getCanonicalPath();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		try {
+			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
+			outputStream.write(recordBytes.toStream());
+			outputStream.flush();
+			outputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			return screenshotFile.getCanonicalPath();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return "";
+
 	}
 
 	// this helper method formats the @RID property into something that can be used in a web frontend
