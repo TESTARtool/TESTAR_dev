@@ -13,6 +13,7 @@
 #include <uiautomation.h>
 #include <comutil.h>
 #include <Psapi.h>
+#include <shellscalingapi.h>
 #include <Shobjidl.h>
 
  // begin by urueda
@@ -2457,6 +2458,38 @@ JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong p
 
 }
 
+/* GetScaleFactorForMonitor */
+JNI_SIG(jlongArray, WINAPI_NS(GetScaleFactorForMonitor)) (JNIEnv * env, jclass cl, jlong hMon){
+	DEVICE_SCALE_FACTOR tmp;
+	HRESULT result = GetScaleFactorForMonitor((HMONITOR)hMon, &tmp);
+	if(FAILED(result)){
+		jlong scaleResult[1];
+		scaleResult[0] = (jlong)result;
+
+		jlongArray ret = env->NewLongArray(1);
+		env->SetLongArrayRegion(ret, 0, 1, scaleResult);
+	 	return ret;
+	}
+
+	jlong scaleResult[2];
+	scaleResult[0] = (jlong)result;
+	scaleResult[1] = (jlong)tmp;
+
+	jlongArray ret = env->NewLongArray(2);
+	env->SetLongArrayRegion(ret, 0, 2, scaleResult);
+	return ret;
+}
+
+/* MonitorFromWindow */
+JNI_SIG(jlong, WINAPI_NS(MonitorFromWindow)) (JNIEnv * env, jclass cl, jlong hwnd, jlong dwFlags){
+	HMONITOR ret = MonitorFromWindow((HWND)hwnd, (DWORD)dwFlags);
+	return (jlong)ret;
+}
+
+/* GetDpiForWindow */
+JNI_SIG(jint, WINAPI_NS(GetDpiForWindow)) (JNIEnv * env, jclass cl, jlong hwnd){
+	return (jint)GetDpiForWindow((HWND)hwnd); 
+};
 
 /* IApplicationActivationManager_ActivateApplication */
 JNI_SIG(jlong, WINAPI_NS(IApplicationActivationManager_1ActivateApplication)) (JNIEnv * env, jclass,
