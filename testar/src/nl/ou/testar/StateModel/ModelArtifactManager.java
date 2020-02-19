@@ -148,6 +148,37 @@ public class ModelArtifactManager {
 		}
 
 	}
+	
+	public static void createSpecificArtefact(ODatabaseSession sessionDB, 
+			String pathArtefact, String appName, String appVersion, String database) {
+		
+		// Search and get the State Model identifier to start the queries
+		String stateModelId = getAbstractStateModelIdentifier(sessionDB, appName, appVersion);
+		
+		if(stateModelId.isEmpty()) {
+			System.out.println(String.format("State Model with name %s and version %s was not found in the dabatase %s",
+					appName, appVersion, database));
+		}
+		
+		String abstractionLevelProperties = getStateModelAbstractionLevel(sessionDB, stateModelId);
+		long numberOfUnvisitedAbstractActions = getStateModelNumberOfUnvisitedActions(sessionDB, stateModelId);
+		boolean isDeterministic = getStateModelIsDeterministic(sessionDB, stateModelId);
+		long numberOfAbstractStates = getStateModelNumberOfAbstractStates(sessionDB, stateModelId);
+		long numberOfAbstractActions = getStateModelNumberOfAbstractActions(sessionDB, stateModelId);
+		long numberOfConcreteStates = getStateModelNumberOfConcreteStates(sessionDB, stateModelId);
+		long numberOfConcreteActions = getStateModelNumberOfConcreteActions(sessionDB, stateModelId);
+		long numberOfWidgets = getStateModelNumberOfWidgets(sessionDB, stateModelId);
+		
+		long numberOfTestSequences = getStateModelNumberOfTestSequences(sessionDB, stateModelId);
+		SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
+		
+        System.out.println("Creating JSON State Model artefact...");
+    	JsonArtefactStateModel.specificStateModelArtefact(pathArtefact, appName, appVersion, stateModelId,
+    			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
+    			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
+    			//TODO: storewidgets (next false) Obtain the option from State Model or settings 
+    			false, numberOfWidgets, numberOfTestSequences, testSequenceObject);
+	}
 
 	private static String getAbstractStateModelIdentifier(ODatabaseSession sessionDB, String appName, String appVer) {
 		

@@ -91,7 +91,6 @@ public class StateModelPanel extends JPanel {
     private JButton stateTagsButton = new JButton("Advanced");
     private AbstractStateSettings stateTagsDialog;
     private JButton analysisButton = new JButton("Analysis");
-    private JDialog analysisDialog;
     private JButton exportDBbutton = new JButton("Export DB");
     private JButton importDBbutton = new JButton("Import DB");
     private JButton artefactStateModel = new JButton("Artefact");
@@ -259,7 +258,8 @@ public class StateModelPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             	ExportDatabaseDialog exportDBdialog = new ExportDatabaseDialog(
-            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
             	exportDBdialog.setVisible(true);
             }
         });
@@ -270,7 +270,8 @@ public class StateModelPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             	ImportDatabaseDialog importDBdialog = new ImportDatabaseDialog(
-            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
             	importDBdialog.setVisible(true);
             }
         });
@@ -281,7 +282,8 @@ public class StateModelPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
             	ArtifactStateModelDialog artefactDialog = new ArtifactStateModelDialog(
-            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
             	artefactDialog.setVisible(true);
             }
         });
