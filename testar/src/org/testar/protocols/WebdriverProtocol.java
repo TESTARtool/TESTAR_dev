@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.fruit.Environment;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -48,8 +49,10 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
+import org.fruit.alayer.webdriver.WdMouse;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
@@ -78,6 +81,48 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
+    
+    /**
+     * This method is called when TESTAR starts the System Under Test (SUT). The method should
+     * take care of
+     * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+     * out what executable to run)
+     * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuratio files etc.)
+     * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+     * seconds until they have finished loading)
+     *
+     * @return a started SUT, ready to be tested.
+     */
+    @Override
+    protected SUT startSystem() throws SystemStartException {
+    	SUT sut = super.startSystem();
+
+    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+    	// webdriver in the constructor of WdDriver.
+    	// A possible solution could be creating a snapshot of the running browser processes before and after
+    	if(System.getProperty("os.name").contains("Windows")
+    			&& sut.get(Tags.HWND, null) == null) {
+    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    		// window handle. The running browser needs to be in the foreground when we reach this part.
+    		long hwnd = Windows.GetForegroundWindow();
+    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    		// Safe to set breakpoints again.
+    		if (WinProcess.procName(pid).contains("chrome")) {
+    			sut.set(Tags.HWND, hwnd);
+    			sut.set(Tags.PID, pid);
+    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    		}
+    	}
+    	
+    	double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
+
+        // See remarks in WdMouse
+        mouse = sut.get(Tags.StandardMouse);
+        mouse.setCursorDisplayScale(displayScale);
+
+    	return sut;
+    }
 
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -88,14 +133,6 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
-    	if(settings.get(ConfigTags.ForceForeground) && System.getProperty("os.name").contains("Windows")) {
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		if(WinProcess.procName(pid).contains("chrome")) {
-    			system.set(Tags.HWND, hwnd);
-    			system.set(Tags.PID, pid);
-    		}
-    	}
     }
     
     /**
@@ -110,7 +147,7 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     protected State getState(SUT system) throws StateBuildException {
     	
     	WdDriver.waitDocumentReady();
-    	
+
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)

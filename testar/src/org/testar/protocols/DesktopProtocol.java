@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,8 +34,7 @@ package org.testar.protocols;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.Util;
+import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -43,10 +42,8 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
-
 import java.io.File;
 import java.util.Set;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -64,6 +61,21 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
+    }
+    
+    /**
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
+    @Override
+    protected void beginSequence(SUT system, State state) {
+    	super.beginSequence(system, state);
+    	
+    	double displayScale = Environment.getInstance().getDisplayScale(state.child(0).get(Tags.HWND, (long)0));
+    	
+    	mouse.setCursorDisplayScale(displayScale);
     }
 
     /**

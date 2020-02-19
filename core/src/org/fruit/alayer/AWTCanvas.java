@@ -69,6 +69,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.fruit.Assert;
+import org.fruit.Environment;
 import org.fruit.Pair;
 
 public class AWTCanvas implements Image, Canvas {
@@ -111,18 +112,19 @@ public class AWTCanvas implements Image, Canvas {
 			throw new IOException("Unable to write image as BMP!");
 	}
 
-	public static AWTCanvas fromScreenshot(Rect r){
-		return fromScreenshot(r, StorageFormat.PNG, 1);
+	public static AWTCanvas fromScreenshot(Rect r, long windowHandle){
+		return fromScreenshot(r, windowHandle, StorageFormat.PNG, 1);
 	}
 
-	public static AWTCanvas fromScreenshot(Rect r, StorageFormat format, double quality){
+	public static AWTCanvas fromScreenshot(Rect r, long windowHandle, StorageFormat format, double quality){
 		Assert.notNull(r, format);
 		Assert.isTrue(quality > 0 && quality <= 1);
+		double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
 		try{
 			// the rectangle may capture multiple screens!
-			Rectangle rect = new Rectangle((int)r.x(), 	   (int)r.y(), 
-										   (int)r.width(), (int)r.height());
-			return new AWTCanvas(r.x(), r.y(), new Robot().createScreenCapture(rect), format, quality);
+			Rectangle rect = new Rectangle((int)(r.x() * displayScale), (int)(r.y() * displayScale),
+					(int)(r.width() * displayScale), (int)(r.height() * displayScale));
+			return new AWTCanvas(r.x() * displayScale, r.y() * displayScale, new Robot().createScreenCapture(rect), format, quality);
 		} catch (AWTException awte) {
 			throw new RuntimeException(awte);
 		}

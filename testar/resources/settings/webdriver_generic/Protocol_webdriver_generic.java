@@ -99,6 +99,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
     // Propagate followLinks setting
     WdDriver.followLinks = followLinks;
+    
+    WdDriver.fullScreen = true;
 
     // Override ProtocolUtil to allow WebDriver screenshots
     protocolUtil = new WdProtocolUtil();
@@ -118,12 +120,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-    SUT sut = super.startSystem();
-
-    // See remarks in WdMouse
-    mouse = sut.get(Tags.StandardMouse);
-
-    return sut;
+	  return super.startSystem();
   }
 
   /**
