@@ -483,8 +483,8 @@ public class ModelArtifactManager {
                 break; // there should at most be one edge
             }
             
-            String concreteActionExecuted = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("concreteActionId"));
-            screenshot = screenshotBytesConcreteAction(sessionDB, concreteActionExecuted);
+            //String concreteActionExecuted = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("concreteActionId"));
+            //screenshot = screenshotBytesConcreteAction(sessionDB, concreteActionExecuted);
 
             actionDescription = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("actionDescription"));
            
@@ -496,7 +496,8 @@ public class ModelArtifactManager {
             counterSource++;
             counterTarget++;
             
-            actionSteps.add(new StateModelTestSequenceStepJsonObject(concreteActionExecuted, screenshot, actionDescription, timestamp));
+            actionSteps.add(new StateModelTestSequenceStepJsonObject(/*concreteActionExecuted, screenshot,*/
+            		actionDescription, timestamp));
         }
         resultSet.close();
 		
