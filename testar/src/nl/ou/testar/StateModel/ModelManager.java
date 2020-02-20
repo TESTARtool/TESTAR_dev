@@ -11,6 +11,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -54,6 +56,9 @@ public class ModelManager implements StateModelManager {
     private boolean storeWidgets;
 
     private AbstractStateIdExtractor abstractStateIdExtractor;
+
+    // logger instance
+    Logger logger = LoggerFactory.getLogger(ModelManager.class);
 
     /**
      * Constructor
@@ -124,6 +129,7 @@ public class ModelManager implements StateModelManager {
 
         // add the concrete state id to the abstract state
         newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+        logger.debug("Reached abstract state: '{}' and concrete state: '{}'", newAbstractState.getStateId(), newState.get(Tags.ConcreteIDCustom));
 
         // check if an action was executed
         if (actionUnderExecution == null) {
@@ -218,6 +224,10 @@ public class ModelManager implements StateModelManager {
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
+        logger.debug("Current abstract state: {}", currentAbstractState.getStateId());
+        logger.debug("Current concrete state: {}", currentConcreteState.getId());
+        logger.debug("Abstract action under execution: {}", actionUnderExecution.getActionId());
+        logger.debug("Executing concrete action with id {} and description '{}'", concreteActionUnderExecution.getActionId(), action.get(Tags.Desc));
         System.out.println("Executing action: " + action.get(Tags.Desc));
         System.out.println("----------------------------------");
 
