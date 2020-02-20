@@ -1,0 +1,41 @@
+{
+  "name": "TESTAR webdriver extension",
+  "author": "TESTAR",
+  "description": "Define JavaScript functions for TESTAR",
+  "version": "1.0",
+  "manifest_version": 2,
+
+  "browser_action": {
+    "default_icon": {"40": "images/icon.png"},
+    "default_title": "TESTAR"
+  },
+
+  "permissions": ["tabs", "<all_urls>"],
+  
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["js/testar.init.start.js"],
+    "run_at": "document_start",
+    "all_frames": true
+  }, {
+    "matches": ["<all_urls>"],
+    "js": ["js/testar.init.end.js"],
+    "run_at": "document_end",
+    "all_frames": true
+  }, {
+    "matches": ["<all_urls>"],
+    "css": ["css/style.css"]
+  }],
+  "web_accessible_resources": [
+    "js/testar.state.js",
+    "js/testar.canvas.js",
+    "css/style.css"
+  ],
+
+  "applications": {
+    "gecko": {
+      "id": "info@testar.org",
+      "strict_min_version": "42.0"
+    }
+  }
+}

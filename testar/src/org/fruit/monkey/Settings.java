@@ -60,10 +60,11 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
-			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
-			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
-	
+	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE";
+	public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
+	public static final String SUT_CONNECTOR_CMDLINE = "COMMAND_LINE";
+	public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
+
 	private static String settingsPath;
 	
 	public static String getSettingsPath() {
@@ -325,9 +326,11 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
 					+"#\n"
+					+"# Requires ProcessListenerEnabled\n"
 					+"# (Only available for desktop applications through COMMAND_LINE)\n"
 					+"#\n"
-					+"# Regular expression defines the suspicious outputs\n"
+					+"# Regular expression SuspiciousProcessOutput contains the specification\n"
+					+"# of what is considered to be suspicious output.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ProcessListenerEnabled = " + Util.lineSep()
@@ -339,8 +342,10 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Required ProcessListenerEnabled\n"
 					+"# (Only available for desktop applications through COMMAND_LINE)\n"
 					+"#\n"
-					+"# Allow TESTAR to store in its logs other possible matches found in the process\n"
-					+"# Use the regular expression .*.* if you want to store all the possible outputs of the process\n"
+					+"# Allow TESTAR to store execution logs coming from the processes.\n"
+					+"# You can use the regular expression ProcessLogs below to filter\n"
+					+"# the logs. Use .*.* if you want to store all the outputs of the \n"
+					+"# process.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ProcessLogs = " + Util.lineSep()

@@ -35,6 +35,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
+import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -64,6 +65,21 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
+    
+    /**
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
+    @Override
+    protected void beginSequence(SUT system, State state) {
+    	super.beginSequence(system, state);
+    	
+    	double displayScale = Environment.getInstance().getDisplayScale(state.child(0).get(Tags.HWND, (long)0));
+    	
+    	mouse.setCursorDisplayScale(displayScale);
+    }
 
     /**
      * This method is called when the TESTAR requests the state of the SUT.
@@ -76,7 +92,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
         //Spy mode didn't use the html report
-    	if(mode() == Modes.Spy)
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
         	return super.getState(system);
     	
     	latestState = super.getState(system);
@@ -318,28 +334,4 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         return actions;
     }
 
-    /**
-     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-     * @param actions
-     * @param ac
-     * @param scrollArrowSize
-     * @param scrollThick
-     * @param widget
-     */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
-        Drag[] drags = null;
-        //If there are scroll (drags/drops) actions possible
-        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
-            //For each possible drag, create an action and add it to the derived actions
-            for (Drag drag : drags){
-                //Create a slide action with the Action Compiler, and add it to the set of derived actions
-                actions.add(ac.slideFromTo(
-                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-                        widget
-                ));
-
-            }
-        }
-    }
 }
