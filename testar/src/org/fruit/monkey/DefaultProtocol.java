@@ -2141,7 +2141,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// this widget did not have a value for the given tag
 			}
 			else{
-				System.out.println(tag.toString()+"=" + widget.get(tag, null).toString()+ "; Description of the widget="+widget.get(Tags.Desc));
+				System.out.println(tag.toString()+"=" + widget.get(tag, null).toString()+ "; Description of the widget="+widget.get(Tags.Desc, ""));
 			}
 		}
 	}
