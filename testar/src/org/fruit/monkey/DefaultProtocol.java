@@ -1569,24 +1569,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		if (this.suspiciousTitlesPattern == null)
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
-		Matcher m;
-		// search all widgets for suspicious titles
-		for(Widget w : state){
-			String title = w.get(Title, "");
-			if (title != null && !title.isEmpty()){
-				m = this.suspiciousTitlesMatchers.get(title);
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(title);
-					this.suspiciousTitlesMatchers.put(title, m);
-				}
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
-				}
+
+		// search all widgets for suspicious String Values
+		Verdict suspiciousValueVerdict = Verdict.OK;
+		for(Widget w : state) {
+			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
+			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+				return suspiciousValueVerdict;
 			}
 		}
 
@@ -1596,6 +1585,38 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// if everything was OK ...
+		return Verdict.OK;
+	}
+	
+	private Verdict suspiciousStringValueMatcher(Widget w) {
+		Matcher m;
+		
+		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
+			
+			if(t != null && !w.get(t,"").isEmpty()) {
+				
+				//Ignore value ValuePattern for UIAEdit widgets
+				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+					continue;
+				}
+				
+				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
+				if (m == null){
+					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
+					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
+				}
+				
+				if (m.matches()){
+					Visualizer visualizer = Util.NullVisualizer;
+					// visualize the problematic widget, by marking it with a red box
+					if(w.get(Tags.Shape, null) != null)
+						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
+							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
+				}
+			} 
+		}
+
 		return Verdict.OK;
 	}
 
