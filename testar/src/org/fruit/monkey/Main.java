@@ -36,14 +36,13 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.UnProc;
-import org.fruit.Util;
+import org.fruit.*;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 
@@ -56,6 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.fruit.alayer.windows.UIATags;
+import org.fruit.alayer.windows.Windows10;
 
 import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
@@ -122,6 +122,8 @@ public class Main {
 
 			initCodingManager(settings);
 
+			initOperatingSystem();
+
 			startTestar(settings, testSettingsFileName);
 		}
 
@@ -135,6 +137,8 @@ public class Main {
 				setTestarDirectory(settings);
 
 				initCodingManager(settings);
+
+				initOperatingSystem();
 
 				startTestar(settings, testSettingsFileName);
 			}
@@ -667,4 +671,15 @@ public class Main {
         }
     }
 
+	/**
+	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 */
+	private static void initOperatingSystem() {
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
+			Environment.setInstance(new Windows10());
+		} else {
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			Environment.setInstance(new UnknownEnvironment());
+		}
+	}
 }

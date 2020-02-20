@@ -248,9 +248,9 @@ public class StateFetcher implements Callable<UIAState>{
 				if((exStyle & Windows.WS_EX_TRANSPARENT) == 0 && (exStyle & Windows.WS_EX_NOACTIVATE) == 0){
 					ret.addFirst(windowHandle);
 					// begin by urueda
-					if (System.getProperty("DEBUG_WINDOWS_PROCESS_NAMES") != null)
-						System.out.println("<" + windowHandle + "> window' process name <" + Windows.GetProcessNameFromHWND(windowHandle) + ">");
-					// end by urueda					
+					if (System.getProperty("DEBUG_WINDOWS_PROCESS_NAMES") != null) {
+						System.out.println("PID <" + Windows.GetWindowProcessId(windowHandle) + ">  Process name <" + Windows.GetProcessNameFromHWND(windowHandle) + ">" + " Window handle <" + windowHandle + ">");
+					} // end by urueda
 				}				
 			}
 			windowHandle = Windows.GetNextWindow(windowHandle, Windows.GW_HWNDNEXT);
@@ -417,6 +417,9 @@ public class StateFetcher implements Callable<UIAState>{
 		// In time, these hard-coded attributes should be refactored away.
 		uiaElement.set(UIATags.UIAControlType, uiaElement.ctrlId);
 		uiaElement.set(UIATags.UIANativeWindowHandle, uiaElement.windowHandle);
+		// Also set the platform generic windowHandle
+		uiaElement.set(Tags.HWND,uiaElement.windowHandle);
+
 		uiaElement.set(UIATags.UIAIsEnabled, uiaElement.enabled);
 		uiaElement.set(UIATags.UIAName, uiaElement.name);
 		uiaElement.set(UIATags.UIAHelpText, uiaElement.helpText);
@@ -517,6 +520,8 @@ public class StateFetcher implements Callable<UIAState>{
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
 
+		parent.set(Tags.HWND, hwnd);
+		
 		long[] vmidAC;
 		if (vmid == 0)
 			vmidAC = Windows.GetAccessibleContext(hwnd);

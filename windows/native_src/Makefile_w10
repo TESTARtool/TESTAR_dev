@@ -1,5 +1,5 @@
 LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib\
-      Msimg32.lib GDIplus.lib kernel32.lib psapi.lib
+      Msimg32.lib GDIplus.lib kernel32.lib psapi.lib shcore.lib
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
