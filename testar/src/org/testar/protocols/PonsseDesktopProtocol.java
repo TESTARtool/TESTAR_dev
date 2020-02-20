@@ -199,7 +199,35 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         }
     }
 
-
+    protected void executeSequenceCloseAndLogout(SUT system){
+        // pushing back button until in logout screen:
+        State state = getState(system);
+        System.out.println("stopSystem: trying to gracefully close all the screens and logout");
+        while(
+                waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnTimeUsageQuery_UnutilizedTimeOtherunutilizedtime",state,system,1,0.5)
+                        || widgetWithAutomationIdFound("specificDownTimeReasonWindow", state) && waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnCancelClose",state,system,1,0.5)
+                        || widgetWithAutomationIdFound("MessageDialog", state) && waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnOk",state,system,1,0.5)
+                        || waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnPopupCancel",state,system,1,0.5)
+                        || waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ExpanderButtonCancel",state,system,1,0.5)
+                        || waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ButtonBack",state,system,1,0.5)
+                        || waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnCancelClose",state,system,1,0.5)
+                        || waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"Cancel",state,system,1,0.5)
+                ){
+            System.out.println("Pushing back/close/etc buttons until in logout screen");
+            //update TESTAR state:
+            state = getState(system);
+        }
+        while(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ButtonLogOut",state,system,1,0.5)){
+            System.out.println("Pushing logout button");
+            //update TESTAR state:
+            state = getState(system);
+        }
+        if(widgetWithAutomationIdFound("btnShutDown", state, system, 1)){
+            System.out.println("Shutdown button found - graceful logout successful!");
+        }else{
+            System.out.println("ERROR: graceful logout failed!");
+        }
+    }
 
     /**
      * This method waits until the widget with given title is found or retry limit is reached

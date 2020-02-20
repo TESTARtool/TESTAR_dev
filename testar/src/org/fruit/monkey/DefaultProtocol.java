@@ -2057,7 +2057,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Widget widget = getWidgetWithMatchingTag(tag,value,state);
 			if(widget!=null){
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				//System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+				System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
 				executeAction(system,state,ac.leftClickAt(widget));
 				// is waiting needed after the action has been executed?
 				return true;
