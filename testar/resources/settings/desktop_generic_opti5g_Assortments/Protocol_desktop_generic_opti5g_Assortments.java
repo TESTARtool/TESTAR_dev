@@ -63,111 +63,48 @@ public class Protocol_desktop_generic_opti5g_Assortments extends PonsseDesktopPr
 	protected void beginSequence(SUT system, State state){
 		System.out.println("DEBUG: Begin sequence, looking if shutdown button is available");
 		if(widgetWithAutomationIdFound("btnShutDown", state, system, 20)){
-			System.out.println("DEBUG: Ponsse UI ready!");
+			System.out.println("beginSequence: btnShutDown found - Ponsse UI ready!");
 		}
 
-		// if testar button is not found, creating new user:
+		// if testar button is not found, creating a new user:
 		if(!widgetWithAutomationIdFound("btntestar", state, system, 1)){
 			// Ponsse GUI ready and testar button not found - creating testar user
-			System.out.println("DEBUG: looking for btnAddUser");
-			waitAndClickButtonByAutomationId("btnAddUser", state, system, 20);
+			System.out.println("creating a new user 'testar'");
+			executeSequenceToCreateTestarUser(state, system);
 
 			//updating TESTAR state:
 			state=getState(system);
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: typing first name");
-			waitAndTypeTextByAutomationId("txtBoxFirstName", "testar", state, system, 20);
-
-			System.out.println("DEBUG: typing last name");
-			waitAndTypeTextByAutomationId("txtBoxLastName", "test", state, system, 20);
-
-			System.out.println("DEBUG: typing user ID");
-			waitAndTypeTextByAutomationId("txtBoxUserId", "testar@ponsse.com", state, system, 20);
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: closing virtual keyboard");
-//		 waitAndClickButton("btnHideVkb", state, system, 20);
-			executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
-
-			//updating TESTAR state:
-			state=getState(system);
-
-			System.out.println("DEBUG: typing new PIN code");
-			waitAndTypeTextByAutomationId("passwordBoxPinBox1", "1111", state, system, 20);
-
-			System.out.println("DEBUG: typing new PIN code again");
-			waitAndTypeTextByAutomationId("passwordBoxPinBox2", "1111", state, system, 20);
-
-			System.out.println("DEBUG: looking for buttonFinish");
-			waitAndClickButtonByAutomationId("buttonFinish", state, system, 20);
 		}
 
-		 System.out.println("DEBUG: closing virtual keyboard if visible");
-//		 waitAndClickButton("btnHideVkb", state, system, 20);
-		 executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
-
-		// Ponsse user created - selecting testar user
-		 System.out.println("DEBUG: looking for btntestar");
-		 waitAndClickButtonByAutomationId("btntestar", state, system, 20);
-
-		 //updating TESTAR state:
-		 state=getState(system);
-		 
-		 System.out.println("DEBUG: looking for pin code");
-		 waitAndTypeTextByAutomationId("passwordBoxPinBoxCode", "1111", state, system, 20);
-		 
-		 System.out.println("DEBUG: looking for btnLogOn");
-		 waitAndClickButtonByAutomationId("btnLogOn", state, system, 20);
+		 // Ponsse user has been created - login testar user:
+		 executeSequenceLoginTestarUser(state,system);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 
-		 System.out.println("DEBUG: looking for btnPlanningView");
-		 waitAndClickButtonByAutomationId("btnPlanningView", state, system, 20);
+		 if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnPlanningView",state,system,20,1)){
+			 System.out.println("beginSequence: btnPlanningView found and clicked");
+		 }else{
+			 System.out.println("ERROR: beginSequence: btnPlanningView not found!");
+		 }
 
 		 //updating TESTAR state:
 		 state=getState(system);
-		 
-		 System.out.println("DEBUG: looking for contextMenuHandle");
-		 waitAndClickButtonByAutomationId("contextMenuHandle", state, system, 20);
+
+		 if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"contextMenuHandle",state,system,20,1)){
+			 System.out.println("beginSequence: contextMenuHandle found and clicked");
+		 }else{
+			 System.out.println("ERROR: beginSequence: contextMenuHandle not found!");
+		 }
 
 		 //updating TESTAR state:
 		 state=getState(system);
-		 
-		 System.out.println("DEBUG: looking for buttonProducts");
-		 waitAndClickButtonByAutomationId("buttonProducts", state, system, 20);
+
+		 if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"buttonProducts",state,system,20,1)){
+			 System.out.println("beginSequence: buttonProducts found and clicked");
+		 }else{
+			 System.out.println("ERROR: beginSequence: buttonProducts not found!");
+		 }
 
 	}
 
@@ -248,22 +185,23 @@ public class Protocol_desktop_generic_opti5g_Assortments extends PonsseDesktopPr
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		//super.stopSystem(system);
 		// pushing back button until in logout screen:
 		State state = getState(system);
+		System.out.println("stopSystem: trying to gracefully close all the screens and logout");
 		while(
-				waitAndClickButtonByAutomationId("btnTimeUsageQuery_UnutilizedTimeOtherunutilizedtime", state, system, 1)
-				|| widgetWithAutomationIdFound("MessageDialog", state) && waitAndClickButtonByAutomationId("btnOk", state, system, 1)
-				|| waitAndClickButtonByAutomationId("btnPopupCancel", state, system, 1)
-				|| waitAndClickButtonByAutomationId("ExpanderButtonCancel", state, system, 1)
-				|| waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
-				|| waitAndClickButtonByAutomationId("btnCancelClose", state, system, 1)
-				|| waitAndClickButtonByTitle("Cancel", state, system, 1)){
-			System.out.println("Pushing back button until in logout screen");
+				waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnTimeUsageQuery_UnutilizedTimeOtherunutilizedtime",state,system,1,0.5)
+				|| widgetWithAutomationIdFound("MessageDialog", state) && waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnOk",state,system,1,0.5)
+				|| waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnPopupCancel",state,system,1,0.5)
+				|| waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ExpanderButtonCancel",state,system,1,0.5)
+				|| waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ButtonBack",state,system,1,0.5)
+				|| waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnCancelClose",state,system,1,0.5)
+				|| waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"Cancel",state,system,1,0.5)
+		){
+			System.out.println("Pushing back/close/etc buttons until in logout screen");
 			//update TESTAR state:
 			state = getState(system);
 		}
-		while(waitAndClickButtonByAutomationId("ButtonLogOut", state, system, 1)){
+		while(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"ButtonLogOut",state,system,1,0.5)){
 			System.out.println("Pushing logout button");
 			//update TESTAR state:
 			state = getState(system);

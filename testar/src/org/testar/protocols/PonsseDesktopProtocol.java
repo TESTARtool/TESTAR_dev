@@ -14,13 +14,24 @@ import org.sikuli.script.Region;
 import org.sikuli.script.Screen;
 
 public class PonsseDesktopProtocol extends DesktopProtocol {
+
+    /**
+     * Returns true if a widget with the given automationId is found.
+     * Retries the given number of times, waits 1 second between retries.
+     *
+     * @param automationId
+     * @param state
+     * @param system
+     * @param maxNumberOfRetries
+     * @return
+     */
     protected boolean widgetWithAutomationIdFound(String automationId, State state, SUT system, int maxNumberOfRetries){
         boolean uiElementFound = false;
         int numberOfRetries = 0;
         while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
             for(Widget widget:state){
                 if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
-                    System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
+                    //System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
                     return true;
                 }
             }
@@ -33,6 +44,13 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         return false;
     }
 
+    /**
+     * Returns true if a widget with the given automationId is found.
+     *
+     * @param automationId
+     * @param state
+     * @return
+     */
     protected boolean widgetWithAutomationIdFound(String automationId, State state){
         for(Widget widget:state){
             if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
@@ -42,6 +60,146 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         }
         return false;
     }
+
+    /**
+     * Executes a sequence on Ponsse 5G to login user 'testar'
+     *
+     * @param state
+     * @param system
+     */
+    protected void executeSequenceLoginTestarUser(State state, SUT system){
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btntestar",state,system,20,1)){
+            System.out.println("executeSequenceLoginTestarUser 1: btntestar found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 1: btntestar not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"passwordBoxPinBoxCode","1111", state,system,20,1)){
+            System.out.println("executeSequenceLoginTestarUser 2: passwordBoxPinBoxCode found, typing '1111'");
+        }else{
+            System.out.println("ERROR: executeSequenceLoginTestarUser 2: passwordBoxPinBoxCode not found!");
+        }
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnLogOn",state,system,20,1)){
+            System.out.println("executeSequenceLoginTestarUser 3: btnLogOn found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 3: btnLogOn not found!");
+        }
+    }
+
+    /**
+     * Executes a sequence on Ponsse 5G to create a new user 'testar'
+     *
+     * @param state
+     * @param system
+     */
+    protected void executeSequenceToCreateTestarUser(State state, SUT system){
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"btnAddUser",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 1: btnAddUser found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 1: btnAddUser not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 2: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 2: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 3: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 3: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"txtBoxFirstName","testar", state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 4: txtBoxFirstName found, typing 'testar'");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 4: txtBoxFirstName not found!");
+        }
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"txtBoxLastName","test", state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 5: txtBoxLastName found, typing 'test'");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 5: txtBoxLastName not found!");
+        }
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"txtBoxUserId","testar@ponsse.com", state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 6: txtBoxUserId found, typing 'testar@ponsse.com'");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 6: txtBoxUserId not found!");
+        }
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 7: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 7: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 8: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 8: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 9: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 9: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"NextButton",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 10: NextButton found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 10: NextButton not found!");
+        }
+
+        //updating TESTAR state:
+        state=getState(system);
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"passwordBoxPinBox1","1111", state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 11: passwordBoxPinBox1 found, typing '1111'");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 11: passwordBoxPinBox1 not found!");
+        }
+
+        if(waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAAutomationId,"passwordBoxPinBox2","1111", state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 12: passwordBoxPinBox2 found, typing '1111'");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 12: passwordBoxPinBox2 not found!");
+        }
+
+        if(waitAndLeftClickWidgetWithMatchingTag(UIATags.UIAAutomationId,"buttonFinish",state,system,20,1)){
+            System.out.println("executeSequenceToCreateTestarUser 13: buttonFinish found and clicked");
+        }else{
+            System.out.println("ERROR: executeSequenceToCreateTestarUser 13: buttonFinish not found!");
+        }
+    }
+
+
 
     /**
      * This method waits until the widget with given title is found or retry limit is reached
@@ -54,6 +212,7 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
      * @param maxNumberOfRetries
      * @return
      */
+    /* DEPRECATED
     protected boolean waitAndClickButtonByTitle(String title, State state, SUT system, int maxNumberOfRetries){
         boolean uiElementFound = false;
         int numberOfRetries = 0;
@@ -76,8 +235,10 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         }
         return false;
     }
+    */
 
     /**Ponsse: This method clicks a button in Opti5G UI*/
+    /* DEPRECATED
     protected boolean waitAndClickButtonByAutomationId(String automationId, State state, SUT system, int maxNumberOfRetries){
         boolean uiElementFound = false;
         int numberOfRetries = 0;
@@ -100,8 +261,10 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         }
         return false;
     }
+    */
 
     /**Ponsse: This method types text to UI element */
+    /* DEPRECATED
     protected boolean waitAndTypeTextByAutomationId(String automationId, String text, State state, SUT system, int maxNumberOfRetries){
         boolean uiElementFound = false;
         int numberOfRetries = 0;
@@ -124,6 +287,7 @@ public class PonsseDesktopProtocol extends DesktopProtocol {
         }
         return false;
     }
+    */
 
     /**
      * Using SikuliX library to click on text on screen
