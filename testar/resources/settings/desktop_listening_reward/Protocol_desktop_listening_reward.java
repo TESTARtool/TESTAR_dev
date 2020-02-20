@@ -33,7 +33,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.StateModel.ModelArtifactManager;
 import nl.ou.testar.StateModel.StateModelTags;
 
 import org.fruit.Drag;
@@ -54,11 +58,18 @@ import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
+
+import org.testar.json.object.JsonArtefactTestResults;
 import org.testar.protocols.DesktopProtocol;
 
 public class Protocol_desktop_listening_reward extends DesktopProtocol {
 
 	private double userInterestReward = 2.5;
+	
+	SortedSet<String> sequencesOutputDir = new TreeSet<>();
+	SortedSet<String> htmlOutputDir = new TreeSet<>();
+	SortedSet<String> logsOutputDir = new TreeSet<>();
+	SortedSet<String> sequencesVerdicts = new TreeSet<>();
 	
 	/**
 	 * Initialize TESTAR with the given settings:
@@ -124,6 +135,30 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 		}
 
 		return highAction;
+	}
+
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
+		sequencesOutputDir.add(getGeneratedSequenceName());
+		logsOutputDir.add(getGeneratedLogName());
+		htmlOutputDir.add(htmlReport.getGeneratedHTMLName());
+		sequencesVerdicts.add(verdictInfo);
+	}
+
+	/**
+	 *  This methods is called after finishing the last sequence
+	 */
+	@Override
+	protected void closeTestSession() {
+		JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
+				logsOutputDir, htmlOutputDir, sequencesVerdicts);
+		ModelArtifactManager.createAutomaticArtefact(settings);
 	}
 
 

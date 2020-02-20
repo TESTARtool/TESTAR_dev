@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ package org.testar.json.object;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.SettingsDialog;
@@ -49,8 +49,8 @@ public class JsonArtefactTestResults {
 	
 	private static String url = "https://testar.org/images/models/";
 
-	public static void createTestResultsArtefact(Settings settings, Set<String> sequencesOutputDir, Set<String> logsOutputDir,
-			Set<String> htmlOutputDir, Set<String> sequencesVerdicts) {
+	public static void createTestResultsArtefact(Settings settings, SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
+			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts) {
 
 		SettingsJsonObject settingJson = new SettingsJsonObject(settings);
 

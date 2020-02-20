@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ package org.testar.json.object;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.fruit.monkey.SettingsDialog;
 import org.testar.OutputStructure;
@@ -50,42 +50,10 @@ public class JsonArtefactStateModel {
 	private static String url = "https://testar.org/images/models/";
 	
 	@JsonCreator
-	public static void createStateModelArtefact(String outputPath, String applicationName, String applicationVersion,
-			String abstractionId, boolean deterministic, int unvisitedActions) {
-		
-		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
-				NativeLinker.getOsName());
-
-		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
-				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
-				NativeLinker.getOsName());
-		
-		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
-				url, sutJson, toolJson, applicationName, applicationVersion, "a",
-				abstractionId, deterministic, unvisitedActions,
-				0, 0, 0, 0,
-				false, 0, 0);
-		
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-		String outputFile = outputPath + File.separator +
-				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + ".json";
-		
-		try{
-			FileWriter fileWriter = new FileWriter(outputFile);
-			gson.toJson(modelJson, fileWriter);
-			fileWriter.flush();
-			fileWriter.close();
-		}catch(Exception e){
-			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
-		}
-	}
-	
-	@JsonCreator
 	public static void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
-			boolean storeWidgets, long widgets, long testSequences, Set<StateModelTestSequenceJsonObject> testSequenceObject) {
+			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
 		
 		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
 				NativeLinker.getOsName());
@@ -107,6 +75,45 @@ public class JsonArtefactStateModel {
 		String outputFile = OutputStructure.outerLoopOutputDir + File.separator +
 				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + "_" +
 				modelIdentifier + "_" + OutputStructure.startOuterLoopDateString + ".json";
+		
+		try{
+			FileWriter fileWriter = new FileWriter(outputFile);
+			gson.toJson(modelJson, fileWriter);
+			fileWriter.flush();
+			fileWriter.close();
+			System.out.println("Created JSON State Model artefact: " + outputFile);
+		}catch(Exception e){
+			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
+		}
+	}
+	
+	@JsonCreator
+	public static void specificStateModelArtefact(String pathArtefact,
+			String applicationName, String applicationVersion, String modelIdentifier,
+			String abstractionId, boolean deterministic, long unvisitedActions,
+			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
+			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
+		
+		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
+				NativeLinker.getOsName());
+
+		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
+				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
+				NativeLinker.getOsName());
+		
+		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
+				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
+				abstractionId, deterministic, unvisitedActions,
+				abstractStates, abstractActions, concreteStates, concreteActions,
+				storeWidgets, widgets, testSequences);
+		
+		modelJson.setTestSequences(testSequenceObject);
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+		String outputFile =  pathArtefact + File.separator +
+				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + "_" +
+				modelIdentifier + ".json";
 		
 		try{
 			FileWriter fileWriter = new FileWriter(outputFile);
