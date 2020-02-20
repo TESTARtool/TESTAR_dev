@@ -41,4 +41,5 @@ public interface Mouse {
 	void isPressed(MouseButtons k);
 	void setCursor(double x, double y);
 	Point cursor();
+	void setCursorDisplayScale(double displayScale);
 }

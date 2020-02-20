@@ -75,6 +75,7 @@ public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
   private static List<String> windowHandles = new ArrayList<>();
   public static boolean followLinks = true;
+  public static boolean fullScreen = false;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -96,7 +97,7 @@ public class WdDriver extends SUTBase {
     String url = parts[parts.length - 1].replace("\"", "");
     Dimension screenDimensions = null;
     Point screenPosition = null;
-    if (parts.length == 3) {
+    if (parts.length == 3 && !fullScreen) {
       String tmp = parts[1].replace("\"", "").toLowerCase();
       String[] dims = tmp.split("\\+")[0].split("x");
       screenDimensions =
@@ -159,6 +160,8 @@ public class WdDriver extends SUTBase {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
+    if(fullScreen)
+    	options.addArguments("--start-maximized");
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);

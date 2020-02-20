@@ -54,6 +54,8 @@ public class WdMouse implements Mouse {
       "Consider using a platform specific Mouse Implementation instead of WdMouse!";
 
   private final Robot robot;
+  
+  private double displayScale;
 
   public static WdMouse build() throws FruitException {
     return new WdMouse();
@@ -62,10 +64,15 @@ public class WdMouse implements Mouse {
   private WdMouse() throws FruitException {
     try {
       robot = new Robot();
+      this.displayScale = 1.0;
     }
     catch (AWTException awte) {
       throw new FruitException(awte);
     }
+  }
+  
+  public void setCursorDisplayScale(double displayScale) {
+	  this.displayScale = displayScale;
   }
 
   public String toString() {
@@ -85,13 +92,16 @@ public class WdMouse implements Mouse {
   }
 
   public void setCursor(double x, double y) {
-    int canvasX = (int) Math.min(Math.max(0, x), CanvasDimensions.getInnerWidth());
-    int canvasY = (int) Math.min(Math.max(0, y), CanvasDimensions.getInnerHeight());
-
+    double canvasX = Math.min(Math.max(0, x), CanvasDimensions.getInnerWidth());
+    double canvasY = Math.min(Math.max(0, y), CanvasDimensions.getInnerHeight());
+    
     canvasX += CanvasDimensions.getCanvasX();
     canvasY += CanvasDimensions.getCanvasY();
+    
+    canvasX = canvasX * displayScale;
+    canvasY = canvasY * displayScale;
 
-    robot.mouseMove(canvasX, canvasY);
+    robot.mouseMove((int)canvasX, (int)canvasY);
   }
 
   public org.fruit.alayer.Point cursor() {
@@ -101,8 +111,8 @@ public class WdMouse implements Mouse {
     }
     java.awt.Point p = info.getLocation();
 
-    int viewportX = p.x - CanvasDimensions.getCanvasX();
-    int viewportY = p.y - CanvasDimensions.getCanvasY();
+    int viewportX = (int) ((p.x/ displayScale) - CanvasDimensions.getCanvasX());
+    int viewportY = (int) ((p.y/ displayScale) - CanvasDimensions.getCanvasY());
     return org.fruit.alayer.Point.from(viewportX, viewportY);
   }
 }
