@@ -2146,6 +2146,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			else if(widget.get(tag, null).toString().equals(value)){
 				return widget;
 			}
+			else if(widget.get(tag, null).toString().contains(value)) {
+				return widget;
+			}
 		}
 		return null;
 	}

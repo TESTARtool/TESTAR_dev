@@ -108,7 +108,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		/*state = getState(system);
 
 		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Email") && w.get(Tags.Title,"").contains("phone")) {
+			if(w.get(Tags.Title,"").contains("Email, phone, or Skype")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
 				Action a = ac.clickTypeInto(w, "testarhandson", true);
 				executeAction(system, state, a);
@@ -169,7 +169,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 
 		/**
-		 * START Option2:
+		 * START Option 2:
 		 *  Work doing keyboard actions, without check the state and widgets
 		 */
 		new CompoundAction.Builder()   
@@ -198,6 +198,36 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		/**
 		 * END Option 2
+		 */
+
+		
+		/**
+		 * START Option 3: 
+		 * Use TESTAR internal methods to find the desired widget Tag with the Value and execute actions like click or type
+		 */
+		
+		/*if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Email, phone, or Skype", "testarhandson@gmail.com", state, system, 5, 1)) {
+			System.out.println("Typing email credentials was sucessfull.");
+		}
+		
+		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Next", state, system, 5, 1)){
+	 		System.out.println("Left click on Next button was successful.");
+		}
+		
+		Util.pause(5);
+		
+		if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Enter the password", "0neDrivetestar", state, system, 5, 1)) {
+			System.out.println("Typing password credentials was sucessfull.");
+		}
+		
+		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Sign in", state, system, 5, 1)){
+	 		System.out.println("Left click on Sign in button was successful.");
+		}
+		
+		Util.pause(2);*/
+		
+		/**
+		 * END Option 3
 		 */
 
 	}
