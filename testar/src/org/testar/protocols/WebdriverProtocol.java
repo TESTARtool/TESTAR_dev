@@ -119,8 +119,6 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 
         // See remarks in WdMouse
         mouse = sut.get(Tags.StandardMouse);
-        mouse.setCursorDisplayScale(displayScale);
-
     	return sut;
     }
 
