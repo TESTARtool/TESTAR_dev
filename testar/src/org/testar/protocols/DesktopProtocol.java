@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,6 @@ package org.testar.protocols;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
 import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -43,10 +42,8 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
-
 import java.io.File;
 import java.util.Set;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -117,23 +114,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
         //the foreground. You should add all other actions here yourself.
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-        Set<Action> actions = super.deriveActions(system,state);
-
-
-        // Derive left-click actions, click and type actions, and scroll actions from
-        // top level (highest Z-index) widgets of the GUI:
-        actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
-
-        if(actions.size()==0){
-            // If the top level widgets did not have any executable widgets, try all widgets:
-//            System.out.println("No actions from top level widgets, changing to all widgets.");
-            // Derive left-click actions, click and type actions, and scroll actions from
-            // all widgets of the GUI:
-            actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-        }
-
-        //return the set of derived actions
-        return actions;
+        return super.deriveActions(system,state);
     }
 
     /**
@@ -333,5 +314,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         }
         return actions;
     }
+
+
 
 }
