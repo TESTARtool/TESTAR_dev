@@ -1,7 +1,6 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,25 +28,27 @@
  *******************************************************************************************************/
 
 
-import java.util.HashSet;
 import java.util.Set;
-
-import nl.ou.testar.ActionSelectionUtils;
-import org.fruit.alayer.*;
+import nl.ou.testar.RandomActionSelector;
+import org.fruit.Drag;
+import org.fruit.alayer.AbsolutePosition;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
+import org.fruit.alayer.Tags;
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
 import org.testar.protocols.DesktopProtocol;
 
-/**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
- *
- * It uses random action selection algorithm.
- */
-public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
-
-
-	private Set<Action> executedActions = new HashSet<Action> ();
-	private Set<Action> previousActions;
+public class Protocol_desktop_orientdb extends DesktopProtocol {
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -85,65 +86,25 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	}
 	
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
-	 *
+	 * Select one of the available actions (e.g. at random)
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		System.out.println("*** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
-		Set<Action> prioritizedActions = new HashSet<Action> ();
-		//checking if it is the first round of actions:
-		if(previousActions==null) {
-			//all actions are new actions:
-			//System.out.println("DEBUG: the first round of actions");
-			prioritizedActions = actions;
-		}else{
-			//if not the first round, get the new actions compared to previous state:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, previousActions);
-		}
-		if(prioritizedActions.size()>0){
-			//there are new actions to choose from, checking if they have been already executed:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, executedActions);
-		}
-		if(prioritizedActions.size()>0){
-			// found new actions that have not been executed before - choose randomly
-			//System.out.println("DEBUG: found NEW actions that have not been executed before");
-		}else{
-			// no new unexecuted actions, checking if any unexecuted actions:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions);
-		}
-		if(prioritizedActions.size()>0){
-			// found actions that have not been executed before - choose randomly
-			//System.out.println("DEBUG: found actions that have not been executed before");
-		}else{
-			// no unexecuted actions, choose randomly on any of the available actions:
-			//System.out.println("DEBUG: NO actions that have not been executed before");
-			prioritizedActions = actions;
-		}
-		//saving the current actions for the next round:
-		previousActions = actions;
-		return(super.selectAction(state, prioritizedActions));
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action a = preSelectAction(state, actions);
+		if (a!= null) {
+			return a;
+		} else
+			//if no preSelected actions are needed, then implement your own strategy
+			System.out.println("Asking state model manager for action");
+			Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+			if (modelAction != null) return modelAction;
+			System.out.println("StateModelManager did not return an action. Returning random");
+			return RandomActionSelector.selectAction(actions);
 	}
 
-	/**
-	 * Execute the selected action.
-	 *
-	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
-	 *
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-		executedActions.add(action);
-		System.out.println("executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
-		return super.executeAction(system, state, action);
-	}
 }

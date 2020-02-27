@@ -1,7 +1,8 @@
+
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,20 +30,24 @@
  *******************************************************************************************************/
 
 
-import java.util.Set;
-
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
+
+import java.util.Set;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
+public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -144,18 +149,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
-
-		if(actions.isEmpty()){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-		}
+		// all widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 
 		//return the set of derived actions
 		return actions;
