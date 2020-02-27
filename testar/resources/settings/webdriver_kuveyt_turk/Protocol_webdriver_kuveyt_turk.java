@@ -235,28 +235,23 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
          * TODO: Customize the credentials obtained from DB
          */
 
-
         // This login sequence is based on the information on: https://isube.kuveytturk.com.tr/Login/InitialLogin
         // But the username and password works only in internal development environment of Kuveyt Turk
         System.out.println("DEBUG 1: looking for BtnOK (expecting a pop-up info screen)");
 
-        waitAndClickButtonByTitle("BtnOK", state, system, 5);
-
+        waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"BtnOK", state, system, 20, 0.5);
 
         System.out.println("DEBUG 2: changing language to English (expecting to be in Turkish login screen)");
 
-        waitAndClickButtonByTitle("english", state, system, 5);
+        waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"english", state, system, 20,0.5);
 
         // widget.get(Tags.ValuePattern, "not available").equalsIgnoreCase("/Login/InitialLoginEnglish"))
 
-
         System.out.println("DEBUG 3: looking for password field");
 
-        waitAndClickAtAndTypeByTitle("Password", "12121212", state, system, 5);
-
+        waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title,"Password", "12121212", state, system, 20,0.5);
 
         Util.pause(1);
-
 
         new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT), 0.2)
 
@@ -266,109 +261,33 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
                 .add(new KeyUp(KBKeys.VK_SHIFT), 0.2).build().run(system, state, 0.2);
 
-
         Util.pause(1);
-
 
         new CompoundAction.Builder().add(new Type("94444281"), 1)
 
                 .build().run(system, state, 0.2);
 
-
         Util.pause(1);
-
 
         System.out.println("DEBUG 4: looking for login/next button");
 
-        waitAndClickButtonByTitle("Login", state, system, 5);
-
+        waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"Login", state, system, 20,0.5);
 
         state = getState(system);
-
-        //waitAndClickButtonByTitle("LoginButton", state, system, 5);
 
         System.out.println("DEBUG 5: clicking login button");
 
-        for (Widget widget : state) {
-
-
-            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("login")) {
-
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-
-                System.out.println("DEBUG: waitAndClickButtonByTitle: left mouse click on " + login);
-
-                Action a = ac.leftClickAt(widget);
-
-                nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
-
-                executeAction(system, state, a);
-
-                Util.pause(1);
-
-                Util.clear(cv);
-
-
-            }
-
-        }
-
+        waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName,"login",state,system,20,0.5 );
 
         state = getState(system);
 
-        //waitAndClickButtonByTitle("LoginButton", state, system, 5);
-
         System.out.println("DEBUG 6: entering smspassword field");
 
-        for (Widget widget : state) {
+        waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"SmsPassword","121212",state,system,20,0.5 );
 
+        System.out.println("DEBUG 7: clicking login button");
 
-            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("SmsPassword")) {
-
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-
-                System.out.println("DEBUG: typıng ınto SMS password");
-
-                Action a = ac.clickTypeInto(widget, "121212", true);
-
-                nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
-
-                executeAction(system, state, a);
-
-                Util.pause(1);
-
-                Util.clear(cv);
-
-
-            }
-
-        }
-
-
-        for (Widget widget : state) {
-
-
-            if (widget.get(WdTags.WebName, "NoTitleAvailable").equalsIgnoreCase("OtpLoginButton")) {
-
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-
-                System.out.println("DEBUG: clıckıng OtpLoginButton");
-
-                Action a = ac.leftClickAt(widget);
-
-                nl.ou.testar.SutVisualization.visualizeSelectedAction(settings, cv, state, a);
-
-                executeAction(system, state, a);
-
-                Util.pause(1);
-
-                Util.clear(cv);
-
-
-            }
-
-        }
-
+        waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName,"OtpLoginButton",state,system,20,0.5 );
 
         super.beginSequence(system, state);
 
@@ -376,258 +295,135 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
 
     /**
-
      * This method is called when TESTAR requests the state of the SUT.
-
      * Here you can add additional information to the SUT's state or write your
-
      * own state fetching routine. The state should have attached an oracle
-
      * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-
      * state is erroneous and if so why.
-
      *
-
      * @return the current state of the SUT with attached oracle.
-
      */
-
     @Override
-
     protected State getState(SUT system) throws StateBuildException {
-
         State state = super.getState(system);
-
-
         return state;
-
     }
 
-
     /**
-
      * This is a helper method used by the default implementation of <code>buildState()</code>
-
      * It examines the SUT's current state and returns an oracle verdict.
-
      *
-
      * @return oracle verdict, which determines whether the state is erroneous and why.
-
      */
-
     @Override
-
     protected Verdict getVerdict(State state) {
-
-
         Verdict verdict = super.getVerdict(state); // by urueda
-
         // system crashes, non-responsiveness and suspicious titles automatically detected!
-
-
         //-----------------------------------------------------------------------------
-
         // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-
         //-----------------------------------------------------------------------------
-
-
         // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-
         return verdict;
-
     }
 
-
     /**
-
      * This method is used by TESTAR to determine the set of currently available actions.
-
      * You can use the SUT's current state, analyze the widgets and their properties to create
-
      * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-
      * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-
      * will stop generation of the current action and continue with the next one.
-
      *
-
      * @param system the SUT
-
      * @param state  the SUT's current state
-
      * @return a set of actions
-
      */
-
     @Override
-
-    protected Set<Action> deriveActions(SUT system, State state)
-
-            throws ActionBuildException {
-
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
-
         Set<Action> actions = super.deriveActions(system, state);
 
-
         // create an action compiler, which helps us create actions
-
         // such as clicks, drag&drop, typing ...
-
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
-
         // Check if forced actions are needed to stay within allowed domains
-
         Set<Action> forcedActions = detectForcedActions(state, ac);
-
         if (forcedActions != null && forcedActions.size() > 0) {
-
             return forcedActions;
-
         }
-
 
         // iterate through all widgets
-
         for (Widget widget : state) {
-
             // only consider enabled and non-tabu widgets
-
             if (!widget.get(Enabled, true) || blackListed(widget)) {
-
                 continue;
-
             }
-
 
             // slides can happen, even though the widget might be blocked
-
             addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-
             // If the element is blocked, Testar can't click on or type in the widget
-
             if (widget.get(Blocked, false)) {
-
                 continue;
-
             }
-
 
             // type into text boxes
-
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-
                 actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-
             }
-
 
             // left clicks, but ignore links outside domain
-
             if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-
                 if (!isLinkDenied(widget)) {
-
                     actions.add(ac.leftClickAt(widget));
-
                 }
-
             }
-
         }
-
-
         return actions;
-
     }
 
-
-
     /*
-
      * Check the state if we need to force an action
-
      */
-
     private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-
         Set<Action> actions = detectForcedDeniedUrl();
-
         if (actions != null && actions.size() > 0) {
-
             return actions;
-
         }
-
 
         actions = detectForcedLogin(state);
-
         if (actions != null && actions.size() > 0) {
-
             return actions;
-
         }
-
 
         actions = detectForcedPopupClick(state, ac);
-
         if (actions != null && actions.size() > 0) {
-
             return actions;
-
         }
 
-
         return null;
-
     }
 
 
-
     /*
-
      * Detect and perform login if defined
-
      */
-
     private Set<Action> detectForcedLogin(State state) {
-
         if (login == null || username == null || password == null) {
-
             return null;
-
         }
 
-
         // Check if the current page is a login page
-
         String currentUrl = WdDriver.getCurrentUrl();
-
         if (currentUrl.startsWith(login.left())) {
-
             CompoundAction.Builder builder = new CompoundAction.Builder();
-
             // Set username and password
-
             for (Widget widget : state) {
-
                 WdWidget wdWidget = (WdWidget) widget;
-
                 // Only enabled, visible widgets
-
                 if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
-
                     continue;
-
                 }
-
 
                 if (username.left().equals(wdWidget.getAttribute("id"))) {
 
