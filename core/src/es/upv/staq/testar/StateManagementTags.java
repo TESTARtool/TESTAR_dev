@@ -271,6 +271,21 @@ public class StateManagementTags {
     public static final Tag<Long> WidgetWindowWindowInteractionState = Tag.from("WidgetWindowWindowInteractionState", Long.class); // check
     public static final Tag<Long> WidgetWindowWindowVisualState = Tag.from("WidgetWindowWindowVisualState", Long.class); // check
 
+    // Web widgets
+    public static final Tag<String> WebWidgetId = Tag.from("Web Widget id", String.class);
+    public static final Tag<String> WebWidgetName = Tag.from("Web Widget name", String.class);
+    public static final Tag<String> WebWidgetTagName = Tag.from("Web Widget tag name", String.class);
+    public static final Tag<String> WebWidgetTextContext= Tag.from("Web Widget text context", String.class);
+    public static final Tag<String> WebWidgetTitle = Tag.from("Web Widget title", String.class);
+    public static final Tag<String> WebWidgetHref = Tag.from("Web Widget href", String.class);
+    public static final Tag<String> WebWidgetValue = Tag.from("Web Widget value", String.class);
+    public static final Tag<String> WebWidgetStyle = Tag.from("Web Widget style", String.class);
+    public static final Tag<String> WebWidgetTarget = Tag.from("Web Widget target", String.class);
+    public static final Tag<String> WebWidgetAlt = Tag.from("Web Widget alt", String.class);
+    public static final Tag<String> WebWidgetType = Tag.from("Web Widget type", String.class);
+    public static final Tag<String> WebWidgetCssClasses = Tag.from("Web Widget css classes", String.class);
+    public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
+    
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
         {
@@ -281,6 +296,7 @@ public class StateManagementTags {
             add(WidgetHelpText);
             add(WidgetAutomationId);
             add(WidgetClassName);
+            add(WidgetIsOffscreen);
             add(WidgetFrameworkId);
             add(WidgetOrientationId);
             add(WidgetIsContentElement);
@@ -340,6 +356,21 @@ public class StateManagementTags {
             add(WidgetValuePattern);
             add(WidgetVirtualizedItemPattern);
             add(WidgetWindowPattern);
+            
+            //Webdriver
+            add(WebWidgetId);
+            add(WebWidgetName);
+            add(WebWidgetTagName);
+            add(WebWidgetTextContext);
+            add(WebWidgetTitle);
+            add(WebWidgetHref);
+            add(WebWidgetValue);
+            add(WebWidgetStyle);
+            add(WebWidgetTarget);
+            add(WebWidgetAlt);
+            add(WebWidgetType);
+            add(WebWidgetCssClasses);
+            add(WebWidgetDisplay);
         }
     };
 
@@ -362,6 +393,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetHelpText, "WidgetHelpText");
         settingsMap.put(WidgetAutomationId, "WidgetAutomationId");
         settingsMap.put(WidgetClassName, "WidgetClassName");
+        settingsMap.put(WidgetIsOffscreen, "WidgetIsOffscreen");
         settingsMap.put(WidgetFrameworkId, "WidgetFrameworkId");
         settingsMap.put(WidgetOrientationId, "WidgetOrientationId");
         settingsMap.put(WidgetIsContentElement, "WidgetIsContentElement");
@@ -417,6 +449,21 @@ public class StateManagementTags {
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
+        
+        //Webdriver
+        settingsMap.put(WebWidgetId, "WebWidgetId");
+        settingsMap.put(WebWidgetName, "WebWidgetName");
+        settingsMap.put(WebWidgetTagName, "WebWidgetTagName");
+        settingsMap.put(WebWidgetTextContext, "WebWidgetTextContext");
+        settingsMap.put(WebWidgetTitle, "WebWidgetTitle");
+        settingsMap.put(WebWidgetHref, "WebWidgetHref");
+        settingsMap.put(WebWidgetValue, "WebWidgetValue");
+        settingsMap.put(WebWidgetStyle, "WebWidgetStyle");
+        settingsMap.put(WebWidgetTarget, "WebWidgetTarget");
+        settingsMap.put(WebWidgetAlt, "WebWidgetAlt");
+        settingsMap.put(WebWidgetType, "WebWidgetType");
+        settingsMap.put(WebWidgetCssClasses, "WebWidgetCssClasses");
+        settingsMap.put(WebWidgetDisplay, "WebWidgetDisplay");
     }
 
     // a mapping of a tag to its group
@@ -429,6 +476,7 @@ public class StateManagementTags {
             put(WidgetHelpText, Group.General);
             put(WidgetAutomationId, Group.General);
             put(WidgetClassName, Group.General);
+            put(WidgetIsOffscreen, Group.General);
             put(WidgetFrameworkId, Group.General);
             put(WidgetOrientationId, Group.General);
             put(WidgetIsContentElement, Group.General);
@@ -484,6 +532,21 @@ public class StateManagementTags {
             put(WidgetValuePattern, Group.ControlPattern);
             put(WidgetVirtualizedItemPattern, Group.ControlPattern);
             put(WidgetWindowPattern, Group.ControlPattern);
+            
+            //Webdriver
+            put(WebWidgetId, Group.General);
+            put(WebWidgetName, Group.General);
+            put(WebWidgetTagName, Group.General);
+            put(WebWidgetTextContext, Group.General);
+            put(WebWidgetTitle, Group.General);
+            put(WebWidgetHref, Group.General);
+            put(WebWidgetValue, Group.General);
+            put(WebWidgetStyle, Group.General);
+            put(WebWidgetTarget, Group.General);
+            put(WebWidgetAlt, Group.General);
+            put(WebWidgetType, Group.General);
+            put(WebWidgetCssClasses, Group.General);
+            put(WebWidgetDisplay, Group.General);
         }
     };
 

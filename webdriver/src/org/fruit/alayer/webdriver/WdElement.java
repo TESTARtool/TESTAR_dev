@@ -56,7 +56,7 @@ public class WdElement extends TaggableBase implements Serializable {
   WdWidget backRef;
 
   public boolean blocked;
-  long culture = 0L;
+  //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
   public String id, name, tagName, textContent, helpText, title;
@@ -102,31 +102,24 @@ public class WdElement extends TaggableBase implements Serializable {
     	System.out.println("-------------------------------------------------------------------------------------");
     	throw e;
     }
-
+    
     id = attributeMap.getOrDefault("id", "");
-    name = (String) packedElement.get("name");
+    name = attributeMap.getOrDefault("name", "");
     tagName = (String) packedElement.get("tagName");
-    textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
-    helpText = attributeMap.get("title");
+    textContent = attributeMap.getOrDefault("textContent", "").replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
-    
-    valuePattern = attributeMap.getOrDefault("href", "");
-    if (valuePattern == null || valuePattern.equals("")) {
-      valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
-    }
-    
     href = attributeMap.getOrDefault("href", "");
-    value = String.valueOf(packedElement.getOrDefault("value", ""));
+    value = attributeMap.getOrDefault("value", "");
     style = attributeMap.getOrDefault("style", "");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
+    type = attributeMap.getOrDefault("type", "");
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
       cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
-    type = attributeMap.get("type");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -156,6 +149,17 @@ public class WdElement extends TaggableBase implements Serializable {
 
     setName();
     fillScrollValues();
+    
+    // Not constant, id vs name
+    //name = (String) packedElement.get("name");
+    // Empty string ?
+    //textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
+    //helpText = attributeMap.get("title");
+    //value = String.valueOf(packedElement.getOrDefault("value", ""));
+    /*valuePattern = attributeMap.getOrDefault("href", "");
+    if (valuePattern == null || valuePattern.equals("")) {
+      valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
+    }*/
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
