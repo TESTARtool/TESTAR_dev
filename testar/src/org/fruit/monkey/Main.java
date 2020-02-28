@@ -416,8 +416,16 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
+			
 			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousWebTitle, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousWebName, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousWebHref, "(?!x)x"));
+			
 			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebId, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebHref, "(?!x)x"));
+			
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
 			defaults.add(Pair.from(ForceForeground, true));

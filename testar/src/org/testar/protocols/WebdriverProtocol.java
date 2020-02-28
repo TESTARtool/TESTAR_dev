@@ -38,22 +38,30 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.fruit.Environment;
+import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdMouse;
 import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
@@ -72,6 +80,14 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
+    
+	protected Pattern actionFilterWebIdPattern = null;
+	protected Pattern actionFilterWebHrefPattern = null;
+	protected Map<String, Matcher> actionFilterWebIdMatchers = new WeakHashMap<>();
+	protected Map<String, Matcher> actionFilterWebHrefMatchers = new WeakHashMap<>();
+	
+	protected Pattern suspiciousValuePattern = null;
+	protected Map<String, Matcher> suspiciousValueMatchers = new WeakHashMap<>();
 
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -179,6 +195,108 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
+    
+	@Override
+	protected Verdict getVerdict(State state){
+
+		Verdict currentVerdict = super.getVerdict(state);
+		
+		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebTitle), Pattern.UNICODE_CHARACTER_CLASS);
+		this.suspiciousValueMatchers = new WeakHashMap<>();
+		Verdict webTitleVerdict = suspiciousValueMatcher(WdTags.WebTitle, state);
+		currentVerdict.join(webTitleVerdict);
+		
+		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebName), Pattern.UNICODE_CHARACTER_CLASS);
+		this.suspiciousValueMatchers = new WeakHashMap<>();
+		Verdict webNameVerdict = suspiciousValueMatcher(WdTags.WebName, state);
+		currentVerdict.join(webNameVerdict);
+		
+		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebHref), Pattern.UNICODE_CHARACTER_CLASS);
+		this.suspiciousValueMatchers = new WeakHashMap<>();
+		Verdict webHrefVerdict = suspiciousValueMatcher(WdTags.WebHref, state);
+		currentVerdict.join(webHrefVerdict);
+
+		return currentVerdict;
+	}
+	
+	private Verdict suspiciousValueMatcher(Tag<String> tag, State state) {
+		for(Widget w : state) {
+			if(tag!=null && !w.get(tag, "").isEmpty()) {
+				String value = w.get(tag,"");
+				Matcher matcher = this.suspiciousValueMatchers.get(value);
+				if (matcher == null){
+					matcher = this.suspiciousValuePattern.matcher(value);
+					this.suspiciousValueMatchers.put(value, matcher);
+				}
+				
+				if (matcher.matches()){
+					Visualizer visualizer = Util.NullVisualizer;
+					// visualize the problematic widget, by marking it with a red box
+					if(w.get(Tags.Shape, null) != null)
+						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
+							"Discovered suspicious widget '" + tag.name() + "' : '" + value + "'.", visualizer);
+				}
+			}
+		}
+		
+		return Verdict.OK;
+	}
+    
+	/**
+	 * Check whether widget w should be filtered based on
+	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
+	 * that is cannot be hit
+	 * @param w
+	 * @return
+	 */
+    @Override
+	protected boolean isUnfiltered(Widget w){
+    	
+		//Check whether the widget can be hit
+		// If not, it should be filtered
+		if(!Util.hitTest(w, 0.5, 0.5))
+			return false;
+
+		String webId = w.get(WdTags.WebId, "");
+		if (!webId.isEmpty()) {
+			//If no ActionFilterPattern exists, then create it
+			//Get the ActionFilterPattern from the regular expression provided by the tester in the Dialog
+			if (this.actionFilterWebIdPattern == null) {
+				this.actionFilterWebIdPattern = Pattern.compile(settings().get(ConfigTags.ActionFilterWebId), Pattern.UNICODE_CHARACTER_CLASS);
+			}
+			//Check whether the title matches any of the ActionFilterPattern
+			Matcher matcherWebId = this.actionFilterWebIdMatchers.get(webId);
+			if (matcherWebId == null){
+				matcherWebId = this.actionFilterWebIdPattern.matcher(webId);
+				this.actionFilterWebIdMatchers.put(webId, matcherWebId);
+			}
+			// If we match some pattern, is not unfiltered
+			if(matcherWebId.matches()) {
+				return false;
+			}
+		}
+		
+		
+		String webHref = w.get(WdTags.WebHref, "");
+		if (!webHref.isEmpty()) {
+			if (this.actionFilterWebHrefPattern == null) {
+				this.actionFilterWebHrefPattern = Pattern.compile(settings().get(ConfigTags.ActionFilterWebHref), Pattern.UNICODE_CHARACTER_CLASS);
+			}
+
+			Matcher matcherWebHref = this.actionFilterWebHrefMatchers.get(webHref);
+			if (matcherWebHref == null){
+				matcherWebHref = this.actionFilterWebHrefPattern.matcher(webHref);
+				this.actionFilterWebHrefMatchers.put(webHref, matcherWebHref);
+			}
+			// If we match some pattern, is not unfiltered
+			if(matcherWebHref.matches()) {
+				return false;
+			}
+		}
+    	
+		return super.isUnfiltered(w);
+	}
 
     /**
      * Overwriting to add HTML report writing into it

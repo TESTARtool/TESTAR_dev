@@ -45,6 +45,9 @@ SequenceLength = 20
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousWebTitle = .*Error.*|.*[eE]xcepti[o?]n.*
+SuspiciousWebName = .*Error.*|.*[eE]xcepti[o?]n.*
+SuspiciousWebHref = .*Error.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -81,6 +84,8 @@ ProcessLogs = .*.*
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ActionFilterWebId = .*logout.*|.*LOGOUT.*
+ActionFilterWebHref = .*logout.*|.*LOGOUT.*
 
 #################################################################
 # Processfilter

@@ -43,8 +43,16 @@ public final class ConfigTags {
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
   public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class);
   public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class);
+  
   public static final Tag<String> SuspiciousTitles = Tag.from("SuspiciousTitles", String.class);
+  public static final Tag<String> SuspiciousWebTitle = Tag.from("SuspiciousWebTitle", String.class);
+  public static final Tag<String> SuspiciousWebName = Tag.from("SuspiciousWebName", String.class);
+  public static final Tag<String> SuspiciousWebHref = Tag.from("SuspiciousWebHref", String.class);
+ 
   public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class);
+  public static final Tag<String> ActionFilterWebId = Tag.from("ActionFilterWebId", String.class);
+  public static final Tag<String> ActionFilterWebHref = Tag.from("ActionFilterWebHref", String.class);
+  
   public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class);
   public static final Tag<String> TempDir = Tag.from("TempDir", String.class);
   public static final Tag<Boolean> OnlySaveFaultySequences = Tag.from("OnlySaveFaultySequences", Boolean.class);

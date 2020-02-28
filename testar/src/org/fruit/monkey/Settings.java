@@ -322,6 +322,9 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"SuspiciousTitles = " + Util.lineSep()
+					+"SuspiciousWebTitle = " + Util.lineSep()
+					+"SuspiciousWebName = " + Util.lineSep()
+					+"SuspiciousWebHref = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
@@ -358,6 +361,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"ClickFilter = " + Util.lineSep()
+					+"ActionFilterWebId = " + Util.lineSep()
+					+"ActionFilterWebHref = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Processfilter\n"
