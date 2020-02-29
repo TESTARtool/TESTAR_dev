@@ -399,6 +399,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ExitOnNonDeterminism =" + Util.lineSep()
 					+"UsePreviousStateInId =" + Util.lineSep()
 					+"UseAllStatesInId =" + Util.lineSep()
+					+"UseIncomingActionInId =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
