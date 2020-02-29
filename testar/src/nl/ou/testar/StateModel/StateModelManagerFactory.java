@@ -75,6 +75,9 @@ public class StateModelManagerFactory {
         else if (settings.get(ConfigTags.UseAllStatesInId)) {
             extractionMode = ExtractionMode.ALL_STATES;
         }
+        else if (settings.get(ConfigTags.UseIncomingActionInId)) {
+            extractionMode = ExtractionMode.INCOMING_ACTION;
+        }
         else {
             extractionMode = ExtractionMode.SINGLE_STATE;
         }

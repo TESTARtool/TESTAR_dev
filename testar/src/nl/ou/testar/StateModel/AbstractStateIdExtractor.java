@@ -1,8 +1,10 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Util.HydrationHelper;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +16,12 @@ import static nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode.*;
  */
 public class AbstractStateIdExtractor {
 
-    // enum with the 3 different extraction modes
+    // enum with the 4 different extraction modes
     public enum ExtractionMode {
         SINGLE_STATE,
         PREVIOUS_STATE,
-        ALL_STATES
+        ALL_STATES,
+        INCOMING_ACTION
     }
 
     // a list of state id strings that have been extracted
@@ -44,7 +47,7 @@ public class AbstractStateIdExtractor {
         System.out.println("Starting abstract state id extractor in mode: " + extractionMode);
     }
 
-    public String extractAbstractStateId(State state) {
+    public String extractAbstractStateId(State state, Action action) {
         switch (extractionMode) {
             case SINGLE_STATE:
                 return extractSingleState(state);
@@ -54,6 +57,9 @@ public class AbstractStateIdExtractor {
 
             case ALL_STATES:
                 return extractAllStates(state);
+
+            case INCOMING_ACTION:
+                return extractIncomingAction(state, action);
 
             default:
                 // this means the extraction mode is null
@@ -76,5 +82,15 @@ public class AbstractStateIdExtractor {
         // implementation is non-trivial, as loops need to be eliminated.
         // if we do not, every model will be of infinite size
         return "";
+    }
+
+    private String extractIncomingAction(State state, Action action) {
+        String actionId;
+        try {
+            actionId = action.get(Tags.AbstractIDCustom);
+        } catch (NoSuchTagException e) {
+            actionId = "unavailable";
+        }
+        return HydrationHelper.lowCollisionID(actionId + extractSingleState(state));
     }
 }

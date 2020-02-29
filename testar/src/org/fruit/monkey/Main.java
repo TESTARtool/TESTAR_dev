@@ -570,6 +570,7 @@ public class Main {
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(UsePreviousStateInId, false));
 			defaults.add(Pair.from(UseAllStatesInId, false));
+			defaults.add(Pair.from(UseIncomingActionInId, false));
 			defaults.add(Pair.from(ExitOnNonDeterminism, false));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
