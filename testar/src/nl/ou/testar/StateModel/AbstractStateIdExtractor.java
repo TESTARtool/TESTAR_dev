@@ -1,14 +1,10 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Util.HydrationHelper;
-import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.exceptions.NoSuchTagException;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode.*;
 
 /**
@@ -47,7 +43,7 @@ public class AbstractStateIdExtractor {
         System.out.println("Starting abstract state id extractor in mode: " + extractionMode);
     }
 
-    public String extractAbstractStateId(State state, Action action) {
+    public String extractAbstractStateId(State state, AbstractAction abstractAction) {
         switch (extractionMode) {
             case SINGLE_STATE:
                 return extractSingleState(state);
@@ -59,7 +55,7 @@ public class AbstractStateIdExtractor {
                 return extractAllStates(state);
 
             case INCOMING_ACTION:
-                return extractIncomingAction(state, action);
+                return extractIncomingAction(state, abstractAction);
 
             default:
                 // this means the extraction mode is null
@@ -84,13 +80,8 @@ public class AbstractStateIdExtractor {
         return "";
     }
 
-    private String extractIncomingAction(State state, Action action) {
-        String actionId;
-        try {
-            actionId = action.get(Tags.AbstractIDCustom);
-        } catch (NoSuchTagException e) {
-            actionId = "unavailable";
-        }
+    private String extractIncomingAction(State state, AbstractAction abstractAction) {
+        String actionId = abstractAction.getActionId() == null ? "" : abstractAction.getActionId();
         return HydrationHelper.lowCollisionID(actionId + extractSingleState(state));
     }
 }

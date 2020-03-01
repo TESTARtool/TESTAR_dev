@@ -100,7 +100,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         // check if we are dealing with a new state or an existing one
-        String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState);
+        String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState, actionUnderExecution);
         AbstractState newAbstractState;
 
         // fetch or create an abstract state
