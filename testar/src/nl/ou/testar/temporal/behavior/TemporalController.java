@@ -74,7 +74,7 @@ public class TemporalController {
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
     private TemporalModel tModel;
-    private TemporalDBHelper tDBHelper;
+    private TemporalDBManager tDBManager;
     private List<TemporalOracle> oracleColl;
 
     public TemporalController(final Settings settings, String outputDir) {
@@ -87,7 +87,7 @@ public class TemporalController {
         } else {
             this.outputDir = outputDir;
         }
-        tDBHelper = new TemporalDBHelper(settings);
+        tDBManager = new TemporalDBManager(settings);
         tModel = new TemporalModel();
         ltlSPOTToWSLPath = settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL);
         ltlSPOTMCCommand = settings.get(ConfigTags.TemporalLTL_SPOTChecker);
@@ -208,7 +208,7 @@ public class TemporalController {
     public void loadApSelectorManager(String filename) {
         this.apSelectorManager = (APSelectorManager) JSONHandler.load(filename, apSelectorManager.getClass());
         apSelectorManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
-        tDBHelper.setApSelectorManager(apSelectorManager);
+        tDBManager.setApSelectorManager(apSelectorManager);
     }
 
     public List<TemporalOracle> getOracleColl() {
@@ -244,24 +244,15 @@ public class TemporalController {
         } else {
             this.apSelectorManager = new APSelectorManager(true);
         }
-        tDBHelper.setApSelectorManager(apSelectorManager);
+        tDBManager.setApSelectorManager(apSelectorManager);
     }
 
-
-    // @TODO: 2019-12-29 refactor db operations to dbhelper
-    private void dbClose() {
-        tDBHelper.dbClose();
-    }
-
-    private void dbReopen() {
-        tDBHelper.dbReopen();
-    }
 
 
     public String pingDB() {
-        tDBHelper.dbReopen();
+
         StringBuilder sb = new StringBuilder();
-        List<AbstractStateModel> models = tDBHelper.fetchAbstractModels();
+        List<AbstractStateModel> models = tDBManager.fetchAbstractModels();
         if (models.isEmpty()) {
             sb.append("model count: 0\n");
         } else {
@@ -272,7 +263,6 @@ public class TemporalController {
                 sb.append("APP: " + abs.getApplicationName() + ", VERSION: " + abs.getApplicationVersion() + ", ID: " + abs.getModelIdentifier() + ", ABSTRACTION: " + abs.getAbstractionAttributes() + "\n");
             }
         }
-        tDBHelper.dbClose();
         String dbfilename = outputDir + "Databasemodels.txt";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbfilename))) {
             bw.write(sb.toString());
@@ -286,8 +276,8 @@ public class TemporalController {
 
     //*********************************
     private void computeTemporalModel(AbstractStateModel abstractStateModel, boolean instrumentDeadState) {
-
-        OResultSet resultSet = tDBHelper.getConcreteStatesFromOrientDb(abstractStateModel);
+        tDBManager.dbReopen();
+        OResultSet resultSet = tDBManager.getConcreteStatesFromOrientDb(abstractStateModel);
 
         if (abstractStateModel != null) {
 
@@ -336,9 +326,9 @@ public class TemporalController {
                             stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
-                        tDBHelper.computeProps(propertyName, stateVertex, propositions, null, false, false);
+                        tDBManager.computeProps(propertyName, stateVertex, propositions, null, false, false);
                     }
-                    propositions.addAll(tDBHelper.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
+                    propositions.addAll(tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
                     senc.setStateAPs(propositions);
                     if (instrumentDeadState && deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
@@ -350,7 +340,7 @@ public class TemporalController {
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
                         senc.setTransitionColl(deadTrencList);
-                    } else senc.setTransitionColl(tDBHelper.getTransitions(senc.getState()));
+                    } else senc.setTransitionColl(tDBManager.getTransitions(senc.getState()));
 
                     tModel.addStateEncoding(senc, false);
                 }
@@ -368,7 +358,7 @@ public class TemporalController {
                     } else encodedConjuncts.add(enc);
                 }
             }
-            tModel.setTraces(tDBHelper.fetchTraces(tModel.getApplication_ModelIdentifier()));
+            tModel.setTraces(tDBManager.fetchTraces(tModel.getApplication_ModelIdentifier()));
             List<String> initStates = new ArrayList<>();
             for (TemporalTrace trace : tModel.getTraces()
             ) {
@@ -387,12 +377,13 @@ public class TemporalController {
             }
 
         }
+        tDBManager.dbClose();
     }
 
 
     private AbstractStateModel getAbstractStateModel() {
         AbstractStateModel abstractStateModel;
-        abstractStateModel = tDBHelper.selectAbstractStateModelByModelId(Modelidentifier);
+        abstractStateModel = tDBManager.selectAbstractStateModelByModelId(Modelidentifier);
         if (abstractStateModel == null) {
             tModel.addLog("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + dbConfig.getDatabase()+">");
             System.out.println("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + dbConfig.getDatabase()+">");
@@ -404,7 +395,7 @@ public class TemporalController {
     public boolean saveToGraphMLFile(String file, boolean excludeWidget) {
         AbstractStateModel abstractStateModel = getAbstractStateModel();
         if (abstractStateModel != null) {
-            return tDBHelper.saveToGraphMLFile(abstractStateModel, outputDir + file, excludeWidget);
+            return tDBManager.saveToGraphMLFile(abstractStateModel, outputDir + file, excludeWidget);
         } else return false;
     }
 
@@ -677,9 +668,7 @@ public class TemporalController {
                 setDefaultAPSelectormanager();
                 saveAPSelectorManager("default_APSelectorManager.json");
             }
-            tDBHelper.dbReopen();
             computeTemporalModel(abstractStateModel, instrumentDeadState);
-            tDBHelper.dbClose();
             if (verbose) {
                 saveModelAsJSON("APEncodedModel.json");
             }

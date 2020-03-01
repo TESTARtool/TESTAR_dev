@@ -8,7 +8,6 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.record.OVertex;
-import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
@@ -25,17 +24,9 @@ import nl.ou.testar.temporal.selector.APSelectorManager;
 import org.fruit.alayer.Tags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
-//import org.apache.tinkerpop.gremlin.structure.Graph;
-//import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
-
-public  class TemporalDBHelper {
+public  class TemporalDBManager {
     private Config dbConfig;
     private OrientDB orientDB;
     private ODatabaseSession db;
@@ -43,10 +34,10 @@ public  class TemporalDBHelper {
 
 
 
-    public TemporalDBHelper() {
+    public TemporalDBManager() {
     }
 
-    public TemporalDBHelper(final Settings settings) {
+    public TemporalDBManager(final Settings settings) {
         dbConfig = makeConfig(settings);
         initOrientDb();
     }
@@ -117,6 +108,7 @@ public  class TemporalDBHelper {
      * @return
      */
     public List<AbstractStateModel> fetchAbstractModels() {
+        dbReopen();
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         //try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
         OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
@@ -131,7 +123,7 @@ public  class TemporalDBHelper {
                 String applicationName = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
                 String applicationVersion = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
                 String modelIdentifier = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
-                Set<String> abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes")); //@todo set or list?
+                Set<String> abstractionAttributes = (Set<String>)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes")); //@todo set or list?
                 // fetch the test sequences
                 List<TestSequence> sequenceList = new ArrayList<>(); // css, trace are fetched in our own way.just for reuse of AbstractStateModel
 
@@ -142,30 +134,11 @@ public  class TemporalDBHelper {
             }
         }
         resultSet.close();
-
+        dbClose();
         return abstractStateModels;
     }
 
-    public AbstractStateModel selectAbstractStateModel(String ApplicationName, String ApplicationVersion) {
 
-        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
-        AbstractStateModel abstractStateModel = null;
-        if (abstractStateModels.size() == 0) {
-            System.out.println("ERROR: No Models in the graph database " + db.toString());
-        } else {
-            for (AbstractStateModel absModel:abstractStateModels
-            ) {
-                if (absModel.getApplicationName().equals(ApplicationName) && absModel.getApplicationVersion().equals(ApplicationVersion)){
-                    abstractStateModel=absModel;
-                    break;
-                }
-            }
-            if (abstractStateModel==null){
-                System.out.println("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.getName());
-            }
-        }
-        return abstractStateModel;
-    }
     public AbstractStateModel selectAbstractStateModelByModelId(String ModelIdentifier) {
         dbReopen();
         List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
@@ -194,7 +167,6 @@ public  class TemporalDBHelper {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
         // navigate from abstractstate to apply the filter.
-        // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
         stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
@@ -202,12 +174,7 @@ public  class TemporalDBHelper {
         return resultSet;
     }
     public Set<String> getWidgetPropositions(String state, List<String> abstractionAttributes) {
-
-
         // concrete widgets
-
-        //stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-        // String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM (SELECT * FROM :state)) WHERE @class = 'Widget'";
         String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
         Map<String, Object> params = new HashMap<>();
         params.put("state", state);
@@ -332,8 +299,6 @@ public  class TemporalDBHelper {
                         nrOfNodes--;
                     }
                 }
-                String sequenceId = (String) getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId"));
-                Date startDateTime = (Date) getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"));
                 trace.setSequenceID(sequenceVertex.getProperty("sequenceId").toString());
                 trace.setTransitionCount((long) nrOfNodes);
                 trace.setRunDate(sequenceVertex.getProperty("startDateTime").toString());
@@ -419,7 +384,6 @@ public  class TemporalDBHelper {
         }
         resultSet.close();
 
-
         if ((ConcreteStates.size() - ConcreteActions.size()) != 1) {
             System.out.println("debug: trace count not matching nodes and edges for sequence:  " + trace.getSequenceID());
             System.out.println("debug:  ConcreteStates.size(): " + ConcreteStates.size());
@@ -431,7 +395,6 @@ public  class TemporalDBHelper {
                 TemporalTraceEvent traceEvent = new TemporalTraceEvent();
                 traceEvent.setState(cs);
                 String trans;
-
                 if ((i + 1) == ConcreteStates.size()) {
                     trans = ""; // we end with a state :-)
                 } else {
@@ -442,8 +405,6 @@ public  class TemporalDBHelper {
                 traceEvents.add(traceEvent);
             }
         }
-
-
         return traceEvents;
     }
 
@@ -472,47 +433,6 @@ public  class TemporalDBHelper {
         return firstNode;
     }
 
-
-
-
-    /**
-     * This method saves screenshots to disk.
-     *
-     * @param recordBytes
-     * @param identifier
-     */
-    private void processScreenShot(ORecordBytes recordBytes, String identifier, String modelIdentifier, String outputDir) {
-        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-            outputDir += File.separator;
-        }
-
-        // see if we have a directory for the screenshots yet
-        File screenshotDir = new File(outputDir + modelIdentifier + File.separator);
-
-        if (!screenshotDir.exists()) {
-            screenshotDir.mkdir();
-        }
-
-        // save the file to disk
-        File screenshotFile = new File(screenshotDir, identifier + ".png");
-        try {
-            FileOutputStream outputStream = new FileOutputStream(screenshotFile);
-            outputStream.write(recordBytes.toStream());
-            outputStream.flush();
-            outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private String formatId(String id) {
-        if (id.indexOf("#") != 0) return id; // not an orientdb id
-        id = id.replaceAll("[#]", "");
-        return id.replaceAll("[:]", "_");
-    }
 
     /**
      * Helper method that converts an object value based on a specified OrientDB data type.
@@ -555,11 +475,9 @@ public  class TemporalDBHelper {
         computeProps(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
     }
 
-
     public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge, boolean isDeadState) {
         // isdeadstate is not used
         StringBuilder apkey = new StringBuilder();
-        //List<WidgetFilter> passedWidgetFilters;
 
         //compose APkey
         for (String k : apSelectorManager.getAPKey()
@@ -619,7 +537,6 @@ public  class TemporalDBHelper {
         // the "both()" in the next stmt is needed to invoke recursion.
         // apparently , the next result set contains first a list of all nodes, then of all edge: good !
         stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) " + excludeWidgets + "   ");
-
 
         Set<GraphML_DocKey> docnodekeys = new HashSet<>();
         Set<GraphML_DocKey> docedgekeys = new HashSet<>();
@@ -684,13 +601,10 @@ public  class TemporalDBHelper {
                     } else {
                         eleProperties.add(new GraphML_DocEleProperty("labelE", graphElement.getSchemaType().get().toString()));
                         edges.add(new GraphML_DocEdge(eleId, source, target, eleProperties));
-
                     }
-
                 }
             }
             resultSet.close();
-
         }
         dbClose();
         GraphML_DocGraph graph = new GraphML_DocGraph(graphXMLID, nodes, edges);
@@ -701,11 +615,6 @@ public  class TemporalDBHelper {
         tempset.addAll(docedgekeys);
         GraphML_DocRoot root = new GraphML_DocRoot(tempset, graph);
         XMLHandler.save(root, file);
-
         return true;
     }
-
-
-    ;
-
 }
