@@ -124,6 +124,11 @@ public class Main {
 		if (settings.get(Automate)) {
 			SqlManager sqlManager = new SqlManager();
 
+			if (settings.get(AddStateColumns)) {
+				sqlManager.addStateResultColumns();
+				exit(1);
+			}
+
 			if (settings.get(UpdateWidgetTable)) {
 				sqlManager.modifyWidgetTable();
 				exit(1);
@@ -217,6 +222,11 @@ public class Main {
 				testRun.setExceptionMessage(TestRunSync.getInstance().getExceptionMessage());
 				testRun.setTrackTrace(TestRunSync.getInstance().getTrackTrace());
 				testRun.setEndingMS(0);
+				testRun.setNrOfAbstractStates(TestRunSync.getInstance().getNrOfAbstractStates());
+				testRun.setNrOfAbstractActions(TestRunSync.getInstance().getNrOfAbstractActions());
+				testRun.setNrOfUnvisitedActions(TestRunSync.getInstance().getNrOfUnvisitedActions());
+				testRun.setNrOfConcreteStates(TestRunSync.getInstance().getNrOfConcreteStates());
+				testRun.setNrOfConcreteActions(TestRunSync.getInstance().getNrOfConcreteActions());
 				sqlManager.saveTestStats(testRun);
 				TestRunSync.resetInstance();
 				System.out.println("Ending run");
@@ -603,6 +613,7 @@ public class Main {
 			defaults.add(Pair.from(RemovePatternWidgets, false));
 			defaults.add(Pair.from(UpdateWidgetTable, false));
 			defaults.add(Pair.from(NrOfTestsToRun, 10000));
+			defaults.add(Pair.from(AddStateColumns, false));
 
 
 			//Overwrite the default settings with those from the file

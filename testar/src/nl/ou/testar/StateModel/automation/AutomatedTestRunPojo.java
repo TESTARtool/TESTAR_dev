@@ -40,6 +40,21 @@ public class AutomatedTestRunPojo {
     @CsvBindByName(column = "stack_trace")
     private String strackTrace;
 
+    @CsvBindByName(column = "nr_of_abstract_states_after_run")
+    private int nrOfAbstractStates;
+
+    @CsvBindByName(column = "nr_of_abstract_actions_after_run")
+    private int nrOfAbstractActions;
+
+    @CsvBindByName(column = "nr_of_concrete_states_after_run")
+    private int nrOfConcreteStates;
+
+    @CsvBindByName(column = "nr_of_concrete_actions_after_run")
+    private int nrOfConcreteActions;
+
+    @CsvBindByName(column = "nr_of_unvisited_abstract_actions_after_run")
+    private int nrOfUnvisitedActions;
+
     public int getTestRunId() {
         return testRunId;
     }
@@ -134,5 +149,45 @@ public class AutomatedTestRunPojo {
 
     public void setStrackTrace(String strackTrace) {
         this.strackTrace = strackTrace;
+    }
+
+    public int getNrOfAbstractStates() {
+        return nrOfAbstractStates;
+    }
+
+    public void setNrOfAbstractStates(int nrOfAbstractStates) {
+        this.nrOfAbstractStates = nrOfAbstractStates;
+    }
+
+    public int getNrOfAbstractActions() {
+        return nrOfAbstractActions;
+    }
+
+    public void setNrOfAbstractActions(int nrOfAbstractActions) {
+        this.nrOfAbstractActions = nrOfAbstractActions;
+    }
+
+    public int getNrOfConcreteStates() {
+        return nrOfConcreteStates;
+    }
+
+    public void setNrOfConcreteStates(int nrOfConcreteStates) {
+        this.nrOfConcreteStates = nrOfConcreteStates;
+    }
+
+    public int getNrOfConcreteActions() {
+        return nrOfConcreteActions;
+    }
+
+    public void setNrOfConcreteActions(int nrOfConcreteActions) {
+        this.nrOfConcreteActions = nrOfConcreteActions;
+    }
+
+    public int getNrOfUnvisitedActions() {
+        return nrOfUnvisitedActions;
+    }
+
+    public void setNrOfUnvisitedActions(int nrOfUnvisitedActions) {
+        this.nrOfUnvisitedActions = nrOfUnvisitedActions;
     }
 }

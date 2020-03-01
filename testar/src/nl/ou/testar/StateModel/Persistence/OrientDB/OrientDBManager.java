@@ -15,6 +15,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.EntityExtractor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
@@ -433,6 +434,42 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             resultSet.close();
             return (int)nrOfActions;
         }
+    }
+
+    @Override
+    public ModelStats getModelStats(AbstractStateModel abstractStateModel) {
+        String abstractStateQuery = "select count(*) as total from abstractstate WHERE modelIdentifier = :modelIdentifier";
+        String abstractActionQuery = "SELECT count(*) as total FROM AbstractAction WHERE modelIdentifier = :modelIdentifier";
+        String unvisitedActionQuery = "SELECT count(*) as total FROM UnvisitedAbstractAction WHERE modelIdentifier = :modelIdentifier";
+        String concreteStateQuery = "SELECT count(*) as total FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :modelIdentifier)) WHERE @class = 'ConcreteState'";
+        String concreteActionQuery = "SELECT count(*) as total FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :modelIdentifier)) WHERE @class = 'ConcreteAction'";
+
+        ModelStats modelStats = new ModelStats();
+
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            Map<Object, Object> params = new HashMap<>();
+            params.put("modelIdentifier", abstractStateModel.getModelIdentifier());
+
+            modelStats.setNrOfAbstractStates(getTotal(abstractStateQuery, db, params));
+            modelStats.setNrOfAbstractActions(getTotal(abstractActionQuery, db, params));
+            modelStats.setNrOfUnvisitedActions(getTotal(unvisitedActionQuery, db, params));
+            modelStats.setNrOfConcreteStates(getTotal(concreteStateQuery, db, params));
+            modelStats.setNrOfConcreteActions(getTotal(concreteActionQuery, db, params));
+        }
+
+        return modelStats;
+    }
+
+    private int getTotal(String query, ODatabaseSession db, Map<Object, Object> params) {
+        OResultSet resultSet = db.query(query, params);
+        if (!resultSet.hasNext()) {
+            resultSet.close();
+            return 0;
+        }
+        OResult result = resultSet.next();
+        long total = result.getProperty("total");
+        resultSet.close();
+        return (int)total;
     }
 
     @Override

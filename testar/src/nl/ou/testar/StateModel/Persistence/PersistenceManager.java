@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence;
 
 import nl.ou.testar.StateModel.*;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
@@ -98,8 +99,10 @@ public interface PersistenceManager {
      * @param abstractStateModel
      * @return
      */
-    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
+    int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
 
     int getTotalNrOfStepsExecuted(AbstractStateModel abstractStateModel);
+
+    ModelStats getModelStats(AbstractStateModel abstractStateModel);
 
 }

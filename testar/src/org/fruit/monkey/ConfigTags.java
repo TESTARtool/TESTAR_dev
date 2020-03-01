@@ -151,4 +151,5 @@ public final class ConfigTags {
   public static final Tag<Boolean> RemovePatternWidgets = Tag.from("RemovePatternWidgets", Boolean.class);
   public static final Tag<Boolean> UpdateWidgetTable = Tag.from("UpdateWidgetTable", Boolean.class);
   public static final Tag<Integer> NrOfTestsToRun = Tag.from("NrOfTestsToRun", Integer.class);
+  public static final Tag<Boolean> AddStateColumns = Tag.from("AddStateColumns", Boolean.class);
 }

@@ -65,6 +65,7 @@ import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import nl.ou.testar.StateModel.automation.TestRun;
@@ -801,7 +802,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		int totalStepsExecuted = stateModelManager.getTotalStepsExecuted();
 		System.out.println("Nr of steps executed: " + totalStepsExecuted);
 		TestRunSync.getInstance().setNrOfStepsExecuted(totalStepsExecuted);
-
+		// get some stats about the current model
+		ModelStats modelStats = stateModelManager.getModelStats();
+		if (modelStats == null) {
+			throw new RuntimeException("Unable to get the model statistics!");
+		}
+		TestRunSync.getInstance().setNrOfAbstractStates(modelStats.getNrOfAbstractStates());
+		TestRunSync.getInstance().setNrOfAbstractActions(modelStats.getNrOfAbstractActions());
+		TestRunSync.getInstance().setNrOfUnvisitedActions(modelStats.getNrOfUnvisitedActions());
+		TestRunSync.getInstance().setNrOfConcreteStates(modelStats.getNrOfConcreteStates());
+		TestRunSync.getInstance().setNrOfConcreteActions(modelStats.getNrOfConcreteActions());
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();

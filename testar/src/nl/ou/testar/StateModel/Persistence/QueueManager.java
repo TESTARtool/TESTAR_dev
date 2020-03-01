@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
@@ -187,5 +188,10 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     @Override
     public int getTotalNrOfStepsExecuted(AbstractStateModel abstractStateModel) {
         return delegateManager.getTotalNrOfStepsExecuted(abstractStateModel);
+    }
+
+    @Override
+    public ModelStats getModelStats(AbstractStateModel abstractStateModel) {
+        return delegateManager.getModelStats(abstractStateModel);
     }
 }

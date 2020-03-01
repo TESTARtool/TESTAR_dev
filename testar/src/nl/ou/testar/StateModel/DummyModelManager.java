@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
@@ -55,5 +56,10 @@ public class DummyModelManager implements StateModelManager{
     @Override
     public int getTotalStepsExecuted() {
         return 0;
+    }
+
+    @Override
+    public ModelStats getModelStats() {
+        return null;
     }
 }

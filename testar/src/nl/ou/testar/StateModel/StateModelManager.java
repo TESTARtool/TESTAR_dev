@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
@@ -25,4 +26,6 @@ public interface StateModelManager {
     boolean modelIsDeterministic();
 
     int getTotalStepsExecuted();
+
+    ModelStats getModelStats();
 }

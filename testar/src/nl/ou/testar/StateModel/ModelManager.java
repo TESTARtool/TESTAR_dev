@@ -3,6 +3,7 @@ package nl.ou.testar.StateModel;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Stats.ModelStats;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
@@ -314,5 +315,10 @@ public class ModelManager implements StateModelManager {
     @Override
     public int getTotalStepsExecuted() {
         return persistenceManager.getTotalNrOfStepsExecuted(abstractStateModel);
+    }
+
+    @Override
+    public ModelStats getModelStats() {
+        return persistenceManager.getModelStats(abstractStateModel);
     }
 }

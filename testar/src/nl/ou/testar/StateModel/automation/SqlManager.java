@@ -573,7 +573,12 @@ public class SqlManager {
                     "    nr_of_steps_executed = ?," +
                     " exception_thrown = ?," +
                     " exception_message = ?," +
-                    " stack_trace = ?" +
+                    " stack_trace = ?," +
+                    "nr_of_abstract_states_after_run = ?, " +
+                    "nr_of_abstract_actions_after_run = ?, " +
+                    "nr_of_unvisited_abstract_actions_after_run = ?, " +
+                    "nr_of_concrete_states_after_run = ?, " +
+                    "nr_of_concrete_actions_after_run = ? " +
                     " WHERE test_run_id = ?";
             Connection connection = getConnection();
             PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
@@ -585,7 +590,12 @@ public class SqlManager {
             insertStatement.setInt(5, testRun.isExceptionThrown() ? 1 : 0);
             insertStatement.setString(6, testRun.getExceptionMessage());
             insertStatement.setString(7, testRun.getTrackTrace());
-            insertStatement.setInt(8, testRun.getTestRunId());
+            insertStatement.setInt(8, testRun.getNrOfAbstractStates());
+            insertStatement.setInt(9, testRun.getNrOfAbstractActions());
+            insertStatement.setInt(10, testRun.getNrOfUnvisitedActions());
+            insertStatement.setInt(11, testRun.getNrOfConcreteStates());
+            insertStatement.setInt(12, testRun.getNrOfConcreteActions());
+            insertStatement.setInt(13, testRun.getTestRunId());
             insertStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1206,6 +1216,22 @@ public class SqlManager {
             Statement statement = connection.createStatement();
             statement.executeUpdate(alterQuery);
             statement.executeUpdate(updateQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addStateResultColumns() {
+        try {
+            String alterQuery = "ALTER TABLE `automated_test_run` " +
+                    "ADD COLUMN `nr_of_abstract_states_after_run` int(0) NULL AFTER `nr_of_steps_executed`, " +
+                    "ADD COLUMN `nr_of_abstract_actions_after_run` int(0) NULL AFTER `nr_of_abstract_states_after_run`, " +
+                    "ADD COLUMN `nr_of_concrete_states_after_run` int(0) NULL AFTER `nr_of_abstract_actions_after_run`, " +
+                    "ADD COLUMN `nr_of_concrete_actions_after_run` int(0) NULL AFTER `nr_of_concrete_states_after_run`, " +
+                    "ADD COLUMN `nr_of_unvisited_abstract_actions_after_run` int(0) NULL AFTER `nr_of_concrete_actions_after_run`";
+            Connection connection = getConnection();
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(alterQuery);
         } catch (SQLException e) {
             e.printStackTrace();
         }
