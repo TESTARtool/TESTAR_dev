@@ -209,7 +209,7 @@ public class SqlManager {
                 keys.next();
                 int testRunId = keys.getInt(1);
 
-                for (int widgetId: combination) {
+                for (int widgetId : combination) {
                     widgetAttachStatement.setInt(1, testRunId);
                     widgetAttachStatement.setInt(2, widgetId);
                     widgetAttachStatement.execute();
@@ -297,7 +297,7 @@ public class SqlManager {
                 keys.next();
                 int testRunId = keys.getInt(1);
 
-                for (int widgetId: combination) {
+                for (int widgetId : combination) {
                     widgetAttachStatement.setInt(1, testRunId);
                     widgetAttachStatement.setInt(2, widgetId);
                     widgetAttachStatement.execute();
@@ -308,8 +308,6 @@ public class SqlManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
 
 
     }
@@ -405,7 +403,7 @@ public class SqlManager {
                 keys.next();
                 int testRunId = keys.getInt(1);
 
-                for (int widgetId: combination) {
+                for (int widgetId : combination) {
                     widgetAttachStatement.setInt(1, testRunId);
                     widgetAttachStatement.setInt(2, widgetId);
                     widgetAttachStatement.execute();
@@ -416,8 +414,6 @@ public class SqlManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
 
 
     }
@@ -513,7 +509,7 @@ public class SqlManager {
                 keys.next();
                 int testRunId = keys.getInt(1);
 
-                for (int widgetId: combination) {
+                for (int widgetId : combination) {
                     widgetAttachStatement.setInt(1, testRunId);
                     widgetAttachStatement.setInt(2, widgetId);
                     widgetAttachStatement.execute();
@@ -606,7 +602,7 @@ public class SqlManager {
 
     private List<int[]> generateCombinations(List<Integer> input, int r) {
         List<int[]> combinations = new ArrayList<>();
-        helper(combinations, new int[r], 0, input.size() -1, 0, input);
+        helper(combinations, new int[r], 0, input.size() - 1, 0, input);
         return combinations;
     }
 
@@ -809,8 +805,25 @@ public class SqlManager {
                 System.out.println("Parsed " + atrs.size() + " nr of test results");
                 testRunTotal.add(atrs.size());
 
-                String query = "INSERT INTO automated_test_run_import(test_run_id, application_id, configured_sequences, configured_steps, reset_data_store_before_run, starting_time_ms, ending_time_ms, nr_of_steps_executed, deterministic_model, exception_thrown, exception_message, stack_trace) " +
-                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                String query = "INSERT INTO automated_test_run_import(test_run_id, " +
+                        "application_id, " +
+                        "configured_sequences, " +
+                        "configured_steps, " +
+                        "reset_data_store_before_run, " +
+                        "starting_time_ms, " +
+                        "ending_time_ms, " +
+                        "nr_of_steps_executed, " +
+                        "deterministic_model, " +
+                        "exception_thrown, " +
+                        "exception_message, " +
+                        "stack_trace, " +
+                        "nr_of_abstract_states_after_run, " +
+                        "nr_of_abstract_actions_after_run, " +
+                        "nr_of_unvisited_abstract_actions_after_run, " +
+                        "nr_of_concrete_states_after_run, " +
+                        "nr_of_concrete_actions_after_run" +
+                        ") " +
+                        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 try {
                     PreparedStatement insertAtrStatement = connection.prepareStatement(query);
 
@@ -828,6 +841,11 @@ public class SqlManager {
                             insertAtrStatement.setInt(10, booleanStringToIntHelper(atr.getExceptionThrown()));
                             insertAtrStatement.setString(11, atr.getExceptionMessage());
                             insertAtrStatement.setString(12, atr.getStrackTrace());
+                            insertAtrStatement.setInt(13, atr.getNrOfAbstractStates());
+                            insertAtrStatement.setInt(14, atr.getNrOfAbstractActions());
+                            insertAtrStatement.setInt(15, atr.getNrOfUnvisitedActions());
+                            insertAtrStatement.setInt(16, atr.getNrOfConcreteStates());
+                            insertAtrStatement.setInt(17, atr.getNrOfConcreteActions());
                             insertAtrStatement.execute();
                         } catch (SQLException e) {
                             e.printStackTrace();
@@ -894,7 +912,6 @@ public class SqlManager {
             System.out.println("Imported a total of " + testRunWidgetTotal.stream().mapToInt(i -> i).sum() + " test run widgets");
 
 
-
         });
 
         // process the test results
@@ -910,7 +927,7 @@ public class SqlManager {
         try {
             Statement configMappingStatement = connection.createStatement();
             ResultSet configResultSet = configMappingStatement.executeQuery(configMappingQuery);
-            while(configResultSet.next()) {
+            while (configResultSet.next()) {
                 String configName = configResultSet.getString(2);
                 int widgetId = configResultSet.getInt(1);
                 if (configName.isEmpty()) {
@@ -1020,7 +1037,23 @@ public class SqlManager {
             }
 
             // finally, insert the values from the import tables
-            String query5 = "INSERT INTO automated_test_run(test_run_id, application_id, configured_sequences, configured_steps, reset_data_store_before_run, starting_time_ms, ending_time_ms, nr_of_steps_executed, deterministic_model, exception_thrown, exception_message, stack_trace) " +
+            String query5 = "INSERT INTO automated_test_run(test_run_id, " +
+                    "application_id, " +
+                    "configured_sequences, " +
+                    "configured_steps, " +
+                    "reset_data_store_before_run, " +
+                    "starting_time_ms, " +
+                    "ending_time_ms, " +
+                    "nr_of_steps_executed, " +
+                    "nr_of_abstract_states_after_run, " +
+                    "nr_of_abstract_actions_after_run, " +
+                    "nr_of_concrete_states_after_run, " +
+                    "nr_of_concrete_actions_after_run, " +
+                    "nr_of_unvisited_abstract_actions_after_run, " +
+                    "deterministic_model, " +
+                    "exception_thrown, " +
+                    "exception_message, " +
+                    "stack_trace)  " +
                     "SELECT * FROM automated_test_run_import";
             String query6 = "INSERT INTO test_run_widget(test_run_id, widget_id) " +
                     "SELECT test_run_id, widget_id FROM test_run_widget_import";
@@ -1052,36 +1085,58 @@ public class SqlManager {
             }
         }
 
-        String insertResultsQuery = "INSERT INTO test_run_result(widget_combo, widget_names, average_runtime_seconds, nr_of_steps_series,\n" +
-                "                            steps_executed_total, steps_executed_average)\n" +
-                "\n" +
-                "SELECT test_run_base.widget_combo,\n" +
-                "       test_run_base.widget_names,\n" +
-                "       ROUND(AVG(test_run_base.runtime_ms) / 1000)                                                                 as average_runtime_seconds,\n" +
-                "       GROUP_CONCAT(test_run_base.nr_of_steps_executed ORDER BY test_run_base.nr_of_steps_executed SEPARATOR\n" +
-                "                    ', ')                                                                                          as steps_cumulative,\n" +
-                "       SUM(test_run_base.nr_of_steps_executed)                                                                     as total_steps_executed,\n" +
-                "\n" +
-                "       AVG(test_run_base.nr_of_steps_executed)                                                                     as steps_executed_average\n" +
-                "\n" +
-                "FROM (\n" +
-                "         SELECT trw.test_run_id,\n" +
-                "                atr.ending_time_ms - atr.starting_time_ms                                       as runtime_ms,\n" +
-                "                atr.nr_of_steps_executed,\n" +
-                "                GROUP_CONCAT(trw.widget_id ORDER BY trw.widget_id SEPARATOR '-')                as widget_combo,\n" +
-                "                GROUP_CONCAT(w.widget_config_name ORDER BY w.widget_config_name SEPARATOR ', ') as widget_names\n" +
-                "\n" +
-                "         FROM test_run_widget trw\n" +
-                "\n" +
-                "                  JOIN automated_test_run atr USING (test_run_id)\n" +
-                "\n" +
-                "                  JOIN widget w USING (widget_id)\n" +
-                "\n" +
-                "         GROUP BY trw.test_run_id\n" +
-                "     ) as test_run_base\n" +
-                "\n" +
-                "GROUP BY test_run_base.widget_combo\n" +
-                "\n" +
+        String insertResultsQuery = "INSERT INTO test_run_result(widget_combo, " +
+                "                            widget_names, " +
+                "                            average_runtime_seconds, " +
+                "                            nr_of_steps_series, " +
+                "                            steps_executed_total, " +
+                "                            steps_executed_average, " +
+                "                            abstract_state_total, " +
+                "                            abstract_action_total, " +
+                "                            unvisited_action_total, " +
+                "                            concrete_state_total, " +
+                "                            concrete_action_total, " +
+                "                            abstract_state_average, " +
+                "                            abstract_action_average, " +
+                "                            unvisited_action_average, " +
+                "                            concrete_state_average, " +
+                "                            concrete_action_average) " +
+                " " +
+                "SELECT test_run_base.widget_combo, " +
+                "       test_run_base.widget_names, " +
+                "       ROUND(AVG(test_run_base.runtime_ms) / 1000)                                                                 AS average_runtime_seconds, " +
+                "       GROUP_CONCAT(test_run_base.nr_of_steps_executed ORDER BY test_run_base.nr_of_steps_executed SEPARATOR " +
+                "                    ', ')                                                                                          AS steps_cumulative, " +
+                "       IFNULL(SUM(test_run_base.nr_of_steps_executed), 0)                                                                     AS total_steps_executed, " +
+                "       IFNULL(AVG(test_run_base.nr_of_steps_executed) , 0)                                                                     AS steps_executed_average, " +
+                "       IFNULL(SUM(test_run_base.nr_of_abstract_states_after_run), 0)                                                           AS nr_of_abstract_states_total, " +
+                "       IFNULL(SUM(test_run_base.nr_of_abstract_actions_after_run), 0)                                                          AS nr_of_abstract_actions_total, " +
+                "       IFNULL(SUM(test_run_base.nr_of_unvisited_abstract_actions_after_run), 0)                                                AS nr_of_unvisited_abstract_actions_total, " +
+                "       IFNULL(SUM(test_run_base.nr_of_concrete_states_after_run), 0)                                                           AS nr_of_concrete_states_total, " +
+                "       IFNULL(SUM(test_run_base.nr_of_concrete_actions_after_run), 0)                                                          AS nr_of_concrete_actions_total, " +
+                " " +
+                "       IFNULL(AVG(test_run_base.nr_of_abstract_states_after_run), 0)                                                           AS nr_of_abstract_states_average, " +
+                "       IFNULL(AVG(test_run_base.nr_of_abstract_actions_after_run), 0)                                                          AS nr_of_abstract_actions_average, " +
+                "       IFNULL(AVG(test_run_base.nr_of_unvisited_abstract_actions_after_run), 0)                                                AS nr_of_unvisited_abstract_actions_average, " +
+                "       IFNULL(AVG(test_run_base.nr_of_concrete_states_after_run), 0)                                                           AS nr_of_concrete_states_average, " +
+                "       IFNULL(AVG(test_run_base.nr_of_concrete_actions_after_run), 0)                                                          AS nr_of_concrete_actions_average " +
+                "FROM ( " +
+                "         SELECT trw.test_run_id, " +
+                "                atr.ending_time_ms - atr.starting_time_ms                                       AS runtime_ms, " +
+                "                atr.nr_of_steps_executed, " +
+                "                atr.nr_of_abstract_states_after_run, " +
+                "                atr.nr_of_abstract_actions_after_run, " +
+                "                atr.nr_of_unvisited_abstract_actions_after_run, " +
+                "                atr.nr_of_concrete_states_after_run, " +
+                "                atr.nr_of_concrete_actions_after_run, " +
+                "                GROUP_CONCAT(trw.widget_id ORDER BY trw.widget_id SEPARATOR '-')                AS widget_combo, " +
+                "                GROUP_CONCAT(w.widget_config_name ORDER BY w.widget_config_name SEPARATOR ', ') AS widget_names " +
+                "         FROM test_run_widget trw " +
+                "                  JOIN automated_test_run atr USING (test_run_id) " +
+                "                  JOIN widget w USING (widget_id) " +
+                "         GROUP BY trw.test_run_id " +
+                "     ) AS test_run_base " +
+                "GROUP BY test_run_base.widget_combo " +
                 "ORDER BY SUM(test_run_base.nr_of_steps_executed) DESC";
         try {
             System.out.println("Calculating and inserting test results.");
@@ -1091,22 +1146,32 @@ public class SqlManager {
             // we calculate the median in Java, as it is much more complicated to do in MySql.
             System.out.println("Calculating the median value for steps executed");
             String fetchTestRunResultsQuery = "SELECT\n" +
-                    "\ttrw.test_run_id,\n" +
-                    "\tatr.nr_of_steps_executed,\n" +
-                    "\tGROUP_CONCAT( trw.widget_id ORDER BY trw.widget_id SEPARATOR '-' ) AS widget_combo \n" +
+                    "    trw.test_run_id,\n" +
+                    "    atr.nr_of_steps_executed,\n" +
+                    "    nr_of_abstract_states_after_run,\n" +
+                    "    nr_of_abstract_actions_after_run,\n" +
+                    "    nr_of_unvisited_abstract_actions_after_run,\n" +
+                    "    nr_of_concrete_states_after_run,\n" +
+                    "    nr_of_concrete_actions_after_run,\n" +
+                    "    GROUP_CONCAT( trw.widget_id ORDER BY trw.widget_id SEPARATOR '-' ) AS widget_combo\n" +
                     "FROM\n" +
-                    "\ttest_run_widget trw\n" +
-                    "\tJOIN automated_test_run atr USING ( test_run_id )\n" +
-                    "\tJOIN widget w USING ( widget_id ) \n" +
+                    "    test_run_widget trw\n" +
+                    "        JOIN automated_test_run atr USING ( test_run_id )\n" +
+                    "        JOIN widget w USING ( widget_id )\n" +
                     "GROUP BY\n" +
-                    "\ttrw.test_run_id";
+                    "    trw.test_run_id;";
             statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(fetchTestRunResultsQuery);
             List<TestRunStepsResultPojo> testRunStepsResultPojos = new ArrayList<>();
             while (resultSet.next()) {
                 TestRunStepsResultPojo pojo = new TestRunStepsResultPojo();
                 pojo.setNrOfStepsExecuted(resultSet.getInt(2));
-                pojo.setComboIdentifier(resultSet.getString(3));
+                pojo.setNrOfAbstractStates(resultSet.getInt(3));
+                pojo.setNrOfAbstractActions(resultSet.getInt(4));
+                pojo.setNrOfUnvisitedActions(resultSet.getInt(5));
+                pojo.setNrOfConcreteStates(resultSet.getInt(6));
+                pojo.setNrOfConcreteActions(resultSet.getInt(7));
+                pojo.setComboIdentifier(resultSet.getString(8));
                 testRunStepsResultPojos.add(pojo);
             }
 
@@ -1114,18 +1179,33 @@ public class SqlManager {
 
             // group the test results by the widget combo id
             Map<String, List<TestRunStepsResultPojo>> comboResultMapping = testRunStepsResultPojos.stream().collect(Collectors.groupingBy(TestRunStepsResultPojo::getComboIdentifier));
-            String updateTestResultQuery = "UPDATE test_run_result \n" +
-                    "SET steps_executed_median = ? \n" +
-                    "WHERE\n" +
-                    "\twidget_combo = ?";
+            String updateTestResultQuery = "UPDATE test_run_result " +
+                    "SET steps_executed_median = ?, " +
+                    "abstract_state_median = ?," +
+                    "abstract_action_median = ?," +
+                    "unvisited_action_median = ?," +
+                    "concrete_state_median = ?," +
+                    "concrete_action_median = ?" +
+                    "WHERE " +
+                    "widget_combo = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(updateTestResultQuery);
             comboResultMapping.keySet().stream().forEach(widgetCombo -> {
                 double stepsExecutedMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfStepsExecuted).collect(Collectors.toList()));
+                double abstractStateMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfAbstractStates).collect(Collectors.toList()));
+                double abstractActionMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfAbstractActions).collect(Collectors.toList()));
+                double unvisitedActionMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfUnvisitedActions).collect(Collectors.toList()));
+                double concreteStateMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfConcreteStates).collect(Collectors.toList()));
+                double concreteActionMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfConcreteActions).collect(Collectors.toList()));
                 // update the test result table and insert the median
 
                 try {
                     preparedStatement.setDouble(1, stepsExecutedMedian);
-                    preparedStatement.setString(2, widgetCombo);
+                    preparedStatement.setDouble(2, abstractStateMedian);
+                    preparedStatement.setDouble(3, abstractActionMedian);
+                    preparedStatement.setDouble(4, unvisitedActionMedian);
+                    preparedStatement.setDouble(5, concreteStateMedian);
+                    preparedStatement.setDouble(6, concreteActionMedian);
+                    preparedStatement.setString(7, widgetCombo);
                     preparedStatement.executeUpdate();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -1169,7 +1249,7 @@ public class SqlManager {
             Map<Integer, String> widgets = new HashMap<>();
             Statement widgetStatement = connection.createStatement();
             ResultSet widgetResultSet = widgetStatement.executeQuery(getWidgetQuery);
-            while(widgetResultSet.next()) {
+            while (widgetResultSet.next()) {
                 widgets.put(widgetResultSet.getInt(1), widgetResultSet.getString(2));
             }
 
@@ -1178,7 +1258,7 @@ public class SqlManager {
 
             // now, we want to break up the combo id string into separate parts
             Map<Integer, Integer> counter = new HashMap<>();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 String widgetComboIds = resultSet.getString(1);
                 String[] ids = widgetComboIds.trim().split("-");
                 Arrays.stream(ids).mapToInt(Integer::parseInt).forEach(i -> counter.merge(i, 1, Integer::sum));
