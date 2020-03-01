@@ -289,7 +289,7 @@ public class SqlManager {
                 preparedStatement1.setInt(1, applicationId);
                 preparedStatement1.setInt(2, 4);
                 preparedStatement1.setInt(3, 100);
-                preparedStatement1.setInt(4, 0);
+                preparedStatement1.setInt(4, 1); // we do want to reset before each run for this test
                 preparedStatement1.execute();
 
                 // fetch the generated test run id
