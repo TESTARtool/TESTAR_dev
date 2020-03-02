@@ -59,7 +59,7 @@ public class WdElement extends TaggableBase implements Serializable {
   //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, tagName, textContent, helpText, title;
+  public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
 
@@ -68,7 +68,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt;
+  String valuePattern, href, value, style, target, alt, src;
 
   double zindex;
   Rect rect;
@@ -105,6 +105,7 @@ public class WdElement extends TaggableBase implements Serializable {
     
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
+    genericTitle = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
     textContent = attributeMap.getOrDefault("textContent", "").replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
@@ -114,6 +115,7 @@ public class WdElement extends TaggableBase implements Serializable {
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
+    src = attributeMap.getOrDefault("src", "");
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
@@ -150,8 +152,6 @@ public class WdElement extends TaggableBase implements Serializable {
     setName();
     fillScrollValues();
     
-    // Not constant, id vs name
-    //name = (String) packedElement.get("name");
     // Empty string ?
     //textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     //helpText = attributeMap.get("title");

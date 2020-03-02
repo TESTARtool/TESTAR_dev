@@ -148,7 +148,10 @@ public final class WdState extends WdWidget implements State {
 			ret = w.element.enabled;
 		}
 		else if (t.equals(Tags.Title)) {
-			ret = w.element.title;
+			ret = w.element.genericTitle;
+		}
+		else if (t.equals(WdTags.WebGenericTitle)) {
+			ret = w.element.genericTitle;
 		}
 		else if (t.equals(Tags.ValuePattern)) {
 			ret = w.element.href;
@@ -281,6 +284,9 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
+		}
+		else if (t.equals(WdTags.WebSrc)) {
+			ret = w.element.src;
 		}
 		else if (t.equals(WdTags.WebZIndex)) {
 			ret = w.element.zindex;

@@ -77,6 +77,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebName = from("WebName", String.class);
   
   /**
+   * Web generic representative title of a widget.
+   */
+  public static final Tag<String> WebGenericTitle = from("WebGenericTitle", String.class);
+  
+  /**
    * Web title of a widget.
    */
   public static final Tag<String> WebTitle = from("WebTitle", String.class);
@@ -120,6 +125,11 @@ public class WdTags extends TagsBase {
    * Web type of input of a widget.
    */
   public static final Tag<String> WebType = from("WebType", String.class);
+  
+  /**
+   * Web src of a widget.
+   */
+  public static final Tag<String> WebSrc = from("WebSrc", String.class);
   
   /**
    * Web zIndex of a widget

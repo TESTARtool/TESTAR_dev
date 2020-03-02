@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class StateManagementTags {
 
-    public enum Group {General, ControlPattern}
+    public enum Group {General, ControlPattern, WebDriver}
 
 
     // a widget's control type
@@ -285,6 +285,9 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetType = Tag.from("Web Widget type", String.class);
     public static final Tag<String> WebWidgetCssClasses = Tag.from("Web Widget css classes", String.class);
     public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
+    public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
+    public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
+    
     
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
@@ -296,7 +299,6 @@ public class StateManagementTags {
             add(WidgetHelpText);
             add(WidgetAutomationId);
             add(WidgetClassName);
-            add(WidgetIsOffscreen);
             add(WidgetFrameworkId);
             add(WidgetOrientationId);
             add(WidgetIsContentElement);
@@ -371,6 +373,8 @@ public class StateManagementTags {
             add(WebWidgetType);
             add(WebWidgetCssClasses);
             add(WebWidgetDisplay);
+            add(WebWidgetIsOffScreen);
+            add(WebWidgetSrc);
         }
     };
 
@@ -393,7 +397,6 @@ public class StateManagementTags {
         settingsMap.put(WidgetHelpText, "WidgetHelpText");
         settingsMap.put(WidgetAutomationId, "WidgetAutomationId");
         settingsMap.put(WidgetClassName, "WidgetClassName");
-        settingsMap.put(WidgetIsOffscreen, "WidgetIsOffscreen");
         settingsMap.put(WidgetFrameworkId, "WidgetFrameworkId");
         settingsMap.put(WidgetOrientationId, "WidgetOrientationId");
         settingsMap.put(WidgetIsContentElement, "WidgetIsContentElement");
@@ -464,6 +467,8 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetType, "WebWidgetType");
         settingsMap.put(WebWidgetCssClasses, "WebWidgetCssClasses");
         settingsMap.put(WebWidgetDisplay, "WebWidgetDisplay");
+        settingsMap.put(WebWidgetIsOffScreen, "WebWidgetIsOffScreen");
+        settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
     }
 
     // a mapping of a tag to its group
@@ -476,7 +481,6 @@ public class StateManagementTags {
             put(WidgetHelpText, Group.General);
             put(WidgetAutomationId, Group.General);
             put(WidgetClassName, Group.General);
-            put(WidgetIsOffscreen, Group.General);
             put(WidgetFrameworkId, Group.General);
             put(WidgetOrientationId, Group.General);
             put(WidgetIsContentElement, Group.General);
@@ -534,19 +538,21 @@ public class StateManagementTags {
             put(WidgetWindowPattern, Group.ControlPattern);
             
             //Webdriver
-            put(WebWidgetId, Group.General);
-            put(WebWidgetName, Group.General);
-            put(WebWidgetTagName, Group.General);
-            put(WebWidgetTextContext, Group.General);
-            put(WebWidgetTitle, Group.General);
-            put(WebWidgetHref, Group.General);
-            put(WebWidgetValue, Group.General);
-            put(WebWidgetStyle, Group.General);
-            put(WebWidgetTarget, Group.General);
-            put(WebWidgetAlt, Group.General);
-            put(WebWidgetType, Group.General);
-            put(WebWidgetCssClasses, Group.General);
-            put(WebWidgetDisplay, Group.General);
+            put(WebWidgetId, Group.WebDriver);
+            put(WebWidgetName, Group.WebDriver);
+            put(WebWidgetTagName, Group.WebDriver);
+            put(WebWidgetTextContext, Group.WebDriver);
+            put(WebWidgetTitle, Group.WebDriver);
+            put(WebWidgetHref, Group.WebDriver);
+            put(WebWidgetValue, Group.WebDriver);
+            put(WebWidgetStyle, Group.WebDriver);
+            put(WebWidgetTarget, Group.WebDriver);
+            put(WebWidgetAlt, Group.WebDriver);
+            put(WebWidgetType, Group.WebDriver);
+            put(WebWidgetCssClasses, Group.WebDriver);
+            put(WebWidgetDisplay, Group.WebDriver);
+            put(WebWidgetIsOffScreen, Group.WebDriver);
+            put(WebWidgetSrc, Group.WebDriver);
         }
     };
 

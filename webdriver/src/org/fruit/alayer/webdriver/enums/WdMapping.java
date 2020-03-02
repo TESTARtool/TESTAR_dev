@@ -29,13 +29,14 @@ public class WdMapping {
 			put(WebWidgetType, WdTags.WebType);
 			put(WebWidgetCssClasses, WdTags.WebCssClasses);
 			put(WebWidgetDisplay, WdTags.WebDisplay);
+			put(WebWidgetIsOffScreen, WdTags.WebIsOffScreen);
+			put(WebWidgetSrc, WdTags.WebSrc);
 
 			// Generic
 			put(WidgetControlType, WdTags.WebTagName);
-			put(WidgetTitle, WdTags.WebTitle);
+			put(WidgetTitle, WdTags.WebGenericTitle);
 			put(WidgetIsEnabled, WdTags.WebIsEnabled);
 			put(WidgetBoundary, WdTags.WebBoundary);
-			put(WidgetIsOffscreen, WdTags.WebIsOffScreen);
 			put(WidgetPath, Tags.Path);
 			put(WidgetIsContentElement, WdTags.WebIsContentElement);
 			put(WidgetIsControlElement, WdTags.WebIsControlElement);
