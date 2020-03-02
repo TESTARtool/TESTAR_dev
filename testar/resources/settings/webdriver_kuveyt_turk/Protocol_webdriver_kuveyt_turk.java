@@ -1,115 +1,64 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * <p>
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * <p>
- * <p>
- * <p>
+ * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ *
  * Redistribution and use in source and binary forms, with or without
- * <p>
  * modification, are permitted provided that the following conditions are met:
- * <p>
- * <p>
- * <p>
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
- * <p>
  * this list of conditions and the following disclaimer.
- * <p>
  * 2. Redistributions in binary form must reproduce the above copyright
- * <p>
  * notice, this list of conditions and the following disclaimer in the
- * <p>
  * documentation and/or other materials provided with the distribution.
- * <p>
  * 3. Neither the name of the copyright holder nor the names of its
- * <p>
  * contributors may be used to endorse or promote products derived from
- * <p>
  * this software without specific prior written permission.
- * <p>
- * <p>
- * <p>
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * <p>
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * <p>
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * <p>
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * <p>
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * <p>
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * <p>
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * <p>
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * <p>
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * <p>
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * <p>
  * POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 
 import es.upv.staq.testar.NativeLinker;
-
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
 import nl.ou.testar.ActionSelectionUtils;
 
-
 import org.fruit.Pair;
-
 import org.fruit.Util;
-
 import org.fruit.alayer.*;
-
 import org.fruit.alayer.actions.*;
-
 import org.fruit.alayer.devices.KBKeys;
-
 import org.fruit.alayer.exceptions.ActionBuildException;
-
 import org.fruit.alayer.exceptions.StateBuildException;
-
 import org.fruit.alayer.exceptions.SystemStartException;
-
 import org.fruit.alayer.webdriver.*;
-
 import org.fruit.alayer.webdriver.enums.WdRoles;
-
 import org.fruit.alayer.webdriver.enums.WdTags;
-
 import org.fruit.monkey.ConfigTags;
-
 import org.fruit.monkey.Settings;
-
 import org.testar.protocols.WebdriverProtocol;
 
-
 import java.sql.Connection;
-
 import java.sql.DriverManager;
-
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
-
 import java.sql.Statement;
-
 import java.util.*;
 
-
 import static org.fruit.alayer.Tags.Blocked;
-
 import static org.fruit.alayer.Tags.Enabled;
-
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
-
 
 public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
@@ -216,11 +165,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 			e.printStackTrace();
 		}
 
-
 		/**
 		 * TODO: Customize the credentials obtained from DB
 		 */
-
+		
 		// This login sequence is based on the information on: https://isube.kuveytturk.com.tr/Login/InitialLogin
 		// But the username and password works only in internal development environment of Kuveyt Turk
 		System.out.println("DEBUG 1: looking for BtnOK (expecting a pop-up info screen)");
@@ -240,21 +188,17 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		Util.pause(1);
 
 		new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_SHIFT), 0.2)
-
 		.add(new KeyDown(KBKeys.VK_TAB), 0.2)
-
 		.add(new KeyUp(KBKeys.VK_TAB), 0.2)
-
 		.add(new KeyUp(KBKeys.VK_SHIFT), 0.2).build().run(system, state, 0.2);
 
 		Util.pause(1);
 
 		new CompoundAction.Builder().add(new Type("94444281"), 1)
-
 		.build().run(system, state, 0.2);
-
+		
 		Util.pause(1);
-
+		
 		System.out.println("DEBUG 4: looking for login/next button");
 
 		waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"Login", state, system, 20,0.5);

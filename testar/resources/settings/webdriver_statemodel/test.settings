@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.w3schools.com/"
+SUTConnectorValue = "D:\\TESTAR\\chromedriver_win32\\chromedriver.exe" "1920x900+0+0" "https://www.kuveytturk.com.tr/en/"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.
 #################################################################
 
 Sequences = 1
-SequenceLength = 20
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious titles
@@ -123,6 +123,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -130,7 +132,7 @@ DataStoreMode = instant
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WebWidgetId
 
 #################################################################
 # Other more advanced settings
