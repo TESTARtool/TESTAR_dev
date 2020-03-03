@@ -127,6 +127,9 @@ ApplicationVersion = 1.0.0
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 ExitOnNonDeterminism = true
+UsePreviousStateInId = true
+UseAllStatesInId = false
+UseIncomingActionInId = false
 
 #################################################################
 # State identifier attributes
