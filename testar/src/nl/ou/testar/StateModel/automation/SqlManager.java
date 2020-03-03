@@ -114,9 +114,27 @@ public class SqlManager {
         }
     }
 
-    public void initTest1() {
+    public void initTest1(boolean clearOldResults) {
         try {
             Connection connection = this.getConnection();
+
+            if (clearOldResults) {
+                String query1 = "TRUNCATE TABLE test_run_widget";
+                String query2 = "DELETE FROM automated_test_run";
+                String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+                String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+                Stream.of(query1, query2, query3, query4).forEach(query -> {
+                    try {
+                        Statement statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                        exit(1);
+                    }
+                });
+            }
+
             // fetch the application
             String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
             Statement appStatement = connection.createStatement();
@@ -124,6 +142,16 @@ public class SqlManager {
 
             resultSet1.first();
             int applicationId = resultSet1.getInt("application_id");
+
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0";
+            String updateWidgetQuery2 = "UPDATE widget " +
+                    "SET use_in_abstraction = 1 " +
+                    "WHERE" +
+                    " widget_group = 'general'";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
 
             // now fetch the widgets
             String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
@@ -162,9 +190,27 @@ public class SqlManager {
         }
     }
 
-    public void initTest2() {
+    public void initTest2(boolean clearOldResults) {
         try {
             Connection connection = this.getConnection();
+
+            if (clearOldResults) {
+                String query1 = "TRUNCATE TABLE test_run_widget";
+                String query2 = "DELETE FROM automated_test_run";
+                String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+                String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+                Stream.of(query1, query2, query3, query4).forEach(query -> {
+                    try {
+                        Statement statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                        exit(1);
+                    }
+                });
+            }
+
             // fetch the application
             String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
             Statement appStatement = connection.createStatement();
@@ -172,6 +218,15 @@ public class SqlManager {
             resultSet1.first();
             int applicationId = resultSet1.getInt("application_id");
 
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0";
+            String updateWidgetQuery2 = "UPDATE widget " +
+                    "SET use_in_abstraction = 1 " +
+                    "WHERE" +
+                    " widget_group = 'general'";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
 
             // now fetch the widgets
             String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
