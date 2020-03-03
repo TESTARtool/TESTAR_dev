@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.smartclient.com/smartgwt/showcase/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
 
 #################################################################
 # Sequences
@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
+ProtocolClass = webdriver_parasoft/Protocol_webdriver_parasoft
 
 #################################################################
 # Graphdatabase settings (experimental)

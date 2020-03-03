@@ -69,7 +69,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+		//clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -78,20 +78,22 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.w3schools.com");
+		domainsAllowed = Arrays.asList("parabank.parasoft.com");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
+		followLinks = false;
 
 		// Propagate followLinks setting
 		WdDriver.followLinks = followLinks;
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{ 
+		/*policyAttributes = new HashMap<String, String>() {{ 
 			put("id", "sncmp-banner-btn-agree");
-		}};
+		}};*/
+		
+		WdDriver.fullScreen = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
@@ -113,6 +115,11 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 
+		//If we are on the admin web page, go back to the previous page
+		if(WdDriver.getCurrentUrl().contains("parabank.parasoft.com/parabank/admin.htm")) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -125,13 +132,24 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+
+			// Skip Admin page widget
+			if(widget.get(WdTags.WebHref,"").contains("admin.htm")) {
+				continue;
+			}
+
+			// If the State contains the login panel, create a login action
+			if(widget.get(WdTags.WebId,"").contains("loginPanel")) {
+				loginParasoft("username", "password", state, actions, ac);
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
@@ -152,6 +170,37 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		}
 
 		return actions;
+	}
+	
+	/**
+	 * If all necessary widgets exists, create a compound action for login
+	 */
+	private void loginParasoft(String username, String password, State state, Set<Action> actions, StdActionCompiler ac) {
+		Action typeUsername = new NOP();
+		Action typePassword = new NOP();
+		Action clickLogin = new NOP();
+		String nop = "No Operation";
+
+		for(Widget w : state) {
+			if(w.get(WdTags.WebName,"").equals("username")) {
+				typeUsername = ac.clickTypeInto(w, username, true);
+			}
+			if(w.get(WdTags.WebName,"").equals("password")) {
+				typePassword = ac.clickTypeInto(w, password, true);
+			}
+			if(w.get(WdTags.WebValue,"").equals("Log In")) {
+				clickLogin = ac.leftClickAt(w);
+			}
+		}
+		
+		if(!typeUsername.toString().contains(nop) && !typePassword.toString().contains(nop) && !clickLogin.toString().contains(nop)) {
+			Action userLogin = new CompoundAction.Builder()
+					.add(typeUsername, 1)
+					.add(typePassword, 1)
+					.add(clickLogin, 1).build();
+			userLogin.set(Tags.OriginWidget, typeUsername.get(Tags.OriginWidget));
+			actions.add(userLogin);
+		}
 	}
 
 	@Override
@@ -180,6 +229,12 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	protected boolean isTypeable(Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			
+			// Specific class="input" for parasoft SUT
+			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+				return true;
+			}
+			
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
 				String type = ((WdWidget) widget).element.type;
