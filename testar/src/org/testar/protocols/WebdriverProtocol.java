@@ -57,6 +57,7 @@ import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -114,17 +115,41 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
     		}
     	}
-    	
-    	double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
-        // See remarks in WdMouse
+		double displayScale = getDisplayScale(sut);
+
+		// See remarks in WdMouse
         mouse = sut.get(Tags.StandardMouse);
         mouse.setCursorDisplayScale(displayScale);
 
     	return sut;
     }
 
-    /**
+	/**
+	 * Returns the display scale based on the settings, if the user has set the override webdriver display scale
+	 * we return the override value otherwise the display scale obtained from the system.
+	 * @param sut The system under test
+	 * @return The display scale.
+	 */
+	private double getDisplayScale(SUT sut) {
+		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
+
+		// If the user has specified a scale override the display scale obtained from the system.
+		String overrideDisplayScaleAsString = settings().get(ConfigTags.OverrideWebDriverDisplayScale);
+		if (!overrideDisplayScaleAsString.isEmpty()) {
+			try {
+				double webDriverDisplayScaleOverride = Double.parseDouble(overrideDisplayScaleAsString);
+				if (webDriverDisplayScaleOverride != 0) {
+					displayScale = webDriverDisplayScaleOverride;
+				}
+			} catch (NumberFormatException nfe) {
+				System.out.printf("WARNING Unable to convert display scale override to double: %s, will use %f\n", overrideDisplayScaleAsString, displayScale);
+			}
+		}
+		return displayScale;
+	}
+
+	/**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
      * This can be used for example for bypassing a login screen by filling the username and password
      * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore

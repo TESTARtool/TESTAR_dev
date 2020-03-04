@@ -108,6 +108,21 @@ GraphDBUser =
 GraphDBPassword =
 
 #################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system. 
+# Can solve problems when the mouse clicks are not aligned with 
+# the elements on the screen. This can easily be deteced when
+# running the spy mode. FOr example hover over a text element and
+# the popup window should appear with information about the 
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5). 
+#################################################################
+
+OverrideWebDriverDisplayScale = 
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
