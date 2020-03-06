@@ -29,6 +29,7 @@
  *******************************************************************************************************/
 
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -41,6 +42,7 @@ import nl.ou.testar.StateModel.ModelArtifactManager;
 import nl.ou.testar.StateModel.StateModelTags;
 
 import org.fruit.Drag;
+import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Action;
@@ -51,6 +53,10 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
+
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import org.fruit.monkey.ConfigTags;
@@ -80,6 +86,29 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 	protected void initialize(Settings settings) {
 		//Set before initialize StateModel
 		settings.set(ConfigTags.ListeningMode, true);
+		
+		//Launch CODEO with JaCoCo
+		String initCODEOJacoco = "java -javaagent:jacoco_0.8.5\\lib\\jacocoagent.jar -jar C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
+		try {
+			Runtime.getRuntime().exec("cmd /c start \"\" " + initCODEOJacoco);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Util.pause(20);
+
+		Keyboard kb = AWTKeyboard.build();
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+
+		Util.pause(30);
+		
 		super.initialize(settings);
 	}
 	
@@ -135,6 +164,44 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 		}
 
 		return highAction;
+	}
+	
+	/**
+	 * Here you can put graceful shutdown sequence for your SUT
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
+
+		Keyboard kb = AWTKeyboard.build();
+
+		kb.press(KBKeys.VK_ALT);
+		kb.press(KBKeys.VK_F4);
+
+		kb.release(KBKeys.VK_ALT);
+		kb.release(KBKeys.VK_F4);
+
+		Util.pause(10);
+
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+
+		Util.pause(10);
+
+		super.stopSystem(system);
+
+		//Launch JaCoCo report
+		String antCommand = "cd jacoco_0.8.5 && ant report";
+		try {
+			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+			builder.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

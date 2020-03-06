@@ -99,6 +99,11 @@ task prepareSUTs(type: Copy) {
     into 'target/scripts/suts'
 }
 
+task prepareJacoco(type: Copy) {
+    from 'jacoco_0.8.5'
+    into 'target/scripts/jacoco_0.8.5'
+}
+
 task prepareOracles(type: Copy) {
     from 'target/classes/java/oracle'
     into 'target/scripts/settings'

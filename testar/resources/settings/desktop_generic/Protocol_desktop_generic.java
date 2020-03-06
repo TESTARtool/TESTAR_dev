@@ -29,13 +29,16 @@
  *******************************************************************************************************/
 
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
+import java.io.IOException;
 import java.util.Set;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -57,6 +60,29 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	protected void initialize(Settings settings) {
 		//Set before initialize StateModel
 		settings.set(ConfigTags.ListeningMode, true);
+
+		//Launch CODEO with JaCoCo
+		String initCODEOJacoco = "java -javaagent:jacoco_0.8.5\\lib\\jacocoagent.jar -jar C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
+		try {
+			Runtime.getRuntime().exec("cmd /c start \"\" " + initCODEOJacoco);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Util.pause(20);
+
+		Keyboard kb = AWTKeyboard.build();
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+
+		Util.pause(30);
+
 		super.initialize(settings);
 	}
 
@@ -91,9 +117,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -110,14 +136,14 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
-		
+
 		/*for(Widget w : state){
 			System.out.println("\n NEW WIDGET");
 			for (Tag<?> t : w.tags()) {
 				System.out.println("Tag: "+ t + " Value: " + w.get(t, null));
 			}
 		}*/
-		
+
 		return state;
 	}
 
@@ -158,12 +184,12 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		//return the set of derived actions
 		return actions;
 	}
-	
+
 	//CheckBox from project configuration panel
 	private boolean isUnrecognizedCheckBox(Widget w) {
 		if(w.parent()!=null &&
-        		w.get(Tags.Role).toString().contains("UIAText") &&
-        		w.parent().get(Tags.Role).toString().contains("ListItem")) {
+				w.get(Tags.Role).toString().contains("UIAText") &&
+				w.parent().get(Tags.Role).toString().contains("ListItem")) {
 			return true;
 		}
 		return false;
@@ -229,7 +255,36 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
+
+		Keyboard kb = AWTKeyboard.build();
+
+		kb.press(KBKeys.VK_ALT);
+		kb.press(KBKeys.VK_F4);
+
+		kb.release(KBKeys.VK_ALT);
+		kb.release(KBKeys.VK_F4);
+
+		Util.pause(10);
+
+		kb.press(KBKeys.VK_SHIFT);
+		kb.release(KBKeys.VK_SHIFT);
+
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+
+		Util.pause(10);
+
 		super.stopSystem(system);
+
+		//Launch JaCoCo report
+		String antCommand = "cd jacoco_0.8.5 && ant report";
+		try {
+			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+			builder.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
