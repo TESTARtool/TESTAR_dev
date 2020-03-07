@@ -119,11 +119,15 @@ public class TemporalController {
         this(settings, "");
     }
 
+    /**
+     * no params
+     * @return outputdirectory
+     */
     public String getOutputDir() {
         return outputDir;
     }
 
-    public void setTemporalModelMetaData(AbstractStateModel abstractStateModel) {
+    private void setTemporalModelMetaData(AbstractStateModel abstractStateModel) {
         if (abstractStateModel != null) {
             tModel.setApplicationName(abstractStateModel.getApplicationName());
             tModel.setApplicationVersion(abstractStateModel.getApplicationVersion());
@@ -196,7 +200,7 @@ public class TemporalController {
     }
 
 
-    public TemporalModel gettModel() {
+    private TemporalModel gettModel() {
         return tModel;
     }
 
@@ -205,7 +209,7 @@ public class TemporalController {
         JSONHandler.save(apSelectorManager, outputDir + filename, true);
     }
 
-    public void loadApSelectorManager(String filename) {
+    private void loadApSelectorManager(String filename) {
         this.apSelectorManager = (APSelectorManager) JSONHandler.load(filename, apSelectorManager.getClass());
         apSelectorManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
         tDBManager.setApSelectorManager(apSelectorManager);
@@ -215,21 +219,19 @@ public class TemporalController {
         return oracleColl;
     }
 
-    public void setOracleColl(List<TemporalOracle> oracleColl) {
+    private void setOracleColl(List<TemporalOracle> oracleColl) {
         this.oracleColl = oracleColl;
         this.oracleColl.sort(Comparator.comparing(TemporalOracle::getPatternTemporalType)); //sort by type
     }
 
-    public void updateOracleCollMetaData(boolean onlyModifiedDate) {
+    private void updateOracleCollMetaData() {
         LocalDateTime localDateTime = LocalDateTime.now();
         for (TemporalOracle ora : oracleColl
         ) {
-            if (!onlyModifiedDate) {
-                ora.setApplicationName(tModel.getApplicationName());
-                ora.setApplicationVersion(tModel.getApplicationVersion());
-                ora.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
-                ora.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
-            }
+            ora.setApplicationName(tModel.getApplicationName());
+            ora.setApplicationVersion(tModel.getApplicationVersion());
+            ora.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
+            ora.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
             ora.set_modifieddate(localDateTime.toString());
         }
     }
@@ -256,11 +258,13 @@ public class TemporalController {
         if (models.isEmpty()) {
             sb.append("model count: 0\n");
         } else {
-            sb.append("model count: " + models.size() + "\n");
+            sb.append("model count: ").append(models.size()).append("\n");
             sb.append("Model info:\n");
             for (AbstractStateModel abs : models
             ) {
-                sb.append("APP: " + abs.getApplicationName() + ", VERSION: " + abs.getApplicationVersion() + ", ID: " + abs.getModelIdentifier() + ", ABSTRACTION: " + abs.getAbstractionAttributes() + "\n");
+                sb.append("APP: ").append(abs.getApplicationName()).append(", VERSION: ")
+                        .append(abs.getApplicationVersion()).append(", ID: ").append(abs.getModelIdentifier())
+                        .append(", ABSTRACTION: ").append(abs.getAbstractionAttributes()).append("\n");
             }
         }
         String dbfilename = outputDir + "Databasemodels.txt";
@@ -275,107 +279,102 @@ public class TemporalController {
 
 
     //*********************************
-    private void computeTemporalModel(AbstractStateModel abstractStateModel, boolean instrumentDeadState) {
+    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentDeadState) {
         tDBManager.dbReopen();
         OResultSet resultSet = tDBManager.getConcreteStatesFromOrientDb(abstractStateModel);
 
-        if (abstractStateModel != null) {
+        //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
+        boolean firstDeadState = true;
+        StateEncoding deadStateEnc;
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()) {
 
+                Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
 
-            //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
-            boolean firstDeadState = true;
-            StateEncoding deadStateEnc;
-            while (resultSet.hasNext()) {
-                OResult result = resultSet.next();
-                // we're expecting a vertex
-                if (result.isVertex()) {
+                OVertex stateVertex = op.get();
+                StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
+                Set<String> propositions = new LinkedHashSet<>();
+                boolean deadstate = false;
+                Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
+                Iterator<OEdge> edgeiter = outedges.iterator();
+                deadstate = !edgeiter.hasNext();
 
-                    Optional<OVertex> op = result.getVertex();
-                    if (!op.isPresent()) continue;
+                if (deadstate) {
+                    tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
+                    if (instrumentDeadState && firstDeadState) {
+                        //add stateenc for 'Dead', inclusive dead transition selfloop;
+                        deadStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
+                        Set<String> deadStatePropositions = new LinkedHashSet<>();
+                        //deadStatePropositions.add("dead");   //redundant on transitionbased automatons
+                        deadStateEnc.setStateAPs(deadStatePropositions);
 
-                    OVertex stateVertex = op.get();
-                    StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
-                    Set<String> propositions = new LinkedHashSet<>();
-                    boolean deadstate = false;
-                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
-                    Iterator<OEdge> edgeiter = outedges.iterator();
-                    deadstate = !edgeiter.hasNext();
-
-                    if (deadstate) {
-                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
-                        if (instrumentDeadState && firstDeadState) {
-                            //add stateenc for 'Dead', inclusive dead transition selfloop;
-                            deadStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
-                            Set<String> deadStatePropositions = new LinkedHashSet<>();
-                            //deadStatePropositions.add("dead");   //redundant on transitionbased automatons
-                            deadStateEnc.setStateAPs(deadStatePropositions);
-
-                            TransitionEncoding deadTrenc = new TransitionEncoding();
-                            deadTrenc.setTransition(TemporalModel.getDeadProposition() + "_selfloop");
-                            deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
-                            Set<String> deadTransitionPropositions = new LinkedHashSet<>();
-                            deadTransitionPropositions.add(TemporalModel.getDeadProposition());
-                            deadTrenc.setTransitionAPs(deadTransitionPropositions);
-                            List<TransitionEncoding> deadTrencList = new ArrayList<>();
-                            deadTrencList.add(deadTrenc);
-                            deadStateEnc.setTransitionColl(deadTrencList);
-                            tModel.addStateEncoding(deadStateEnc, false);
-                            firstDeadState = false;
-                        }
-                        if (!instrumentDeadState)
-                            stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
-                    }
-                    for (String propertyName : stateVertex.getPropertyNames()) {
-                        tDBManager.computeProps(propertyName, stateVertex, propositions, null, false, false);
-                    }
-                    propositions.addAll(tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
-                    senc.setStateAPs(propositions);
-                    if (instrumentDeadState && deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
-                        deadTrenc.setTransition("#" + TemporalModel.getDeadProposition() + "_" + stateVertex.getIdentity().toString());
+                        deadTrenc.setTransition(TemporalModel.getDeadProposition() + "_selfloop");
                         deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                         deadTransitionPropositions.add(TemporalModel.getDeadProposition());
                         deadTrenc.setTransitionAPs(deadTransitionPropositions);
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
-                        senc.setTransitionColl(deadTrencList);
-                    } else senc.setTransitionColl(tDBManager.getTransitions(senc.getState()));
-
-                    tModel.addStateEncoding(senc, false);
+                        deadStateEnc.setTransitionColl(deadTrencList);
+                        tModel.addStateEncoding(deadStateEnc, false);
+                        firstDeadState = false;
+                    }
+                    if (!instrumentDeadState)
+                        stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
                 }
-            }
-            resultSet.close();
-            tModel.finalizeTransitions(); //update once. this is a costly operation
-            for (StateEncoding stenc : tModel.getStateEncodings()
-            ) {
-                List<String> encodedConjuncts = new ArrayList<>();
-                for (TransitionEncoding tren : stenc.getTransitionColl()
-                ) {
-                    String enc = tren.getEncodedTransitionAPConjunct();
-                    if (encodedConjuncts.contains(enc)) {
-                        tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
-                    } else encodedConjuncts.add(enc);
+                for (String propertyName : stateVertex.getPropertyNames()) {
+                    tDBManager.computeProps(propertyName, stateVertex, propositions, null, false, false);
                 }
-            }
-            tModel.setTraces(tDBManager.fetchTraces(tModel.getApplication_ModelIdentifier()));
-            List<String> initStates = new ArrayList<>();
-            for (TemporalTrace trace : tModel.getTraces()
-            ) {
-                TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
-                initStates.add(traceevent.getState());
-            }
-            tModel.setInitialStates(initStates);
-            tModel.setAPSeparator(apSelectorManager.getApEncodingSeparator());
+                propositions.addAll(tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
+                senc.setStateAPs(propositions);
+                if (instrumentDeadState && deadstate) {
+                    TransitionEncoding deadTrenc = new TransitionEncoding();
+                    deadTrenc.setTransition("#" + TemporalModel.getDeadProposition() + "_" + stateVertex.getIdentity().toString());
+                    deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
+                    Set<String> deadTransitionPropositions = new LinkedHashSet<>();
+                    deadTransitionPropositions.add(TemporalModel.getDeadProposition());
+                    deadTrenc.setTransitionAPs(deadTransitionPropositions);
+                    List<TransitionEncoding> deadTrencList = new ArrayList<>();
+                    deadTrencList.add(deadTrenc);
+                    senc.setTransitionColl(deadTrencList);
+                } else senc.setTransitionColl(tDBManager.getTransitions(senc.getState()));
 
-            for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
-            ) {
-                if (ap.contains(apSelectorManager.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
-                    tModel.addLog("WARNING: Model contains dead states (there are states without outgoing edges)");
-                    break;
-                }
+                tModel.addStateEncoding(senc, false);
             }
+        }
+        resultSet.close();
+        tModel.finalizeTransitions(); //update once. this is a costly operation
+        for (StateEncoding stenc : tModel.getStateEncodings()
+        ) {
+            List<String> encodedConjuncts = new ArrayList<>();
+            for (TransitionEncoding tren : stenc.getTransitionColl()
+            ) {
+                String enc = tren.getEncodedTransitionAPConjunct();
+                if (encodedConjuncts.contains(enc)) {
+                    tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
+                } else encodedConjuncts.add(enc);
+            }
+        }
+        tModel.setTraces(tDBManager.fetchTraces(tModel.getApplication_ModelIdentifier()));
+        List<String> initStates = new ArrayList<>();
+        for (TemporalTrace trace : tModel.getTraces()
+        ) {
+            TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
+            initStates.add(traceevent.getState());
+        }
+        tModel.setInitialStates(initStates);
+        tModel.setAPSeparator(apSelectorManager.getApEncodingSeparator());
 
+        for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
+        ) {
+            if (ap.contains(apSelectorManager.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
+                tModel.addLog("WARNING: Model contains dead states (there are states without outgoing edges)");
+                break;
+            }
         }
         tDBManager.dbClose();
     }
@@ -403,14 +402,12 @@ public class TemporalController {
         JSONHandler.save(tModel, outputDir + toFile);
     }
 
-    public boolean saveModelForChecker(TemporalFormalism tmptype, String file) {
-        boolean b = false;
+    private void saveModelForChecker(TemporalFormalism tmptype, String file) {
         String contents = "";
 
 
         if (tmptype.equals(TemporalFormalism.LTL) || tmptype.equals(TemporalFormalism.LTL_SPOT)) {
             contents = tModel.makeHOAOutput();
-            b = true;
         }
         if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.LTL_ITS) || tmptype.equals(TemporalFormalism.LTL_LTSMIN)) {
 
@@ -429,27 +426,39 @@ public class TemporalController {
 //            saveStringToFile(contents1,output);
 
             contents = tModel.makeETFOutput();
-            b = true;
         }
-        if (b) {
             File output = new File(file);
             saveStringToFile(contents,output);
         }
-        return b;
-    }
 
-
-    public void saveFormulaFiles(List<TemporalOracle> oracleColl, File output) {
+    /**
+     *
+     * @param oracleColl nn
+     * @param output nn
+     */
+    private void saveFormulaFiles(List<TemporalOracle> oracleColl, File output) {
         saveFormulaFiles(oracleColl, output, true);
     }
 
-    public void saveFormulaFiles(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
+    /**
+     *
+     * @param oracleColl nnn
+     * @param output nnn
+     * @param doTransformation nn
+     * @link saveStringToFile()
+     */
+    private void saveFormulaFiles(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
 
         String contents = tModel.validateAndMakeFormulas(oracleColl, doTransformation);
         TemporalController.saveStringToFile(contents, output);
     }
 
-    public static void saveStringToFile(String contents, File output) {
+    /**
+     * @see  #saveStringToFile(String, File)
+     * @param contents jj
+     * @param output jj
+     */
+    private static void saveStringToFile(String contents, File output) {
 
         try {
 
@@ -507,7 +516,7 @@ public class TemporalController {
                 }
 
                 setOracleColl(fromcoll);
-                updateOracleCollMetaData(false);
+                updateOracleCollMetaData();
 
                 String strippedFile;
                 String filename = Paths.get(oracleFile).getFileName().toString();
@@ -631,7 +640,7 @@ public class TemporalController {
 
 
                     if (!verbose) {
-                        if (automatonFile.exists()) Files.delete(automatonFile.toPath());
+                        if (automatonFile !=null && automatonFile.exists()) Files.delete(automatonFile.toPath());
                         if (resultsFile.exists())Files.delete(resultsFile.toPath());
                         if (formulaFile.exists())Files.delete(formulaFile.toPath());
                         if (syntaxformulaFile.exists())Files.delete(syntaxformulaFile.toPath());
@@ -659,21 +668,20 @@ public class TemporalController {
             System.out.println(LocalTime.now() + " | " + "compute temporal model started");
 
             AbstractStateModel abstractStateModel = getAbstractStateModel();
-            if (abstractStateModel == null){
+            if (abstractStateModel == null) {
                 System.err.println("Error: StateModel not available");
-            }
-            else{
-            setTemporalModelMetaData(abstractStateModel);
-            if (APSelectorFile.equals("")) {
-                setDefaultAPSelectormanager();
-                saveAPSelectorManager("default_APSelectorManager.json");
-            }
-            computeTemporalModel(abstractStateModel, instrumentDeadState);
-            if (verbose) {
-                saveModelAsJSON("APEncodedModel.json");
-            }
+            } else {
+                setTemporalModelMetaData(abstractStateModel);
+                if (APSelectorFile.equals("")) {
+                    setDefaultAPSelectormanager();
+                    saveAPSelectorManager("default_APSelectorManager.json");
+                }
+                settModel(abstractStateModel, instrumentDeadState);
+                if (verbose) {
+                    saveModelAsJSON("APEncodedModel.json");
+                }
 
-            System.out.println(LocalTime.now() + " | " + "compute temporal model completed");
+                System.out.println(LocalTime.now() + " | " + "compute temporal model completed");
             }
         } catch (Exception f) {
             f.printStackTrace();
@@ -694,7 +702,7 @@ public class TemporalController {
             File PotentialoracleFile = new File(outputDir + "TemporalPotentialOracles.csv");
 
             List<TemporalOracle> fromcoll;
-            fromcoll = generatePotentialOracles(patterns, patternConstraints, tactic_oraclesPerPattern);
+            fromcoll = getPotentialOracles(patterns, patternConstraints, tactic_oraclesPerPattern);
             CSVHandler.save(fromcoll, PotentialoracleFile.getAbsolutePath());
 
             System.out.println(" potential Oracle generator completed \n");
@@ -705,7 +713,7 @@ public class TemporalController {
     }
 
 
-    public List<TemporalOracle> generatePotentialOracles(List<TemporalPattern> patterns, List<TemporalPatternConstraint> patternConstraints, int tactic_oraclesPerPattern) {
+    private List<TemporalOracle> getPotentialOracles(List<TemporalPattern> patterns, List<TemporalPatternConstraint> patternConstraints, int tactic_oraclesPerPattern) {
         // there is no check on duplicate assignments:  a pattern can turn up as a oracle with exactly the same assignments.
         // the risk is remote due to the randomness on AP selection and e=randomness on constraint-set selection.
         List<TemporalOracle> potentialOracleColl = new ArrayList<>();

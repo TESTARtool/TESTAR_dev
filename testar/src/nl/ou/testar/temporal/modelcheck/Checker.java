@@ -93,17 +93,10 @@ public class Checker {
                                       String automatonFile, String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
         //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.
-        if (pathToExecutable.equals("")) {
-            String message = " **error ERROR : This modelchecker was not enabled";
-            File messageFile = new File(resultsFile);
-            TemporalController.saveStringToFile(message, messageFile);
-        }
-        else {
-
             try {
                 List<String> lines = Files.readAllLines(Paths.get(formulaFile), StandardCharsets.UTF_8);
                 boolean first = true;
-                String cli = "";
+                String cli;
                 String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFile) : automatonFile);// no witness nor counterexamples
                 String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile) : resultsFile);
                 for (String line : lines) {
@@ -118,7 +111,6 @@ public class Checker {
                 e.printStackTrace();
             }
         }
-    }
 
     public static void CTLMC_ByITS(String pathToExecutable, boolean toWslPath, boolean counterExamples,
                                    String automatonFile, String formulaFile, String resultsFile) {
