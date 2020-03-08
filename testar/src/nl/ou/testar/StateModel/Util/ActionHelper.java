@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel.Util;
 
 import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractActionIdExtractor;
+import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -31,10 +33,10 @@ public class ActionHelper {
      * @param actions
      * @return
      */
-    public static Set<AbstractAction> convertActionsToAbstractActions(Set<Action> actions) {
+    public static Set<AbstractAction> convertActionsToAbstractActions(AbstractState abstractState, Set<Action> actions) {
         Set<AbstractAction> abstractActions = new HashSet<>();
         // group the actions by the abstract action id
-        Map<String, List<Action>> actionMap = actions.stream().collect(Collectors.groupingBy(a -> a.get(Tags.AbstractIDCustom)));
+        Map<String, List<Action>> actionMap = actions.stream().collect(Collectors.groupingBy(a -> AbstractActionIdExtractor.extract(abstractState, a)));
         // create the actions
         for (String abstractActionId : actionMap.keySet()) {
             AbstractAction abstractAction = new AbstractAction(abstractActionId);
