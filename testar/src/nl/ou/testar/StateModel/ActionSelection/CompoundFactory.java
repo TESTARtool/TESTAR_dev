@@ -12,7 +12,7 @@ public class CompoundFactory {
         // this is hardcoded for now, but can be configurable in the future.
         List<ActionSelector> selectors = new ArrayList<>();
         if (settings.get(ConfigTags.ActionSelectionAlgorithm).equals("unvisited")) {
-            selectors.add(new ImprovedUnvisitedActionSelector());
+            selectors.add(new ImprovedUnvisitedActionSelector(settings.get(ConfigTags.MaxNrOfFlowAlterations)));
         }
         selectors.add(new RandomActionSelector());
         return new CompoundActionSelector(selectors);

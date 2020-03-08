@@ -25,7 +25,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     /**
      * The maximum nr of times that the flow can be altered.
      */
-    private final int MAX_FLOW_ALTERATIONS = 5;
+    private int maxNrOfAlterations = 5;
 
     /**
      * The number of times that the flow was altered.
@@ -35,11 +35,14 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     /**
      * Constructor
      */
-    ImprovedUnvisitedActionSelector() {
+    ImprovedUnvisitedActionSelector(Integer maxNrOfAlterations) {
         executionPath = new LinkedList<>();
         nrOfFlowAlterations = 0;
         logger = LoggerFactory.getLogger(ImprovedUnvisitedActionSelector.class);
         System.out.println("Class: " + ImprovedUnvisitedActionSelector.class);
+        if (maxNrOfAlterations != null) {
+            this.maxNrOfAlterations = maxNrOfAlterations;
+        }
     }
 
     @Override
@@ -54,7 +57,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
         // when that is the case, this action selector is not really useful anymore, because it can get stuck in a loop
         // there are several smart ways to fix this, but we opt for an easy one for now:
         // we throw an exception, so the random action selection algorithm can take over
-        if (nrOfFlowAlterations >= MAX_FLOW_ALTERATIONS) {
+        if (nrOfFlowAlterations >= maxNrOfAlterations) {
             System.out.println("Too many alterations in the flow. Throwing exception.");
             logger.debug("Too many alterations in the flow. Throwing exception.");
             throw new ActionNotFoundException();

@@ -103,7 +103,7 @@ public class ModelManager implements StateModelManager {
 
     /**
      * This method should be called once when a new state is reached after the execution
-     * of an action or succesfully starting the SUT.
+     * of an action or successfully starting the SUT.
      * @param newState
      * @param actions
      */
@@ -214,13 +214,14 @@ public class ModelManager implements StateModelManager {
     public void notifyActionExecution(Action action) {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
+        String abstractActionId = AbstractActionIdExtractor.extract(currentAbstractState, action);
         try {
-            actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
+            actionUnderExecution = currentAbstractState.getAction(abstractActionId);
         }
         catch (ActionNotFoundException ex) {
             System.out.println("Action not found in state model");
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
-            actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
+            actionUnderExecution = new AbstractAction(abstractActionId);
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
@@ -261,11 +262,11 @@ public class ModelManager implements StateModelManager {
                 errorMessages.add(message);
                 return null;
             }
-            String abstractIdCustom = abstractAction.getActionId();
-            System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
+            String abstractActionId = abstractAction.getActionId();
+            System.out.println("Finding action with abstractActionId : " + abstractActionId);
             for(Action action : actions) {
             	try {
-                if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
+                if (AbstractActionIdExtractor.extract(currentAbstractState, action).equals(abstractActionId)) {
                     return action;
                 }
             	}catch (Exception e) {
@@ -274,8 +275,8 @@ public class ModelManager implements StateModelManager {
             		errorMessages.add(message);
             	}
             }
-            System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
-            errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
+            System.out.println("Could not find action with abstractActionId : " + abstractActionId);
+            errorMessages.add("The actions selector returned the action with abstractActionId: " + abstractActionId + " . However, TESTAR was " +
                     "unable to find the action in its executable actions");
         } catch (ActionNotFoundException e) {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());

@@ -15,7 +15,7 @@ public abstract class AbstractStateService {
      */
     public static void updateAbstractStateActions(AbstractState abstractState, Set<Action> actions) {
         // we only add actions to the abstract state. We do not delete.
-        for (AbstractAction action : ActionHelper.convertActionsToAbstractActions(actions)) {
+        for (AbstractAction action : ActionHelper.convertActionsToAbstractActions(abstractState, actions)) {
             abstractState.addNewAction(action);
         }
     }
