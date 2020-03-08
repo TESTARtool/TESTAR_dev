@@ -121,6 +121,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> UsePreviousStateInId = Tag.from("UsePreviousStateInId", Boolean.class);
   public static final Tag<Boolean> UseAllStatesInId = Tag.from("UseAllStatesInId", Boolean.class);
   public static final Tag<Boolean> UseIncomingActionInId = Tag.from("UseIncomingActionInId", Boolean.class);
+  public static final Tag<Integer> MaxNrOfFlowAlterations = Tag.from("MaxNrOfFlowAlterations", Integer.class);
+
 
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);

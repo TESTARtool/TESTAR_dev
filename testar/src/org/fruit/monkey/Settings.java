@@ -400,6 +400,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"UsePreviousStateInId =" + Util.lineSep()
 					+"UseAllStatesInId =" + Util.lineSep()
 					+"UseIncomingActionInId =" + Util.lineSep()
+					+"MaxNrOfFlowAlterations =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
