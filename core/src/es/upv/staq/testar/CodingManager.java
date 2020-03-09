@@ -329,7 +329,7 @@ public class CodingManager {
 	 * This method will return the unique hash to identify the abstract state model
 	 * @return String A unique hash
 	 */
-	public static String getAbstractStateModelHash(String applicationName, String applicationVersion) {
+	public static String getAbstractStateModelHash(String applicationName, String applicationVersion, String extractionMode) {
 		// we calculate the hash using the tags that are used in constructing the custom abstract state id
 		// for now, an easy way is to order them alphabetically by name
 		Tag<?>[] abstractTags = getCustomTagsForAbstractId().clone();
@@ -341,6 +341,7 @@ public class CodingManager {
 		// we add the application name and version to the hash input
 		hashInput.append(applicationName);
 		hashInput.append(applicationVersion);
+		hashInput.append(extractionMode);
 		return lowCollisionID(hashInput.toString());
 	}
 
