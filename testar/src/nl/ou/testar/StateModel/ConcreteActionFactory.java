@@ -6,8 +6,8 @@ import org.fruit.alayer.Tags;
 
 public class ConcreteActionFactory {
 
-    public static ConcreteAction createConcreteAction(Action action, AbstractAction abstractAction) {
-        ConcreteAction concreteAction =  new ConcreteAction(action.get(Tags.ConcreteID), abstractAction);
+    public static ConcreteAction createConcreteAction(Action action, AbstractAction abstractAction, String concreteActionId) {
+        ConcreteAction concreteAction =  new ConcreteAction(concreteActionId, abstractAction);
 
         // check if a widget is attached to this action.
         // if so, copy all the attributes to the action

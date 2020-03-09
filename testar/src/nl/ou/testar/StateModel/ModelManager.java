@@ -55,6 +55,8 @@ public class ModelManager implements StateModelManager {
 
     private AbstractStateIdExtractor abstractStateIdExtractor;
 
+    private ConcreteStateIdExtractor concreteStateIdExtractor;
+
     /**
      * Constructor
      * @param abstractStateModel
@@ -66,7 +68,9 @@ public class ModelManager implements StateModelManager {
                         Set<Tag<?>> concreteStateTags,
                         SequenceManager sequenceManager,
                         boolean storeWidgets,
-                        AbstractStateIdExtractor abstractStateIdExtractor) {
+                        AbstractStateIdExtractor abstractStateIdExtractor,
+                        ConcreteStateIdExtractor concreteStateIdExtractor
+                        ) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
@@ -76,6 +80,7 @@ public class ModelManager implements StateModelManager {
         nrOfNonDeterministicActions = 0;
         this.storeWidgets = storeWidgets;
         this.abstractStateIdExtractor = abstractStateIdExtractor;
+        this.concreteStateIdExtractor = concreteStateIdExtractor;
         init();
     }
 
@@ -99,6 +104,10 @@ public class ModelManager implements StateModelManager {
      */
     @Override
     public void notifyNewStateReached(State newState, Set<Action> actions) {
+        //////////////////// NOTICE ///////////////////////
+        // During development, this class has gotten bigger and bigger, with more functionality tacked on.
+        // It really needs refactoring at this stage.
+
         // check if we are dealing with a new state or an existing one
         String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState, actionUnderExecution);
         AbstractState newAbstractState;
@@ -119,7 +128,8 @@ public class ModelManager implements StateModelManager {
         }
 
         // add the concrete state id to the abstract state
-        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+        String concreteStateId = concreteStateIdExtractor.extractConcreteStateId(newState, concreteActionUnderExecution);
+        newAbstractState.addConcreteStateId(concreteStateId);
 
         // check if an action was executed
         if (actionUnderExecution == null) {
@@ -154,7 +164,7 @@ public class ModelManager implements StateModelManager {
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state and possibly the action
-        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets, concreteStateId);
         if (concreteActionUnderExecution == null) {
             persistenceManager.persistConcreteState(newConcreteState);
         }
@@ -212,7 +222,8 @@ public class ModelManager implements StateModelManager {
             actionUnderExecution = new AbstractAction(abstractActionId);
             currentAbstractState.addNewAction(actionUnderExecution);
         }
-        concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
+        String concreteActionId = ConcreteActionIdExtractor.extract(currentConcreteState, action);
+        concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution, concreteActionId);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
         System.out.println("Executing action: " + action.get(Tags.Desc));
         System.out.println("----------------------------------");

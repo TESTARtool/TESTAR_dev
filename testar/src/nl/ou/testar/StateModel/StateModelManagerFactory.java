@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel;
 
 import es.upv.staq.testar.CodingManager;
-import nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -82,7 +81,7 @@ public class StateModelManagerFactory {
             extractionMode = ExtractionMode.SINGLE_STATE;
         }
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, new AbstractStateIdExtractor(extractionMode));
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, new AbstractStateIdExtractor(extractionMode), new ConcreteStateIdExtractor(extractionMode));
     }
 
 }
