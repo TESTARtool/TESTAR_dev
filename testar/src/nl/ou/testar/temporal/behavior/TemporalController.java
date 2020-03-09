@@ -417,7 +417,7 @@ public class TemporalController {
 //            String strippedFile;
 //            String filename = Paths.get(file).getFileName().toString();
 //            if (filename.contains(".")){
-//                strippedFile = file.substring(0, filename.lastIndexOf("."));
+//                strippedFile = file.substring(0, file.lastIndexOf("."));
 //            }
 //            else {
 //                strippedFile = file;
@@ -490,6 +490,10 @@ public class TemporalController {
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
                        String ltlLtsminMCCommand, boolean ltlLtsminWSLPath, boolean ltlltsminEnabled) {
+        // css20200309 disabled: ltlITSEnabled this model check gives unexpected results: False Positive.
+        // ITS LTL fields are made invisible in the Temporalpanel
+        ltlItsEnabled=false;
+
         try {
 
             System.out.println(LocalTime.now() + " | " + "Temporal model-checking started");

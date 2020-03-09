@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel2">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
     <rowspec value="top:275px:noGrow"/>
@@ -59,9 +59,9 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:d:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:37px:noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:37px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:139px:noGrow"/>
@@ -75,7 +75,7 @@
               <tabbedpane title="Setup"/>
             </constraints>
             <properties>
-              <visible value="false"/>
+              <visible value="true"/>
             </properties>
             <border type="none"/>
             <children>
@@ -112,7 +112,7 @@
               </component>
               <component id="6abf5" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -122,7 +122,7 @@
               </component>
               <component id="bbeae" class="javax.swing.JTextField" binding="itsCTLChecker">
                 <constraints>
-                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="8" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -164,7 +164,7 @@
               </component>
               <component id="90cb5" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLITS">
                 <constraints>
-                  <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -174,48 +174,6 @@
               </component>
               <component id="dc921" class="javax.swing.JTextField" binding="itsLTLChecker">
                 <constraints>
-                  <grid row="8" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value=""/>
-                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
-                </properties>
-              </component>
-              <component id="75b8e" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLITS">
-                <constraints>
-                  <grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
-                </properties>
-              </component>
-              <component id="bc30b" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="ITS LTL Checker:"/>
-                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
-                </properties>
-              </component>
-              <component id="74406" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="LTSMIN LTL Checker:"/>
-                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
-                </properties>
-              </component>
-              <component id="23b7e" class="javax.swing.JTextField" binding="ltsminLTLChecker">
-                <constraints>
                   <grid row="10" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
@@ -224,9 +182,10 @@
                 <properties>
                   <text value=""/>
                   <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                  <visible value="false"/>
                 </properties>
               </component>
-              <component id="5fef" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLLTSMIN">
+              <component id="75b8e" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLITS">
                 <constraints>
                   <grid row="10" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -234,6 +193,19 @@
                 <properties>
                   <text value="WSL"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <visible value="false"/>
+                </properties>
+              </component>
+              <component id="bc30b" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <opaque value="false"/>
+                  <text value="ITS LTL Checker:"/>
+                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
+                  <visible value="false"/>
                 </properties>
               </component>
               <component id="98c82" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
@@ -278,7 +250,7 @@
               </component>
               <component id="65b2" class="javax.swing.JCheckBox" binding="enableITS_CTL">
                 <constraints>
-                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -288,17 +260,50 @@
               </component>
               <component id="15eea" class="javax.swing.JCheckBox" binding="enableITS_LTL">
                 <constraints>
-                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="10" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Enable"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <visible value="false"/>
+                </properties>
+              </component>
+              <component id="74406" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="LTSMIN LTL Checker:"/>
+                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
+                </properties>
+              </component>
+              <component id="23b7e" class="javax.swing.JTextField" binding="ltsminLTLChecker">
+                <constraints>
+                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value=""/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                </properties>
+              </component>
+              <component id="5fef" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLLTSMIN">
+                <constraints>
+                  <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="WSL"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="fbc2" class="javax.swing.JCheckBox" binding="enableLTSMIN_LTL">
                 <constraints>
-                  <grid row="10" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>

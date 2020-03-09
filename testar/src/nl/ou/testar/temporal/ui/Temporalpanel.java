@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.fruit.monkey.ConfigTags.TemporalGeneratorTactics;
 
-public class Temporalpanel2 {
+public class Temporalpanel {
     //****custom
     private Process webAnalyzerProcess = null;
     private String VisualizerURL;
@@ -82,7 +82,7 @@ public class Temporalpanel2 {
     private JCheckBox enableITS_LTL;
     private JCheckBox enableLTSMIN_LTL;
 
-    public Temporalpanel2() {
+    public Temporalpanel() {
         $$$setupUI$$$();
 
 
@@ -172,8 +172,8 @@ public class Temporalpanel2 {
         });
     }
 
-    public static Temporalpanel2 createTemporalPanel() {
-        return new Temporalpanel2();
+    public static Temporalpanel createTemporalPanel() {
+        return new Temporalpanel();
     }
 
 
@@ -199,8 +199,8 @@ public class Temporalpanel2 {
         containerTab.setVisible(true);
         mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
-        setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(false);
+        setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        setupPanel.setVisible(true);
         containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
@@ -216,10 +216,10 @@ public class Temporalpanel2 {
         final JLabel label2 = new JLabel();
         label2.setText("ITS CTL Checker:");
         label2.setToolTipText("Used for CTL model check. the usual command to invoke is:  its-ctl");
-        setupPanel.add(label2, cc.xy(1, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        setupPanel.add(label2, cc.xy(1, 9, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         itsCTLChecker = new JTextField();
         itsCTLChecker.setToolTipText("<html>Command to invoke the ITS-based CTL model checker.<br>\n(no visualization of counterexample possible)</html>");
-        setupPanel.add(itsCTLChecker, cc.xyw(2, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        setupPanel.add(itsCTLChecker, cc.xyw(2, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         enableTemporalOfflineOraclesCheckBox = new JCheckBox();
         enableTemporalOfflineOraclesCheckBox.setText("Enable Temporal Offline Oracles");
         enableTemporalOfflineOraclesCheckBox.setToolTipText("Temporal oracles are automatically evaluated after each TESTAR run by using the settigns supplied in this form.");
@@ -236,31 +236,23 @@ public class Temporalpanel2 {
         WSLCheckBoxCTLITS = new JCheckBox();
         WSLCheckBoxCTLITS.setText("WSL");
         WSLCheckBoxCTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxCTLITS, cc.xy(6, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(WSLCheckBoxCTLITS, cc.xy(6, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         itsLTLChecker = new JTextField();
         itsLTLChecker.setText("");
         itsLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
-        setupPanel.add(itsLTLChecker, cc.xyw(2, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        itsLTLChecker.setVisible(false);
+        setupPanel.add(itsLTLChecker, cc.xyw(2, 11, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLITS = new JCheckBox();
         WSLCheckBoxLTLITS.setText("WSL");
         WSLCheckBoxLTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxLTLITS, cc.xy(6, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        WSLCheckBoxLTLITS.setVisible(false);
+        setupPanel.add(WSLCheckBoxLTLITS, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label3 = new JLabel();
+        label3.setOpaque(false);
         label3.setText("ITS LTL Checker:");
         label3.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
-        setupPanel.add(label3, cc.xy(1, 9, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label4 = new JLabel();
-        label4.setText("LTSMIN LTL Checker:");
-        label4.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
-        setupPanel.add(label4, cc.xy(1, 11, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        ltsminLTLChecker = new JTextField();
-        ltsminLTLChecker.setText("");
-        ltsminLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
-        setupPanel.add(ltsminLTLChecker, cc.xyw(2, 11, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        WSLCheckBoxLTLLTSMIN = new JCheckBox();
-        WSLCheckBoxLTLLTSMIN.setText("WSL");
-        WSLCheckBoxLTLLTSMIN.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(WSLCheckBoxLTLLTSMIN, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        label3.setVisible(false);
+        setupPanel.add(label3, cc.xy(1, 11, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         verboseCheckBox = new JCheckBox();
         verboseCheckBox.setSelected(true);
         verboseCheckBox.setText("Verbose");
@@ -280,15 +272,28 @@ public class Temporalpanel2 {
         enableITS_CTL = new JCheckBox();
         enableITS_CTL.setText("Enable");
         enableITS_CTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(enableITS_CTL, cc.xy(7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(enableITS_CTL, cc.xy(7, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableITS_LTL = new JCheckBox();
         enableITS_LTL.setText("Enable");
         enableITS_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(enableITS_LTL, cc.xy(7, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        enableITS_LTL.setVisible(false);
+        setupPanel.add(enableITS_LTL, cc.xy(7, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        final JLabel label4 = new JLabel();
+        label4.setText("LTSMIN LTL Checker:");
+        label4.setToolTipText("Used for LTL model check. the usual command to invoke is:  its-ltl");
+        setupPanel.add(label4, cc.xy(1, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        ltsminLTLChecker = new JTextField();
+        ltsminLTLChecker.setText("");
+        ltsminLTLChecker.setToolTipText("<html>Command to invoke the ITS-based LTL model checker<br>\n(counterexamples are computed in the raw output, but not visualized)");
+        setupPanel.add(ltsminLTLChecker, cc.xyw(2, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        WSLCheckBoxLTLLTSMIN = new JCheckBox();
+        WSLCheckBoxLTLLTSMIN.setText("WSL");
+        WSLCheckBoxLTLLTSMIN.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        setupPanel.add(WSLCheckBoxLTLLTSMIN, cc.xy(6, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableLTSMIN_LTL = new JCheckBox();
         enableLTSMIN_LTL.setText("Enable");
         enableLTSMIN_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
-        setupPanel.add(enableLTSMIN_LTL, cc.xy(7, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        setupPanel.add(enableLTSMIN_LTL, cc.xy(7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
         minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:11px:noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:104px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,left:40dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
         containerTab.addTab("Miner", minerPanel);

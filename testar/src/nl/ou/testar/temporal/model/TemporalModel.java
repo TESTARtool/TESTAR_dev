@@ -265,6 +265,7 @@ public class TemporalModel extends TemporalBean {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
 
             int transindex = 0;
+            Set<StateEncoding> doneState=new HashSet<>();
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
                 //       result.append("" + stateid + " ");
@@ -277,29 +278,32 @@ public class TemporalModel extends TemporalBean {
                         break;
                     }
                 }
-                String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
-                int idex = 0;
-                for (String ap : stateaps
-                ) {
+                if (!doneState.contains(targetenc)) {
+                    String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
+                    int idex = 0;
+                    for (String ap : stateaps
+                    ) {
 
 
-                    if (ap.startsWith("!")) {
-                        result.append("0/");
-                    } else {
-                        result.append("1/");
+                        if (ap.startsWith("!")) {
+                            result.append("0/");
+                        } else {
+                            result.append("1/");
+                        }
+                        if (targetaps[idex].startsWith("!")) {
+                            result.append("0 ");
+                        } else {
+                            result.append("1 ");
+                        }
+
+
+                        idex++;
                     }
-                    if (targetaps[idex].startsWith("!")) {
-                        result.append("0 ");
-                    } else {
-                        result.append("1 ");
-                    }
-
-
-                    idex++;
+                    //   result.append(" " + transindex).append("\n");
+                    result.append("\n");
+                    transindex++;
+                    doneState.add(targetenc);
                 }
-            //   result.append(" " + transindex).append("\n");
-                result.append("\n");
-                transindex++;
             }
             stateid++;
         }
@@ -405,6 +409,7 @@ public class TemporalModel extends TemporalBean {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
 
             int transindex = 0;
+            Set<StateEncoding> doneState= new HashSet<>();
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
                 //       result.append("" + stateid + " ");
@@ -413,58 +418,62 @@ public class TemporalModel extends TemporalBean {
                 for (StateEncoding stenc1 : stateEncodings
                 ) {
                     if (targetstate.equals(stenc1.getState())) {
-                        targetenc = stenc1;
+                            targetenc = stenc1;
                         break;
                     }
                 }
-                String artificalEdge = "_F"+trenc.getTransition().replace("#","_").replace(":","_");
-                StringBuilder condition=new StringBuilder();
-                StringBuilder assignment=new StringBuilder();
+                if (!doneState.contains(targetenc)) {
 
-                condition.append("[ stateindex == "+stateList.indexOf(stenc.getState())+ " ");
+                    String artificalEdge = "F_F" + trenc.getTransition().replace("#", "_").replace(":", "_");
+                    StringBuilder condition = new StringBuilder();
+                    StringBuilder assignment = new StringBuilder();
+
+                    condition.append("[ stateindex == " + stateList.indexOf(stenc.getState()) + " ");
 
 
-                String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
-                int idex = 0;
-                int chunk2 = 25;
-                assignment.append("        stateindex = ").append(stateList.indexOf(targetenc.getState())).append(" ;\n");
-                assignment .append("        ");
+                    String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
+                    int idex = 0;
+                    int chunk2 = 25;
+                    assignment.append("        stateindex = ").append(stateList.indexOf(targetenc.getState())).append(" ;\n");
+                    assignment.append("        ");
 
-                for (String ap : stateaps
-                ) {
-                    if (ap.startsWith("!")) {
-                  //      condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
-                    } else {
-                        condition.append(" &&  ").append(APPrefix).append(idex).append(" == 1").append(" ");
+                    for (String ap : stateaps
+                    ) {
+                        if (ap.startsWith("!")) {
+                            condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
+                        } else {
+                            condition.append(" &&  ").append(APPrefix).append(idex).append(" == 1").append(" ");
+                        }
+                        if (idex > 0 && (idex % chunk2) == 0) {
+                            condition.append("\n");
+                            condition.append("        ");
+                        }
+
+
+                        if (targetaps[idex].startsWith("!")) {
+                            assignment.append(APPrefix).append(idex).append(" = 0").append(" ; ");
+                        } else {
+                            assignment.append(APPrefix).append(idex).append(" = 1").append(" ; ");
+                        }
+                        if (idex > 0 && (idex % chunk2) == 0) {
+                            assignment.append("\n");
+                            assignment.append("        ");
+                        }
+
+                        idex++;
                     }
-                    if (idex> 0 && (idex % chunk2) == 0) {
-                        condition.append("\n");
-                        condition.append("        ");
-                    }
+                    condition.append(" ]\n");
+                    // result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+" {\n");
+                    result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append(" {\n");
+
+                    result.append(assignment.toString());
+                    result.append("    }\n");
 
 
-                    if (targetaps[idex].startsWith("!")) {
-                        assignment.append(APPrefix).append(idex).append(" = 0").append(" ; ");
-                    } else {
-                        assignment.append(APPrefix).append(idex).append(" = 1").append(" ; ");
-                    }
-                    if (idex> 0 && (idex % chunk2) == 0) {
-                        assignment.append("\n");
-                        assignment.append("        ");
-                    }
-
-                    idex++;
+                    //result.append(" " + transindex).append("\n");
+                    transindex++;
+                    doneState.add(targetenc);
                 }
-                condition.append(" ]\n");
-               // result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+" {\n");
-                result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( " {\n");
-
-                result.append(assignment.toString());
-                result.append("    }\n");
-
-
-                //result.append(" " + transindex).append("\n");
-                transindex++;
             }
             stateid++;
         }
