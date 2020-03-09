@@ -201,7 +201,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		
 		System.out.println("DEBUG 4: looking for login/next button");
 
-		waitAndLeftClickWidgetWithMatchingTag(Tags.Title,"Login", state, system, 20,0.5);
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName,"Login", state, system, 20,0.5);
 
 		state = getState(system);
 
