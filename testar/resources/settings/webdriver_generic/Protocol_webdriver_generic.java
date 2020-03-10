@@ -66,7 +66,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+		clickableClasses = Arrays.asList(
+				   "multiselect__content-wrapper", "multiselect__select",
+				   "multiselect__option", "option__text", "extended-option",
+				   "profileimg",
+				   "fa-sort", "fa-globe",
+				   "month-head", "week-number", "day-header",
+				   //"day",
+				   "moment-period",
+				   "flatpickr-day", "flatpickr-next-month", "flatpickr-prev-month", "flatpickr-month");
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -75,7 +83,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+		domainsAllowed = Arrays.asList("testwerk.preview.remindotoets.nl");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -85,15 +93,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// URL + form name, username input id + value, password input id + value
 		// Set login to null to disable this feature
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
+		login = Pair.from("https://testwerk.preview.remindotoets.nl/login/", "login");
+		username = Pair.from("login_username", "");
+		password = Pair.from("login_password", "");
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{
+		/*policyAttributes = new HashMap<String, String>() {{
 			put("class", "lfr-btn-label");
-		}};
+		}};*/
 
 		WdDriver.fullScreen = true;
 
