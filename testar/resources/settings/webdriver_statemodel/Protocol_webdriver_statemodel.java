@@ -33,6 +33,7 @@ import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import org.fruit.Pair;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -98,6 +99,52 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 	}
+	
+	
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
+	 */
+	@Override
+	protected void beginSequence(SUT system, State state){
+
+		// When a TESTAR sequence begins we will login in to the application
+		for(Widget w : state) {
+			
+			// Find username Input widget to type the username
+			if(w.get(WdTags.WebName,"").equals("username")) {
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				Action a = ac.clickTypeInto(w, "username", true);
+				executeAction(system, state, a);
+			}
+			
+			// Find password Input widget to type the password
+			if(w.get(WdTags.WebName,"").equals("password")) {
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				Action a = ac.clickTypeInto(w, "password", true);
+				executeAction(system, state, a);
+			}
+		}
+
+		// Credentials are typed, now we need to find Log In button and click
+		for(Widget w : state) {
+			if(w.get(WdTags.WebValue,"").equals("Log In")) {
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				Action a = ac.leftClickAt(w);
+				executeAction(system, state, a);
+			}
+		}
+		
+		// Pause a bit, SUT will refresh
+		Util.pause(5);
+		
+		// Update the state to retrieve the new one after login
+		state = getState(system);
+		
+		super.beginSequence(system, state);
+	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -133,8 +180,9 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			// Skip Admin page widget
-			if(widget.get(WdTags.WebHref,"").contains("admin.htm")) {
+			// Skip Admin and logout page widget
+			if(widget.get(WdTags.WebHref,"").contains("admin.htm")
+					|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
 				continue;
 			}
 
