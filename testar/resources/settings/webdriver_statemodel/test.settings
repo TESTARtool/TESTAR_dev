@@ -44,7 +44,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*Error.*|.*[eE]xcepti[o?]n.*|.*404.*|.*403.*
 SuspiciousWebTitle = .*Error.*|.*[eE]xcepti[o?]n.*
 SuspiciousWebName = .*Error.*|.*[eE]xcepti[o?]n.*
 SuspiciousWebHref = .*Error.*|.*[eE]xcepti[o?]n.*

@@ -1311,7 +1311,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		faultySequence = false;
+		faultySequence = !getVerdict(state).equals(Verdict.OK);
 		nonReactingActionNumber = 0;
 	}
 
@@ -1871,9 +1871,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
+		return !faultySequence &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
-				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}

@@ -241,21 +241,30 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 	protected Verdict getVerdict(State state){
 
 		Verdict currentVerdict = super.getVerdict(state);
+		if(!currentVerdict.equals(Verdict.OK)) {
+			return currentVerdict;
+		}
 		
 		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebTitle), Pattern.UNICODE_CHARACTER_CLASS);
 		this.suspiciousValueMatchers = new WeakHashMap<>();
 		Verdict webTitleVerdict = suspiciousValueMatcher(WdTags.WebTitle, state);
-		currentVerdict.join(webTitleVerdict);
+		if(!webTitleVerdict.equals(Verdict.OK)) {
+			return webTitleVerdict;
+		}
 		
 		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebName), Pattern.UNICODE_CHARACTER_CLASS);
 		this.suspiciousValueMatchers = new WeakHashMap<>();
 		Verdict webNameVerdict = suspiciousValueMatcher(WdTags.WebName, state);
-		currentVerdict.join(webNameVerdict);
+		if(!webNameVerdict.equals(Verdict.OK)) {
+			return webNameVerdict;
+		}
 		
 		this.suspiciousValuePattern = Pattern.compile(settings().get(ConfigTags.SuspiciousWebHref), Pattern.UNICODE_CHARACTER_CLASS);
 		this.suspiciousValueMatchers = new WeakHashMap<>();
 		Verdict webHrefVerdict = suspiciousValueMatcher(WdTags.WebHref, state);
-		currentVerdict.join(webHrefVerdict);
+		if(!webHrefVerdict.equals(Verdict.OK)) {
+			return webHrefVerdict;
+		}
 
 		return currentVerdict;
 	}
