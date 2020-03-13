@@ -425,6 +425,7 @@ public class Main {
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
 			defaults.add(Pair.from(ShowSettingsAfterTest, true));
+			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));

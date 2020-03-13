@@ -162,3 +162,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0
