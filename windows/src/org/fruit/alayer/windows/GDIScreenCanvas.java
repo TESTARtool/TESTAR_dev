@@ -299,4 +299,8 @@ public final class GDIScreenCanvas implements Canvas {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public String toString() {
+		return "x: " + x + ", y: " + y + ", width: " + width + ", height: " + height ;
+	}
 }
