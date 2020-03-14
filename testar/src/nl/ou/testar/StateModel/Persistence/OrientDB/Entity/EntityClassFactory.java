@@ -200,6 +200,11 @@ public class EntityClassFactory {
         applicationVersion.setNullable(true);
         applicationVersion.setIdentifier(false);
         abstractStateModelClass.addProperty(applicationVersion);
+        Property extractionMode = new Property("extractionMode", OType.STRING);
+        extractionMode.setMandatory(false);
+        extractionMode.setNullable(true);
+        extractionMode.setIdentifier(false);
+        abstractStateModelClass.addProperty(extractionMode);
         entityClasses.put(EntityClassName.AbstractStateModel, abstractStateModelClass);
         return abstractStateModelClass;
     }

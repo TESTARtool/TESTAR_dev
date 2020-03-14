@@ -9,15 +9,18 @@ public class AbstractStateModel {
 
     private String applicationName;
 
+    private String extractionMode;
+
     private String modelIdentifier;
 
     private Set abstractionAttributes;
 
     private List<TestSequence> sequences;
 
-    public AbstractStateModel(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes, List<TestSequence> sequences) {
+    public AbstractStateModel(String applicationName, String applicationVersion, String extractionMode, String modelIdentifier, Set abstractionAttributes, List<TestSequence> sequences) {
         this.applicationVersion = applicationVersion;
         this.applicationName = applicationName;
+        this.extractionMode = extractionMode;
         this.modelIdentifier = modelIdentifier;
         this.abstractionAttributes = abstractionAttributes;
         this.sequences = sequences;
@@ -33,6 +36,10 @@ public class AbstractStateModel {
 
     public String getApplicationName() {
         return applicationName;
+    }
+
+    public String getExtractionMode() {
+        return extractionMode;
     }
 
     public void setApplicationName(String applicationName) {
