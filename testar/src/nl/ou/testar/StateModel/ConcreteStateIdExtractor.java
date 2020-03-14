@@ -28,7 +28,7 @@ public class ConcreteStateIdExtractor {
         if (extractionMode == PREVIOUS_STATE) {
             previousStateId = "";
         }
-        System.out.println("Starting abstract state id extractor in mode: " + extractionMode);
+        System.out.println("Starting concrete state id extractor in mode: " + extractionMode);
     }
 
     private String extractSingleState(State state) {
@@ -36,9 +36,9 @@ public class ConcreteStateIdExtractor {
     }
 
     private String extractPreviousState(State state) {
-        String abstractStateId = HydrationHelper.lowCollisionID(previousStateId + extractSingleState(state));
+        String concreteStateId = HydrationHelper.lowCollisionID(previousStateId + extractSingleState(state));
         previousStateId = extractSingleState(state);
-        return abstractStateId;
+        return concreteStateId;
     }
 
     private String extractAllStates(State state) {
