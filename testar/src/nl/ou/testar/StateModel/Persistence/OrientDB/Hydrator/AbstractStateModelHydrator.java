@@ -44,5 +44,6 @@ public class AbstractStateModelHydrator implements EntityHydrator<VertexEntity> 
         // add the application name and version
         vertexEntity.addPropertyValue("applicationName", new PropertyValue(OType.STRING, ((AbstractStateModel) source).getApplicationName()));
         vertexEntity.addPropertyValue("applicationVersion", new PropertyValue(OType.STRING, ((AbstractStateModel) source).getApplicationVersion()));
+        vertexEntity.addPropertyValue("extractionMode", new PropertyValue(OType.STRING, ((AbstractStateModel) source).getExtractionMode()));
     }
 }

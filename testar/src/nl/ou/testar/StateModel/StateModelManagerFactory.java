@@ -74,6 +74,7 @@ public class StateModelManagerFactory {
         AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
                 settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion),
+                extractionMode.toString(),
                 abstractTags,
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);

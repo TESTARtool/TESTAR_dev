@@ -22,6 +22,9 @@ public class AbstractStateModel {
     // the version of the application that is being modelled
     private String applicationVersion;
 
+    // the extraction mode used to construct the model
+    private String extractionMode;
+
     // a set of tags that was used to `form` the abstract state model
     private Set<Tag<?>> tags;
 
@@ -50,11 +53,13 @@ public class AbstractStateModel {
     public AbstractStateModel(String modelIdentifier,
                               String applicationName,
                               String applicationVersion,
+                              String extractionMode,
                               Set<Tag<?>> tags,
                               StateModelEventListener ...eventListeners) {
         this.modelIdentifier = modelIdentifier;
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
+        this.extractionMode = extractionMode;
         this.tags = tags;
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
@@ -298,6 +303,15 @@ public class AbstractStateModel {
      */
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+
+    /**
+     * This method returns a string representation of the extraction mode that was used to
+     * construct the state model.
+     * @return
+     */
+    public String getExtractionMode() {
+        return extractionMode;
     }
 
     /**

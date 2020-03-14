@@ -107,13 +107,14 @@ public class AnalysisManager {
 
                     String applicationName = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
                     String applicationVersion = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
+                    String extractionMode = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("extractionMode"));
                     String modelIdentifier = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
                     Set abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
                     // fetch the test sequences
                     List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier, db);
 
                     AbstractStateModel abstractStateModel = new AbstractStateModel(
-                            applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
+                            applicationName, applicationVersion, extractionMode, modelIdentifier, abstractionAttributes, sequenceList
                     );
                     abstractStateModels.add(abstractStateModel);
                 }
