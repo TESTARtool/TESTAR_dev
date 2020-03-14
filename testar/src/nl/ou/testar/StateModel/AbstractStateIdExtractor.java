@@ -5,20 +5,12 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import java.util.ArrayList;
 import java.util.List;
-import static nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode.*;
+import static nl.ou.testar.StateModel.ExtractionMode.*;
 
 /**
  * This class extracts the abstract state ids for use in the abstract layer of our models.
  */
 public class AbstractStateIdExtractor {
-
-    // enum with the 4 different extraction modes
-    public enum ExtractionMode {
-        SINGLE_STATE,
-        PREVIOUS_STATE,
-        ALL_STATES,
-        INCOMING_ACTION
-    }
 
     // a list of state id strings that have been extracted
     private List<String> extractedStateIds;

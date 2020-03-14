@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel;
 
 import es.upv.staq.testar.CodingManager;
-import nl.ou.testar.StateModel.AbstractStateIdExtractor.ExtractionMode;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -47,9 +46,24 @@ public class StateModelManagerFactory {
         PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(managerType);
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
 
+        // provide the state model manager with an abstract state id extractor
+        ExtractionMode extractionMode;
+        if (settings.get(ConfigTags.UsePreviousStateInId)) {
+            extractionMode = ExtractionMode.PREVIOUS_STATE;
+        }
+        else if (settings.get(ConfigTags.UseAllStatesInId)) {
+            extractionMode = ExtractionMode.ALL_STATES;
+        }
+        else if (settings.get(ConfigTags.UseIncomingActionInId)) {
+            extractionMode = ExtractionMode.INCOMING_ACTION;
+        }
+        else {
+            extractionMode = ExtractionMode.SINGLE_STATE;
+        }
+
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
         String modelIdentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
-                settings.get(ConfigTags.ApplicationVersion));
+                settings.get(ConfigTags.ApplicationVersion), extractionMode.toString());
 
         // we need a sequence manager to record the sequences
         Set<StateModelEventListener> eventListeners = new HashSet<>();
@@ -67,22 +81,7 @@ public class StateModelManagerFactory {
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-        // provide the state model manager with an abstract state id extractor
-        ExtractionMode extractionMode;
-        if (settings.get(ConfigTags.UsePreviousStateInId)) {
-            extractionMode = ExtractionMode.PREVIOUS_STATE;
-        }
-        else if (settings.get(ConfigTags.UseAllStatesInId)) {
-            extractionMode = ExtractionMode.ALL_STATES;
-        }
-        else if (settings.get(ConfigTags.UseIncomingActionInId)) {
-            extractionMode = ExtractionMode.INCOMING_ACTION;
-        }
-        else {
-            extractionMode = ExtractionMode.SINGLE_STATE;
-        }
-
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, new AbstractStateIdExtractor(extractionMode));
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, new AbstractStateIdExtractor(extractionMode), new ConcreteStateIdExtractor(extractionMode));
     }
 
 }
