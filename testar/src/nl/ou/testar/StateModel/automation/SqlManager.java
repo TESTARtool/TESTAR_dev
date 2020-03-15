@@ -423,7 +423,7 @@ public class SqlManager {
                 mainWidgetIds.add(resultSet2.getInt("widget_id"));
             }
 
-            String alternateWidgetQuery = "SELECT * FROM widget WHERE use_in_abstraction = 0";
+            String alternateWidgetQuery = "SELECT * FROM widget WHERE use_in_abstraction = 0 AND widget_group = 'general'";
             Statement alternateWidgetStatement = connection.createStatement();
             ResultSet resultSet3 = alternateWidgetStatement.executeQuery(alternateWidgetQuery);
 
