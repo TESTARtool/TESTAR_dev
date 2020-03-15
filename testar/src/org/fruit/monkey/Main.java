@@ -168,7 +168,34 @@ public class Main {
 			}
 
 			if (settings.get(InitTests)) {
-				sqlManager.initTest1(settings.get(ClearResults));
+
+				switch (settings.get(TestNr)) {
+					case 1:
+						sqlManager.initTest1(settings.get(ClearResults));
+						break;
+
+					case 2:
+						sqlManager.initTest2(settings.get(ClearResults));
+						break;
+
+					case 3:
+						sqlManager.initTest3(settings.get(ClearResults));
+						break;
+
+					case 4:
+						sqlManager.initTest4(settings.get(ClearResults));
+						break;
+
+					case 5:
+						sqlManager.initTest5(settings.get(ClearResults));
+						break;
+
+					default:
+						out.println("Please specify a valid test nr! Closing down Testar");
+						System.exit(1);
+				}
+
+				sqlManager.initTest2(settings.get(ClearResults));
 
 				if (settings.get(InitTestsOnly)) {
 					System.exit(1);
@@ -598,6 +625,7 @@ public class Main {
 			defaults.add(Pair.from(Automate, false));
 			defaults.add(Pair.from(CreateAttributes, false));
 			defaults.add(Pair.from(InitTests, false));
+			defaults.add(Pair.from(TestNr, 99));
 			defaults.add(Pair.from(InitTestsOnly, false));
 			defaults.add(Pair.from(ResetDbFirst, false));
 			defaults.add(Pair.from(DebugEnabled, false));

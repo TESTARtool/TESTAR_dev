@@ -137,6 +137,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> Automate = Tag.from("Automate", Boolean.class);
   public static final Tag<Boolean> CreateAttributes = Tag.from("CreateAttributes", Boolean.class);
   public static final Tag<Boolean> InitTests = Tag.from("InitTests", Boolean.class);
+  public static final Tag<Integer> TestNr = Tag.from("TestNr", Integer.class);
   public static final Tag<Boolean> InitTestsOnly = Tag.from("InitTestsOnly", Boolean.class);
   public static final Tag<Boolean> ResetDbFirst = Tag.from("ResetDbFirst", Boolean.class);
   public static final Tag<Boolean> DebugEnabled = Tag.from("DebugEnabled", Boolean.class);
