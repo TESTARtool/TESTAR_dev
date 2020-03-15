@@ -195,8 +195,6 @@ public class Main {
 						System.exit(1);
 				}
 
-				sqlManager.initTest2(settings.get(ClearResults));
-
 				if (settings.get(InitTestsOnly)) {
 					System.exit(1);
 				}
