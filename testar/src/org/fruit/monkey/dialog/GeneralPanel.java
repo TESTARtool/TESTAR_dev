@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,6 @@
 
 package org.fruit.monkey.dialog;
 
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import org.fruit.monkey.*;
 
 import javax.swing.*;
@@ -134,20 +133,26 @@ public class GeneralPanel extends JPanel implements Observer {
     add(checkStopOnFault);*/
     
     labelAppName.setBounds(330, 242, 150, 27);
+    labelAppName.setToolTipText(applicationNameTTT);
     add(labelAppName);
     applicationNameField.setBounds(480, 242, 125, 27);
+    applicationNameField.setToolTipText(applicationNameTTT);
     add(applicationNameField);
 
     labelAppVersion.setBounds(330, 280, 150, 27);
+    labelAppVersion.setToolTipText(applicationVersionTTT);
     add(labelAppVersion);
     applicationVersionField.setBounds(480, 280, 125, 27);
+    applicationVersionField.setToolTipText(applicationVersionTTT);
     add(applicationVersionField);
 
     // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
     setOverrideWebDriverDisplayScaleVisibility(false);
     labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
+    labelOverrideWebDriverDisplayScale.setToolTipText(overrideWebDriverDisplayScaleTTT);
     add(labelOverrideWebDriverDisplayScale);
     overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
+    overrideWebDriverDisplayScaleField.setToolTipText(overrideWebDriverDisplayScaleTTT);
     add(overrideWebDriverDisplayScaleField);
   }
 

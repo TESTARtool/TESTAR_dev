@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -52,12 +52,10 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdMouse;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -135,7 +133,7 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
 		// If the user has specified a scale override the display scale obtained from the system.
-		String overrideDisplayScaleAsString = settings().get(ConfigTags.OverrideWebDriverDisplayScale);
+		String overrideDisplayScaleAsString = settings().get(ConfigTags.OverrideWebDriverDisplayScale, "");
 		if (!overrideDisplayScaleAsString.isEmpty()) {
 			try {
 				double webDriverDisplayScaleOverride = Double.parseDouble(overrideDisplayScaleAsString);
