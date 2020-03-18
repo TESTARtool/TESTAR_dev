@@ -73,7 +73,7 @@ public class AbstractStateIdExtractor {
     }
 
     private String extractIncomingAction(State state, AbstractAction abstractAction) {
-        String actionId = abstractAction.getActionId() == null ? "" : abstractAction.getActionId();
+        String actionId = abstractAction == null ? "" : abstractAction.getActionId();
         return HydrationHelper.lowCollisionID(actionId + extractSingleState(state));
     }
 }
