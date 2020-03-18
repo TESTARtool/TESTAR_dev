@@ -107,7 +107,8 @@ public class WdElement extends TaggableBase implements Serializable {
     name = attributeMap.getOrDefault("name", "");
     genericTitle = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
-    textContent = attributeMap.getOrDefault("textContent", "").replaceAll("\\s+", " ").trim();
+    //textContent = attributeMap.getOrDefault("textContent", "").replaceAll("\\s+", " ").trim();
+    textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
     value = attributeMap.getOrDefault("value", "");

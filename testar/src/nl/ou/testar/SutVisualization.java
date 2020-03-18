@@ -140,7 +140,7 @@ public class SutVisualization {
 
                     //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
                     //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
-                    int pos = 250;
+                    int pos = -20;
                     StringBuilder sb = new StringBuilder();
                     sb.append("Ancestors: ");
 

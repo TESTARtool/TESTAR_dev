@@ -136,6 +136,33 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		
 		super.beginSequence(system, state);
 	}
+	
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
+
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		//--------------------------------------------------------
+
+		for(Widget w : state) {
+			if(w.get(WdTags.WebTextContext,"").contains("internal error")) {
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
+						"Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContext,"") + "'.");
+			}
+		}
+		
+		return verdict;
+	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -152,7 +179,7 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
-		Set<Action> filteredActions = new HashSet<Action>();
+		Set<Action> filteredActions = new HashSet<>();
 
 		//If we are on the admin web page, go back to the previous page
 		if(WdDriver.getCurrentUrl().contains("parabank.parasoft.com/parabank/admin.htm")) {
@@ -196,7 +223,7 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			addSlidingActions(actions, ac, SCROLL_ARROW_SIZE, SCROLL_THICK, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
@@ -220,6 +247,10 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		//Showing the grey dots for filtered actions if visualization is on:
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
+		if(actions.isEmpty()) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
 		return actions;
 	}
 	
