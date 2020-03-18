@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\webdrivers\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
+SUTConnectorValue = "D:\\TESTAR\\chromedriver_win32\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
 
 #################################################################
 # Sequences
@@ -44,7 +44,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*[eE]rror .*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners

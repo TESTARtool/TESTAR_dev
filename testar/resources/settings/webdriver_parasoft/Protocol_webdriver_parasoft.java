@@ -30,6 +30,7 @@
 
 import es.upv.staq.testar.NativeLinker;
 
+import nl.ou.testar.SutVisualization;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -65,7 +66,7 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
+		deniedExtensions = Arrays.asList("pdf", "jpg", "png","pfx");
 
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
@@ -151,6 +152,7 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
+		Set<Action> filteredActions = new HashSet<Action>();
 
 		//If we are on the admin web page, go back to the previous page
 		if(WdDriver.getCurrentUrl().contains("parabank.parasoft.com/parabank/admin.htm")) {
@@ -173,6 +175,7 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 			// Skip Admin and logout page widget
 			if(widget.get(WdTags.WebHref,"").contains("admin.htm")
 					|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
+				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}
 			
@@ -181,8 +184,14 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 				loginParasoft("username", "password", state, actions, ac);
 			}
 			
-			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
+			// only consider enabled widgets
+			if (!widget.get(Enabled, true)) {
+				continue;
+			}
+
+			// filter tabu widgets
+			if (blackListed(widget)) {
+				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}
 
@@ -203,9 +212,13 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
 					actions.add(ac.leftClickAt(widget));
+				}else{
+					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
 	}
