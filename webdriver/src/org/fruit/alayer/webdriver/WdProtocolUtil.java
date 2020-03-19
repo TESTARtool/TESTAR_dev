@@ -49,12 +49,12 @@ public class WdProtocolUtil extends ProtocolUtil {
   @Override
   public String getStateshot(State state) {
     double width = CanvasDimensions.getCanvasWidth() + (
-        state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+        state.get(WdTags.WebVerticallyScrollable, false) ? scrollThick : 0);
     double height = CanvasDimensions.getCanvasHeight() + (
-        state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+        state.get(WdTags.WebHorizontallyScrollable, false) ? scrollThick : 0);
     Rect rect = Rect.from(0, 0, width, height);
     AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
+    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "Empty ConcreteIDCustom"), screenshot);
   }
 
   @Override

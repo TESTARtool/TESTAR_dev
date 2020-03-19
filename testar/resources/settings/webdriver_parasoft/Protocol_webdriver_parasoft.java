@@ -201,7 +201,9 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 			
 			// Skip Admin and logout page widget
 			if(widget.get(WdTags.WebHref,"").contains("admin.htm")
-					|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
+					|| widget.get(WdTags.WebHref,"").contains("logout.htm")
+					|| widget.get(WdTags.WebHref,"").contains("wadl")
+					|| widget.get(WdTags.WebHref,"").contains("wsdl")) {
 				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}

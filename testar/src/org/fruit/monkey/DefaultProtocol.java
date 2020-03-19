@@ -1545,9 +1545,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
+		//if(viewPort != null){
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
+		//}
 	}
 
 	@Override
