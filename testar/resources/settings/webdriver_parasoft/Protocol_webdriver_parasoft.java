@@ -107,14 +107,14 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 			// Find username Input widget to type the username
 			if(w.get(WdTags.WebName,"").equals("username")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "username", true);
+				Action a = ac.clickTypeInto(w, "parasoft", true);
 				executeAction(system, state, a);
 			}
 			
 			// Find password Input widget to type the password
 			if(w.get(WdTags.WebName,"").equals("password")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "password", true);
+				Action a = ac.clickTypeInto(w, "demo", true);
 				executeAction(system, state, a);
 			}
 		}
