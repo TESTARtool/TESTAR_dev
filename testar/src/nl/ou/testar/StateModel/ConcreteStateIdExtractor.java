@@ -50,7 +50,7 @@ public class ConcreteStateIdExtractor {
 
     // todo this method needs verification
     private String extractIncomingAction(State state, ConcreteAction concreteAction) {
-        String actionId = concreteAction.getActionId() == null ? "" : concreteAction.getActionId();
+        String actionId = concreteAction == null ? "" : concreteAction.getActionId();
         return HydrationHelper.lowCollisionID(actionId + extractSingleState(state));
     }
 
