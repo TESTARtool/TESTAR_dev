@@ -30,6 +30,9 @@
 
 package org.fruit.alayer.webdriver.enums;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
@@ -239,4 +242,35 @@ public class WdTags extends TagsBase {
    * Access key of a widget.
    */
   public static final Tag<String> WebAccessKey = from("WebAccessKey", String.class);
+  
+	private static Set<Tag<String>> webdriverStringVerdictTags = new HashSet<Tag<String>>() {
+		{
+			add(WebLocalizedControlType);
+			add(WebItemType);
+			add(WebItemStatus);
+			add(Desc);
+			add(WebTagName);
+			add(WebId);
+			add(WebCssClasses);
+			add(WebHelpText);
+			add(WebName);
+			add(WebGenericTitle);
+			add(WebTitle);
+			add(WebTextContext);
+			add(WebHref);
+			add(WebValue);
+			add(WebStyle);
+			add(WebTarget);
+			add(WebAlt);
+			add(WebDisplay);
+			add(WebType);
+			add(WebSrc);
+		}
+	};
+
+	public static Set<Tag<String>> getWebdriverStringVerdictTags() {
+		return webdriverStringVerdictTags;
+	}
+	
+  
 }

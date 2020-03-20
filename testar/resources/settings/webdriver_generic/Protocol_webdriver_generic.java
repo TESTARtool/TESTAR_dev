@@ -164,13 +164,19 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
-
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
+		
+		for(Widget w : state) {
+			for(Tag<String> tag : WdTags.getWebdriverStringVerdictTags()) {
+				if(w.get(tag,"").toLowerCase().contains("error")
+						|| w.get(tag,"").toLowerCase().contains("exception")
+						|| w.get(tag,"").toLowerCase().contains("fout")
+						|| w.get(tag,"").toLowerCase().contains("probleem")
+						|| w.get(tag,"").toLowerCase().contains("uitzondering")) {
+					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+							"Discovered suspicious widget '" + tag.name() + "' : '" + w.get(tag,"") + "'.");
+				}
+			}
+		}
 
 		return verdict;
 	}
