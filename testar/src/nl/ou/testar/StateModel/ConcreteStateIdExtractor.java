@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Util.HydrationHelper;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
@@ -36,9 +37,9 @@ public class ConcreteStateIdExtractor {
     }
 
     private String extractPreviousState(State state) {
-        String abstractStateId = HydrationHelper.lowCollisionID(previousStateId + extractSingleState(state));
+        String concreteStateId = HydrationHelper.lowCollisionID(previousStateId + extractSingleState(state));
         previousStateId = extractSingleState(state);
-        return abstractStateId;
+        return concreteStateId;
     }
 
     private String extractAllStates(State state) {
@@ -49,12 +50,14 @@ public class ConcreteStateIdExtractor {
     }
 
     // todo this method needs verification
-    private String extractIncomingAction(State state, ConcreteAction concreteAction) {
-        String actionId = concreteAction == null ? "" : concreteAction.getActionId();
-        return HydrationHelper.lowCollisionID(actionId + extractSingleState(state));
+    private String extractIncomingAction(State state, Action action) {
+        String actionId = action == null ? "" : action.get(Tags.ConcreteIDCustom);
+        String concreteStateId = HydrationHelper.lowCollisionID(previousStateId + actionId + extractSingleState(state));
+        previousStateId = extractSingleState(state);
+        return concreteStateId;
     }
 
-    public String extractConcreteStateId(State state, ConcreteAction concreteAction) {
+    public String extractConcreteStateId(State state, Action action) {
         switch (extractionMode) {
             case SINGLE_STATE:
                 return extractSingleState(state);
@@ -66,7 +69,7 @@ public class ConcreteStateIdExtractor {
                 return extractAllStates(state);
 
             case INCOMING_ACTION:
-                return extractIncomingAction(state, concreteAction);
+                return extractIncomingAction(state, action);
 
             default:
                 // this means the extraction mode is null

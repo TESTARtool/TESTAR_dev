@@ -25,6 +25,9 @@ public class ModelManager implements StateModelManager {
     // the action that is currently being executed, if applicable
     private AbstractAction actionUnderExecution;
 
+    // the testar action that is being executed
+    private Action rawActionUnderExecution;
+
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
 
@@ -109,7 +112,7 @@ public class ModelManager implements StateModelManager {
         // It really needs refactoring at this stage.
 
         // check if we are dealing with a new state or an existing one
-        String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState, actionUnderExecution);
+        String abstractStateId = abstractStateIdExtractor.extractAbstractStateId(newState, rawActionUnderExecution);
         AbstractState newAbstractState;
 
         // fetch or create an abstract state
@@ -128,7 +131,7 @@ public class ModelManager implements StateModelManager {
         }
 
         // add the concrete state id to the abstract state
-        String concreteStateId = concreteStateIdExtractor.extractConcreteStateId(newState, concreteActionUnderExecution);
+        String concreteStateId = concreteStateIdExtractor.extractConcreteStateId(newState, rawActionUnderExecution);
         newAbstractState.addConcreteStateId(concreteStateId);
 
         // check if an action was executed
@@ -210,9 +213,10 @@ public class ModelManager implements StateModelManager {
      */
     @Override
     public void notifyActionExecution(Action action) {
+        rawActionUnderExecution = action;
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
-        String abstractActionId = AbstractActionIdExtractor.extract(currentAbstractState, action, false);
+        String abstractActionId = AbstractActionIdExtractor.extract(currentAbstractState, action);
         try {
             actionUnderExecution = currentAbstractState.getAction(abstractActionId);
         }
@@ -222,7 +226,7 @@ public class ModelManager implements StateModelManager {
             actionUnderExecution = new AbstractAction(abstractActionId);
             currentAbstractState.addNewAction(actionUnderExecution);
         }
-        String concreteActionId = ConcreteActionIdExtractor.extract(currentConcreteState, action, false);
+        String concreteActionId = ConcreteActionIdExtractor.extract(currentConcreteState, action);
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution, concreteActionId);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
         System.out.println("Executing action: " + action.get(Tags.Desc));
@@ -254,7 +258,7 @@ public class ModelManager implements StateModelManager {
             System.out.println("Finding action with abstractActionId : " + abstractActionId);
             for(Action action : actions) {
             	try {
-                if (AbstractActionIdExtractor.extract(currentAbstractState, action, false).equals(abstractActionId)) {
+                if (AbstractActionIdExtractor.extract(currentAbstractState, action).equals(abstractActionId)) {
                     return action;
                 }
             	}catch (Exception e) {

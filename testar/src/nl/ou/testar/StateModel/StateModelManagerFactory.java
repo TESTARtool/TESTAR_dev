@@ -61,6 +61,9 @@ public class StateModelManagerFactory {
             extractionMode = ExtractionMode.SINGLE_STATE;
         }
 
+        AbstractActionIdExtractor.setExtractionMode(extractionMode);
+        ConcreteActionIdExtractor.setExtractionMode(extractionMode);
+
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
         String modelIdentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion), extractionMode.toString());
