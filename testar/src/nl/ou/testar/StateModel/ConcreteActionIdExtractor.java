@@ -12,8 +12,8 @@ public class ConcreteActionIdExtractor {
      * @param action
      * @return
      */
-    public static String extract(ConcreteState concreteState, Action action) {
-        return HydrationHelper.lowCollisionID(concreteState.getId() + action.get(Tags.ConcreteIDCustom));
+    public static String extract(ConcreteState concreteState, Action action, boolean useStateId) {
+        return HydrationHelper.lowCollisionID((useStateId ? concreteState.getId() : "") + action.get(Tags.ConcreteIDCustom));
     }
 
 }
