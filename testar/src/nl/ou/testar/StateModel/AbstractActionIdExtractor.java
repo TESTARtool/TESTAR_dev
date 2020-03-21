@@ -17,9 +17,9 @@ public class AbstractActionIdExtractor {
      * @return
      */
     @Nonnull
-    public static String extract(@Nonnull AbstractState abstractState, @Nonnull Action action) {
+    public static String extract(@Nonnull AbstractState abstractState, @Nonnull Action action, boolean useStateId) {
         // we concatenate the abstract state identifier to the calculated abstract action identifier
-        return HydrationHelper.lowCollisionID(abstractState.getStateId() + action.get(Tags.AbstractIDCustom));
+        return HydrationHelper.lowCollisionID((useStateId ? abstractState.getStateId() : "") + action.get(Tags.AbstractIDCustom));
     }
 
 }
