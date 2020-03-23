@@ -94,19 +94,24 @@ public class APSelector {
     }
 
     public static final Set<String> useMinimalAttributes(){
-        // to prevent that edges are totally filtered away.
         Set<String> tmptagset=new LinkedHashSet<>();
-        Tag<?> t = Tags.Role;
+        Tag<?> t = Tags.Role;// is the only attribute existing for ALL transactions. (e.g.ROLE doesn't exist for a Virtual Key)
         tmptagset.add(Validation.sanitizeAttributeName(t.name())); //orientdb style tags
         return  tmptagset;
     }
-
+    public static final Set<String> useMinimalTransAttributes(){
+        Set<String> tmptagset=new LinkedHashSet<>();
+        Tag<?> t = Tags.Desc;// is the only attribute existing for ALL transactions. (e.g.ROLE doesn't exist for a Virtual Key)
+        tmptagset.add(Validation.sanitizeAttributeName(t.name())); //orientdb style tags
+        return  tmptagset;
+    }
 
     public static final Set<String> useBasicAttributes() {
         Set<String> tmptagset=new LinkedHashSet<>();
         Set<String> basicset = new HashSet<>();
         basicset.add(Tags.Title.name());
         basicset.add(Tags.Path.name());
+        basicset.add(Tags.Role.name());
         basicset.add(Tags.Desc.name());
         basicset.add(Tags.ZIndex.name());
         basicset.add(Tags.Blocked.name());
@@ -128,6 +133,24 @@ public class APSelector {
         minve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
         return minve;
     }
+    public static final Set<PairBean<InferrableExpression,String>> useMinimalTransSelectedExpressions() {
+        // following list is derived by inspecting AnnotatingActionCompiler
+        Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Click)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Right Click)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Drag)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Double Click)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Replace ')"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Append ')"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Shortcut Key)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Key)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Bring the system to the foreground)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i: Kill Process)"));
+        return minve;
+    }
+
+
+
     public static final Set<PairBean<InferrableExpression,String>> useRoleConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
         minve.add(new PairBean<>(InferrableExpression.textmatch_, UIARoles.UIAButton.name()+"|"+
@@ -265,7 +288,7 @@ public class APSelector {
         String stag = getTag(attrib);
 
 
-        if (stag != null) {   //this attribute is required as a(n) (set of) AP .. result is dependent on selectedattributes
+        if (stag != null) {   //this attribute is not available in the model then no AP can be calculated.
             //lookup type
             TagBean<?> tag=null;  //refactor candidate
             for (TagBean<?> tg: getAllAttributeTags()

@@ -8,6 +8,8 @@ import java.util.regex.PatternSyntaxException;
 
 public final class CachedRegexPatterns {
     private static Map<String, Pattern> cachedRegExPatterns = new HashMap<>();
+    private static int cacheHits=0;
+    private static int cacheMisses=0;
 
 
     public static boolean add(String regexString ) {
@@ -34,7 +36,11 @@ public final class CachedRegexPatterns {
 
     public static Pattern addAndGet(String regexString) {
         if (!contains(regexString)){
+            cacheMisses++;
             add(regexString);
+        }
+        else{
+            cacheHits++;
         }
         return cachedRegExPatterns.get(regexString);
     }

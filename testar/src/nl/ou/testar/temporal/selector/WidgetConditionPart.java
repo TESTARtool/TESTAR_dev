@@ -7,10 +7,10 @@ import nl.ou.testar.temporal.foundation.PairBean;
 
 import java.util.Set;
 
-public class WidgetFilterPart extends APSelector {
+public class WidgetConditionPart extends APSelector {
 
 
-    public WidgetFilterPart() {
+    public WidgetConditionPart() {
         super();
     }
     @JsonGetter("conditionAttributes")

@@ -24,11 +24,11 @@ public class APSelectorManager {
         stateFilter = new APSelector();
         transitionFilter = new APSelector();
         widgetfilters = new LinkedHashSet<>();
-        comments.add(" Apkey is must be a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
-        comments.add(" !!!!ONLY EMPTY 'selectedattributes' or' valuedexpression' will be enriched with 'Enabled,Role,IsDeadState' attributes and 'exists__' and isblank__' expressions");
+        comments.add(" Apkey must be a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
+        comments.add(" !!!!for STATEfilter: EMPTY 'selectedattributes' or' valuedexpression' will be enriched with 'Role,IsDeadState' attributes and 'exists__' and  expressions");
        comments.add(" second widget filter lists the default protperties");
        comments.add(" EMPTY widget <ROLE-PATH-TITLE> filters will result in acceptance of  <ALL ROLE- ALL PATH -ALL TITLE>");
-        comments.add("Consider when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
+        comments.add("Note that when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
         comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and is NOT listed in the map of modelAp's");
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
 
@@ -45,8 +45,8 @@ public class APSelectorManager {
             transitionFilter = new APSelector();
             stateFilter.setSelectedStateAttributes(APSelector.useMinimalAttributes());
             stateFilter.setSelectedExpressions(APSelector.useMinimalSelectedExpressions());
-            transitionFilter.setSelectedAttributes(APSelector.useMinimalAttributes());
-            transitionFilter.setSelectedExpressions(APSelector.useMinimalSelectedExpressions());
+            transitionFilter.setSelectedAttributes(APSelector.useMinimalTransAttributes());
+            transitionFilter.setSelectedExpressions(APSelector.useMinimalTransSelectedExpressions());
             WidgetFilter wf = new WidgetFilter();
             wf.setDefaultWidgetFilter();
             widgetfilters.add(wf);
@@ -157,7 +157,7 @@ public class APSelectorManager {
             for (Map.Entry<String, String> entry : attribmap.entrySet()
             ) {
                 pass = false;
-                for (WidgetFilterPart wfpart : wf.getWidgetFilterParts()
+                for (WidgetConditionPart wfpart : wf.getWidgetConditionParts()
                 ) {
                     if (wfpart.getSelectedAttributes().contains(entry.getKey())) {
                       //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    time: "+System.nanoTime());

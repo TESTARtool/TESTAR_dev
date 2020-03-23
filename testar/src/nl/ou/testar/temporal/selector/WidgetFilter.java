@@ -15,7 +15,7 @@ public class WidgetFilter {//extends APSelector {
 
 
     private  String freeFormatText;
-    private List<WidgetFilterPart> widgetFilterParts;
+    private List<WidgetConditionPart> widgetConditionParts;
     private APSelector widgetSelectorPart;
 
 
@@ -23,7 +23,7 @@ public class WidgetFilter {//extends APSelector {
 
     public WidgetFilter() {
         super();
-        widgetFilterParts = new ArrayList<WidgetFilterPart>();
+        widgetConditionParts = new ArrayList<WidgetConditionPart>();
         widgetSelectorPart = new APSelector();
     }
     @JsonIgnore
@@ -33,12 +33,12 @@ public class WidgetFilter {//extends APSelector {
     public String getFreeFormatText() {
         return freeFormatText;
     }
-    public List<WidgetFilterPart> getWidgetFilterParts() {
-        return widgetFilterParts;
+    public List<WidgetConditionPart> getWidgetConditionParts() {
+        return widgetConditionParts;
     }
 
-    public void setWidgetFilterParts(List<WidgetFilterPart> widgetFilterParts) {
-        this.widgetFilterParts = widgetFilterParts;
+    public void setWidgetConditionParts(List<WidgetConditionPart> widgetConditionParts) {
+        this.widgetConditionParts = widgetConditionParts;
     }
     public APSelector getWidgetSelectorPart() {
         return widgetSelectorPart;
@@ -50,24 +50,24 @@ public class WidgetFilter {//extends APSelector {
 
     public void  setDefaultWidgetFilter() {
         updateFreeFormatText("==================This is a Sample WidgetFilter, with 3 filter requirements");
-        WidgetFilterPart wfp = new WidgetFilterPart();
+        WidgetConditionPart wfp = new WidgetConditionPart();
         Set<String> temp= new  HashSet<String>();
         temp.add(Tags.Role.name());
         wfp.setSelectedAttributes(temp);
         wfp.setSelectedExpressions(useRoleConditionalExpressions());
-        widgetFilterParts.add(wfp);
+        widgetConditionParts.add(wfp);
 
-        WidgetFilterPart wfp1 = new WidgetFilterPart();
+        WidgetConditionPart wfp1 = new WidgetConditionPart();
         temp= new  HashSet<String>(){{add(Tags.Path.name());}};
         wfp1.setSelectedAttributes(temp);
         wfp1.setSelectedExpressions(usePathConditionalExpressions());
-        widgetFilterParts.add(wfp1);
+        widgetConditionParts.add(wfp1);
 
-        WidgetFilterPart wfp2 = new WidgetFilterPart();
+        WidgetConditionPart wfp2 = new WidgetConditionPart();
         temp= new  HashSet<String>(){{add(Tags.Title.name());}};
         wfp2.setSelectedAttributes(temp);
         wfp2.setSelectedExpressions(useTitleConditionalExpressions());
-        widgetFilterParts.add(wfp2);
+        widgetConditionParts.add(wfp2);
 
         widgetSelectorPart.setSelectedAttributes(useBasicAttributes());
         widgetSelectorPart.setSelectedExpressions(useBasicSelectedExpressions());
@@ -75,11 +75,11 @@ public class WidgetFilter {//extends APSelector {
 
     public void setMinimalWidgetFilter() {
         updateFreeFormatText("==================This is a Sample WidgetFilter, with 1 filter requirements");
-        WidgetFilterPart wfp2 = new WidgetFilterPart();
+        WidgetConditionPart wfp2 = new WidgetConditionPart();
         Set<String>   temp= new  HashSet<String>(){{add(UIATags.UIAControlType.name());}};
         wfp2.setSelectedAttributes(temp);
         wfp2.setSelectedExpressions(useMinimalSelectedExpressions());
-        widgetFilterParts.add(wfp2);
+        widgetConditionParts.add(wfp2);
 
         widgetSelectorPart.setSelectedAttributes(useMinimalAttributes());
         widgetSelectorPart.setSelectedExpressions(useMinimalSelectedExpressions());

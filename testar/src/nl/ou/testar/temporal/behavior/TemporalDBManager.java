@@ -14,6 +14,7 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.graphml.*;
 import nl.ou.testar.temporal.ioutils.XMLHandler;
 import nl.ou.testar.temporal.model.TemporalTrace;
@@ -173,12 +174,31 @@ public  class TemporalDBManager {
         resultSet.close();
         return resultSet;
     }
-    public Set<String> getWidgetPropositions(String state, List<String> abstractionAttributes) {
+    public int getConcreteStateCountFromOrientDb(AbstractStateModel abstractStateModel){
+        String stmt;
+        int stateCount=0;
+        String dummy="";
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", abstractStateModel.getModelIdentifier());
+        // navigate from abstractstate to apply the filter.
+        stmt = "SELECT Count(*) FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+
+        OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
+        if (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+
+          stateCount= (int)(long)result.getProperty("Count(*)"); //from Long to long to int
+        }
+        resultSet.close();
+        return stateCount;
+    }
+    public PairBean<Set<String>,Integer> getWidgetPropositions(String state, List<String> abstractionAttributes) {
         // concrete widgets
         String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
         Map<String, Object> params = new HashMap<>();
         params.put("state", state);
         OResultSet resultSet = db.query(stmt, params);
+        int wCount=0;
         //***
         Set<String> propositions = new LinkedHashSet<>();
         while (resultSet.hasNext()) {
@@ -188,14 +208,18 @@ public  class TemporalDBManager {
                 Optional<OVertex> op = result.getVertex();
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
+                wCount++;
                 List<WidgetFilter> passedWidgetFilters=getPassingWidgetFilters(stateVertex,abstractionAttributes);
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps( propertyName, stateVertex, propositions,  passedWidgetFilters,true, false);
+                    computeAtomicPropositions( propertyName, stateVertex, propositions,  passedWidgetFilters,true, false);
                 }
             }
         }
+        PairBean pb= new PairBean();
+        pb.setLeft(propositions);
+        pb.setRight(wCount);
         resultSet.close();
-        return propositions;
+        return pb;
     }
     private List<WidgetFilter> getPassingWidgetFilters(OElement graphElement,  List<String> abstractionAttributes){
         List<WidgetFilter> passedWidgetFilters;
@@ -246,7 +270,7 @@ public  class TemporalDBManager {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    computeProps( propertyName, actionEdge, propositions, null,false, true);
+                    computeAtomicPropositions( propertyName, actionEdge, propositions, null,false, true);
                 }
                 trenc.setTransitionAPs(propositions);
 
@@ -471,11 +495,11 @@ public  class TemporalDBManager {
         return convertedValue;
     }
 
-    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
-        computeProps(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
+    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+        computeAtomicPropositions(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
     }
 
-    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge, boolean isDeadState) {
+    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge, boolean isDeadState) {
         // isdeadstate is not used
         StringBuilder apkey = new StringBuilder();
 
@@ -485,16 +509,17 @@ public  class TemporalDBManager {
             Object prop = graphElement.getProperty(k);
             if (prop == null) {
                 String fallback;
-                Object concreteprop;
-                if (isWidget) {
-                    concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
-                } else
-                    concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
-                if (concreteprop == null) {
-                    fallback = "undefined";
-                } else {
-                    fallback = concreteprop.toString();
-                }
+//                Object concreteprop;
+//                if (isWidget) {
+//                    concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
+//                } else
+//                    concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
+//                if (concreteprop == null) {
+//                    fallback = "undefined";
+//                } else {
+//                    fallback = concreteprop.toString();
+//                }
+                fallback = "undefined";
                 apkey.append(fallback);
                 apkey.append(apSelectorManager.getApEncodingSeparator());
             } else {

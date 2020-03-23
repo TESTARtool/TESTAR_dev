@@ -9,6 +9,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -100,5 +102,9 @@ public class Common {
         // inspired from https://alvinalexander.com/java/simpledateformat-convert-date-to-string-formatted-parse
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
         return formatter.format(aDate);
+    }
+    public static String prettyCurrentTime() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");;
+        return LocalTime.now().format(dtf);
     }
 }
