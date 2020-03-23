@@ -63,7 +63,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
-public class WebdriverProtocol extends ClickFilterLayerProtocol {
+public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
