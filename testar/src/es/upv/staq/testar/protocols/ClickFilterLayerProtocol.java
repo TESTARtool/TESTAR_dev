@@ -145,7 +145,8 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     protected boolean whiteListed(Widget w){
     	return filteringManager.whiteListed(w);
     }
-    
+
+    //TODO why is filteringManager having random text functions? also, the original one is in DefaultProtocol and this is the only usage?
     @Override
     protected String getRandomText(Widget w){
     	String randomText = filteringManager.getRandomText(w);

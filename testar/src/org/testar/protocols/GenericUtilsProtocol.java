@@ -1,13 +1,23 @@
 package org.testar.protocols;
 
+import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
+import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.monkey.ConfigTags;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
@@ -149,6 +159,97 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             }
         }
+    }
+
+
+    /**
+     * Check whether a widget is clickable
+     * @param w
+     * @return
+     */
+    protected boolean isClickable(Widget w){
+        Role role = w.get(Tags.Role, Roles.Widget);
+        if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
+            return true;
+        return false;
+    }
+
+    /**
+     * Check whether a widget is typeable
+     * @param w
+     * @return
+     */
+    protected boolean isTypeable(Widget w){
+        return NativeLinker.isNativeTypeable(w);
+    }
+
+
+    /**
+     * Check whether widget w should be filtered based on
+     * its title (matching the regular expression of the Dialog --> clickFilterPattern)
+     * that is cannot be hit
+     * @param w
+     * @return
+     */
+    protected boolean isUnfiltered(Widget w){
+        //Check whether the widget can be hit
+        // If not, it should be filtered
+        if(!Util.hitTest(w, 0.5, 0.5))
+            return false;
+
+        //Check whether the widget has an empty title or no title
+        //If it has, it is unfiltered
+        //Because it cannot match the regular expression of the Action Filter.
+        String title = w.get(Title, "");
+        if (title == null || title.isEmpty())
+            return true;
+
+        //If no clickFilterPattern exists, then create it
+        //Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
+        if (this.clickFilterPattern == null)
+            this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+
+        //Check whether the title matches any of the clickFilterPatterns
+        Matcher m = this.clickFilterMatchers.get(title);
+        if (m == null){
+            m = this.clickFilterPattern.matcher(title);
+            this.clickFilterMatchers.put(title, m);
+        }
+        return !m.matches();
+    }
+
+
+    /**
+     * Return a list of widgets that have the maximal Zindex
+     * @param state
+     * @return
+     */
+    protected List<Widget> getTopWidgets(State state){
+        List<Widget> topWidgets = new ArrayList<>();
+        double maxZIndex = state.get(Tags.MaxZIndex);
+        for (Widget w : state)
+            if (w.get(Tags.ZIndex) == maxZIndex)
+                topWidgets.add(w);
+        return topWidgets;
+    }
+
+
+    protected boolean isNOP(Action action){
+        String as = action.toString();
+        if (as != null && as.equals(NOP.NOP_ID))
+            return true;
+        else
+            return false;
+    }
+
+    protected boolean isESC(Action action){
+        Role r = action.get(Tags.Role, null);
+        if (r != null && r.isA(ActionRoles.HitKey)){
+            String desc = action.get(Tags.Desc, null);
+            if (desc != null && desc.contains("VK_ESCAPE"))
+                return true;
+        }
+        return false;
     }
 
 }
