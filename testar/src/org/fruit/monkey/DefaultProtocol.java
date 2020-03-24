@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,6 @@ import static org.fruit.alayer.Tags.ExecutedAction;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 
 import java.awt.Desktop;
@@ -68,7 +67,6 @@ import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.fruit.Assert;
-import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -167,6 +165,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
+	
+	protected int escAttempts = 0;
+	protected static final int MAX_ESC_ATTEMPTS = 99;
 
 	protected boolean exceptionThrown = false;
 
@@ -302,11 +303,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			//INDEXLOG.error("Exception: ",SystemStartException);
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
 		}
 
@@ -330,7 +329,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
 
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -492,7 +490,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
-			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
 
@@ -522,7 +519,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			//INDEXLOG.error("Exception: ",e);
 		}
 
 		return currentSeqObject;
@@ -566,7 +562,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -592,7 +587,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
 
 		//Delete the temporally testar file
 		try {
@@ -600,7 +594,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (IOException e2) {
 			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
-
 	}
 
 	/**
@@ -645,11 +638,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
+
 		//method for defining other init actions, like setup of external environment
 		initTestSession();
 
 		//initializing TESTAR for generate mode:
-
 		initGenerateMode();
 
 		/*
@@ -788,8 +781,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
-			//Not visualizing the widget info under cursor while in Generate-mode:
-			//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
@@ -912,7 +903,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//Wait since TestSerialiser write all fragments on sequence File
 		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			//System.out.println("Saving sequences...");
 			synchronized (this) {
 				try {
 					this.wait(1000);
@@ -952,12 +942,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
-
-		//bin folder
-		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
-
-
 	}
 
 	/**
@@ -1152,6 +1136,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+	/**
+	 * Method to run TESTAR in replay mode.
+	 * The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
+	 */
 	protected void runReplayLoop(){
 		actionCount = 1;
 		boolean success = true;
@@ -1170,7 +1158,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			//ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(seqFile)));
 			fis = new FileInputStream(seqFile);
 			bis = new BufferedInputStream(fis);
 			gis = new GZIPInputStream(bis);
@@ -1199,8 +1186,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				while(!success && (Util.time() - start < rrt)){
 					tries++;
 					cv.begin(); Util.clear(cv);
-					//In Replay-mode, we DO NOT show the widget info under cursor:
-					//SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
@@ -1215,7 +1200,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try{
 						if(tries < 2){
 							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							//System.out.println(replayMessage);
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						}else{
 							if(tries % 50 == 0)
@@ -1246,10 +1230,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
 		} catch(IOException ioe){
-			//INDEXLOG.error("Exception: ",ioe);
 			throw new RuntimeException("Cannot read file.", ioe);
 		} catch (ClassNotFoundException cnfe) {
-			//INDEXLOG.error("Exception: ",cnfe);
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
@@ -1305,7 +1287,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected Canvas buildCanvas() {
-		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
@@ -1355,7 +1336,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
-		else{ // Settings.SUT_CONNECTOR_CMDLINE
+		else{
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 
 			//Read the settings to know if user wants to start the process listener
@@ -1486,7 +1467,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
@@ -1797,75 +1777,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Return a list of widgets that have the maximal Zindex
-	 * @param state
-	 * @return
-	 */
-	protected List<Widget> getTopWidgets(State state){
-		List<Widget> topWidgets = new ArrayList<>();
-		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
-			if (w.get(Tags.ZIndex) == maxZIndex)
-				topWidgets.add(w);
-		return topWidgets;
-	}
-
-	/**
-	 * Check whether widget w should be filtered based on
-	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
-	 * that is cannot be hit
-	 * @param w
-	 * @return
-	 */
-	protected boolean isUnfiltered(Widget w){
-		//Check whether the widget can be hit
-		// If not, it should be filtered
-		if(!Util.hitTest(w, 0.5, 0.5))
-			return false;
-
-		//Check whether the widget has an empty title or no title
-		//If it has, it is unfiltered
-		//Because it cannot match the regular expression of the Action Filter.
-		String title = w.get(Title, "");
-		if (title == null || title.isEmpty())
-			return true;
-
-		//If no clickFilterPattern exists, then create it
-		//Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
-		if (this.clickFilterPattern == null)
-			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-
-		//Check whether the title matches any of the clickFilterPatterns
-		Matcher m = this.clickFilterMatchers.get(title);
-		if (m == null){
-			m = this.clickFilterPattern.matcher(title);
-			this.clickFilterMatchers.put(title, m);
-		}
-		return !m.matches();
-	}
-
-	/**
-	 * Check whether a widget is clickable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isClickable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
-			return true;
-		return false;
-	}
-
-	/**
-	 * Check whether a widget is typeable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isTypeable(Widget w){
-		return NativeLinker.isNativeTypeable(w);
-	}
-
-	/**
 	 * STOP criteria for selecting more actions for a sequence
 	 * @param state
 	 * @return
@@ -1883,8 +1794,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreSequences() {
-		//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-		//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
@@ -2009,165 +1918,4 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.end();
 		}
 	}
-
-	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-	protected boolean isNOP(Action action){
-		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID))
-			return true;
-		else
-			return false;
-	}
-
-	protected boolean isESC(Action action){
-		Role r = action.get(Tags.Role, null);
-		if (r != null && r.isA(ActionRoles.HitKey)){
-			String desc = action.get(Tags.Desc, null);
-			if (desc != null && desc.contains("VK_ESCAPE"))
-				return true;
-		}
-		return false;
-	}
-
-	/**
-     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-     * @param actions
-     * @param ac
-     * @param scrollArrowSize
-     * @param scrollThick
-     * @param widget
-     */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
-        Drag[] drags = null;
-        //If there are scroll (drags/drops) actions possible
-        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
-            //For each possible drag, create an action and add it to the derived actions
-            for (Drag drag : drags){
-                //Create a slide action with the Action Compiler, and add it to the set of derived actions
-                actions.add(ac.slideFromTo(
-                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-                        widget
-                ));
-
-            }
-        }
-    }
-
-	/**
-	 * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
-	 * If a matching widget is found, left mouse button is clicked on it and return value is true.
-	 * Else returns false
-	 *
-	 * @param tag for example: org.fruit.alayer.Tags.Title
-	 * @param value
-	 * @param state
-	 * @param system needed for updating the state between retries
-	 * @param maxNumberOfRetries int number of times
-	 * @param waitBetween double in seconds
-	 * @return
-	 */
-	protected boolean waitAndLeftClickWidgetWithMatchingTag(Tag tag, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
-		int numberOfRetries = 0;
-		while(numberOfRetries<maxNumberOfRetries){
-			//looking for a widget with matching tag value:
-			Widget widget = getWidgetWithMatchingTag(tag,value,state);
-			if(widget!=null){
-				StdActionCompiler ac = new AnnotatingActionCompiler();
-				//System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
-				executeAction(system,state,ac.leftClickAt(widget));
-				// is waiting needed after the action has been executed?
-				return true;
-			}
-			else{
-				Util.pause(waitBetween);
-				state = getState(system);
-				numberOfRetries++;
-			}
-		}
-		System.out.println("Matching widget was not found, "+tag.toString()+"=" + value);
-		printTagValuesOfWidgets(tag,state);
-		return false;
-	}
-
-	/**
-	 * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
-	 * If a matching widget is found, left mouse button is clicked on it, the given text is typed into it, and return value is true.
-	 * Else returns false
-	 *
-	 * @param tag for example: org.fruit.alayer.Tags.Title
-	 * @param value
-	 * @param textToType types the given text by replacing the existing text
-	 * @param state
-	 * @param system needed for updating the state between retries
-	 * @param maxNumberOfRetries int number of times
-	 * @param waitBetween double in seconds
-	 * @return
-	 */
-	protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tag tag, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween){
-		int numberOfRetries = 0;
-		while(numberOfRetries<maxNumberOfRetries){
-			//looking for a widget with matching tag value:
-			Widget widget = getWidgetWithMatchingTag(tag,value,state);
-			if(widget!=null){
-				StdActionCompiler ac = new AnnotatingActionCompiler();
-				executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
-				// is waiting needed after the action has been executed?
-				return true;
-			}
-			else{
-				Util.pause(waitBetween);
-				state = getState(system);
-				numberOfRetries++;
-			}
-		}
-		System.out.println("Matching widget was not found, "+tag.toString()+"=" + value);
-		printTagValuesOfWidgets(tag,state);
-		return false;
-	}
-
-
-	/**
-	 * Iterates the widgets of the state until a widget with matching tag value is found.
-	 * The value is case sensitive.
-	 *
-	 * @param tag
-	 * @param value
-	 * @param state
-	 * @return the matching widget if found, null if not found
-	 */
-	protected Widget getWidgetWithMatchingTag(Tag tag, String value, State state){
-		for(Widget widget:state){
-			if(widget.get(tag, null)==null){
-				// this widget did not have a value for the given tag
-			}
-			else if(widget.get(tag, null).toString().equals(value)){
-				return widget;
-			}
-			else if(widget.get(tag, null).toString().contains(value)) {
-				return widget;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Prints to system out all the widgets that have some value in the given tag.
-	 *
-	 * @param tag
-	 * @param state
-	 */
-	protected void printTagValuesOfWidgets(Tag tag, State state){
-		for(Widget widget:state){
-			if(widget.get(tag, null)==null){
-				// this widget did not have a value for the given tag
-			}
-			else{
-				System.out.println(tag.toString()+"=" + widget.get(tag, null).toString()+ "; Description of the widget="+widget.get(Tags.Desc, ""));
-			}
-		}
-	}
-
 }
