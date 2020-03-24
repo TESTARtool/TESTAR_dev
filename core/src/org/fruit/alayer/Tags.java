@@ -44,7 +44,6 @@ import org.fruit.alayer.devices.ProcessHandle;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -216,16 +215,4 @@ public final class Tags extends TagsBase {
 	 * The original widget that can be attached to things like actions
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
-	
-	private static Set<Tag<String>> generalStringVerdictTags = new HashSet<Tag<String>>() {
-		{
-			add(Title);
-			add(ValuePattern);
-		}
-	};
-
-	public static Set<Tag<String>> getGeneralStringVerdictTags() {
-		return generalStringVerdictTags;
-	}
-	
 }

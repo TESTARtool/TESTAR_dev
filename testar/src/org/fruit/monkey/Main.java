@@ -41,6 +41,8 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.fruit.*;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.VerdictTags;
+import org.fruit.alayer.webdriver.enums.WdVerdictTags;
 
 import javax.swing.*;
 import java.io.*;
@@ -407,7 +409,6 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
 			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
@@ -457,6 +458,13 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			
+			defaults.add(Pair.from(SuspiciousPatterns, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousVerdictTags, new ArrayList<String>() {
+				{
+					add("Title");
+				}
+			}));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
@@ -489,6 +497,13 @@ public class Main {
 			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
 				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+			}
+			
+			// check that the Suspicious Verdict Tags have at least 1 value
+			if (settings.get(ConfigTags.SuspiciousVerdictTags).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid widget TAG or leave the key out of the settings file");
+			} else {
+				initSuspiciousVerdictTags(settings);
 			}
 
 			return settings;
@@ -662,6 +677,22 @@ public class Main {
             CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
     }
+	
+	/**
+	 * Initialize the enabled suspicious verdict tags to use with the suspicious patterns
+	 * @param settings
+	 */
+	private static void initSuspiciousVerdictTags(Settings settings) {
+		VerdictTags.resetGeneralStringVerdictTags();
+		WdVerdictTags.resetWebdriverStringVerdictTags();
+		
+		String[] tags = settings.get(ConfigTags.SuspiciousVerdictTags).toArray(new String[0]);
+
+		for(String tagName : tags[0].split(", ")) {
+			VerdictTags.setGeneralStringVerdictTags(tagName);
+			WdVerdictTags.setWebdriverStringVerdictTags(tagName);
+		}
+	}
 
 	/**
 	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.

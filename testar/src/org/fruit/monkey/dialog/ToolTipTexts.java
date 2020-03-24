@@ -112,10 +112,10 @@ public class ToolTipTexts {
       "TESTAR will kill any process whose name matches the given regular expression.\n</html>";
 
   // TTTs for the oracle panel
-  public static String suspiciousTitlesTTT =
+  public static String suspiciousPatternsTTT =
       "<html>\nThis is a very simple oracle in the form of a regular expression, " +
-          "which is applied to each<br>widget's Title property. " +
-          "If TESTAR finds a widget on the screen, whose title matches the given<br>\n" +
+          "which is applied to each<br>widget's SELECTED TAG property. " +
+          "If TESTAR finds a widget on the screen, whose TAG VALUE matches the given<br>\n" +
           "expression, it will consider the current sequence to be erroneous.\n</html>";
 
   // TTTs for the timing panel

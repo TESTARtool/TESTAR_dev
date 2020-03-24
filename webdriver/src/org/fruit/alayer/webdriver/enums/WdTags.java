@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -84,7 +84,7 @@ public class WdTags extends TagsBase {
   /**
    * Web text context of a widget.
    */
-  public static final Tag<String> WebTextContext = from("WebTextContext", String.class);
+  public static final Tag<String> WebTextContent = from("WebTextContent", String.class);
   
   /**
    * Web Hypertext Reference of a widget.
@@ -120,6 +120,11 @@ public class WdTags extends TagsBase {
    * Web type of input of a widget.
    */
   public static final Tag<String> WebType = from("WebType", String.class);
+  
+  /**
+   * Web src of a widget.
+   */
+  public static final Tag<String> WebSrc = from("WebSrc", String.class);
   
   /**
    * Web zIndex of a widget

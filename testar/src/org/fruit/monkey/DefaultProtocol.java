@@ -81,7 +81,6 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
 
 import es.upv.staq.testar.managers.DataManager;
@@ -157,8 +156,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
 	protected Map<String, Matcher> clickFilterMatchers = new WeakHashMap<String, Matcher>();
-	protected Pattern suspiciousTitlesPattern = null;
-	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
+	protected Pattern suspiciousPattern = null;
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false;
@@ -1543,17 +1541,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(state.get(Tags.NotResponding, false)){
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
+		
 		//------------------------
-		// ORACLES ALMOST FOR FREE
+		// Suspicious Pattern ORACLES
 		//------------------------
 
-		if (this.suspiciousTitlesPattern == null)
-			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-
-		// search all widgets for suspicious String Values
+		if (this.suspiciousPattern == null) {
+			this.suspiciousPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousPatterns), Pattern.UNICODE_CHARACTER_CLASS);
+		}
+		
+		// search all widgets for suspicious Pattern Values
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
-			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
+			suspiciousValueVerdict = VerdictTags.suspiciousStringValueMatcher(suspiciousPattern, w, RedPen);
 			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
 				return suspiciousValueVerdict;
 			}
@@ -1565,38 +1565,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// if everything was OK ...
-		return Verdict.OK;
-	}
-	
-	private Verdict suspiciousStringValueMatcher(Widget w) {
-		Matcher m;
-		
-		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
-			
-			if(t != null && !w.get(t,"").isEmpty()) {
-				
-				//Ignore value ValuePattern for UIAEdit widgets
-				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-					continue;
-				}
-				
-				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
-					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
-				}
-				
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
-							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
-				}
-			} 
-		}
-
 		return Verdict.OK;
 	}
 

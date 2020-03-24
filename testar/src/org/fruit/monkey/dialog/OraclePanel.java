@@ -38,20 +38,20 @@ import javax.swing.*;
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
-import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
+import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousPatternsTTT;
 
 public class OraclePanel extends JPanel {
 
 	private static final long serialVersionUID = -8633257917450402330L;
 
-	private JTextArea txtSuspTitles;
+	private JTextArea txtSuspPatterns;
 	private JCheckBox processCheckBox;
 	private JTextArea txtProcTitles;
 	private JSpinner spnFreezeTime;
 
 	public OraclePanel() {
-		txtSuspTitles = new JTextArea();
-		txtSuspTitles.setLineWrap(true);
+		txtSuspPatterns = new JTextArea();
+		txtSuspPatterns.setLineWrap(true);
 		txtProcTitles = new JTextArea();
 		txtProcTitles.setLineWrap(true);
 
@@ -64,13 +64,13 @@ public class OraclePanel extends JPanel {
 		spnFreezeTime.setModel(new SpinnerNumberModel(1.0d, 1.0d, null, 1.0d));
 
 		JScrollPane suspiciousTitlePane = new JScrollPane();
-		suspiciousTitlePane.setViewportView(txtSuspTitles);
+		suspiciousTitlePane.setViewportView(txtSuspPatterns);
 		JScrollPane suspiciousProcessPane = new JScrollPane();
 		suspiciousProcessPane.setViewportView(txtProcTitles);
 
 
-		JLabel suspiciousTitleLabel = new JLabel("Suspicious Titles:");
-		suspiciousTitleLabel.setToolTipText(suspiciousTitlesTTT);
+		JLabel suspiciousPatternsLabel = new JLabel("Suspicious Patterns:");
+		suspiciousPatternsLabel.setToolTipText(suspiciousPatternsTTT);
 		JLabel suspiciousProcessLabel = new JLabel("Suspicious Process Output:");
 		JLabel freezeTimeLabel = new JLabel("Freeze Time:");
 		JLabel secondsLabel = new JLabel("seconds");
@@ -103,14 +103,14 @@ public class OraclePanel extends JPanel {
 										.addGap(23))
 								.addGroup(gl_jPanelOracles.createSequentialGroup()
 										.addPreferredGap(RELATED)
-										.addComponent(suspiciousTitleLabel, PREFERRED_SIZE, 142, PREFERRED_SIZE)
+										.addComponent(suspiciousPatternsLabel, PREFERRED_SIZE, 142, PREFERRED_SIZE)
 										.addContainerGap(348, Short.MAX_VALUE))))
 				);
 		gl_jPanelOracles.setVerticalGroup(
 				gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING)
 				.addGroup(gl_jPanelOracles.createSequentialGroup()
 						.addGap(18)
-						.addComponent(suspiciousTitleLabel)
+						.addComponent(suspiciousPatternsLabel)
 						.addGap(240)
 						.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.BASELINE)
 								.addComponent(spnFreezeTime, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
@@ -135,7 +135,7 @@ public class OraclePanel extends JPanel {
 	 * @param settings The settings to load.
 	 */
 	public void populateFrom(final Settings settings) {
-		txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTitles));
+		txtSuspPatterns.setText(settings.get(ConfigTags.SuspiciousPatterns));
 		processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
 		txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
 		spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
@@ -146,7 +146,7 @@ public class OraclePanel extends JPanel {
 	 * @param settings reference to the object where the settings will be stored.
 	 */
 	public void extractInformation(final Settings settings) {
-		settings.set(ConfigTags.SuspiciousTitles, txtSuspTitles.getText());
+		settings.set(ConfigTags.SuspiciousPatterns, txtSuspPatterns.getText());
 		settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
 		settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
 		settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());

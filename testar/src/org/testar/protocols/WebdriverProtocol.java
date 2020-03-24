@@ -53,6 +53,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.webdriver.enums.WdVerdictTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
@@ -201,6 +202,42 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
+    
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// General - Suspicious Pattern
+		Verdict verdict = super.getVerdict(state);
+		
+		//TODO: Refactor verdict.join to join webdriver suspicious pattern
+		if(verdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
+			return verdict;
+		}
+		
+		//----------------------------------------
+		// Suspicious Pattern ORACLES at DOM level
+		//----------------------------------------
+		
+		// search all widgets for suspicious Pattern Values
+		Verdict webdriverSuspiciousValueVerdict = Verdict.OK;
+		
+		for(Widget w : state) {
+			webdriverSuspiciousValueVerdict = WdVerdictTags.webdriverSuspiciousStringValueMatcher(suspiciousPattern, w, RedPen);
+			
+			if (webdriverSuspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+				return webdriverSuspiciousValueVerdict;
+			}
+		}
+
+		return verdict;
+	}
 
     /**
      * Overwriting to add HTML report writing into it
