@@ -31,7 +31,6 @@
 
 package org.testar.protocols;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Environment;
@@ -314,7 +313,4 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         }
         return actions;
     }
-
-
-
 }

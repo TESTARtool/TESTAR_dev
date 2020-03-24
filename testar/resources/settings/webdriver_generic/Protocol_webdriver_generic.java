@@ -82,7 +82,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   // Set to null to disable this feature
   private static Map<String, String> policyAttributes =
       new HashMap<String, String>() {{
-        put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+        put("class", "lfr-btn-label");
       }};
 
   /**

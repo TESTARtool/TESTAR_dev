@@ -59,7 +59,6 @@ import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
@@ -287,10 +286,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			write.close();
     		
     		} catch (IOException e) {System.out.println(e.getMessage());}
-    		
-    		//System.out.println("* " + existingCssClasses.size()+ " * Existing Css Classes: " + existingCssClasses.toString());
-
     	}
+    	
     	super.stopSystem(system);
     }
     

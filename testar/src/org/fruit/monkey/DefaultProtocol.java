@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,6 @@ import static org.fruit.alayer.Tags.ExecutedAction;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 
 import java.awt.Desktop;
@@ -68,7 +67,6 @@ import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.fruit.Assert;
-import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -167,6 +165,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
+	
+	protected int escAttempts = 0;
+	protected static final int MAX_ESC_ATTEMPTS = 99;
 
 	protected boolean exceptionThrown = false;
 
@@ -302,11 +303,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			//INDEXLOG.error("Exception: ",SystemStartException);
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
 		}
 
@@ -330,7 +329,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
 
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -492,7 +490,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
-			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
 
@@ -522,7 +519,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			//INDEXLOG.error("Exception: ",e);
 		}
 
 		return currentSeqObject;
@@ -566,7 +562,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -592,7 +587,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
 
 		//Delete the temporally testar file
 		try {
@@ -600,7 +594,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (IOException e2) {
 			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
-
 	}
 
 	/**
@@ -645,11 +638,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
+
 		//method for defining other init actions, like setup of external environment
 		initTestSession();
 
 		//initializing TESTAR for generate mode:
-
 		initGenerateMode();
 
 		/*
@@ -788,8 +781,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
-			//Not visualizing the widget info under cursor while in Generate-mode:
-			//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
@@ -912,7 +903,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//Wait since TestSerialiser write all fragments on sequence File
 		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			//System.out.println("Saving sequences...");
 			synchronized (this) {
 				try {
 					this.wait(1000);
@@ -952,12 +942,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
-
-		//bin folder
-		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
-
-
 	}
 
 	/**
@@ -1152,6 +1136,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+	/**
+	 * Method to run TESTAR in replay mode.
+	 * The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
+	 */
 	protected void runReplayLoop(){
 		actionCount = 1;
 		boolean success = true;
@@ -1170,7 +1158,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			//ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(seqFile)));
 			fis = new FileInputStream(seqFile);
 			bis = new BufferedInputStream(fis);
 			gis = new GZIPInputStream(bis);
@@ -1199,8 +1186,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				while(!success && (Util.time() - start < rrt)){
 					tries++;
 					cv.begin(); Util.clear(cv);
-					//In Replay-mode, we DO NOT show the widget info under cursor:
-					//SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
@@ -1215,7 +1200,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try{
 						if(tries < 2){
 							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							//System.out.println(replayMessage);
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						}else{
 							if(tries % 50 == 0)
@@ -1246,10 +1230,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
 		} catch(IOException ioe){
-			//INDEXLOG.error("Exception: ",ioe);
 			throw new RuntimeException("Cannot read file.", ioe);
 		} catch (ClassNotFoundException cnfe) {
-			//INDEXLOG.error("Exception: ",cnfe);
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
@@ -1305,7 +1287,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected Canvas buildCanvas() {
-		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
@@ -1355,7 +1336,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
-		else{ // Settings.SUT_CONNECTOR_CMDLINE
+		else{
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 
 			//Read the settings to know if user wants to start the process listener
@@ -1486,7 +1467,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
@@ -1814,8 +1794,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreSequences() {
-		//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-		//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
@@ -1940,10 +1918,4 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.end();
 		}
 	}
-
-	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-
-
 }
