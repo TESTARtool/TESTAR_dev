@@ -40,7 +40,6 @@ public final class ConfigTags {
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
   public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class);
   public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class);
-  public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class);
   public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class);
   public static final Tag<String> TempDir = Tag.from("TempDir", String.class);
   public static final Tag<Boolean> OnlySaveFaultySequences = Tag.from("OnlySaveFaultySequences", Boolean.class);
@@ -73,10 +72,14 @@ public final class ConfigTags {
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
   
+  //Filter Patterns
+  public static final Tag<String> ActionFilterWidgetTitle = Tag.from("ActionFilterWidgetTitle", String.class);
+  
+  //Suspicious Patterns Oracles
   public static final Tag<String> SuspiciousPatterns = Tag.from("SuspiciousPatterns", String.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> SuspiciousVerdictTags = Tag.from("SuspiciousVerdictTags", (Class<List<String>>) (Class<?>) List.class);
-
+  
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
   public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);

@@ -51,6 +51,8 @@ import java.util.regex.Pattern;
 import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
+	
+	protected Pattern clickFilterPattern = null;
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -236,7 +238,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         //If no clickFilterPattern exists, then create it
         //Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
         if (this.clickFilterPattern == null)
-            this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+            this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ActionFilterWidgetTitle), Pattern.UNICODE_CHARACTER_CLASS);
 
         //Check whether the title matches any of the clickFilterPatterns
         Matcher m = this.clickFilterMatchers.get(title);

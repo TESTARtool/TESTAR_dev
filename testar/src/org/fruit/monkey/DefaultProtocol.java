@@ -154,7 +154,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProtocolUtil protocolUtil = new ProtocolUtil();
 	protected EventHandler eventHandler;
 	protected Canvas cv;
-	protected Pattern clickFilterPattern = null;
 	protected Map<String, Matcher> clickFilterMatchers = new WeakHashMap<String, Matcher>();
 	protected Pattern suspiciousPattern = null;
 	private StateBuilder builder;

@@ -44,7 +44,7 @@ public class FilterPanel extends JPanel {
 
   private static final long serialVersionUID = 1572649050808020748L;
  
-  private JTextArea txtClickFilter;
+  private JTextArea txtActionFilterWidgetTitle;
   private JTextArea txtProcessFilter;
 
   public FilterPanel() {
@@ -95,9 +95,9 @@ public class FilterPanel extends JPanel {
     txtProcessFilter.setLineWrap(true);
     killProcessByNamePane.setViewportView(txtProcessFilter);
 
-    txtClickFilter = new JTextArea();
-    txtClickFilter.setLineWrap(true);
-    filterByTitlePane.setViewportView(txtClickFilter);
+    txtActionFilterWidgetTitle = new JTextArea();
+    txtActionFilterWidgetTitle.setLineWrap(true);
+    filterByTitlePane.setViewportView(txtActionFilterWidgetTitle);
 
   }
 
@@ -106,7 +106,7 @@ public class FilterPanel extends JPanel {
    * @param settings The settings to load.
    */
   public void populateFrom(final Settings settings) {
-    txtClickFilter.setText(settings.get(ConfigTags.ClickFilter));
+	txtActionFilterWidgetTitle.setText(settings.get(ConfigTags.ActionFilterWidgetTitle));
     txtProcessFilter.setText(settings.get(ConfigTags.ProcessesToKillDuringTest));
   }
 
@@ -115,7 +115,7 @@ public class FilterPanel extends JPanel {
    * @param settings reference to the object where the settings will be stored.
    */
   public void extractInformation(final Settings settings) {
-    settings.set(ConfigTags.ClickFilter, txtClickFilter.getText());
+    settings.set(ConfigTags.ActionFilterWidgetTitle, txtActionFilterWidgetTitle.getText());
     settings.set(ConfigTags.ProcessesToKillDuringTest, txtProcessFilter.getText());
   }
 }

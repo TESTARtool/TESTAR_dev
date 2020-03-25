@@ -409,7 +409,6 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
 			defaults.add(Pair.from(ForceForeground, true));
@@ -459,6 +458,10 @@ public class Main {
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 			
+			//Filter Patterns
+			defaults.add(Pair.from(ActionFilterWidgetTitle, "(?!x)x"));
+
+			//Suspicious Patterns Oracles
 			defaults.add(Pair.from(SuspiciousPatterns, "(?!x)x"));
 			defaults.add(Pair.from(SuspiciousVerdictTags, new ArrayList<String>() {
 				{

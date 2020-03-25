@@ -90,7 +90,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
+ActionFilterWidgetTitle = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
 
 #################################################################
 # Processfilter

@@ -360,7 +360,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# these will be added to the protocol_filter.xml file.\n"
 					+"#################################################################\n"
 					+"\n"
-					+"ClickFilter = " + Util.lineSep()
+					+"ActionFilterWidgetTitle = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Processfilter\n"
