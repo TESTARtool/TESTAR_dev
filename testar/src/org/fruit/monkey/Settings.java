@@ -361,6 +361,22 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"ActionFilterWidgetTitle = " + Util.lineSep()
+					+"ActionFilterWidgetDesc = " + Util.lineSep()
+					+"ActionFilterWidgetText = " + Util.lineSep()
+					+"ActionFilterWidgetValuePattern = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Webdriver ActionFilter\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ActionFilterWebId = " + Util.lineSep()
+					+"ActionFilterWebHref = " + Util.lineSep()
+					+"ActionFilterWebName = " + Util.lineSep()
+					+"ActionFilterWebTagName = " + Util.lineSep()
+					+"ActionFilterWebTitle = " + Util.lineSep()
+					+"ActionFilterWebAlt = " + Util.lineSep()
+					+"ActionFilterWebTextContent = " + Util.lineSep()
+					+"ActionFilterWebSrc = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Processfilter\n"

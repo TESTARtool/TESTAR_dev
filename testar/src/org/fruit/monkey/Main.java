@@ -458,8 +458,21 @@ public class Main {
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 			
-			//Filter Patterns
+			//Filter Patterns, General Tags
 			defaults.add(Pair.from(ActionFilterWidgetTitle, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWidgetDesc, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWidgetText, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWidgetValuePattern, "(?!x)x"));
+
+			//Filter Patterns, Webdriver Tags
+			defaults.add(Pair.from(ActionFilterWebId, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebHref, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebName, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebTagName, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebTitle, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebAlt, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebTextContent, "(?!x)x"));
+			defaults.add(Pair.from(ActionFilterWebSrc, "(?!x)x"));
 
 			//Suspicious Patterns Oracles
 			defaults.add(Pair.from(SuspiciousPatterns, "(?!x)x"));

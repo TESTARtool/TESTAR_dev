@@ -57,6 +57,7 @@ import org.fruit.alayer.webdriver.enums.WdVerdictTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.testar.FilterTags;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -238,6 +239,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		return verdict;
 	}
+	
+    /**
+     * Check whether widget w should be filtered based on
+     * its Webdriver tags (matching the regular expression of the Dialog --> actionFilterWebPattern)
+     * @param widget
+     * @return
+     */
+	@Override
+    protected boolean isUnfiltered(Widget w){
+        if(!super.isUnfiltered(w)) {
+        	return false;
+        }
+
+        return FilterTags.checkWebdriverTagIsUnfiltered(w, settings);
+    }
 
     /**
      * Overwriting to add HTML report writing into it

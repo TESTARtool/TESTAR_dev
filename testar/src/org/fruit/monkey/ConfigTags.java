@@ -72,8 +72,21 @@ public final class ConfigTags {
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
   
-  //Filter Patterns
+  //Filter Patterns, General Tags
   public static final Tag<String> ActionFilterWidgetTitle = Tag.from("ActionFilterWidgetTitle", String.class);
+  public static final Tag<String> ActionFilterWidgetDesc = Tag.from("ActionFilterWidgetDesc", String.class);
+  public static final Tag<String> ActionFilterWidgetText = Tag.from("ActionFilterWidgetText", String.class);
+  public static final Tag<String> ActionFilterWidgetValuePattern = Tag.from("ActionFilterWidgetValuePattern", String.class);
+  
+  //Filter Patterns, Webdriver Tags
+  public static final Tag<String> ActionFilterWebId = Tag.from("ActionFilterWebId", String.class);
+  public static final Tag<String> ActionFilterWebHref = Tag.from("ActionFilterWebHref", String.class);
+  public static final Tag<String> ActionFilterWebName = Tag.from("ActionFilterWebName", String.class);
+  public static final Tag<String> ActionFilterWebTagName = Tag.from("ActionFilterWebTagName", String.class);
+  public static final Tag<String> ActionFilterWebTitle = Tag.from("ActionFilterWebTitle", String.class);
+  public static final Tag<String> ActionFilterWebAlt = Tag.from("ActionFilterWebAlt", String.class);
+  public static final Tag<String> ActionFilterWebTextContent = Tag.from("ActionFilterWebTextContent", String.class);
+  public static final Tag<String> ActionFilterWebSrc = Tag.from("ActionFilterWebSrc", String.class);
   
   //Suspicious Patterns Oracles
   public static final Tag<String> SuspiciousPatterns = Tag.from("SuspiciousPatterns", String.class);

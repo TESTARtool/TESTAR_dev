@@ -40,19 +40,13 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.monkey.ConfigTags;
+import org.testar.FilterTags;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
-	
-	protected Pattern clickFilterPattern = null;
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -217,36 +211,19 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
     /**
      * Check whether widget w should be filtered based on
-     * its title (matching the regular expression of the Dialog --> clickFilterPattern)
+     * its tags (matching the regular expression of the Dialog --> actionFilterWidgetPattern)
      * that is cannot be hit
-     * @param w
+     * @param widget
      * @return
      */
     protected boolean isUnfiltered(Widget w){
         //Check whether the widget can be hit
         // If not, it should be filtered
-        if(!Util.hitTest(w, 0.5, 0.5))
+        if(!Util.hitTest(w, 0.5, 0.5)) {
             return false;
-
-        //Check whether the widget has an empty title or no title
-        //If it has, it is unfiltered
-        //Because it cannot match the regular expression of the Action Filter.
-        String title = w.get(Title, "");
-        if (title == null || title.isEmpty())
-            return true;
-
-        //If no clickFilterPattern exists, then create it
-        //Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
-        if (this.clickFilterPattern == null)
-            this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ActionFilterWidgetTitle), Pattern.UNICODE_CHARACTER_CLASS);
-
-        //Check whether the title matches any of the clickFilterPatterns
-        Matcher m = this.clickFilterMatchers.get(title);
-        if (m == null){
-            m = this.clickFilterPattern.matcher(title);
-            this.clickFilterMatchers.put(title, m);
         }
-        return !m.matches();
+
+        return FilterTags.checkGeneralTagIsUnfiltered(w, settings);
     }
 
     /**
