@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -61,16 +61,15 @@ public class OraclePanel extends JPanel {
 		txtSuspPatterns.setLineWrap(true);
 		txtProcTitles = new JTextArea();
 		txtProcTitles.setLineWrap(true);
-		
+
 		buttonSelectTags = new JButton("Select Suspicious Tags");
 		buttonSelectTags.setBounds(300, 10, 190, 30);
 		buttonSelectTags.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            	suspicousTagsPanel.loadCheckBoxes();
-            	suspicousTagsPanel.setVisible(true);
-            }
-        });
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				suspicousTagsPanel.setVisible(true);
+			}
+		});
 		add(buttonSelectTags);
 
 		processCheckBox = new JCheckBox("Enable Process Listener");

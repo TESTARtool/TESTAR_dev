@@ -95,6 +95,7 @@ public class SuspiciousTagsPanel extends JDialog {
 
 		generalCheckBoxesTags();
 		webdriverCheckBoxesTags();
+		loadCheckBoxes();
 	}
 	
 	/**
