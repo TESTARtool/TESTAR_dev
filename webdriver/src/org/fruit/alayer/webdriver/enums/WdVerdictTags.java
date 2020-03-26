@@ -99,21 +99,28 @@ public class WdVerdictTags {
 		}
 		return enabledWebdriverVerdictTags;
 	}
+	
+	public static boolean isWebdriverStringVerdictTagEnabled(String tagName) {
+		for(Map.Entry<Tag<String>, Boolean> entry : webdriverStringVerdictTags.entrySet()) {
+			if(entry.getKey().toString().equals(tagName)) {
+				return entry.getValue();
+			}
+		}
+		return false;
+	}
 
 	public static Verdict webdriverSuspiciousStringValueMatcher(Pattern suspiciousPattern, Widget w, Pen redPen) {
 
-		Map<String, Matcher> webdriverSuspiciousPatternMatchers = new WeakHashMap<>();
-		Matcher m;
-
 		for(Tag<String> t : WdVerdictTags.getEnabledWebdriverStringVerdictTags()) {
+			
+			Map<String, Matcher> webdriverSuspiciousPatternMatchers = new WeakHashMap<>();
+			Matcher m;
 
 			if(t != null && !w.get(t,"").isEmpty()) {
 
 				m = webdriverSuspiciousPatternMatchers.get(w.get(t,""));
-				if (m == null){
-					m = suspiciousPattern.matcher(w.get(t,""));
-					webdriverSuspiciousPatternMatchers.put(w.get(t,""), m);
-				}
+				m = suspiciousPattern.matcher(w.get(t,""));
+				webdriverSuspiciousPatternMatchers.put(w.get(t,""), m);
 
 				if (m.matches()) {
 					Visualizer visualizer = Util.NullVisualizer;

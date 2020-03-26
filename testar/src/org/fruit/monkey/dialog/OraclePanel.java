@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,25 +41,41 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousPatternsTTT;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class OraclePanel extends JPanel {
 
 	private static final long serialVersionUID = -8633257917450402330L;
 
 	private JTextArea txtSuspPatterns;
+	private JButton buttonSelectTags;
 	private JCheckBox processCheckBox;
 	private JTextArea txtProcTitles;
 	private JSpinner spnFreezeTime;
+	
+	private SuspiciousTagsPanel suspicousTagsPanel = new SuspiciousTagsPanel();
 
 	public OraclePanel() {
 		txtSuspPatterns = new JTextArea();
 		txtSuspPatterns.setLineWrap(true);
 		txtProcTitles = new JTextArea();
 		txtProcTitles.setLineWrap(true);
+		
+		buttonSelectTags = new JButton("Select Suspicious Tags");
+		buttonSelectTags.setBounds(300, 10, 190, 30);
+		buttonSelectTags.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	suspicousTagsPanel.loadCheckBoxes();
+            	suspicousTagsPanel.setVisible(true);
+            }
+        });
+		add(buttonSelectTags);
 
 		processCheckBox = new JCheckBox("Enable Process Listener");
 		processCheckBox.setBounds(10, 128, 192, 20);
 		add(processCheckBox);
-
 
 		spnFreezeTime = new JSpinner();
 		spnFreezeTime.setModel(new SpinnerNumberModel(1.0d, 1.0d, null, 1.0d));
@@ -150,5 +167,6 @@ public class OraclePanel extends JPanel {
 		settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
 		settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
 		settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
+		settings.set(ConfigTags.SuspiciousVerdictTags, suspicousTagsPanel.extractInformation());
 	}
 }

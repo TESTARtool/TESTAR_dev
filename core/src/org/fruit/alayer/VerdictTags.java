@@ -76,14 +76,23 @@ public class VerdictTags {
 		}
 		return enabledVerdictTags;
 	}
+	
+	public static boolean isGeneralStringVerdictTagEnabled(String tagName) {
+		for(Map.Entry<Tag<String>, Boolean> entry : generalStringVerdictTags.entrySet()) {
+			if(entry.getKey().toString().equals(tagName)) {
+				return entry.getValue();
+			}
+		}
+		return false;
+	}
 
 	public static Verdict suspiciousStringValueMatcher(Pattern suspiciousPattern, Widget w, Pen redPen) {
 
-		Map<String, Matcher> suspiciousPatternMatchers = new WeakHashMap<>();
-		Matcher m;
-
 		for(Tag<String> t : VerdictTags.getEnabledGeneralStringVerdictTags()) {
 
+			Map<String, Matcher> suspiciousPatternMatchers = new WeakHashMap<>();
+			Matcher m;
+			
 			if(t != null && !w.get(t,"").isEmpty()) {
 
 				if(concreteTagValueToIgnore(t, w)) {
@@ -91,10 +100,8 @@ public class VerdictTags {
 				}
 
 				m = suspiciousPatternMatchers.get(w.get(t,""));
-				if (m == null){
-					m = suspiciousPattern.matcher(w.get(t,""));
-					suspiciousPatternMatchers.put(w.get(t,""), m);
-				}
+				m = suspiciousPattern.matcher(w.get(t,""));
+				suspiciousPatternMatchers.put(w.get(t,""), m);
 
 				if (m.matches()) {
 					Visualizer visualizer = Util.NullVisualizer;

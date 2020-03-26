@@ -79,11 +79,12 @@ public class FilterTags {
 	 * @return
 	 */
 	public static boolean checkGeneralTagIsUnfiltered(Widget w, Settings settings) {
-		Pattern generalActionFilterPattern = null;
-		Map<String, Matcher> generalActionFilterMatchers = new WeakHashMap<>();
-		Matcher m;
 
 		for(Map.Entry<Tag<String>, Tag<String>> entry : generalFilterTags.entrySet()) {
+			
+			Pattern generalActionFilterPattern = null;
+			Map<String, Matcher> generalActionFilterMatchers = new WeakHashMap<>();
+			Matcher m;
 
 			//Only if the widget has the tag with content, if empty check next
 			if(!w.get(entry.getValue(),"").isEmpty()) {
@@ -115,12 +116,13 @@ public class FilterTags {
 	 * @return
 	 */
 	public static boolean checkWebdriverTagIsUnfiltered(Widget w, Settings settings) {
-		Pattern webdriverActionFilterPattern = null;
-		Map<String, Matcher> webdriverActionFilterMatchers = new WeakHashMap<>();
-		Matcher m;
 
 		for(Map.Entry<Tag<String>, Tag<String>> entry : webdriverFilterTags.entrySet()) {
 
+			Pattern webdriverActionFilterPattern = null;
+			Map<String, Matcher> webdriverActionFilterMatchers = new WeakHashMap<>();
+			Matcher m;
+			
 			//Only if the widget has the tag with content, if empty check next
 			if(!w.get(entry.getValue(),"").isEmpty()) {
 
