@@ -24,10 +24,58 @@ sourceSets {
  * Note this version only works on Windows.
  */
 task runTestar(type: Exec) {
+    // Make sure temp dir exists on case-sensitive OSs
+    doFirst{
+        new File("${project.buildDir}/install/testar/bin/output/temp").mkdirs()
+    }
+
     group = 'custom_testar'
     description ='runTESTAR'
     workingDir 'target/install/testar/bin'
     commandLine 'cmd', '/c', 'testar.bat'
+
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+		environment "JAVA_TOOL_OPTIONS", "-Djava.awt.headless=false"
+		commandLine "./testar"
+	} else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+		commandLine "./testar"
+	} else {
+		commandLine 'cmd', '/c', 'testar.bat'
+	}
+}
+
+/**
+ * Prepare folder structure to run debuggin mode from IDE
+ */
+task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
+    group = 'custom_testar'
+    description ='debuggingDistribution'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task debugFiles(type: Copy) {
+    from 'target/scripts/.'
+    into '.'
+}
+
+task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
+    group = 'custom_testar'
+    description ='cleanDebugging'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task deleteDebugging(type: Delete){
+	delete 'settings'
+	delete 'suts'
+	delete 'output'
+	delete 'testar'
+	delete 'testar.bat'
+	delete 'windows.dll'
+	delete 'index.log'
 }
 
 dependencies {
@@ -90,5 +138,6 @@ startScripts.dependsOn {
 
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
+debuggingDistribution.dependsOn(build)
 
 mainClassName='org.fruit.monkey.Main'

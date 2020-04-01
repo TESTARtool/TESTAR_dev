@@ -63,11 +63,11 @@ public class Main {
     static String SSE_ACTIVATED = null;
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public static String resourcesDir = "resources" + File.separator;
+    //public static String resourcesDir = "resources" + File.separator;
     //Default paths
     private static String testarDir = FileSystems.getDefault().getPath("").toAbsolutePath() + File.separator; // + "testar" + File.separator + "resources" + File.separator;
-    public static String settingsDir = testarDir + resourcesDir + "settings" + File.separator;
-    private static String outputDir = testarDir + resourcesDir + "output" + File.separator;
+    public static String settingsDir = testarDir + "settings" + File.separator;
+    private static String outputDir = testarDir + "output" + File.separator;
     private static String tempDir = outputDir + "temp" + File.separator;
 
 
