@@ -12,7 +12,7 @@ public enum APEncodingSeparator {
 
     public final String symbol;
 
-    private APEncodingSeparator(String unlikely) {
+    APEncodingSeparator(String unlikely) {
         this.symbol = unlikely;
     }
 }

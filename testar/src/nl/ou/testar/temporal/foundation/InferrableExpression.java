@@ -16,8 +16,8 @@ public  enum InferrableExpression {
 
     public final String typ;
 
-    private InferrableExpression(String typ) {
+    InferrableExpression(String typ) {
         this.typ=typ;
     }
-};
+}
 

@@ -24,7 +24,7 @@ public class WidgetFilter {//extends APSelector {
 
     public WidgetFilter() {
         super();
-        widgetConditionParts = new ArrayList<WidgetConditionPart>();
+        widgetConditionParts = new ArrayList<>();
         widgetSelectorPart = new APSelector();
     }
     @JsonIgnore
@@ -37,7 +37,7 @@ public class WidgetFilter {//extends APSelector {
     public List<WidgetConditionPart> getWidgetConditionParts() {
         return widgetConditionParts;
     }
-
+    @SuppressWarnings("unused")
     public void setWidgetConditionParts(List<WidgetConditionPart> widgetConditionParts) {
         this.widgetConditionParts = widgetConditionParts;
     }
@@ -49,7 +49,7 @@ public class WidgetFilter {//extends APSelector {
     public Set<String> getAPsOfWidgetAttribute(String apkey, String transitionProperty, String value) {
         return getWidgetSelectorPart().getAPsOfAttribute(apkey, transitionProperty, value);
     }
-
+    @SuppressWarnings("unused")
     public void setWidgetSelectorPart(APSelector widgetSelectorPart) {
         this.widgetSelectorPart = widgetSelectorPart;
     }
@@ -57,7 +57,7 @@ public class WidgetFilter {//extends APSelector {
     public void  setDefaultWidgetFilter() {
         updateFreeFormatText("==================This is a Sample WidgetFilter, with 3 filter conditions");
         WidgetConditionPart wfp = new WidgetConditionPart();
-        Set<String> temp= new  HashSet<String>();
+        Set<String> temp= new HashSet<>();
         temp.add(Tags.Role.name());
         wfp.setSelectedAttributes(temp);
         wfp.setSelectedExpressions(useRoleConditionalExpressions());

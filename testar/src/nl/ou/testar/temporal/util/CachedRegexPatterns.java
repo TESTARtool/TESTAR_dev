@@ -49,11 +49,11 @@ public final class CachedRegexPatterns {
 
     public static Pattern addAndGet(String regexString) {
         if (!contains(regexString)){
-            cacheMisses++;
+            CachedRegexPatterns.cacheMisses++;
             add(regexString);
         }
         else{
-            cacheHits++;
+            CachedRegexPatterns.cacheHits++;
         }
         return cachedRegExPatterns.get(regexString);
     }

@@ -105,7 +105,7 @@ public  class TemporalDBManager {
     /**
      * This method fetches a list of the abstract state models in the current OrientDB data store.
      *
-     * @return
+     * @return List of AbstractStateModels
      */
     public List<AbstractStateModel> fetchAbstractModels() {
         dbReopen();
@@ -123,7 +123,7 @@ public  class TemporalDBManager {
                 String applicationName = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
                 String applicationVersion = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
                 String modelIdentifier = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
-                Set<String> abstractionAttributes = (Set<String>)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes")); //@todo set or list?
+                Set<String> abstractionAttributes = (Set<String>) getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes")); //@ set or list?
                 // fetch the test sequences
                 List<TestSequence> sequenceList = new ArrayList<>(); // css, trace are fetched in our own way.just for reuse of AbstractStateModel
 
@@ -169,20 +169,19 @@ public  class TemporalDBManager {
         // navigate from abstractstate to apply the filter.
         stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
-        OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
+        OResultSet resultSet = db.query(stmt, params);
         resultSet.close();
         return resultSet;
     }
     public int getConcreteStateCountFromOrientDb(AbstractStateModel abstractStateModel){
         String stmt;
         int stateCount=0;
-        String dummy="";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
         // navigate from abstractstate to apply the filter.
         stmt = "SELECT Count(*) FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
-        OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
+        OResultSet resultSet = db.query(stmt, params);
         if (resultSet.hasNext()) {
             OResult result = resultSet.next();
 
@@ -223,7 +222,6 @@ public  class TemporalDBManager {
     private List<WidgetFilter> getPassingWidgetFilters(OElement graphElement,  List<String> abstractionAttributes){
         List<WidgetFilter> passedWidgetFilters;
         Map<String,String> attribmap=new HashMap<>();
-        passedWidgetFilters=null;
         for (String attrib:abstractionAttributes
         ) {
             Object prop = graphElement.getProperty(attrib);
@@ -261,7 +259,7 @@ public  class TemporalDBManager {
                     continue;
                 }
                 OEdge actionEdge = op.get();
-                OVertexDocument source = actionEdge.getProperty("out");
+                //OVertexDocument source = actionEdge.getProperty("out");
                 OVertexDocument target = actionEdge.getProperty("in");
 
                 TransitionEncoding trenc = new TransitionEncoding();
@@ -460,9 +458,9 @@ public  class TemporalDBManager {
     /**
      * Helper method that converts an object value based on a specified OrientDB data type.
      *
-     * @param oType
-     * @param valueToConvert
-     * @return
+     * @param oType orientDB data type
+     * @param valueToConvert raw value to apply to converion on
+     * @return converted object
      */
     private Object getConvertedValue(OType oType, Object valueToConvert) {
         Object convertedValue = null;
@@ -612,8 +610,8 @@ public  class TemporalDBManager {
                         }
                         eleProperties.add(new GraphML_DocEleProperty(keyname, graphElement.getProperty(propertyName).toString()));
                     }
+                    assert graphElement.getSchemaType().isPresent(); // Optional requires a check
                     if (result.isVertex()) {
-
                         eleProperties.add(new GraphML_DocEleProperty("labelV", graphElement.getSchemaType().get().toString()));
                         nodes.add(new GraphML_DocNode(eleId, eleProperties));
                     } else {
@@ -626,7 +624,7 @@ public  class TemporalDBManager {
         }
         dbClose();
         GraphML_DocGraph graph = new GraphML_DocGraph(graphXMLID, nodes, edges);
-        Set<GraphML_DocKey> tempset = new LinkedHashSet<GraphML_DocKey>();
+        Set<GraphML_DocKey> tempset = new LinkedHashSet<>();
         docnodekeys.add(new GraphML_DocKey("labelV", "node", "labelV", "string"));
         docedgekeys.add(new GraphML_DocKey("labelE", "edge", "labelE", "string"));
         tempset.addAll(docnodekeys);

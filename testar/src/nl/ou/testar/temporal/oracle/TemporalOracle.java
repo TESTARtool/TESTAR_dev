@@ -58,7 +58,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setPatternBase(TemporalPatternBase patternBase) {
         this.patternBase = patternBase;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getExampleRun_Prefix_Transitions() {
         return exampleRun_Prefix_Transitions;
     }
@@ -66,7 +66,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setExampleRun_Prefix_Transitions(List<String> exampleRun_Prefix_Transitions) {
         this.exampleRun_Prefix_Transitions = exampleRun_Prefix_Transitions;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getExampleRun_Cycle_Transitions() {
         return exampleRun_Cycle_Transitions;
     }
@@ -74,7 +74,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setExampleRun_Cycle_Transitions(List<String> exampleRun_Cycle_Transitions) {
         this.exampleRun_Cycle_Transitions = exampleRun_Cycle_Transitions;
     }
-
+    @SuppressWarnings("unused")
     public MultiValuedMap<String,String> getPattern_Substitutions() {
         return pattern_Substitutions;
     }
@@ -82,7 +82,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public TreeMap<String,String> getSortedPattern_Substitutions(){
         TreeMap<String, String> treeMap = new TreeMap<>();
         for(String str : pattern_Substitutions.keySet()){
-            List<String> valueList=new ArrayList<String>(pattern_Substitutions.get(str));
+            List<String> valueList=new ArrayList<>(pattern_Substitutions.get(str));
             treeMap.put(str, valueList.get(0)); // first list entry
         }
       return treeMap;
@@ -92,6 +92,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
 
         this.pattern_Substitutions = pattern_Substitutions;
     }
+    @SuppressWarnings("unused")
     public int getPattern_ConstraintSet() {
         return pattern_ConstraintSet;
     }
@@ -99,6 +100,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setPattern_ConstraintSet(int pattern_ConstraintSet) {
         this.pattern_ConstraintSet = pattern_ConstraintSet;
     }
+    @SuppressWarnings("unused")
     public ValStatus getOracle_validationstatus() {
         return oracle_validationstatus;
     }
@@ -107,7 +109,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
         this.oracle_validationstatus = oracle_validationstatus;
     }
 
-
+    @SuppressWarnings("unused")
     public Verdict getOracle_verdict() {
         return oracle_verdict;
     }
@@ -115,7 +117,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setOracle_verdict(Verdict oracle_verdict) {
         this.oracle_verdict = oracle_verdict;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getExampleRun_Prefix_States() {
         return exampleRun_Prefix_States;
     }
@@ -123,7 +125,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setExampleRun_Prefix_States(List<String> exampleRun_Prefix_States) {
         this.exampleRun_Prefix_States = exampleRun_Prefix_States;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getExampleRun_Cycle_States() {
         return exampleRun_Cycle_States;
     }
@@ -131,7 +133,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
     public void setExampleRun_Cycle_States(List<String> exampleRun_Cycle_States) {
         this.exampleRun_Cycle_States = exampleRun_Cycle_States;
     }
-
+    @SuppressWarnings("unused")
     public String getLog_RunDate() {
         return log_RunDate;
     }
@@ -192,7 +194,7 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
         pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+APEncodingSeparator.CUSTOM.symbol+"exists");
         to.setPattern_Substitutions(pattern_Substitutions);
 
-        List<String> comments= new ArrayList<String>();
+        List<String> comments= new ArrayList<>();
         comments.add("Format version: "+version);
         comments.add("This is a sample oracle. for valid substitutions, please see the APEncodedModel.json");
         comments.add("Formula, parameter and substitutions are the key elements. parameter syntax: 'p[0-9]+'");

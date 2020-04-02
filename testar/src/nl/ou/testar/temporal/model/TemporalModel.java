@@ -32,7 +32,7 @@ public class TemporalModel extends TemporalBean {
         this.modelAPs = new LinkedHashSet<>();  //must maintain order
     }
 
-
+    @SuppressWarnings("unused")
     public List<String> getInitialStates() {
         return InitialStates;
     }
@@ -48,19 +48,19 @@ public class TemporalModel extends TemporalBean {
     public void setModelAPs(Set<String> modelAPs) {
         this.modelAPs = modelAPs;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getStateList() {
         return stateList;
     }
-
+    @SuppressWarnings("unused")
     public void setStateList(List<String> stateList) {
         this.stateList = stateList;
     }
-
+    @SuppressWarnings("unused")
     public List<String> getTransitionList() {
         return transitionList;
     }
-
+    @SuppressWarnings("unused")
     public void setTransitionList(List<String> transitionList) {
         this.transitionList = transitionList;
     }
@@ -103,11 +103,11 @@ public class TemporalModel extends TemporalBean {
         finalizeTransitions();
     }
 
-
+    @SuppressWarnings("unused")
     public String get_formatVersion() {
         return formatVersion;
     }
-
+    @SuppressWarnings("unused")
     public void set_formatVersion(String _formatVersion) {
         this.formatVersion = _formatVersion;
     }
@@ -143,12 +143,14 @@ public class TemporalModel extends TemporalBean {
         StringBuilder result = new StringBuilder();
         result.append("HOA: v1\n");
         result.append("tool: \"TESTAR-CSS20190914\"\n");
-        result.append("name: \"" + "app= " + this.getApplicationName() + ", ver=" + this.getApplicationVersion() + ", modelid= " + this.getApplication_ModelIdentifier() + ", abstraction= " + this.getApplication_AbstractionAttributes() + "\"\n");
+        result.append("name: \"" + "app= ").append(this.getApplicationName()).append(", ver=").
+                append(this.getApplicationVersion()).append(", modelid= ").append(this.getApplication_ModelIdentifier()).
+                append(", abstraction= ").append(this.getApplication_AbstractionAttributes()).append("\"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
-        int stateindex = -1;
+        int stateindex;
         for (String initialState : initialStatesSet
         ) {
             stateindex = stateList.indexOf(initialState);
@@ -159,7 +161,7 @@ public class TemporalModel extends TemporalBean {
         result.append("AP: ");
         result.append(modelAPs.size());
         int i = 0;
-        for (String ap : modelAPs) {
+        for (String ignored : modelAPs) {
             result.append(" \"").append(APPrefix);
             result.append(i);
             result.append("\"");
@@ -210,7 +212,7 @@ public class TemporalModel extends TemporalBean {
         int chunk = 25;
         int i = 0;
         //   result.append("stateid:stateid\n");
-        for (String ap : modelAPs) {
+        for (String ignored : modelAPs) {
             result.append(APPrefix).append(i).append(":bool ");
             if (i > 0 && (i % chunk) == 0) {
                 result.append("\n");
@@ -228,7 +230,6 @@ public class TemporalModel extends TemporalBean {
 
         for (String initstate : initialStatesSet
         ) {
-            int stateid = 0;
             for (StateEncoding stenc : stateEncodings
             ) {
                 if (stenc.getState().equals(initstate)) {
@@ -244,18 +245,15 @@ public class TemporalModel extends TemporalBean {
                     }
                     result.append("\n");
                 }
-                stateid++;
             }
         }
         result.append("end init\n");
 
         result.append("begin trans\n");
-        int stateid = 0;
         for (StateEncoding stenc : stateEncodings
         ) {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
 
-            int transindex = 0;
             Set<StateEncoding> doneState=new HashSet<>();
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
@@ -292,11 +290,9 @@ public class TemporalModel extends TemporalBean {
                     }
                     //   result.append(" " + transindex).append("\n");
                     result.append("\n");
-                    transindex++;
                     doneState.add(targetenc);
                 }
             }
-            stateid++;
         }
         result.append("\n");
         result.append("end trans\n");
@@ -342,7 +338,7 @@ public class TemporalModel extends TemporalBean {
         String artifical_StartState=""+ (int)Math.pow(2,20); //assume max 1 million states
         result.append("stateindex = "+artifical_StartState +" ;\n");
 
-        for (String ap : modelAPs) {
+        for (String ignored : modelAPs) {
             result.append("int ");
             result.append(APPrefix).append(i).append( " = 0 ; ");
             if (i > 0 && (i % chunk) == 0) {
@@ -394,12 +390,10 @@ public class TemporalModel extends TemporalBean {
 
 
         result.append("//BEGIN explicit transitions\n");
-        int stateid = 0;
         for (StateEncoding stenc : stateEncodings
         ) {
             String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
 
-            int transindex = 0;
             Set<StateEncoding> doneState= new HashSet<>();
             for (TransitionEncoding trenc : stenc.getTransitionColl()
             ) {
@@ -419,7 +413,7 @@ public class TemporalModel extends TemporalBean {
                     StringBuilder condition = new StringBuilder();
                     StringBuilder assignment = new StringBuilder();
 
-                    condition.append("[ stateindex == " + stateList.indexOf(stenc.getState()) + " ");
+                    condition.append("[ stateindex == ").append(stateList.indexOf(stenc.getState())).append(" ");
 
 
                     String[] targetaps = targetenc.getEncodedStateAPConjunct().split("&");
@@ -462,11 +456,9 @@ public class TemporalModel extends TemporalBean {
 
 
                     //result.append(" " + transindex).append("\n");
-                    transindex++;
                     doneState.add(targetenc);
                 }
             }
-            stateid++;
         }
 
         result.append("}\n\n");
@@ -504,7 +496,7 @@ public class TemporalModel extends TemporalBean {
             if (!importStatus) {
                 String falseFormula="false";
                 candidateOracle.addLog("setting formula to 'false'");
-                String  formulalvl6= StringUtils.replace(falseFormula,tst.false_replace.getLeft(), tst.false_replace.getRight()) + tst.line_append;;
+                String  formulalvl6= StringUtils.replace(falseFormula,tst.false_replace.getLeft(), tst.false_replace.getRight()) + tst.line_append;
                 Formulas.append(formulalvl6);
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             } else {
@@ -597,6 +589,7 @@ public class TemporalModel extends TemporalBean {
     }
 
     @JsonSetter("modelAPs")
+    @SuppressWarnings("unused")
     private void setFromSimpleModelMap(LinkedHashMap<Integer, String> map) {
         this.modelAPs.addAll(map.values());
     }

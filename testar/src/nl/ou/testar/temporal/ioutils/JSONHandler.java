@@ -23,10 +23,7 @@ public class JSONHandler {
                 return cls.cast(result);
             }
         } catch (
-                JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (
-                IOException e) {
+                IOException e) { // catches also JsonProcessingException
             e.printStackTrace();
         }
         return null;
@@ -85,14 +82,10 @@ public class JSONHandler {
                 }
             }
 
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IOException e) {  //also catches JsonGenerationException,JsonProcessingException
             e.printStackTrace();
         }
-return tmp;//either empty of filed was found
+        return tmp;//either empty of filed was found
     }
 
     //=============not used ??
@@ -102,15 +95,15 @@ return tmp;//either empty of filed was found
     public Map<String, Object> peekNode (String inFile, String nodeStartsWith) {
         return peekNode(inFile, nodeStartsWith, true, "");
     }
-    public Map<String, Object> peekNode (String inFile, Boolean primitvesOnly) {
-        return peekNode(inFile, "", primitvesOnly, "");
+    public Map<String, Object> peekNode (String inFile, Boolean primitivesOnly) {
+        return peekNode(inFile, "", primitivesOnly, "");
     }
-    public Map<String, Object> peekNode (String inFile, String nodeStartsWith, Boolean primitvesOnly) {
-        return peekNode(inFile, nodeStartsWith, primitvesOnly, "");
+    public Map<String, Object> peekNode (String inFile, String nodeStartsWith, Boolean primitivesOnly) {
+        return peekNode(inFile, nodeStartsWith, primitivesOnly, "");
     }
 
     private Map<String, Object> peekNode (String inFile, String nodeStartsWith,
-                                          Boolean primitvesOnly, String subnode){
+                                          Boolean primitivesOnly, String subnode){
         // actually need proper error  handling... throws Exception {
         // peeks only one level deep from the root
 
@@ -122,8 +115,8 @@ return tmp;//either empty of filed was found
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (subnode != "") root = root.get(subnode);
-        return getFields(root, nodeStartsWith, primitvesOnly);
+        if (!subnode.equals("")) root = root.get(subnode);
+        return getFields(root, nodeStartsWith, primitivesOnly);
     }
     private static Map<String, Object> getFields (JsonNode data, String nodeStartsWith, Boolean primitivesonly){
         Map<String, Object> attributes = new HashMap<>();

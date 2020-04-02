@@ -15,7 +15,9 @@ public class GraphML_DocEdge {
 
 
 
-    @JacksonXmlProperty( isAttribute = false, localName = "data")
+    @JacksonXmlProperty(localName = "data")
+    //@JacksonXmlProperty( isAttribute = false, localName = "data")
+
     @JacksonXmlElementWrapper(useWrapping = false)
         private List<GraphML_DocEleProperty> eleproperty;
 

@@ -7,7 +7,7 @@ import com.opencsv.bean.AbstractBeanField;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class CSVConvertList extends AbstractBeanField {
+public class CSVConvertList<T,I> extends AbstractBeanField<T,I> {
 public  static String csvsep;
 
     public CSVConvertList() {
@@ -16,7 +16,7 @@ public  static String csvsep;
     }
     public CSVConvertList(String csvsep) {
         super();
-        this.csvsep = csvsep;
+        CSVConvertList.csvsep = csvsep;
     }
 
     @Override
@@ -31,8 +31,7 @@ public  static String csvsep;
     @Override
     public String convertToWrite(Object value) {
         List<String> listie = (List<String>) value;
-        String result = Joiner.on(csvsep).join(listie);
-        return result;
+        return Joiner.on(csvsep).join(listie);
     }
 
 

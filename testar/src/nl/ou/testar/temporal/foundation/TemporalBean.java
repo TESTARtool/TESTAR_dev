@@ -3,7 +3,6 @@ package nl.ou.testar.temporal.foundation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvIgnore;
 import com.opencsv.bean.CsvRecurse;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.alayer.Tag;
@@ -12,9 +11,6 @@ import org.fruit.alayer.windows.UIAMapping;
 import java.util.*;
 
 public class TemporalBean {
-
-    @CsvIgnore
-    private static String version = "20200104";
 
     protected static final String csvsep=";";
     @CsvBindByName
@@ -37,7 +33,7 @@ public class TemporalBean {
         metaData = new TemporalMeta();
     }
     public static String getVersion() {
-        return version;
+        return "20200104";
     }
 
         public String getApplicationName () {

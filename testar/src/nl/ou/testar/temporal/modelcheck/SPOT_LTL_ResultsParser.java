@@ -6,10 +6,7 @@ import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.foundation.Verdict;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class SPOT_LTL_ResultsParser extends ResultsParser {
 
@@ -42,7 +39,6 @@ public class SPOT_LTL_ResultsParser extends ResultsParser {
                 return null;
             }
             int i = 0;
-            boolean toggle=false;
             for (String fResult : formularesults
             ) {
                 TemporalOracle Oracle = oracleColl.get(i);
@@ -132,7 +128,7 @@ public class SPOT_LTL_ResultsParser extends ResultsParser {
                     }
                     Oracle.setExampleRun_Prefix_States(prefixStateList);
                     Oracle.setExampleRun_Prefix_Transitions(prefixTransitionList); //test only
-                    Oracle.set_comments(new ArrayList<>(Arrays.asList("Encoded Formula: "+encodedFormula)));
+                    Oracle.set_comments(new ArrayList<>(Collections.singletonList("Encoded Formula: " + encodedFormula)));
                     for (int j = 0; j < cycleStateList.size(); j++) {
                         String targetState ;
                         String sourceState = cycleStateList.get(j);

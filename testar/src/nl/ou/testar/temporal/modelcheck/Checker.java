@@ -31,42 +31,8 @@ public class Checker {
         Common.RunOSChildProcess(cli);
     }
 
-    public static String LTLParse_VerifiedFormula_BySPOT(String resultsFile, boolean keepLTLFModelVariant) {
-        Scanner scanner = new Scanner(resultsFile);
-        scanner.useDelimiter("\\s*===\\s*");
 
-        if (scanner.hasNext()) {
-            scanner.next();
-            scanner.next(); //throw away 2 headerlines
-        }
-        String formulaline = "";
-        String formula = "";
-
-        StringBuilder formulasParsed = new StringBuilder();
-
-        while (scanner.hasNext()) {
-            String testtoken = scanner.next();
-            if (testtoken.startsWith("Formula")) {
-                String endline = scanner.nextLine();
-                if (endline.contains("LTL model-check End")) {
-                    break;
-                }
-                formulaline = endline; //not the end but a new formula
-                int indexmodel = formulaline.lastIndexOf("[LTLF Model]");
-                int indextrace = formulaline.lastIndexOf("[LTLF G&V]");
-                if (keepLTLFModelVariant) {
-                    formula = indexmodel != -1 ? formulaline.substring(indexmodel) : formulaline.substring(0, indextrace - 1);
-                } else {
-                    formula = formulaline.substring(indextrace, indexmodel - 1);//keep the trace variant
-                }
-                formulasParsed.append(formula).append("\n");
-            }
-            System.out.println("unexpected token <" + testtoken + "> to parse in File: " + resultsFile);
-        }
-        return formulasParsed.toString();
-    }
-
-
+    @SuppressWarnings("unused")
     public static void CTLMC_ByLTSMIN(String pathToExecutable, boolean toWslPath, String automatonFile,
                                       String formulaFile, String resultsFile) {
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;

@@ -9,7 +9,7 @@ public class GraphML_DocNode {
     @JacksonXmlProperty( isAttribute = true)
     private String id;
     //       @JacksonXmlProperty( isAttribute = false, localName = "data")
-    @JacksonXmlProperty( isAttribute = false, localName = "data")
+    @JacksonXmlProperty(  localName = "data")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<GraphML_DocEleProperty> eleProperty;
 

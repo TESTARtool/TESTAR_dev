@@ -32,8 +32,7 @@ public class LTSMIN_LTL_ResultsParser extends ResultsParser {
             return null;
         }
         int i = 0;
-        boolean toggle = false;
-        for (String fResult : formularesults
+         for (String fResult : formularesults
         ) {
             TemporalOracle Oracle = oracleColl.get(i);
             i++;

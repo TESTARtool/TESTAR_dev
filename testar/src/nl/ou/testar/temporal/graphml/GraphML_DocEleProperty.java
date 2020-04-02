@@ -2,7 +2,6 @@ package nl.ou.testar.temporal.graphml;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
-import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

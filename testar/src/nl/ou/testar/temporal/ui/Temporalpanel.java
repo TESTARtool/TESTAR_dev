@@ -88,88 +88,25 @@ public class Temporalpanel {
 
         startAnalyzerBtn.addActionListener(this::startTemporalWebAnalyzer);
         stopAnalyzerBtn.addActionListener(this::stopTemporalWebAnalyzer);
-        clearBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                logArea.setText("cleared");
-            }
-        });
-        ModelOnlyBtn.addActionListener(new ActionListener() {
-                                           @Override
-                                           public void actionPerformed(ActionEvent e) {
-                                               exportTemporalmodel(e);
-                                           }
-                                       }
+        clearBtn.addActionListener(e -> logArea.setText("cleared"));
+        ModelOnlyBtn.addActionListener(this::exportTemporalmodel
         );
-        testDbButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testdbconnection(e);
-            }
-        });
-        selectFilePython_ENV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(PythonEnv_Path);
-            }
-        });
-        selectFilePython_VIZ.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(PythonVisualizer_Path);
-            }
-        });
-        selectFileApModelManager.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(ApModelManagerFile);
-            }
-        });
-        selectFileOracles.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(oracleFile);
-            }
-        });
-        modelCheckBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ModelCheck(e);
-            }
-        });
-        defaultAPModelBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testSaveDefaultApSelectionManagerJSON();
-            }
-        });
-        sampleOracleBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testOracleCSV();
-                testPatternCSV();
-                testPatternConstraintCSV();
-            }
+        testDbButton.addActionListener(this::testdbconnection);
+        selectFilePython_ENV.addActionListener(e -> chooserHelper(PythonEnv_Path));
+        selectFilePython_VIZ.addActionListener(e -> chooserHelper(PythonVisualizer_Path));
+        selectFileApModelManager.addActionListener(e -> chooserHelper(ApModelManagerFile));
+        selectFileOracles.addActionListener(e -> chooserHelper(oracleFile));
+        modelCheckBtn.addActionListener(e -> ModelCheck());
+        defaultAPModelBtn.addActionListener(e -> testSaveDefaultApSelectionManagerJSON());
+        sampleOracleBtn.addActionListener(e -> {
+            testOracleCSV();
+            testPatternCSV();
+            testPatternConstraintCSV();
         });
         graphMLBtn.addActionListener(this::testgraphml);
-        generateBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generateOracles(e);
-            }
-        });
-        selectFilePatterns.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(patternFile);
-            }
-        });
-        selectFilePatternConstraints.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooserHelper(patternConstraintsFile);
-            }
-        });
+        generateBtn.addActionListener(e -> generateOracles());
+        selectFilePatterns.addActionListener(e -> chooserHelper(patternFile));
+        selectFilePatternConstraints.addActionListener(e -> chooserHelper(patternConstraintsFile));
     }
 
     public static Temporalpanel createTemporalPanel() {
@@ -521,7 +458,7 @@ public class Temporalpanel {
         }
     }
 
-    private void ModelCheck(ActionEvent e) {
+    private void ModelCheck() {
 
         tcontrol.MCheck(
                 ApModelManagerFile.getText(),
@@ -535,13 +472,13 @@ public class Temporalpanel {
                 ltsminLTLChecker.getText(), WSLCheckBoxLTLLTSMIN.isSelected(), enableLTSMIN_LTL.isSelected());
     }
 
-    private void generateOracles(ActionEvent e) {
+    private void generateOracles() {
 
         tcontrol.generateOraclesFromPatterns(
                 ApModelManagerFile.getText(),
                 patternFile.getText(),
                 patternConstraintsFile.getText(),
-                Integer.parseInt(tacticComboBox.getSelectedItem().toString()));
+                Integer.parseInt(Objects.requireNonNull(tacticComboBox.getSelectedItem()).toString())); //requirenonnull?
     }
 
 
@@ -587,6 +524,7 @@ public class Temporalpanel {
                 logArea.append("Forcing Visualizer  to Stop.\n");
                 ret = webAnalyzerProcess.waitFor(2, TimeUnit.SECONDS);  //gently wait
             }
+            assert webAnalyzerProcess != null;
             logArea.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
             if (ret) webAnalyzerProcess = null;
             webAnalyzerErr.stop();
@@ -614,7 +552,7 @@ public class Temporalpanel {
             logArea.append("connecting to: db\n");
             logArea.repaint();
             boolean res;
-            res = tcontrol.saveToGraphMLFile("GraphML.XML", false);
+            tcontrol.saveToGraphMLFile("GraphML.XML", false);
             res = tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
 
             logArea.append(" saving to  graphml file done with result:" + res + "\n\n");

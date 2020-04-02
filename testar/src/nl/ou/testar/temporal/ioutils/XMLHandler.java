@@ -11,11 +11,11 @@ import java.nio.charset.StandardCharsets;
 
 public class XMLHandler {
     /**
-     * @param fromFile
-     * @param cls
-     * @return
+     * @param fromFile source file containing the XML
+     * @param cls JAVA Class  to put the XML into
+     * @return Object of type Class containg the XML values
      */
-    private  static Object loadNA(String fromFile, Class cls) { // CLASS method
+    private  static Object load(String fromFile, Class cls) { // CLASS method
 
         try {
             File input = new File(fromFile);
@@ -24,9 +24,6 @@ public class XMLHandler {
                 Object result = objectMapper.readValue(input, cls);
                 return cls.cast(result);
             }
-        } catch (
-                JsonProcessingException e) {
-            e.printStackTrace();
         } catch (
                 IOException e) {
             e.printStackTrace();

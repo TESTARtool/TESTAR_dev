@@ -36,6 +36,7 @@ public class TemporalTrace implements Cloneable{
     public void setTraceEvents(List<TemporalTraceEvent> traceEvents) {
         this.traceEvents = traceEvents;
     }
+    @SuppressWarnings("unused")
     public String getRunDate() {
         return runDate;
     }
@@ -43,6 +44,7 @@ public class TemporalTrace implements Cloneable{
     public void setRunDate(String runDate) {
         this.runDate = runDate;
     }
+    @SuppressWarnings("unused")
     public Long getTransitionCount() {
         return transitionCount;
     }

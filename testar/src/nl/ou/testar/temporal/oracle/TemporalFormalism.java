@@ -55,7 +55,7 @@ public enum TemporalFormalism {
 
     //futures: ,CTLSTAR, LTLTRACEPROM, LTLTRACEQUARRY , MUCALC }
 
-    private TemporalFormalism(String ap_prepend , String ap_append, String line_append,
+    TemporalFormalism(String ap_prepend , String ap_append, String line_append,
                               PairBean<String, String> finally_replace,
                               PairBean<String, String> globally_replace,
                               PairBean<String, String> and_replace,

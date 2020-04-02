@@ -28,8 +28,8 @@ public class SPOT_LTLFormula_ResultsParser {
             scanner.next();
             scanner.next(); //throw away 2 headerlines
         }
-        String formulaline = "";
-        String formula = "";
+        String formulaline;
+        String formula;
 
         List<String> formulasParsed = new ArrayList<>();
 

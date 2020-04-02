@@ -19,8 +19,8 @@ protected static final String csvsep=";";
 
 
     public TemporalMeta() {
-        _log = new ArrayList<String>();
-        _comments = new ArrayList<String>();
+        _log = new ArrayList<>();
+        _comments = new ArrayList<>();
         _modifieddate = LocalDateTime.now().toString();
     }
 

@@ -16,8 +16,8 @@ public class GraphML_DocKey {
     private String attributeName;
     @JacksonXmlProperty( isAttribute = true, localName = "attr.type")
     private String attributeType;
-    @JacksonXmlText
-    private String dummyvalue="";
+    //@JacksonXmlText
+    //private String dummyvalue="";
 
     @Override
     public boolean equals(Object o) {

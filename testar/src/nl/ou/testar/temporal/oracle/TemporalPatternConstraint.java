@@ -36,15 +36,15 @@ public class TemporalPatternConstraint {
     public String getPattern_Formula() {
         return pattern_Formula;
     }
-
+    @SuppressWarnings("unused")
     private  void setPattern_Formula(String pattern_Formula) {
         this.pattern_Formula = pattern_Formula;
     }
-
+    @SuppressWarnings("unused")
     private  MultiValuedMap<String, String> getConstraintMapper() {
         return constraintMapper;
     }
-
+    @SuppressWarnings("unused")
     public void setConstraintMapper(MultiValuedMap<String, String> constraintMapper) {
         this.constraintMapper = constraintMapper;
         for (Map.Entry<String,String> entrie:constraintMapper.entries()
@@ -90,10 +90,11 @@ public class TemporalPatternConstraint {
     public TreeMap<Integer, Map<String, String>> getConstraintSets() {
         return constraintSets;
     }
+
     public Map<String, String> getConstraintSetByIndex(int index) {
         return constraintSets.get(index);
     }
-
+    @SuppressWarnings("unused")
     private void setConstraintSets(TreeMap<Integer, Map<String, String>> constraintSets) {
         this.constraintSets = constraintSets;
         updateConstraintmapper();

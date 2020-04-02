@@ -7,7 +7,7 @@ import com.opencsv.bean.AbstractBeanField;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class CSVConvertMap extends AbstractBeanField {
+public class CSVConvertMap<T,I> extends AbstractBeanField<T,I> {
 public static final String csvsep = ";";
     public static final String kvsep = ":";
 
@@ -22,9 +22,9 @@ public static final String csvsep = ";";
 
     @Override
     public String convertToWrite(Object value) {
+        @SuppressWarnings("unchecked")
         Map<String,String> mappie = (Map<String,String>) value;
-        String result = Joiner.on(csvsep).withKeyValueSeparator(kvsep).join(mappie);
-        return result;
+        return Joiner.on(csvsep).withKeyValueSeparator(kvsep).join(mappie);
     }
 
 

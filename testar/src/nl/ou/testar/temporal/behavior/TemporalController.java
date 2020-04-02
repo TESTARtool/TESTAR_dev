@@ -2,9 +2,6 @@ package nl.ou.testar.temporal.behavior;
 /**
  * Temporal Controller: orchestrates the Model Check function of TESTAR
  */
-
-import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
@@ -47,12 +44,6 @@ import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
 
 public class TemporalController {
-    /**
-     * Constructor
-     */
-
-    // orient db instance that will create database sessions
-    private OrientDB orientDB;
     private Config dbConfig;
     private String ApplicationName;
     private String ApplicationVersion;
@@ -79,7 +70,6 @@ public class TemporalController {
 
     private boolean instrumentDeadlockState;
 
-    private ODatabaseSession db;
     private APModelManager apModelManager;
     private TemporalModel tModel;
     private TemporalDBManager tDBManager;
@@ -154,7 +144,7 @@ public class TemporalController {
         // for new models we enforce this by setting "TemporalConcreteEqualsAbstract = true" in the test.settings file
         // copied from Main.initcodingmanager
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
             CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
         //copied from StateModelManagerFactory
@@ -245,15 +235,6 @@ public class TemporalController {
     }
 
     public void setDefaultAPModelmanager() {
-        List<String> APKey = new ArrayList<>();
- /*       if (tModel != null) {
-            APKey = tModel.getApplication_BackendAbstractionAttributes();
-        }
-        if (APKey != null && !APKey.isEmpty()) {
-            this.apModelManager = new APModelManager(true, APKey);
-        } else {
-            this.apModelManager = new APModelManager(true);
-        }*/
         this.apModelManager = new APModelManager(true);
         tDBManager.setApModelManager(apModelManager);
     }
@@ -310,7 +291,7 @@ public class TemporalController {
                 OVertex stateVertex = op.get();
                 StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
-                boolean deadstate = false;
+                boolean deadstate;
                 Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
                 Iterator<OEdge> edgeiter = outedges.iterator();
                 deadstate = !edgeiter.hasNext();
@@ -344,7 +325,7 @@ public class TemporalController {
                 PairBean<Set<String>,Integer> pb = tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes());
                 propositions.addAll(pb.left());// concrete widgets
                 tModel.addComments("#Widgets of State "+senc.getState()+" = "+pb.right());
-                runningWcount=runningWcount+(int)pb.right();
+                runningWcount=runningWcount+ pb.right();
                 senc.setStateAPs(propositions);
                 if (instrumentDeadState && deadstate) {
                     TransitionEncoding deadTrenc = new TransitionEncoding();
@@ -538,9 +519,6 @@ public class TemporalController {
                             new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
 
-                setOracleColl(fromcoll);
-                updateOracleCollMetaData();
-
                 String strippedFile;
                 String filename = Paths.get(oracleFile).getFileName().toString();
                 if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
@@ -548,16 +526,19 @@ public class TemporalController {
                 File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
 
-                Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =
-                        fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 makeTemporalModel(APModelManagerFile, verbose, instrumentDeadState);
+                setOracleColl(fromcoll);
+                updateOracleCollMetaData();
+                Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =
+                            fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
+
                 if (verbose) {
-                    System.out.println(prettyCurrentTime() + " | " + "generating GraphML files");
-                    saveToGraphMLFile("GraphML.XML", false);
-                    saveToGraphMLFile("GraphML_NoWidgets.XML", true);
-                    System.out.println(prettyCurrentTime() + " | " + "generating APEncodedModel file");
-                    saveModelAsJSON("APEncodedModel.json");
+                System.out.println(prettyCurrentTime() + " | " + "generating GraphML files");
+                saveToGraphMLFile("GraphML.XML", false);
+                saveToGraphMLFile("GraphML_NoWidgets.XML", true);
+                System.out.println(prettyCurrentTime() + " | " + "generating APEncodedModel file");
+                saveModelAsJSON("APEncodedModel.json");
                 }
                 List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
@@ -760,7 +741,7 @@ public class TemporalController {
             boolean passConstraint = false;
             Random constraintRnd = new Random(6000000);
             int cSetindex = -1;
-            Map<String, String> constraintSet = null;
+            Map<String, String> constraintSet;
             patcIndex = -1;
             if (patternConstraints != null) {
                 for (int h = 0; h < patternConstraints.size(); h++) {
@@ -783,7 +764,7 @@ public class TemporalController {
                 for (String param : pat.getPattern_Parameters()
                 ) {
                     passConstraint = false;
-                    String provisionalParamSubstitution = null;
+                    String provisionalParamSubstitution;
                     if (constrainSets == null) {
                         provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
                         ParamSubstitutions.put(param, provisionalParamSubstitution);

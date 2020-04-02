@@ -23,7 +23,7 @@ public class Common {
         wslpath.append("/mnt/");
         wslpath.append(winpath.getRoot().toString().split(":")[0].toLowerCase());  // convert C:\\ --> c
         for (int i = 0; i < winpath.getNameCount(); i++) {
-            wslpath.append("/" + winpath.getName(i));
+            wslpath.append("/").append(winpath.getName(i));
         }
         return wslpath.toString();
     }
@@ -36,12 +36,13 @@ public class Common {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        HttpURLConnection con = null;
+        HttpURLConnection con ;
         try {
             con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");// optional default is GET
             con.setRequestProperty("User-Agent", USER_AGENT);//add request header
-            int responseCode = con.getResponseCode(); //consume and discard responsecode
+            con.getResponseCode(); //consume and discard responsecode
+            //int responseCode = con.getResponseCode(); //consume and discard responsecode
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
@@ -59,8 +60,8 @@ public class Common {
     public static void RunOSChildProcess(String command) {
 
         Process theProcess = null;
-        BufferedReader inStream = null;
-        BufferedReader errStream = null;
+        BufferedReader inStream;
+        BufferedReader errStream;
         String response;
         String errorresponse = null;
 
@@ -104,7 +105,7 @@ public class Common {
         return formatter.format(aDate);
     }
     public static String prettyCurrentTime() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");;
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
         return LocalTime.now().format(dtf);
     }
 }

@@ -10,7 +10,6 @@ import java.util.*;
 public class LTSMIN_CTL_ResultsParser extends ResultsParser {
 
     public List<TemporalOracle> parse(String rawInput) {
-        List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
          while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
@@ -28,7 +27,6 @@ public class LTSMIN_CTL_ResultsParser extends ResultsParser {
             return null;
         }
         int i = 0;
-        boolean toggle = false;
         for (String fResult : formularesults
         ) {
             TemporalOracle Oracle = oracleColl.get(i);

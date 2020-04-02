@@ -15,7 +15,6 @@ public class ITS_LTL_ResultsParser extends ResultsParser {
 
 //an accepting run exists false
 // Formula 0 is TRUE no accepting run found.
-        List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();

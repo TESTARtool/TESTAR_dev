@@ -1,4 +1,5 @@
-/***************************************************************************************************
+/*
+***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
 *
@@ -27,8 +28,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-/**
- *  @author Sebastian Bauersfeld
+/*
+   @author Sebastian Bauersfeld
  */
 
 package nl.ou.testar.temporal.foundation;
@@ -63,7 +64,7 @@ public class PairBean<L, R> implements Serializable {
 	private  R right;
 
 	public static <L, R> PairBean<L, R> from(L left, R right){
-		return new PairBean<L, R>(left, right);
+		return new PairBean<>(left, right);
 	}
 
 	public PairBean(L left, R right){

@@ -22,9 +22,6 @@ public class TemporalPatternBase implements Cloneable{
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> pattern_Parameters; //b0,b1,b2,bn
 
-    @CsvIgnore
-    private String version="20200104";
-
     public TemporalPatternBase() {
     }
 
@@ -36,7 +33,7 @@ public class TemporalPatternBase implements Cloneable{
     public void setPattern_TemporalFormalism(TemporalFormalism pattern_TemporalFormalism) {
         this.pattern_TemporalFormalism = pattern_TemporalFormalism;
     }
-
+    @SuppressWarnings("unused")
     public String getPattern_Scope() {
         return pattern_Scope;
     }
@@ -44,7 +41,7 @@ public class TemporalPatternBase implements Cloneable{
     public void setPattern_Scope(String pattern_Scope) {
         this.pattern_Scope = pattern_Scope;
     }
-
+    @SuppressWarnings("unused")
     public String getPattern_Class() {
         return pattern_Class;
     }
@@ -53,7 +50,7 @@ public class TemporalPatternBase implements Cloneable{
         this.pattern_Class = pattern_Class;
     }
 
-
+    @SuppressWarnings("unused")
     public String getPattern_Description() {
         return pattern_Description;
     }
@@ -78,7 +75,7 @@ public class TemporalPatternBase implements Cloneable{
         this.pattern_Parameters = pattern_Parameters;
     }
     public String getVersion() {
-        return version;
+        return "20200104";
     }
 
 

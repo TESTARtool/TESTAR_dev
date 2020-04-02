@@ -7,13 +7,13 @@ import java.util.List;
 
 public class GraphML_DocGraph {
     @JacksonXmlProperty( isAttribute = true)
-    private String id="G";
+    private String id;
     @JacksonXmlProperty( isAttribute = true)
     private String edgedefault="directed";
-    @JacksonXmlProperty( isAttribute = false, localName = "node")
+    @JacksonXmlProperty(  localName = "node")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<GraphML_DocNode> nodes ;
-    @JacksonXmlProperty( isAttribute = false, localName = "edge")
+    @JacksonXmlProperty( localName = "edge")
     @JacksonXmlElementWrapper(useWrapping = false )
     private List<GraphML_DocEdge> edges ;
 

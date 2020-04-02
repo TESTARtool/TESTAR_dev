@@ -17,11 +17,11 @@ public class GraphML_DocRoot {
 
 
 
-    @JacksonXmlProperty( isAttribute = false)
+    @JacksonXmlProperty()
     @JacksonXmlElementWrapper(useWrapping = false)
     private Set<GraphML_DocKey> key;
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty( isAttribute = false)
+    @JacksonXmlProperty()
     private GraphML_DocGraph graph;
 
     public GraphML_DocRoot(Set<GraphML_DocKey> keys, GraphML_DocGraph graph) {

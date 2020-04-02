@@ -72,7 +72,7 @@ public class APModelManager {
     public Set<String> getAPsOfStateAttribute(String apkey, String transitionProperty, String value) {
         return getStateFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
-
+    @SuppressWarnings("unused")
     public void setStateFilter(APSelector stateFilter) {
         // let the AP selector check for the minimal set
         this.stateFilter.setSelectedStateAttributes(stateFilter.getSelectedAttributes());
@@ -86,7 +86,7 @@ public class APModelManager {
     public Set<String> getAPsOfTransitionAttribute(String apkey, String transitionProperty, String value) {
         return getTransitionFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
-
+    @SuppressWarnings("unused")
     public void setTransitionFilter(APSelector transitionFilter) {
         this.transitionFilter.setSelectedAttributes(transitionFilter.getSelectedAttributes());
         this.transitionFilter.setSelectedExpressions(transitionFilter.getSelectedExpressions());
@@ -94,12 +94,13 @@ public class APModelManager {
     public String getApEncodingSeparator() {
         return apEncodingSeparator;
     }
-
+    @SuppressWarnings("unused")
     public void setApEncodingSeparator(String apEncodingSeparator) {
         this.apEncodingSeparator = apEncodingSeparator;
     }
     @JsonIgnore
-    private  List<String> getAPKey() {
+    @SuppressWarnings("unused")
+    private  List<String> getAPKey() {  // kept for compatability
        return APKey;
     }
 
@@ -114,19 +115,19 @@ public class APModelManager {
     public void setComments(List<String> comments) {
         this.comments = comments;
     }
-
+    @SuppressWarnings("unused")
     public String getFormatVersion() {
         return formatVersion;
     }
-
+    @SuppressWarnings("unused")
     public void setFormatVersion(String formatVersion) {
         this.formatVersion = formatVersion;
     }
-
+    @SuppressWarnings("unused")
     public Set<WidgetFilter> getWidgetfilters() {
         return widgetfilters;
     }
-
+    @SuppressWarnings("unused")
     public void setWidgetfilters(Set<WidgetFilter> widgetfilters) {
         this.widgetfilters = widgetfilters;
     }
@@ -148,19 +149,18 @@ public class APModelManager {
     public void updateFreeFormatText(String freeFormatText) {
         this.freeFormatText = freeFormatText;
     }
-
+    @SuppressWarnings("unused")
     public void addWidgetFilter(WidgetFilter w){
         widgetfilters.add(w);
     }
 
 
     public List<WidgetFilter> passWidgetFilters(Map<String,String> attribmap){
-        boolean pass=false;
         List<WidgetFilter> passedWidgetFilters= new ArrayList<>();
         //pass if each entry in the attribmap matches at least one FilterPart ('disjunction of FilterParts')
         // all values in attribmap are non-empty
 
-        pass = false;
+        boolean pass = false;
         for (WidgetFilter wf : widgetfilters
         ) {
             for (Map.Entry<String, String> entry : attribmap.entrySet()

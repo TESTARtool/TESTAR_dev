@@ -46,7 +46,7 @@ public class TransitionEncoding {
     public String getEncodedTransitionAPConjunct() {
         return encodedTransitionAPConjunct;
     }
-
+    @SuppressWarnings("unused")
     public void setEncodedTransitionAPConjunct(String encodedTransitionAPConjunct) {
         this.encodedTransitionAPConjunct = encodedTransitionAPConjunct;
 
@@ -59,11 +59,13 @@ public class TransitionEncoding {
             boolean b = transitionAPs.stream().anyMatch(str -> str.trim().equals(modelap));
             //encodedresult.append("[");
             if (b){
-                encodedresult.append(""+i); }
+                encodedresult.append(i); }
             else{
                 boolean be = stateAPs.stream().anyMatch(str -> str.trim().equals(modelap));
-                if(be){encodedresult.append(""+i);}
-                else{encodedresult.append("!"+i);}
+                if(be){
+                    encodedresult.append(i);}
+                else{
+                    encodedresult.append("!").append(i);}
             }
             //encodedresult.append("]");
             i++;
