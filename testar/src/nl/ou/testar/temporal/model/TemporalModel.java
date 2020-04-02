@@ -17,19 +17,12 @@ public class TemporalModel extends TemporalBean {
     private List<String> InitialStates;
     private List<TemporalTrace> traces; //
     private List<String> stateList;
-
-
     private List<String> transitionList;
     private Set<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion = "20200104";
+    private String formatVersion = "20200402";
     private static String APPrefix = "ap";
-
-
     private static String deadProposition = "dead";
-
-
-    private String APSeparator;
-
+    //private String APSeparator;
 
     public TemporalModel() {
         super(); // needed ?
@@ -72,13 +65,11 @@ public class TemporalModel extends TemporalBean {
         this.transitionList = transitionList;
     }
 
-    public String getAPSeparator() {
-        return APSeparator;
-    }
+    //public String getAPSeparator() {        return APSeparator;    }
 
-    public void setAPSeparator(String APSeperator) {
-        APSeparator = APSeperator;
-    }
+    //public void setAPSeparator(String APSeperator) {
+    //    APSeparator = APSeperator;
+    //}
 
     public static String getDeadProposition() {
         return deadProposition;

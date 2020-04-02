@@ -149,7 +149,7 @@
                 <properties>
                   <selected value="true"/>
                   <text value="Enforce Abstraction equality"/>
-                  <toolTipText value="&lt;html&gt;Concrete Abstraction attributes in new models are the same as on the Abstract Layer.&lt;br&gt;&#10;(this overrules the ConcreteStateAttributes parameter in the settings file and &lt;br&gt;&#10;the default setting that uses ALL StateAttributes as ConcreteStateAttributes)&lt;br&gt;&#10;It is advised to leave this setting enabled.&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Concrete Abstraction attributes in new models will be the same as on the Abstract Layer.&lt;br&gt;&#10;(this overrules the ConcreteStateAttributes parameter in the settings file and &lt;br&gt;&#10;the default paramater value, when it is not in the settings file  &lt;br&gt;&#10;uses ALL StateAttributes as ConcreteStateAttributes)&lt;br&gt;&#10;It is advised to leave this setting enabled.&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="d9a8" class="javax.swing.JCheckBox" binding="instrumentDeadlockStatesCheckBox">
@@ -392,10 +392,10 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="APSelectorManager:"/>
+                  <text value="APModelManager:"/>
                 </properties>
               </component>
-              <component id="1e04" class="javax.swing.JTextField" binding="ApSelectorManagerFile">
+              <component id="1e04" class="javax.swing.JTextField" binding="ApModelManagerFile">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -428,7 +428,7 @@
                   <text value="..."/>
                 </properties>
               </component>
-              <component id="3c50" class="javax.swing.JButton" binding="selectFileApSelectorManager">
+              <component id="3c50" class="javax.swing.JButton" binding="selectFileApModelManager">
                 <constraints>
                   <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
@@ -502,7 +502,7 @@
                   <text value="Generate:"/>
                 </properties>
               </component>
-              <component id="a1231" class="javax.swing.JButton" binding="defaultSelectorBtn">
+              <component id="a1231" class="javax.swing.JButton" binding="defaultAPModelBtn">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -511,8 +511,8 @@
                   <maximumSize width="130" height="38"/>
                   <minimumSize width="130" height="38"/>
                   <preferredSize width="130" height="30"/>
-                  <text value="AP Selector"/>
-                  <toolTipText value="Generate a default APSelectionManager"/>
+                  <text value="AP Model Mgr"/>
+                  <toolTipText value="Generate a default APModelManager"/>
                 </properties>
               </component>
               <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
@@ -537,7 +537,7 @@
                 <properties>
                   <preferredSize width="78" height="30"/>
                   <text value="Model"/>
-                  <toolTipText value="&lt;html&gt;Exports/transforms the model** from the graphDB  into (JSON) format. &lt;br&gt;&#10;required field: APSelectorManager. This file is used for filtering propositions &lt;BR&gt;&lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. APModelManager is available. This file is used for filtering propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
               <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
@@ -549,7 +549,7 @@
                   <maximumSize width="83" height="38"/>
                   <preferredSize width="90" height="30"/>
                   <text value="GraphML"/>
-                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that the correct &lt;BR&gt;&#10;1. Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel&lt;BR&gt;&#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
               <component id="11461" class="javax.swing.JButton" binding="generateBtn">
@@ -562,7 +562,7 @@
                   <horizontalTextPosition value="0"/>
                   <maximumSize width="81" height="30"/>
                   <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
-                  <toolTipText value="&lt;html&gt;Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &#10;&lt;BR&gt;The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB &lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the APModelManager filters the graph DB &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
@@ -573,7 +573,7 @@
                 <properties>
                   <horizontalTextPosition value="0"/>
                   <text value="Model Check"/>
-                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required field: APSelectorManager. This file is used for filtering propositions &lt;BR&gt;&lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required field: APModelManager. This file is used for filtering propositions &lt;BR&gt;&lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
             </children>

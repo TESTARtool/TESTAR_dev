@@ -21,7 +21,7 @@ import nl.ou.testar.temporal.ioutils.JSONHandler;
 import nl.ou.testar.temporal.model.*;
 import nl.ou.testar.temporal.modelcheck.*;
 import nl.ou.testar.temporal.oracle.*;
-import nl.ou.testar.temporal.selector.APSelectorManager;
+import nl.ou.testar.temporal.selector.APModelManager;
 import nl.ou.testar.temporal.foundation.TagBean;
 import nl.ou.testar.temporal.util.*;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -72,7 +72,7 @@ public class TemporalController {
     private boolean ltlLTSMINToWSLPath;
     private String ltlLTSMINMCCommand;
     private boolean ltlLTSMINEnabled;
-    private String APSelectorFile;
+    private String APModelManagerFile;
     private String oracleFile;
     private boolean verbose;
     private boolean counterExamples;
@@ -80,7 +80,7 @@ public class TemporalController {
     private boolean instrumentDeadlockState;
 
     private ODatabaseSession db;
-    private APSelectorManager apSelectorManager;
+    private APModelManager apModelManager;
     private TemporalModel tModel;
     private TemporalDBManager tDBManager;
     private List<TemporalOracle> oracleColl;
@@ -113,13 +113,13 @@ public class TemporalController {
         ltlLTSMINMCCommand = settings.get(ConfigTags.TemporalLTL_LTSMINChecker);
         ltlLTSMINEnabled = settings.get(ConfigTags.TemporalLTL_LTSMINChecker_Enabled);
 
-        APSelectorFile = settings.get(ConfigTags.TemporalAPSelectorManager);
+        APModelManagerFile = settings.get(ConfigTags.TemporalAPModelManager);
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
         instrumentDeadlockState = settings.get(ConfigTags.TemporalInstrumentDeadlockState);
 
-        setDefaultAPSelectormanager();
+        setDefaultAPModelmanager();
 
     }
 
@@ -213,14 +213,14 @@ public class TemporalController {
     }
 
 
-    public void saveAPSelectorManager(String filename) {
-        JSONHandler.save(apSelectorManager, outputDir + filename, true);
+    public void saveAPModelManager(String filename) {
+        JSONHandler.save(apModelManager, outputDir + filename, true);
     }
 
-    private void loadApSelectorManager(String filename) {
-        this.apSelectorManager = (APSelectorManager) JSONHandler.load(filename, apSelectorManager.getClass());
-        apSelectorManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
-        tDBManager.setApSelectorManager(apSelectorManager);
+    private void loadApModelManager(String filename) {
+        this.apModelManager = (APModelManager) JSONHandler.load(filename, apModelManager.getClass());
+        //apModelManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
+        tDBManager.setApModelManager(apModelManager);
     }
 
     public List<TemporalOracle> getOracleColl() {
@@ -244,17 +244,18 @@ public class TemporalController {
         }
     }
 
-    public void setDefaultAPSelectormanager() {
+    public void setDefaultAPModelmanager() {
         List<String> APKey = new ArrayList<>();
-        if (tModel != null) {
+ /*       if (tModel != null) {
             APKey = tModel.getApplication_BackendAbstractionAttributes();
         }
         if (APKey != null && !APKey.isEmpty()) {
-            this.apSelectorManager = new APSelectorManager(true, APKey);
+            this.apModelManager = new APModelManager(true, APKey);
         } else {
-            this.apSelectorManager = new APSelectorManager(true);
-        }
-        tDBManager.setApSelectorManager(apSelectorManager);
+            this.apModelManager = new APModelManager(true);
+        }*/
+        this.apModelManager = new APModelManager(true);
+        tDBManager.setApModelManager(apModelManager);
     }
 
 
@@ -298,7 +299,6 @@ public class TemporalController {
         OResultSet resultSet = tDBManager.getConcreteStatesFromOrientDb(abstractStateModel);
         totalStates=tDBManager.getConcreteStateCountFromOrientDb(abstractStateModel);
 
-        //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
         boolean firstDeadState = true;
         StateEncoding deadStateEnc;
         while (resultSet.hasNext()) {
@@ -339,7 +339,7 @@ public class TemporalController {
                         stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
                 }
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    tDBManager.computeAtomicPropositions(propertyName, stateVertex, propositions, null, false, false);
+                    tDBManager.computeAtomicPropositions(tModel.getApplication_BackendAbstractionAttributes(),propertyName, stateVertex, propositions, false);
                 }
                 PairBean<Set<String>,Integer> pb = tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes());
                 propositions.addAll(pb.left());// concrete widgets
@@ -356,7 +356,7 @@ public class TemporalController {
                     List<TransitionEncoding> deadTrencList = new ArrayList<>();
                     deadTrencList.add(deadTrenc);
                     senc.setTransitionColl(deadTrencList);
-                } else senc.setTransitionColl(tDBManager.getTransitions(senc.getState()));
+                } else senc.setTransitionColl(tDBManager.getTransitions(senc.getState(),tModel.getApplication_BackendAbstractionAttributes()));
 
                 tModel.addStateEncoding(senc, false);
             }
@@ -386,11 +386,11 @@ public class TemporalController {
             initStates.add(traceevent.getState());
         }
         tModel.setInitialStates(initStates);
-        tModel.setAPSeparator(apSelectorManager.getApEncodingSeparator());
+        //tModel.setAPSeparator(apModelManager.getApEncodingSeparator());
 
         for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
         ) {
-            if (ap.contains(apSelectorManager.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
+            if (ap.contains(apModelManager.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
                 tModel.addLog("WARNING: Model contains dead states (there are states without outgoing edges)");
                 break;
             }
@@ -499,7 +499,7 @@ public class TemporalController {
 
     public void MCheck() {
 
-        MCheck(APSelectorFile, oracleFile, verbose, counterExamples, instrumentDeadlockState,
+        MCheck(APModelManagerFile, oracleFile, verbose, counterExamples, instrumentDeadlockState,
                 ltlSPOTMCCommand, ltlSPOTToWSLPath, ltlSPOTEnabled,
                 ctlITSMCCommand, ctlITSToWSLPath, ctlITSEnabled,
                 ltlITSMCCommand, ltlITSToWSLPath, ltlITSEnabled,
@@ -507,7 +507,7 @@ public class TemporalController {
     }
 
 
-    public void MCheck(String APSelectorFile, String oracleFile,
+    public void MCheck(String APModelManagerFile, String oracleFile,
                        boolean verbose, boolean counterExamples, boolean instrumentDeadState,
                        String ltlSpotMCCommand, boolean ltlSpotWSLPath, boolean ltlSpotEnabled,
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
@@ -531,13 +531,9 @@ public class TemporalController {
                 }
                 else {
 
-                setTemporalModelMetaData(abstractStateModel);
-                //loadApSelectorManager(APSelectorFile);
-                String APCopy = "copy_of_used_" + Paths.get(APSelectorFile).getFileName().toString();
+               // setTemporalModelMetaData(abstractStateModel);
                 String OracleCopy = "copy_of_used_" + Paths.get(oracleFile).getFileName().toString();
                 if (verbose) {
-                 //   Files.copy((new File(APSelectorFile).toPath()),
-                 //           new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     Files.copy((new File(oracleFile).toPath()),
                             new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
@@ -555,7 +551,7 @@ public class TemporalController {
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =
                         fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
-                makeTemporalModel(APSelectorFile, verbose, instrumentDeadState);
+                makeTemporalModel(APModelManagerFile, verbose, instrumentDeadState);
                 if (verbose) {
                     System.out.println(prettyCurrentTime() + " | " + "generating GraphML files");
                     saveToGraphMLFile("GraphML.XML", false);
@@ -690,7 +686,7 @@ public class TemporalController {
         }
     }
 
-    public void makeTemporalModel(String APSelectorFile, boolean verbose, boolean instrumentDeadState) {
+    public void makeTemporalModel(String APModelManagerFile, boolean verbose, boolean instrumentDeadState) {
         try {
             System.out.println(prettyCurrentTime() + " | " + "compute temporal model started");
 
@@ -699,18 +695,18 @@ public class TemporalController {
                 System.err.println("Error: StateModel not available");
             } else {
                 setTemporalModelMetaData(abstractStateModel);
-                if (APSelectorFile.equals("")) {
-                    setDefaultAPSelectormanager();
-                    saveAPSelectorManager("default_APSelectorManager.json");
+                if (APModelManagerFile.equals("")) {
+                    setDefaultAPModelmanager();
+                    saveAPModelManager("APModelManager_default.json");
                 }
                 else {
-                    String APCopy = "copy_of_used_" + Paths.get(APSelectorFile).getFileName().toString();
+                    String APCopy = "copy_of_used_" + Paths.get(APModelManagerFile).getFileName().toString();
                     if (verbose) {
-                        Files.copy((new File(APSelectorFile).toPath()),
+                        Files.copy((new File(APModelManagerFile).toPath()),
                                 new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
-                loadApSelectorManager(APSelectorFile);
+                loadApModelManager(APModelManagerFile);
                 settModel(abstractStateModel, instrumentDeadState);
                 if (verbose) {
                     saveModelAsJSON("APEncodedModel.json");
@@ -724,10 +720,10 @@ public class TemporalController {
 
     }
 
-    public void generateOraclesFromPatterns(String APSelectorfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
+    public void generateOraclesFromPatterns(String APModelManagerfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
         try {
             System.out.println(" potential Oracle generator started \n");
-            makeTemporalModel(APSelectorfile, false, true);
+            makeTemporalModel(APModelManagerfile, false, true);
             List<TemporalPattern> patterns = CSVHandler.load(patternFile, TemporalPattern.class);
             List<TemporalPatternConstraint> patternConstraints = null;
             if (!patternConstraintFile.equals("")) {

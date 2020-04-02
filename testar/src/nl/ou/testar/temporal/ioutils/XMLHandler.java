@@ -10,7 +10,13 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class XMLHandler {
+    /**
+     * @param fromFile
+     * @param cls
+     * @return
+     */
     private  static Object loadNA(String fromFile, Class cls) { // CLASS method
+
         try {
             File input = new File(fromFile);
             if (input.exists()) {

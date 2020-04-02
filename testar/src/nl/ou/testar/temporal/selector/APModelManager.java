@@ -1,12 +1,15 @@
+
 package nl.ou.testar.temporal.selector;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import nl.ou.testar.temporal.foundation.APEncodingSeparator;
 import org.fruit.alayer.Tags;
 
 import java.util.*;
 
 
-public class APSelectorManager {
+public class APModelManager {
 
 
     private  String freeFormatText;
@@ -19,28 +22,26 @@ public class APSelectorManager {
     private List<String> comments = new ArrayList<>();
 
 
-    public APSelectorManager() {
+    public APModelManager() {
         super();
         stateFilter = new APSelector();
         transitionFilter = new APSelector();
         widgetfilters = new LinkedHashSet<>();
-        comments.add(" Apkey must be a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
-        comments.add(" !!!!for STATEfilter: EMPTY 'selectedattributes' or' valuedexpression' will be enriched with 'Role,IsDeadState' attributes and 'exists__' and  expressions");
-       comments.add(" second widget filter lists the default protperties");
-       comments.add(" EMPTY widget <ROLE-PATH-TITLE> filters will result in acceptance of  <ALL ROLE- ALL PATH -ALL TITLE>");
-        comments.add("Note that when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
-        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and is NOT listed in the map of modelAp's");
+        comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsDeadState' 'valuedexpression' with 'exists__' and  expressions");
+        comments.add(" An EMPTY widget condition results in rejection");
+        comments.add("Note that when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is true somewhere in the model. ");
+        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp");
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
 
     }
-    public APSelectorManager(boolean initializeWithDefaults) {
+    public APModelManager(boolean initializeWithDefaults) {
          this(initializeWithDefaults,null);
     }
 
-    public APSelectorManager(boolean initializeWithDefaults,List<String> APKey) {
+    public APModelManager(boolean initializeWithDefaults, List<String> APKey) {
         this();
         if (initializeWithDefaults){
-            updateFreeFormatText("This is a Sample APSelectorManager with two widget filters.");
+            updateFreeFormatText("This is a Sample APModelManager with two widget filters.");
             stateFilter = new APSelector();
             transitionFilter = new APSelector();
             stateFilter.setSelectedStateAttributes(APSelector.useMinimalAttributes());
@@ -63,9 +64,13 @@ public class APSelectorManager {
     }
     //*********************
 
-
-    public APSelector getStateFilter() {
+    @JsonGetter("stateFilter")
+    private  APSelector getStateFilter() {
         return stateFilter;
+    }
+
+    public Set<String> getAPsOfStateAttribute(String apkey, String transitionProperty, String value) {
+        return getStateFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
 
     public void setStateFilter(APSelector stateFilter) {
@@ -73,9 +78,13 @@ public class APSelectorManager {
         this.stateFilter.setSelectedStateAttributes(stateFilter.getSelectedAttributes());
         this.stateFilter.setSelectedExpressions(stateFilter.getSelectedExpressions());
     }
-
-    public APSelector getTransitionFilter() {
+    @JsonGetter("transitionFilter")
+    private   APSelector getTransitionFilter() {
         return transitionFilter;
+    }
+
+    public Set<String> getAPsOfTransitionAttribute(String apkey, String transitionProperty, String value) {
+        return getTransitionFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
 
     public void setTransitionFilter(APSelector transitionFilter) {
@@ -89,9 +98,9 @@ public class APSelectorManager {
     public void setApEncodingSeparator(String apEncodingSeparator) {
         this.apEncodingSeparator = apEncodingSeparator;
     }
-
-    public List<String> getAPKey() {
-        return APKey;
+    @JsonIgnore
+    private  List<String> getAPKey() {
+       return APKey;
     }
 
     public void updateAPKey(List<String> APKey) {
@@ -157,11 +166,11 @@ public class APSelectorManager {
             for (Map.Entry<String, String> entry : attribmap.entrySet()
             ) {
                 pass = false;
-                for (WidgetConditionPart wfpart : wf.getWidgetConditionParts()
+                for (WidgetConditionPart wfConditionPart : wf.getWidgetConditionParts()
                 ) {
-                    if (wfpart.getSelectedAttributes().contains(entry.getKey())) {
+                    if (wfConditionPart.getSelectedAttributes().contains(entry.getKey())) {
                       //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    time: "+System.nanoTime());
-                        Set<String> dummy = wfpart.getAPsOfAttribute("dummy", entry.getKey(), entry.getValue());
+                        Set<String> dummy = wfConditionPart.getAPsOfAttribute("dummy", entry.getKey(), entry.getValue());
                       //  System.out.println("DEBUG: checking done    time: "+System.nanoTime());
                         if (dummy != null && !dummy.isEmpty()) {
                             pass = true;

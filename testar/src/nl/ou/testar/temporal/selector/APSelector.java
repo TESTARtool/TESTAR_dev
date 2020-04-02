@@ -136,16 +136,17 @@ public class APSelector {
     public static final Set<PairBean<InferrableExpression,String>> useMinimalTransSelectedExpressions() {
         // following list is derived by inspecting AnnotatingActionCompiler
         Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Click)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Right Click)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Drag)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Double Click)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Replace ')"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Append ')"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Shortcut Key)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Key)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Bring the system to the foreground)"));
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i: Kill Process)"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Click).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Right Click).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Drag).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Double Click).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Type ).*(?i:into ).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Replace ').*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Append ').*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Shortcut Key).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Key).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Bring the system to the foreground).*"));
+        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i: Kill Process).*"));
         return minve;
     }
 

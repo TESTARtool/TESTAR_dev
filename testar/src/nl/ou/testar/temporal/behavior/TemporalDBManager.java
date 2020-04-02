@@ -21,8 +21,7 @@ import nl.ou.testar.temporal.model.TemporalTrace;
 import nl.ou.testar.temporal.model.TemporalTraceEvent;
 import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.selector.WidgetFilter;
-import nl.ou.testar.temporal.selector.APSelectorManager;
-import org.fruit.alayer.Tags;
+import nl.ou.testar.temporal.selector.APModelManager;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import java.util.*;
@@ -31,7 +30,7 @@ public  class TemporalDBManager {
     private Config dbConfig;
     private OrientDB orientDB;
     private ODatabaseSession db;
-    private APSelectorManager apSelectorManager;  // used by computeProps
+    private APModelManager apModelManager;  // used by computeProps
 
 
 
@@ -56,8 +55,8 @@ public  class TemporalDBManager {
     public void setDb(ODatabaseSession db) {
         this.db = db;
     }
-    public void setApSelectorManager(APSelectorManager apSelectorManager) {
-        this.apSelectorManager = apSelectorManager;
+    public void setApModelManager(APModelManager apModelManager) {
+        this.apModelManager = apModelManager;
 
     }
 
@@ -207,15 +206,15 @@ public  class TemporalDBManager {
             if (result.isVertex()) {
                 Optional<OVertex> op = result.getVertex();
                 if (!op.isPresent()) continue;
-                OVertex stateVertex = op.get();
+                OVertex widgetVertex = op.get();
                 wCount++;
-                List<WidgetFilter> passedWidgetFilters=getPassingWidgetFilters(stateVertex,abstractionAttributes);
-                for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeAtomicPropositions( propertyName, stateVertex, propositions,  passedWidgetFilters,true, false);
+                List<WidgetFilter> passedWidgetFilters=getPassingWidgetFilters(widgetVertex,abstractionAttributes);
+                for (String propertyName : widgetVertex.getPropertyNames()) {
+                    computeAtomicPropositions( abstractionAttributes,propertyName, widgetVertex, propositions,  passedWidgetFilters);
                 }
             }
         }
-        PairBean pb= new PairBean();
+        PairBean<Set<String>,Integer> pb= new PairBean<>();
         pb.setLeft(propositions);
         pb.setRight(wCount);
         resultSet.close();
@@ -237,13 +236,13 @@ public  class TemporalDBManager {
             }
         }
 //        System.out.println("DEBUG: checking widgetfilters for graphelement: " + graphElement.getIdentity().toString()+"     time: "+System.nanoTime());
-        passedWidgetFilters = apSelectorManager.passWidgetFilters(attribmap);//
+        passedWidgetFilters = apModelManager.passWidgetFilters(attribmap);//
 //        System.out.println("DEBUG: check done      time: "+System.nanoTime());
 
         return passedWidgetFilters;
     }
 
-    public List<TransitionEncoding> getTransitions(String state) {
+    public List<TransitionEncoding> getTransitions(String state,List<String> abstractionAttributes) {
         List<TransitionEncoding> trenclist = new ArrayList<>();
 
 
@@ -270,7 +269,7 @@ public  class TemporalDBManager {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    computeAtomicPropositions( propertyName, actionEdge, propositions, null,false, true);
+                    computeAtomicPropositions( abstractionAttributes,propertyName, actionEdge, propositions,  true);
                 }
                 trenc.setTransitionAPs(propositions);
 
@@ -495,37 +494,31 @@ public  class TemporalDBManager {
         return convertedValue;
     }
 
-    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
-        computeAtomicPropositions(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
+    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions,  boolean isEdge) {
+        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, null,false, isEdge);
+    }
+    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters ) {
+        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, passedWidgetFilters,true, false);
     }
 
-    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge, boolean isDeadState) {
-        // isdeadstate is not used
+//    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+//        computeAtomicPropositions(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
+//    }
+
+    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+
         StringBuilder apkey = new StringBuilder();
 
         //compose APkey
-        for (String k : apSelectorManager.getAPKey()
+        for (String k : abstractionAttributes //apModelManager.getAPKey()
         ) {
             Object prop = graphElement.getProperty(k);
             if (prop == null) {
-                String fallback;
-//                Object concreteprop;
-//                if (isWidget) {
-//                    concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
-//                } else
-//                    concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
-//                if (concreteprop == null) {
-//                    fallback = "undefined";
-//                } else {
-//                    fallback = concreteprop.toString();
-//                }
-                fallback = "undefined";
-                apkey.append(fallback);
-                apkey.append(apSelectorManager.getApEncodingSeparator());
+                apkey.append("undefined");
             } else {
                 apkey.append(prop);
-                apkey.append(apSelectorManager.getApEncodingSeparator());
             }
+            apkey.append(apModelManager.getApEncodingSeparator());
         }
         if (isWidget) {
 
@@ -533,16 +526,16 @@ public  class TemporalDBManager {
                 for (WidgetFilter wf : passedWidgetFilters) // add the filter specific elected attributes and expressions
                 {// candidate for refactoring as this requires a double iteration of widget filter
                     //globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
-                    globalPropositions.addAll(wf.getWidgetSelectorPart().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+                    globalPropositions.addAll(wf.getAPsOfWidgetAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
 
                 }
             }
         }
         if (!isWidget && isEdge) {
-            globalPropositions.addAll(apSelectorManager.getTransitionFilter().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+            globalPropositions.addAll(apModelManager.getAPsOfTransitionAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
         if (!isWidget && !isEdge) {
-            globalPropositions.addAll(apSelectorManager.getStateFilter().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+            globalPropositions.addAll(apModelManager.getAPsOfStateAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
 
     }

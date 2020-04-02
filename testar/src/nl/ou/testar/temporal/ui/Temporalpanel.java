@@ -40,11 +40,11 @@ public class Temporalpanel {
     private JTextArea logArea;
     private JButton clearBtn;
     private JTextField patternFile;
-    private JTextField ApSelectorManagerFile;
+    private JTextField ApModelManagerFile;
     private JButton selectFilePatterns;
     private JButton selectFileOracles;
     private JTextField oracleFile;
-    private JButton selectFileApSelectorManager;
+    private JButton selectFileApModelManager;
     private JButton generateBtn;
     private JButton startAnalyzerBtn;
     private JButton stopAnalyzerBtn;
@@ -59,7 +59,7 @@ public class Temporalpanel {
     private JButton selectFilePython_VIZ;
     private JButton testDbButton;
     private JComboBox<String> tacticComboBox;
-    private JButton defaultSelectorBtn;
+    private JButton defaultAPModelBtn;
     private JButton sampleOracleBtn;
     private JButton graphMLBtn;
     private JCheckBox verboseCheckBox;
@@ -119,10 +119,10 @@ public class Temporalpanel {
                 chooserHelper(PythonVisualizer_Path);
             }
         });
-        selectFileApSelectorManager.addActionListener(new ActionListener() {
+        selectFileApModelManager.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                chooserHelper(ApSelectorManagerFile);
+                chooserHelper(ApModelManagerFile);
             }
         });
         selectFileOracles.addActionListener(new ActionListener() {
@@ -137,7 +137,7 @@ public class Temporalpanel {
                 ModelCheck(e);
             }
         });
-        defaultSelectorBtn.addActionListener(new ActionListener() {
+        defaultAPModelBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 testSaveDefaultApSelectionManagerJSON();
@@ -200,7 +200,7 @@ public class Temporalpanel {
         mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
         setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(true);
+        setupPanel.setVisible(false);
         containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
@@ -309,19 +309,19 @@ public class Temporalpanel {
         patternFile.setText("");
         minerPanel.add(patternFile, cc.xyw(2, 8, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label7 = new JLabel();
-        label7.setText("APSelectorManager:");
+        label7.setText("APModelManager:");
         minerPanel.add(label7, cc.xy(1, 4, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        ApSelectorManagerFile = new JTextField();
-        minerPanel.add(ApSelectorManagerFile, cc.xyw(2, 4, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
+        ApModelManagerFile = new JTextField();
+        minerPanel.add(ApModelManagerFile, cc.xyw(2, 4, 2, CellConstraints.FILL, CellConstraints.DEFAULT));
         selectFileOracles = new JButton();
         selectFileOracles.setText("...");
         minerPanel.add(selectFileOracles, cc.xy(4, 10));
         selectFilePatterns = new JButton();
         selectFilePatterns.setText("...");
         minerPanel.add(selectFilePatterns, cc.xy(4, 8));
-        selectFileApSelectorManager = new JButton();
-        selectFileApSelectorManager.setText("...");
-        minerPanel.add(selectFileApSelectorManager, cc.xy(4, 4));
+        selectFileApModelManager = new JButton();
+        selectFileApModelManager.setText("...");
+        minerPanel.add(selectFileApModelManager, cc.xy(4, 4));
         final JLabel label8 = new JLabel();
         label8.setText("Pattern Constraints:");
         minerPanel.add(label8, cc.xy(1, 6, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -350,13 +350,13 @@ public class Temporalpanel {
         final JLabel label9 = new JLabel();
         label9.setText("Generate:");
         minerPanel.add(label9, cc.xy(1, 3, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        defaultSelectorBtn = new JButton();
-        defaultSelectorBtn.setMaximumSize(new Dimension(130, 38));
-        defaultSelectorBtn.setMinimumSize(new Dimension(130, 38));
-        defaultSelectorBtn.setPreferredSize(new Dimension(130, 30));
-        defaultSelectorBtn.setText("AP Selector");
-        defaultSelectorBtn.setToolTipText("Generate a default APSelectionManager");
-        minerPanel.add(defaultSelectorBtn, cc.xy(2, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        defaultAPModelBtn = new JButton();
+        defaultAPModelBtn.setMaximumSize(new Dimension(130, 38));
+        defaultAPModelBtn.setMinimumSize(new Dimension(130, 38));
+        defaultAPModelBtn.setPreferredSize(new Dimension(130, 30));
+        defaultAPModelBtn.setText("AP Model Mgr");
+        defaultAPModelBtn.setToolTipText("Generate a default APModelManager");
+        minerPanel.add(defaultAPModelBtn, cc.xy(2, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         sampleOracleBtn = new JButton();
         sampleOracleBtn.setPreferredSize(new Dimension(110, 30));
         sampleOracleBtn.setText("Sample Oracle");
@@ -366,25 +366,25 @@ public class Temporalpanel {
         ModelOnlyBtn = new JButton();
         ModelOnlyBtn.setPreferredSize(new Dimension(78, 30));
         ModelOnlyBtn.setText("Model");
-        ModelOnlyBtn.setToolTipText("<html>Exports/transforms the model** from the graphDB  into (JSON) format. <br>\nrequired field: APSelectorManager. This file is used for filtering propositions <BR><BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        ModelOnlyBtn.setToolTipText("<html>Exports/transforms the model from the graphDB  into (JSON) format. <br>\n\n** Ensure that <BR>\n1. APModelManager is available. This file is used for filtering propositions <BR>\n2. Application name and version settings on General panel and <BR>\n3. Abstraction settings on the State model panel<BR> \nare saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
         minerPanel.add(ModelOnlyBtn, cc.xy(16, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         graphMLBtn = new JButton();
         graphMLBtn.setMaximumSize(new Dimension(83, 38));
         graphMLBtn.setPreferredSize(new Dimension(90, 30));
         graphMLBtn.setText("GraphML");
-        graphMLBtn.setToolTipText("<html>Exports the model** from the graphDB  into (GRAPHML.XML) format. <br>\n<BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        graphMLBtn.setToolTipText("<html>Exports the model** from the graphDB  into (GRAPHML.XML) format. <br>\n<BR>\n** Ensure that the correct <BR>\n1. Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel<BR>\nare saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
         minerPanel.add(graphMLBtn, cc.xyw(11, 3, 2, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         generateBtn = new JButton();
         generateBtn.setEnabled(true);
         generateBtn.setHorizontalTextPosition(0);
         generateBtn.setMaximumSize(new Dimension(81, 30));
         generateBtn.setText("<html>Generate</html>");
-        generateBtn.setToolTipText("<html>Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. \n<BR>The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html>");
+        generateBtn.setToolTipText("<html>Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. <BR>\nPattern Constraints can be applied to control the ramdom instantiation.\n<BR>\nThe list of  AP's in the model is computed by applying the APModelManager filters the graph DB </html>");
         minerPanel.add(generateBtn, cc.xyw(8, 8, 5));
         modelCheckBtn = new JButton();
         modelCheckBtn.setHorizontalTextPosition(0);
         modelCheckBtn.setText("Model Check");
-        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired field: APSelectorManager. This file is used for filtering propositions <BR><BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired field: APModelManager. This file is used for filtering propositions <BR><BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
         minerPanel.add(modelCheckBtn, cc.xyw(8, 10, 5));
         visualizerPanel = new JPanel();
         visualizerPanel.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:78dlu:noGrow,left:4dlu:noGrow,left:115px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:47px:noGrow,left:27dlu:noGrow,fill:max(d;4px):noGrow", "center:49px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
@@ -466,7 +466,7 @@ public class Temporalpanel {
         enforceAbstractionEquality.setSelected(settings.get(ConfigTags.TemporalConcreteEqualsAbstract));
         oracleFile.setText(settings.get(ConfigTags.TemporalOracles));
         patternFile.setText(settings.get(ConfigTags.TemporalPatterns));
-        ApSelectorManagerFile.setText(settings.get(ConfigTags.TemporalAPSelectorManager));
+        ApModelManagerFile.setText(settings.get(ConfigTags.TemporalAPModelManager));
         patternConstraintsFile.setText(settings.get(ConfigTags.TemporalPatternConstraints));
         String[] comboBoxLabels = settings.get(TemporalGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
         DefaultComboBoxModel<String> cbModel = new DefaultComboBoxModel<>(comboBoxLabels); // read only
@@ -501,7 +501,7 @@ public class Temporalpanel {
         settings.set(ConfigTags.TemporalOffLineEnabled, enableTemporalOfflineOraclesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
         settings.set(ConfigTags.TemporalOracles, oracleFile.getText());
-        settings.set(ConfigTags.TemporalAPSelectorManager, ApSelectorManagerFile.getText());
+        settings.set(ConfigTags.TemporalAPModelManager, ApModelManagerFile.getText());
         settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsFile.getText());
         settings.set(ConfigTags.TemporalInstrumentDeadlockState, instrumentDeadlockStatesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalPythonEnvironment, PythonEnv_Path.getText());
@@ -524,7 +524,7 @@ public class Temporalpanel {
     private void ModelCheck(ActionEvent e) {
 
         tcontrol.MCheck(
-                ApSelectorManagerFile.getText(),
+                ApModelManagerFile.getText(),
                 oracleFile.getText(),
                 verboseCheckBox.isSelected(),
                 CounterExamples.isSelected(),
@@ -538,7 +538,7 @@ public class Temporalpanel {
     private void generateOracles(ActionEvent e) {
 
         tcontrol.generateOraclesFromPatterns(
-                ApSelectorManagerFile.getText(),
+                ApModelManagerFile.getText(),
                 patternFile.getText(),
                 patternConstraintsFile.getText(),
                 Integer.parseInt(tacticComboBox.getSelectedItem().toString()));
@@ -605,7 +605,7 @@ public class Temporalpanel {
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
-        tcontrol.makeTemporalModel(ApSelectorManagerFile.getText(), verboseCheckBox.isSelected(), true);
+        tcontrol.makeTemporalModel(ApModelManagerFile.getText(), verboseCheckBox.isSelected(), true);
     }
 
     private void testgraphml(ActionEvent evt) {
@@ -649,9 +649,9 @@ public class Temporalpanel {
     }
 
     public void testSaveDefaultApSelectionManagerJSON() {
-        logArea.append("Writing a APSelectionManager.JSON\n");
-        tcontrol.setDefaultAPSelectormanager();
-        tcontrol.saveAPSelectorManager("APSelectorManager_Default.json");
+        logArea.append("Writing a APModelManager.JSON\n");
+        tcontrol.setDefaultAPModelmanager();
+        tcontrol.saveAPModelManager("APModelManager_Default.json");
     }
 
 //*******************Eventhandlers

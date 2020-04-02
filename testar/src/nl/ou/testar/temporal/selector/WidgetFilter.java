@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.selector;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.windows.UIATags;
@@ -40,8 +41,13 @@ public class WidgetFilter {//extends APSelector {
     public void setWidgetConditionParts(List<WidgetConditionPart> widgetConditionParts) {
         this.widgetConditionParts = widgetConditionParts;
     }
-    public APSelector getWidgetSelectorPart() {
+    @JsonGetter("widgetSelectorPart")
+    private  APSelector getWidgetSelectorPart() {
         return widgetSelectorPart;
+    }
+
+    public Set<String> getAPsOfWidgetAttribute(String apkey, String transitionProperty, String value) {
+        return getWidgetSelectorPart().getAPsOfAttribute(apkey, transitionProperty, value);
     }
 
     public void setWidgetSelectorPart(APSelector widgetSelectorPart) {
@@ -49,7 +55,7 @@ public class WidgetFilter {//extends APSelector {
     }
 
     public void  setDefaultWidgetFilter() {
-        updateFreeFormatText("==================This is a Sample WidgetFilter, with 3 filter requirements");
+        updateFreeFormatText("==================This is a Sample WidgetFilter, with 3 filter conditions");
         WidgetConditionPart wfp = new WidgetConditionPart();
         Set<String> temp= new  HashSet<String>();
         temp.add(Tags.Role.name());
@@ -74,7 +80,7 @@ public class WidgetFilter {//extends APSelector {
     }
 
     public void setMinimalWidgetFilter() {
-        updateFreeFormatText("==================This is a Sample WidgetFilter, with 1 filter requirements");
+        updateFreeFormatText("==================This is a Sample WidgetFilter, with 1 filter condition");
         WidgetConditionPart wfp2 = new WidgetConditionPart();
         Set<String>   temp= new  HashSet<String>(){{add(UIATags.UIAControlType.name());}};
         wfp2.setSelectedAttributes(temp);

@@ -31,7 +31,7 @@ public class JSONHandler {
         }
         return null;
     }
-    public static void save(Object content, String toFile, boolean failOnEmptyBean) {
+      public static void save(Object content, String toFile, boolean failOnEmptyBean) {
         try {
             File output = new File(toFile);
             ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);

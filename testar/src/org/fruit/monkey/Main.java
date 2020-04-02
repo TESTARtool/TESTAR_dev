@@ -471,7 +471,7 @@ public class Main {
 			defaults.add(Pair.from(TemporalCounterExamples, true));
 			defaults.add(Pair.from(TemporalOracles, ""));
 			defaults.add(Pair.from(TemporalPatterns, ""));
-			defaults.add(Pair.from(TemporalAPSelectorManager, ""));
+			defaults.add(Pair.from(TemporalAPModelManager, ""));
 			defaults.add(Pair.from(TemporalPatternConstraints,""));
 			defaults.add(Pair.from(TemporalGeneratorTactics,new ArrayList<String>() {
 				{
