@@ -182,4 +182,28 @@ task buildWindows(type: Exec) {
 }
 buildWindows.dependsOn classes
 
+/**
+ * Prepare folder structure in /testar/ that allows run TESTAR from the IDE (debugging purposes)
+ */
+task build_IDE_distribution(type: Copy, dependsOn:'build') {
+    group = 'custom_testar'
+    description ='build IDE distribution'
+
+    from 'target/scripts/.'
+    into '.'
+}
+
+task clean_IDE_distribution(type: Delete) {
+    group = 'custom_testar'
+    description ='clean IDE distribution'
+	
+	delete 'settings'
+	delete 'suts'
+	delete 'output'
+	delete 'testar'
+	delete 'testar.bat'
+	delete 'windows.dll'
+	delete 'index.log'
+}
+
 mainClassName='org.fruit.monkey.Main'

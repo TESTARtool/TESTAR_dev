@@ -777,6 +777,12 @@ public final class Util {
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       if (compiler == null) {
+    	  System.out.println("************  WARNING  ************");
+    	  System.out.println("If you are trying to run TESTAR from an IDE");
+    	  System.out.println("-> ADD your JDK as IDE runtime");
+    	  System.out.println("-> Project -> Properties -> JRE system Library -> Edit");
+    	  System.out.println("-> Alternate JDK -> Select JDK -> Apply");
+    	  System.out.println("Run again, IDE should run without exceptions now");
         throw new RuntimeException("JDK required (running inside of JRE)");
       }
       DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
