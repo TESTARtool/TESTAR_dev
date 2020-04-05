@@ -1,7 +1,5 @@
 package nl.ou.testar.temporal.behavior;
-/**
- * Temporal Controller: orchestrates the Model Check function of TESTAR
- */
+
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
@@ -43,8 +41,10 @@ import static nl.ou.testar.temporal.util.Common.prettyCurrentTime;
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
 
+/**
+ * Temporal Controller: orchestrates the Model Check function of TESTAR
+ */
 public class TemporalController {
-    private Config dbConfig;
     private String ApplicationName;
     private String ApplicationVersion;
     private String Modelidentifier;
@@ -79,7 +79,6 @@ public class TemporalController {
         this.ApplicationName = settings.get(ConfigTags.ApplicationName);
         this.ApplicationVersion = settings.get(ConfigTags.ApplicationVersion);
         setModelidentifier(settings);
-        dbConfig = makeConfig(settings);
         if (outputDir.equals("")) {
             this.outputDir = makeOutputDir(settings);
         } else {
@@ -151,33 +150,6 @@ public class TemporalController {
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
         this.Modelidentifier = CodingManager.getAbstractStateModelHash(ApplicationName, ApplicationVersion);
 
-    }
-
-    private Config makeConfig(final Settings settings) {
-        // used here, but controlled on StateModelPanel
-
-        String dataStoreText;
-        String dataStoreServerDNS;
-        String dataStoreDirectory;
-        String dataStoreDBText;
-        String dataStoreUser;
-        String dataStorePassword;
-        String dataStoreType;
-        dataStoreText = settings.get(ConfigTags.DataStore); //assume orientdb
-        dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
-        dataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
-        dataStoreDBText = settings.get(ConfigTags.DataStoreDB);
-        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
-        dataStorePassword = settings.get(ConfigTags.DataStorePassword);
-        dataStoreType = settings.get(ConfigTags.DataStoreType);
-        Config dbconfig = new Config();
-        dbconfig.setConnectionType(dataStoreType);
-        dbconfig.setServer(dataStoreServerDNS);
-        dbconfig.setDatabase(dataStoreDBText);
-        dbconfig.setUser(dataStoreUser);
-        dbconfig.setPassword(dataStorePassword);
-        dbconfig.setDatabaseDirectory(dataStoreDirectory);
-        return dbconfig;
     }
 
     private String makeOutputDir(final Settings settings) {
@@ -269,7 +241,7 @@ public class TemporalController {
 
 
     //*********************************
-    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentDeadState) {
+    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
         long start_time = System.currentTimeMillis();
         int runningWcount=0;
         int stateCount=0;
@@ -279,9 +251,11 @@ public class TemporalController {
         //candidate for refactoring as maintaining Oresultset is responsibility of TemporalDBManager
         OResultSet resultSet = tDBManager.getConcreteStatesFromOrientDb(abstractStateModel);
         totalStates=tDBManager.getConcreteStateCountFromOrientDb(abstractStateModel);
-
-        boolean firstDeadState = true;
-        StateEncoding deadStateEnc;
+        Map<String,Integer> commentWidgetDistri = new HashMap<>();
+        MultiValuedMap<String,String> logNonDeterministicTransitions = new HashSetValuedHashMap<>();
+        List<String> logTerminalStates= new ArrayList<>();
+        boolean firstTerminalState = true;
+        StateEncoding terminalStateEnc;
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -291,19 +265,20 @@ public class TemporalController {
                 OVertex stateVertex = op.get();
                 StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
-                boolean deadstate;
+                boolean terminalState;
                 Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
                 Iterator<OEdge> edgeiter = outedges.iterator();
-                deadstate = !edgeiter.hasNext();
+                terminalState = !edgeiter.hasNext();
 
-                if (deadstate) {
-                    tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition.");
-                    if (instrumentDeadState && firstDeadState) {
+                if (terminalState) {
+                    logTerminalStates.add(stateVertex.getIdentity().toString() );
+                    //tModel.addLog("State: " + stateVertex.getIdentity().toString() + " is terminal.");
+                    if (instrumentTerminalState && firstTerminalState) {
                         //add stateenc for 'Dead', inclusive dead transition selfloop;
-                        deadStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
-                        Set<String> deadStatePropositions = new LinkedHashSet<>();
-                        //deadStatePropositions.add("dead");   //redundant on transition based automatons
-                        deadStateEnc.setStateAPs(deadStatePropositions);
+                        terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
+                        Set<String> terminalStatePropositions = new LinkedHashSet<>();
+                        //terminalStatePropositions.add("dead");   //redundant on transition based automatons
+                        terminalStateEnc.setStateAPs(terminalStatePropositions);
                         TransitionEncoding deadTrenc = new TransitionEncoding();
                         deadTrenc.setTransition(TemporalModel.getDeadProposition() + "_selfloop");
                         deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
@@ -312,22 +287,23 @@ public class TemporalController {
                         deadTrenc.setTransitionAPs(deadTransitionPropositions);
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
-                        deadStateEnc.setTransitionColl(deadTrencList);
-                        tModel.addStateEncoding(deadStateEnc, false);
-                        firstDeadState = false;
+                        terminalStateEnc.setTransitionColl(deadTrencList);
+                        tModel.addStateEncoding(terminalStateEnc, false);
+                        firstTerminalState = false;
                     }
-                    if (!instrumentDeadState)
-                        stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
+                    if (!instrumentTerminalState)
+                        stateVertex.setProperty(TagBean.IsTerminalState.name(), true);  //candidate for refactoring
                 }
                 for (String propertyName : stateVertex.getPropertyNames()) {
                     tDBManager.computeAtomicPropositions(tModel.getApplication_BackendAbstractionAttributes(),propertyName, stateVertex, propositions, false);
                 }
                 PairBean<Set<String>,Integer> pb = tDBManager.getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes());
                 propositions.addAll(pb.left());// concrete widgets
-                tModel.addComments("#Widgets of State "+senc.getState()+" = "+pb.right());
+                commentWidgetDistri.put(senc.getState(),pb.right());
+                //tModel.addComments("#Widgets of State "+senc.getState()+" = "+);
                 runningWcount=runningWcount+ pb.right();
                 senc.setStateAPs(propositions);
-                if (instrumentDeadState && deadstate) {
+                if (instrumentTerminalState && terminalState) {
                     TransitionEncoding deadTrenc = new TransitionEncoding();
                     deadTrenc.setTransition("#" + TemporalModel.getDeadProposition() + "_" + stateVertex.getIdentity().toString());
                     deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
@@ -346,6 +322,8 @@ public class TemporalController {
             System.out.println(prettyCurrentTime() + " | " + "States processed: "+Math.floorDiv((100*stateCount),totalStates)+"%");
         }
         }
+
+
         resultSet.close();
         tModel.finalizeTransitions(); //update once. this is a costly operation
         for (StateEncoding stenc : tModel.getStateEncodings()
@@ -355,10 +333,24 @@ public class TemporalController {
             ) {
                 String enc = tren.getEncodedTransitionAPConjunct();
                 if (encodedConjuncts.contains(enc)) {
-                    tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
+                    logNonDeterministicTransitions.put(stenc.getState(),tren.getTransition());
+                    //tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
                 } else encodedConjuncts.add(enc);
             }
         }
+
+        tModel.addLog("Terminal States : "+logTerminalStates.toString());
+        String mapAsString = commentWidgetDistri.keySet().stream()
+                .map(key -> key + "->" + commentWidgetDistri.get(key))
+                .collect(Collectors.joining(", ", "{", "}"));
+        tModel.addComments("#Widgets per State : "+mapAsString);
+
+        mapAsString = logNonDeterministicTransitions.keySet().stream()
+                .map(key -> key + "->" + logNonDeterministicTransitions.get(key).toString())
+                .collect(Collectors.joining(", ", "{", "}"));
+        tModel.addLog("non-deterministic transitions per State: "+mapAsString);
+
+
         tModel.setTraces(tDBManager.fetchTraces(tModel.getApplication_ModelIdentifier()));
         List<String> initStates = new ArrayList<>();
         for (TemporalTrace trace : tModel.getTraces()
@@ -366,16 +358,9 @@ public class TemporalController {
             TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
             initStates.add(traceevent.getState());
         }
-        tModel.setInitialStates(initStates);
-        //tModel.setAPSeparator(apModelManager.getApEncodingSeparator());
 
-        for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
-        ) {
-            if (ap.contains(apModelManager.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
-                tModel.addLog("WARNING: Model contains dead states (there are states without outgoing edges)");
-                break;
-            }
-        }
+        tModel.setInitialStates(initStates);
+
         tModel.addComments("Total #Widgets = "+runningWcount);
         long end_time = System.currentTimeMillis();
         long difference = (end_time-start_time)/1000;
@@ -388,8 +373,8 @@ public class TemporalController {
         AbstractStateModel abstractStateModel;
         abstractStateModel = tDBManager.selectAbstractStateModelByModelId(Modelidentifier);
         if (abstractStateModel == null) {
-            tModel.addLog("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + dbConfig.getDatabase()+">");
-            System.out.println("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + dbConfig.getDatabase()+">");
+            tModel.addLog("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + tDBManager.getDatabase()+">");
+            System.out.println("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + tDBManager.getDatabase()+">");
         }
         return abstractStateModel;
     }
@@ -489,7 +474,7 @@ public class TemporalController {
 
 
     public void MCheck(String APModelManagerFile, String oracleFile,
-                       boolean verbose, boolean counterExamples, boolean instrumentDeadState,
+                       boolean verbose, boolean counterExamples, boolean instrumentTerminalState,
                        String ltlSpotMCCommand, boolean ltlSpotWSLPath, boolean ltlSpotEnabled,
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
@@ -527,15 +512,16 @@ public class TemporalController {
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
 
 
-                makeTemporalModel(APModelManagerFile, verbose, instrumentDeadState);
+                makeTemporalModel(APModelManagerFile, verbose, instrumentTerminalState);
                 setOracleColl(fromcoll);
                 updateOracleCollMetaData();
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =
                             fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 if (verbose) {
-                System.out.println(prettyCurrentTime() + " | " + "generating GraphML files");
+                System.out.println(prettyCurrentTime() + " | " + "generating GraphML.XML file");
                 saveToGraphMLFile("GraphML.XML", false);
+                System.out.println(prettyCurrentTime() + " | " + "generating GraphML_NoWidgets.XML file");
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true);
                 System.out.println(prettyCurrentTime() + " | " + "generating APEncodedModel file");
                 saveModelAsJSON("APEncodedModel.json");
@@ -559,7 +545,7 @@ public class TemporalController {
                     if (ltlSpotEnabled && (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL || TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_SPOT)) {
                         automatonFile = new File(outputDir + "Model.hoa");
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
-                        String aliveprop = gettModel().getPropositionIndex("!" + TemporalModel.getDeadProposition()); //instrumentDeadState will determine whether this return value is ""
+                        String aliveprop = gettModel().getPropositionIndex("!" + TemporalModel.getDeadProposition()); //instrumentTerminalState will determine whether this return value is ""
                         saveFormulaFiles(oracleList, formulaFile);
                         Checker.LTLMC_BySPOT(ltlSpotMCCommand, ltlSpotWSLPath, counterExamples, automatonFile.getAbsolutePath(),
                                 formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
@@ -577,7 +563,7 @@ public class TemporalController {
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
 
                         //formula ltl model variant converter
-                        // instrumentDeadState will determine whether this return value is ""
+                        // instrumentTerminalState will determine whether this return value is ""
                         String aliveprop = gettModel().getPropositionIndex("!" + TemporalModel.getDeadProposition());
                         if (!aliveprop.equals("")) {
                             saveFormulaFiles(oracleList, formulaFile, false);
@@ -599,7 +585,7 @@ public class TemporalController {
                         } else {
                             saveFormulaFiles(oracleList, formulaFile, true);
                         }
-                        ResultsParser sParse = null;
+                        ResultsParser sParse ;
                         if (ltlItsEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_ITS) {
                             Checker.LTLMC_ByITS(ltlItsMCCommand, ltlItsWSLPath, counterExamples, automatonFile.getAbsolutePath(),
                                     formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
@@ -667,7 +653,7 @@ public class TemporalController {
         }
     }
 
-    public void makeTemporalModel(String APModelManagerFile, boolean verbose, boolean instrumentDeadState) {
+    public void makeTemporalModel(String APModelManagerFile, boolean verbose, boolean instrumentTerminalState) {
         try {
             System.out.println(prettyCurrentTime() + " | " + "compute temporal model started");
 
@@ -688,7 +674,7 @@ public class TemporalController {
                     }
                 }
                 loadApModelManager(APModelManagerFile);
-                settModel(abstractStateModel, instrumentDeadState);
+                settModel(abstractStateModel, instrumentTerminalState);
                 if (verbose) {
                     saveModelAsJSON("APEncodedModel.json");
                 }
@@ -714,6 +700,7 @@ public class TemporalController {
             File PotentialoracleFile = new File(outputDir + "TemporalPotentialOracles.csv");
 
             List<TemporalOracle> fromcoll;
+            assert patterns != null;
             fromcoll = getPotentialOracles(patterns, patternConstraints, tactic_oraclesPerPattern);
             CSVHandler.save(fromcoll, PotentialoracleFile.getAbsolutePath());
 

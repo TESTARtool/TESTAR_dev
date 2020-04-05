@@ -11,18 +11,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class CSVHandler {
-    public static List load(String fromFile, Class cls) { // CLASS method
+    public static <T> List<T> load(String fromFile, Class<T> cls) { // CLASS method
         try {
             File input = new File(fromFile);
             if (input.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(input.getAbsoluteFile()));
-
-
                 FileInputStream fis = new FileInputStream(fromFile);
-                     InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                List result  = new CsvToBeanBuilder(isr).withType(cls).withSeparator(';').build().parse();
-               // List result  = new CsvToBeanBuilder(reader).withType(cls).build().parse();
-                return result;
+                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                CsvToBeanBuilder<T> csvBuilder= new CsvToBeanBuilder<>(isr)  ;
+                return csvBuilder.withType(cls).withSeparator(';').build().parse();
             }
         }  catch (
                 IOException e) {
@@ -30,7 +26,7 @@ public class CSVHandler {
         }
         return null;
     }
-    public static void save(List content, String toFile) {
+    public static <T>void save(List<T> content, String toFile) {
         try {
             //File output = new File(toFile);
             //if (output.exists() || output.createNewFile()) {
@@ -40,7 +36,7 @@ public class CSVHandler {
 
                 //BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
                 //StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-                StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(osw).withSeparator(';').build();
+                StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(osw).withSeparator(';').build();
 
                 beanToCsv.write(content);
                 //writer.close();

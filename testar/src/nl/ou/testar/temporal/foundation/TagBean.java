@@ -32,6 +32,9 @@
 /*
  *  @author Sebastian Bauersfeld
  */
+/*
+ * forked CSS 2019-20120
+ */
 package nl.ou.testar.temporal.foundation;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -51,14 +54,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * They have a name and a type and are associated with values who must be of that type. 
  */
 public final class TagBean<T> implements Serializable{  // copy of TAg class, but that was final, could not read/write to files
-	private final static ConcurrentHashMap<TagBean<?>, TagBean<?>> existingTags = new ConcurrentHashMap<TagBean<?>, TagBean<?>>();
+	private final static ConcurrentHashMap<TagBean<?>, TagBean<?>> existingTags = new ConcurrentHashMap<>();
 
-	/**
-	 * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>.
-	 * @param name The name of the tag
-	 * @param valueType The type of the values that are associated with this tag.
-	 * @return A tag object.
-	 */
+
 
 	@JsonIgnore  // not interested in clazz.  name of the tag is unique.
 	private  Class<?> clazz;
@@ -68,17 +66,22 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 	public TagBean() {  //for JSON handler
 	}
 
-
+	/**
+	 * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>.
+	 * @param name The name of the tag
+	 * @param valueType The type of the values that are associated with this tag.
+	 * @return A tag object.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T> TagBean<T> from(String name, Class<?> valueType){
 		Assert.notNull(name, valueType);
-		TagBean<T> ret = new TagBean<T>(name, valueType);
+		TagBean<T> ret = new TagBean<>(name, valueType);
 		TagBean<T> existing = (TagBean<T>)existingTags.putIfAbsent(ret, ret);
 		if(existing != null)
 			return existing;
 		return ret;
 	}
-	public static final TagBean<Boolean> IsDeadState = TagBean.from("IsDeadState", Boolean.class);   //refactoring candidate
+	public static final TagBean<Boolean> IsTerminalState = TagBean.from("IsTerminalState", Boolean.class);   //refactoring candidate
 
 	private static final long serialVersionUID = -1215427100999751199L;
 
@@ -89,8 +92,8 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 	public void setTheClazz(String claz)  {
 		try {
 
-			Class cl = Class.forName(claz);
-			this.clazz = (Class<?>) cl;
+			Class<?> cl = Class.forName(claz);
+			this.clazz =  cl;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

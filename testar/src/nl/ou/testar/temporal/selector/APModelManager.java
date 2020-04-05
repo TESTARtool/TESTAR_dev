@@ -27,7 +27,7 @@ public class APModelManager {
         stateFilter = new APSelector();
         transitionFilter = new APSelector();
         widgetfilters = new LinkedHashSet<>();
-        comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsDeadState' 'valuedexpression' with 'exists__' and  expressions");
+        comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsTerminalState' 'valuedexpression' with 'exists__' and  expressions");
         comments.add(" An EMPTY widget condition results in rejection");
         comments.add("Note that when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is true somewhere in the model. ");
         comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp");

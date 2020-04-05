@@ -11,7 +11,7 @@ public  enum InferrableExpression {
     textlength_lt_("text"),
     is_blank_("boolean"),
     exists_("boolean"),
-    is_deadstate_("boolean"), //not used anymore, deadstate requires special handling
+    //is_deadstate_("boolean"), //not used anymore, deadstate requires special handling
     ;
 
     public final String typ;

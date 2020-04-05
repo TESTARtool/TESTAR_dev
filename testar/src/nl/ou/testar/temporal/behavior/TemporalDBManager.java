@@ -98,8 +98,9 @@ public  class TemporalDBManager {
             db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
         }
         db.activateOnCurrentThread();
-
-
+    }
+    public String getDatabase(){
+        return dbConfig.getDatabase();
     }
 
     /**
@@ -107,6 +108,7 @@ public  class TemporalDBManager {
      *
      * @return List of AbstractStateModels
      */
+    @SuppressWarnings("unchecked")
     public List<AbstractStateModel> fetchAbstractModels() {
         dbReopen();
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();

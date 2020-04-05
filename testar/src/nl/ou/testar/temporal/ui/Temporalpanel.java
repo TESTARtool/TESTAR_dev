@@ -137,7 +137,7 @@ public class Temporalpanel {
         mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
         setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(false);
+        setupPanel.setVisible(true);
         containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
@@ -164,7 +164,7 @@ public class Temporalpanel {
         enforceAbstractionEquality = new JCheckBox();
         enforceAbstractionEquality.setSelected(true);
         enforceAbstractionEquality.setText("Enforce Abstraction equality");
-        enforceAbstractionEquality.setToolTipText("<html>Concrete Abstraction attributes in new models are the same as on the Abstract Layer.<br>\n(this overrules the ConcreteStateAttributes parameter in the settings file and <br>\nthe default setting that uses ALL StateAttributes as ConcreteStateAttributes)<br>\nIt is advised to leave this setting enabled.</html>");
+        enforceAbstractionEquality.setToolTipText("<html>Concrete Abstraction attributes in new models will be the same as on the Abstract Layer.<br>\n(this overrules the ConcreteStateAttributes parameter in the settings file and <br>\nthe default paramater value, when it is not in the settings file  <br>\nuses ALL StateAttributes as ConcreteStateAttributes)<br>\nIt is advised to leave this setting enabled.</html>");
         setupPanel.add(enforceAbstractionEquality, cc.xyw(1, 3, 3));
         instrumentDeadlockStatesCheckBox = new JCheckBox();
         instrumentDeadlockStatesCheckBox.setText("Instrument deadlock states");
@@ -211,6 +211,8 @@ public class Temporalpanel {
         enableITS_CTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
         setupPanel.add(enableITS_CTL, cc.xy(7, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableITS_LTL = new JCheckBox();
+        enableITS_LTL.setEnabled(true);
+        enableITS_LTL.setSelected(false); //css: false positives result from this checker
         enableITS_LTL.setText("Enable");
         enableITS_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
         enableITS_LTL.setVisible(false);

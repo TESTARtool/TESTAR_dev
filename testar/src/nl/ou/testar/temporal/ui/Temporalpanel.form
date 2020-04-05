@@ -264,6 +264,8 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="true"/>
+                  <selected value="false"/>
                   <text value="Enable"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                   <visible value="false"/>

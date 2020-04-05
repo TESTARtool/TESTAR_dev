@@ -13,16 +13,15 @@ public class XMLHandler {
     /**
      * @param fromFile source file containing the XML
      * @param cls JAVA Class  to put the XML into
-     * @return Object of type Class containg the XML values
+     * @return Object of type Class containing the XML values
      */
-    private  static Object load(String fromFile, Class cls) { // CLASS method
-
+    @SuppressWarnings("unused")
+    private static <T> T load(String fromFile, Class<T> cls) { // future use
         try {
             File input = new File(fromFile);
             if (input.exists()) {
                 ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-                Object result = objectMapper.readValue(input, cls);
-                return cls.cast(result);
+                return objectMapper.readValue(input, cls);
             }
         } catch (
                 IOException e) {
@@ -33,34 +32,13 @@ public class XMLHandler {
     public static void save(Object content, String toFile, boolean failOnEmptyBean) {
         try {
             File output = new File(toFile);
-
-            //ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-            //objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-            // let's write the resulting json to a file
             if (output.exists() || output.createNewFile()) {
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
                 xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-
                 //xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 //xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-
-               /* StringWriter stringWriter = new StringWriter();
-                XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-                xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-                // above line is not recommended https://github.com/FasterXML/jackson-dataformat-xml/issues/326#issue-391788245
-                XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(stringWriter);
-
-
-                //xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-                sw.writeStartDocument("utf-8","1.0");
-                xmlMapper.writeValue(sw,content);
-                sw.writeComment("test CSS");
-                sw.writeEndDocument();
-                sw.flush();
-                sw.close();
-                */
                 String result = xmlMapper.writeValueAsString(content);
                 BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));//, StandardCharsets.UTF_8));
                 writer.append(result);
