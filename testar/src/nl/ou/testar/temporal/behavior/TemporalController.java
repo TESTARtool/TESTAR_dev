@@ -7,6 +7,7 @@ import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.foundation.PairBean;

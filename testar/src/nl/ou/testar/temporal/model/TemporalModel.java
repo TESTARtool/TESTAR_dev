@@ -193,9 +193,12 @@ public class TemporalModel extends TemporalBean {
         return result.toString();
     }
 
+
     public String makeETFOutput() {
         //see https://ltsmin.utwente.nl/assets/man/etf.html
         StringBuilder result = new StringBuilder();
+        StringBuilder temptransresult = new StringBuilder();
+
         result.append("%tool: \"TESTAR-CSS20200126\"\n");
         result.append("%name: \"" + "app= ").
                 append(this.getApplicationName()).
@@ -224,31 +227,70 @@ public class TemporalModel extends TemporalBean {
         result.append("begin edge\n");
         //result.append("transition:transition\n");
         result.append("end edge\n");
+
         result.append("begin init\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
+        if (InitialStates.size()>1) {
+            result.append("%Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
+            result.append("%Requires that formulas need to be modified: F(f) => X(f), where X is the next Operator\n");
+            result.append("%To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
+            //make new initial state
 
+            for (String ignore :modelAPs) {
+                result.append("0 ");
+            }
+            result.append("\n");
 
-        for (String initstate : initialStatesSet
-        ) {
-            for (StateEncoding stenc : stateEncodings
+        }
+        else{
+            for (String initstate : initialStatesSet  //max one !!
             ) {
-                if (stenc.getState().equals(initstate)) {
-                    //           result.append("" + stateid + " ");
-                    String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
-                    for (String ap : stateaps
-                    ) {
-                        if (ap.startsWith("!")) {
-                            result.append("0 ");
-                        } else {
-                            result.append("1 ");
+                for (StateEncoding stenc : stateEncodings
+                ) {
+                    if (stenc.getState().equals(initstate)) {
+                        String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+                        for (String ap : stateaps
+                        ) {
+                            if (ap.startsWith("!")) {
+                                result.append("0 ");
+                            } else {
+                                result.append("1 ");
+                            }
                         }
+                        result.append("\n");
                     }
-                    result.append("\n");
                 }
             }
-        }
+            }
+
         result.append("end init\n");
 
+
+        if (InitialStates.size()>1) {
+            //add artificial transitions
+            result.append("begin trans\n");
+            result.append("%artificial transitions to original initial states\n");
+            for (String initstate : initialStatesSet
+            ) {
+                for (StateEncoding stenc : stateEncodings
+                ) {
+                    if (stenc.getState().equals(initstate)) {
+                        String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+                        for (String ap : stateaps
+                        ) {
+                            if (ap.startsWith("!")) {
+                                result.append("0/0 ");  //first zero aligns with the artificial initial state values
+                            } else {
+                                result.append("0/1 ");
+                            }
+                        }
+                        result.append("\n");
+                    }
+                }
+            }
+            result.append("end trans\n");
+
+        }
         result.append("begin trans\n");
         for (StateEncoding stenc : stateEncodings
         ) {
@@ -336,7 +378,7 @@ public class TemporalModel extends TemporalBean {
         int i = 0;
         result.append("int ");
         String artifical_StartState=""+ (int)Math.pow(2,20); //assume max 1 million states
-        result.append("stateindex = "+artifical_StartState +" ;\n");
+        result.append("stateindex = ").append(artifical_StartState).append(" ;\n");
 
         for (String ignored : modelAPs) {
             result.append("int ");
@@ -476,7 +518,7 @@ public class TemporalModel extends TemporalBean {
             Collections.sort(sortedparameters);
             List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
             sortedsubstitionvalues.removeAll(Collections.singletonList(""));  // discard empty substitutions
-            TemporalFormalism tst = TemporalFormalism.valueOf(candidateOracle.getPatternTemporalType().name());
+            TemporalFormalism tFormalism = TemporalFormalism.valueOf(candidateOracle.getPatternTemporalType().name());
 
             boolean importStatus;
             importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
@@ -496,7 +538,7 @@ public class TemporalModel extends TemporalBean {
             if (!importStatus) {
                 String falseFormula="false";
                 candidateOracle.addLog("setting formula to 'false'");
-                String  formulalvl6= StringUtils.replace(falseFormula,tst.false_replace.getLeft(), tst.false_replace.getRight()) + tst.line_append;
+                String  formulalvl6= StringUtils.replace(falseFormula,tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight()) + tFormalism.line_append;
                 Formulas.append(formulalvl6);
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             } else {
@@ -524,19 +566,32 @@ public class TemporalModel extends TemporalBean {
 
                     {
                         String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
-                        String formulalvl1 = rawFormula + tst.line_append;
-                        String formulalvl2 = StringUtils.replace(formulalvl1,
-                                tst.finally_replace.getLeft(), tst.finally_replace.getRight());
-                        String formulalvl3 = StringUtils.replace(formulalvl2,
-                                tst.globally_replace.getLeft(), tst.globally_replace.getRight());
-                        String formulalvl4 = StringUtils.replace(formulalvl3,
-                                tst.and_replace.getLeft(), tst.and_replace.getRight());
-                        String formulalvl5 = StringUtils.replace(formulalvl4,
-                                tst.or_replace.getLeft(), tst.or_replace.getRight());
-                        String formulalvl6 = StringUtils.replace(formulalvl5,
-                                tst.false_replace.getLeft(), tst.false_replace.getRight());
+                        String formulalvl0 = rawFormula;
+                        if( getInitialStates().size()>1){
+                            // ETF models can only have just 1 initial state.
+                            if (tFormalism == TemporalFormalism.CTL ||
+                                tFormalism == TemporalFormalism.CTL_ITS){ //||tFormalism == TemporalFormalism.CTL_LTSMIN){
+                                formulalvl0="AX("+rawFormula+")";
+                            }
+                            if (tFormalism == TemporalFormalism.LTL_ITS){ //|| tFormalism == TemporalFormalism.LTL_LTSMIN){
+                                formulalvl0="X("+rawFormula+")";
+                            }
 
-                        apindex.replaceAll(s -> tst.ap_prepend + s + tst.ap_append);
+                        }
+
+                        String formulalvl1 = formulalvl0 + tFormalism.line_append;
+                        String formulalvl2 = StringUtils.replace(formulalvl1,
+                                tFormalism.finally_replace.getLeft(), tFormalism.finally_replace.getRight());
+                        String formulalvl3 = StringUtils.replace(formulalvl2,
+                                tFormalism.globally_replace.getLeft(), tFormalism.globally_replace.getRight());
+                        String formulalvl4 = StringUtils.replace(formulalvl3,
+                                tFormalism.and_replace.getLeft(), tFormalism.and_replace.getRight());
+                        String formulalvl5 = StringUtils.replace(formulalvl4,
+                                tFormalism.or_replace.getLeft(), tFormalism.or_replace.getRight());
+                        String formulalvl6 = StringUtils.replace(formulalvl5,
+                                tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight());
+
+                        apindex.replaceAll(s -> tFormalism.ap_prepend + s + tFormalism.ap_append);
 
                         formula = StringUtils.replaceEach(formulalvl6,
                                 sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));

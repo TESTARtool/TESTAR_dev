@@ -148,7 +148,7 @@ public class GeneralPanel extends JPanel implements Observer {
     add(applicationVersionField);
     //css Q&D 20200102
     JButton btnSave = new JButton("Save");
-    btnSave .setBounds(510, 325, 100, 25);
+    btnSave .setBounds(225, 242, 100, 25);
     btnSave .addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) { settingsDialog.saveCurrentSettings();}});

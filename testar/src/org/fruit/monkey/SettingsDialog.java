@@ -196,7 +196,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
     miscPanel.checkSettings();
   }
-/*  private void aveCurrentSettings() {
+/*  private void saveCurrentSettings() {
 
     extractInformation(settings);
     try {
