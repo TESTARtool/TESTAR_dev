@@ -30,20 +30,16 @@
 
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.UnProc;
-import org.fruit.Util;
+import org.fruit.*;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
@@ -51,6 +47,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import org.fruit.alayer.windows.Windows10;
 
 import static org.fruit.monkey.ConfigTags.*;
 
@@ -116,6 +113,8 @@ public class Main {
 
 			initCodingManager(settings);
 
+			initOperatingSystem();
+
 			startTestar(settings, testSettingsFileName);
 		}
 
@@ -129,6 +128,8 @@ public class Main {
 				setTestarDirectory(settings);
 
 				initCodingManager(settings);
+
+				initOperatingSystem();
 
 				startTestar(settings, testSettingsFileName);
 			}
@@ -451,56 +452,15 @@ public class Main {
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
-
-			defaults.add(Pair.from(TemporalLTL_SPOTChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_SPOTCheckerWSL, true));
-			defaults.add(Pair.from(TemporalLTL_SPOTChecker_Enabled, false));
-			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
-			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, true));
-			defaults.add(Pair.from(TemporalCTL_ITSChecker_Enabled, false));
-			defaults.add(Pair.from(TemporalLTL_ITSChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, true));
-			defaults.add(Pair.from(TemporalLTL_ITSChecker_Enabled, false));
-			defaults.add(Pair.from(TemporalLTL_LTSMINChecker, ""));
-			defaults.add(Pair.from(TemporalLTL_LTSMINCheckerWSL, true));
-			defaults.add(Pair.from(TemporalLTL_LTSMINChecker_Enabled, false));
-			defaults.add(Pair.from(TemporalOffLineEnabled, false));
-			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, true));
-			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
-			defaults.add(Pair.from(TemporalVerbose, true));
-			defaults.add(Pair.from(TemporalCounterExamples, true));
-			defaults.add(Pair.from(TemporalOracles, ""));
-			defaults.add(Pair.from(TemporalPatterns, ""));
-			defaults.add(Pair.from(TemporalAPModelManager, ""));
-			defaults.add(Pair.from(TemporalPatternConstraints,""));
-			defaults.add(Pair.from(TemporalGeneratorTactics,new ArrayList<String>() {
-				{
-					add("10");
-					add("100");
-				}
-			}));
-			defaults.add(Pair.from(TemporalDirectory, "temporal"));
-			defaults.add(Pair.from(TemporalSubDirectories, true));
-			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
-			defaults.add(Pair.from(TemporalVisualizerServer, ""));
-			defaults.add(Pair.from(TemporalVisualizerURL, ""));
-			defaults.add(Pair.from(TemporalVisualizerURLStop, ""));
-
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
 					add("WidgetControlType");
-				}
-			}));
-			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<String>() {
-				{
-					add("WidgetControlType");
-					add("WidgetPath");
-					add("WidgetTitle");
 				}
 			}));
 
@@ -689,32 +649,18 @@ public class Main {
 	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
-		int i;
-		// concrete state id from settings file
 
-
-		// then the attributes for the abstract state id
-		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-			Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
-			CodingManager.setCustomTagsForAbstractId(abstractTags);
-
-		}
-		if (settings.get(ConfigTags.TemporalConcreteEqualsAbstract)) {
-			Tag<?>[] abstractTags = CodingManager.getCustomTagsForAbstractId();
-			CodingManager.setCustomTagsForConcreteId(abstractTags);
-		} else {
-			if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-				Tag<?>[] concreteTags = settings.get(ConcreteStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
-				CodingManager.setCustomTagsForConcreteId(concreteTags);
-			} else {
-				Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-				// for the concrete state tags we use all the state management tags that are available
-				if (!stateManagementTags.isEmpty()) {
-					CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
-				}
-			}
+        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+        // for the concrete state tags we use all the state management tags that are available
+		if (!stateManagementTags.isEmpty()) {
+			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 		}
 
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
     }
 
 }

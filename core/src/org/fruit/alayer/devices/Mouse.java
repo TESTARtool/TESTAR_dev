@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013-2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -41,4 +42,5 @@ public interface Mouse {
 	void isPressed(MouseButtons k);
 	void setCursor(double x, double y);
 	Point cursor();
+	void setCursorDisplayScale(double displayScale);
 }

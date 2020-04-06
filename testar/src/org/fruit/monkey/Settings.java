@@ -34,6 +34,16 @@
  */
 package org.fruit.monkey;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -42,10 +52,6 @@ import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
-
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
@@ -437,7 +443,22 @@ public class Settings extends TaggableBase implements Serializable {
                     +"#################################################################\n"
 			        +"AbstractStateAttributes =" + Util.lineSep()
 					+"ConcreteStateAttributes =" + Util.lineSep()
+					+"#################################################################\n"
+					+"# Override display scale\n"
+					+"#\n"
+					+"# Overrides the displayscale obtained from the system.\n"
+					+"# Can solve problems when the mouse clicks are not aligned with\n"
+					+"# the elements on the screen. This can easily be detected when\n"
+					+"# running the spy mode. For example hover over a text element and\n"
+					+"# the popup window should appear with information about the\n"
+					+"# element, if the popup window is not shown or when the mouse is\n"
+					+"# located somewhere else you can try to override the displayscale\n"
+					+"# Values should be provided as doubles (1.5).\n"
+					+"#################################################################\n"
 					+"\n"
+					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
+					+"\n"
+
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"
 					+"#################################################################\n");
@@ -496,7 +517,7 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)||tag.equals(ConfigTags.ConcreteStateAttributes)
+		return tag.equals(ConfigTags.AbstractStateAttributes)
 				? "," : ";";
 	}
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.fruit.Environment;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -48,6 +49,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
@@ -57,11 +59,10 @@ import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
-public class WebdriverProtocol extends ClickFilterLayerProtocol {
+public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
@@ -78,8 +79,74 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
-
+    
     /**
+     * This method is called when TESTAR starts the System Under Test (SUT). The method should
+     * take care of
+     * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+     * out what executable to run)
+     * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuratio files etc.)
+     * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+     * seconds until they have finished loading)
+     *
+     * @return a started SUT, ready to be tested.
+     */
+    @Override
+    protected SUT startSystem() throws SystemStartException {
+    	SUT sut = super.startSystem();
+
+    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+    	// webdriver in the constructor of WdDriver.
+    	// A possible solution could be creating a snapshot of the running browser processes before and after
+    	if(System.getProperty("os.name").contains("Windows")
+    			&& sut.get(Tags.HWND, null) == null) {
+    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    		// window handle. The running browser needs to be in the foreground when we reach this part.
+    		long hwnd = Windows.GetForegroundWindow();
+    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    		// Safe to set breakpoints again.
+    		if (WinProcess.procName(pid).contains("chrome")) {
+    			sut.set(Tags.HWND, hwnd);
+    			sut.set(Tags.PID, pid);
+    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    		}
+    	}
+
+		double displayScale = getDisplayScale(sut);
+
+		// See remarks in WdMouse
+        mouse = sut.get(Tags.StandardMouse);
+        mouse.setCursorDisplayScale(displayScale);
+
+    	return sut;
+    }
+
+	/**
+	 * Returns the display scale based on the settings, if the user has set the override webdriver display scale
+	 * we return the override value otherwise the display scale obtained from the system.
+	 * @param sut The system under test
+	 * @return The display scale.
+	 */
+	private double getDisplayScale(SUT sut) {
+		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
+
+		// If the user has specified a scale override the display scale obtained from the system.
+		String overrideDisplayScaleAsString = settings().get(ConfigTags.OverrideWebDriverDisplayScale, "");
+		if (!overrideDisplayScaleAsString.isEmpty()) {
+			try {
+				double webDriverDisplayScaleOverride = Double.parseDouble(overrideDisplayScaleAsString);
+				if (webDriverDisplayScaleOverride != 0) {
+					displayScale = webDriverDisplayScaleOverride;
+				}
+			} catch (NumberFormatException nfe) {
+				System.out.printf("WARNING Unable to convert display scale override to double: %s, will use %f\n", overrideDisplayScaleAsString, displayScale);
+			}
+		}
+		return displayScale;
+	}
+
+	/**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
      * This can be used for example for bypassing a login screen by filling the username and password
      * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -88,14 +155,6 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
-    	if(settings.get(ConfigTags.ForceForeground) && System.getProperty("os.name").contains("Windows")) {
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		if(WinProcess.procName(pid).contains("chrome")) {
-    			system.set(Tags.HWND, hwnd);
-    			system.set(Tags.PID, pid);
-    		}
-    	}
     }
     
     /**
@@ -110,7 +169,7 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     protected State getState(SUT system) throws StateBuildException {
     	
     	WdDriver.waitDocumentReady();
-    	
+
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
@@ -227,10 +286,8 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     			write.close();
     		
     		} catch (IOException e) {System.out.println(e.getMessage());}
-    		
-    		//System.out.println("* " + existingCssClasses.size()+ " * Existing Css Classes: " + existingCssClasses.toString());
-
     	}
+    	
     	super.stopSystem(system);
     }
     

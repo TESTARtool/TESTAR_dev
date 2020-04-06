@@ -82,7 +82,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   // Set to null to disable this feature
   private static Map<String, String> policyAttributes =
       new HashMap<String, String>() {{
-        put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+        put("class", "lfr-btn-label");
       }};
 
   /**
@@ -99,6 +99,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
     // Propagate followLinks setting
     WdDriver.followLinks = followLinks;
+    
+    WdDriver.fullScreen = true;
 
     // Override ProtocolUtil to allow WebDriver screenshots
     protocolUtil = new WdProtocolUtil();
@@ -118,12 +120,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-    SUT sut = super.startSystem();
-
-    // See remarks in WdMouse
-    mouse = sut.get(Tags.StandardMouse);
-
-    return sut;
+	  return super.startSystem();
   }
 
   /**
