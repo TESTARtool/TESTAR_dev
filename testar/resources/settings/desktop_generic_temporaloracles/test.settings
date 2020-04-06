@@ -129,7 +129,7 @@ DataStoreMode = instant
 # Temporal Oracle settings
 #################################################################
 TemporalOffLineEnabled = false
-# TemporalConcreteEqualsAbstract overrides setting: ConcreteStateAttributes
+# The following setting overrides setting: ConcreteStateAttributes
 TemporalConcreteEqualsAbstract = true
 TemporalLTL_SPOTChecker = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
 TemporalLTL_SPOTCheckerWSL = true
@@ -137,9 +137,14 @@ TemporalLTL_SPOTChecker_Enabled = true
 TemporalCTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ctl
 TemporalCTL_ITSCheckerWSL = true
 TemporalCTL_ITSChecker_Enabled = true
-TemporalLTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
-TemporalLTL_ITSCheckerWSL = true
-TemporalLTL_ITSChecker_Enabled = true
+#
+#css 20200309 the following 3 settings are ignored in TemporalController
+#and are made invisible in the Temporal panel.
+#==> this model checker returned False positives.
+#TemporalLTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
+#TemporalLTL_ITSCheckerWSL = true
+#TemporalLTL_ITSChecker_Enabled = true
+#
 TemporalLTL_LTSMINChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-seq
 TemporalLTL_LTSMINCheckerWSL = true
 TemporalLTL_LTSMINChecker_Enabled = true
@@ -152,7 +157,7 @@ TemporalInstrumentDeadlockState = true
 TemporalOracles = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalOracleSample_for_TEST.csv
 TemporalPatterns = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
 TemporalPatternConstraints = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternConstraintSample.csv
-TemporalAPSelectorManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManager_for_TEST.json
+TemporalAPModelManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APModelManager_for_TEST.json
 TemporalGeneratorTactics = 1;5;10;50;100;500;1000
 TemporalDirectory = temporal
 TemporalSubDirectories = true

@@ -27,9 +27,12 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-
+import nl.ou.testar.temporal.behavior.TemporalController;
+import nl.ou.testar.temporal.behavior.TemporalControllerFactory;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 import java.util.Set;
@@ -43,7 +46,26 @@ import java.util.Set;
  *
  *  It only changes the selectAction() method.
  */
+
+
 public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
+	protected TemporalController temporalController;
+
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+				super.initialize(settings);
+		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
+			if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+				temporalController = TemporalControllerFactory.getTemporalController(settings);
+			}
+		}
+
+	}
 
 
 	/**
@@ -73,7 +95,9 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 	}
 	@Override
 	protected void closeTestSession() {
-		temporalExecutor.ModelCheck();
+		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+			temporalController.MCheck();
+		}
 		super.closeTestSession();
 	}
 

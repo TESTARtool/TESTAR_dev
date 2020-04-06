@@ -68,8 +68,6 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
-import nl.ou.testar.temporal.behavior.TemporalExecutor;
-import nl.ou.testar.temporal.behavior.TemporalExecutorFactory;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -195,7 +193,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
-	protected TemporalExecutor temporalExecutor;
+
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -373,9 +371,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
 		}
-		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
-			temporalExecutor = TemporalExecutorFactory.getTemporalExecutor(settings);
-		}
+
 
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
