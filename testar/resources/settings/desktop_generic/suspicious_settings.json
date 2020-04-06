@@ -1,0 +1,18 @@
+{
+  "id": "SuspiciousPatterns",
+  "GeneralTags" : [
+    {
+	  "name" : "default",
+	  "pair": {
+	    "VerdictTags": "Title, ValuePattern",
+        "VerdictPattern": ".*[eE]rror.*|.*[eE]xcepti[o?]n.*"
+	  }
+	},
+    {
+	  "name" : "customOne",
+	  "pair" : {
+	    "VerdictTags": "Text, Desc",
+		"VerdictPattern": ".*404.*|.*404.*"
+	  }
+	}]
+}

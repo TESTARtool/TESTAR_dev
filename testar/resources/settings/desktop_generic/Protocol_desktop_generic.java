@@ -29,13 +29,15 @@
  *******************************************************************************************************/
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
-import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.verdicts.VerdictGeneral;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
@@ -44,6 +46,8 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
 
+	VerdictGeneral verdict;
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -52,6 +56,12 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
+		try {
+			String jsonPath = new File(Settings.getSettingsPath()).getCanonicalPath() + File.separator + "suspicious_settings.json";
+			verdict = new VerdictGeneral(jsonPath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
