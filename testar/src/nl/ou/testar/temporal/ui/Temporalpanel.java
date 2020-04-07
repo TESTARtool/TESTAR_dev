@@ -486,14 +486,15 @@ public class Temporalpanel {
 
     private void startTemporalWebAnalyzer(ActionEvent evt) {
         String cli = PythonEnv_Path.getText() + " " + PythonVisualizer_Path.getText();
-        logArea.setText("invoking : \n");
-        logArea.append(cli + "\n");
+        //logArea.setText("invoking : \n");
+        //logArea.append(cli + "\n");
         // call the external program
         try {
             if (webAnalyzerProcess == null) {
                 webAnalyzerProcess = Runtime.getRuntime().exec(cli);
-                logArea.append("Visualizer Started. goto " + VisualizerURL);
-                logArea.append("\n");
+                System.out.println("Visualizer Started. goto " + VisualizerURL+"\n");
+                //logArea.append("Visualizer Started. goto " + VisualizerURL+"\n");
+
                 Desktop desktop = Desktop.getDesktop();
                 URI uri = new URI(VisualizerURL);
                 desktop.browse(uri);
@@ -508,7 +509,7 @@ public class Temporalpanel {
             }
         } catch (Exception e) {
             System.err.println("Error on starting Visualizer");
-            logArea.append("Error on starting Visualizer");
+           // logArea.append("Error on starting Visualizer");
             e.printStackTrace();
         }
     }
@@ -527,13 +528,14 @@ public class Temporalpanel {
                 ret = webAnalyzerProcess.waitFor(2, TimeUnit.SECONDS);  //gently wait
             }
             assert webAnalyzerProcess != null;
-            logArea.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
+            System.out.println("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
+            //logArea.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
             if (ret) webAnalyzerProcess = null;
             webAnalyzerErr.stop();
             webAnalyzerOut.stop();
         } catch (Exception e) {
             System.err.println("Error on stopping Analyzer");
-            logArea.append("Error on stopping Analyzer\n");
+            //logArea.append("Error on stopping Analyzer\n");
 
             e.printStackTrace();
         }
@@ -541,7 +543,7 @@ public class Temporalpanel {
     }
 
     private void testdbconnection(ActionEvent evt) {
-        logArea.append(tcontrol.pingDB() + "\n");
+        //logArea.append(tcontrol.pingDB() + "\n");
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
@@ -549,25 +551,12 @@ public class Temporalpanel {
     }
 
     private void testgraphml(ActionEvent evt) {
-        try {
-
-            logArea.append("connecting to: db\n");
-            logArea.repaint();
-            boolean res;
             tcontrol.saveToGraphMLFile("GraphML.XML", false);
-            res = tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
-
-            logArea.append(" saving to  graphml file done with result:" + res + "\n\n");
-        } catch (Exception e) {
-            System.err.println("Error connecting to db");
-            logArea.append("Error connecting to db\n");
-            logArea.append("\n");
-            e.printStackTrace();
-        }
+            tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
     }
 
     public void testOracleCSV() {
-        logArea.append("Writing an oracle to CSV file\n");
+        System.out.println("Writing an oracle to CSV file\n");
         TemporalOracle to = TemporalOracle.getSampleLTLOracle();
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
@@ -575,7 +564,7 @@ public class Temporalpanel {
     }
 
     public void testPatternCSV() {
-        logArea.append("Writing a pattern to CSV file\n");
+        System.out.println("Writing a pattern to CSV file\n");
         TemporalPattern pat = TemporalPattern.getSamplePattern();
         List<TemporalPattern> patcoll = new ArrayList<>();
         patcoll.add(pat);
@@ -583,13 +572,12 @@ public class Temporalpanel {
     }
 
     public void testPatternConstraintCSV() {
-        logArea.append("Writing a pattern-constraint to CSV file\n");
+        System.out.println("Writing a pattern-constraint to CSV file\n");
         List<TemporalPatternConstraint> patconstraintcoll = TemporalPatternConstraint.getSampleConstraints();
         CSVHandler.save(patconstraintcoll, outputDir + "temporalPatternConstraintSample.csv");
     }
 
     public void testSaveDefaultApSelectionManagerJSON() {
-        logArea.append("Writing a APModelManager.JSON\n");
         tcontrol.setDefaultAPModelmanager();
         tcontrol.saveAPModelManager("APModelManager_Default.json");
     }

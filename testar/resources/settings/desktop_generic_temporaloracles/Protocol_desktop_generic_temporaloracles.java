@@ -59,12 +59,23 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 				super.initialize(settings);
+		// comment the following block if output is to be conserved for each test sequence
 		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
 			if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
 				temporalController = TemporalControllerFactory.getTemporalController(settings);
 			}
 		}
-
+	}
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		// uncomment the following block if output is to be conserved for each test sequence
+		/*		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
+					if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+					temporalController = TemporalControllerFactory.getTemporalController(settings);
+					}
+				}
+		*/
 	}
 
 
@@ -94,7 +105,16 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 		return retAction;
 	}
 	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
+		// uncomment the following block if modelcheck is required per test sequence
+		/*		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+				temporalController.MCheck();
+		} */
+	}
+	@Override
 	protected void closeTestSession() {
+		// comment the following block if modelcheck is required per test sequence
 		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
 			temporalController.MCheck();
 		}

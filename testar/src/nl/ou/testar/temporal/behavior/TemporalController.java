@@ -7,13 +7,13 @@ import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
-import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+
 import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.foundation.ValStatus;
 import nl.ou.testar.temporal.ioutils.CSVHandler;
 import nl.ou.testar.temporal.ioutils.JSONHandler;
+import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.model.*;
 import nl.ou.testar.temporal.modelcheck.*;
 import nl.ou.testar.temporal.oracle.*;
@@ -75,8 +75,11 @@ public class TemporalController {
     private TemporalModel tModel;
     private TemporalDBManager tDBManager;
     private List<TemporalOracle> oracleColl;
+    private SimpleLog simpleLog;
+    private String logFileName;
 
     public TemporalController(final Settings settings,  String outputDir) {
+
         this.ApplicationName = settings.get(ConfigTags.ApplicationName);
         this.ApplicationVersion = settings.get(ConfigTags.ApplicationVersion);
         setModelidentifier(settings);
@@ -85,6 +88,9 @@ public class TemporalController {
         } else {
             this.outputDir = outputDir;
         }
+        logFileName=this.outputDir +"log.txt";
+        simpleLog= new SimpleLog(logFileName,true);
+        simpleLog.append(prettyCurrentTime() + " | " +"Temporal Component uses output folder: "+this.outputDir+"\n");
         tDBManager = new TemporalDBManager(settings);
         tModel = new TemporalModel();
         ltlSPOTToWSLPath = settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL);
@@ -177,6 +183,7 @@ public class TemporalController {
 
 
     public void saveAPModelManager(String filename) {
+        simpleLog.append(prettyCurrentTime() + " | " + "generating APModelManager file: "+filename);
         JSONHandler.save(apModelManager, outputDir + filename, true);
     }
 
@@ -237,7 +244,8 @@ public class TemporalController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "inspect file: " + dbfilename;
+        simpleLog.append("generated file: " + dbfilename);
+        return "generated file: " + dbfilename;
     }
 
 
@@ -320,7 +328,7 @@ public class TemporalController {
             }
         stateCount++;
         if (stateCount % (Math.floorDiv(totalStates, chunks)) == 0){
-            System.out.println(prettyCurrentTime() + " | " + "States processed: "+Math.floorDiv((100*stateCount),totalStates)+"%");
+            simpleLog.append(prettyCurrentTime() + " | " + "States processed: "+Math.floorDiv((100*stateCount),totalStates)+"%");
         }
         }
 
@@ -375,13 +383,14 @@ public class TemporalController {
         abstractStateModel = tDBManager.selectAbstractStateModelByModelId(Modelidentifier);
         if (abstractStateModel == null) {
             tModel.addLog("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + tDBManager.getDatabase()+">");
-            System.out.println("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + tDBManager.getDatabase()+">");
+            simpleLog.append("ERROR: Model with identifier : " + Modelidentifier + " was not found in the graph database <" + tDBManager.getDatabase()+">");
         }
         return abstractStateModel;
     }
 
 
     public boolean saveToGraphMLFile(String file, boolean excludeWidget) {
+        simpleLog.append(prettyCurrentTime() + " | " + "generating "+file+" file");
         AbstractStateModel abstractStateModel = getAbstractStateModel();
         if (abstractStateModel != null) {
             return tDBManager.saveToGraphMLFile(abstractStateModel, outputDir + file, excludeWidget);
@@ -389,6 +398,7 @@ public class TemporalController {
     }
 
     private void saveModelAsJSON(String toFile) {
+        simpleLog.append(prettyCurrentTime() + " | " + "generating APEncodedModel file: "+toFile);
         JSONHandler.save(tModel, outputDir + toFile);
     }
 
@@ -486,15 +496,15 @@ public class TemporalController {
 
         try {
 
-            System.out.println(prettyCurrentTime() + " | " + "Temporal model-checking started");
+            simpleLog.append(prettyCurrentTime() + " | " + "Temporal model-checking started");
             List<TemporalOracle> fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
             if (fromcoll == null) {
-                System.out.println(prettyCurrentTime()+"Error: verify the file at location '" + oracleFile + "'");
+                simpleLog.append(prettyCurrentTime()+"Error: verify the file at location '" + oracleFile + "'");
             } else {
                 tModel = new TemporalModel();
                 AbstractStateModel abstractStateModel = getAbstractStateModel();
                 if (abstractStateModel == null){
-                    System.err.println("Error: StateModel not available");
+                    simpleLog.append("Error: StateModel not available");
                 }
                 else {
 
@@ -520,12 +530,9 @@ public class TemporalController {
                             fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 if (verbose) {
-                System.out.println(prettyCurrentTime() + " | " + "generating GraphML.XML file");
                 saveToGraphMLFile("GraphML.XML", false);
-                System.out.println(prettyCurrentTime() + " | " + "generating GraphML_NoWidgets.XML file");
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true);
-                System.out.println(prettyCurrentTime() + " | " + "generating APEncodedModel file");
-                saveModelAsJSON("APEncodedModel.json");
+                //saveModelAsJSON("APEncodedModel.json");
                 }
                 List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
@@ -542,7 +549,7 @@ public class TemporalController {
                     File convertedformulaFile = new File(outputDir + oracleType + "_convertedformulas.txt");
 
                     initialoraclelist.addAll(oracleList);
-                    System.out.println(prettyCurrentTime() + " | " + oracleType + " invoking the " + "backend model-checker");
+                    simpleLog.append(prettyCurrentTime() + " | " + oracleType + " invoking the " + "backend model-checker");
                     if (ltlSpotEnabled && (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL || TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_SPOT)) {
                         automatonFile = new File(outputDir + "Model.hoa");
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
@@ -553,10 +560,10 @@ public class TemporalController {
                         ResultsParser sParse = new SPOT_LTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
-                        System.out.println(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
                         if (modelCheckedOracles == null) {
-                            System.err.println(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                            simpleLog.append(LocalTime.now() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
                     } else if ((ltlItsEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_ITS) ||
                             (ltlltsminEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_LTSMIN)) {
@@ -600,10 +607,10 @@ public class TemporalController {
 
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
-                        System.out.println(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
                         if (modelCheckedOracles == null) {
-                            System.out.println(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
                     } else if (ctlItsEnabled &&  (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL ||
                                                 TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL_ITS)) {
@@ -617,13 +624,13 @@ public class TemporalController {
                         ResultsParser sParse = new ITS_CTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
-                        System.out.println(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
                         if (modelCheckedOracles == null) {
-                            System.err.println(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
                     } else {
-                        System.err.println(prettyCurrentTime() + " | " + oracleType + " Warning:  this oracle type is not implemented or disabled");
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  this oracle type is not implemented or disabled");
                     }
                     if (modelCheckedOracles != null) {
                         finaloraclelist.addAll(modelCheckedOracles);
@@ -638,17 +645,17 @@ public class TemporalController {
                         if (convertedformulaFile.exists())Files.delete(convertedformulaFile.toPath());
                         if (inputvalidatedFile.exists())Files.delete(inputvalidatedFile.toPath());
                     }
-                    System.out.println(prettyCurrentTime() + " | " + oracleType + " model-checking completed");
+                    simpleLog.append(prettyCurrentTime() + " | " + oracleType + " model-checking completed");
                 }
                 CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
                 if (finaloraclelist.size() != fromcoll.size()) {
-                    System.err.println(prettyCurrentTime() + " | " + "** Warning: less oracle verdicts received than in original collection");
-                    System.err.println(prettyCurrentTime() + " | " + "from file: "+ Paths.get(oracleFile).getFileName());
+                    simpleLog.append(prettyCurrentTime() + " | " + "** Warning: less oracle verdicts received than in original collection");
+                    simpleLog.append(prettyCurrentTime() + " | " + "from file: "+ Paths.get(oracleFile).getFileName());
                 }
                 CSVHandler.save(finaloraclelist, modelCheckedFile.getAbsolutePath());
             }
             }
-            System.out.println(prettyCurrentTime() + " | " + "Temporal model-checking completed");
+            simpleLog.append(prettyCurrentTime() + " | " + "Temporal model-checking completed");
         } catch (Exception f) {
             f.printStackTrace();
         }
@@ -656,11 +663,11 @@ public class TemporalController {
 
     public void makeTemporalModel(String APModelManagerFile, boolean verbose, boolean instrumentTerminalState) {
         try {
-            System.out.println(prettyCurrentTime() + " | " + "compute temporal model started");
+            simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model started");
 
             AbstractStateModel abstractStateModel = getAbstractStateModel();
             if (abstractStateModel == null) {
-                System.err.println("Error: StateModel not available");
+                simpleLog.append("Error: StateModel not available");
             } else {
                 setTemporalModelMetaData(abstractStateModel);
                 if (APModelManagerFile.equals("")) {
@@ -680,7 +687,7 @@ public class TemporalController {
                     saveModelAsJSON("APEncodedModel.json");
                 }
 
-                System.out.println(prettyCurrentTime() + " | " + "compute temporal model completed");
+                simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
             }
         } catch (Exception f) {
             f.printStackTrace();
@@ -690,7 +697,7 @@ public class TemporalController {
 
     public void generateOraclesFromPatterns(String APModelManagerfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
         try {
-            System.out.println(" potential Oracle generator started \n");
+            simpleLog.append(" potential Oracle generator started \n");
             makeTemporalModel(APModelManagerfile, false, true);
             List<TemporalPattern> patterns = CSVHandler.load(patternFile, TemporalPattern.class);
             List<TemporalPatternConstraint> patternConstraints = null;
@@ -705,7 +712,7 @@ public class TemporalController {
             fromcoll = getPotentialOracles(patterns, patternConstraints, tactic_oraclesPerPattern);
             CSVHandler.save(fromcoll, PotentialoracleFile.getAbsolutePath());
 
-            System.out.println(" potential Oracle generator completed \n");
+            simpleLog.append(" potential Oracle generator completed \n");
         } catch (Exception f) {
             f.printStackTrace();
         }
