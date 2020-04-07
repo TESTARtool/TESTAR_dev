@@ -43,11 +43,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class VerdictGeneral {
+public class WebdriverVerdicts {
 	
-	Set<VerdictGeneralTags> generalVerdicts = new HashSet<>();
+	private Set<WebdriverVerdictItem> webdriverVerdictsCollection = new HashSet<>();
+	
+	public Set<WebdriverVerdictItem> getWebdriverVerdicts() {
+		return this.webdriverVerdictsCollection;
+	}
 
-	public VerdictGeneral(String jsonPath) {
+	public WebdriverVerdicts(String jsonPath) {
 
 		try (FileReader reader = new FileReader(jsonPath)) {
 
@@ -61,15 +65,10 @@ public class VerdictGeneral {
 						
 				throw new SuspiciousPatternException(message);
 				
-			} else if(jsonObject.get("GeneralTags").isJsonNull()) {
+			} else if(!jsonObject.get("WebdriverTags").isJsonNull()) {
 				
-				String message = String.format("JSON Array with name 'GeneralTags' is required in file '%s'",
-						jsonPath);
+				loadSuspiciousPatternsList(jsonObject.get("WebdriverTags").getAsJsonArray());
 				
-				throw new SuspiciousPatternException(message);
-				
-			} else {
-				loadSuspiciousPatternsList(jsonObject.get("GeneralTags").getAsJsonArray());
 			}
 			
 		} catch (IOException e) {
@@ -89,14 +88,14 @@ public class VerdictGeneral {
 			Set<String> tagsName = splitTagsStringToSet(tagsPattern.get("VerdictTags").getAsString());
 			Pattern suspiciousPattern =  getPatternFromString(tagsPattern.get("VerdictPattern").getAsString());
 			
-			VerdictGeneralTags verdictObjectList = new VerdictGeneralTags(name, tagsName, suspiciousPattern);
+			WebdriverVerdictItem verdictObjectList = new WebdriverVerdictItem(name, tagsName, suspiciousPattern);
 			
 			System.out.println("JSON Verdict List Element");
 			System.out.println("Name: " + name);
 			System.out.println("TagsName: " + tagsName.toString());
 			System.out.println("SuspiciousPattern: " + suspiciousPattern.toString());
 			
-			generalVerdicts.add(verdictObjectList);
+			webdriverVerdictsCollection.add(verdictObjectList);
 		}
 	}
 	

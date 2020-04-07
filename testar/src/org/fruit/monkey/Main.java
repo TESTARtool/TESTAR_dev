@@ -407,7 +407,6 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
 			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
@@ -457,6 +456,9 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			
+			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousTitlesFile, "suspicious_settings.json"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

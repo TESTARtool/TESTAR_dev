@@ -41,57 +41,72 @@ import java.util.regex.Pattern;
 
 import org.fruit.Util;
 import org.fruit.alayer.Pen;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.webdriver.enums.WdTags;
 
-public class VerdictGeneralTags {
+public class WebdriverVerdictItem {
 
 	String suspiciousListName;
 	Pattern suspiciousPattern;
 	
-	public VerdictGeneralTags(String suspiciousListName, Set<String> tagsName, Pattern suspiciousPattern) {
+	public WebdriverVerdictItem(String suspiciousListName, Set<String> tagsName, Pattern suspiciousPattern) {
 		this.suspiciousListName = suspiciousListName;
 		this.suspiciousPattern = suspiciousPattern;
 		
 		for(String tag : tagsName) {
-			setGeneralStringVerdictTags(tag);
+			setWebdriverStringVerdictTags(tag);
 		}
 	}
 	
-	private static Map<Tag<String>, Boolean> generalStringVerdictTags = new HashMap<>();
+	private static Map<Tag<String>, Boolean> webdriverStringVerdictTags = new HashMap<>();
 
 	static {
-		generalStringVerdictTags.put(Tags.Title, false);
-		generalStringVerdictTags.put(Tags.ValuePattern, false);
-		generalStringVerdictTags.put(Tags.Text, false);
-		generalStringVerdictTags.put(Tags.Desc, false);
+		webdriverStringVerdictTags.put(WdTags.WebLocalizedControlType, false);
+		webdriverStringVerdictTags.put(WdTags.WebItemType, false);
+		webdriverStringVerdictTags.put(WdTags.WebItemStatus, false);
+		webdriverStringVerdictTags.put(WdTags.Desc, false);
+		webdriverStringVerdictTags.put(WdTags.WebTagName, false);
+		webdriverStringVerdictTags.put(WdTags.WebId, false);
+		// webdriverStringVerdictTags.put(WdTags.WebCssClasses, false);  We don't want to detect error-form
+		webdriverStringVerdictTags.put(WdTags.WebHelpText, false);
+		webdriverStringVerdictTags.put(WdTags.WebName, false);
+		webdriverStringVerdictTags.put(WdTags.WebTitle, false);
+		//webdriverStringVerdictTags.put(WdTags.WebTextContent, false); //TODO: Implement
+		webdriverStringVerdictTags.put(WdTags.WebHref, false);
+		webdriverStringVerdictTags.put(WdTags.WebValue, false);
+		webdriverStringVerdictTags.put(WdTags.WebStyle, false);
+		webdriverStringVerdictTags.put(WdTags.WebTarget, false);
+		webdriverStringVerdictTags.put(WdTags.WebAlt, false);
+		webdriverStringVerdictTags.put(WdTags.WebDisplay, false);
+		webdriverStringVerdictTags.put(WdTags.WebType, false);
+		//webdriverStringVerdictTags.put(WdTags.WebSrc, false); //TODO: Implement
 	}
 
-	public void setGeneralStringVerdictTags(String tagName) {
-		for(Map.Entry<Tag<String>, Boolean> entry : generalStringVerdictTags.entrySet()) {
+	public void setWebdriverStringVerdictTags(String tagName) {
+		for(Map.Entry<Tag<String>, Boolean> entry : webdriverStringVerdictTags.entrySet()) {
 			if(entry.getKey().toString().equals(tagName)) {
-				generalStringVerdictTags.put(entry.getKey(), true);
+				webdriverStringVerdictTags.put(entry.getKey(), true);
 			}
 		}
 	}
 
-	public Set<Tag<String>> getEnabledGeneralStringVerdictTags() {
-		Set<Tag<String>> enabledVerdictTags = new HashSet<>();
-		for(Map.Entry<Tag<String>, Boolean> entry : generalStringVerdictTags.entrySet()) {
+	public Set<Tag<String>> getEnabledWebdriverStringVerdictTags() {
+		Set<Tag<String>> enabledWebdriverVerdictTags = new HashSet<>();
+		for(Map.Entry<Tag<String>, Boolean> entry : webdriverStringVerdictTags.entrySet()) {
 			if(entry.getValue()) {
-				enabledVerdictTags.add(entry.getKey());
+				enabledWebdriverVerdictTags.add(entry.getKey());
 			}
 		}
-		return enabledVerdictTags;
+		return enabledWebdriverVerdictTags;
 	}
-
-	/*public boolean isGeneralStringVerdictTagEnabled(String tagName) {
-		for(Map.Entry<Tag<String>, Boolean> entry : generalStringVerdictTags.entrySet()) {
+	
+	/*public boolean isWebdriverStringVerdictTagEnabled(String tagName) {
+		for(Map.Entry<Tag<String>, Boolean> entry : webdriverStringVerdictTags.entrySet()) {
 			if(entry.getKey().toString().equals(tagName)) {
 				return entry.getValue();
 			}
@@ -99,22 +114,18 @@ public class VerdictGeneralTags {
 		return false;
 	}*/
 
-	public Verdict suspiciousStringValueMatcher(Widget w, Pen redPen) {
+	public Verdict webdriverSuspiciousStringValueMatcher(Widget w, Pen redPen) {
 
-		for(Tag<String> t : getEnabledGeneralStringVerdictTags()) {
-
-			Map<String, Matcher> suspiciousPatternMatchers = new WeakHashMap<>();
+		for(Tag<String> t : getEnabledWebdriverStringVerdictTags()) {
+			
+			Map<String, Matcher> webdriverSuspiciousPatternMatchers = new WeakHashMap<>();
 			Matcher m;
 
 			if(t != null && !w.get(t,"").isEmpty()) {
 
-				if(concreteTagValueToIgnore(t, w)) {
-					continue;
-				}
-
-				m = suspiciousPatternMatchers.get(w.get(t,""));
+				m = webdriverSuspiciousPatternMatchers.get(w.get(t,""));
 				m = suspiciousPattern.matcher(w.get(t,""));
-				suspiciousPatternMatchers.put(w.get(t,""), m);
+				webdriverSuspiciousPatternMatchers.put(w.get(t,""), m);
 
 				if (m.matches()) {
 					Visualizer visualizer = Util.NullVisualizer;
@@ -130,21 +141,5 @@ public class VerdictGeneralTags {
 		}
 
 		return Verdict.OK;
-	}
-
-	/**
-	 * Some Text Edit widgets have Tag Values that dynamically change based on typed text.
-	 * Ignore these Specific Tags 
-	 * 
-	 * @param Tag
-	 * @param Widget
-	 * @return
-	 */
-	private boolean concreteTagValueToIgnore(Tag<?> t, Widget w) {
-		//Ignore value ValuePattern for UIAEdit widgets
-		if (t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-			return true;
-		}
-		return false;
 	}
 }

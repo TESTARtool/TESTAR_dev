@@ -1,0 +1,19 @@
+{
+  "id": "SuspiciousPatterns",
+  "GeneralTags" : [
+    {
+	  "name" : "default",
+	  "pair": {
+	    "VerdictTags": "Title, ValuePattern",
+        "VerdictPattern": ".*[eE]rror.*|.*[eE]xcepti[o?]n.*"
+	  }
+	}],
+	"WebdriverTags" : [
+    {
+	  "name" : "webdriver",
+	  "pair" : {
+	    "VerdictTags": "WebTagName, WebName, WebHelpText, WebHref, WebValue",
+		"VerdictPattern": ".*404.*|.*404.*"
+	  }
+	}]
+}

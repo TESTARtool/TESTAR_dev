@@ -40,7 +40,6 @@ public final class ConfigTags {
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
   public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class);
   public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class);
-  public static final Tag<String> SuspiciousTitles = Tag.from("SuspiciousTitles", String.class);
   public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class);
   public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class);
   public static final Tag<String> TempDir = Tag.from("TempDir", String.class);
@@ -93,6 +92,10 @@ public final class ConfigTags {
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
+  // SuspicousPatterns
+  public static final Tag<String> SuspiciousTitles = Tag.from("SuspiciousTitles", String.class);
+  public static final Tag<String> SuspiciousTitlesFile = Tag.from("SuspiciousTitlesFile", String.class);
+  
   // graph db config tags
   public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
   public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
