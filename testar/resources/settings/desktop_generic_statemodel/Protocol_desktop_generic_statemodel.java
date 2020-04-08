@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.SortedSet;
@@ -42,6 +43,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.OutputStructure;
+import org.testar.jacoco.MBeanClient;
 import org.testar.json.object.JsonArtefactStateModel;
 import org.testar.json.object.JsonArtefactTestResults;
 import org.testar.protocols.DesktopProtocol;
@@ -58,12 +61,20 @@ import nl.ou.testar.StateModel.ModelArtifactManager;
  */
 public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
-
 	SortedSet<String> sequencesOutputDir = new TreeSet<>();
 	SortedSet<String> htmlOutputDir = new TreeSet<>();
 	SortedSet<String> logsOutputDir = new TreeSet<>();
 	SortedSet<String> sequencesVerdicts = new TreeSet<>();
 
+	private static final String JACOCO_CODEO = "java"
+			+ " -Dcom.sun.management.jmxremote.port=5000"
+			+ " -Dcom.sun.management.jmxremote.authenticate=false"
+			+ " -Dcom.sun.management.jmxremote.ssl=false"
+			+ " -javaagent:jacoco_0.8.5\\lib\\jacocoagent.jar=jmx=true"
+			+ " -jar"
+			+ " C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
+	
+	
 	/**
 	 * Initialize TESTAR with the given settings:
 	 *
@@ -71,19 +82,23 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
+		super.initialize(settings);
+		
 		//Set before initialize StateModel
 		settings.set(ConfigTags.ListeningMode, true);
 		
-		//Launch CODEO with JaCoCo
-		String initCODEOJacoco = "java -javaagent:jacoco_0.8.5\\lib\\jacocoagent.jar -jar C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
 		try {
-			Runtime.getRuntime().exec("cmd /c start \"\" " + initCODEOJacoco);
+			Runtime.getRuntime().exec("cmd /c start \"\" " + JACOCO_CODEO);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Util.pause(20);
 
+		// Workspace dialog
+		/*
+		
+		Util.pause(30);
+		
 		Keyboard kb = AWTKeyboard.build();
 		kb.press(KBKeys.VK_SHIFT);
 		kb.release(KBKeys.VK_SHIFT);
@@ -92,11 +107,9 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		kb.release(KBKeys.VK_SHIFT);
 
 		kb.press(KBKeys.VK_ENTER);
-		kb.release(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);*/
 
 		Util.pause(30);
-		
-		super.initialize(settings);
 	}
 	
 	/**
@@ -117,17 +130,6 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 			JsonUtils.createWidgetInfoJsonFile(state);
 
 		return state;
-	}
-	
-	
-	//CheckBox from project configuration panel
-	private boolean isUnrecognizedCheckBox(Widget w) {
-		if(w.parent()!=null &&
-				w.get(Tags.Role).toString().contains("UIAText") &&
-				w.parent().get(Tags.Role).toString().contains("ListItem")) {
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -163,34 +165,47 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	@Override
 	protected void stopSystem(SUT system) {
 
-		Keyboard kb = AWTKeyboard.build();
+		if(!settings.get(ConfigTags.Mode).equals(Modes.Spy)) {
+			String jacocoFile = "jacoco-client.exec";
+			try {
+				jacocoFile = MBeanClient.dumpJaCoCoReport(OutputStructure.executedSUTname);
+			} catch (Exception e) {
+				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
+			}
 
-		kb.press(KBKeys.VK_ALT);
-		kb.press(KBKeys.VK_F4);
+			Keyboard kb = AWTKeyboard.build();
 
-		kb.release(KBKeys.VK_ALT);
-		kb.release(KBKeys.VK_F4);
+			kb.press(KBKeys.VK_ALT);
+			kb.press(KBKeys.VK_F4);
 
-		Util.pause(10);
+			kb.release(KBKeys.VK_ALT);
+			kb.release(KBKeys.VK_F4);
 
-		kb.press(KBKeys.VK_SHIFT);
-		kb.release(KBKeys.VK_SHIFT);
+			Util.pause(10);
 
-		kb.press(KBKeys.VK_ENTER);
-		kb.release(KBKeys.VK_ENTER);
+			kb.press(KBKeys.VK_SHIFT);
+			kb.release(KBKeys.VK_SHIFT);
 
-		Util.pause(10);
+			kb.press(KBKeys.VK_ENTER);
+			kb.release(KBKeys.VK_ENTER);
 
-		super.stopSystem(system);
+			Util.pause(10);
 
-		//Launch JaCoCo report
-		String antCommand = "cd jacoco_0.8.5 && ant report";
-		try {
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			builder.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			super.stopSystem(system);
+
+			try {
+				//Launch JaCoCo report
+				String antCommand = "cd jacoco_0.8.5 && ant report"
+						+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
+						+ " -DreportCoverageDir=" 
+						+ new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+
+				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+				builder.start();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

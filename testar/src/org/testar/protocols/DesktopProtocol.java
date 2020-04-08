@@ -31,6 +31,7 @@
 
 package org.testar.protocols;
 
+import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
@@ -55,6 +56,8 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 	protected HtmlSequenceReport htmlReport;
 	protected State latestState;
 	protected String verdictInfo;
+	
+	static double menubar_filter;
 
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -75,6 +78,15 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
+		
+		for(Widget w : super.getState(system)){
+            Role role = w.get(Tags.Role, Roles.Widget);
+            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAMenuBar")})) {
+            	menubar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            	break;
+            }
+        }
+		
 		//Spy mode didn't use the html report
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return super.getState(system);
@@ -129,6 +141,11 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 						//Create a left click action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.leftClickAt(w));
 					}
+					
+					/*else if(isClickable(w) && isUnrecognizedCheckBox(w) && (isUnfiltered(w) || whiteListed(w))) {
+						//Create a left click action with the Action Compiler, and add it to the set of derived actions
+						actions.add(ac.leftClickAt(w, 0.05, 0.5));
+					}*/
 
 					//For widgets that are:
 					// - typeable
@@ -140,15 +157,45 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
+					
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
-					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+					//addSlidingActions(actions, ac, SCROLL_ARROW_SIZE,SCROLL_THICK, w.parent(), state);
+					
 				}
 			}
 		}
 		return actions;
 	}
+	
+	@Override
+	protected boolean isUnfiltered(Widget w) {
+		Shape shape = w.get(Tags.Shape, null);
+		if (shape != null && shape.y() < menubar_filter && !w.get(Tags.Desc,"").contains("CODEO")) {
+			return false;
+		}
 
+		return super.isUnfiltered(w);
+	}
+	
+	@Override
+	protected boolean isTypeable(Widget w) {
+		if(w.get(Tags.Role, Roles.Widget).toString().contains("UIAText")) {
+			return false;
+		}
+		return super.isTypeable(w);
+	}
+
+	//CheckBox from project configuration panel
+	private boolean isUnrecognizedCheckBox(Widget w) {
+		if(w.parent()!=null &&
+				w.get(Tags.Role).toString().contains("UIAText") &&
+				w.parent().get(Tags.Role).toString().contains("ListItem")) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Overwriting to add HTML report writing into it
 	 *
