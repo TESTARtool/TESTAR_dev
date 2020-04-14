@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -29,15 +29,11 @@
 *******************************************************************************************************/
 
 
-/**
- * @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 public final class ConfigTags {
@@ -78,7 +74,6 @@ public final class ConfigTags {
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
 
-  // begin by urueda
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
   public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);
@@ -98,7 +93,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
-  // begin by florendegier
+  // graph db config tags
   public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
   public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
   public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
@@ -117,8 +112,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
-  @SuppressWarnings("unchecked")
-  public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
+  public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 
@@ -129,5 +124,8 @@ public final class ConfigTags {
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
   
   public static final Tag<String> InputFileText = Tag.from("InputFileText", String.class);
+
+  // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
+  public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
 
 }

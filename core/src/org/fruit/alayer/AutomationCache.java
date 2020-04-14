@@ -120,7 +120,7 @@ public abstract class AutomationCache {
 			return Long.MIN_VALUE;
 		}
 		try {
-			AWTCanvas scrshot = AWTCanvas.fromScreenshot(hwndRect, AWTCanvas.StorageFormat.PNG, 1);
+			AWTCanvas scrshot = AWTCanvas.fromScreenshot(hwndRect, hwnd, AWTCanvas.StorageFormat.PNG, 1);
 			CachedAutomationElement ac = automationCache.get(new Long(hwnd));
 			if (ac != null){
 				if (ac.getHwndShape().equals(hwndRect) && scrshot.compareImage(ac.getScrshot()) >= SCRSHOT_SIMILARITY_THRESHOLD){

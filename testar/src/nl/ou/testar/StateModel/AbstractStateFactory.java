@@ -7,7 +7,7 @@ import org.fruit.alayer.Tags;
 
 import java.util.Set;
 
-public abstract class AbstractStateFactory {
+abstract class AbstractStateFactory {
 
     /**
      * This builder method will create a new abstract state class and populate it with the needed data
@@ -15,7 +15,7 @@ public abstract class AbstractStateFactory {
      * @param actions a set of Testar actions
      * @return the new abstract state
      */
-    public static AbstractState createAbstractState(State newState, Set<Action> actions) {
+    static AbstractState createAbstractState(State newState, Set<Action> actions) {
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
         return new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
     }

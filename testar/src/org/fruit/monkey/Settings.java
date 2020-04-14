@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -42,8 +43,9 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Pair;
@@ -58,10 +60,11 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
-			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
-			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
-	
+	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE";
+	public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
+	public static final String SUT_CONNECTOR_CMDLINE = "COMMAND_LINE";
+	public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
+
 	private static String settingsPath;
 	
 	public static String getSettingsPath() {
@@ -213,32 +216,32 @@ public class Settings extends TaggableBase implements Serializable {
 	public Settings(List<Pair<?, ?>> defaults, Properties props){
 		Assert.notNull(props, defaults);
 
-		for(Pair<?, ?> p : defaults){
-			Assert.notNull(p.left(), p.right());
-			Assert.isTrue(p.left() instanceof Tag);			
-			Tag<Object> t = (Tag<Object>)p.left();
-			Object v = p.right();
-			Assert.isTrue(t.type().isAssignableFrom(v.getClass()), "Wrong value type for tag " + t.name());
-			set(t, v);			
+		for(Pair<?, ?> pair : defaults){
+			Assert.notNull(pair.left(), pair.right());
+			Assert.isTrue(pair.left() instanceof Tag);
+			Tag<Object> tag = (Tag<Object>)pair.left();
+			Object value = pair.right();
+			Assert.isTrue(tag.type().isAssignableFrom(value.getClass()), "Wrong value type for tag " + tag.name());
+			set(tag, value);
 		}
 
 		for(String key : props.stringPropertyNames()){
 			String value = props.getProperty(key);
 			
-			Tag<?> defTag = null;
+			Tag<?> defaultTag = null;
 			
-			for(Pair<?, ?> p : defaults){
-				Tag<?> t = (Tag<?>)p.left();
-				if(t.name().equals(key)){
-					defTag = t;
+			for(Pair<?, ?> pair : defaults){
+				Tag<?> tag = (Tag<?>)pair.left();
+				if(tag.name().equals(key)){
+					defaultTag = tag;
 					break;
 				}
 			}
 
-			if(defTag == null){
+			if(defaultTag == null){
 				set(Tag.from(key, String.class), value);
 			}else{
-				set((Tag)defTag, parse(value, defTag));
+				set((Tag)defaultTag, parse(value, defaultTag));
 			}
 		}
 
@@ -278,15 +281,15 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#\n"
 					+"# Indicate how you want to connect to the SUT:\n"
 					+"#\n"
-					+"# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that\n"
+					+"# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that\n"
 					+"# starts the SUT.\n"
 					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
 					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
+					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed\n"
 					+"# in the SUT main window. The SUT must be manually started and closed.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.\n"
+					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.\n"
 					+"# The SUT must be manually started and closed.\n"
 					+"#################################################################\n"
 					+"SUTConnector = " + Util.lineSep()
@@ -323,9 +326,11 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
 					+"#\n"
+					+"# Requires ProcessListenerEnabled\n"
 					+"# (Only available for desktop applications through COMMAND_LINE)\n"
 					+"#\n"
-					+"# Regular expression defines the suspicious outputs\n"
+					+"# Regular expression SuspiciousProcessOutput contains the specification\n"
+					+"# of what is considered to be suspicious output.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ProcessListenerEnabled = " + Util.lineSep()
@@ -337,8 +342,10 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Required ProcessListenerEnabled\n"
 					+"# (Only available for desktop applications through COMMAND_LINE)\n"
 					+"#\n"
-					+"# Allow TESTAR to store in its logs other possible matches found in the process\n"
-					+"# Use the regular expression .*.* if you want to store all the possible outputs of the process\n"
+					+"# Allow TESTAR to store execution logs coming from the processes.\n"
+					+"# You can use the regular expression ProcessLogs below to filter\n"
+					+"# the logs. Use .*.* if you want to store all the outputs of the \n"
+					+"# process.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ProcessLogs = " + Util.lineSep()
@@ -391,16 +398,31 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStoreMode = instant" + Util.lineSep()
 					+"ApplicationName = Buggy calculator" + Util.lineSep()
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
+					+"ActionSelectionAlgorithm =" + Util.lineSep()
+					+"StateModelStoreWidgets =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
-					+"# Allowed value are: Role,Path,Title,Enabled\n"
-                    +"#################################################################\n"
-			        +"ConcreteStateAttributes =" + Util.lineSep()
-			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"#################################################################\n"
+					+"AbstractStateAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Override display scale\n"
+					+"#\n"
+					+"# Overrides the displayscale obtained from the system.\n"
+					+"# Can solve problems when the mouse clicks are not aligned with\n"
+					+"# the elements on the screen. This can easily be detected when\n"
+					+"# running the spy mode. For example hover over a text element and\n"
+					+"# the popup window should appear with information about the\n"
+					+"# element, if the popup window is not shown or when the mouse is\n"
+					+"# located somewhere else you can try to override the displayscale\n"
+					+"# Values should be provided as doubles (1.5).\n"
+					+"#################################################################\n"
+					+"\n"
+					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"
@@ -440,27 +462,11 @@ public class Settings extends TaggableBase implements Serializable {
 	 */
 	private void verifySettings() {
 		// verify the concrete and abstract state settings
-		// the values provided should be allowed by the Coding Manager
-        Set<String> stateSet = new HashSet<>();
-        Set<String> allowedStateAttributes = CodingManager.allowedStateTags.keySet();
+		// the values provided should be valid state management tags
+        Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
 
-        // first the concrete states
-		try {
-			List<String> concreteStateAttributes = get(ConfigTags.ConcreteStateAttributes);
-			for (String concreteStateAttribute : concreteStateAttributes) {
-                if (allowedStateAttributes.contains(concreteStateAttribute)) {
-                    stateSet.add(concreteStateAttribute);
-                }
-			}
-			set(ConfigTags.ConcreteStateAttributes, new ArrayList<>(stateSet));
-		}
-		catch (NoSuchTagException ex) {
-			// no need to do anything, nothing to verify
-		}
-
-        stateSet.clear();
-
-		// then the abstract states
+		// add only the state management tags that are available
+		Set<String> stateSet = new HashSet<>();
         try {
             List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
             for (String abstractStateAttribute : abstractStateAttributes) {
@@ -476,7 +482,7 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
+		return tag.equals(ConfigTags.AbstractStateAttributes)
 				? "," : ";";
 	}
 }

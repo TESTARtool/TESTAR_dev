@@ -36,4 +36,14 @@ public class DummyModelManager implements StateModelManager{
     public void notifyTestSequenceStopped() {
 
     }
+
+    @Override
+    public void notifyTestSequenceInterruptedByUser() {
+
+    }
+
+    @Override
+    public void notifyTestSequenceInterruptedBySystem(String message) {
+
+    }
 }

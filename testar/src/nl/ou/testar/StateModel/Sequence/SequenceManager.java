@@ -72,6 +72,18 @@ public class SequenceManager {
      * Stop the currently executing test sequence. This particular sequence can no longer be restarted after it has been stopped.
      */
     public void stopSequence() {
+        currentSequence.setSequenceVerdict(SequenceVerdict.COMPLETED_SUCCESFULLY);
+        currentSequence.stop();
+    }
+
+    public void notifyInterruptionByUser() {
+        currentSequence.setSequenceVerdict(SequenceVerdict.INTERRUPTED_BY_USER);
+        currentSequence.stop();
+    }
+
+    public void notifyInterruptionBySystem(String message) {
+        currentSequence.setSequenceVerdict(SequenceVerdict.INTERRUPTED_BY_ERROR);
+        currentSequence.setTerminationMessage(message);
         currentSequence.stop();
     }
 
@@ -80,11 +92,23 @@ public class SequenceManager {
      * @param concreteState the concrete state reached
      * @param concreteAction (Optionally) a concrete action that was executed.
      */
-    public void notifyStateReached(ConcreteState concreteState, ConcreteAction concreteAction) {
+    public void notifyStateReached(ConcreteState concreteState, ConcreteAction concreteAction, SequenceError ...sequenceErrors) {
         if (concreteState == null || currentSequence == null || !currentSequence.isRunning()) {
             return;
         }
-        currentSequence.addNode(concreteState, concreteAction);
+
+        currentSequence.addNode(concreteState, concreteAction, sequenceErrors);
+    }
+
+    /**
+     * Notify that an error has occurred in the current state, which will have to be stored on the current sequence node.
+     * @param errorMessage
+     */
+    public void notifyErrorInCurrentState(String errorMessage) {
+        SequenceNode lastNode = currentSequence.getLastNode();
+        if (lastNode != null) {
+            lastNode.addErrorMessage(errorMessage);
+        }
     }
 
 }

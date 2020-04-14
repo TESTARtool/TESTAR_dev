@@ -81,6 +81,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.mouseMove(w);
 		ret.set(Tags.Desc, "Mouse move");
 		ret.set(Tags.Role, ActionRoles.MouseMove);
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 	
@@ -89,7 +90,8 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.mouseMove(w,position);
 		Shape s = w.get(Tags.Shape);
 		Shape moveShape = Rect.from(s.x(), s.y() + s.height(), s.width(), 1); // Rect.from(s.x() + s.width()/4, s.y() + s.height(), s.width()/2, 1);
-		ret.set(Tags.Visualizer, new ShapeVisualizer(MovePen, moveShape, "", 0.5, 0.5));		
+		ret.set(Tags.Visualizer, new ShapeVisualizer(MovePen, moveShape, "", 0.5, 0.5));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 

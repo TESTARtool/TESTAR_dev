@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -41,10 +41,11 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
+import java.util.Observer;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-public class GeneralPanel extends JPanel {
+public class GeneralPanel extends JPanel implements Observer {
 
   private static final long serialVersionUID = -7401834140061189752L;
 
@@ -53,16 +54,19 @@ public class GeneralPanel extends JPanel {
   private JTextArea txtSutPath;
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
-  private JSpinner esiSpinner;
-  private JComboBox<String> comboboxVerbosity;
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
   
   private JLabel labelAppName = new JLabel("Application name");
   private JLabel labelAppVersion = new JLabel("Application version");
+
   private JTextField applicationNameField = new JTextField();
   private JTextField applicationVersionField = new JTextField();
+
+  private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
+  private JTextField overrideWebDriverDisplayScaleField = new JTextField();
+
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -77,7 +81,8 @@ public class GeneralPanel extends JPanel {
     cboxSUTconnector.setModel(new DefaultComboBoxModel<>(new String[]{
         Settings.SUT_CONNECTOR_CMDLINE,
         Settings.SUT_CONNECTOR_PROCESS_NAME,
-        Settings.SUT_CONNECTOR_WINDOW_TITLE
+        Settings.SUT_CONNECTOR_WINDOW_TITLE,
+        Settings.SUT_CONNECTOR_WEBDRIVER
     }));
     cboxSUTconnector.setSelectedIndex(0);
     cboxSUTconnector.setBounds(114, 12, 171, 25);
@@ -101,32 +106,18 @@ public class GeneralPanel extends JPanel {
     spnSequenceLength.setToolTipText(sequencesActionsTTT);
     add(spnSequenceLength);
 
-    esiSpinner = new JSpinner();
-    esiSpinner.setBounds(160, 237, 71, 25);
-    esiSpinner.setValue(10);
-    esiSpinner.setToolTipText(intervalTTT);
-    add(esiSpinner);
-
-    comboboxVerbosity = new JComboBox<>();
-    comboboxVerbosity.setModel(new DefaultComboBoxModel<>(
-        new String[]{"Critical", "Information", "Debug"}));
-    comboboxVerbosity.setSelectedIndex(1);
-    comboboxVerbosity.setBounds(160, 275, 107, 25);
-    comboboxVerbosity.setMaximumRowCount(3);
-    comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
-    add(comboboxVerbosity);
-
     comboBoxProtocol = new JComboBox<>();
     comboBoxProtocol.setBounds(350, 161, 260, 25);
- //   String[] sutSettings = new File("./settings/")
     String[] sutSettings = new File(Main.settingsDir)
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
+    
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
+    myItemListener.addObserver(this);
     comboBoxProtocol.addItemListener(myItemListener);
     comboBoxProtocol.setToolTipText(comboBoxProtocolTTT);
     add(comboBoxProtocol);
@@ -142,14 +133,38 @@ public class GeneralPanel extends JPanel {
     add(checkStopOnFault);*/
     
     labelAppName.setBounds(330, 242, 150, 27);
+    labelAppName.setToolTipText(applicationNameTTT);
     add(labelAppName);
     applicationNameField.setBounds(480, 242, 125, 27);
+    applicationNameField.setToolTipText(applicationNameTTT);
     add(applicationNameField);
 
     labelAppVersion.setBounds(330, 280, 150, 27);
+    labelAppVersion.setToolTipText(applicationVersionTTT);
     add(labelAppVersion);
     applicationVersionField.setBounds(480, 280, 125, 27);
+    applicationVersionField.setToolTipText(applicationVersionTTT);
     add(applicationVersionField);
+
+    // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
+    setOverrideWebDriverDisplayScaleVisibility(false);
+    labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
+    labelOverrideWebDriverDisplayScale.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(labelOverrideWebDriverDisplayScale);
+    overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
+    overrideWebDriverDisplayScaleField.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(overrideWebDriverDisplayScaleField);
+  }
+
+  private void setOverrideWebDriverDisplayScaleVisibility(boolean isVisible){
+    labelOverrideWebDriverDisplayScale.setVisible(isVisible);
+    overrideWebDriverDisplayScaleField.setVisible(isVisible);
+  }
+
+  @Override
+  public void update(Observable o, Object arg) {
+    boolean showWidgets = arg.toString().contains("webdriver");
+    setOverrideWebDriverDisplayScaleVisibility(showWidgets);
   }
 
   private void addGeneralControlsLocal() {
@@ -185,16 +200,6 @@ public class GeneralPanel extends JPanel {
     lblNofSequences.setToolTipText(nofSequencesTTT);
     add(lblNofSequences);
 
-    JLabel lblSamplingInterval = new JLabel("Sampling interval:");
-    lblSamplingInterval.setBounds(10, 240, 100, 14);
-    lblSamplingInterval.setToolTipText(intervalTTT);
-    add(lblSamplingInterval);
-
-    JLabel lblLoggingVerbosity = new JLabel("Logging Verbosity:");
-    lblLoggingVerbosity.setBounds(10, 278, 120, 14);
-    lblLoggingVerbosity.setToolTipText(lblLoggingVerbosityTTT);
-    add(lblLoggingVerbosity);
-
     JLabel lblSequenceActions = new JLabel("Sequence actions:");
     lblSequenceActions.setBounds(10, 202, 148, 14);
     lblSequenceActions.setToolTipText(sequencesActionsTTT);
@@ -214,8 +219,17 @@ public class GeneralPanel extends JPanel {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
 
-      // Set the text from settings in txtSutPath
-      txtSutPath.setText(file);
+      if (settings.get(ConfigTags.SUTConnector)
+          .equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
+        // When using the WEB_DRIVER connector, only replace webdriver path
+        String[] orgSettingParts = txtSutPath.getText().split(" ");
+        orgSettingParts[0] = "\"" + file + "\"";
+        txtSutPath.setText(String.join(" ", orgSettingParts));
+      }
+      else {
+        // Set the text from settings in txtSutPath
+        txtSutPath.setText(file);
+      }
     }
   }
 
@@ -237,13 +251,12 @@ public class GeneralPanel extends JPanel {
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
-    esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
-    comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
+    overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
   }
 
   /**
@@ -256,13 +269,12 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
-    settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
-    settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
+    settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

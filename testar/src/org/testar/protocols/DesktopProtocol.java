@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,10 +31,9 @@
 
 package org.testar.protocols;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
+import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -42,7 +41,6 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,7 +52,7 @@ import java.util.stream.Stream;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class DesktopProtocol extends ClickFilterLayerProtocol {
+public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
@@ -78,6 +76,21 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
+    
+    /**
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
+    @Override
+    protected void beginSequence(SUT system, State state) {
+    	super.beginSequence(system, state);
+    	
+    	double displayScale = Environment.getInstance().getDisplayScale(state.child(0).get(Tags.HWND, (long)0));
+    	
+    	mouse.setCursorDisplayScale(displayScale);
+    }
 
     /**
      * This method is called when the TESTAR requests the state of the SUT.
@@ -89,7 +102,11 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        latestState = super.getState(system);
+        //Spy mode didn't use the html report
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
+        	return super.getState(system);
+    	
+    	latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
@@ -111,23 +128,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
         //the foreground. You should add all other actions here yourself.
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-        Set<Action> actions = super.deriveActions(system,state);
-
-
-        // Derive left-click actions, click and type actions, and scroll actions from
-        // top level (highest Z-index) widgets of the GUI:
-        actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
-
-        if(actions.size()==0){
-            // If the top level widgets did not have any executable widgets, try all widgets:
-//            System.out.println("No actions from top level widgets, changing to all widgets.");
-            // Derive left-click actions, click and type actions, and scroll actions from
-            // all widgets of the GUI:
-            actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-        }
-
-        //return the set of derived actions
-        return actions;
+        return super.deriveActions(system,state);
     }
 
     /**
@@ -256,7 +257,10 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
+                        final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
+
+                        actions.add(ac.clickTypeInto(w, textToInsert, true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
@@ -329,30 +333,6 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
             }
         }
         return actions;
-    }
-
-    /**
-     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-     * @param actions
-     * @param ac
-     * @param scrollArrowSize
-     * @param scrollThick
-     * @param w
-     */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-        Drag[] drags = null;
-        //If there are scroll (drags/drops) actions possible
-        if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-            //For each possible drag, create an action and add it to the derived actions
-            for (Drag drag : drags){
-                //Create a slide action with the Action Compiler, and add it to the set of derived actions
-                actions.add(ac.slideFromTo(
-                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-                ));
-
-            }
-        }
     }
 
     private String[] getTextInputsFromFile(final String inputFile) {

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,19 +30,16 @@
 
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
+import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.UnProc;
-import org.fruit.Util;
+import org.fruit.*;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
@@ -50,8 +47,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import org.fruit.alayer.windows.Windows10;
 
-import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -116,6 +113,8 @@ public class Main {
 
 			initCodingManager(settings);
 
+			initOperatingSystem();
+
 			startTestar(settings, testSettingsFileName);
 		}
 
@@ -129,6 +128,8 @@ public class Main {
 				setTestarDirectory(settings);
 
 				initCodingManager(settings);
+
+				initOperatingSystem();
 
 				startTestar(settings, testSettingsFileName);
 			}
@@ -148,9 +149,9 @@ public class Main {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			if(!System.getenv("JAVA_HOME").contains("1.8"))
+			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
+		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
 				+"Check if JAVA_HOME system variable is correctly defined \n \n"
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
 
@@ -449,16 +450,18 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(InputFileText, "blns.txt"));
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 
-			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
-					add("Role");
+					add("WidgetControlType");
 				}
 			}));
 
@@ -483,11 +486,6 @@ public class Main {
 			//PrologActivated is ALWAYS false.
 			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
 			settings.set(ConfigTags.PrologActivated, false);
-
-			// check that the abstract state properties and the abstract action properties have at least 1 value
-			if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
-			}
 
 			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
@@ -652,31 +650,29 @@ public class Main {
 	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
-		int i;
 
-		// first the attributes for the concrete state id
-		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-			i = 0;
-
-			Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
-			for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
-				concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
-			}
-
-			CodingManager.setCustomTagsForConcreteId(concreteTags);
+        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+        // for the concrete state tags we use all the state management tags that are available
+		if (!stateManagementTags.isEmpty()) {
+			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 		}
 
-		// then the attributes for the abstract state id
-		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-			i = 0;
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+    }
 
-			Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
-			for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
-				abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
-			}
-
-			CodingManager.setCustomTagsForAbstractId(abstractTags);
+	/**
+	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 */
+	private static void initOperatingSystem() {
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
+			Environment.setInstance(new Windows10());
+		} else {
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
-
 }

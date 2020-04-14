@@ -30,6 +30,8 @@
 
 
 import java.util.Set;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
@@ -147,7 +149,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// top level (highest Z-index) widgets of the GUI:
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-		if(actions.size()==0){
+		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
 //			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from

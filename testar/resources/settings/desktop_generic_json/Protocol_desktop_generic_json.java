@@ -29,8 +29,13 @@
 *******************************************************************************************************/
 
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+
+import java.util.Set;
+
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -55,8 +60,45 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
-		JsonUtils.createWidgetInfoJsonFile(state);
+		if(settings.get(ConfigTags.Mode) == Modes.Generate)
+			JsonUtils.createWidgetInfoJsonFile(state);
+		
 		return state;
+	}
+	
+	/**
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @return  a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		Set<Action> actions = super.deriveActions(system,state);
+
+
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
+
+		//return the set of derived actions
+		return actions;
 	}
 
 }
