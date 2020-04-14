@@ -45,9 +45,12 @@ public final class MBeanClient {
 	 * @param args
 	 * @throws Exception
 	 */
-	public static String dumpJaCoCoReport(String sequence) throws Exception {
+	public static String dumpJaCoCoReport() throws Exception {
 		
-		String destFile = OutputStructure.outerLoopOutputDir + File.separator + "jacoco-" + sequence + ".exec";
+		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
+				+ "jacoco-"
+				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+				+ ".exec";
 		//String destFile = "jacoco-client.exec";
 		
 		// Open connection to the coverage agent:

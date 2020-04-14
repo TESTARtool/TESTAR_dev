@@ -44,6 +44,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
+import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
 import org.testar.json.object.JsonArtefactStateModel;
 import org.testar.json.object.JsonArtefactTestResults;
@@ -65,6 +66,8 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	SortedSet<String> htmlOutputDir = new TreeSet<>();
 	SortedSet<String> logsOutputDir = new TreeSet<>();
 	SortedSet<String> sequencesVerdicts = new TreeSet<>();
+	SortedSet<String> coverageSummary = new TreeSet<>();
+	SortedSet<String> coverageDir = new TreeSet<>();
 
 	private static final String JACOCO_CODEO = "java"
 			+ " -Dcom.sun.management.jmxremote.port=5000"
@@ -168,7 +171,7 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		if(!settings.get(ConfigTags.Mode).equals(Modes.Spy)) {
 			String jacocoFile = "jacoco-client.exec";
 			try {
-				jacocoFile = MBeanClient.dumpJaCoCoReport(OutputStructure.executedSUTname);
+				jacocoFile = MBeanClient.dumpJaCoCoReport();
 			} catch (Exception e) {
 				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
 			}
@@ -194,16 +197,28 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 			super.stopSystem(system);
 
 			try {
+				
+				String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports"
+						+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
+				coverageDir.add(reportDir);
+				
 				//Launch JaCoCo report
 				String antCommand = "cd jacoco_0.8.5 && ant report"
 						+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-						+ " -DreportCoverageDir=" 
-						+ new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+						+ " -DreportCoverageDir=" + reportDir;
 
 				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-				builder.start();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				Process p = builder.start();
+				p.waitFor();
+				
+				System.out.println("JaCoCo report created successfully!");
+				
+				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+				coverageSummary.add(coverageInfo);
+				
+				System.out.println(coverageInfo);
+				
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -229,7 +244,8 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
-				logsOutputDir, htmlOutputDir, sequencesVerdicts);
+				logsOutputDir, htmlOutputDir, sequencesVerdicts,
+				coverageSummary, coverageDir);
 		ModelArtifactManager.createAutomaticArtefact(settings);
 	}
 

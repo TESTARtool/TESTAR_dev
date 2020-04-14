@@ -27,6 +27,8 @@
 				
 			</structure>
 			<html destdir="${reportCoverageDir}" />
+			<csv destfile="${reportCoverageDir}/report_jacoco.csv" />
+			<xml destfile="${reportCoverageDir}/reportjacoco.xml" />
 		</jacoco:report>
 	</target>
 	
