@@ -328,31 +328,31 @@ Z̮̞̠͙͔ͅḀ̗̞͈̻̗Ḷ͙͎̯̹̞͓G̻O̭̗̮
 #
 #	Strings which attempt to invoke a benign script injection; shows vulnerability to XSS
 
-<script>alert(123)</script>
+<script>alert(XSS injection Exception)</script>
 &lt;script&gt;alert(&#39;123&#39;);&lt;/script&gt;
-<img src=x onerror=alert(123) />
-<svg><script>123<1>alert(123)</script>
-"><script>alert(123)</script>
-'><script>alert(123)</script>
-><script>alert(123)</script>
-</script><script>alert(123)</script>
-< / script >< script >alert(123)< / script >
-onfocus=JaVaSCript:alert(123) autofocus
-" onfocus=JaVaSCript:alert(123) autofocus
-' onfocus=JaVaSCript:alert(123) autofocus
-＜script＞alert(123)＜/script＞
-<sc<script>ript>alert(123)</sc</script>ript>
---><script>alert(123)</script>
-";alert(123);t="
-';alert(123);t='
-JavaSCript:alert(123)
-;alert(123);
+<img src=x onerror=alert(XSS injection Exception) />
+<svg><script>123<1>alert(XSS injection Exception)</script>
+"><script>alert(XSS injection Exception)</script>
+'><script>alert(XSS injection Exception)</script>
+><script>alert(XSS injection Exception)</script>
+</script><script>alert(XSS injection Exception)</script>
+< / script >< script >alert(XSS injection Exception)< / script >
+onfocus=JaVaSCript:alert(XSS injection Exception) autofocus
+" onfocus=JaVaSCript:alert(XSS injection Exception) autofocus
+' onfocus=JaVaSCript:alert(XSS injection Exception) autofocus
+＜script＞alert(XSS injection Exception)＜/script＞
+<sc<script>ript>alert(XSS injection Exception)</sc</script>ript>
+--><script>alert(XSS injection Exception)</script>
+";alert(XSS injection Exception);t="
+';alert(XSS injection Exception);t='
+JavaSCript:alert(XSS injection Exception)
+;alert(XSS injection Exception);
 src=JaVaSCript:prompt(132)
-"><script>alert(123);</script x="
-'><script>alert(123);</script x='
-><script>alert(123);</script x=
-" autofocus onkeyup="javascript:alert(123)
-' autofocus onkeyup='javascript:alert(123)
+"><script>alert(XSS injection Exception);</script x="
+'><script>alert(XSS injection Exception);</script x='
+><script>alert(XSS injection Exception);</script x=
+" autofocus onkeyup="javascript:alert(XSS injection Exception)
+' autofocus onkeyup='javascript:alert(XSS injection Exception)
 <script\x20type="text/javascript">javascript:alert(1);</script>
 <script\x3Etype="text/javascript">javascript:alert(1);</script>
 <script\x0Dtype="text/javascript">javascript:alert(1);</script>
@@ -563,7 +563,7 @@ perl -e 'print "<IMG SRC=java\0script:alert(\"XSS\")>";' > out
 <i onwheel=alert(1)> Scroll over me </i>
 <plaintext>
 http://a/%%30%30
-</textarea><script>alert(123)</script>
+</textarea><script>alert(XSS injection Exception)</script>
 
 #	SQL Injection
 #
