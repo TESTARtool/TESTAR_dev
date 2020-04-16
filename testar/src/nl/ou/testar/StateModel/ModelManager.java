@@ -342,6 +342,6 @@ public class ModelManager implements StateModelManager {
 
     @Override
     public int getNrOfNonDeterministicActions() {
-        return nrOfNonDeterministicActions;
+        return persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
     }
 }
