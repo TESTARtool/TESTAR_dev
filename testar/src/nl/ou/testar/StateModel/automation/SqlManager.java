@@ -579,6 +579,182 @@ public class SqlManager {
 
     }
 
+    public void initTest6(boolean clearOldResults) {
+        try {
+            Connection connection = this.getConnection();
+
+            if (clearOldResults) {
+                String query1 = "TRUNCATE TABLE test_run_widget";
+                String query2 = "DELETE FROM automated_test_run";
+                String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+                String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+                Stream.of(query1, query2, query3, query4).forEach(query -> {
+                    try {
+                        Statement statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                        exit(1);
+                    }
+                });
+            }
+
+            // fetch the application
+            String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
+            Statement appStatement = connection.createStatement();
+            ResultSet resultSet1 = appStatement.executeQuery(fetchApplicationQuery);
+            resultSet1.first();
+            int applicationId = resultSet1.getInt("application_id");
+
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0";
+            String updateWidgetQuery2 =
+                    "UPDATE widget\n" +
+                    "SET use_in_abstraction = 1\n" +
+                    "WHERE widget_config_name IN\n" +
+                    "      ('WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary', 'WidgetScrollItemPattern', 'WidgetValuePattern')";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
+
+            // now fetch the widgets
+            String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
+            Statement widgetStatement = connection.createStatement();
+            ResultSet resultSet2 = widgetStatement.executeQuery(fetchWidgetQuery);
+
+            // in test 1, we create tests with just a single widget
+            String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
+                    "VALUES(?, ?, ?, ?)";
+            PreparedStatement preparedStatement1 = connection.prepareStatement(testRunInsertQuery, Statement.RETURN_GENERATED_KEYS);
+
+            String widgetAttachQuery = "INSERT INTO test_run_widget(test_run_id, widget_id) VALUES(?, ?)";
+            PreparedStatement widgetAttachStatement = connection.prepareStatement(widgetAttachQuery);
+
+            // in the second test, we make combinations of widgets
+            List<Integer> widgetIds = new ArrayList<>();
+            while (resultSet2.next()) {
+                widgetIds.add(resultSet2.getInt("widget_id"));
+            }
+
+            // now create the combinations
+            List<int[]> combinations = generateCombinations(widgetIds, 5);
+            System.out.println("Number of combinations: " + combinations.size());
+
+            // for each combination, we insert a test run
+            for (int[] combination : combinations) {
+                preparedStatement1.setInt(1, applicationId);
+                preparedStatement1.setInt(2, 100);
+                preparedStatement1.setInt(3, 500);
+                preparedStatement1.setInt(4, 0);
+                preparedStatement1.execute();
+
+                // fetch the generated test run id
+                ResultSet keys = preparedStatement1.getGeneratedKeys();
+                keys.next();
+                int testRunId = keys.getInt(1);
+
+                for (int widgetId : combination) {
+                    widgetAttachStatement.setInt(1, testRunId);
+                    widgetAttachStatement.setInt(2, widgetId);
+                    widgetAttachStatement.execute();
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initTest7(boolean clearOldResults) {
+        try {
+            Connection connection = this.getConnection();
+
+            if (clearOldResults) {
+                String query1 = "TRUNCATE TABLE test_run_widget";
+                String query2 = "DELETE FROM automated_test_run";
+                String query3 = "ALTER TABLE automated_test_run AUTO_INCREMENT = 1";
+                String query4 = "ALTER TABLE test_run_widget AUTO_INCREMENT = 1";
+                Stream.of(query1, query2, query3, query4).forEach(query -> {
+                    try {
+                        Statement statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        System.out.println("Error occurred while cleaning old results. Exiting TESTAR.");
+                        exit(1);
+                    }
+                });
+            }
+
+            // fetch the application
+            String fetchApplicationQuery = "SELECT * FROM application WHERE application_name = 'Notepad'";
+            Statement appStatement = connection.createStatement();
+            ResultSet resultSet1 = appStatement.executeQuery(fetchApplicationQuery);
+            resultSet1.first();
+            int applicationId = resultSet1.getInt("application_id");
+
+            String updateWidgetQuery1 = "UPDATE widget " +
+                    "SET use_in_abstraction = 0";
+            String updateWidgetQuery2 =
+                    "UPDATE widget\n" +
+                            "SET use_in_abstraction = 1\n" +
+                            "WHERE widget_config_name IN\n" +
+                            "      ('WidgetTitle', 'WidgetHasKeyboardFocus', 'WidgetBoundary')";
+            Statement updateWidgetStatement = connection.createStatement();
+            updateWidgetStatement.executeUpdate(updateWidgetQuery1);
+            updateWidgetStatement.executeUpdate(updateWidgetQuery2);
+
+            // now fetch the widgets
+            String fetchWidgetQuery = "SELECT * from widget WHERE use_in_abstraction = 1";
+            Statement widgetStatement = connection.createStatement();
+            ResultSet resultSet2 = widgetStatement.executeQuery(fetchWidgetQuery);
+
+            // in test 1, we create tests with just a single widget
+            String testRunInsertQuery = "INSERT INTO automated_test_run(application_id, configured_sequences, configured_steps, reset_data_store_before_run) " +
+                    "VALUES(?, ?, ?, ?)";
+            PreparedStatement preparedStatement1 = connection.prepareStatement(testRunInsertQuery, Statement.RETURN_GENERATED_KEYS);
+
+            String widgetAttachQuery = "INSERT INTO test_run_widget(test_run_id, widget_id) VALUES(?, ?)";
+            PreparedStatement widgetAttachStatement = connection.prepareStatement(widgetAttachQuery);
+
+            // in the second test, we make combinations of widgets
+            List<Integer> widgetIds = new ArrayList<>();
+            while (resultSet2.next()) {
+                widgetIds.add(resultSet2.getInt("widget_id"));
+            }
+
+            // now create the combinations
+            List<int[]> combinations = generateCombinations(widgetIds, 3);
+            System.out.println("Number of combinations: " + combinations.size());
+
+            // for each combination, we insert a test run
+            for (int[] combination : combinations) {
+                preparedStatement1.setInt(1, applicationId);
+                preparedStatement1.setInt(2, 100);
+                preparedStatement1.setInt(3, 500);
+                preparedStatement1.setInt(4, 0);
+                preparedStatement1.execute();
+
+                // fetch the generated test run id
+                ResultSet keys = preparedStatement1.getGeneratedKeys();
+                keys.next();
+                int testRunId = keys.getInt(1);
+
+                for (int widgetId : combination) {
+                    widgetAttachStatement.setInt(1, testRunId);
+                    widgetAttachStatement.setInt(2, widgetId);
+                    widgetAttachStatement.execute();
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<TestRun> getTestRuns(Integer limit) {
         List<TestRun> testRuns = new ArrayList<>();
         try {
