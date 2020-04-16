@@ -14,6 +14,8 @@ public class TestRunStepsResultPojo {
 
     private int nrOfUnvisitedActions;
 
+    private int nrOfNonDeterministicActions;
+
     private String comboIdentifier;
 
     public int getNrOfStepsExecuted() {
@@ -70,5 +72,13 @@ public class TestRunStepsResultPojo {
 
     public void setComboIdentifier(String comboIdentifier) {
         this.comboIdentifier = comboIdentifier;
+    }
+
+    public int getNrOfNonDeterministicActions() {
+        return nrOfNonDeterministicActions;
+    }
+
+    public void setNrOfNonDeterministicActions(int nrOfNonDeterministicActions) {
+        this.nrOfNonDeterministicActions = nrOfNonDeterministicActions;
     }
 }

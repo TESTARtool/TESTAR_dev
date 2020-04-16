@@ -869,6 +869,7 @@ public class SqlManager {
                         "ending_time_ms, " +
                         "nr_of_steps_executed, " +
                         "deterministic_model, " +
+                        "nr_of_non_deterministic_actions, " +
                         "exception_thrown, " +
                         "exception_message, " +
                         "stack_trace, " +
@@ -893,14 +894,15 @@ public class SqlManager {
                             insertAtrStatement.setLong(7, Long.parseLong(atr.getEndingTimeMs()));
                             insertAtrStatement.setInt(8, atr.getNrOfStepsExecuted());
                             insertAtrStatement.setInt(9, booleanStringToIntHelper(atr.getDeterministicModel()));
-                            insertAtrStatement.setInt(10, booleanStringToIntHelper(atr.getExceptionThrown()));
-                            insertAtrStatement.setString(11, atr.getExceptionMessage());
-                            insertAtrStatement.setString(12, atr.getStrackTrace());
-                            insertAtrStatement.setInt(13, atr.getNrOfAbstractStates());
-                            insertAtrStatement.setInt(14, atr.getNrOfAbstractActions());
-                            insertAtrStatement.setInt(15, atr.getNrOfUnvisitedActions());
-                            insertAtrStatement.setInt(16, atr.getNrOfConcreteStates());
-                            insertAtrStatement.setInt(17, atr.getNrOfConcreteActions());
+                            insertAtrStatement.setInt(10, booleanStringToIntHelper(atr.getNrOfNonDeterministicActions()));
+                            insertAtrStatement.setInt(11, booleanStringToIntHelper(atr.getExceptionThrown()));
+                            insertAtrStatement.setString(12, atr.getExceptionMessage());
+                            insertAtrStatement.setString(13, atr.getStrackTrace());
+                            insertAtrStatement.setInt(14, atr.getNrOfAbstractStates());
+                            insertAtrStatement.setInt(15, atr.getNrOfAbstractActions());
+                            insertAtrStatement.setInt(16, atr.getNrOfUnvisitedActions());
+                            insertAtrStatement.setInt(17, atr.getNrOfConcreteStates());
+                            insertAtrStatement.setInt(18, atr.getNrOfConcreteActions());
                             insertAtrStatement.execute();
                         } catch (SQLException e) {
                             e.printStackTrace();
@@ -1106,6 +1108,7 @@ public class SqlManager {
                     "nr_of_concrete_actions_after_run, " +
                     "nr_of_unvisited_abstract_actions_after_run, " +
                     "deterministic_model, " +
+                    "nr_of_non_deterministic_actions, " +
                     "exception_thrown, " +
                     "exception_message, " +
                     "stack_trace)  " +
@@ -1155,7 +1158,10 @@ public class SqlManager {
                 "                            abstract_action_average, " +
                 "                            unvisited_action_average, " +
                 "                            concrete_state_average, " +
-                "                            concrete_action_average) " +
+                "                            concrete_action_average, " +
+                "                            nr_of_non_deterministic_actions_series," +
+                "                            nr_of_non_deterministic_actions_average " +
+                ") " +
                 " " +
                 "SELECT test_run_base.widget_combo, " +
                 "       test_run_base.widget_names, " +
@@ -1174,7 +1180,9 @@ public class SqlManager {
                 "       IFNULL(AVG(test_run_base.nr_of_abstract_actions_after_run), 0)                                                          AS nr_of_abstract_actions_average, " +
                 "       IFNULL(AVG(test_run_base.nr_of_unvisited_abstract_actions_after_run), 0)                                                AS nr_of_unvisited_abstract_actions_average, " +
                 "       IFNULL(AVG(test_run_base.nr_of_concrete_states_after_run), 0)                                                           AS nr_of_concrete_states_average, " +
-                "       IFNULL(AVG(test_run_base.nr_of_concrete_actions_after_run), 0)                                                          AS nr_of_concrete_actions_average " +
+                "       IFNULL(AVG(test_run_base.nr_of_concrete_actions_after_run), 0)                                                          AS nr_of_concrete_actions_average, " +
+                "       GROUP_CONCAT(test_run_base.nr_of_non_deterministic_actions ORDER BY test_run_base.nr_of_non_deterministic_actions SEPARATOR ', ') as nr_on_non_deterministic_actions_series, " +
+                "       IFNULL(AVG(test_run_base.nr_of_non_deterministic_actions) , 0)                                                                     AS nr_of_non_deterministic_actions_average " +
                 "FROM ( " +
                 "         SELECT trw.test_run_id, " +
                 "                atr.ending_time_ms - atr.starting_time_ms                                       AS runtime_ms, " +
@@ -1184,6 +1192,7 @@ public class SqlManager {
                 "                atr.nr_of_unvisited_abstract_actions_after_run, " +
                 "                atr.nr_of_concrete_states_after_run, " +
                 "                atr.nr_of_concrete_actions_after_run, " +
+                "                atr.nr_of_non_deterministic_actions, " +
                 "                GROUP_CONCAT(trw.widget_id ORDER BY trw.widget_id SEPARATOR '-')                AS widget_combo, " +
                 "                GROUP_CONCAT(w.widget_config_name ORDER BY w.widget_config_name SEPARATOR ', ') AS widget_names " +
                 "         FROM test_run_widget trw " +
@@ -1208,6 +1217,7 @@ public class SqlManager {
                     "    nr_of_unvisited_abstract_actions_after_run,\n" +
                     "    nr_of_concrete_states_after_run,\n" +
                     "    nr_of_concrete_actions_after_run,\n" +
+                    "    nr_of_non_deterministic_actions,\n" +
                     "    GROUP_CONCAT( trw.widget_id ORDER BY trw.widget_id SEPARATOR '-' ) AS widget_combo\n" +
                     "FROM\n" +
                     "    test_run_widget trw\n" +
@@ -1226,7 +1236,8 @@ public class SqlManager {
                 pojo.setNrOfUnvisitedActions(resultSet.getInt(5));
                 pojo.setNrOfConcreteStates(resultSet.getInt(6));
                 pojo.setNrOfConcreteActions(resultSet.getInt(7));
-                pojo.setComboIdentifier(resultSet.getString(8));
+                pojo.setNrOfNonDeterministicActions(resultSet.getInt(8));
+                pojo.setComboIdentifier(resultSet.getString(9));
                 testRunStepsResultPojos.add(pojo);
             }
 
@@ -1240,7 +1251,8 @@ public class SqlManager {
                     "abstract_action_median = ?," +
                     "unvisited_action_median = ?," +
                     "concrete_state_median = ?," +
-                    "concrete_action_median = ?" +
+                    "concrete_action_median = ?," +
+                    "nr_of_non_deterministic_actions_median = ? " +
                     "WHERE " +
                     "widget_combo = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(updateTestResultQuery);
@@ -1251,6 +1263,7 @@ public class SqlManager {
                 double unvisitedActionMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfUnvisitedActions).collect(Collectors.toList()));
                 double concreteStateMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfConcreteStates).collect(Collectors.toList()));
                 double concreteActionMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfConcreteActions).collect(Collectors.toList()));
+                double nrOfNonDeterministicActionsMedian = calculateMedian(comboResultMapping.get(widgetCombo).stream().map(TestRunStepsResultPojo::getNrOfNonDeterministicActions).collect(Collectors.toList()));
                 // update the test result table and insert the median
 
                 try {
@@ -1260,7 +1273,8 @@ public class SqlManager {
                     preparedStatement.setDouble(4, unvisitedActionMedian);
                     preparedStatement.setDouble(5, concreteStateMedian);
                     preparedStatement.setDouble(6, concreteActionMedian);
-                    preparedStatement.setString(7, widgetCombo);
+                    preparedStatement.setDouble(7, nrOfNonDeterministicActionsMedian);
+                    preparedStatement.setString(8, widgetCombo);
                     preparedStatement.executeUpdate();
                 } catch (SQLException e) {
                     e.printStackTrace();

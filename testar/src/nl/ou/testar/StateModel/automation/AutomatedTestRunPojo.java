@@ -31,6 +31,9 @@ public class AutomatedTestRunPojo {
     @CsvBindByName(column = "deterministic_model")
     private String deterministicModel;
 
+    @CsvBindByName(column = "nr_of_non_deterministic_actions")
+    private String nrOfNonDeterministicActions;
+
     @CsvBindByName(column = "exception_thrown")
     private String exceptionThrown;
 
@@ -121,6 +124,14 @@ public class AutomatedTestRunPojo {
 
     public String getDeterministicModel() {
         return deterministicModel;
+    }
+
+    public String getNrOfNonDeterministicActions() {
+        return nrOfNonDeterministicActions;
+    }
+
+    public void setNrOfNonDeterministicActions(String nrOfNonDeterministicActions) {
+        this.nrOfNonDeterministicActions = nrOfNonDeterministicActions;
     }
 
     public void setDeterministicModel(String deterministicModel) {
