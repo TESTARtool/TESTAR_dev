@@ -27,5 +27,7 @@ public interface StateModelManager {
 
     int getTotalStepsExecuted();
 
+    int getNrOfNonDeterministicActions();
+
     ModelStats getModelStats();
 }

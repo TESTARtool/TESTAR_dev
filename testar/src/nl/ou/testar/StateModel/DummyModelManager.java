@@ -62,4 +62,9 @@ public class DummyModelManager implements StateModelManager{
     public ModelStats getModelStats() {
         return null;
     }
+
+    @Override
+    public int getNrOfNonDeterministicActions() {
+        return 0;
+    }
 }

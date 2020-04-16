@@ -629,7 +629,8 @@ public class SqlManager {
                     "nr_of_abstract_actions_after_run = ?, " +
                     "nr_of_unvisited_abstract_actions_after_run = ?, " +
                     "nr_of_concrete_states_after_run = ?, " +
-                    "nr_of_concrete_actions_after_run = ? " +
+                    "nr_of_concrete_actions_after_run = ?, " +
+                    "nr_of_non_deterministic_actions = ? " +
                     " WHERE test_run_id = ?";
             Connection connection = getConnection();
             PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
@@ -646,7 +647,8 @@ public class SqlManager {
             insertStatement.setInt(10, testRun.getNrOfUnvisitedActions());
             insertStatement.setInt(11, testRun.getNrOfConcreteStates());
             insertStatement.setInt(12, testRun.getNrOfConcreteActions());
-            insertStatement.setInt(13, testRun.getTestRunId());
+            insertStatement.setInt(13, testRun.getNrOfNonDeterministicActions());
+            insertStatement.setInt(14, testRun.getTestRunId());
             insertStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();

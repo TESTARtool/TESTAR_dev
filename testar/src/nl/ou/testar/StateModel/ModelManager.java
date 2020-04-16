@@ -339,4 +339,9 @@ public class ModelManager implements StateModelManager {
     public ModelStats getModelStats() {
         return persistenceManager.getModelStats(abstractStateModel);
     }
+
+    @Override
+    public int getNrOfNonDeterministicActions() {
+        return nrOfNonDeterministicActions;
+    }
 }

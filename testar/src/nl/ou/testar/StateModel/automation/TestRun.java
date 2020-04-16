@@ -22,6 +22,8 @@ public class TestRun {
 
     private boolean modelIsDeterministic;
 
+    private int nrOfNonDeterministicActions = 0;
+
     private int nrOfStepsExecuted;
 
     private boolean exceptionThrown = false;
@@ -163,5 +165,13 @@ public class TestRun {
 
     public void setNrOfUnvisitedActions(int nrOfUnvisitedActions) {
         this.nrOfUnvisitedActions = nrOfUnvisitedActions;
+    }
+
+    public int getNrOfNonDeterministicActions() {
+        return nrOfNonDeterministicActions;
+    }
+
+    public void setNrOfNonDeterministicActions(int nrOfNonDeterministicActions) {
+        this.nrOfNonDeterministicActions = nrOfNonDeterministicActions;
     }
 }

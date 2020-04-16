@@ -814,6 +814,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		TestRunSync.getInstance().setNrOfUnvisitedActions(modelStats.getNrOfUnvisitedActions());
 		TestRunSync.getInstance().setNrOfConcreteStates(modelStats.getNrOfConcreteStates());
 		TestRunSync.getInstance().setNrOfConcreteActions(modelStats.getNrOfConcreteActions());
+		TestRunSync.getInstance().setNrOfNonDeterministicActions(stateModelManager.getNrOfNonDeterministicActions());
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();

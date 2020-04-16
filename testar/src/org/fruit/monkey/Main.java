@@ -257,6 +257,7 @@ public class Main {
 				testRun.setNrOfUnvisitedActions(TestRunSync.getInstance().getNrOfUnvisitedActions());
 				testRun.setNrOfConcreteStates(TestRunSync.getInstance().getNrOfConcreteStates());
 				testRun.setNrOfConcreteActions(TestRunSync.getInstance().getNrOfConcreteActions());
+				testRun.setNrOfNonDeterministicActions(TestRunSync.getInstance().getNrOfNonDeterministicActions());
 				sqlManager.saveTestStats(testRun);
 				TestRunSync.resetInstance();
 				System.out.println("Ending run");

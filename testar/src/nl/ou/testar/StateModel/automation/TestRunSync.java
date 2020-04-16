@@ -21,6 +21,8 @@ public class TestRunSync {
 
     private boolean modelIsDeterministic = true;
 
+    private int nrOfNonDeterministicActions = 0;
+
     private int nrOfStepsExecuted = 0;
 
     private boolean exceptionThrown = false;
@@ -117,5 +119,13 @@ public class TestRunSync {
 
     public void setNrOfUnvisitedActions(int nrOfUnvisitedActions) {
         this.nrOfUnvisitedActions = nrOfUnvisitedActions;
+    }
+
+    public int getNrOfNonDeterministicActions() {
+        return nrOfNonDeterministicActions;
+    }
+
+    public void setNrOfNonDeterministicActions(int nrOfNonDeterministicActions) {
+        this.nrOfNonDeterministicActions = nrOfNonDeterministicActions;
     }
 }
