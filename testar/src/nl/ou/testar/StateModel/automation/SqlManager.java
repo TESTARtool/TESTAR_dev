@@ -1372,4 +1372,16 @@ public class SqlManager {
         }
     }
 
+    public void addNonDetAmountColumn() {
+        try {
+            String alterQuery = "ALTER TABLE `automated_test_run` " +
+                    "ADD COLUMN `nr_of_non_deterministic_actions` int(0) NULL AFTER `deterministic_model`";
+            Connection connection = getConnection();
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(alterQuery);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
 }

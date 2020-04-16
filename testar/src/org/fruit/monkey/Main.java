@@ -124,6 +124,11 @@ public class Main {
 		if (settings.get(Automate)) {
 			SqlManager sqlManager = new SqlManager();
 
+			if (settings.get(AddNonDetActionColumn)) {
+				sqlManager.addNonDetAmountColumn();
+				exit(1);
+			}
+
 			if (settings.get(AddStateColumns)) {
 				sqlManager.addStateResultColumns();
 				exit(1);
@@ -641,6 +646,7 @@ public class Main {
 			defaults.add(Pair.from(UpdateWidgetTable, false));
 			defaults.add(Pair.from(NrOfTestsToRun, 10000));
 			defaults.add(Pair.from(AddStateColumns, false));
+			defaults.add(Pair.from(AddNonDetActionColumn, false));
 
 
 			//Overwrite the default settings with those from the file
