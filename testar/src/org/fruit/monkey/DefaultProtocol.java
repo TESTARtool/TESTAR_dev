@@ -41,6 +41,7 @@ import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.SequenceLength;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -58,6 +59,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 
 import javax.swing.JFrame;
@@ -894,6 +896,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			executeAction(system, state, action);
 			lastExecutedAction = action;
 			actionCount++;
+			// print a progress bar to console
+			printProgressBar();
 
 			//Saving the actions and the executed action into replayable test sequence:
 			saveActionIntoFragmentForReplayableSequence(action, state, actions);
@@ -1933,6 +1937,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
+	}
+
+	private void printProgressBar() {
+		int totalNrOfSequenceSteps = settings().get(ConfigTags.Sequences) * settings().get(SequenceLength);
+		int executedSteps = (sequenceCount - 1) * settings.get(SequenceLength) + actionCount;
+		executedSteps = Math.min(executedSteps, totalNrOfSequenceSteps);
+		StringJoiner joiner = new StringJoiner("");
+		joiner.add("|");
+		int barLength = 40;
+		int nrOfFilledSegments = (int) ((double)executedSteps / (double)totalNrOfSequenceSteps * barLength);
+		int emptySegments = Math.max(0, barLength - nrOfFilledSegments);
+		IntStream.rangeClosed(1, nrOfFilledSegments).forEach(__ -> joiner.add("%"));
+		IntStream.rangeClosed(1, emptySegments).forEach(__ -> joiner.add("_"));
+		joiner.add("|");
+		System.out.println("Progress:");
+		System.out.println(joiner.toString());
+		System.out.println();
 	}
 
 	@Override
