@@ -39,6 +39,10 @@ import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.Settings;
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Pattern;
+import org.sikuli.script.Region;
+import org.sikuli.script.Screen;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
@@ -100,6 +104,11 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state){
+
+		// Starting Parasoft Chrome plugin
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_recorder_chrome_icon.jpg");
+
+		Util.pause(5);
 
 		// When a TESTAR sequence begins we will login in to the application
 		for(Widget w : state) {
@@ -328,5 +337,39 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Using SikuliX library to click on text on screen
+	 * @param textToFindOrImagePath
+	 */
+	protected  static void executeClickOnTextOrImagePath(String textToFindOrImagePath){
+		Screen sikuliScreen = new Screen();
+		try {
+			//System.out.println("DEBUG: sikuli clicking on text (or image path): "+textToFindOrImagePath);
+			sikuliScreen.click(textToFindOrImagePath);
+		} catch (FindFailed findFailed) {
+			findFailed.printStackTrace();
+		}
+	}
+
+	protected  static boolean textOrImageExists(String textOrImagePath){
+		if(getRegionOfTextOrImage(textOrImagePath)==null){
+			// text or image not found
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 *
+	 * @param textOrImagePath
+	 * @return null if not found
+	 */
+	protected  static Region getRegionOfTextOrImage(String textOrImagePath){
+		Screen sikuliScreen = new Screen();
+		Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.90));
+		Region region = sikuliScreen.exists(pattern);
+		return region;
 	}
 }
