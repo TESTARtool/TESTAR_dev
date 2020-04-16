@@ -29,7 +29,7 @@ public class SqlManager {
     private String connectionString;
 
     public SqlManager() {
-        connectionString = "jdbc:mysql://localhost:3306/" + database;
+        connectionString = "jdbc:mysql://localhost:3306/" + database + "?serverTimezone=UTC";
     }
 
     public Connection getConnection() {
