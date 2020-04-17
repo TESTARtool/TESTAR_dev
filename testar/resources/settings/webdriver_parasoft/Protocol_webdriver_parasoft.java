@@ -34,6 +34,9 @@ import nl.ou.testar.SutVisualization;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
@@ -43,6 +46,7 @@ import org.sikuli.script.FindFailed;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Region;
 import org.sikuli.script.Screen;
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
@@ -53,6 +57,9 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 
+	String extensionId = "";
+	String extensionVersion = "";
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -96,7 +103,9 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		 * Local Path to the desired Chrome Extension
 		 * Example: "C:\\Users\\*username*\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\*extension id*\\*extension version*";
 		 */
-		WdDriver.additionalExtension = "";
+		
+		WdDriver.additionalExtension = "C:\\Users\\testar\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\"
+		+ extensionId + "\\" + extensionVersion;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
@@ -112,7 +121,11 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 	protected void beginSequence(SUT system, State state){
 
 		// Starting Parasoft Chrome plugin
+		WdDriver.loadingExtension = true;
 		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_recorder_chrome_icon.jpg");
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_start_recording_icon.jpg");
+		WdDriver.loadingExtension = false;
+		//parasoftStartRecording();
 
 		Util.pause(5);
 
@@ -271,6 +284,43 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		return actions;
 	}
 	
+	@Override
+	protected void stopSystem(SUT system) {
+		// Stop recording with Parasoft Chrome plugin
+		WdDriver.loadingExtension = true;
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_recorder_chrome_icon_stop.jpg");
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_stop_recording_icon.jpg");
+		
+		Util.pause(1);
+		
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_test_name.jpg");
+		
+		Util.pause(1);
+		
+		Keyboard kb = AWTKeyboard.build();
+		kb.press(KBKeys.VK_TAB);
+		kb.release(KBKeys.VK_TAB);
+		
+		new CompoundAction.Builder()   
+		.add(new Type(OutputStructure.startOuterLoopDateString +"_"+ OutputStructure.executedSUTname),1).build()
+		.run(system, null, 1);
+		
+		Util.pause(1);
+		
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_download_record.jpg");
+		
+		Util.pause(5);
+		
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+		
+		Util.pause(5);
+		
+		WdDriver.loadingExtension = false;
+		
+		super.stopSystem(system);
+	}
+	
 	/**
 	 * If all necessary widgets exists, create a compound action for login
 	 */
@@ -377,5 +427,14 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.90));
 		Region region = sikuliScreen.exists(pattern);
 		return region;
+	}
+	
+	protected void parasoftStartRecording() {
+		WdDriver.followLinks = true;
+		String extensionURL = "\"chrome-extension://" + extensionId + "/html/popup.html\"";
+		WdDriver.executeScript("window.open(" + extensionURL + ");");
+		Util.pause(1);
+		WdDriver.executeScript("$(\"#startRecordingButton\").click()");
+		WdDriver.followLinks = followLinks;
 	}
 }

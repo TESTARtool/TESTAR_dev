@@ -81,6 +81,7 @@ public class WdDriver extends SUTBase {
   private final Mouse mouse = WdMouse.build();
   
   public static String additionalExtension = "";
+  public static boolean loadingExtension = false;
 
   private WdDriver(String sutConnector) {
 	
@@ -416,7 +417,7 @@ public class WdDriver extends SUTBase {
     updateHandlesList();
 
     // Nothing to activate
-    if (windowHandles.size() < 1) {
+    if (windowHandles.size() < 1 || loadingExtension) {
       return;
     }
 
