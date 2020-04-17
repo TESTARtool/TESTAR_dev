@@ -91,6 +91,12 @@ public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 		}};*/
 
 		WdDriver.fullScreen = true;
+		
+		/**
+		 * Local Path to the desired Chrome Extension
+		 * Example: "C:\\Users\\*username*\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\*extension id*\\*extension version*";
+		 */
+		WdDriver.additionalExtension = "";
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
