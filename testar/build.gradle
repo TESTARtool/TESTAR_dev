@@ -138,9 +138,8 @@ prepareOracles.dependsOn(oracleClasses)
  * To debug build TESTAR with the -DDEBUG=true.
  */
 startScripts {
-    if(System.getProperty('DEBUG', 'true') ) {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
-                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+    if(System.getProperty('DEBUG', 'false') ) {
+        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
     } else {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
     }
