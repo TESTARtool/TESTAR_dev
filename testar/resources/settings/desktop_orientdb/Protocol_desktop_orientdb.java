@@ -66,7 +66,7 @@ public class Protocol_desktop_orientdb extends DesktopProtocol {
 			return RandomActionSelector.selectAction(actions);
 	}
 
-	/*@Override
+	@Override
 	protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -170,6 +170,6 @@ public class Protocol_desktop_orientdb extends DesktopProtocol {
 			}
 		}
 		return actions;
-	}*/
+	}
 
 }
