@@ -419,7 +419,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
         // we will use a custom query to search for states in which the same action occurs more than once, leading to
         // different target states
-        String query = "SELECT COUNT(*) as distinctActionNr FROM (SELECT SUM(nrOfActions) as totalActionNr FROM (SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate WHERE modelIdentifier = :modelIdentifier UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1))";
+        String query = "SELECT COUNT(*) as totalActions FROM (select actionId, COUNT(*) as nrOfActions from abstractAction WHERE modelIdentifier = :modelIdentifier GROUP BY actionId) WHERE nrOfActions > 1";
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
             Map<Object, Object> params = new HashMap<>();
             params.put("modelIdentifier", abstractStateModel.getModelIdentifier());
@@ -430,7 +430,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             }
 
             OResult result = resultSet.next();
-            long nrOfActions = result.getProperty("distinctActionNr");
+            long nrOfActions = result.getProperty("totalActions");
             resultSet.close();
             return (int)nrOfActions;
         }
