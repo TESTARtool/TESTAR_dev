@@ -129,7 +129,7 @@ StateModelStoreWidgets = false
 ExitOnNonDeterminism = false
 UsePreviousStateInId = false
 UseAllStatesInId = false
-UseIncomingActionInId = false
+UseIncomingActionInId = true
 
 #################################################################
 # State identifier attributes
