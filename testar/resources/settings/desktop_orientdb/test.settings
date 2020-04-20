@@ -127,7 +127,7 @@ ApplicationVersion = 1.0.0
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 ExitOnNonDeterminism = false
-UsePreviousStateInId = true
+UsePreviousStateInId = false
 UseAllStatesInId = false
 UseIncomingActionInId = false
 
