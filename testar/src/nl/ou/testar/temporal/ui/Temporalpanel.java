@@ -13,6 +13,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -88,7 +89,7 @@ public class Temporalpanel {
 
         startAnalyzerBtn.addActionListener(this::startTemporalWebAnalyzer);
         stopAnalyzerBtn.addActionListener(this::stopTemporalWebAnalyzer);
-        clearBtn.addActionListener(e -> logArea.setText("cleared"));
+        //clearBtn.addActionListener(e -> logArea.setText("cleared"));
         ModelOnlyBtn.addActionListener(this::exportTemporalmodel
         );
         testDbButton.addActionListener(this::testdbconnection);
@@ -123,9 +124,9 @@ public class Temporalpanel {
      */
     private void $$$setupUI$$$() {
         mainTemporalPanel = new JPanel();
-        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:275px:noGrow,top:106px:noGrow"));
+        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:275px:noGrow"));
         mainTemporalPanel.setPreferredSize(new Dimension(621, 340));
-        mainTemporalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null));
+        mainTemporalPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JSeparator separator1 = new JSeparator();
         CellConstraints cc = new CellConstraints();
         mainTemporalPanel.add(separator1, cc.xyw(1, 1, 3, CellConstraints.FILL, CellConstraints.FILL));
@@ -137,7 +138,7 @@ public class Temporalpanel {
         mainTemporalPanel.add(containerTab, cc.xyw(1, 2, 16));
         setupPanel = new JPanel();
         setupPanel.setLayout(new FormLayout("fill:139px:noGrow,left:91px:noGrow,left:8dlu:noGrow,fill:137px:noGrow,left:5dlu:noGrow,right:66px:noGrow,fill:132px:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:37px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
-        setupPanel.setVisible(true);
+        setupPanel.setVisible(false);
         containerTab.addTab("Setup", setupPanel);
         final JLabel label1 = new JLabel();
         label1.setText("SPOT LTL Checker:");
@@ -148,7 +149,7 @@ public class Temporalpanel {
         setupPanel.add(spotLTLChecker, cc.xyw(2, 5, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLSpot = new JCheckBox();
         WSLCheckBoxLTLSpot.setText("WSL");
-        WSLCheckBoxLTLSpot.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        WSLCheckBoxLTLSpot.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input filenames for the modelchecker are converted automatically.\n</html>");
         setupPanel.add(WSLCheckBoxLTLSpot, cc.xy(6, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JLabel label2 = new JLabel();
         label2.setText("ITS CTL Checker:");
@@ -172,7 +173,7 @@ public class Temporalpanel {
         setupPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(4, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         WSLCheckBoxCTLITS = new JCheckBox();
         WSLCheckBoxCTLITS.setText("WSL");
-        WSLCheckBoxCTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        WSLCheckBoxCTLITS.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input filenames for the modelchecker are converted automatically.\n</html>");
         setupPanel.add(WSLCheckBoxCTLITS, cc.xy(6, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         itsLTLChecker = new JTextField();
         itsLTLChecker.setText("");
@@ -204,15 +205,15 @@ public class Temporalpanel {
         setupPanel.add(testDbButton, cc.xy(7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableSPOT_LTL = new JCheckBox();
         enableSPOT_LTL.setText("Enable");
-        enableSPOT_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        enableSPOT_LTL.setToolTipText("<html> Use this model-checker?<br> \nWhen ticked,then this model checker will verify<br>\nthe supplied temporal oracles that match the temporal-type.\n</html>");
         setupPanel.add(enableSPOT_LTL, cc.xy(7, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableITS_CTL = new JCheckBox();
         enableITS_CTL.setText("Enable");
-        enableITS_CTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        enableITS_CTL.setToolTipText("<html> Use this model-checker?<br> \nWhen ticked,then this model checker will verify<br>\nthe supplied temporal oracles that match the temporal-type.\n</html>");
         setupPanel.add(enableITS_CTL, cc.xy(7, 9, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableITS_LTL = new JCheckBox();
         enableITS_LTL.setEnabled(true);
-        enableITS_LTL.setSelected(false); //css: false positives result from this checker
+        enableITS_LTL.setSelected(false);
         enableITS_LTL.setText("Enable");
         enableITS_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
         enableITS_LTL.setVisible(false);
@@ -227,11 +228,11 @@ public class Temporalpanel {
         setupPanel.add(ltsminLTLChecker, cc.xyw(2, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         WSLCheckBoxLTLLTSMIN = new JCheckBox();
         WSLCheckBoxLTLLTSMIN.setText("WSL");
-        WSLCheckBoxLTLLTSMIN.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        WSLCheckBoxLTLLTSMIN.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input filenames for the modelchecker are converted automatically.\n</html>");
         setupPanel.add(WSLCheckBoxLTLLTSMIN, cc.xy(6, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enableLTSMIN_LTL = new JCheckBox();
         enableLTSMIN_LTL.setText("Enable");
-        enableLTSMIN_LTL.setToolTipText("<html> Does this command need a WSL path?<br> \ne.g. starting with \"/mnt/C/...\"<br>\nWhen ticked then input files for the modelchecker are converted automatically.\n</html>");
+        enableLTSMIN_LTL.setToolTipText("<html> Use this model-checker?<br> \nWhen ticked,then this model checker will verify<br>\nthe supplied temporal oracles that match the temporal-type.\n</html>");
         setupPanel.add(enableLTSMIN_LTL, cc.xy(7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
         minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:133px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:11px:noGrow,left:9dlu:noGrow,fill:max(d;4px):noGrow,fill:d:noGrow,left:104px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,left:40dlu:noGrow,left:33dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
@@ -323,10 +324,11 @@ public class Temporalpanel {
         modelCheckBtn = new JButton();
         modelCheckBtn.setHorizontalTextPosition(0);
         modelCheckBtn.setText("Model Check");
-        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired field: APModelManager. This file is used for filtering propositions <BR><BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired input: <BR>\n\t+ APModelManager. This file is used for filtering propositions, when generating the Model<BR>\n\t+ Oracles. This file contains the formulas to be checked. <BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
         minerPanel.add(modelCheckBtn, cc.xyw(8, 10, 5));
         visualizerPanel = new JPanel();
         visualizerPanel.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:78dlu:noGrow,left:4dlu:noGrow,left:115px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:47px:noGrow,left:27dlu:noGrow,fill:max(d;4px):noGrow", "center:49px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        visualizerPanel.setEnabled(false);
         containerTab.addTab("Visualizer", visualizerPanel);
         PythonEnv_Path = new JTextField();
         visualizerPanel.add(PythonEnv_Path, cc.xyw(3, 1, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
@@ -352,24 +354,6 @@ public class Temporalpanel {
         stopAnalyzerBtn = new JButton();
         stopAnalyzerBtn.setText("Stop Analyzer");
         visualizerPanel.add(stopAnalyzerBtn, cc.xyw(5, 5, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        clearBtn = new JButton();
-        clearBtn.setHorizontalAlignment(0);
-        clearBtn.setMaximumSize(new Dimension(-1, -1));
-        clearBtn.setMinimumSize(new Dimension(-1, -1));
-        clearBtn.setPreferredSize(new Dimension(60, 38));
-        clearBtn.setText("Clr");
-        clearBtn.setToolTipText("Clear the Log");
-        mainTemporalPanel.add(clearBtn, cc.xyw(13, 3, 4, CellConstraints.DEFAULT, CellConstraints.CENTER));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        mainTemporalPanel.add(scrollPane1, cc.xyw(1, 3, 11, CellConstraints.FILL, CellConstraints.FILL));
-        logArea = new JTextArea();
-        logArea.setEnabled(true);
-        logArea.setMaximumSize(new Dimension(1, 20));
-        logArea.setMinimumSize(new Dimension(1, 30));
-        logArea.setOpaque(false);
-        logArea.setPreferredSize(new Dimension(1, 30));
-        logArea.setRows(0);
-        scrollPane1.setViewportView(logArea);
     }
 
     /**
@@ -486,14 +470,11 @@ public class Temporalpanel {
 
     private void startTemporalWebAnalyzer(ActionEvent evt) {
         String cli = PythonEnv_Path.getText() + " " + PythonVisualizer_Path.getText();
-        //logArea.setText("invoking : \n");
-        //logArea.append(cli + "\n");
-        // call the external program
-        try {
+        try {// call the external program
             if (webAnalyzerProcess == null) {
                 webAnalyzerProcess = Runtime.getRuntime().exec(cli);
-                System.out.println("Visualizer Started. goto " + VisualizerURL+"\n");
-                //logArea.append("Visualizer Started. goto " + VisualizerURL+"\n");
+                System.out.println("Visualizer Started. goto " + VisualizerURL + "\n");
+
 
                 Desktop desktop = Desktop.getDesktop();
                 URI uri = new URI(VisualizerURL);
@@ -505,45 +486,39 @@ public class Temporalpanel {
                 webAnalyzerOut.start();
 
             } else {
-                logArea.append("Visualizer was already running. goto " + VisualizerURL + "\n");
+                System.out.println("Visualizer was already running. goto " + VisualizerURL + "\n");
             }
         } catch (Exception e) {
             System.err.println("Error on starting Visualizer");
-           // logArea.append("Error on starting Visualizer");
             e.printStackTrace();
         }
     }
 
     private void stopTemporalWebAnalyzer(ActionEvent evt) {
         try {
-            Common.HTTPGet(VisualizerURLStop);
+            assert webAnalyzerProcess != null;
+            if (webAnalyzerProcess.isAlive()) Common.HTTPGet(VisualizerURLStop);
 
             boolean ret = false;
-            // in case the python is invoked via a OS batch command , the above stopcommand may leave the command running.
-            // equivalently:  killing just the OS batch process, may leave then the python process( which is a server) running)
-            if (webAnalyzerProcess != null) webAnalyzerProcess.waitFor(1, TimeUnit.SECONDS);
-            if (webAnalyzerProcess != null) {
+            webAnalyzerProcess.waitFor(1, TimeUnit.SECONDS);
+            if (webAnalyzerProcess.isAlive()) {
                 webAnalyzerProcess.destroyForcibly();
-                logArea.append("Forcing Visualizer  to Stop.\n");
+                System.out.println("Forcing Visualizer Server  to Stop.\n");
                 ret = webAnalyzerProcess.waitFor(2, TimeUnit.SECONDS);  //gently wait
+                System.out.println("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
             }
-            assert webAnalyzerProcess != null;
-            System.out.println("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
-            //logArea.append("Visualizer Stopped. (exitcode was : " + webAnalyzerProcess.exitValue() + ")\n");
-            if (ret) webAnalyzerProcess = null;
+            if (ret || !webAnalyzerProcess.isAlive()) webAnalyzerProcess = null;
             webAnalyzerErr.stop();
             webAnalyzerOut.stop();
         } catch (Exception e) {
             System.err.println("Error on stopping Analyzer");
-            //logArea.append("Error on stopping Analyzer\n");
-
             e.printStackTrace();
         }
 
     }
 
     private void testdbconnection(ActionEvent evt) {
-        //logArea.append(tcontrol.pingDB() + "\n");
+        tcontrol.pingDB();
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
@@ -551,8 +526,8 @@ public class Temporalpanel {
     }
 
     private void testgraphml(ActionEvent evt) {
-            tcontrol.saveToGraphMLFile("GraphML.XML", false);
-            tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
+        tcontrol.saveToGraphMLFile("GraphML.XML", false);
+        tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
     }
 
     public void testOracleCSV() {

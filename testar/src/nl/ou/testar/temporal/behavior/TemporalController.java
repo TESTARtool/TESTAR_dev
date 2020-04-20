@@ -190,7 +190,7 @@ public class TemporalController {
     private void loadApModelManager(String filename) {
         this.apModelManager = (APModelManager) JSONHandler.load(filename, apModelManager.getClass());
         //apModelManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
-        tDBManager.setApModelManager(apModelManager);
+        tDBManager.setApModelManager(this.apModelManager);
     }
 
     public List<TemporalOracle> getOracleColl() {
@@ -412,18 +412,18 @@ public class TemporalController {
         if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.LTL_ITS) || tmptype.equals(TemporalFormalism.LTL_LTSMIN)) {
 
 //            **under construction ITS-GAL
-//            String contents1 = "";
-//            contents1 =tModel.makeGALOutput();
-//            String strippedFile;
-//            String filename = Paths.get(file).getFileName().toString();
-//            if (filename.contains(".")){
-//                strippedFile = file.substring(0, file.lastIndexOf("."));
-//            }
-//            else {
-//                strippedFile = file;
-//            }
-//            File output = new File(strippedFile+".gal");
-//            saveStringToFile(contents1,output);
+            String contents1 = "";
+            contents1 =tModel.makeGALOutput();
+            String strippedFile;
+            String filename = Paths.get(file).getFileName().toString();
+            if (filename.contains(".")){
+                strippedFile = file.substring(0, file.lastIndexOf("."));
+            }
+            else {
+                strippedFile = file;
+            }
+            File output = new File(strippedFile+".gal");
+            saveStringToFile(contents1,output);
 
             contents = tModel.makeETFOutput();
         }
@@ -664,6 +664,7 @@ public class TemporalController {
     public void makeTemporalModel(String APModelManagerFile, boolean verbose, boolean instrumentTerminalState) {
         try {
             simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model started");
+            tModel = new TemporalModel();
 
             AbstractStateModel abstractStateModel = getAbstractStateModel();
             if (abstractStateModel == null) {
