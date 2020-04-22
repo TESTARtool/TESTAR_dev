@@ -207,6 +207,10 @@ public class Main {
 						sqlManager.initTest8(settings.get(ClearResults));
 						break;
 
+					case 9:
+						sqlManager.initTest9(settings.get(ClearResults));
+						break;
+
 					default:
 						out.println("Please specify a valid test nr! Closing down Testar");
 						System.exit(1);
