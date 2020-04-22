@@ -85,7 +85,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.kuveytturk.com.tr", "isube.kuveytturk.com.tr", "internetbranchtest");
+		domainsAllowed = Arrays.asList("www.kuveytturk.com.tr", "isube.kuveytturk.com.tr", "internetbranchtest", "internetbranchprep");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -207,7 +207,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
 		System.out.println("DEBUG 5: clicking login button");
 
-		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName,"login",state,system,20,0.5 );
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebId,"LoginButton",state,system,20,0.5 );
 
 		state = getState(system);
 
@@ -217,7 +217,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
 		System.out.println("DEBUG 7: clicking login button");
 
-		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName,"OtpLoginButton",state,system,20,0.5 );
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebId,"OtpLoginButton",state,system,20,0.5 );
 
 		super.beginSequence(system, state);
 
