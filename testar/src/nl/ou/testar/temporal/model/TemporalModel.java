@@ -193,8 +193,10 @@ public class TemporalModel extends TemporalBean {
         return result.toString();
     }
 
-
     public String makeETFOutput() {
+       return makeETFOutput(true);
+    }
+    public String makeETFOutput(boolean needArtificialInitialState) {
         //see https://ltsmin.utwente.nl/assets/man/etf.html
         StringBuilder result = new StringBuilder();
         StringBuilder temptransresult = new StringBuilder();
@@ -230,7 +232,7 @@ public class TemporalModel extends TemporalBean {
 
         result.append("begin init\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
-        if (InitialStates.size()>1) {
+        if (needArtificialInitialState && initialStatesSet.size()>1) {
             result.append("%Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
             result.append("%Requires that formulas need to be modified: F(f) => X(f), where X is the next Operator\n");
             result.append("%To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
@@ -258,7 +260,9 @@ public class TemporalModel extends TemporalBean {
                             }
                         }
                         result.append("\n");
+                        break;
                     }
+
                 }
             }
             }
@@ -266,7 +270,7 @@ public class TemporalModel extends TemporalBean {
         result.append("end init\n");
 
 
-        if (InitialStates.size()>1) {
+        if (needArtificialInitialState && initialStatesSet.size()>1) {
             //add artificial transitions
             result.append("begin trans\n");
             result.append("%artificial transitions to original initial states\n");
@@ -376,59 +380,101 @@ public class TemporalModel extends TemporalBean {
         result.append("gal TESTAR {\n");
         int chunk = 25;
         int i = 0;
-        result.append("int ");
-        String artifical_StartState=""+ (int)Math.pow(2,20); //assume max 1 million states
-        result.append("stateindex = ").append(artifical_StartState).append(" ;\n");
 
-        for (String ignored : modelAPs) {
-            result.append("int ");
-            result.append(APPrefix).append(i).append( " = 0 ; ");
-            if (i > 0 && (i % chunk) == 0) {
-                result.append("\n");
-            }
-            i++;
-        }
-        result.append("\n");
-        //result.append("begin init\n");
         Set<String> initialStatesSet = new HashSet<>(InitialStates);
+        if (initialStatesSet.size()>1) {
+            result.append("int ");
+            //String artifical_StartState=""+ (int)Math.pow(2,20); //out of memory error on ITS above 30.000
+            String artifical_StartState=""+ (stateList.size()+1); //statecount plus 1
+            result.append("stateindex = ").append(artifical_StartState).append(" ;\n");
 
-        result.append("// BEGIN artificial initial states\n");
-        for (String initstate : initialStatesSet
-        ) {
-            for (StateEncoding stenc : stateEncodings
+            for (String ignored : modelAPs) {
+                result.append("int ");
+                result.append(APPrefix).append(i).append( " = 0 ; ");
+                if (i > 0 && (i % chunk) == 0) {
+                    result.append("\n");
+                }
+                i++;
+            }
+            result.append("\n");
+
+
+
+            result.append("// BEGIN artificial initial states\n");
+            for (String initstate : initialStatesSet
             ) {
-                if (stenc.getState().equals(initstate)) {
+                for (StateEncoding stenc : stateEncodings
+                ) {
+                    if (stenc.getState().equals(initstate)) {
 
-                    String artificalEdge = "artificial_init_transition_to_" + stateList.indexOf(stenc.getState());
-                    result.append("    transition ").append(artificalEdge).
-                            append(" [ stateindex == ").append(artifical_StartState).append(" ] label \"").
-                            append(artificalEdge).append("\" {\n");
-                    result.append("        stateindex = ").
-                            append(stateList.indexOf(stenc.getState())).append(" ;\n");
+                        String artificalEdge = "artificial_init_transition_to_" + stateList.indexOf(stenc.getState());
+                        result.append("    transition ").append(artificalEdge).
+                                append(" [ stateindex == ").append(artifical_StartState).append(" ]  {\n");
+                        result.append("        stateindex = ").
+                                append(stateList.indexOf(stenc.getState())).append(" ;\n");
 
-                    String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
-                    int j = 0;
-                    int chunk1 = 25;
-                    result.append("        ");
-                    for (String ap : stateaps
-                    ) {
-                        if (ap.startsWith("!")) {
-                            result.append(APPrefix).append(j).append(" = 0").append(" ; ");
-                        } else {
-                            result.append(APPrefix).append(j).append(" = 1").append(" ; ");
+                        String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+                        int j = 0;
+                        int chunk1 = 25;
+                        result.append("        ");
+                        for (String ap : stateaps
+                        )
+                        {
+
+                            if (ap.startsWith("!")) {
+                                result.append(APPrefix).append(j).append(" = 0 ; ");
+                            } else {
+                                result.append(APPrefix).append(j).append(" = 1 ; ");
+                            }
+                            if (j > 0 && (j % chunk1) == 0) {
+                                result.append("\n");
+                                result.append("        ");
+                            }
+                            j++;
+
                         }
-                        if (j > 0 && (j % chunk1) == 0) {
-                            result.append("\n");
-                            result.append("        ");
-                        }
-                        j++;
-
+                        result.append("    }\n");
                     }
-                    result.append("    }\n");
+                }
+            }
+            result.append("// END artificial initial states\n");
+        }
+        else{
+            result.append("// BEGIN initial state\n");
+            result.append("int ");
+            for (String initstate : initialStatesSet
+            ) {
+
+                result.append("stateindex = ").append(stateList.indexOf(initstate)).append(" ;\n");
+                for (StateEncoding stenc : stateEncodings
+                ) {
+                    if (stenc.getState().equals(initstate)) {
+
+                        String[] stateaps = stenc.getEncodedStateAPConjunct().split("&");
+                        int j = 0;
+                        int chunk1 = 25;
+                        result.append("        ");
+                        for (String ap : stateaps
+                        ) {
+                            result.append("int ");
+                            if (ap.startsWith("!")) {
+                                result.append(APPrefix).append(j).append(" = 0 ; ");
+                            } else {
+                                result.append(APPrefix).append(j).append(" = 1 ; ");
+                            }
+                            if (j > 0 && (j % chunk1) == 0) {
+                                result.append("\n");
+                                result.append("        ");
+                            }
+                            j++;
+
+                        }
+                        result.append("\n");
+                        break; // there is only one initalState in this scenario
+                    }
                 }
             }
         }
-        result.append("// END artificial initial states\n");
 
 
         result.append("//BEGIN explicit transitions\n");
@@ -538,7 +584,7 @@ public class TemporalModel extends TemporalBean {
             if (!importStatus) {
                 String falseFormula="false";
                 candidateOracle.addLog("setting formula to 'false'");
-                String  formulalvl6= StringUtils.replace(falseFormula,tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight()) + tFormalism.line_append;
+                String  formulalvl6= tFormalism.line_prepend+StringUtils.replace(falseFormula,tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight()) + tFormalism.line_append;
                 Formulas.append(formulalvl6);
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             } else {
@@ -567,19 +613,22 @@ public class TemporalModel extends TemporalBean {
                     {
                         String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
                         String formulalvl0 = rawFormula;
-                        if( getInitialStates().size()>1){
-                            // ETF models can only have just 1 initial state.
+                        Set<String> initialStatesSet = new HashSet<>(InitialStates);
+                        if( !tFormalism.supportsMultiInitialStates && initialStatesSet.size()>1){
+                            // ETF models for ITS can only have  1 initial state. ETF by LTSMIN can handle multiple
+                            //when there are initial states added to the model, the formula alter:
+                            //satisfaction of the formula starts after the artificial state, hence the X-operator.
                             if (tFormalism == TemporalFormalism.CTL ||
                                 tFormalism == TemporalFormalism.CTL_ITS){ //||tFormalism == TemporalFormalism.CTL_LTSMIN){
                                 formulalvl0="AX("+rawFormula+")";
                             }
                             if (tFormalism == TemporalFormalism.LTL_ITS){ //|| tFormalism == TemporalFormalism.LTL_LTSMIN){
-                                formulalvl0="X("+rawFormula+")";
+                                formulalvl0="X("+rawFormula+")"; //@todo test ltsmin on set of initial states
                             }
 
                         }
-
-                        String formulalvl1 = formulalvl0 + tFormalism.line_append;
+                        String formulalvl1a =  tFormalism.line_prepend+formulalvl0;
+                        String formulalvl1 = formulalvl1a + tFormalism.line_append;
                         String formulalvl2 = StringUtils.replace(formulalvl1,
                                 tFormalism.finally_replace.getLeft(), tFormalism.finally_replace.getRight());
                         String formulalvl3 = StringUtils.replace(formulalvl2,

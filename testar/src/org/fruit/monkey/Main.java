@@ -459,6 +459,9 @@ public class Main {
 			defaults.add(Pair.from(TemporalCTL_ITSChecker, ""));
 			defaults.add(Pair.from(TemporalCTL_ITSCheckerWSL, true));
 			defaults.add(Pair.from(TemporalCTL_ITSChecker_Enabled, false));
+			defaults.add(Pair.from(TemporalCTL_GALChecker, ""));
+			defaults.add(Pair.from(TemporalCTL_GALCheckerWSL, false));
+			defaults.add(Pair.from(TemporalCTL_GALChecker_Enabled, false));
 			defaults.add(Pair.from(TemporalLTL_ITSChecker, ""));
 			defaults.add(Pair.from(TemporalLTL_ITSCheckerWSL, true));
 			defaults.add(Pair.from(TemporalLTL_ITSChecker_Enabled, false));
@@ -688,7 +691,7 @@ public class Main {
 	 * concrete and abstract state ids, if provided of course.
 	 * @param settings
 	 */
-	private static void initCodingManager(Settings settings) {
+	private static void XinitCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 
@@ -714,6 +717,26 @@ public class Main {
 			}
 		}
 	}
+	private static void initCodingManager(Settings settings) {
+		// we look if there are user-provided custom state tags in the settings
+		// if so, we provide these to the coding manager
+
+		Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+		// for the concrete state tags we use all the state management tags that are available
+		if (!stateManagementTags.isEmpty()) {
+			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
+		}
+
+		// then the attributes for the abstract state id
+		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+			Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
+		}
+	}
+
+	/**
+	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 */
 
 	/**
 	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.

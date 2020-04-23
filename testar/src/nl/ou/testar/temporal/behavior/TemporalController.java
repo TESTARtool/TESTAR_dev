@@ -58,6 +58,10 @@ public class TemporalController {
     private boolean ctlITSToWSLPath;
     private String ctlITSMCCommand;
     private boolean ctlITSEnabled;
+    private boolean ctlGALToWSLPath;
+    private String ctlGALMCCommand;
+    private boolean ctlGALEnabled;
+
     private boolean ltlITSToWSLPath;
     private String ltlITSMCCommand;
     private boolean ltlITSEnabled;
@@ -100,7 +104,9 @@ public class TemporalController {
         ctlITSToWSLPath = settings.get(ConfigTags.TemporalCTL_ITSCheckerWSL);
         ctlITSMCCommand = settings.get(ConfigTags.TemporalCTL_ITSChecker);
         ctlITSEnabled = settings.get(ConfigTags.TemporalCTL_ITSChecker_Enabled);
-
+        ctlGALToWSLPath = settings.get(ConfigTags.TemporalCTL_GALCheckerWSL);
+        ctlGALMCCommand = settings.get(ConfigTags.TemporalCTL_GALChecker);
+        ctlGALEnabled = settings.get(ConfigTags.TemporalCTL_GALChecker_Enabled);
         ltlITSToWSLPath = settings.get(ConfigTags.TemporalLTL_ITSCheckerWSL);
         ltlITSMCCommand = settings.get(ConfigTags.TemporalLTL_ITSChecker);
         ltlITSEnabled = settings.get(ConfigTags.TemporalLTL_ITSChecker_Enabled);
@@ -410,22 +416,10 @@ public class TemporalController {
             contents = tModel.makeHOAOutput();
         }
         if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.LTL_ITS) || tmptype.equals(TemporalFormalism.LTL_LTSMIN)) {
-
-//            **under construction ITS-GAL
-            String contents1 = "";
-            contents1 =tModel.makeGALOutput();
-            String strippedFile;
-            String filename = Paths.get(file).getFileName().toString();
-            if (filename.contains(".")){
-                strippedFile = file.substring(0, file.lastIndexOf("."));
-            }
-            else {
-                strippedFile = file;
-            }
-            File output = new File(strippedFile+".gal");
-            saveStringToFile(contents1,output);
-
-            contents = tModel.makeETFOutput();
+            contents = tModel.makeETFOutput(tmptype.supportsMultiInitialStates);
+        }
+        if (tmptype.equals(TemporalFormalism.CTL_GAL)) {  // **under construction ITS-GAL
+            contents = tModel.makeGALOutput();
         }
             File output = new File(file);
             saveStringToFile(contents,output);
@@ -480,7 +474,9 @@ public class TemporalController {
                 ltlSPOTMCCommand, ltlSPOTToWSLPath, ltlSPOTEnabled,
                 ctlITSMCCommand, ctlITSToWSLPath, ctlITSEnabled,
                 ltlITSMCCommand, ltlITSToWSLPath, ltlITSEnabled,
-                ltlLTSMINMCCommand, ltlLTSMINToWSLPath, ltlLTSMINEnabled);
+                ltlLTSMINMCCommand, ltlLTSMINToWSLPath, ltlLTSMINEnabled,
+                ctlGALMCCommand, ctlGALToWSLPath, ctlGALEnabled);
+
     }
 
 
@@ -489,7 +485,9 @@ public class TemporalController {
                        String ltlSpotMCCommand, boolean ltlSpotWSLPath, boolean ltlSpotEnabled,
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
-                       String ltlLtsminMCCommand, boolean ltlLtsminWSLPath, boolean ltlltsminEnabled) {
+                       String ltlLtsminMCCommand, boolean ltlLtsminWSLPath, boolean ltlltsminEnabled,
+                       String ctlGalMCCommand, boolean ctlGalWSLPath, boolean ctlGalEnabled
+                       ) {
         // css20200309 disabled: ltlITSEnabled this model check gives unexpected results: False Positive.
         // ITS LTL fields are made invisible in the Temporalpanel
         ltlItsEnabled=false;
@@ -539,9 +537,11 @@ public class TemporalController {
                 for (Map.Entry<TemporalFormalism, List<TemporalOracle>> oracleentry : oracleTypedMap.entrySet()
                 ) {
                     List<TemporalOracle> modelCheckedOracles = null;
-                    File automatonFile = null;
+                    File automatonFile ;
+
                     String oracleType = oracleentry.getKey().name();
                     List<TemporalOracle> oracleList = oracleentry.getValue();
+                    automatonFile = new File(outputDir +oracleType+"_model."+oracleentry.getKey().fileExtension);
 
                     File formulaFile = new File(outputDir + oracleType + "_formulas.txt");
                     File resultsFile = new File(outputDir + oracleType + "_results.txt");
@@ -551,7 +551,7 @@ public class TemporalController {
                     initialoraclelist.addAll(oracleList);
                     simpleLog.append(prettyCurrentTime() + " | " + oracleType + " invoking the " + "backend model-checker");
                     if (ltlSpotEnabled && (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL || TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_SPOT)) {
-                        automatonFile = new File(outputDir + "Model.hoa");
+                        //automatonFile = new File(outputDir + "Model"+TemporalFormalism.valueOf(oracleType)+".hoa");
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
                         String aliveprop = gettModel().getPropositionIndex("!" + TemporalModel.getDeadProposition()); //instrumentTerminalState will determine whether this return value is ""
                         saveFormulaFiles(oracleList, formulaFile);
@@ -567,7 +567,7 @@ public class TemporalController {
                         }
                     } else if ((ltlItsEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_ITS) ||
                             (ltlltsminEnabled && TemporalFormalism.valueOf(oracleType) == TemporalFormalism.LTL_LTSMIN)) {
-                        automatonFile = new File(outputDir + "Model.etf");
+                        //automatonFile = new File(outputDir + "Model"+TemporalFormalism.valueOf(oracleType)+".etf");
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
 
                         //formula ltl model variant converter
@@ -613,8 +613,8 @@ public class TemporalController {
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
                     } else if (ctlItsEnabled &&  (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL ||
-                                                TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL_ITS)) {
-                        automatonFile = new File(outputDir + "Model.etf");
+                            TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL_ITS)) {
+                        //automatonFile = new File(outputDir + "Model"+TemporalFormalism.valueOf(oracleType)+".etf");
                         saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
                         //ITS-CTL checker: not using witness because this is  difficult to understand and to parse and show.
                         //LTSMIN-CTL bug: gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
@@ -624,12 +624,39 @@ public class TemporalController {
                         ResultsParser sParse = new ITS_CTL_ResultsParser();//decode results
                         sParse.setTmodel(gettModel());
                         sParse.setOracleColl(oracleList);
-                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results from the backend model-checker");
                         modelCheckedOracles = sParse.parse(resultsFile);
                         if (modelCheckedOracles == null) {
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                         }
-                    } else {
+                    }else if (ctlGalEnabled &&  (TemporalFormalism.valueOf(oracleType) == TemporalFormalism.CTL_GAL )) {
+
+                        saveModelForChecker(TemporalFormalism.valueOf(oracleType), automatonFile.getAbsolutePath());
+                        saveFormulaFiles(oracleList, formulaFile);
+                        if (tModel.getModelAPs().size()>250 ||tModel.getStateList().size()>25000){
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: model too complex (propositions>250 or states>25000");
+                        }
+                        else{
+
+                            Checker.CTLMC_ByGAL(ctlGalMCCommand, ctlGalWSLPath, counterExamples, automatonFile.getAbsolutePath(),
+                                    formulaFile.getAbsolutePath(), resultsFile.getAbsolutePath());
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
+                        /*   ResultsParser sParse = new ITS_CTL_ResultsParser();//decode results
+                        sParse.setTmodel(gettModel());
+                        sParse.setOracleColl(oracleList);
+                        simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying the results form the backend model-checker");
+                        modelCheckedOracles = sParse.parse(resultsFile);
+                        if (modelCheckedOracles == null) {
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
+                        }*/
+                        }
+
+
+                    }
+
+
+
+                    else {
                         simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  this oracle type is not implemented or disabled");
                     }
                     if (modelCheckedOracles != null) {
@@ -638,7 +665,7 @@ public class TemporalController {
 
 
                     if (!verbose) {
-                        if (automatonFile !=null && automatonFile.exists()) Files.delete(automatonFile.toPath());
+                        if ( automatonFile.exists()) Files.delete(automatonFile.toPath());
                         if (resultsFile.exists())Files.delete(resultsFile.toPath());
                         if (formulaFile.exists())Files.delete(formulaFile.toPath());
                         if (syntaxformulaFile.exists())Files.delete(syntaxformulaFile.toPath());

@@ -39,7 +39,10 @@ public  class TemporalDBManager {
 
     public TemporalDBManager(final Settings settings) {
         dbConfig = makeConfig(settings);
-        initOrientDb();
+       // if(settings.get(ConfigTags.StateModelEnabled)){
+            initOrientDb();
+       // }
+
     }
 
     private void initOrientDb() {
@@ -52,7 +55,7 @@ public  class TemporalDBManager {
 
     }
 
-    public void setDb(ODatabaseSession db) {
+    private void setDb(ODatabaseSession db) {
         this.db = db;
     }
     public void setApModelManager(APModelManager apModelManager) {
@@ -497,7 +500,7 @@ public  class TemporalDBManager {
     public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions,  boolean isEdge) {
         computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, null,false, isEdge);
     }
-    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters ) {
+    private   void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters ) {
         computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, passedWidgetFilters,true, false);
     }
 
@@ -505,7 +508,7 @@ public  class TemporalDBManager {
 //        computeAtomicPropositions(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
 //    }
 
-    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+    private  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
 
         StringBuilder apkey = new StringBuilder();
 

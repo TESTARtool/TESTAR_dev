@@ -126,6 +126,10 @@ public final class ConfigTags {
   public static final Tag<Boolean> TemporalCTL_ITSCheckerWSL = Tag.from("TemporalCTL_ITSCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalCTL_ITSChecker_Enabled = Tag.from("TemporalCTL_ITSChecker_Enabled", Boolean.class);
 
+  public static final Tag<String> TemporalCTL_GALChecker = Tag.from("TemporalCTL_GALChecker", String.class);
+  public static final Tag<Boolean> TemporalCTL_GALCheckerWSL = Tag.from("TemporalCTL_GALCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalCTL_GALChecker_Enabled = Tag.from("TemporalCTL_GALChecker_Enabled", Boolean.class);
+
   public static final Tag<String> TemporalLTL_ITSChecker = Tag.from("TemporalLTL_ITSChecker", String.class);
   public static final Tag<Boolean> TemporalLTL_ITSCheckerWSL = Tag.from("TemporalLTL_ITSCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalLTL_ITSChecker_Enabled = Tag.from("TemporalLTL_ITSChecker_Enabled", Boolean.class);

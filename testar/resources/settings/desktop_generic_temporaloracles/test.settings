@@ -137,6 +137,9 @@ TemporalLTL_SPOTChecker_Enabled = true
 TemporalCTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ctl
 TemporalCTL_ITSCheckerWSL = true
 TemporalCTL_ITSChecker_Enabled = true
+TemporalCTL_GALChecker = c:\\itscommand\\eclipsec.exe
+TemporalCTL_GALCheckerWSL = false
+TemporalCTL_GALChecker_Enabled = true
 #
 #css 20200309 the following 3 settings are ignored in TemporalController
 #and are made invisible in the Temporal panel.

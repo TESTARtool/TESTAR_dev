@@ -1,11 +1,10 @@
 package nl.ou.testar.temporal.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -56,40 +55,54 @@ public class Common {
             ex.printStackTrace();
         }
     }
-
     public static void RunOSChildProcess(String command) {
+        RunOSChildProcess(command, "");
+    }
+    public static void RunOSChildProcess(String command, String resultsFileName) {
 
         Process theProcess = null;
         BufferedReader inStream;
         BufferedReader errStream;
         String response;
         String errorresponse = null;
+        File captureFile = null;
+        BufferedWriter captureWriter = null;
+
 
         // call the external program
         try {
             theProcess = Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.err.println("Error on exec() method");
             e.printStackTrace();
         }
 
         // read from the called program's standard output stream
         try {
-            inStream = new BufferedReader(new InputStreamReader
-                    (theProcess.getInputStream()));
-            errStream = new BufferedReader(new InputStreamReader
-                    (theProcess.getErrorStream()));
+            if (!resultsFileName.equals("")){
+            captureFile = new File(resultsFileName);
+            if (captureFile.exists() || captureFile.createNewFile()) {
+                captureWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(captureFile.getAbsolutePath()), StandardCharsets.UTF_8));
+            }
+        }
+            inStream = new BufferedReader(new InputStreamReader(theProcess.getInputStream()));
+            errStream = new BufferedReader(new InputStreamReader(theProcess.getErrorStream()));
             while ((response = inStream.readLine()) != null || (errorresponse = errStream.readLine()) != null) {
                 if (response != null) {
-                    System.out.println("response: " + response);
+                    if (captureFile ==null){ System.out.println("response: " + response); }
+                    else{ captureWriter.append(response+"\n"); }
                 }
                 if (errorresponse != null) {
-                    System.out.println("error response: " + errorresponse);
+                    if (captureFile ==null){ System.out.println("error response: " + errorresponse); }
+                    else{ captureWriter.append(errorresponse+"\n"); }
                 }
             }
-
+            if (captureFile !=null) {
+                captureWriter.close();
+            }
         } catch (IOException e) {
-            System.err.println("Error on inStream.readLine()");
+            System.err.println("Error on input stream from child process");
             e.printStackTrace();
         }
     }
