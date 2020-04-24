@@ -21,4 +21,6 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedByUser();
 
     void notifyTestSequenceInterruptedBySystem(String message);
+    
+    boolean sequenceStarted();
 }

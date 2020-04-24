@@ -683,15 +683,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
 
+				// notify the statemodelmanager
+				stateModelManager.notifyTestSequencedStarted();
+				
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
 
+				//update state after begin sequence SUT modification
+				state = getState(system);
+				
 				//initializing fragment for recording replayable test sequence:
 				initFragmentForReplayableSequence(state);
-
-				// notify the statemodelmanager
-				stateModelManager.notifyTestSequencedStarted();
 
 				/*
 				 ***** starting the INNER LOOP:
@@ -2073,10 +2076,31 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while(numberOfRetries<maxNumberOfRetries){
 			//looking for a widget with matching tag value:
 			Widget widget = getWidgetWithMatchingTag(tag,value,state);
+			
 			if(widget!=null){
+				
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				//System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
-				executeAction(system,state,ac.leftClickAt(widget));
+				Action predefinedAction = ac.leftClickAt(widget);
+				
+				// If State Model sequences is enabled and started, send the information
+				if(stateModelManager.sequenceStarted()) {
+					//Deriving actions from the state:
+					Set<Action> actions = deriveActions(system, state);
+					
+					predefinedAction = mergeLeftClickAtPredefinedStateModelActions(widget, predefinedAction, actions);
+					
+					CodingManager.buildIDs(state, actions);
+					for(Action a : actions)
+						if(a.get(Tags.AbstractIDCustom, null) == null)
+							CodingManager.buildEnvironmentActionIDs(state, a);
+					
+					stateModelManager.notifyNewStateReached(state, actions);
+					
+					//before action execution, pass it to the state model manager
+					stateModelManager.notifyActionExecution(predefinedAction);
+				}
+				
+				executeAction(system, state, predefinedAction);
 				// is waiting needed after the action has been executed?
 				return true;
 			}
@@ -2111,8 +2135,29 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//looking for a widget with matching tag value:
 			Widget widget = getWidgetWithMatchingTag(tag,value,state);
 			if(widget!=null){
+				
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+				Action predefinedAction = ac.clickTypeInto(widget, textToType, true);
+				
+				// If State Model sequences is enabled and started, send the information
+				if(stateModelManager.sequenceStarted()) {
+					//Deriving actions from the state:
+					Set<Action> actions = deriveActions(system, state);
+					
+					actions.add(predefinedAction);
+					
+					CodingManager.buildIDs(state, actions);
+					for(Action a : actions)
+						if(a.get(Tags.AbstractIDCustom, null) == null)
+							CodingManager.buildEnvironmentActionIDs(state, a);
+					
+					stateModelManager.notifyNewStateReached(state, actions);
+					
+					//before action execution, pass it to the state model manager
+					stateModelManager.notifyActionExecution(predefinedAction);
+				}
+
+				executeAction(system,state, predefinedAction);
 				// is waiting needed after the action has been executed?
 				return true;
 			}
@@ -2167,6 +2212,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				System.out.println(tag.toString()+"=" + widget.get(tag, null).toString()+ "; Description of the widget="+widget.get(Tags.Desc, ""));
 			}
 		}
+	}
+	
+	/**
+	 * If desired predefined action exists in available derived actions of the State
+	 * select this derived actions instead of create a new one.
+	 * Then the State Model will not have an additional existing action in the navigable graph.
+	 * 
+	 * @param widget
+	 * @param predefinedAction
+	 * @param actions
+	 */
+	private Action mergeLeftClickAtPredefinedStateModelActions(Widget widget, Action predefinedAction, Set<Action> actions) {
+		for(Action a : actions) {
+			if(a.get(Tags.OriginWidget, null)!= null && a.get(Tags.OriginWidget).equals(widget)
+					&& a.get(Tags.Role, ActionRoles.Type).equals(ActionRoles.LeftClickAt)) {
+				return a;
+			}
+		}
+		actions.add(predefinedAction);
+		return predefinedAction;
 	}
 
 }

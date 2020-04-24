@@ -218,6 +218,11 @@ public class ProtocolUtil {
 	public Shape calculateWidgetInfoShape(Canvas canvas, Shape cwShape, double widgetInfoW, double widgetInfoH){
 		Shape s = Rect.from(cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 		Shape rs = repositionShape(canvas,s);
+
+		// If y-axis canvas is over the screen (negative value), set to 0.0
+		if(s.y() < 0.0) {s = Rect.from(cwShape.x(), 0.0, widgetInfoW, widgetInfoH);}
+		if(rs.y() < 0.0) {rs = Rect.from(rs.x(), 0.0, rs.width(), rs.height());}
+
 		if (s == rs)
 			return cwShape;
 		else

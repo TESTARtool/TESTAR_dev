@@ -52,6 +52,8 @@ public class ModelManager implements StateModelManager {
 
     // should the widgets of concrete states be stored in the model?
     boolean storeWidgets;
+    
+    private boolean sequenceStarted = false;
 
     /**
      * Constructor
@@ -212,6 +214,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestingEnded() {
         persistenceManager.shutdown();
+        sequenceStarted = false;
     }
 
     /**
@@ -249,6 +252,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequencedStarted() {
         sequenceManager.startNewSequence();
+        sequenceStarted = true;
     }
 
     @Override
@@ -258,16 +262,24 @@ public class ModelManager implements StateModelManager {
         actionUnderExecution = null;
         concreteActionUnderExecution = null;
         sequenceManager.stopSequence();
+        sequenceStarted = false;
     }
 
     @Override
     public void notifyTestSequenceInterruptedByUser() {
         sequenceManager.notifyInterruptionByUser();
+        sequenceStarted = false;
     }
 
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
+        sequenceStarted = false;
     }
+
+	@Override
+	public boolean sequenceStarted() {
+		return sequenceStarted;
+	}
 
 }
