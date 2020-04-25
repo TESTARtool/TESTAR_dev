@@ -141,8 +141,7 @@ TemporalCTL_GALChecker = c:\\itscommand\\eclipsec.exe
 TemporalCTL_GALCheckerWSL = false
 TemporalCTL_GALChecker_Enabled = false
 #
-#css 20200309
-#==> this model checker returned False positives.
+#css 20200309 this following model checker returned False positives.
 TemporalLTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
 TemporalLTL_ITSCheckerWSL = true
 TemporalLTL_ITSChecker_Enabled = true
@@ -150,6 +149,10 @@ TemporalLTL_ITSChecker_Enabled = true
 TemporalLTL_LTSMINChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-seq
 TemporalLTL_LTSMINCheckerWSL = true
 TemporalLTL_LTSMINChecker_Enabled = false
+#
+TemporalCTL_LTSMINChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-sym
+TemporalCTL_LTSMINCheckerWSL = true
+TemporalCTL_LTSMINChecker_Enabled = false
 TemporalVerbose = true
 TemporalCounterExamples = true
 TemporalInstrumentDeadlockState = true

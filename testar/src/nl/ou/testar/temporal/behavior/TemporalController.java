@@ -45,41 +45,47 @@ import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
  * Temporal Controller: orchestrates the Model Check function of TESTAR
  */
 public class TemporalController {
-    private String ApplicationName;
-    private String ApplicationVersion;
+    private final String ApplicationName;
+    private final String ApplicationVersion;
     private String Modelidentifier;
+    private final String outputDir;
 
+    private final boolean ltlSPOTToWSLPath;
+    private final String ltlSPOTMCCommand;
+    private final boolean ltlSPOTEnabled;
 
-    private String outputDir;
-    private boolean ltlSPOTToWSLPath;
-    private String ltlSPOTMCCommand;
-    private boolean ltlSPOTEnabled;
-    private boolean ctlITSToWSLPath;
-    private String ctlITSMCCommand;
-    private boolean ctlITSEnabled;
-    private boolean ctlGALToWSLPath;
-    private String ctlGALMCCommand;
-    private boolean ctlGALEnabled;
+    private final boolean ctlITSToWSLPath;
+    private final String ctlITSMCCommand;
+    private final boolean ctlITSEnabled;
 
-    private boolean ltlITSToWSLPath;
-    private String ltlITSMCCommand;
-    private boolean ltlITSEnabled;
-    private boolean ltlLTSMINToWSLPath;
-    private String ltlLTSMINMCCommand;
-    private boolean ltlLTSMINEnabled;
-    private String APModelManagerFile;
-    private String oracleFile;
-    private boolean verbose;
-    private boolean counterExamples;
+    private final boolean ctlGALToWSLPath;
+    private final String ctlGALMCCommand;
+    private final boolean ctlGALEnabled;
 
-    private boolean instrumentDeadlockState;
+    private final boolean ltlITSToWSLPath;
+    private final String ltlITSMCCommand;
+    private final boolean ltlITSEnabled;
+
+    private final boolean ltlLTSMINToWSLPath;
+    private final String ltlLTSMINMCCommand;
+    private final boolean ltlLTSMINEnabled;
+
+    private final boolean ctlLTSMINToWSLPath;
+    private final String ctlLTSMINMCCommand;
+    private final boolean ctlLTSMINEnabled;
+
+    private final String APModelManagerFile;
+    private final String oracleFile;
+    private final boolean verbose;
+    private final boolean counterExamples;
+
+    private final boolean instrumentDeadlockState;
 
     private APModelManager apModelManager;
     private TemporalModel tModel;
-    private TemporalDBManager tDBManager;
+    private final TemporalDBManager tDBManager;
     private List<TemporalOracle> oracleColl;
-    private SimpleLog simpleLog;
-    private String logFileName;
+    private final SimpleLog simpleLog;
 
     public TemporalController(final Settings settings,  String outputDir) {
 
@@ -91,7 +97,7 @@ public class TemporalController {
         } else {
             this.outputDir = outputDir;
         }
-        logFileName=this.outputDir +"log.txt";
+        String logFileName = this.outputDir + "log.txt";
         simpleLog= new SimpleLog(logFileName,true);
         simpleLog.append(prettyCurrentTime() + " | " +"Temporal Component uses output folder: "+this.outputDir+"\n");
         tDBManager = new TemporalDBManager(settings);
@@ -103,9 +109,11 @@ public class TemporalController {
         ctlITSToWSLPath = settings.get(ConfigTags.TemporalCTL_ITSCheckerWSL);
         ctlITSMCCommand = settings.get(ConfigTags.TemporalCTL_ITSChecker);
         ctlITSEnabled = settings.get(ConfigTags.TemporalCTL_ITSChecker_Enabled);
+
         ctlGALToWSLPath = settings.get(ConfigTags.TemporalCTL_GALCheckerWSL);
         ctlGALMCCommand = settings.get(ConfigTags.TemporalCTL_GALChecker);
         ctlGALEnabled = settings.get(ConfigTags.TemporalCTL_GALChecker_Enabled);
+
         ltlITSToWSLPath = settings.get(ConfigTags.TemporalLTL_ITSCheckerWSL);
         ltlITSMCCommand = settings.get(ConfigTags.TemporalLTL_ITSChecker);
         ltlITSEnabled = settings.get(ConfigTags.TemporalLTL_ITSChecker_Enabled);
@@ -113,6 +121,10 @@ public class TemporalController {
         ltlLTSMINToWSLPath = settings.get(ConfigTags.TemporalLTL_LTSMINCheckerWSL);
         ltlLTSMINMCCommand = settings.get(ConfigTags.TemporalLTL_LTSMINChecker);
         ltlLTSMINEnabled = settings.get(ConfigTags.TemporalLTL_LTSMINChecker_Enabled);
+
+        ctlLTSMINToWSLPath = settings.get(ConfigTags.TemporalCTL_LTSMINCheckerWSL);
+        ctlLTSMINMCCommand = settings.get(ConfigTags.TemporalCTL_LTSMINChecker);
+        ctlLTSMINEnabled = settings.get(ConfigTags.TemporalCTL_LTSMINChecker_Enabled);
 
         APModelManagerFile = settings.get(ConfigTags.TemporalAPModelManager);
         oracleFile = settings.get(ConfigTags.TemporalOracles);
@@ -408,7 +420,9 @@ public class TemporalController {
         if (tmptype.equals(TemporalFormalism.LTL) || tmptype.equals(TemporalFormalism.LTL_SPOT)) {
             contents = tModel.makeHOAOutput();
         }
-        if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.LTL_ITS) || tmptype.equals(TemporalFormalism.LTL_LTSMIN)) {
+        if (tmptype.equals(TemporalFormalism.CTL) || tmptype.equals(TemporalFormalism.CTL_ITS) ||
+                tmptype.equals(TemporalFormalism.LTL_ITS) ||
+                tmptype.equals(TemporalFormalism.LTL_LTSMIN)|| tmptype.equals(TemporalFormalism.CTL_LTSMIN)) {
             contents = tModel.makeETFOutput(tmptype.supportsMultiInitialStates);
         }
         if (tmptype.equals(TemporalFormalism.CTL_GAL)) {  // **under construction ITS-GAL
@@ -459,7 +473,8 @@ public class TemporalController {
                 ctlITSMCCommand, ctlITSToWSLPath, ctlITSEnabled,
                 ltlITSMCCommand, ltlITSToWSLPath, ltlITSEnabled,
                 ltlLTSMINMCCommand, ltlLTSMINToWSLPath, ltlLTSMINEnabled,
-                ctlGALMCCommand, ctlGALToWSLPath, ctlGALEnabled);
+                ctlGALMCCommand, ctlGALToWSLPath, ctlGALEnabled,
+                ctlLTSMINMCCommand, ctlLTSMINToWSLPath, ctlLTSMINEnabled);
 
     }
 
@@ -470,7 +485,8 @@ public class TemporalController {
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
                        String ltlLtsminMCCommand, boolean ltlLtsminWSLPath, boolean ltlltsminEnabled,
-                       String ctlGalMCCommand, boolean ctlGalWSLPath, boolean ctlGalEnabled
+                       String ctlGalMCCommand, boolean ctlGalWSLPath, boolean ctlGalEnabled,
+                       String ctlLtsminMCCommand, boolean ctlLtsminWSLPath, boolean ctlltsminEnabled
                        ) {
         try {
 
@@ -576,6 +592,11 @@ public class TemporalController {
                         modelCheckedOracles = checker.check(ltlLtsminMCCommand, ltlLtsminWSLPath, counterExamples,
                         automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
                      }
+                    if(ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN)){
+                        modelCheckedOracles = checker.check(ctlLtsminMCCommand, ctlLtsminWSLPath, counterExamples,
+                                automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                    }
+
                     if (ctlItsEnabled &&  (  oracleType == TemporalFormalism.CTL ||
                                                     oracleType == TemporalFormalism.CTL_ITS)) {
                         modelCheckedOracles = checker.check(ctlItsMCCommand, ctlItsWSLPath, counterExamples,
@@ -593,8 +614,10 @@ public class TemporalController {
                     }
 
                     if(!(
-                            (ltlSpotEnabled && ((oracleType == TemporalFormalism.LTL) || (oracleType == TemporalFormalism.LTL_SPOT)))||
+                            (ltlSpotEnabled && ((oracleType == TemporalFormalism.LTL) ||
+                            (oracleType == TemporalFormalism.LTL_SPOT)))||
                             (ltlltsminEnabled && (oracleType == TemporalFormalism.LTL_LTSMIN) )||
+                            (ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN) )||
                             (ltlItsEnabled && (oracleType == TemporalFormalism.LTL_ITS))||
                             (ctlItsEnabled &&  ( oracleType == TemporalFormalism.CTL) ||  (oracleType == TemporalFormalism.CTL_ITS))||
                             (ctlGalEnabled &&  (oracleType == TemporalFormalism.CTL_GAL ))

@@ -138,6 +138,10 @@ public final class ConfigTags {
   public static final Tag<Boolean> TemporalLTL_LTSMINCheckerWSL = Tag.from("TemporalLTL_LTSMINCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalLTL_LTSMINChecker_Enabled = Tag.from("TemporalLTL_LTSMINChecker_Enabled", Boolean.class);
 
+  public static final Tag<String> TemporalCTL_LTSMINChecker = Tag.from("TemporalCTL_LTSMINChecker", String.class);
+  public static final Tag<Boolean> TemporalCTL_LTSMINCheckerWSL = Tag.from("TemporalCTL_LTSMINCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalCTL_LTSMINChecker_Enabled = Tag.from("TemporalCTL_LTSMINChecker_Enabled", Boolean.class);
+
 
   public static final Tag<Boolean> TemporalInstrumentDeadlockState= Tag.from("TemporalInstrumentDeadlockState", Boolean.class);
   public static final Tag<Boolean> TemporalVerbose = Tag.from("TemporalVerbose", Boolean.class);

@@ -19,7 +19,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
     public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
                                       String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
-        //LTSMIN does not provide counter examles for CTL, does not allow the implies ('->') operator, crashes on some ETF models.
+        //LTSMIN does not provide counter examples for CTL, does not allow the implies ('->') operator, crashes on some ETF models.
         String cli = pathToExecutable;
         StringBuilder sb = new StringBuilder();
         try {//formulafile to --ctl strings

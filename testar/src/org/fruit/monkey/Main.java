@@ -468,6 +468,9 @@ public class Main {
 			defaults.add(Pair.from(TemporalLTL_LTSMINChecker, ""));
 			defaults.add(Pair.from(TemporalLTL_LTSMINCheckerWSL, true));
 			defaults.add(Pair.from(TemporalLTL_LTSMINChecker_Enabled, false));
+			defaults.add(Pair.from(TemporalCTL_LTSMINChecker, ""));
+			defaults.add(Pair.from(TemporalCTL_LTSMINCheckerWSL, true));
+			defaults.add(Pair.from(TemporalCTL_LTSMINChecker_Enabled, false));
 			defaults.add(Pair.from(TemporalOffLineEnabled, false));
 			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, true));
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));

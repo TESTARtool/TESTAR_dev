@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
-    <rowspec value="top:301px:noGrow"/>
+    <rowspec value="top:328px:noGrow"/>
     <colspec value="right:245px:grow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:45px:noGrow"/>
@@ -20,10 +20,11 @@
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="20" y="20" width="668" height="343"/>
+      <xy x="20" y="20" width="668" height="369"/>
     </constraints>
     <properties>
-      <preferredSize width="621" height="340"/>
+      <minimumSize width="621" height="350"/>
+      <preferredSize width="621" height="350"/>
     </properties>
     <border type="empty">
       <size top="0" left="2" bottom="2" right="2"/>
@@ -44,8 +45,8 @@
           <forms/>
         </constraints>
         <properties>
-          <minimumSize width="617" height="275"/>
-          <preferredSize width="617" height="275"/>
+          <minimumSize width="617" height="350"/>
+          <preferredSize width="617" height="350"/>
           <requestFocusEnabled value="true"/>
           <visible value="true"/>
         </properties>
@@ -65,6 +66,8 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:42px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:139px:noGrow"/>
             <colspec value="left:91px:noGrow"/>
             <colspec value="left:8dlu:noGrow"/>
@@ -76,6 +79,8 @@
               <tabbedpane title="Setup"/>
             </constraints>
             <properties>
+              <minimumSize width="588" height="325"/>
+              <preferredSize width="588" height="325"/>
               <visible value="true"/>
             </properties>
             <border type="none"/>
@@ -194,18 +199,6 @@
                 <properties>
                   <text value="WSL"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
-                  <visible value="true"/>
-                </properties>
-              </component>
-              <component id="bc30b" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <opaque value="false"/>
-                  <text value="ITS LTL Checker:"/>
-                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
                   <visible value="true"/>
                 </properties>
               </component>
@@ -353,6 +346,67 @@
                 <properties>
                   <text value="Enable"/>
                   <toolTipText value="&lt;html&gt; Use this model-checker?&lt;br&gt; &#10;When ticked,then this model checker will verify&lt;br&gt;&#10;the supplied temporal oracles that match the temporal-type.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="bc30b" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <opaque value="false"/>
+                  <text value="ITS LTL Checker:"/>
+                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
+                  <visible value="true"/>
+                </properties>
+              </component>
+              <component id="1e049" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <opaque value="false"/>
+                  <text value="LTSMIN CTL Checker:"/>
+                  <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
+                  <visible value="true"/>
+                </properties>
+              </component>
+              <component id="d339d" class="javax.swing.JTextField" binding="ltsminCTLChecker">
+                <constraints>
+                  <grid row="14" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value=""/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                  <visible value="true"/>
+                </properties>
+              </component>
+              <component id="51af3" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLLTSMIN">
+                <constraints>
+                  <grid row="14" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="WSL"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <visible value="true"/>
+                </properties>
+              </component>
+              <component id="2c872" class="javax.swing.JCheckBox" binding="enableLTSMIN_CTL">
+                <constraints>
+                  <grid row="14" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <selected value="false"/>
+                  <text value="Enable"/>
+                  <toolTipText value="&lt;html&gt; Use this model-checker?&lt;br&gt; &#10;When ticked,then this model checker will verify&lt;br&gt;&#10;the supplied temporal oracles that match the temporal-type.&#10;&lt;/html&gt;"/>
+                  <visible value="true"/>
                 </properties>
               </component>
             </children>

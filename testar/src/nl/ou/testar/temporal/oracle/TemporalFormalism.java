@@ -47,7 +47,8 @@ public enum TemporalFormalism {
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
             new PairBean<>("~~unlikely",""),false,"gal");
-    //'dummypropertyname' is a fixed name, but apparently GAL syntax allows this..... and we don't need a reference
+    //'dummypropertyname' is a fixed name with no 'increment',
+    // but apparently GAL syntax allows this..... and we don't need this reference
 
 
     //futures: CTLSTAR,  MUCALC }
