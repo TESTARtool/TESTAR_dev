@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
-    <rowspec value="top:275px:noGrow"/>
+    <rowspec value="top:301px:noGrow"/>
     <colspec value="right:245px:grow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:45px:noGrow"/>
@@ -20,7 +20,7 @@
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="20" y="20" width="668" height="312"/>
+      <xy x="20" y="20" width="668" height="343"/>
     </constraints>
     <properties>
       <preferredSize width="621" height="340"/>
@@ -64,7 +64,7 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="center:42px:noGrow"/>
             <colspec value="fill:139px:noGrow"/>
             <colspec value="left:91px:noGrow"/>
             <colspec value="left:8dlu:noGrow"/>
@@ -183,7 +183,7 @@
                 <properties>
                   <text value=""/>
                   <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
-                  <visible value="false"/>
+                  <visible value="true"/>
                 </properties>
               </component>
               <component id="75b8e" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLITS">
@@ -194,7 +194,7 @@
                 <properties>
                   <text value="WSL"/>
                   <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
-                  <visible value="false"/>
+                  <visible value="true"/>
                 </properties>
               </component>
               <component id="bc30b" class="javax.swing.JLabel">
@@ -206,7 +206,7 @@
                   <opaque value="false"/>
                   <text value="ITS LTL Checker:"/>
                   <toolTipText value="Used for LTL model check. the usual command to invoke is:  its-ltl"/>
-                  <visible value="false"/>
+                  <visible value="true"/>
                 </properties>
               </component>
               <component id="98c82" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
@@ -268,8 +268,8 @@
                   <enabled value="true"/>
                   <selected value="false"/>
                   <text value="Enable"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
-                  <visible value="false"/>
+                  <toolTipText value="&lt;html&gt; Use this model-checker?&lt;br&gt; &#10;When ticked,then this model checker will verify&lt;br&gt;&#10;the supplied temporal oracles that match the temporal-type.&#10;&lt;/html&gt;"/>
+                  <visible value="true"/>
                 </properties>
               </component>
               <component id="74406" class="javax.swing.JLabel">

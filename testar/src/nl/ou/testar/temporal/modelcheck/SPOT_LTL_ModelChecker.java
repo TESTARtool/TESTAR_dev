@@ -1,17 +1,34 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
+import nl.ou.testar.temporal.model.TemporalModel;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.util.Common;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class SPOT_LTL_ResultsParser extends ResultsParser {
+public class SPOT_LTL_ModelChecker extends ModelChecker {
 
+    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                      String automatonFile, String formulaFile, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead ";
+        String cli = pathToExecutable;
+        cli = cli + " --a " + ((toWslPath) ? Common.toWSLPath(automatonFile) : automatonFile) + " --ff " + ((toWslPath) ? Common.toWSLPath(formulaFile) : formulaFile);
+        //if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
+        if (counterExamples) cli = cli + " --witness ";
+        cli = cli + " &> " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        Common.RunOSChildProcess(cli);
 
-    public List<TemporalOracle> parse(String rawInput) {
+        setTmodel(tModel);
+        setOracleColl(oracleList);
+        return parseResultsFile(resultsFile);
+    }
+
+    public List<TemporalOracle> parseResultsString(String rawInput) {
 
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);

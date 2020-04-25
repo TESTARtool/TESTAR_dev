@@ -1,16 +1,34 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.model.StateEncoding;
+import nl.ou.testar.temporal.model.TemporalModel;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.util.Common;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class ITS_LTL_ResultsParser extends ResultsParser {
+public class ITS_LTL_ModelChecker extends ModelChecker {
 
+    // css20200309  this model check gives unexpected results: False Positive.
 
-    public List<TemporalOracle> parse(String rawInput) {
+    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                      String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+        //String cli = "ubuntu1804 run ~/its/its-ltl -i model.etf -t ETF  -ltl formula.ltl -c -e &> results.txt;
+        String cli = pathToExecutable;
+        String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFilePath) : automatonFilePath);
+        String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        String cli_formulafile = " " + ((toWslPath) ? Common.toWSLPath(formulaFilePath) : formulaFilePath);
+
+        cli = cli + " -i " + cli_automaton +" -t ETF -LTL " + cli_formulafile + " -c " + (counterExamples ? "-e" : "");
+        cli = cli + " &> " + cli_resultsfile;
+        Common.RunOSChildProcess(cli);
+        setTmodel(tModel);
+        setOracleColl(oracleList);
+        return parseResultsFile(resultsFile);
+    }
+    public List<TemporalOracle> parseResultsString(String rawInput) {
 
 
 //an accepting run exists false

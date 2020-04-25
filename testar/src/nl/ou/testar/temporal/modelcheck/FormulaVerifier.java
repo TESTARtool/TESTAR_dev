@@ -1,17 +1,30 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import nl.ou.testar.temporal.util.Common;
+import java.io.*;
+import java.util.*;
 
-public class SPOT_LTLFormula_ResultsParser {
+public class FormulaVerifier {
 
 
-    public static List<String> parse(File rawInput, boolean keepLTLFModelVariant) {
+
+    public static List<String> verifyLTL(String pathToExecutable, boolean toWslPath, String formulaFilePath, File resultsFile) {
+        //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
+        String cli = pathToExecutable;
+        String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        String cli_formulafile = " " + ((toWslPath) ? Common.toWSLPath(formulaFilePath) : formulaFilePath);
+
+        cli = cli + " --fonly --ff " +  cli_formulafile;
+        cli = cli + " &> " + cli_resultsfile;
+        Common.RunOSChildProcess(cli);
+        return parse(resultsFile);
+
+    }
+
+
+
+    private static List<String> parse(File rawInput) {
+        boolean keepLTLFModelVariant=true;
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
@@ -63,6 +76,5 @@ public class SPOT_LTLFormula_ResultsParser {
         return formulasParsed;
     }
 }
-
 
 

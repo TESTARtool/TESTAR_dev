@@ -1,9 +1,16 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
+import nl.ou.testar.temporal.model.TemporalModel;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.util.Common;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,9 +18,33 @@ import java.util.List;
 import java.util.Scanner;
 
 //css ltsmin cannot provide counterexamples for CTL, only LTL
-public class LTSMIN_LTL_ResultsParser extends ResultsParser {
+public class LTSMIN_LTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> parse(String rawInput) {
+    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                      String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+        //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
+        //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(formulaFilePath), StandardCharsets.UTF_8);
+            boolean first = true;
+            String cli;
+            String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFilePath) : automatonFilePath);// no witness nor counterexamples
+            String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+            for (String line : lines) {
+                cli = pathToExecutable + " --ltl='" + line + "' " + cli_automaton;
+                    cli = cli + (first ? " &> " : "&>>") + cli_resultsfile;
+                    first = false;
+                Common.RunOSChildProcess(cli);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setTmodel(tModel);
+        setOracleColl(oracleList);
+        return parseResultsFile(resultsFile);
+    }
+
+    public List<TemporalOracle> parseResultsString(String rawInput) {
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
          while (scanner.hasNextLine()) {

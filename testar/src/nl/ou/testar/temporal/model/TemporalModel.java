@@ -363,6 +363,7 @@ public class TemporalModel extends TemporalBean {
 
     public String makeGALOutput() {
         //see https://lip6.github.io/ITSTools-web/galmm.html
+        final String edgeprefix = "trans"; // also used for parsing counter examples
         StringBuilder result = new StringBuilder();
         result.append("//tool: \"TESTAR-CSS20200126\"\n");
         result.append("//name: \"" + "app= ").
@@ -497,7 +498,8 @@ public class TemporalModel extends TemporalBean {
                 }
                 if (!doneState.contains(targetenc)) {
 
-                    String artificalEdge = "F_F" + trenc.getTransition().replace("#", "_").replace(":", "_");
+
+                    String edge = edgeprefix + trenc.getTransition().replace("#", "_").replace(":", "_");
                     StringBuilder condition = new StringBuilder();
                     StringBuilder assignment = new StringBuilder();
 
@@ -537,7 +539,7 @@ public class TemporalModel extends TemporalBean {
                     }
                     condition.append(" ]\n");
                     // result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append( "label "+"\""+trenc.getTransition()+"\""+" {\n");
-                    result.append("    transition ").append(artificalEdge).append(" ").append(condition.toString()).append(" {\n");
+                    result.append("    transition ").append(edge).append(" ").append(condition.toString()).append(" {\n");
 
                     result.append(assignment.toString());
                     result.append("    }\n");

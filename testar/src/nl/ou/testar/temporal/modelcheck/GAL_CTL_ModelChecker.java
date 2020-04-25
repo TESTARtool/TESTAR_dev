@@ -1,9 +1,17 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.model.StateEncoding;
-import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.model.StateEncoding;
+import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalOracle;
+import nl.ou.testar.temporal.util.Common;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,9 +19,34 @@ import java.util.List;
 import java.util.Scanner;
 //css: version without --witness : CTL counterexamples by its-ctl are not well described
 
-public class ITS_CTL_ResultsParser extends ResultsParser {
+public class GAL_CTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> parse(String rawInput) {
+    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
+                                      String automatonFile, String formulaFile, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+
+
+        //String cli = "eclipsec.exe -i CTL_GAL_model1.gal -ctl -itsflags "--precise --backward --witness" 2> results.txt;
+        // append formulas to the model file:
+        Path path = Paths.get(formulaFile);
+        try {
+            byte[] contentToAppend = Files.readAllBytes(path);
+            Files.write(
+                    Paths.get(automatonFile), contentToAppend, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String cli = pathToExecutable;
+        cli = cli + " -i " +  ((toWslPath) ? Common.toWSLPath(automatonFile) : automatonFile) + "  -ctl " +
+                (counterExamples ? "-itsflags \"--precise --backward --witness\"" : "");
+        Common.RunOSChildProcess(cli,resultsFile.getAbsolutePath());
+
+        setTmodel(tModel);
+        setOracleColl(oracleList);
+        return parseResultsFile(resultsFile);
+    }
+
+    public List<TemporalOracle> parseResultsString(String rawInput) {
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
         while (scanner.hasNextLine()) {
@@ -43,7 +76,7 @@ public class ITS_CTL_ResultsParser extends ResultsParser {
                 forumlascanner.useDelimiter("\\sFormula is\\s");
             if (forumlascanner.hasNext()) {forumlascanner.next();} //throw away
             if (forumlascanner.hasNext()) {
-                formulaStatus=forumlascanner.next().replaceAll(" !","");
+                formulaStatus=forumlascanner.nextLine().replaceAll(" !","");
                 //process witness?
             }
             else {//in case there is a change in the future how the checker provide log details

@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ResultsParser {
+public abstract class ModelChecker {
 
     protected TemporalModel tmodel;
     protected List<TemporalOracle> oracleColl;
 
-    public ResultsParser() { }
+    public ModelChecker() { }
 
 
     public void setTmodel(TemporalModel tmodel) {  this.tmodel = tmodel;   }
@@ -33,9 +33,14 @@ public abstract class ResultsParser {
         }
     }
 
-    public abstract List<TemporalOracle> parse(String rawInput);
+    public abstract  List<TemporalOracle> check(String pathToExecutable, boolean toWslPath,
+                                                boolean counterExamples,String automatonFilePath,
+                                                String formulaFilePath, File resultsFile,
+                                                TemporalModel tModel, List<TemporalOracle> oracleList);
 
-    public List<TemporalOracle> parse(File rawInput) {
+    public abstract List<TemporalOracle> parseResultsString(String rawInput);
+
+    public  List<TemporalOracle> parseResultsFile(File rawInput) {
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
@@ -45,7 +50,7 @@ public abstract class ResultsParser {
         } catch (IOException f) {
             f.printStackTrace();
         }
-        return parse(contentBuilder.toString());
+        return parseResultsString(contentBuilder.toString());
 
     }
 }
