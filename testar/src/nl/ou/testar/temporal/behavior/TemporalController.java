@@ -276,6 +276,7 @@ public class TemporalController {
         List<String> logTerminalStates= new ArrayList<>();
         boolean firstTerminalState = true;
         StateEncoding terminalStateEnc;
+        terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -295,13 +296,13 @@ public class TemporalController {
                     //tModel.addLog("State: " + stateVertex.getIdentity().toString() + " is terminal.");
                     if (instrumentTerminalState && firstTerminalState) {
                         //add stateenc for 'Dead', inclusive dead transition selfloop;
-                        terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
+                        //terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
                         Set<String> terminalStatePropositions = new LinkedHashSet<>();
                         //terminalStatePropositions.add("dead");   //redundant on transition based automatons
                         terminalStateEnc.setStateAPs(terminalStatePropositions);
                         TransitionEncoding deadTrenc = new TransitionEncoding();
                         deadTrenc.setTransition(TemporalModel.getDeadProposition() + "_selfloop");
-                        deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
+                        deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                         deadTransitionPropositions.add(TemporalModel.getDeadProposition());
                         deadTrenc.setTransitionAPs(deadTransitionPropositions);
@@ -325,8 +326,8 @@ public class TemporalController {
                 senc.setStateAPs(propositions);
                 if (instrumentTerminalState && terminalState) {
                     TransitionEncoding deadTrenc = new TransitionEncoding();
-                    deadTrenc.setTransition("#" + TemporalModel.getDeadProposition() + "_" + stateVertex.getIdentity().toString());
-                    deadTrenc.setTargetState("#" + TemporalModel.getDeadProposition());
+                    deadTrenc.setTransition(terminalStateEnc.getState() + "_" + stateVertex.getIdentity().toString());
+                    deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
                     Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                     deadTransitionPropositions.add(TemporalModel.getDeadProposition());
                     deadTrenc.setTransitionAPs(deadTransitionPropositions);
@@ -359,6 +360,7 @@ public class TemporalController {
             }
         }
 
+
         tModel.addLog("Terminal States : "+logTerminalStates.toString());
         String mapAsString = commentWidgetDistri.keySet().stream()
                 .map(key -> key + "->" + commentWidgetDistri.get(key))
@@ -372,20 +374,25 @@ public class TemporalController {
 
 
         tModel.setTraces(tDBManager.fetchTraces(tModel.getApplication_ModelIdentifier()));
-        List<String> initStates = new ArrayList<>();
+        Set<String> initStates = new HashSet<>();
         for (TemporalTrace trace : tModel.getTraces()
         ) {
             TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
             initStates.add(traceevent.getState());
         }
-
         tModel.setInitialStates(initStates);
-
         tModel.addComments("Total #Widgets = "+runningWcount);
+
+        simpleLog.append(prettyCurrentTime() + " | " + "Total States : "+tModel.getStateList().size());
+        simpleLog.append(prettyCurrentTime() + " | " + "Total Atomic Propositions detected : "+tModel.getModelAPs().size());
+        simpleLog.append(prettyCurrentTime() + " | " + "Model has "+(logTerminalStates.size()==0?"no":""+logTerminalStates.size())+ " terminal states");
+        simpleLog.append(prettyCurrentTime() + " | " + "Model has "+tModel.getInitialStates().size()+ " initial states");
+
         long end_time = System.currentTimeMillis();
         long difference = (end_time-start_time)/1000;
         tModel.addComments("Duration to create the model:"+difference +" (s)" );
         tDBManager.dbClose();
+
     }
 
 
@@ -593,8 +600,17 @@ public class TemporalController {
                         automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
                      }
                     if(ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN)){
-                        modelCheckedOracles = checker.check(ctlLtsminMCCommand, ctlLtsminWSLPath, counterExamples,
-                                automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                        int maxap=450;
+                        int maxstate=25000;
+                        if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
+                        }
+                        else{
+                            modelCheckedOracles = checker.check(ctlLtsminMCCommand, ctlLtsminWSLPath, counterExamples,
+                                    automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
+                        }
+
                     }
 
                     if (ctlItsEnabled &&  (  oracleType == TemporalFormalism.CTL ||
@@ -603,8 +619,10 @@ public class TemporalController {
                         automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
                     }
                     if (ctlGalEnabled &&  (oracleType == TemporalFormalism.CTL_GAL )) {
-                        if (tModel.getModelAPs().size()>250 ||tModel.getStateList().size()>25000){
-                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: model too complex (propositions>250 or states>25000");
+                        int maxap=200;
+                        int maxstate=25000;
+                        if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
                         }
                         else{
                             modelCheckedOracles = checker.check(ctlGalMCCommand, ctlGalWSLPath, counterExamples,
@@ -644,8 +662,8 @@ public class TemporalController {
                 }
                 CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
                 if (finaloraclelist.size() != fromcoll.size()) {
-                    simpleLog.append(prettyCurrentTime() + " | " + "** Warning: less oracle verdicts received than in original collection");
-                    simpleLog.append(prettyCurrentTime() + " | " + "from file: "+ Paths.get(oracleFile).getFileName());
+                    simpleLog.append(prettyCurrentTime() + " | " + "** Warning: less oracle verdicts " +
+                            "received than requested in: "+ Paths.get(oracleFile).getFileName());
                 }
                 CSVHandler.save(finaloraclelist, modelCheckedFile.getAbsolutePath());
             }

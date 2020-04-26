@@ -14,7 +14,7 @@ import java.util.*;
 public class TemporalModel extends TemporalBean {
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
-    private List<String> InitialStates;
+    private Set<String> InitialStates;
     private List<TemporalTrace> traces; //
     private List<String> stateList;
     private List<String> transitionList;
@@ -33,11 +33,11 @@ public class TemporalModel extends TemporalBean {
     }
 
     @SuppressWarnings("unused")
-    public List<String> getInitialStates() {
+    public Set<String> getInitialStates() {
         return InitialStates;
     }
 
-    public void setInitialStates(List<String> initialStates) {
+    public void setInitialStates(Set<String> initialStates) {
         InitialStates = initialStates;
     }
 
@@ -65,7 +65,7 @@ public class TemporalModel extends TemporalBean {
         this.transitionList = transitionList;
     }
 
-    //public String getAPSeparator() {        return APSeparator;    }
+    //public String getAPSeparator() {        return APSeparamtor;    }
 
     //public void setAPSeparator(String APSeperator) {
     //    APSeparator = APSeperator;
@@ -149,9 +149,9 @@ public class TemporalModel extends TemporalBean {
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
-        Set<String> initialStatesSet = new HashSet<>(InitialStates);
+
         int stateindex;
-        for (String initialState : initialStatesSet
+        for (String initialState : InitialStates
         ) {
             stateindex = stateList.indexOf(initialState);
             assert stateindex == -1 : "initial state not in statelist";
@@ -231,8 +231,8 @@ public class TemporalModel extends TemporalBean {
         result.append("end edge\n");
 
         result.append("begin init\n");
-        Set<String> initialStatesSet = new HashSet<>(InitialStates);
-        if (needArtificialInitialState && initialStatesSet.size()>1) {
+
+        if (needArtificialInitialState && InitialStates.size()>1) {
             result.append("%Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
             result.append("%Requires that formulas need to be modified: F(f) => X(f), where X is the next Operator\n");
             result.append("%To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
@@ -245,7 +245,7 @@ public class TemporalModel extends TemporalBean {
 
         }
         else{
-            for (String initstate : initialStatesSet  //max one !!
+            for (String initstate : InitialStates  //max one !!
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -270,11 +270,11 @@ public class TemporalModel extends TemporalBean {
         result.append("end init\n");
 
 
-        if (needArtificialInitialState && initialStatesSet.size()>1) {
+        if (needArtificialInitialState && InitialStates.size()>1) {
             //add artificial transitions
             result.append("begin trans\n");
             result.append("%artificial transitions to original initial states\n");
-            for (String initstate : initialStatesSet
+            for (String initstate : InitialStates
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -382,10 +382,10 @@ public class TemporalModel extends TemporalBean {
         int chunk = 25;
         int i = 0;
 
-        Set<String> initialStatesSet = new HashSet<>(InitialStates);
-        if (initialStatesSet.size()>1) {
+
+        if (InitialStates.size()>1) {
             result.append("int ");
-            //String artifical_StartState=""+ (int)Math.pow(2,20); //out of memory error on ITS above 30.000
+            //out of memory error on ITS above 30.000
             String artifical_StartState=""+ (stateList.size()+1); //statecount plus 1
             result.append("stateindex = ").append(artifical_StartState).append(" ;\n");
 
@@ -402,7 +402,7 @@ public class TemporalModel extends TemporalBean {
 
 
             result.append("// BEGIN artificial initial states\n");
-            for (String initstate : initialStatesSet
+            for (String initstate : InitialStates
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -443,7 +443,7 @@ public class TemporalModel extends TemporalBean {
         else{
             result.append("// BEGIN initial state\n");
             result.append("int ");
-            for (String initstate : initialStatesSet
+            for (String initstate : InitialStates
             ) {
 
                 result.append("stateindex = ").append(stateList.indexOf(initstate)).append(" ;\n");
@@ -560,6 +560,7 @@ public class TemporalModel extends TemporalBean {
     public String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
 
         StringBuilder Formulas = new StringBuilder();
+        String rawFormula;
         for (TemporalOracle candidateOracle : oracleColl) {
             String formula;
             List<String> sortedparameters = new ArrayList<>(candidateOracle.getPatternBase().getPattern_Parameters());//clone list
@@ -569,6 +570,10 @@ public class TemporalModel extends TemporalBean {
             TemporalFormalism tFormalism = TemporalFormalism.valueOf(candidateOracle.getPatternTemporalType().name());
 
             boolean importStatus;
+            rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
+            if (rawFormula.toUpperCase().equals("FALSE")){
+                importStatus=false; // MS Excel converts 'false' to 'FALSE'. this is interpreted as eventually F(ALSE)
+            }
             importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
             if (!importStatus) {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
@@ -613,10 +618,10 @@ public class TemporalModel extends TemporalBean {
                     }
 
                     {
-                        String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
+                      //  String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
                         String formulalvl0 = rawFormula;
-                        Set<String> initialStatesSet = new HashSet<>(InitialStates);
-                        if( !tFormalism.supportsMultiInitialStates && initialStatesSet.size()>1){
+
+                        if( !tFormalism.supportsMultiInitialStates && InitialStates.size()>1){
                             // ETF models for ITS can only have  1 initial state. ETF by LTSMIN can handle multiple
                             //when there are initial states added to the model, the formula alter:
                             //satisfaction of the formula starts after the artificial state, hence the X-operator.

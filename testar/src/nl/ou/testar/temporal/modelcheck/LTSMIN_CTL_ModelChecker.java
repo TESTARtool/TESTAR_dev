@@ -77,7 +77,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
             }
             else {
                 if (fResult.contains(nothold)) {
-                    formulaStatus = "PASS";
+                    formulaStatus = "FAIL";
                     encodedFormula = fResult.split(nothold)[0];
                 }
                 else {
