@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,6 +36,7 @@ package org.fruit.alayer.devices;
 
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
 import org.fruit.FruitException;
 
@@ -53,6 +55,12 @@ public final class AWTKeyboard implements Keyboard {
 	public String toString() { return "AWT Keyboard"; }
 	public void press(KBKeys k) { robot.keyPress(k.code());	}	
 	public void release(KBKeys k) { robot.keyRelease(k.code());	}
+	public void paste() {
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+	}
 
 	public void isPressed(KBKeys k) {
 		throw new UnsupportedOperationException("Unfortunately AWT Keyboard cannot poll the keyboard's state!");

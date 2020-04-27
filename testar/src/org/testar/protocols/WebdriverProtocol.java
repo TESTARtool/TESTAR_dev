@@ -89,6 +89,8 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 	protected static double SCROLL_THICK = 16; //scroll thickness
 	protected HtmlSequenceReport htmlReport;
 	protected State latestState;
+	
+	protected boolean naughtyStrings = false;
 
     protected static Set<String> existingCssClasses = new HashSet<>();
     
@@ -135,6 +137,15 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void preSequencePreparations() {
+
+		if(!new File(settings.get(ConfigTags.InputFileText)).exists()) {
+			System.out.println("Warning: BLNS file from "+ settings.get(ConfigTags.ProtocolClass) + " settings cannot be readed, "
+					+ "check if the current value is correct: " + settings.get(ConfigTags.InputFileText));
+			System.out.println("Example of correct value: \"InputFileText = ./settings/webdriver_path/blns.txt\" ");
+			System.out.println("If you want to use a set of advanced Strings to test the text input fields, "
+					+ "please configure properly the InputFileText setting");
+		}
+
 		//initializing the HTML sequence report:
 		htmlReport = new HtmlSequenceReport();
 	}
@@ -677,4 +688,12 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
 	}
+	
+	protected String[] getTextInputsFromFile(final String inputFile) {
+        try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
+            return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

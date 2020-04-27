@@ -167,3 +167,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+InputFileText = ./settings/webdriver_statemodel/blns.txt

@@ -101,6 +101,10 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		}};
 
 		WdDriver.fullScreen = true;
+		
+		// List of strings which have a high probability of causing issues when used as user-input data
+		// https://github.com/minimaxir/big-list-of-naughty-strings
+		naughtyStrings = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
@@ -299,7 +303,16 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+
+				if(naughtyStrings) {
+					//Create a type action with the Action Compiler, and add it to the set of derived actions
+					final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
+					final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(widget);
+
+					actions.add(ac.pasteTextInto(widget, textToInsert, true));
+				} else {
+					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				}
 			}
 
 			// left clicks, but ignore links outside domain
