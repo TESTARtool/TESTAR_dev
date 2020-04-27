@@ -33,6 +33,7 @@ import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.ActionSelectionUtils;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -104,7 +105,7 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		
 		// List of strings which have a high probability of causing issues when used as user-input data
 		// https://github.com/minimaxir/big-list-of-naughty-strings
-		naughtyStrings = true;
+		naughtyStrings = false;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
@@ -309,7 +310,9 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 					final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
 					final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(widget);
 
-					actions.add(ac.pasteTextInto(widget, textToInsert, true));
+					Action paste = ac.pasteTextInto(widget, textToInsert, true);
+					paste.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml(textToInsert));
+					actions.add(paste);
 				} else {
 					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				}

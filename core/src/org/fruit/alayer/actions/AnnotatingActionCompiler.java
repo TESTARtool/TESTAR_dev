@@ -190,6 +190,22 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Role, ActionRoles.ClickTypeInto);
 		return ret;
 	}
+	
+	@Override
+	public Action pasteAndReplaceText(final Position position, final String text){
+		Action ret = super.pasteAndReplaceText(position, text);
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("blns naughty text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Role, ActionRoles.PasteTextInto);
+		return ret;
+	}
+
+	@Override
+	public Action pasteAndAppendText(final Position position, final String text){
+		Action ret = super.pasteAndAppendText(position, text);
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("blns naughty text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Role, ActionRoles.PasteTextInto);
+		return ret;
+	}
 
 	@Override
 	public Action dropDownAt(Position position){

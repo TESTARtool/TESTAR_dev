@@ -329,6 +329,7 @@ public class StdActionCompiler {
 		}
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 	
