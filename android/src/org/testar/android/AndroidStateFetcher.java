@@ -91,12 +91,18 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		Document xmlAndroid = AppiumFramework.getAndroidPageSource();
 		
 		Node stateNode = xmlAndroid.getDocumentElement();
-		System.out.println("Android XML State Node: " + stateNode.toString());
+		//System.out.println("Android XML State Node: " + stateNode.toString());
 		
 		rootElement.ignore = false;
 		rootElement.enabled = true;
 		rootElement.blocked = false;
 		rootElement.zindex = 0;
+		
+		rootElement.text = "rootLayout";
+		rootElement.className = "rootLayout";
+		
+		rootElement.rect = Rect.from(0, 0, 0, 0);
+		rootElement.bounds = Rect.from(0, 0, 0, 0);
 		
 		if(stateNode.hasChildNodes()) {
 			int childNum = stateNode.getChildNodes().getLength();
@@ -114,19 +120,35 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		AndroidElement childElement = new AndroidElement(parent);
 		parent.children.add(childElement);
 		
-		childElement.ignore = false;
-		childElement.enabled = true;
-		childElement.blocked = false;
-		
-		childElement.zindex = parent.zindex + 1;
-		
-		System.out.println("Child XML... " + xmlNode.getNodeName() + ", Attributes:");
+		/*System.out.println("Child XML... " + xmlNode.getNodeName() + ", Attributes:");
 		if(xmlNode.getAttributes() != null) {
 			for(int a = 0; a < xmlNode.getAttributes().getLength(); a++) {
 				Node attribute = xmlNode.getAttributes().item(a);
 				System.out.println("Name: " + attribute.getNodeName() + ", Value: " + attribute.getNodeValue());
 			}
-		}
+		}*/
+		childElement.zindex = parent.zindex + 1;
+		childElement.enabled = getBooleanAttribute(xmlNode, "enabled");
+		childElement.ignore = false;
+		childElement.blocked = getBooleanAttribute(xmlNode, "focusable"); 
+
+		childElement.nodeIndex = getIntegerAttribute(xmlNode, "index");
+		childElement.text = getStringAttribute(xmlNode, "text");
+		childElement.resourceId = getStringAttribute(xmlNode, "resource-id");
+		childElement.className = getStringAttribute(xmlNode, "class");
+		childElement.packageName = getStringAttribute(xmlNode, "package");
+		childElement.checkable = getBooleanAttribute(xmlNode, "checkable");
+		childElement.checked = getBooleanAttribute(xmlNode, "checked");
+		childElement.clickable = getBooleanAttribute(xmlNode, "clickable");
+		childElement.focusable = getBooleanAttribute(xmlNode, "focusable");
+		childElement.focused = getBooleanAttribute(xmlNode, "focused");
+		childElement.scrollable = getBooleanAttribute(xmlNode, "scrollable");
+		childElement.longclicklable = getBooleanAttribute(xmlNode, "long-clicklable");
+		childElement.password = getBooleanAttribute(xmlNode, "password");
+		childElement.selected = getBooleanAttribute(xmlNode, "selected");
+		
+		childElement.rect = androidBoundsRect(getStringAttribute(xmlNode, "bounds"));
+		childElement.bounds = androidBoundsRect(getStringAttribute(xmlNode, "bounds"));
 		
 		if(xmlNode.hasChildNodes()) {
 			int childNum = xmlNode.getChildNodes().getLength();
@@ -160,6 +182,67 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		for (AndroidElement child : element.children) {
 			createWidgetTree(w, child);
 		}
+	}
+	
+	private String getStringAttribute(Node xmlNode, String attributeName) {
+		try {
+			xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
+		} catch(Exception e) {
+			return "";
+		}
+
+		return xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue(); 
+	}
+	
+	private Integer getIntegerAttribute(Node xmlNode, String attributeName) {
+		try {
+			Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
+			return -1;
+		}
+
+		return Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+	}
+	
+	private Double getDoubleAttribute(Node xmlNode, String attributeName) {
+		try {
+			Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
+			return -1.0;
+		}
+
+		return Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+	}
+	
+	private Boolean getBooleanAttribute(Node xmlNode, String attributeName) {
+		try {
+			Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
+			return false;
+		}
+
+		return Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+	}
+	
+	private Rect androidBoundsRect(String bounds) {
+		String x = "0";
+		String y = "0";
+		String width = "0";
+		String height = "0";
+
+		try {
+			x = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
+			y = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
+			
+			bounds = bounds.substring(bounds.indexOf("["), bounds.indexOf("]")+1);
+			
+			width = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
+			height = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
+		} catch(Exception e) {
+			return Rect.from(0, 0, 0, 0);
+		}
+
+		return Rect.from(Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(width), Double.parseDouble(height));
 	}
 
 	/* lists all visible top level windows in ascending z-order (foreground window last) */

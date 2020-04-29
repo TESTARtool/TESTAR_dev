@@ -30,10 +30,43 @@
 
 package org.testar.android.enums;
 
+import org.fruit.alayer.Rect;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
 public class AndroidTags extends TagsBase {
 	
 	private AndroidTags() {}
-
+	
+	public static final Tag<Boolean> AndroidEnabled = from("AndroidEnabled", Boolean.class);
+	
+	public static final Tag<Rect> AndroidBounds = from("AndroidBounds", Rect.class);
+	
+	public static final Tag<Integer> AndroidNodeIndex = from("AndroidNodeIndex", Integer.class);
+	
+	public static final Tag<String> AndroidText = from("AndroidText", String.class);
+	
+	public static final Tag<String> AndroidResourceId = from("AndroidResourceId", String.class);
+	
+	public static final Tag<String> AndroidClassName = from("AndroidClassName", String.class);
+	
+	public static final Tag<String> AndroidPackageName = from("AndroidPackageName", String.class);
+	
+	public static final Tag<Boolean> AndroidCheckable = from("AndroidCheckable", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidChecked = from("AndroidChecked", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidClickable = from("AndroidClickable", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidFocusable = from("AndroidFocusable", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidFocused = from("AndroidFocused", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidScrollable = from("AndroidScrollable", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidLongClickable = from("AndroidLongClickable", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidPassword = from("AndroidPassword", Boolean.class);
+	
+	public static final Tag<Boolean> AndroidSelected = from("AndroidSelected", Boolean.class);
 }

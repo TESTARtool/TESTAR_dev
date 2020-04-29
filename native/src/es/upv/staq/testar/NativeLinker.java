@@ -145,7 +145,8 @@ public class NativeLinker {
 			return new WdCanvas(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
-			return new AndroidCanvas(pen);
+			//return new AndroidCanvas(pen);
+			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);

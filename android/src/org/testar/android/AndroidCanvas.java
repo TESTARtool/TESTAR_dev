@@ -129,8 +129,7 @@ public class AndroidCanvas implements Canvas {
 
 	@Override
 	public Pen defaultPen() {
-		// TODO Auto-generated method stub
-		return null;
+		return defaultPen;
 	}
 
 	@Override

@@ -30,71 +30,25 @@
 
 package org.testar.android;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.fruit.alayer.HitTester;
 
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.TaggableBase;
+public class AndroidHitTester implements HitTester {
+	private static final long serialVersionUID = -5963729249658717638L;
 
-public class AndroidElement extends TaggableBase implements Serializable {
-	private static final long serialVersionUID = -2910535746470588590L;
-	
-	List<AndroidElement> children = new ArrayList<>();
-	AndroidElement parent;
-	AndroidRootElement root;
-	AndroidWidget backRef;
-	
-	boolean enabled;
-	boolean ignore;
-	boolean blocked;
+	private final AndroidElement element;
 
-	double zindex;
-	
-	Rect rect;
-	Rect bounds;
-	
-	int nodeIndex;
-	String text;
-	String resourceId;
-	String className;
-	String packageName;
-	
-	boolean checkable;
-	boolean checked;
-	boolean clickable; 
-	boolean focusable;
-	boolean focused;
-	boolean scrollable;
-	boolean longclicklable;
-	boolean password;
-	boolean selected;
-	
-	public AndroidElement(){ this(null); }
-
-	public AndroidElement(AndroidElement parent){
-		this.parent = parent;
-		if(parent != null)
-			root = parent.root;
-		enabled = true;
+	public AndroidHitTester(AndroidElement element) {
+		this.element = element;
 	}
 
-	public boolean visibleAt(double x, double y) {
-		return true;
+	@Override
+	public boolean apply(double x, double y) {
+		return element.visibleAt(x, y);
 	}
 
-	public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-		return visibleAt(x, y);
+	@Override
+	public boolean apply(double x, double y, boolean obscuredByChildFeature) {
+		return element.visibleAt(x, y, obscuredByChildFeature);
 	}
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
-
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
 }

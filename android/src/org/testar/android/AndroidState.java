@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.Util;
+import org.fruit.alayer.Rect;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
@@ -44,6 +45,7 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.WidgetIterator;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.testar.android.enums.AndroidMapping;
+import org.testar.android.enums.AndroidRoles;
 import org.testar.android.enums.AndroidTags;
 
 public class AndroidState extends AndroidWidget implements State {
@@ -134,14 +136,13 @@ public class AndroidState extends AndroidWidget implements State {
 		 * Generic SUT Tags
 		 */
 		if (t.equals(Tags.Desc)) {
-			ret = "TODO AndroidState Tags Desc";
-			//ret = w.element.name;
+			ret = w.element.className;
 		}
 		else if (t.equals(Tags.Role)) {
-			//ret = w.element.WidgetType.toString();
+			ret = AndroidRoles.AndroidWidget;
 		}
 		else if (t.equals(Tags.HitTester)) {
-			//ret = new AndroidHitTester(w.element);
+			ret = new AndroidHitTester(w.element);
 		}
 		else if (t.equals(Tags.Shape)) {
 			ret = w.element.rect;
@@ -153,12 +154,10 @@ public class AndroidState extends AndroidWidget implements State {
 			ret = w.element.enabled;
 		}
 		else if (t.equals(Tags.Title)) {
-			ret = "TODO AndroidState Tags Title";
-			//ret = w.element.title;
+			ret = w.element.text;
 		}
 		else if (t.equals(Tags.Path)) {
-			ret = "TODO AndroidState Tags Path";
-			//ret = w.element.path;
+			ret = w.element.className;
 		}
 		else if (t.equals(Tags.PID)) {
 			ret = (long) -1;
@@ -178,7 +177,55 @@ public class AndroidState extends AndroidWidget implements State {
 		/**
 		 * Specific Android Tags
 		 */
-
+		else if (t.equals(AndroidTags.AndroidEnabled)) {
+			ret = w.element.enabled;
+		}
+		else if (t.equals(AndroidTags.AndroidBounds)) {
+			ret = w.element.bounds;
+		}
+		else if (t.equals(AndroidTags.AndroidNodeIndex)) {
+			ret = w.element.nodeIndex;
+		}
+		else if (t.equals(AndroidTags.AndroidText)) {
+			ret = w.element.text;
+		}
+		else if (t.equals(AndroidTags.AndroidResourceId)) {
+			ret = w.element.resourceId;
+		}
+		else if (t.equals(AndroidTags.AndroidClassName)) {
+			ret = w.element.className;
+		}
+		else if (t.equals(AndroidTags.AndroidPackageName)) {
+			ret = w.element.packageName;
+		}
+		else if (t.equals(AndroidTags.AndroidCheckable)) {
+			ret = w.element.checkable;
+		}
+		else if (t.equals(AndroidTags.AndroidChecked)) {
+			ret = w.element.checked;
+		}
+		else if (t.equals(AndroidTags.AndroidClickable)) {
+			ret = w.element.clickable;
+		}
+		else if (t.equals(AndroidTags.AndroidFocusable)) {
+			ret = w.element.focusable;
+		}
+		else if (t.equals(AndroidTags.AndroidFocused)) {
+			ret = w.element.focused;
+		}
+		else if (t.equals(AndroidTags.AndroidScrollable)) {
+			ret = w.element.scrollable;
+		}
+		else if (t.equals(AndroidTags.AndroidLongClickable)) {
+			ret = w.element.longclicklable;
+		}
+		else if (t.equals(AndroidTags.AndroidPassword)) {
+			ret = w.element.clickable;
+		}
+		else if (t.equals(AndroidTags.AndroidSelected)) {
+			ret = w.element.selected;
+		}
+		
 		cacheTag(w, t, ret);
 
 		return (ret == null) ? defaultValue : (T) ret;
