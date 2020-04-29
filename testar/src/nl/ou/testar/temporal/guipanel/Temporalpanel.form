@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.guipanel.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
     <rowspec value="top:328px:noGrow"/>
@@ -7,7 +7,7 @@
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:45px:noGrow"/>
     <colspec value="left:7dlu:noGrow"/>
-    <colspec value="fill:d:grow"/>
+    <colspec value="fill:51px:grow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
@@ -23,8 +23,10 @@
       <xy x="20" y="20" width="668" height="369"/>
     </constraints>
     <properties>
+      <enabled value="true"/>
       <minimumSize width="621" height="350"/>
       <preferredSize width="621" height="350"/>
+      <visible value="true"/>
     </properties>
     <border type="empty">
       <size top="0" left="2" bottom="2" right="2"/>
@@ -81,7 +83,7 @@
             <properties>
               <minimumSize width="588" height="325"/>
               <preferredSize width="588" height="325"/>
-              <visible value="true"/>
+              <visible value="false"/>
             </properties>
             <border type="none"/>
             <children>
@@ -230,6 +232,7 @@
                 </constraints>
                 <properties>
                   <text value="Show DB Models"/>
+                  <toolTipText value="Exports the existing models in the Graph database."/>
                 </properties>
               </component>
               <component id="492cc" class="javax.swing.JCheckBox" binding="enableSPOT_LTL">
@@ -490,10 +493,10 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="APModelManager:"/>
+                  <text value="Proposition Manager:"/>
                 </properties>
               </component>
-              <component id="1e04" class="javax.swing.JTextField" binding="ApModelManagerFile">
+              <component id="1e04" class="javax.swing.JTextField" binding="PropositionManagerFile">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -526,7 +529,7 @@
                   <text value="..."/>
                 </properties>
               </component>
-              <component id="3c50" class="javax.swing.JButton" binding="selectFileApModelManager">
+              <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
                 <constraints>
                   <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
@@ -600,7 +603,7 @@
                   <text value="Generate:"/>
                 </properties>
               </component>
-              <component id="a1231" class="javax.swing.JButton" binding="defaultAPModelBtn">
+              <component id="a1231" class="javax.swing.JButton" binding="defaultPropositionMgrBtn">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
@@ -609,8 +612,8 @@
                   <maximumSize width="130" height="38"/>
                   <minimumSize width="130" height="38"/>
                   <preferredSize width="130" height="30"/>
-                  <text value="AP Model Mgr"/>
-                  <toolTipText value="Generate a default APModelManager"/>
+                  <text value="Proposition Mgr"/>
+                  <toolTipText value="Generate a default Proposition Manager"/>
                 </properties>
               </component>
               <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
@@ -635,7 +638,7 @@
                 <properties>
                   <preferredSize width="78" height="30"/>
                   <text value="Model"/>
-                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. APModelManager is available. This file is used for filtering propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Propositio nManager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
               <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
@@ -652,7 +655,7 @@
               </component>
               <component id="11461" class="javax.swing.JButton" binding="generateBtn">
                 <constraints>
-                  <grid row="7" column="7" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="10" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -660,18 +663,18 @@
                   <horizontalTextPosition value="0"/>
                   <maximumSize width="81" height="30"/>
                   <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
-                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the APModelManager filters the graph DB &lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
                 <constraints>
-                  <grid row="9" column="7" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="9" column="10" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <horizontalTextPosition value="0"/>
                   <text value="Model Check"/>
-                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ APModelManager. This file is used for filtering propositions, when generating the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
             </children>

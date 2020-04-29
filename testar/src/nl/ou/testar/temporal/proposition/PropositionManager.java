@@ -1,5 +1,5 @@
 
-package nl.ou.testar.temporal.selector;
+package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,12 +9,12 @@ import org.fruit.alayer.Tags;
 import java.util.*;
 
 
-public class APModelManager {
+public class PropositionManager {
 
 
     private  String freeFormatText;
-    private  APSelector stateFilter;
-    private  APSelector transitionFilter;
+    private PropositionSelector stateFilter;
+    private PropositionSelector transitionFilter;
     private List<String> APKey= new ArrayList<>();
     private String apEncodingSeparator;
     private Set<WidgetFilter> widgetfilters;
@@ -22,10 +22,10 @@ public class APModelManager {
     private List<String> comments = new ArrayList<>();
 
 
-    public APModelManager() {
+    public PropositionManager() {
         super();
-        stateFilter = new APSelector();
-        transitionFilter = new APSelector();
+        stateFilter = new PropositionSelector();
+        transitionFilter = new PropositionSelector();
         widgetfilters = new LinkedHashSet<>();
         comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsTerminalState' 'valuedexpression' with 'exists__' and  expressions");
         comments.add(" An EMPTY widget condition results in rejection");
@@ -34,20 +34,20 @@ public class APModelManager {
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
 
     }
-    public APModelManager(boolean initializeWithDefaults) {
+    public PropositionManager(boolean initializeWithDefaults) {
          this(initializeWithDefaults,null);
     }
 
-    public APModelManager(boolean initializeWithDefaults, List<String> APKey) {
+    public PropositionManager(boolean initializeWithDefaults, List<String> APKey) {
         this();
         if (initializeWithDefaults){
             updateFreeFormatText("This is a Sample APModelManager with two widget filters.");
-            stateFilter = new APSelector();
-            transitionFilter = new APSelector();
-            stateFilter.setSelectedStateAttributes(APSelector.useMinimalAttributes());
-            stateFilter.setSelectedExpressions(APSelector.useMinimalSelectedExpressions());
-            transitionFilter.setSelectedAttributes(APSelector.useMinimalTransAttributes());
-            transitionFilter.setSelectedExpressions(APSelector.useMinimalTransSelectedExpressions());
+            stateFilter = new PropositionSelector();
+            transitionFilter = new PropositionSelector();
+            stateFilter.setSelectedStateAttributes(PropositionSelector.useMinimalAttributes());
+            stateFilter.setSelectedExpressions(PropositionSelector.useMinimalSelectedExpressions());
+            transitionFilter.setSelectedAttributes(PropositionSelector.useMinimalTransAttributes());
+            transitionFilter.setSelectedExpressions(PropositionSelector.useMinimalTransSelectedExpressions());
             WidgetFilter wf = new WidgetFilter();
             wf.setDefaultWidgetFilter();
             widgetfilters.add(wf);
@@ -65,7 +65,7 @@ public class APModelManager {
     //*********************
 
     @JsonGetter("stateFilter")
-    private  APSelector getStateFilter() {
+    private PropositionSelector getStateFilter() {
         return stateFilter;
     }
 
@@ -73,13 +73,13 @@ public class APModelManager {
         return getStateFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
     @SuppressWarnings("unused")
-    public void setStateFilter(APSelector stateFilter) {
+    public void setStateFilter(PropositionSelector stateFilter) {
         // let the AP selector check for the minimal set
         this.stateFilter.setSelectedStateAttributes(stateFilter.getSelectedAttributes());
         this.stateFilter.setSelectedExpressions(stateFilter.getSelectedExpressions());
     }
     @JsonGetter("transitionFilter")
-    private   APSelector getTransitionFilter() {
+    private PropositionSelector getTransitionFilter() {
         return transitionFilter;
     }
 
@@ -87,7 +87,7 @@ public class APModelManager {
         return getTransitionFilter().getAPsOfAttribute(apkey, transitionProperty, value);
     }
     @SuppressWarnings("unused")
-    public void setTransitionFilter(APSelector transitionFilter) {
+    public void setTransitionFilter(PropositionSelector transitionFilter) {
         this.transitionFilter.setSelectedAttributes(transitionFilter.getSelectedAttributes());
         this.transitionFilter.setSelectedExpressions(transitionFilter.getSelectedExpressions());
     }

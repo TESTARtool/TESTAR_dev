@@ -431,7 +431,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalCounterExamples = true" + Util.lineSep()
 					+"TemporalOracles = TemporalOracles.csv" + Util.lineSep()
 					+"TemporalPatterns = TemporalPatterns.csv" + Util.lineSep()
-					+"TemporalAPModelManager = APModelManager.json"+ Util.lineSep()
+					+"TemporalPropositionManager = PropositionManager.json"+ Util.lineSep()
 					+"TemporalPatternConstraints = TemporalPatternConstraints.csv" + Util.lineSep()
 					+"TemporalGeneratorTactics = 10;100"+ Util.lineSep()
 					+"TemporalDirectory = temporal" + Util.lineSep()

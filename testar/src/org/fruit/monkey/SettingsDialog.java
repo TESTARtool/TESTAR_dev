@@ -36,7 +36,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
-import nl.ou.testar.temporal.ui.Temporalpanel;
+import nl.ou.testar.temporal.guipanel.Temporalpanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 

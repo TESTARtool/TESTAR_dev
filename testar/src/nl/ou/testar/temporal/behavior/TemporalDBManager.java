@@ -16,28 +16,34 @@ import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.graphml.*;
+import nl.ou.testar.temporal.ioutils.CSVHandler;
+import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.ioutils.XMLHandler;
 import nl.ou.testar.temporal.model.TemporalTrace;
 import nl.ou.testar.temporal.model.TemporalTraceEvent;
 import nl.ou.testar.temporal.model.TransitionEncoding;
-import nl.ou.testar.temporal.selector.WidgetFilter;
-import nl.ou.testar.temporal.selector.APModelManager;
+import nl.ou.testar.temporal.proposition.WidgetFilter;
+import nl.ou.testar.temporal.proposition.PropositionManager;
+import nl.ou.testar.temporal.util.Common;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+
+import java.io.File;
 import java.util.*;
 
 public  class TemporalDBManager {
     private Config dbConfig;
     private OrientDB orientDB;
     private ODatabaseSession db;
-    private APModelManager apModelManager;  // used by computeProps
+    private PropositionManager propositionManager;  // used by computeProps
+    private final SimpleLog simpleLog;
 
 
 
-    public TemporalDBManager() {
-    }
+    //public TemporalDBManager() {    }
 
-    public TemporalDBManager(final Settings settings) {
+    public TemporalDBManager(final Settings settings, SimpleLog simpleLog) {
+        this.simpleLog=simpleLog;
         dbConfig = makeConfig(settings);
        // if(settings.get(ConfigTags.StateModelEnabled)){
             initOrientDb();
@@ -46,20 +52,27 @@ public  class TemporalDBManager {
     }
 
     private void initOrientDb() {
+
+
+
         String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
                 dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
         OLogManager logmanager=OLogManager.instance();
         logmanager.setConsoleLevel("WARNING");
+        try {
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
-
+    }
+        catch (Exception e){
+            simpleLog.append(Common.prettyCurrentTime() + " Error opening Graph database: check state model settings" );
+    }
     }
 
     private void setDb(ODatabaseSession db) {
         this.db = db;
     }
-    public void setApModelManager(APModelManager apModelManager) {
-        this.apModelManager = apModelManager;
+    public void setPropositionManager(PropositionManager propositionManager) {
+        this.propositionManager = propositionManager;
 
     }
 
@@ -111,6 +124,9 @@ public  class TemporalDBManager {
      *
      * @return List of AbstractStateModels
      */
+
+
+
     @SuppressWarnings("unchecked")
     public List<AbstractStateModel> fetchAbstractModels() {
         dbReopen();
@@ -239,7 +255,7 @@ public  class TemporalDBManager {
             }
         }
 //        System.out.println("DEBUG: checking widgetfilters for graphelement: " + graphElement.getIdentity().toString()+"     time: "+System.nanoTime());
-        passedWidgetFilters = apModelManager.passWidgetFilters(attribmap);//
+        passedWidgetFilters = propositionManager.passWidgetFilters(attribmap);//
 //        System.out.println("DEBUG: check done      time: "+System.nanoTime());
 
         return passedWidgetFilters;
@@ -521,7 +537,7 @@ public  class TemporalDBManager {
             } else {
                 apkey.append(prop);
             }
-            apkey.append(apModelManager.getApEncodingSeparator());
+            apkey.append(propositionManager.getApEncodingSeparator());
         }
         if (isWidget) {
 
@@ -535,10 +551,10 @@ public  class TemporalDBManager {
             }
         }
         if (!isWidget && isEdge) {
-            globalPropositions.addAll(apModelManager.getAPsOfTransitionAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+            globalPropositions.addAll(propositionManager.getAPsOfTransitionAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
         if (!isWidget && !isEdge) {
-            globalPropositions.addAll(apModelManager.getAPsOfStateAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+            globalPropositions.addAll(propositionManager.getAPsOfStateAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
 
     }
@@ -637,5 +653,22 @@ public  class TemporalDBManager {
         GraphML_DocRoot root = new GraphML_DocRoot(tempset, graph);
         XMLHandler.save(root, file);
         return true;
+    }
+    public String pingDB() {
+
+        StringBuilder sb = new StringBuilder();
+        List<AbstractStateModel> models = fetchAbstractModels();
+        sb.append("APPLICATIONNAME").append(";APPLICATIONVERSION").append(";MODELIDENTIFIER").append(";ABSTRACTIONATTRIBUTES").append("\n");
+        if (models.isEmpty()) {
+            sb.append("model count: 0\n");
+        } else {
+
+            for (AbstractStateModel abs : models
+            ) {
+                sb.append(abs.getApplicationName()).append(";").append(abs.getApplicationVersion()).append(";")
+                  .append(abs.getModelIdentifier()).append(";").append(abs.getAbstractionAttributes()).append("\n");
+            }
+        }
+        return sb.toString();
     }
 }

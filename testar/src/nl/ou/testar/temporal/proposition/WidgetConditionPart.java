@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.selector;
+package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -7,7 +7,7 @@ import nl.ou.testar.temporal.foundation.PairBean;
 
 import java.util.Set;
 
-public class WidgetConditionPart extends APSelector {
+public class WidgetConditionPart extends PropositionSelector {
 
 
     public WidgetConditionPart() {

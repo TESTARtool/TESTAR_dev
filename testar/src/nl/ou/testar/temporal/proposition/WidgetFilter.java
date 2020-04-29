@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.selector;
+package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,14 +10,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.ou.testar.temporal.selector.APSelector.*;
+import static nl.ou.testar.temporal.proposition.PropositionSelector.*;
 
 public class WidgetFilter {//extends APSelector {
 
 
     private  String freeFormatText;
     private List<WidgetConditionPart> widgetConditionParts;
-    private APSelector widgetSelectorPart;
+    private PropositionSelector widgetSelectorPart;
 
 
 
@@ -25,7 +25,7 @@ public class WidgetFilter {//extends APSelector {
     public WidgetFilter() {
         super();
         widgetConditionParts = new ArrayList<>();
-        widgetSelectorPart = new APSelector();
+        widgetSelectorPart = new PropositionSelector();
     }
     @JsonIgnore
     public void updateFreeFormatText(String freeFormatText) {
@@ -42,7 +42,7 @@ public class WidgetFilter {//extends APSelector {
         this.widgetConditionParts = widgetConditionParts;
     }
     @JsonGetter("widgetSelectorPart")
-    private  APSelector getWidgetSelectorPart() {
+    private PropositionSelector getWidgetSelectorPart() {
         return widgetSelectorPart;
     }
 
@@ -50,7 +50,7 @@ public class WidgetFilter {//extends APSelector {
         return getWidgetSelectorPart().getAPsOfAttribute(apkey, transitionProperty, value);
     }
     @SuppressWarnings("unused")
-    public void setWidgetSelectorPart(APSelector widgetSelectorPart) {
+    public void setWidgetSelectorPart(PropositionSelector widgetSelectorPart) {
         this.widgetSelectorPart = widgetSelectorPart;
     }
 

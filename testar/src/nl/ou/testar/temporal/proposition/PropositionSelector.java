@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.selector;
+package nl.ou.testar.temporal.proposition;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import nl.ou.testar.temporal.util.CachedRegexPatterns;
@@ -18,13 +18,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class APSelector {
+public class PropositionSelector {
     private Set<String> selectedAttributes;
     private Set<PairBean<InferrableExpression,String>> selectedExpressions;
 
 
 
-    public APSelector() {
+    public PropositionSelector() {
 
         selectedAttributes=new LinkedHashSet<>();
         selectedExpressions =new LinkedHashSet<>();

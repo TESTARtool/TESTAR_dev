@@ -149,7 +149,7 @@ public final class ConfigTags {
 
   public static final Tag<String> TemporalOracles = Tag.from("TemporalOracles", String.class);
   public static final Tag<String> TemporalPatterns = Tag.from("TemporalPatterns", String.class);
-  public static final Tag<String> TemporalAPModelManager = Tag.from("TemporalAPModelManager", String.class);
+  public static final Tag<String> TemporalPropositionManager = Tag.from("TemporalPropositionManager", String.class);
   public static final Tag<String> TemporalPatternConstraints = Tag.from("TemporalPatternConstraints", String.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> TemporalGeneratorTactics = Tag.from("TemporalGeneratorTactics", (Class<List<String>>) (Class<?>) List.class);
