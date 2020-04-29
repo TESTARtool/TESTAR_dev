@@ -1,2 +1,2 @@
-include 'core', 'native', 'windows', 'testar', 'linux', 'graphdb', 'webdriver'
+include 'core', 'native', 'windows', 'testar', 'linux', 'graphdb', 'webdriver', 'android'
 

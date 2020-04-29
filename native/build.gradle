@@ -2,6 +2,7 @@ dependencies {
     compile project(':core')
     compile project(':windows')
     compile project(':webdriver')
+    compile project(':android')
     compile project(':linux')
     compile files('../linux/lib/libatspi.jar')
 }

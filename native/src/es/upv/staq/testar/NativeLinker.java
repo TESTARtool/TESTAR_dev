@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,10 @@ import org.fruit.alayer.webdriver.WdStateBuilder;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.*;
+import org.testar.android.AndroidCanvas;
+import org.testar.android.AndroidStateBuilder;
+import org.testar.android.AppiumFramework;
+import org.testar.android.enums.AndroidRoles;
 
 import java.util.*;
 
@@ -89,6 +93,14 @@ public class NativeLinker {
 		PLATFORM_OS.remove(OperatingSystems.WEBDRIVER);
 	}
 	
+	public static void addAndroidOS() {
+		PLATFORM_OS.add(OperatingSystems.ANDROID);
+	}
+	
+	public static void cleanAndroidOS() {
+		PLATFORM_OS.remove(OperatingSystems.ANDROID);
+	}
+	
 	public static Set<OperatingSystems> getPLATFORM_OS() {
 		return PLATFORM_OS;
 	}
@@ -103,8 +115,12 @@ public class NativeLinker {
 	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
 			boolean accessBridgeEnabled,
 			String SUTProcesses){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return new AndroidStateBuilder(timeToFreeze);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
@@ -125,8 +141,12 @@ public class NativeLinker {
 	 * @return A Canvas on which Testar can paint elements in Spy mode.
 	 */
 	public static Canvas getNativeCanvas(Pen pen){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdCanvas(pen);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return new AndroidCanvas(pen);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
@@ -145,8 +165,12 @@ public class NativeLinker {
 	 * @return A handle to the process in a SUT object.
 	 */
 	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AppiumFramework.fromCapabilities(executableCommand);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
@@ -167,8 +191,12 @@ public class NativeLinker {
 	 * @return A list of running processes wrapped in a SUT class.
 	 */
 	public static List<SUT> getNativeProcesses(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromAll();
+		}
+		else if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AppiumFramework.fromAll();
+		}
 		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -197,8 +225,13 @@ public class NativeLinker {
 	 * @return Memory usage in KB.
 	 */
 	public static int getMemUsage(SUT nativeSUT){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return 0;
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			//TODO: Implement Emulator + internal android usage
+			return 0;
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -214,6 +247,10 @@ public class NativeLinker {
 	public static long[] getCPUsage(SUT nativeSUT){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			// TODO Make sure 'runTest' doesn't need this anymore
+			return new long[]{0, 0, 0};
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			//TODO: Implement Emulator + internal android usage
 			return new long[]{0, 0, 0};
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
@@ -234,6 +271,9 @@ public class NativeLinker {
 	public static Collection<Role> getNativeRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdRoles.rolesSet();
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AndroidRoles.rolesSet();
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
