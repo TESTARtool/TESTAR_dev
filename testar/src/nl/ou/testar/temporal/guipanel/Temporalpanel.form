@@ -55,10 +55,6 @@
         <border type="none"/>
         <children>
           <grid id="a86c6" binding="setupPanel" layout-manager="FormLayout">
-            <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:d:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
@@ -73,8 +69,7 @@
             <colspec value="fill:139px:noGrow"/>
             <colspec value="left:91px:noGrow"/>
             <colspec value="left:8dlu:noGrow"/>
-            <colspec value="fill:137px:noGrow"/>
-            <colspec value="left:5dlu:noGrow"/>
+            <colspec value="fill:212px:noGrow"/>
             <colspec value="right:66px:noGrow"/>
             <colspec value="fill:132px:noGrow"/>
             <constraints>
@@ -89,7 +84,7 @@
             <children>
               <component id="bd336" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -99,28 +94,28 @@
               </component>
               <component id="947fb" class="javax.swing.JTextField" binding="spotLTLChecker">
                 <constraints>
-                  <grid row="4" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="0" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <toolTipText value="&lt;html&gt;Command to invoke the SPOT-based LTL model checker&lt;br&gt;&#10;(counterexamples will be computed)"/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the SPOT-based LTL model checker&lt;br&gt;&#10;(counterexamples can be computed and visualized)"/>
                 </properties>
               </component>
               <component id="3f853" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLSpot">
                 <constraints>
-                  <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input filenames for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="6abf5" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -130,7 +125,7 @@
               </component>
               <component id="bbeae" class="javax.swing.JTextField" binding="itsCTLChecker">
                 <constraints>
-                  <grid row="8" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="4" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -139,50 +134,19 @@
                   <toolTipText value="&lt;html&gt;Command to invoke the ITS-based CTL model checker.&lt;br&gt;&#10;(no visualization of counterexample possible)&lt;/html&gt;"/>
                 </properties>
               </component>
-              <component id="6ddd2" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Enable Temporal Offline Oracles"/>
-                  <toolTipText value="Temporal oracles are automatically evaluated after each TESTAR run by using the settigns supplied in this form."/>
-                </properties>
-              </component>
-              <component id="a4624" class="javax.swing.JCheckBox" binding="enforceAbstractionEquality">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text value="Enforce Abstraction equality"/>
-                  <toolTipText value="&lt;html&gt;Concrete Abstraction attributes in &lt;b&gt;NEW&lt;/b&gt; models will be the same as on the Abstract Layer.&lt;br&gt;&#10;(this overrules the ConcreteStateAttributes parameter in the settings file and &lt;br&gt;&#10;the default uses &lt;b&gt;ALL&lt;/b&gt; StateAttributes as ConcreteStateAttributes)&lt;br&gt;&#10;It is advised to leave this setting enabled.&lt;/html&gt;"/>
-                </properties>
-              </component>
-              <component id="d9a8" class="javax.swing.JCheckBox" binding="instrumentDeadlockStatesCheckBox">
-                <constraints>
-                  <grid row="2" column="3" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Instrument deadlock states"/>
-                  <toolTipText value="&lt;html&gt; In case that the Graph-model has deadlock states (~ no outgoing transitions):&lt;BR&gt;&#10;1. A new state with atomic property 'dead==true' with a selfloop is added&lt;BR&gt;&#10;2. forall deadlock states, a transition will be added to that newly created state.&lt;BR&gt;&#10;The additions wil be added to the model that will be provided to the model-checker.&lt;BR&gt;&#10;(not the Graph-model) &lt;/html&gt;"/>
-                </properties>
-              </component>
               <component id="90cb5" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLITS">
                 <constraints>
-                  <grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input filenames for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="dc921" class="javax.swing.JTextField" binding="itsLTLChecker">
                 <constraints>
-                  <grid row="12" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="8" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -195,49 +159,18 @@
               </component>
               <component id="75b8e" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLITS">
                 <constraints>
-                  <grid row="12" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                   <visible value="true"/>
-                </properties>
-              </component>
-              <component id="98c82" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text value="Verbose"/>
-                  <toolTipText value="&lt;html&gt; When checked: keeps the intermediate files on disk ,&lt;br&gt;else these files are deleted after the Checker has run.&quot;&#10;&lt;/html&gt;"/>
-                </properties>
-              </component>
-              <component id="f1a92" class="javax.swing.JCheckBox" binding="CounterExamples">
-                <constraints>
-                  <grid row="0" column="3" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Counter Examples"/>
-                  <toolTipText value="&lt;html&gt;Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).&lt;BR&gt;&#10;(not all implemented modelcheckers can produce such traces) &lt;/html&gt;"/>
-                </properties>
-              </component>
-              <component id="8bf16" class="javax.swing.JButton" binding="testDbButton">
-                <constraints>
-                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Show DB Models"/>
-                  <toolTipText value="Exports the existing models in the Graph database."/>
                 </properties>
               </component>
               <component id="492cc" class="javax.swing.JCheckBox" binding="enableSPOT_LTL">
                 <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -247,7 +180,7 @@
               </component>
               <component id="65b2" class="javax.swing.JCheckBox" binding="enableITS_CTL">
                 <constraints>
-                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -257,7 +190,7 @@
               </component>
               <component id="15eea" class="javax.swing.JCheckBox" binding="enableITS_LTL">
                 <constraints>
-                  <grid row="12" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -270,7 +203,7 @@
               </component>
               <component id="74406" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -280,29 +213,29 @@
               </component>
               <component id="23b7e" class="javax.swing.JTextField" binding="ltsminLTLChecker">
                 <constraints>
-                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="2" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value=""/>
-                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the LTSMIN-based LTL model checker&lt;br&gt;&#10;(counterexamples cannot be computed)"/>
                 </properties>
               </component>
               <component id="5fef" class="javax.swing.JCheckBox" binding="WSLCheckBoxLTLLTSMIN">
                 <constraints>
-                  <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input filenames for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="fbc2" class="javax.swing.JCheckBox" binding="enableLTSMIN_LTL">
                 <constraints>
-                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -312,7 +245,7 @@
               </component>
               <component id="cbbbd" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -322,28 +255,28 @@
               </component>
               <component id="89ad" class="javax.swing.JTextField" binding="galCTLChecker">
                 <constraints>
-                  <grid row="10" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <toolTipText value="&lt;html&gt;Command to invoke the ITS/GAL-based CTL model checker.&lt;br&gt;&#10;(slow, but able to produce counter examples&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS/GAL-based CTL model checker.&lt;br&gt;&#10;(slow,counterexamples are computed in the raw output, but not visualized)&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="15146" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLGAL">
                 <constraints>
-                  <grid row="10" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input filenames for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="60b48" class="javax.swing.JCheckBox" binding="enableGAL_CTL">
                 <constraints>
-                  <grid row="10" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -353,7 +286,7 @@
               </component>
               <component id="bc30b" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -365,7 +298,7 @@
               </component>
               <component id="1e049" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -377,31 +310,31 @@
               </component>
               <component id="d339d" class="javax.swing.JTextField" binding="ltsminCTLChecker">
                 <constraints>
-                  <grid row="14" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="10" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value=""/>
-                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are computed in the raw output, but not visualized)"/>
+                  <toolTipText value="&lt;html&gt;Command to invoke the ITS-based LTL model checker&lt;br&gt;&#10;(counterexamples are not available)"/>
                   <visible value="true"/>
                 </properties>
               </component>
               <component id="51af3" class="javax.swing.JCheckBox" binding="WSLCheckBoxCTLLTSMIN">
                 <constraints>
-                  <grid row="14" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="10" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="WSL"/>
-                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then input files for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Does this command need a WSL path?&lt;br&gt; &#10;e.g. starting with &quot;/mnt/C/...&quot;&lt;br&gt;&#10;When ticked then filepath for the modelchecker are converted automatically.&#10;&lt;/html&gt;"/>
                   <visible value="true"/>
                 </properties>
               </component>
               <component id="2c872" class="javax.swing.JCheckBox" binding="enableLTSMIN_CTL">
                 <constraints>
-                  <grid row="14" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="10" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -417,6 +350,10 @@
           <grid id="d3094" binding="minerPanel" layout-manager="FormLayout">
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:41px:noGrow"/>
             <rowspec value="center:41px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
@@ -426,23 +363,14 @@
             <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:42px:noGrow"/>
             <colspec value="left:132px:noGrow"/>
-            <colspec value="fill:133px:noGrow"/>
+            <colspec value="fill:121px:noGrow"/>
             <colspec value="fill:37px:noGrow"/>
             <colspec value="fill:43px:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="fill:19px:noGrow"/>
             <colspec value="fill:11px:noGrow"/>
-            <colspec value="left:9dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="fill:d:noGrow"/>
-            <colspec value="left:104px:noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="left:40dlu:noGrow"/>
-            <colspec value="left:33dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="fill:33px:noGrow"/>
+            <colspec value="left:111px:noGrow"/>
+            <colspec value="left:45dlu:noGrow"/>
             <constraints>
               <tabbedpane title="Miner"/>
             </constraints>
@@ -451,7 +379,7 @@
             <children>
               <component id="dd5b0" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -460,7 +388,7 @@
               </component>
               <component id="7250a" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -469,7 +397,7 @@
               </component>
               <component id="b9b70" class="javax.swing.JTextField" binding="oracleFile">
                 <constraints>
-                  <grid row="9" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="13" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -478,7 +406,7 @@
               </component>
               <component id="55810" class="javax.swing.JTextField" binding="patternFile">
                 <constraints>
-                  <grid row="7" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="11" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -489,7 +417,7 @@
               </component>
               <component id="8b8e4" class="javax.swing.JLabel" default-binding="true">
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -498,52 +426,16 @@
               </component>
               <component id="1e04" class="javax.swing.JTextField" binding="PropositionManagerFile">
                 <constraints>
-                  <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="7" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="d20dc" class="javax.swing.JButton" binding="selectFileOracles">
-                <constraints>
-                  <grid row="9" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="25d53" class="javax.swing.JButton" binding="selectFilePatterns">
-                <constraints>
-                  <grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
-                <constraints>
-                  <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
               <component id="ca661" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -552,28 +444,16 @@
               </component>
               <component id="f800a" class="javax.swing.JTextField" binding="patternConstraintsFile">
                 <constraints>
-                  <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="9" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="e8bb" class="javax.swing.JButton" binding="selectFilePatternConstraints">
-                <constraints>
-                  <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
               <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
                 <constraints>
-                  <grid row="7" column="15" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="11" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -596,7 +476,7 @@
               </component>
               <component id="59e45" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -605,7 +485,7 @@
               </component>
               <component id="a1231" class="javax.swing.JButton" binding="defaultPropositionMgrBtn">
                 <constraints>
-                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -613,49 +493,26 @@
                   <minimumSize width="130" height="38"/>
                   <preferredSize width="130" height="30"/>
                   <text value="Proposition Mgr"/>
-                  <toolTipText value="Generate a default Proposition Manager"/>
+                  <toolTipText value="Generate a sample Proposition Manager"/>
                 </properties>
               </component>
               <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
                 <constraints>
-                  <grid row="2" column="2" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
                 <properties>
                   <preferredSize width="110" height="30"/>
                   <text value="Sample Oracle"/>
-                  <toolTipText value="Generate files with a sample Oracle and a sample Pattern."/>
+                  <toolTipText value="Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint"/>
                 </properties>
                 <clientProperties>
                   <html.disable class="java.lang.Boolean" value="false"/>
                 </clientProperties>
               </component>
-              <component id="6174" class="javax.swing.JButton" binding="ModelOnlyBtn">
-                <constraints>
-                  <grid row="2" column="15" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <preferredSize width="78" height="30"/>
-                  <text value="Model"/>
-                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Propositio nManager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
-                </properties>
-              </component>
-              <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
-                <constraints>
-                  <grid row="2" column="10" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <maximumSize width="83" height="38"/>
-                  <preferredSize width="90" height="30"/>
-                  <text value="GraphML"/>
-                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that the correct &lt;BR&gt;&#10;1. Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel&lt;BR&gt;&#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
-                </properties>
-              </component>
               <component id="11461" class="javax.swing.JButton" binding="generateBtn">
                 <constraints>
-                  <grid row="7" column="10" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="11" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -668,13 +525,146 @@
               </component>
               <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
                 <constraints>
-                  <grid row="9" column="10" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="13" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <horizontalTextPosition value="0"/>
                   <text value="Model Check"/>
                   <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="73a81" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Enable Temporal Offline Oracles"/>
+                  <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after each TESTAR run and use the settings in this form.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="8a066" class="javax.swing.JCheckBox" binding="CounterExamples">
+                <constraints>
+                  <grid row="2" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Counter Examples"/>
+                  <toolTipText value="&lt;html&gt;Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).&lt;BR&gt;&#10;(not all implemented modelcheckers can produce such traces) &lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="8e7a8" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="Verbose"/>
+                  <toolTipText value="&lt;html&gt; When checked: keeps the intermediate files on disk ,&lt;br&gt;&#10;else: these files are deleted after the Checker has run.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="e7209" class="javax.swing.JCheckBox" binding="enforceAbstractionEquality">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="Enforce Abstraction equality"/>
+                  <toolTipText value="&lt;html&gt;Concrete Abstraction attributes in &lt;b&gt;NEW&lt;/b&gt; models will be the same as on the Abstract Layer.&lt;br&gt;&#10;(this overrules the ConcreteStateAttributes parameter in the settings file and &lt;br&gt;&#10;the default uses &lt;b&gt;ALL&lt;/b&gt; StateAttributes as ConcreteStateAttributes)&lt;br&gt;&#10;It is advised to leave this setting enabled.&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="655bc" class="javax.swing.JCheckBox" binding="instrumentDeadlockStatesCheckBox">
+                <constraints>
+                  <grid row="4" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Instrument terminal states"/>
+                  <toolTipText value="&lt;html&gt; In case that the Graph-model has terminal states (~ no outgoing transitions):&lt;BR&gt;&#10;1. a new artificial state  with a selfloop is added&lt;BR&gt;&#10;2. forall terminal states, a transition will be added to that newly created artificial state.&lt;BR&gt;&#10;3. the transitions have a single atomic proposition that indicates that the target state is terminal.&lt;BR&gt;&#10;This 'enriched' model will be provided to the model-checker.&lt;BR&gt;&#10;(not the original Graph-model) &lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="54d5f" class="javax.swing.JButton" binding="testDbButton">
+                <constraints>
+                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Show DB "/>
+                  <toolTipText value="Exports the existing models in the Graph database to a file."/>
+                </properties>
+              </component>
+              <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
+                <constraints>
+                  <grid row="6" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <maximumSize width="83" height="38"/>
+                  <preferredSize width="90" height="30"/>
+                  <text value="GraphML"/>
+                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that the correct &lt;BR&gt;&#10;1. Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel&lt;BR&gt;&#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db' to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="6174" class="javax.swing.JButton" binding="ModelOnlyBtn">
+                <constraints>
+                  <grid row="6" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <preferredSize width="78" height="30"/>
+                  <text value="Model"/>
+                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Proposition Manager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db'  to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
+                <constraints>
+                  <grid row="7" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="e8bb" class="javax.swing.JButton" binding="selectFilePatternConstraints">
+                <constraints>
+                  <grid row="9" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="25d53" class="javax.swing.JButton" binding="selectFilePatterns">
+                <constraints>
+                  <grid row="11" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="d20dc" class="javax.swing.JButton" binding="selectFileOracles">
+                <constraints>
+                  <grid row="13" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
                 </properties>
               </component>
             </children>
