@@ -128,50 +128,40 @@ DataStoreMode = instant
 #################################################################
 # Temporal Oracle settings
 #################################################################
-TemporalOffLineEnabled = false
-# The following setting overrides setting: ConcreteStateAttributes
-TemporalConcreteEqualsAbstract = true
-TemporalLTL_SPOTChecker = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
-TemporalLTL_SPOTCheckerWSL = true
-TemporalLTL_SPOTChecker_Enabled = true
-TemporalCTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ctl
-TemporalCTL_ITSCheckerWSL = true
-TemporalCTL_ITSChecker_Enabled = true
-TemporalCTL_GALChecker = c:\\itscommand\\eclipsec.exe
-TemporalCTL_GALCheckerWSL = false
-TemporalCTL_GALChecker_Enabled = false
-#
-#css 20200309 this following model checker returned False positives.
-TemporalLTL_ITSChecker = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
-TemporalLTL_ITSCheckerWSL = true
-TemporalLTL_ITSChecker_Enabled = true
-#
-TemporalLTL_LTSMINChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-seq
-TemporalLTL_LTSMINCheckerWSL = true
-TemporalLTL_LTSMINChecker_Enabled = false
-#
-TemporalCTL_LTSMINChecker = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-sym
-TemporalCTL_LTSMINCheckerWSL = true
-TemporalCTL_LTSMINChecker_Enabled = false
-TemporalVerbose = true
-TemporalCounterExamples = true
-TemporalInstrumentDeadlockState = true
-#TemporalOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
-#TemporalPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
-#TemporalPropositionManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
-TemporalOracles = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalOracleSample_for_TEST.csv
-TemporalPatterns = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
-TemporalPatternConstraints = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternConstraintSample.csv
-TemporalPropositionManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APModelManager_for_TEST.json
-TemporalGeneratorTactics = 1;5;10;50;100;500;1000
-TemporalDirectory = temporal
-TemporalSubDirectories = true
-#TemporalPythonEnvironment = C:\\Users\\c\\AppData\\Local\\Programs\\Python\\Python37\\python.exe
-TemporalPythonEnvironment = C:\\Program Files (x86)\\Python38-32\\python.exe
-#TemporalVisualizerServer = C:\\Users\\c\\git\\Testar_viz\\run.py --port 8050
-TemporalVisualizerServer = C:\\Users\\cseng\\git\\Testar_viz\\run.py --port 8050
-TemporalVisualizerURL = http://localhost:8050
-TemporalVisualizerURLStop = http://localhost:8050/shutdown
+TemporalLTL_SPOTChecker             = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
+TemporalLTL_SPOTCheckerWSL          = true
+TemporalLTL_SPOTChecker_Enabled     = true
+TemporalCTL_ITSChecker              = wsl --distribution Ubuntu1804 --user css  ~/its/its-ctl
+TemporalCTL_ITSCheckerWSL           = true
+TemporalCTL_ITSChecker_Enabled      = true
+TemporalGAL_ITSChecker              = c:\itscommand\eclipsec.exe
+TemporalGAL_ITSCheckerWSL           = false
+TemporalGAL_ITSChecker_Enabled      = true
+TemporalLTL_ITSChecker              = wsl --distribution Ubuntu1804 --user css  ~/its/its-ltl
+TemporalLTL_ITSCheckerWSL           = true
+TemporalLTL_ITSChecker_Enabled      = true
+TemporalLTL_LTSMINChecker           = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-seq
+TemporalLTL_LTSMINCheckerWSL        = true
+TemporalLTL_LTSMINChecker_Enabled   = false
+TemporalCTL_LTSMINChecker           = wsl --distribution Ubuntu1804 --user css  ~/ltsminv3.0.2/bin/etf2lts-sym
+TemporalCTL_LTSMINCheckerWSL        = true
+TemporalCTL_LTSMINChecker_Enabled   = false
+TemporalOffLineEnabled              = false
+TemporalConcreteEqualsAbstract      = true
+TemporalInstrumentDeadlockState     = true
+TemporalVerbose                     = true
+TemporalCounterExamples             = true
+TemporalOracles                     = Oracle.csv
+TemporalPatterns                    = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
+TemporalPropositionManager          = PropositionManager.json
+TemporalPatternConstraints          = PatternConstraint.csv
+TemporalGeneratorTactics            = 1;5;10;50;100;500;1000
+TemporalDirectory                   = temporal
+TemporalSubDirectories              = true
+TemporalPythonEnvironment           = C:\\Program Files (x86)\\Python38-32\\python.exe
+TemporalVisualizerServer            = C:\\Users\\cseng\\git\\Testar_viz\\run.py --port 8050
+TemporalVisualizerURL               = http://localhost:8050
+TemporalVisualizerURLStop           = http://localhost:8050/shutdown
 
 
 #################################################################
