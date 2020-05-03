@@ -70,11 +70,11 @@ dependencies {
     compile project(':native')
     compile project(':graphdb')
     compile files('./lib/jsyntaxpane-1.1.5.jar')
-    compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
     compile files('./lib/gson-2.8.5.jar')
     compile jnativehook
     compile 'com.google.guava:guava:26.0-jre'
+    compile group: 'com.sikulix', name: 'sikulixapi', version: '2.0.3'
     compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
@@ -84,6 +84,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }

@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_qlearning/Protocol_desktop_reinforcement_learning
+ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -110,10 +110,10 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb\\databases
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
+DataStoreDirectory = C:\\orientdb-3.0.28\\databases
+DataStoreDB = testarDB
+DataStoreUser = admin
+DataStorePassword = admin
 DataStoreMode = delayed
 ApplicationName = Notepad
 ApplicationVersion = 1.0.0
@@ -125,6 +125,19 @@ ApplicationVersion = 1.0.0
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# Reinforcement learning settings
+#################################################################
+Alpha = 1.0
+Gamma = 0.99
+DefaultValue = 0.0
+DefaultReward = 0.0
+Epsilon = 0.7
+MaxQValue = 1.0
+DecayRate = 0.0001
+Temperature = 1.0
+RewardFunction = WidgetTreeBasedRewardFunction
 
 #################################################################
 # Other more advanced settings

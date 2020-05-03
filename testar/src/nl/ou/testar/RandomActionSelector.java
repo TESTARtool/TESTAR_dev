@@ -29,6 +29,7 @@
 
 package nl.ou.testar;
 
+import nl.ou.testar.StateModel.AbstractAction;
 import org.fruit.alayer.Action;
 
 import javax.annotation.Nonnull;
@@ -42,5 +43,11 @@ public class RandomActionSelector {
         long graphTime = System.currentTimeMillis();
         Random rnd = new Random(graphTime);
         return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+    }
+
+    public static AbstractAction selectAbstractAction(Set<AbstractAction> actions) {
+        long graphTime = System.currentTimeMillis();
+        Random rnd = new Random(graphTime);
+        return new ArrayList<AbstractAction>(actions).get(rnd.nextInt(actions.size()));
     }
 }

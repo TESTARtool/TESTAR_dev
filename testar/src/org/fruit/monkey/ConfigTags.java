@@ -115,6 +115,19 @@ public final class ConfigTags {
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
   public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
+
+  // Reinforcement learning specific
+  public static final Tag<Double> Alpha = Tag.from("Alpha", Double.class);
+  public static final Tag<Double> Gamma = Tag.from("Gamma", Double.class);
+  public static final Tag<Double> DefaultValue = Tag.from("DefaultValue", Double.class);
+  public static final Tag<Float> Epsilon = Tag.from("Epsilon", Float.class);
+  public static final Tag<Double> DefaultReward = Tag.from("DefaultReward", Double.class);
+  public static final Tag<String> RewardFunction = Tag.from("RewardFunction", String.class);
+  public static final Tag<String> Policy = Tag.from("Policy", String.class);
+  public static final Tag<Double> DecayRate = Tag.from("DecayRate", Double.class);
+  public static final Tag<Double> Temperature = Tag.from("Temperature", Double.class);
+  public static final Tag<Double> MaxQValue = Tag.from("MaxQValue", Double.class);
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 

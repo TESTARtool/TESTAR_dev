@@ -1,6 +1,13 @@
 package nl.ou.testar.StateModel;
 
 import es.upv.staq.testar.CodingManager;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
+import nl.ou.testar.ReinforcementLearning.QFunctions.QFunctionFactory;
+import nl.ou.testar.ReinforcementLearning.QFunctions.SarsaQFunction;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -55,34 +62,38 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
-        
-        if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
-            // create the abstract state model and then the state model manager
-        	AbstractStateModelReinforcementLearning abstractStateModelRL = new AbstractStateModelReinforcementLearning(modelIdentifier,
-                    settings.get(ConfigTags.ApplicationName),
-                    settings.get(ConfigTags.ApplicationVersion),
-                    abstractTags,
-                    persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
-            ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+        // should we store widgets?
+        boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-            // should we store widgets?
-            boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
-            
-            return new ModelManagerReinforcementLearning(abstractStateModelRL, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
-        }
-        
         // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
+        AbstractStateModelReinforcementLearning abstractStateModel = new AbstractStateModelReinforcementLearning(modelIdentifier,
                 settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion),
                 abstractTags,
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
+
+        if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
+            final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
+
+            final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
+            final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+            return new SarsaModelManager(abstractStateModel,
+                    actionSelector,
+                    persistenceManager,
+                    concreteStateTags,
+                    sequenceManager,
+                    storeWidgets,
+                    rewardFunction,
+                    qFunction);
+        }
+        
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
 
-        // should we store widgets?
-        boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
-
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+        return new ModelManager(abstractStateModel,
+                actionSelector,
+                persistenceManager,
+                concreteStateTags,
+                sequenceManager,
+                storeWidgets);
     }
-
 }

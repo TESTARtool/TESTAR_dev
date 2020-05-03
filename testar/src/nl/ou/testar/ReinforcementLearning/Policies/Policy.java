@@ -1,12 +1,7 @@
 package nl.ou.testar.ReinforcementLearning.Policies;
 
-import com.google.common.collect.Multimap;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
+import nl.ou.testar.StateModel.AbstractAction;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -15,10 +10,8 @@ import java.util.Set;
 public interface Policy {
 
     /**
-     *
-     * @return
+     * For a {@link Set<AbstractAction>} selects actions to execute
+     * @return An {@link AbstractAction} selected by the {@link Policy}, can be {@code null}
      */
-    @Nonnull
-    public Collection<Action> applyPolicy(@Nonnull final Multimap<Double, Action> actionQValues);
-
+    AbstractAction applyPolicy(final Set<AbstractAction> actions);
 }
