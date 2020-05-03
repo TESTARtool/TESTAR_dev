@@ -36,6 +36,7 @@ public class CheckerFactory {
                 break;
 
         }
+        modelChecker.setTemporalFormalism(temporalFormalism);
         return modelChecker;
     }
 

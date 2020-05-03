@@ -2,6 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
@@ -20,28 +21,31 @@ import java.util.Scanner;
 //css ltsmin cannot provide counterexamples for CTL, only LTL
 public class LTSMIN_LTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                      String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+    public List<TemporalOracle> check() {
+
+        String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
+        saveStringToFile(contents,this.automatonFile);
+        validateAndSaveFormulas();
+
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
         //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.
         try {
-            List<String> lines = Files.readAllLines(Paths.get(formulaFilePath), StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(Paths.get(formula), StandardCharsets.UTF_8);
             boolean first = true;
             String cli;
-            String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFilePath) : automatonFilePath);// no witness nor counterexamples
-            String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+
             for (String line : lines) {
-                cli = pathToExecutable + " --ltl='" + line + "' " + cli_automaton;
-                    cli = cli + (first ? " &> " : "&>>") + cli_resultsfile;
+                cli = pathToExecutable + " --ltl='" + line + "' " + automat;
+                    cli = cli + (first ? " &> " : "&>>") + result;
                     first = false;
                 Common.RunOSChildProcess(cli);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setTmodel(tModel);
-        setOracleColl(oracleList);
-        return parseResultsFile(resultsFile);
+        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
+        removeFiles();
+        return oracleResults;
     }
 
     public List<TemporalOracle> parseResultsString(String rawInput) {
@@ -99,5 +103,6 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
         }
         return this.oracleColl;
     }
+
 }
 

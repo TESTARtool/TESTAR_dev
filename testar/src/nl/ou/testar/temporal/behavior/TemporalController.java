@@ -195,7 +195,7 @@ public class TemporalController {
 
 
     public void savePropositionManager(String filename) {
-        simpleLog.append(prettyCurrentTime() + " | " + "generating APModelManager file: "+filename);
+        simpleLog.append(prettyCurrentTime() + " | " + "generating Proposition Manager file: "+filename);
         JSONHandler.save(propositionManager, outputDir + filename, true);
     }
 
@@ -403,7 +403,7 @@ public class TemporalController {
     }
 
     private void saveModelAsJSON(String toFile) {
-        simpleLog.append(prettyCurrentTime() + " | " + "generating APEncodedModel file: "+toFile);
+        simpleLog.append(prettyCurrentTime() + " | " + "generating Model file: "+toFile);
         JSONHandler.save(tModel, outputDir + toFile);
     }
 
@@ -428,7 +428,7 @@ public class TemporalController {
 
     /**
      *
-     * @param oracleColl nnn
+     * @param oracleColl nnn collection is updated!
      * @param output nnn
      * @param doTransformation nn
      * @link saveStringToFile()
@@ -518,83 +518,65 @@ public class TemporalController {
                 if (verbose) {
                 saveToGraphMLFile("GraphML.XML", false);
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true);
-                //saveModelAsJSON("APEncodedModel.json");
                 }
                 List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
+                    FormulaVerifier.INSTANCE.setPathToExecutable(ltlSpotMCCommand);
+                    FormulaVerifier.INSTANCE.setToWslPath(ltlSpotWSLPath);
                 for (Map.Entry<TemporalFormalism, List<TemporalOracle>> oracleentry : oracleTypedMap.entrySet()
                 ) {
                     List<TemporalOracle> modelCheckedOracles = null;
                     File automatonFile ;
-
-                    //String oracleType = oracleentry.getKey().name();
                    TemporalFormalism oracleType = oracleentry.getKey();
 
                     List<TemporalOracle> oracleList = oracleentry.getValue();
-                    automatonFile = new File(outputDir +oracleType+"_model."+oracleentry.getKey().fileExtension);
+                    automatonFile = new File(outputDir +oracleType+"_model."+oracleType.fileExtension);
 
                     File formulaFile = new File(outputDir + oracleType + "_formulas.txt");
                     File resultsFile = new File(outputDir + oracleType + "_results.txt");
                     File syntaxformulaFile = new File(outputDir + oracleType + "_syntaxcheckedformulas.txt");
-                    initialoraclelist.addAll(oracleList);
+
+                    List<TemporalOracle> acceptedOracleList = oracleList.stream().
+                                    filter(o -> (o.getOracle_validationstatus() ==ValStatus.ACCEPTED ||
+                                    o.getOracle_validationstatus() ==ValStatus.CANDIDATE)).
+                                    collect(Collectors.toList());
+                    List<TemporalOracle> rejectedOracleList = oracleList.stream().
+                            filter(o -> !(o.getOracle_validationstatus() ==ValStatus.ACCEPTED ||
+                                    o.getOracle_validationstatus() ==ValStatus.CANDIDATE)).
+                            collect(Collectors.toList());
+                    initialoraclelist.addAll(acceptedOracleList);
+                    initialoraclelist.addAll(rejectedOracleList);
+
                     simpleLog.append(prettyCurrentTime() + " | " + oracleType + " invoking the " + "backend model-checker");
-                    saveModelForChecker(oracleType, automatonFile.getAbsolutePath());
+                   // saveModelForChecker(oracleType, automatonFile.getAbsolutePath());
 
-                    ModelChecker checker = CheckerFactory.getModelChecker(oracleentry.getKey());
+                    ModelChecker checker = CheckerFactory.getModelChecker(oracleType);
+                    checker.setupModel( verbose,counterExamples,outputDir,tModel,acceptedOracleList);
 
-                    if ((ltlItsEnabled && oracleType == TemporalFormalism.LTL_ITS)
-                        ||(ltlltsminEnabled && oracleType == TemporalFormalism.LTL_LTSMIN)
-                        ||(ltlSpotEnabled && (oracleType == TemporalFormalism.LTL ||
-                            oracleType == TemporalFormalism.LTL_SPOT))){
-                        //formula ltl model variant converter
-                        // instrumentTerminalState will determine whether this return value is ""
-                        String aliveprop = tModel.getPropositionIndex("!" + TemporalModel.getDeadProposition());
-                        if (!aliveprop.equals("")) {
-                            saveFormulasForChecker(oracleList, formulaFile, false);
-                            List<String> tmpformulas =FormulaVerifier.verifyLTL(ltlSpotMCCommand, ltlSpotWSLPath,
-                                                        formulaFile.getAbsolutePath(), syntaxformulaFile);
-                            List<TemporalOracle> tmporacleList = new ArrayList<>();
-                            int j = 0;
-                            for (TemporalOracle ora : oracleList
-                            ) {
-                                TemporalOracle oraClone = ora.clone();
-                                TemporalPatternBase pat = oraClone.getPatternBase();
-                                pat.setPattern_Formula(tmpformulas.get(j));
-                                tmporacleList.add(oraClone);
-                                j++;
-                            }
-                            saveFormulasForChecker(tmporacleList, formulaFile, true);
-                        } else {
-                            saveFormulasForChecker(oracleList, formulaFile, true);
-                        }
-                    }else{
-                        saveFormulasForChecker(oracleList, formulaFile,true);
-                    }
-
-                    if (ltlSpotEnabled && (oracleType == TemporalFormalism.LTL ||
-                                        oracleType == TemporalFormalism.LTL_SPOT)) {
-                        modelCheckedOracles = checker.check(ltlSpotMCCommand, ltlSpotWSLPath, counterExamples,
-                        automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                    if (ltlSpotEnabled && (oracleType == TemporalFormalism.LTL || oracleType == TemporalFormalism.LTL_SPOT)) {
+                        checker.setExecutable(ltlSpotMCCommand, ltlSpotWSLPath);
+                        modelCheckedOracles = checker.check();
 
                     }
-                     if (ltlItsEnabled && (oracleType == TemporalFormalism.LTL_ITS)){
-                         modelCheckedOracles = checker.check(ltlItsMCCommand, ltlItsWSLPath, counterExamples,
-                        automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                    if (ltlItsEnabled && (oracleType == TemporalFormalism.LTL_ITS)){
+                         checker.setExecutable(ltlItsMCCommand, ltlItsWSLPath);
+                         modelCheckedOracles = checker.check();
                         }
 
-                     if(ltlltsminEnabled && (oracleType == TemporalFormalism.LTL_LTSMIN)){
-                        modelCheckedOracles = checker.check(ltlLtsminMCCommand, ltlLtsminWSLPath, counterExamples,
-                        automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                    if(ltlltsminEnabled && (oracleType == TemporalFormalism.LTL_LTSMIN)){
+                         checker.setExecutable(ltlLtsminMCCommand, ltlLtsminWSLPath);
+                         modelCheckedOracles = checker.check();
                      }
                     if(ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN)){
                         int maxap=450;
                         int maxstate=25000;
                         if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
-                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType +
+                                    " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
                         }
                         else{
-                            modelCheckedOracles = checker.check(ctlLtsminMCCommand, ctlLtsminWSLPath, counterExamples,
-                                    automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                            checker.setExecutable(ctlLtsminMCCommand, ctlLtsminWSLPath);
+                            modelCheckedOracles = checker.check();
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
 
@@ -602,18 +584,19 @@ public class TemporalController {
 
                     if (ctlItsEnabled &&  (  oracleType == TemporalFormalism.CTL ||
                                                     oracleType == TemporalFormalism.CTL_ITS)) {
-                        modelCheckedOracles = checker.check(ctlItsMCCommand, ctlItsWSLPath, counterExamples,
-                        automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(),resultsFile,tModel,oracleList);
+                        checker.setExecutable(ctlItsMCCommand, ctlItsWSLPath);
+                        modelCheckedOracles = checker.check();
                     }
                     if (ctlGalEnabled &&  (oracleType == TemporalFormalism.CTL_GAL )) {
                         int maxap=200;
                         int maxstate=25000;
                         if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
-                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
+                            simpleLog.append(prettyCurrentTime() + " | " + oracleType +
+                                    " Warning:  real check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
                         }
                         else{
-                            modelCheckedOracles = checker.check(ctlGalMCCommand, ctlGalWSLPath, counterExamples,
-                            automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), resultsFile,tModel,oracleList);
+                            checker.setExecutable(ctlGalMCCommand, ctlGalWSLPath);
+                            modelCheckedOracles = checker.check();
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
                     }
@@ -637,14 +620,8 @@ public class TemporalController {
                     else {
                         simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                     }
-
-                    if (!verbose) {
-                        if ( automatonFile.exists()) Files.delete(automatonFile.toPath());
-                        if (resultsFile.exists())Files.delete(resultsFile.toPath());
-                        if (formulaFile.exists())Files.delete(formulaFile.toPath());
-                        if (syntaxformulaFile.exists())Files.delete(syntaxformulaFile.toPath());
-                        if (inputvalidatedFile.exists())Files.delete(inputvalidatedFile.toPath());
-                    }
+                    finaloraclelist.addAll(rejectedOracleList);
+                    if (!verbose && inputvalidatedFile.exists())    Files.delete(inputvalidatedFile.toPath());
                     simpleLog.append(prettyCurrentTime() + " | " + oracleType + " model-checking completed");
                 }
                 CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());

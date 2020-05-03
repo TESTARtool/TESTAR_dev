@@ -2,6 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
@@ -19,23 +20,24 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
 
 
 
-    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                      String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+    public List<TemporalOracle> check() {
+
+        String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
+        saveStringToFile(contents,this.automatonFile);
+        validateAndSaveFormulas();
+
+
         //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
         //counterexamples are not shown in the visualizer. as they are
         //not well documented, hard to parse, not complete traces and difficult to understand
         String cli = pathToExecutable;
-        String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFilePath) : automatonFilePath);
-        String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
-        String cli_formulafile = " " + ((toWslPath) ? Common.toWSLPath(formulaFilePath) : formulaFilePath);
 
-        cli = cli + " -i " + cli_automaton + " -t ETF -ctl " +cli_formulafile + (counterExamples ? "" : "");// no witness
-        if (!resultsFile.getAbsolutePath().equals("")) cli = cli + " &> " + cli_resultsfile;
+        cli = cli + " -i " + automat + " -t ETF -ctl " +formula + (counterExamples ? "" : "");// no witness
+        cli = cli + " &> " + result;
         Common.RunOSChildProcess(cli);
-
-        setTmodel(tModel);
-        setOracleColl(oracleList);
-        return parseResultsFile(resultsFile);
+        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
+        removeFiles();
+        return oracleResults;
     }
 
 
@@ -88,5 +90,6 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
         }
         return this.oracleColl;
     }
+
 }
 

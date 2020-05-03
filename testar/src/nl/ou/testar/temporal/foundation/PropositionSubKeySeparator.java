@@ -1,6 +1,6 @@
 package nl.ou.testar.temporal.foundation;
 
-public enum APEncodingSeparator {
+public enum PropositionSubKeySeparator {
     //utf 8 encoding required for non-ascii chars
     // list of symbol characters in the title of a widget.
     SECTIONSIGN("§§"),
@@ -12,7 +12,7 @@ public enum APEncodingSeparator {
 
     public final String symbol;
 
-    APEncodingSeparator(String unlikely) {
+    PropositionSubKeySeparator(String unlikely) {
         this.symbol = unlikely;
     }
 }

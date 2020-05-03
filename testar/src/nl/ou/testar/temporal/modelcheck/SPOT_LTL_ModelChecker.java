@@ -2,6 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.foundation.Verdict;
@@ -13,20 +14,25 @@ import java.util.*;
 
 public class SPOT_LTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                      String automatonFile, String formulaFile, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+
+    public List<TemporalOracle> check() {
+
+        String contents = tmodel.makeHOAOutput();
+        saveStringToFile(contents,this.automatonFile);
+        validateAndSaveFormulas();
+
         //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead ";
         String cli = pathToExecutable;
-        cli = cli + " --a " + ((toWslPath) ? Common.toWSLPath(automatonFile) : automatonFile) + " --ff " + ((toWslPath) ? Common.toWSLPath(formulaFile) : formulaFile);
-        //if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
+        cli = cli + " --a " + automat + " --ff " + formula;
         if (counterExamples) cli = cli + " --witness ";
-        cli = cli + " &> " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        cli = cli + " &> " + result;
         Common.RunOSChildProcess(cli);
-
-        setTmodel(tModel);
-        setOracleColl(oracleList);
-        return parseResultsFile(resultsFile);
+        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
+        removeFiles();
+        return oracleResults;
     }
+
+
 
     public List<TemporalOracle> parseResultsString(String rawInput) {
 
@@ -84,7 +90,11 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         String[] prefixLines = cleanprefix.split("\\n");
                         if (prefixLines.length>=2){  // only when there is  content in the prefix section
                         for (int j = 0; j < prefixLines.length; j = j + 2) {
-                            StateEncoding sEnc = stateEncodings.get(Integer.parseInt(prefixLines[j].trim()));
+                            int stateindex= stateindex=Integer.parseInt(prefixLines[j].trim());
+                            if (tmodel.getInitialStates().size()>1){ // SPOT adds the artificial state and silently increases the state count.
+                                stateindex=stateindex-1;
+                            }
+                            StateEncoding sEnc = stateEncodings.get(stateindex);
                             prefixStateList.add(sEnc.getState());
 
                             String conjunctStr = prefixLines[j + 1].
@@ -104,8 +114,11 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         String[] cycleLines = cleancycle.split("\\n");
                         if (cycleLines.length>=2){  // only when there is  content in the cycle section
                         for (int j = 0; j < cycleLines.length; j = j + 2) {
-
-                            StateEncoding sEnc = stateEncodings.get(Integer.parseInt(cycleLines[j].trim()));
+                            int stateindex= stateindex=Integer.parseInt(cycleLines[j].trim());
+                            if (tmodel.getInitialStates().size()>1){// SPOT adds the artificial state and silently increases the state count.
+                                stateindex=stateindex-1;
+                            }
+                            StateEncoding sEnc = stateEncodings.get(stateindex);
                             cycleStateList.add(sEnc.getState());
 
                             String conjunctStr = cycleLines[j + 1].
@@ -181,5 +194,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
         }
         return this.oracleColl;
     }
+
 }
+
 

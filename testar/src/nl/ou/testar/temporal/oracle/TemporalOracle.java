@@ -1,7 +1,7 @@
 package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.*;
-import nl.ou.testar.temporal.foundation.APEncodingSeparator;
+import nl.ou.testar.temporal.foundation.PropositionSubKeySeparator;
 import nl.ou.testar.temporal.foundation.ValStatus;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.ioutils.CSVConvertValStatus;
@@ -189,9 +189,9 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
 
         to.setOracle_validationstatus(ValStatus.ACCEPTED);
         MultiValuedMap<String,String> pattern_Substitutions = new HashSetValuedHashMap<>();
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P0","UIButton"+ APEncodingSeparator.CUSTOM.symbol+"Title_Match_OK");
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P1","UIWindow_Title_main"+APEncodingSeparator.CUSTOM.symbol+"exists");
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+APEncodingSeparator.CUSTOM.symbol+"exists");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P0","UIButton"+ PropositionSubKeySeparator.CUSTOM.symbol+"Title_Match_OK");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P1","UIWindow_Title_main"+ PropositionSubKeySeparator.CUSTOM.symbol+"exists");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+ PropositionSubKeySeparator.CUSTOM.symbol+"exists");
         to.setPattern_Substitutions(pattern_Substitutions);
 
         List<String> comments= new ArrayList<>();

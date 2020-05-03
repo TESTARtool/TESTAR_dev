@@ -4,11 +4,23 @@ import nl.ou.testar.temporal.util.Common;
 import java.io.*;
 import java.util.*;
 
-public class FormulaVerifier {
+public enum FormulaVerifier {
+    INSTANCE;//singleton
+    private String pathToExecutable;
 
 
 
-    public static List<String> verifyLTL(String pathToExecutable, boolean toWslPath, String formulaFilePath, File resultsFile) {
+    private boolean toWslPath;
+
+    public void setPathToExecutable(String pathToExecutable) {
+        this.pathToExecutable = pathToExecutable;
+    }
+    public void setToWslPath(boolean toWslPath) {
+        this.toWslPath = toWslPath;
+    }
+
+
+    public   List<String> verifyLTL(  String formulaFilePath, File resultsFile) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
         String cli = pathToExecutable;
         String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());

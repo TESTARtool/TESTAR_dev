@@ -16,7 +16,6 @@ import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.graphml.*;
-import nl.ou.testar.temporal.ioutils.CSVHandler;
 import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.ioutils.XMLHandler;
 import nl.ou.testar.temporal.model.TemporalTrace;
@@ -28,7 +27,6 @@ import nl.ou.testar.temporal.util.Common;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.io.File;
 import java.util.*;
 
 public  class TemporalDBManager {
@@ -537,7 +535,7 @@ public  class TemporalDBManager {
             } else {
                 apkey.append(prop);
             }
-            apkey.append(propositionManager.getApEncodingSeparator());
+            apkey.append(propositionManager.getPropositionSubKeySeparator());
         }
         if (isWidget) {
 

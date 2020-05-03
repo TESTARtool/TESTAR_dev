@@ -3,7 +3,7 @@ package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import nl.ou.testar.temporal.foundation.APEncodingSeparator;
+import nl.ou.testar.temporal.foundation.PropositionSubKeySeparator;
 import org.fruit.alayer.Tags;
 
 import java.util.*;
@@ -15,8 +15,8 @@ public class PropositionManager {
     private  String freeFormatText;
     private PropositionSelector stateFilter;
     private PropositionSelector transitionFilter;
-    private List<String> APKey= new ArrayList<>();
-    private String apEncodingSeparator;
+    private List<String> propositionKey = new ArrayList<>();
+    private String propositionSubKeySeparator;
     private Set<WidgetFilter> widgetfilters;
     private String formatVersion="20200101";
     private List<String> comments = new ArrayList<>();
@@ -29,7 +29,7 @@ public class PropositionManager {
         widgetfilters = new LinkedHashSet<>();
         comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsTerminalState' 'valuedexpression' with 'exists__' and  expressions");
         comments.add(" An EMPTY widget condition results in rejection");
-        comments.add("Note that when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is true somewhere in the model. ");
+        comments.add("Note that when you are inspecting  propositions in a Model:  An entry in the map of modelAPs indicates that the property is true somewhere in the model. ");
         comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp");
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
 
@@ -38,7 +38,7 @@ public class PropositionManager {
          this(initializeWithDefaults,null);
     }
 
-    public PropositionManager(boolean initializeWithDefaults, List<String> APKey) {
+    public PropositionManager(boolean initializeWithDefaults, List<String> propositionKey) {
         this();
         if (initializeWithDefaults){
             updateFreeFormatText("This is a Sample APModelManager with two widget filters.");
@@ -54,11 +54,11 @@ public class PropositionManager {
             WidgetFilter wf1 = new WidgetFilter();
             wf1.setMinimalWidgetFilter();
             widgetfilters.add(wf1);
-            if (APKey==null){
+            if (propositionKey ==null){
                 setRoleTitlePathAsAPKey();  }
             else{
-                this.APKey=APKey;}
-            this.apEncodingSeparator= APEncodingSeparator.CUSTOM.symbol;
+                this.propositionKey = propositionKey;}
+            this.propositionSubKeySeparator = PropositionSubKeySeparator.CUSTOM.symbol;
         }
 
     }
@@ -91,21 +91,21 @@ public class PropositionManager {
         this.transitionFilter.setSelectedAttributes(transitionFilter.getSelectedAttributes());
         this.transitionFilter.setSelectedExpressions(transitionFilter.getSelectedExpressions());
     }
-    public String getApEncodingSeparator() {
-        return apEncodingSeparator;
+    public String getPropositionSubKeySeparator() {
+        return propositionSubKeySeparator;
     }
     @SuppressWarnings("unused")
-    public void setApEncodingSeparator(String apEncodingSeparator) {
-        this.apEncodingSeparator = apEncodingSeparator;
+    public void setPropositionSubKeySeparator(String propositionSubKeySeparator) {
+        this.propositionSubKeySeparator = propositionSubKeySeparator;
     }
     @JsonIgnore
     @SuppressWarnings("unused")
-    private  List<String> getAPKey() {  // kept for compatability
-       return APKey;
+    private  List<String> getPropositionKey() {  // kept for compatability
+       return propositionKey;
     }
 
     public void updateAPKey(List<String> APKey) {
-        this.APKey = APKey;
+        this.propositionKey = APKey;
     }
 
     public List<String> getComments() {
@@ -134,10 +134,10 @@ public class PropositionManager {
 
 
     public void setRoleTitlePathAsAPKey(){
-        APKey.clear();
-        APKey.add(Tags.Role.name());
-        APKey.add(Tags.Title.name());
-        APKey.add(Tags.Path.name());
+        propositionKey.clear();
+        propositionKey.add(Tags.Role.name());
+        propositionKey.add(Tags.Title.name());
+        propositionKey.add(Tags.Path.name());
 
     }
 

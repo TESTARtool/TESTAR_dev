@@ -34,6 +34,8 @@
 
 package nl.ou.testar.temporal.foundation;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.fruit.Util;
 
 import java.io.Serializable;
@@ -43,19 +45,19 @@ public class PairBean<L, R> implements Serializable {
 
 	public PairBean() { //for JSON handler
 	}
-
+	@JsonGetter("type")
 	public L getLeft() {
 		return left;
 	}
-
+	@JsonGetter("value")
 	public R getRight() {
 		return right;
 	}
-
+	@JsonSetter("type")
 	public void setLeft(L left) {
 		this.left = left;
 	}
-
+	@JsonSetter("value")
 	public void setRight(R right) {
 		this.right = right;
 	}

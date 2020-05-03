@@ -3,6 +3,7 @@ package nl.ou.testar.temporal.modelcheck;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.util.Common;
 
@@ -21,29 +22,29 @@ import java.util.Scanner;
 
 public class GAL_CTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                      String automatonFile, String formulaFile, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+    public List<TemporalOracle> check() {
 
+        String contents = tmodel.makeGALOutput();
+        saveStringToFile(contents,this.automatonFile);
+        validateAndSaveFormulas();
 
         //String cli = "eclipsec.exe -i CTL_GAL_model1.gal -ctl -itsflags "--precise --backward --witness" 2> results.txt;
         // append formulas to the model file:
-        Path path = Paths.get(formulaFile);
+        Path path = Paths.get(formula);
         try {
             byte[] contentToAppend = Files.readAllBytes(path);
             Files.write(
-                    Paths.get(automatonFile), contentToAppend, StandardOpenOption.APPEND);
+                    Paths.get(automat), contentToAppend, StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         String cli = pathToExecutable;
-        cli = cli + " -i " +  ((toWslPath) ? Common.toWSLPath(automatonFile) : automatonFile) + "  -ctl " +
-                (counterExamples ? "-itsflags \"--precise --backward --witness\"" : "");
-        Common.RunOSChildProcess(cli,resultsFile.getAbsolutePath());
-
-        setTmodel(tModel);
-        setOracleColl(oracleList);
-        return parseResultsFile(resultsFile);
+        cli = cli + " -i " +  automat + "  -ctl "+ (counterExamples? " -itsflags \"--precise --backward --witness\"" : "");
+        Common.RunOSChildProcess(cli,result);
+        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
+        removeFiles();
+        return oracleResults;
     }
 
     public List<TemporalOracle> parseResultsString(String rawInput) {
@@ -95,5 +96,6 @@ public class GAL_CTL_ModelChecker extends ModelChecker {
         }
         return this.oracleColl;
     }
+
 }
 

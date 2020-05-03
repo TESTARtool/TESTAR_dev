@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
@@ -16,31 +17,32 @@ import java.util.*;
 //LTSMIN-CTL bug: gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
 public class LTSMIN_CTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> check(String pathToExecutable, boolean toWslPath, boolean counterExamples,
-                                      String automatonFilePath, String formulaFilePath, File resultsFile, TemporalModel tModel, List<TemporalOracle> oracleList) {
+    public List<TemporalOracle> check() {
+
+        String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
+        saveStringToFile(contents,this.automatonFile);
+        validateAndSaveFormulas();
+
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
-        //LTSMIN does not provide counter examples for CTL, does not allow the implies ('->') operator, crashes on some ETF models.
+        //LTSMIN does not provide counter examples for CTL, does not allow the implies ('->') operator, crashes on large ETF models.
+
         String cli = pathToExecutable;
         StringBuilder sb = new StringBuilder();
+
         try {//formulafile to --ctl strings
-            List<String> lines = Files.readAllLines(Paths.get(formulaFilePath), StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(Paths.get(formula), StandardCharsets.UTF_8);
             for (String line : lines) {
                 sb.append("--ctl='").append(line).append("' ");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String formulalist = sb.toString();
-        String cli_automaton = ((toWslPath) ? Common.toWSLPath(automatonFilePath) : automatonFilePath);
-        String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
-        cli = cli + " " + formulalist;
-        cli = cli + cli_automaton;
-        cli = cli + " &> " +  cli_resultsfile;
-        Common.RunOSChildProcess(cli);
 
-        setTmodel(tModel);
-        setOracleColl(oracleList);
-        return parseResultsFile(resultsFile);
+        cli = cli + " " + sb.toString() +" " +automat+ " &> " +  result;
+        Common.RunOSChildProcess(cli);
+        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
+        removeFiles();
+        return oracleResults;
     }
 
     public List<TemporalOracle> parseResultsString(String rawInput) {
@@ -97,5 +99,6 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
         }
         return this.oracleColl;
     }
+
 }
 
