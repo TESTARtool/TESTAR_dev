@@ -20,8 +20,6 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
-        validateAndSaveFormulas();
-
 
         //String cli = "ubuntu1804 run ~/its/its-ctl -i model.etf -t ETF  -ctl formula.ctl --witness &> results.txt;
         //counterexamples are not shown in the visualizer. as they are

@@ -441,7 +441,7 @@ public class TemporalController {
                 String filename = Paths.get(oracleFile).getFileName().toString();
                 if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
                 else strippedFile = filename;
-                File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
+                //File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
 
 
@@ -545,10 +545,10 @@ public class TemporalController {
                         simpleLog.append(prettyCurrentTime() + " | " + oracleType + "  ** Error: no results from the model-checker");
                     }
                     finaloraclelist.addAll(rejectedOracleList);
-                    if (!verbose && inputvalidatedFile.exists())    Files.delete(inputvalidatedFile.toPath());
+                   // if (!verbose && inputvalidatedFile.exists())    Files.delete(inputvalidatedFile.toPath());
                     simpleLog.append(prettyCurrentTime() + " | " + oracleType + " model-checking completed");
                 }
-                CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
+                //CSVHandler.save(initialoraclelist, inputvalidatedFile.getAbsolutePath());
                 if (finaloraclelist.size() != fromcoll.size()) {
                     simpleLog.append(prettyCurrentTime() + " | " + "** Warning: less oracle verdicts " +
                             "received than requested in: "+ Paths.get(oracleFile).getFileName());

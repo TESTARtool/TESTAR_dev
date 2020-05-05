@@ -14,8 +14,6 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
-        validateAndSaveFormulas();
-
 
         //String cli = "ubuntu1804 run ~/its/its-ltl -i model.etf -t ETF  -ltl formula.ltl -c -e &> results.txt;
         String cli = pathToExecutable;

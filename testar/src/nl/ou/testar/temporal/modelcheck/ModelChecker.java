@@ -78,19 +78,16 @@ public abstract class ModelChecker {
     }
 
 
-    abstract  void delegatedCheck();
+
 
     public  List<TemporalOracle> modelcheck(){
+        validateFormulasForChecker();
         delegatedCheck();
         String rawresults =parseResultsFile(resultsFile);
         List<TemporalOracle> oracleResults= delegatedParseResults(rawresults);
-        updateOracleCollMetaData(oracleResults);
         removeFiles();
         return oracleResults;
     }
-
-    abstract List<TemporalOracle> delegatedParseResults(String rawInput);
-
     private  String parseResultsFile(File rawInput) {
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
@@ -104,6 +101,9 @@ public abstract class ModelChecker {
         return contentBuilder.toString();
 
     }
+    abstract  void delegatedCheck();
+    abstract List<TemporalOracle> delegatedParseResults(String rawInput);
+
 
 
     /**
@@ -137,7 +137,7 @@ public abstract class ModelChecker {
         String contents = validateAndMakeFormulas(oracleColl, doTransformation);
         saveStringToFile(contents, output);
     }
-    public void setFiles(){
+    private void setFiles(){
         automatonFile = new File(outputDir +temporalFormalism+"_model."+temporalFormalism.fileExtension);
         formulaFile = new File(outputDir + temporalFormalism + "_formulas.txt");
         resultsFile = new File(outputDir + temporalFormalism + "_results.txt");
@@ -147,7 +147,7 @@ public abstract class ModelChecker {
         result = ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
         //System.out.println("debug: ");
     }
-    public  void validateAndSaveFormulas() {
+    private  void validateFormulasForChecker() {
         if ((temporalFormalism == TemporalFormalism.LTL_ITS) || (temporalFormalism == TemporalFormalism.LTL_LTSMIN) ||
                 (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
             //formula ltl model variant converter
@@ -203,7 +203,7 @@ public abstract class ModelChecker {
             ora.set_modifieddate(Common.prettyCurrentDateTime());
         }
     }
-    public String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
+    private String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
 
         StringBuilder Formulas = new StringBuilder();
         String rawFormula;
@@ -276,7 +276,6 @@ public abstract class ModelChecker {
                             if (tFormalism == TemporalFormalism.LTL_ITS|| tFormalism == TemporalFormalism.LTL_SPOT){
                                 formulalvl0="X("+rawFormula+")";
                             }
-
                         }
                         String formulalvl1a =  tFormalism.line_prepend+formulalvl0;
                         String formulalvl1 = formulalvl1a + tFormalism.line_append;
@@ -295,7 +294,6 @@ public abstract class ModelChecker {
 
                         formula = StringUtils.replaceEach(formulalvl6,
                                 sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
-
                     }
                 } else {
                     formula = candidateOracle.getPatternBase().getPattern_Formula();
@@ -303,13 +301,8 @@ public abstract class ModelChecker {
                 Formulas.append(formula);
             }
             Formulas.append("\n"); //always a new line . if formula is not validated a blank line appears
-
         }
-
         return Formulas.toString();
-
     }
-
-
 }
 

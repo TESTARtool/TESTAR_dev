@@ -21,7 +21,6 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
-        validateAndSaveFormulas();
 
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
         //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.

@@ -22,7 +22,6 @@ public class GAL_CTL_ModelChecker extends ModelChecker {
 
         String contents = tmodel.makeGALOutput();
         saveStringToFile(contents,this.automatonFile);
-        validateAndSaveFormulas();
 
         //String cli = "eclipsec.exe -i CTL_GAL_model1.gal -ctl -itsflags "--precise --backward --witness" 2> results.txt;
         // append formulas to the model file:

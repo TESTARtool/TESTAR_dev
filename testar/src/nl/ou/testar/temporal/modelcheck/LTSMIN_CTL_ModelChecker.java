@@ -17,7 +17,6 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
-        validateAndSaveFormulas();
 
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
         //LTSMIN does not provide counter examples for CTL, does not allow the implies ('->') operator, crashes on large ETF models.
