@@ -212,17 +212,6 @@ public class TemporalController {
         this.oracleColl.sort(Comparator.comparing(TemporalOracle::getPatternTemporalType)); //sort by type
     }
 
-    private void updateOracleCollMetaData() {
-
-        for (TemporalOracle ora : oracleColl
-        ) {
-            ora.setApplicationName(tModel.getApplicationName());
-            ora.setApplicationVersion(tModel.getApplicationVersion());
-            ora.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
-            ora.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
-            ora.set_modifieddate(Common.prettyCurrentDateTime());
-        }
-    }
 
     public void setDefaultPropositionManager() {
         this.propositionManager = new PropositionManager(true);
@@ -458,7 +447,7 @@ public class TemporalController {
 
                 makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState);
                 setOracleColl(fromcoll);
-                updateOracleCollMetaData();
+
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 if (verbose) {
