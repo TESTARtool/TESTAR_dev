@@ -2,7 +2,6 @@ package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import nl.ou.testar.temporal.foundation.InferrableExpression;
 import nl.ou.testar.temporal.foundation.PairBean;
 
 import java.util.Set;

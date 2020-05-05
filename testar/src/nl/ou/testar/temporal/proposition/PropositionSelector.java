@@ -2,7 +2,6 @@ package nl.ou.testar.temporal.proposition;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import nl.ou.testar.temporal.util.CachedRegexPatterns;
-import nl.ou.testar.temporal.foundation.InferrableExpression;
 import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.foundation.TagBean;
 import org.fruit.alayer.Shape;
@@ -103,23 +102,23 @@ public class PropositionSelector {
 
     public static Set<PairBean<InferrableExpression,String>> useMinimalSelectedExpressions() {
         Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
-        minve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
+        minve.add(new PairBean<>(InferrableExpression.exists, ""));// use always
         return minve;
     }
     public static Set<PairBean<InferrableExpression,String>> useMinimalTransSelectedExpressions() {
         // following list is derived by inspecting AnnotatingActionCompiler
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Click).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Right Click).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Drag).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Left Double Click).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Type ).*(?i:into ).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Replace ').*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Append ').*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Shortcut Key).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Hit Key).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:Bring the system to the foreground).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i: Kill Process).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Left Click).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Right Click).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Drag).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Left Double Click).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Type ).*(?i:into ).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Replace ').*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Append ').*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Shortcut Key).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Key).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Bring the system to the foreground).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i: Kill Process).*"));
         return minie;
     }
 
@@ -127,21 +126,21 @@ public class PropositionSelector {
 
     public static Set<PairBean<InferrableExpression,String>> useRoleConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, UIARoles.UIAButton.name()+"|"+
+        minie.add(new PairBean<>(InferrableExpression.textmatch, UIARoles.UIAButton.name()+"|"+
                 UIARoles.UIAMenu.name()+"|"+ UIARoles.UIAMenuItem.name()+"|"+ UIARoles.UIACheckBox.name()+"|"+
                 UIARoles.UIARadioButton.name()+"|"+ UIARoles.UIAWindow.name()));  // use always
         return minie;
     }
     public static Set<PairBean<InferrableExpression,String>> usePathConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
-       minie.add(new PairBean<>(InferrableExpression.textmatch_, ".*\\[(\\d+, )*\\d+\\]"));// use always
+       minie.add(new PairBean<>(InferrableExpression.textmatch, ".*\\[(\\d+, )*\\d+\\]"));// use always
         return minie;
 
     }
 
     public static Set<PairBean<InferrableExpression, String>> useTitleConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
-        minie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)|(?i:CANCEL)|(?i:YES)|(?i:NO)|" +
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:OK)|(?i:CANCEL)|(?i:YES)|(?i:NO)|" +
                 "(?i:RUN)|(?i:SAVE)|(?i:EXIT)|(?i:CLOSE)|(?i:REMOVE)|(?i:ERROR)|" +
                 "(?i:SUBMIT)|(?i:OPEN)|(?i:IGNORE)|(?i:PROCEED)|(?i:PRINT)|(?i:VIEW)|" +
                 "(?i:UP)|(?i:DOWN)|(?i:LEFT)|(?i:RIGHT)"));
@@ -151,55 +150,55 @@ public class PropositionSelector {
 
     public static Set<PairBean<InferrableExpression,String>> useBasicSelectedExpressions() {
         Set<PairBean<InferrableExpression, String>> defie = new LinkedHashSet<>(useMinimalSelectedExpressions());
-        defie.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
-        defie.add(new PairBean<>(InferrableExpression.value_eq_, "1"));
-        defie.add(new PairBean<>(InferrableExpression.value_eq_, "2"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "10"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "100"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "1000"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "10000"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "100000"));
-        defie.add(new PairBean<>(InferrableExpression.value_lt_, "1000000"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CANCEL)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:YES)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:NO)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:GO)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RUN)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SAVE)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:EXIT)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CLOSE)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:REMOVE)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:ERROR)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SUBMIT)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OPEN)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:IGNORE)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:PROCEED)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:PRINT)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:VIEW)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:UP)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:DOWN)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:LEFT)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RIGHT)"));
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, "")); //no title
-        defie.add(new PairBean<>(InferrableExpression.textmatch_, ".*\\[(\\d+, )*\\d+\\]"));
-        defie.add(new PairBean<>(InferrableExpression.heigth_lt_, "50"));
-        defie.add(new PairBean<>(InferrableExpression.heigth_lt_, "250"));
-        defie.add(new PairBean<>(InferrableExpression.heigth_lt_, "500"));
-        defie.add(new PairBean<>(InferrableExpression.heigth_lt_, "1000"));
-        defie.add(new PairBean<>(InferrableExpression.width_lt_, "50"));
-        defie.add(new PairBean<>(InferrableExpression.width_lt_, "250"));
-        defie.add(new PairBean<>(InferrableExpression.width_lt_, "500"));
-        defie.add(new PairBean<>(InferrableExpression.width_lt_, "1000"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_eq_, "1"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_eq_, "2"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_eq_, "3"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_lt_, "10"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_lt_, "20"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_lt_, "50"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_lt_, "100"));
-        defie.add(new PairBean<>(InferrableExpression.textlength_lt_, "200"));
-        defie.add(new PairBean<>(InferrableExpression.is_blank_, ""));
+        defie.add(new PairBean<>(InferrableExpression.value_eq, "0"));
+        defie.add(new PairBean<>(InferrableExpression.value_eq, "1"));
+        defie.add(new PairBean<>(InferrableExpression.value_eq, "2"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "10"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "100"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "1000"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "10000"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "100000"));
+        defie.add(new PairBean<>(InferrableExpression.value_lt, "1000000"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:OK)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:CANCEL)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:YES)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:NO)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:GO)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:RUN)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:SAVE)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:EXIT)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:CLOSE)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:REMOVE)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:ERROR)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:SUBMIT)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:OPEN)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:IGNORE)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:PROCEED)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:PRINT)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:VIEW)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:UP)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:DOWN)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:LEFT)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:RIGHT)"));
+        defie.add(new PairBean<>(InferrableExpression.textmatch, "")); //no title
+        defie.add(new PairBean<>(InferrableExpression.textmatch, ".*\\[(\\d+, )*\\d+\\]"));
+        defie.add(new PairBean<>(InferrableExpression.heigth_lt, "50"));
+        defie.add(new PairBean<>(InferrableExpression.heigth_lt, "250"));
+        defie.add(new PairBean<>(InferrableExpression.heigth_lt, "500"));
+        defie.add(new PairBean<>(InferrableExpression.heigth_lt, "1000"));
+        defie.add(new PairBean<>(InferrableExpression.width_lt, "50"));
+        defie.add(new PairBean<>(InferrableExpression.width_lt, "250"));
+        defie.add(new PairBean<>(InferrableExpression.width_lt, "500"));
+        defie.add(new PairBean<>(InferrableExpression.width_lt, "1000"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_eq, "1"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_eq, "2"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_eq, "3"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_lt, "10"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_lt, "20"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_lt, "50"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_lt, "100"));
+        defie.add(new PairBean<>(InferrableExpression.textlength_lt, "200"));
+        defie.add(new PairBean<>(InferrableExpression.is_blank, ""));
         return defie;
     }
 
@@ -276,26 +275,27 @@ public class PropositionSelector {
                     }
                 } else {
                     for (PairBean<InferrableExpression, String> iap : getSelectedExpressions()
+                        // just encode the TRUE/existence  and FALSE is then considered absence
                     ) {
                         if (iap.left().typ.equals("number") && (tag.type() == Double.class || tag.type() == Long.class || tag.type() == Integer.class)) {
                             int intVal = (int) Double.parseDouble(value);
-                            if (((iap.left() == InferrableExpression.value_eq_) && (intVal == Integer.parseInt(iap.right()))) ||
-                                    ((iap.left() == InferrableExpression.value_lt_) && (intVal < Integer.parseInt(iap.right())))) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "__");// just encode the TRUE/existence  and FALSE is then considered absence
+                            if (((iap.left() == InferrableExpression.value_eq) && (intVal == Integer.parseInt(iap.right()))) ||
+                                    ((iap.left() == InferrableExpression.value_lt) && (intVal < Integer.parseInt(iap.right())))) {
+                                apset.add(widgetkey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
                             }
                         }
-                        if (iap.left().typ.equals("text")) { // && (tag.type() == String.class)) { // now also handles specific classes
+                        if (iap.left().typ.equals("text")) {
 
-                            if (((iap.left() == InferrableExpression.textlength_eq_) && (value.length() == Integer.parseInt(iap.right()))) ||
-                                    ((iap.left() == InferrableExpression.textlength_lt_) && (value.length() < Integer.parseInt(iap.right())))) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            if (((iap.left() == InferrableExpression.textlength_eq) && (value.length() == Integer.parseInt(iap.right()))) ||
+                                    ((iap.left() == InferrableExpression.textlength_lt) && (value.length() < Integer.parseInt(iap.right())))) {
+                                apset.add(widgetkey + attrib + "_" + iap.left().name() + "_" + iap.right());
                             }
 
-                            if (((iap.left() == InferrableExpression.textmatch_))) {
+                            if (((iap.left() == InferrableExpression.textmatch))) {
                                 Pattern pat = CachedRegexPatterns.addAndGet(iap.right());
                                 Matcher m = pat.matcher(value);
                                 if (m.matches()) {
-                                    apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "__");
+                                    apset.add(widgetkey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
                                 }
                             }
 
@@ -308,20 +308,20 @@ public class PropositionSelector {
                             test = value.split("h:")[1].split("]")[0];
                             int heigth = (int) Double.parseDouble(test);
 
-                            if (((iap.left() == InferrableExpression.width_lt_) && (width < Integer.parseInt(iap.right()))) ||
-                                    ((iap.left() == InferrableExpression.heigth_lt_) && (heigth < Integer.parseInt(iap.right())))
+                            if (((iap.left() == InferrableExpression.width_lt) && (width < Integer.parseInt(iap.right()))) ||
+                                    ((iap.left() == InferrableExpression.heigth_lt) && (heigth < Integer.parseInt(iap.right())))
                             ) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "__");
+                                apset.add(widgetkey + attrib + "_" + iap.left().name() + "_" + iap.right() );
                             }
                         }
 
                         if (iap.left().typ.equals("boolean")) {   //add these regardless of the tag-type
                             //format:     <data key="Abc"></data>
-                            if ((iap.left() == InferrableExpression.is_blank_) && value.equals("")) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "_"); //note : 1 space only
+                            if ((iap.left() == InferrableExpression.is_blank) && value.equals("")) {
+                                apset.add(widgetkey + attrib + "_" + iap.left().name() );
                             }
-                            if ((iap.left() == InferrableExpression.exists_)) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + iap.right() + "_");
+                            if ((iap.left() == InferrableExpression.exists)) {
+                                apset.add(widgetkey + attrib + "_" + iap.left().name() );
                             }
 
                         }

@@ -21,7 +21,8 @@ public enum TemporalFormalism {
     LTL_SPOT("","","","",
                      new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
             new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
-            new PairBean<>("~~unlikely",""),false,"txt"), //spot adds untractable edge when model is a polyforest
+            new PairBean<>("~~unlikely",""),false,"txt"),
+        //spot adds untractable edges when model is disconnect: observed on a 'singular'  initial state
     LTL_ITS("(\""," = 1\")","","",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             //new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),

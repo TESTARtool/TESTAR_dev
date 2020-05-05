@@ -1,23 +1,19 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.model.TemporalModel;
-import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.*;
 //css ltsmin cannot provide counterexamples for CTL, only LTL
 //LTSMIN-CTL bug: gives a segmentation fault when checking ctl, but same model can be checked on ltl . :-)
 public class LTSMIN_CTL_ModelChecker extends ModelChecker {
 
-    public List<TemporalOracle> check() {
+     void delegatedCheck() {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
@@ -40,12 +36,9 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
 
         cli = cli + " " + sb.toString() +" " +automat+ " &> " +  result;
         Common.RunOSChildProcess(cli);
-        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
-        removeFiles();
-        return oracleResults;
     }
 
-    public List<TemporalOracle> parseResultsString(String rawInput) {
+    public List<TemporalOracle> delegatedParseResults(String rawInput) {
         Scanner scanner = new Scanner(rawInput);
          while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
@@ -95,7 +88,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.equals(Verdict.FAIL.toString())) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.equals(Verdict.PASS.toString())) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(LocalDateTime.now().toString());
+            Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }

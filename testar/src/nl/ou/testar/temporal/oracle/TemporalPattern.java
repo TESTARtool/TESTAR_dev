@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.CsvIgnore;
 import com.opencsv.bean.CsvRecurse;
-import nl.ou.testar.temporal.foundation.TemporalMeta;
+import nl.ou.testar.temporal.foundation.LogData;
 
 import java.util.*;
 
@@ -11,29 +11,29 @@ public class TemporalPattern extends TemporalPatternBase {
     @CsvIgnore
     private  static String version = "20200104";
     @CsvRecurse
-    private TemporalMeta metaData;
+    private LogData logData;
 
     public TemporalPattern() {
         super();
-        metaData = new TemporalMeta();
+        logData = new LogData();
     }
 
     public void set_comments(List< String > _comments) {
-        metaData.set_comments(_comments);
+        logData.set_comments(_comments);
     }
     public void addComments ( String  comment) {
-        metaData.addComments( comment);
+        logData.addComments( comment);
     }
 
     public void set_modifieddate(String _modifieddate){
-        metaData.set_modifieddate( _modifieddate);
+        logData.set_modifieddate( _modifieddate);
     }
 
     public void set_log(List < String > _log) {
-        metaData.set_log(_log);
+        logData.set_log(_log);
     }
     public void addLog ( String  log) {
-        metaData.addLog(log);
+        logData.addLog(log);
     }
 
     @Override

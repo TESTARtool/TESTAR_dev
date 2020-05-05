@@ -3,7 +3,6 @@ package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import nl.ou.testar.temporal.foundation.PropositionSubKeySeparator;
 import org.fruit.alayer.Tags;
 
 import java.util.*;
@@ -58,7 +57,7 @@ public class PropositionManager {
                 setRoleTitlePathAsAPKey();  }
             else{
                 this.propositionKey = propositionKey;}
-            this.propositionSubKeySeparator = PropositionSubKeySeparator.CUSTOM.symbol;
+            this.propositionSubKeySeparator = PropositionConstants.SETTING.subKeySeparator;
         }
 
     }

@@ -1,18 +1,18 @@
 package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.*;
-import nl.ou.testar.temporal.foundation.PropositionSubKeySeparator;
+import nl.ou.testar.temporal.foundation.ModelBean;
+import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.foundation.ValStatus;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.ioutils.CSVConvertValStatus;
 import nl.ou.testar.temporal.ioutils.CSVConvertVerdict;
-import nl.ou.testar.temporal.foundation.TemporalBean;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import java.util.*;
 
-public class TemporalOracle extends TemporalBean implements Cloneable{
+public class TemporalOracle extends ModelBean implements Cloneable{
     @CsvIgnore
     private static String version = "20200104";
 
@@ -189,9 +189,9 @@ public class TemporalOracle extends TemporalBean implements Cloneable{
 
         to.setOracle_validationstatus(ValStatus.ACCEPTED);
         MultiValuedMap<String,String> pattern_Substitutions = new HashSetValuedHashMap<>();
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P0","UIButton"+ PropositionSubKeySeparator.CUSTOM.symbol+"Title_Match_OK");
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P1","UIWindow_Title_main"+ PropositionSubKeySeparator.CUSTOM.symbol+"exists");
-        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+ PropositionSubKeySeparator.CUSTOM.symbol+"exists");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P0","UIButton"+ PropositionConstants.SETTING.subKeySeparator +"Title_Match_OK");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P1","UIWindow_Title_main"+ PropositionConstants.SETTING.subKeySeparator +"exists");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+ PropositionConstants.SETTING.subKeySeparator +"exists");
         to.setPattern_Substitutions(pattern_Substitutions);
 
         List<String> comments= new ArrayList<>();

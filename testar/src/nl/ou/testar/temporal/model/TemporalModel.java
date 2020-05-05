@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
 import nl.ou.testar.temporal.foundation.ValStatus;
-import nl.ou.testar.temporal.foundation.TemporalBean;
+import nl.ou.testar.temporal.foundation.ModelBean;
 import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
+import nl.ou.testar.temporal.proposition.PropositionConstants;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
-public class TemporalModel extends TemporalBean {
+public class TemporalModel extends ModelBean {
 
     private List<StateEncoding> stateEncodings; //Integer: to concretstateID
     private Set<String> InitialStates;
@@ -19,8 +20,8 @@ public class TemporalModel extends TemporalBean {
     private List<String> transitionList;
     private Set<String> modelAPs; //AP<digits> to widget property map:
     private String formatVersion = "20200402";
-    private static String APPrefix = "ap";  //used in model and in formulas
-    private static String terminalProposition = "dead"; //used in model and in formulas
+    //private static String APPrefix = "ap";  //used in model and in formulas
+    //private static String terminalProposition = "dead"; //used in model and in formulas
     //private String APSeparator;
 
     public TemporalModel() {
@@ -64,15 +65,6 @@ public class TemporalModel extends TemporalBean {
         this.transitionList = transitionList;
     }
 
-    //public String getAPSeparator() {        return APSeparamtor;    }
-
-    //public void setAPSeparator(String APSeperator) {
-    //    APSeparator = APSeperator;
-    //}
-
-    public static String getTerminalProposition() {
-        return terminalProposition;
-    }
 
     public List<TemporalTrace> getTraces() {
         return traces;
@@ -171,7 +163,7 @@ public class TemporalModel extends TemporalBean {
             ) {
                 stateindex = stateList.indexOf(initialState);
                 assert stateindex == -1 : "initial state not in statelist";
-                String terminalprop = getPropositionIndex(terminalProposition, true);
+                String terminalprop = getPropositionIndex(PropositionConstants.SETTING.terminalProposition, true);
                 if (terminalprop.equals("")) {
                     resultartifical.append("[t] ");
                 }else{
@@ -195,7 +187,7 @@ public class TemporalModel extends TemporalBean {
         result.append(modelAPs.size());
         int i = 0;
         for (String ignored : modelAPs) {
-            result.append(" \"").append(APPrefix);
+            result.append(" \"").append(PropositionConstants.SETTING.outputPrefix);
             result.append(i);
             result.append("\"");
             i++;
@@ -254,7 +246,7 @@ public class TemporalModel extends TemporalBean {
         int i = 0;
         //   result.append("stateid:stateid\n");
         for (String ignored : modelAPs) {
-            result.append(APPrefix).append(i).append(":bool ");
+            result.append(PropositionConstants.SETTING.outputPrefix).append(i).append(":bool ");
             if (i > 0 && (i % chunk) == 0) {
                 result.append("\n");
             }
@@ -430,7 +422,7 @@ public class TemporalModel extends TemporalBean {
 
             for (String ignored : modelAPs) {
                 result.append("int ");
-                result.append(APPrefix).append(i).append( " = 0 ; ");
+                result.append(PropositionConstants.SETTING.outputPrefix).append(i).append( " = 0 ; ");
                 if (i > 0 && (i % chunk) == 0) {
                     result.append("\n");
                 }
@@ -462,9 +454,9 @@ public class TemporalModel extends TemporalBean {
                         {
 
                             if (ap.startsWith("!")) {
-                                result.append(APPrefix).append(j).append(" = 0 ; ");
+                                result.append(PropositionConstants.SETTING.outputPrefix).append(j).append(" = 0 ; ");
                             } else {
-                                result.append(APPrefix).append(j).append(" = 1 ; ");
+                                result.append(PropositionConstants.SETTING.outputPrefix).append(j).append(" = 1 ; ");
                             }
                             if (j > 0 && (j % chunk1) == 0) {
                                 result.append("\n");
@@ -498,9 +490,9 @@ public class TemporalModel extends TemporalBean {
                         ) {
                             result.append("int ");
                             if (ap.startsWith("!")) {
-                                result.append(APPrefix).append(j).append(" = 0 ; ");
+                                result.append(PropositionConstants.SETTING.outputPrefix).append(j).append(" = 0 ; ");
                             } else {
-                                result.append(APPrefix).append(j).append(" = 1 ; ");
+                                result.append(PropositionConstants.SETTING.outputPrefix).append(j).append(" = 1 ; ");
                             }
                             if (j > 0 && (j % chunk1) == 0) {
                                 result.append("\n");
@@ -554,9 +546,9 @@ public class TemporalModel extends TemporalBean {
                     for (String ap : stateaps
                     ) {
                         if (ap.startsWith("!")) {
-                            condition.append(" &&  ").append(APPrefix).append(idex).append(" == 0").append(" ");
+                            condition.append(" &&  ").append(PropositionConstants.SETTING.outputPrefix).append(idex).append(" == 0").append(" ");
                         } else {
-                            condition.append(" &&  ").append(APPrefix).append(idex).append(" == 1").append(" ");
+                            condition.append(" &&  ").append(PropositionConstants.SETTING.outputPrefix).append(idex).append(" == 1").append(" ");
                         }
                         if (idex > 0 && (idex % chunk2) == 0) {
                             condition.append("\n");
@@ -565,9 +557,9 @@ public class TemporalModel extends TemporalBean {
 
 
                         if (targetaps[idex].startsWith("!")) {
-                            assignment.append(APPrefix).append(idex).append(" = 0").append(" ; ");
+                            assignment.append(PropositionConstants.SETTING.outputPrefix).append(idex).append(" = 0").append(" ; ");
                         } else {
-                            assignment.append(APPrefix).append(idex).append(" = 1").append(" ; ");
+                            assignment.append(PropositionConstants.SETTING.outputPrefix).append(idex).append(" = 1").append(" ; ");
                         }
                         if (idex > 0 && (idex % chunk2) == 0) {
                             assignment.append("\n");
@@ -611,7 +603,7 @@ public class TemporalModel extends TemporalBean {
             boolean importStatus;
             rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
             if (rawFormula.toUpperCase().equals("FALSE")){
-                importStatus=false; // MS Excel converts 'false' to 'FALSE'. this is interpreted as eventually F(ALSE)
+                rawFormula="false"; // MS Excel converts 'false' to 'FALSE'. this is interpreted as eventually F(ALSE)
             }
             importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
             if (!importStatus) {
@@ -640,18 +632,18 @@ public class TemporalModel extends TemporalBean {
                 ArrayList<String> apindex = new ArrayList<>();
                 if (doTransformation) {
 
-                    String deadprop = getPropositionIndex(terminalProposition, true);
+                    String deadprop = getPropositionIndex(PropositionConstants.SETTING.terminalProposition, true);
                     if (!deadprop.equals("")) { // model has 'dead' as an atomic  property
-                        sortedsubstitionvalues.add(terminalProposition);
-                        sortedparameters.add(terminalProposition); // consider 'dead' as a kind of parameter
+                        sortedsubstitionvalues.add(PropositionConstants.SETTING.terminalProposition);
+                        sortedparameters.add(PropositionConstants.SETTING.terminalProposition); // consider 'dead' as a kind of parameter
                     }
 
                     for (String v : sortedsubstitionvalues
                     ) {
                         if (aplookup.inverse().containsKey(v)) {
-                            apindex.add(APPrefix + aplookup.inverse().get(v));
+                            apindex.add(PropositionConstants.SETTING.outputPrefix + aplookup.inverse().get(v));
                         } else
-                            apindex.add(APPrefix + "_indexNotFound");
+                            apindex.add(PropositionConstants.SETTING.outputPrefix + "_indexNotFound");
                         // will certainly fail if during model-check, because parameters are not prefixed with 'ap'
 
                     }
@@ -715,17 +707,17 @@ public class TemporalModel extends TemporalBean {
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
         if (proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase().substring(1))) {
-            encodedAP = "!" + (!raw ? APPrefix : "") + aplookup.inverse().get(proposition.toLowerCase().substring(1));
+            encodedAP = "!" + (!raw ? PropositionConstants.SETTING.outputPrefix : "") + aplookup.inverse().get(proposition.toLowerCase().substring(1));
         }
         if (!proposition.startsWith("!") && aplookup.inverse().containsKey(proposition.toLowerCase())) {
-            encodedAP = (!raw ? APPrefix : "") + aplookup.inverse().get(proposition.toLowerCase());
+            encodedAP = (!raw ? PropositionConstants.SETTING.outputPrefix : "") + aplookup.inverse().get(proposition.toLowerCase());
         }
         return encodedAP;
     }
 
 
     @JsonGetter("modelAPs")
-    private LinkedHashMap<Integer, String> getSimpleModelMap() {
+    public LinkedHashMap<Integer, String> getSimpleModelMap() {
         LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
 
         int i = 0;

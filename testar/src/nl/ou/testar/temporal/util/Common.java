@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -120,5 +122,9 @@ public class Common {
     public static String prettyCurrentTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
         return LocalTime.now().format(dtf);
+    }
+    public static String prettyCurrentDateTime() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
+        return LocalDateTime.now().format(dtf);
     }
 }

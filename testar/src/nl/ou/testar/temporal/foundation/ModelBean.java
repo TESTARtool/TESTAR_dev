@@ -10,7 +10,7 @@ import org.fruit.alayer.windows.UIAMapping;
 
 import java.util.*;
 
-public class TemporalBean {
+public class ModelBean {
 
     protected static final String csvsep=";";
     @CsvBindByName
@@ -25,12 +25,12 @@ public class TemporalBean {
     private List<String> application_BackendAbstractionAttributes;
 
     @CsvRecurse
-    private TemporalMeta metaData;
+    private LogData logData;
 
 
 
-    public TemporalBean() {
-        metaData = new TemporalMeta();
+    public ModelBean() {
+        logData = new LogData();
     }
     public static String getVersion() {
         return "20200104";
@@ -112,30 +112,30 @@ public class TemporalBean {
 
 
 
-    public TemporalMeta getMetaData() {
-        return metaData;
+    public LogData getLogData() {
+        return logData;
     }
-    public void setMetaData(TemporalMeta metaData) {
-        this.metaData = metaData;
+    public void setLogData(LogData logData) {
+        this.logData = logData;
     }
 
     @JsonIgnore
     public void set_comments(List < String > _comments) {
-        metaData.set_comments(_comments);
+        logData.set_comments(_comments);
     }
     public void addComments ( String  comment) {
-        metaData.addComments( comment);
+        logData.addComments( comment);
     }
     public String get_modifieddate() {
-        return metaData.get_modifieddate();
+        return logData.get_modifieddate();
     }
     @JsonIgnore
     public void set_modifieddate(String _modifieddate){
-        metaData.set_modifieddate( _modifieddate);
+        logData.set_modifieddate( _modifieddate);
     }
 
     public void addLog ( String  log) {
-        metaData.addLog(log);
+        logData.addLog(log);
     }
 
 

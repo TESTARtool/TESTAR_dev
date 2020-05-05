@@ -511,18 +511,21 @@ public  class TemporalDBManager {
         return convertedValue;
     }
 
-    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions,  boolean isEdge) {
-        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, null,false, isEdge);
+    public  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement,
+                                           Set<String> globalPropositions,  boolean isEdge) {
+        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions,
+                null,false, isEdge);
     }
-    private   void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters ) {
-        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions, passedWidgetFilters,true, false);
+    private void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement,
+                                           Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters ) {
+        computeAtomicPropositions(abstractionAttributes,propertyName, graphElement, globalPropositions,
+                passedWidgetFilters,true, false);
     }
 
-//    public  void computeAtomicPropositions(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
-//        computeAtomicPropositions(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
-//    }
 
-    private  void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+    private void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement,
+                                           Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters,
+                                           boolean isWidget, boolean isEdge) {
 
         StringBuilder apkey = new StringBuilder();
 
@@ -542,7 +545,6 @@ public  class TemporalDBManager {
             if (passedWidgetFilters != null && passedWidgetFilters.size() > 0) {
                 for (WidgetFilter wf : passedWidgetFilters) // add the filter specific elected attributes and expressions
                 {// candidate for refactoring as this requires a double iteration of widget filter
-                    //globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
                     globalPropositions.addAll(wf.getAPsOfWidgetAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
 
                 }

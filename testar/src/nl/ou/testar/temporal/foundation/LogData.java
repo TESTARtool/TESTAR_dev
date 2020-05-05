@@ -3,10 +3,12 @@ package nl.ou.testar.temporal.foundation;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
-public class TemporalMeta  {
+import static nl.ou.testar.temporal.util.Common.prettyCurrentDateTime;
+import static nl.ou.testar.temporal.util.Common.prettyCurrentTime;
+
+public class LogData {
 protected static final String csvsep=";";
 
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
@@ -18,10 +20,10 @@ protected static final String csvsep=";";
 
 
 
-    public TemporalMeta() {
+    public LogData() {
         _log = new ArrayList<>();
         _comments = new ArrayList<>();
-        _modifieddate = LocalDateTime.now().toString();
+        _modifieddate = prettyCurrentDateTime();
     }
 
 

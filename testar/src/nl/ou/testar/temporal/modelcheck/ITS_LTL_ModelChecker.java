@@ -1,20 +1,16 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.model.TemporalModel;
-import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
 
-import java.io.File;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class ITS_LTL_ModelChecker extends ModelChecker {
 
     // css20200309  this model check gives unexpected results: False Positive.
 
-    public List<TemporalOracle> check() {
+     void delegatedCheck() {
 
         String contents =  tmodel.makeETFOutput(temporalFormalism.supportsMultiInitialStates);
         saveStringToFile(contents,this.automatonFile);
@@ -28,11 +24,8 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
         cli = cli + " -i " + automat +" -t ETF -LTL " + formula + " -c " + (counterExamples ? "-e" : "");
         cli = cli + " &> " + result;
         Common.RunOSChildProcess(cli);
-        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
-        removeFiles();
-        return oracleResults;
     }
-    public List<TemporalOracle> parseResultsString(String rawInput) {
+    public List<TemporalOracle> delegatedParseResults(String rawInput) {
 
 
 //an accepting run exists false
@@ -81,7 +74,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.contains("FALSE")) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.contains("TRUE")) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(LocalDateTime.now().toString());
+            Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }

@@ -1,21 +1,17 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.model.StateEncoding;
-import nl.ou.testar.temporal.model.TemporalModel;
-import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.util.Common;
 
-import java.io.File;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class SPOT_LTL_ModelChecker extends ModelChecker {
 
 
-    public List<TemporalOracle> check() {
+      void delegatedCheck() {
 
         String contents = tmodel.makeHOAOutput();
         saveStringToFile(contents,this.automatonFile);
@@ -27,14 +23,11 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
         if (counterExamples) cli = cli + " --witness ";
         cli = cli + " &> " + result;
         Common.RunOSChildProcess(cli);
-        List<TemporalOracle> oracleResults =parseResultsFile(resultsFile);
-        removeFiles();
-        return oracleResults;
     }
 
 
 
-    public List<TemporalOracle> parseResultsString(String rawInput) {
+    public List<TemporalOracle> delegatedParseResults(String rawInput) {
 
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
@@ -188,7 +181,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                     if (formulaStatus.equals(Verdict.PASS.toString()))  Oracle.setOracle_verdict(Verdict.PASS);
 
                 }
-                Oracle.setLog_RunDate(LocalDateTime.now().toString());
+                Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
                 i++;
             }
         }

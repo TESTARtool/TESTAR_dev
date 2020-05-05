@@ -17,6 +17,7 @@ import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.model.*;
 import nl.ou.testar.temporal.modelcheck.*;
 import nl.ou.testar.temporal.oracle.*;
+import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.proposition.PropositionManager;
 import nl.ou.testar.temporal.foundation.TagBean;
 import nl.ou.testar.temporal.util.*;
@@ -155,8 +156,6 @@ public class TemporalController {
             tModel.setApplication_ModelIdentifier(abstractStateModel.getModelIdentifier());
             tModel.setApplication_AbstractionAttributes(abstractStateModel.getAbstractionAttributes());
         }
-
-
     }
 
     private void setModelidentifier(Settings settings) {
@@ -214,14 +213,14 @@ public class TemporalController {
     }
 
     private void updateOracleCollMetaData() {
-        LocalDateTime localDateTime = LocalDateTime.now();
+
         for (TemporalOracle ora : oracleColl
         ) {
             ora.setApplicationName(tModel.getApplicationName());
             ora.setApplicationVersion(tModel.getApplicationVersion());
             ora.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
             ora.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
-            ora.set_modifieddate(localDateTime.toString());
+            ora.set_modifieddate(Common.prettyCurrentDateTime());
         }
     }
 
@@ -263,7 +262,7 @@ public class TemporalController {
         List<String> logTerminalStates= new ArrayList<>();
         boolean firstTerminalState = true;
         StateEncoding terminalStateEnc;
-        terminalStateEnc = new StateEncoding("#" + TemporalModel.getTerminalProposition());
+        terminalStateEnc = new StateEncoding("#" + PropositionConstants.SETTING.terminalProposition);
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -288,10 +287,10 @@ public class TemporalController {
                         //terminalStatePropositions.add("dead");   //redundant on transition based automatons
                         terminalStateEnc.setStateAPs(terminalStatePropositions);
                         TransitionEncoding deadTrenc = new TransitionEncoding();
-                        deadTrenc.setTransition(TemporalModel.getTerminalProposition() + "_selfloop");
+                        deadTrenc.setTransition(PropositionConstants.SETTING.terminalProposition + "_selfloop");
                         deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
-                        deadTransitionPropositions.add(TemporalModel.getTerminalProposition());
+                        deadTransitionPropositions.add(PropositionConstants.SETTING.terminalProposition);
                         deadTrenc.setTransitionAPs(deadTransitionPropositions);
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
@@ -315,7 +314,7 @@ public class TemporalController {
                     deadTrenc.setTransition(terminalStateEnc.getState() + "_" + stateVertex.getIdentity().toString());
                     deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
                     Set<String> deadTransitionPropositions = new LinkedHashSet<>();
-                    deadTransitionPropositions.add(TemporalModel.getTerminalProposition());
+                    deadTransitionPropositions.add(PropositionConstants.SETTING.terminalProposition);
                     deadTrenc.setTransitionAPs(deadTransitionPropositions);
                     List<TransitionEncoding> deadTrencList = new ArrayList<>();
                     deadTrencList.add(deadTrenc);
@@ -407,26 +406,6 @@ public class TemporalController {
     }
 
 
-    /**
-     * @see  #saveStringToFile(String, File)
-     * @param contents jj
-     * @param output jj
-     */
-    private static void saveStringToFile(String contents, File output) {
-
-        try {
-
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
-                writer.append(contents);
-                writer.close();
-            }
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public void MCheck() {
 
@@ -513,17 +492,17 @@ public class TemporalController {
 
                     if (ltlSpotEnabled && ( oracleType == TemporalFormalism.LTL_SPOT)) {
                         checker.setExecutable(ltlSpotMCCommand, ltlSpotWSLPath);
-                        modelCheckedOracles = checker.check();
+                        modelCheckedOracles = checker.modelcheck();
 
                     }
                     if (ltlItsEnabled && (oracleType == TemporalFormalism.LTL_ITS)){
                          checker.setExecutable(ltlItsMCCommand, ltlItsWSLPath);
-                         modelCheckedOracles = checker.check();
+                         modelCheckedOracles = checker.modelcheck();
                         }
 
                     if(ltlltsminEnabled && (oracleType == TemporalFormalism.LTL_LTSMIN)){
                          checker.setExecutable(ltlLtsminMCCommand, ltlLtsminWSLPath);
-                         modelCheckedOracles = checker.check();
+                         modelCheckedOracles = checker.modelcheck();
                      }
                     if(ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN)){
                         int maxap=450;
@@ -534,7 +513,7 @@ public class TemporalController {
                         }
                         else{
                             checker.setExecutable(ctlLtsminMCCommand, ctlLtsminWSLPath);
-                            modelCheckedOracles = checker.check();
+                            modelCheckedOracles = checker.modelcheck();
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
 
@@ -542,7 +521,7 @@ public class TemporalController {
 
                     if (ctlItsEnabled &&  ( oracleType == TemporalFormalism.CTL_ITS)) {
                         checker.setExecutable(ctlItsMCCommand, ctlItsWSLPath);
-                        modelCheckedOracles = checker.check();
+                        modelCheckedOracles = checker.modelcheck();
                     }
                     if (ctlGalEnabled &&  (oracleType == TemporalFormalism.CTL_GAL )) {
                         int maxap=200;
@@ -553,7 +532,7 @@ public class TemporalController {
                         }
                         else{
                             checker.setExecutable(ctlGalMCCommand, ctlGalWSLPath);
-                            modelCheckedOracles = checker.check();
+                            modelCheckedOracles = checker.modelcheck();
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
                     }
