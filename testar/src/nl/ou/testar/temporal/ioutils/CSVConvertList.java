@@ -24,12 +24,15 @@ public  static String csvsep;
             throws IllegalArgumentException  {
         List<String> listie;
         Pattern pat = Pattern.compile(csvsep);
+        // https://stackoverflow.com/questions/51926704/why-is-guavas-eventbus-marked-unstable-in-intellij-2018-2
+        // noinspection all
         listie =Splitter.on(pat).splitToList(value);
         return listie;
     }
 
     @Override
     public String convertToWrite(Object value) {
+        @SuppressWarnings("unchecked")
         List<String> listie = (List<String>) value;
         return Joiner.on(csvsep).join(listie);
     }

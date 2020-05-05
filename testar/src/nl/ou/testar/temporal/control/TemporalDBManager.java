@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.behavior;
+package nl.ou.testar.temporal.control;
 
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.ODatabaseSession;

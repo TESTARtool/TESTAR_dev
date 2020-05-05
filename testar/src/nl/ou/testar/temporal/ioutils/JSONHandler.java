@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class JSONHandler {
-    public static Object load(String fromFile, Class cls) { // CLASS method
+    public static <T> Object load(String fromFile, Class<T> cls) { // CLASS method
         try {
             File input = new File(fromFile);
             if (input.exists()) {

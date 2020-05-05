@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.behavior;
+package nl.ou.testar.temporal.control;
 import org.fruit.monkey.Settings;
 
 public class TemporalControllerFactory {

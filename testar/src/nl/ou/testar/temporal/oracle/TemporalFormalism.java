@@ -3,24 +3,25 @@ package nl.ou.testar.temporal.oracle;
 import nl.ou.testar.temporal.foundation.PairBean;
 
 public enum TemporalFormalism {
-//    LTL,
-//    LTL_SPOT,
+//    LTL,    LTL_SPOT,
 //    LTL_ITS,
 //    LTL_LTSMIN,
-//    CTL,
-//    CTL_ITS;
+//    CTL,  CTL_ITS;
+//    CTL_LTSMIN,
 //    CTL_GAL
 
 
 
-    LTL("","","","",
-                new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
-            new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
-            new PairBean<>("~~unlikely",""),true,"txt"),
+    LTL("","","","",new PairBean<>(),new PairBean<>(),
+            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,""),
+    CTL("","","","",new PairBean<>(),new PairBean<>(),
+            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,""),
+
+
     LTL_SPOT("","","","",
                      new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
             new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
-            new PairBean<>("~~unlikely",""),true,"txt"),
+            new PairBean<>("~~unlikely",""),false,"txt"), //spot adds untractable edge when model is a polyforest
     LTL_ITS("(\""," = 1\")","","",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             //new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
@@ -34,11 +35,7 @@ public enum TemporalFormalism {
                        new PairBean<>("F","<>"),new PairBean<>("G","[]"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
             new PairBean<>("~~unlikely",""),true,"etf"),
-    CTL("("," = \"1\")",";","",
-                new PairBean<>("<>","F"),new PairBean<>("[]","G"),
-            new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            //new PairBean<>("false","(\"0\" = \"1\")")),
-            new PairBean<>("~~unlikely",""),false,"txt"),
+
     CTL_ITS("("," = \"1\")",";","",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
@@ -47,9 +44,7 @@ public enum TemporalFormalism {
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
             new PairBean<>("~~unlikely",""),false,"gal");
-    //'dummypropertyname' is a fixed name with no 'increment',
-    // but apparently GAL syntax allows this..... and we don't need this reference
-
+    //'dummypropertyname' is a static name for all properties, apparently GAL syntax allows this and we don't refer.
 
     //futures: CTLSTAR,  MUCALC }
 

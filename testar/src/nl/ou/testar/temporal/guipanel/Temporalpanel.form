@@ -473,6 +473,9 @@
                   <toolTipText value="&lt;HTML&gt;tactic to generate oracles from the supplied Pattern collection.&lt;BR&gt;&#10;Shows the number of potential oracles to generate per pattern&#10;&lt;/HTML&gt;" noi18n="true"/>
                   <verifyInputWhenFocusTarget value="true"/>
                 </properties>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
               </component>
               <component id="59e45" class="javax.swing.JLabel">
                 <constraints>

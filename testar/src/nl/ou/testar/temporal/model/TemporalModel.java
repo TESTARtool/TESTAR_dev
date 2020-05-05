@@ -10,18 +10,17 @@ import nl.ou.testar.temporal.oracle.TemporalOracle;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
-//@JsonRootName(value="TemporalProperties")
 public class TemporalModel extends TemporalBean {
 
-    private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
+    private List<StateEncoding> stateEncodings; //Integer: to concretstateID
     private Set<String> InitialStates;
     private List<TemporalTrace> traces; //
     private List<String> stateList;
     private List<String> transitionList;
     private Set<String> modelAPs; //AP<digits> to widget property map:
     private String formatVersion = "20200402";
-    private static String APPrefix = "ap";
-    private static String deadProposition = "dead";
+    private static String APPrefix = "ap";  //used in model and in formulas
+    private static String terminalProposition = "dead"; //used in model and in formulas
     //private String APSeparator;
 
     public TemporalModel() {
@@ -71,8 +70,8 @@ public class TemporalModel extends TemporalBean {
     //    APSeparator = APSeperator;
     //}
 
-    public static String getDeadProposition() {
-        return deadProposition;
+    public static String getTerminalProposition() {
+        return terminalProposition;
     }
 
     public List<TemporalTrace> getTraces() {
@@ -141,22 +140,56 @@ public class TemporalModel extends TemporalBean {
     public String makeHOAOutput() {
         //see http://adl.github.io/hoaf/
         StringBuilder result = new StringBuilder();
+        StringBuilder resultartifical = new StringBuilder();
         result.append("HOA: v1\n");
         result.append("tool: \"TESTAR-CSS20190914\"\n");
         result.append("name: \"" + "app= ").append(this.getApplicationName()).append(", ver=").
                 append(this.getApplicationVersion()).append(", modelid= ").append(this.getApplication_ModelIdentifier()).
                 append(", abstraction= ").append(this.getApplication_AbstractionAttributes()).append("\"\n");
         result.append("States: ");
-        result.append(stateEncodings.size());
+        if (InitialStates.size()>1) {
+            result.append(stateEncodings.size()+1);//artificial state will be added
+        }else{
+            result.append(stateEncodings.size());
+        }
+
+
         result.append("\n");
 
         int stateindex;
-        for (String initialState : InitialStates
-        ) {
-            stateindex = stateList.indexOf(initialState);
-            assert stateindex == -1 : "initial state not in statelist";
-            result.append("Start: ").append(stateindex).append("\n");
+        if (InitialStates.size()>1){
+            result.append("/*Multiple Initial States found: Adding Artificial start-state that forks to original initial-states */\n");
+            result.append("/*Requires that formulas need to be modified: f => X(f), where X is the next Operator */\n");
+            result.append("/*To always satisfy the new artificial initial state and maintaining the semantics of the original model */\n");
+            int artificialStart = stateList.size();
+            result.append("Start: ").append(artificialStart).append("\n");
+            // make and cache transitions
+            resultartifical.append("State: ");
+            resultartifical.append(artificialStart);
+            resultartifical.append("\n");
+            for (String initialState : InitialStates
+            ) {
+                stateindex = stateList.indexOf(initialState);
+                assert stateindex == -1 : "initial state not in statelist";
+                String terminalprop = getPropositionIndex(terminalProposition, true);
+                if (terminalprop.equals("")) {
+                    resultartifical.append("[t] ");
+                }else{
+                    resultartifical.append("[!").append(terminalprop).append("] ");//not dead at start
+                }
+                resultartifical.append(stateindex);
+                resultartifical.append(" {0}\n");  //all are in the same buchi acceptance set
+            }
+        }else {
+            for (String initialState : InitialStates
+            ) {
+                stateindex = stateList.indexOf(initialState);
+                assert stateindex == -1 : "initial state not in statelist";
+                result.append("Start: ").append(stateindex).append("\n");
+            }
         }
+
+
         result.append("Acceptance: 1 Inf(0)\n");  //==Buchi
         result.append("AP: ");
         result.append(modelAPs.size());
@@ -168,9 +201,12 @@ public class TemporalModel extends TemporalBean {
             i++;
         }
         result.append("\n");
+
         result.append("--BODY--\n");
 
-
+        if (InitialStates.size()>1){
+            result.append(resultartifical);
+        }
         int s = 0;
         for (StateEncoding stateenc : stateEncodings) {
             result.append("State: ");
@@ -194,9 +230,9 @@ public class TemporalModel extends TemporalBean {
     }
 
     public String makeETFOutput() {
-       return makeETFOutput(true);
+       return makeETFOutput(false);
     }
-    public String makeETFOutput(boolean needArtificialInitialState) {
+    public String makeETFOutput(boolean supportsMultipleInitialStates) {
         //see https://ltsmin.utwente.nl/assets/man/etf.html
         StringBuilder result = new StringBuilder();
         StringBuilder temptransresult = new StringBuilder();
@@ -232,9 +268,9 @@ public class TemporalModel extends TemporalBean {
 
         result.append("begin init\n");
 
-        if (needArtificialInitialState && InitialStates.size()>1) {
+        if (!supportsMultipleInitialStates && InitialStates.size()>1) {
             result.append("%Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
-            result.append("%Requires that formulas need to be modified: F(f) => X(f), where X is the next Operator\n");
+            result.append("%Requires that formulas need to be modified: f => X(f), where X is the next Operator\n");
             result.append("%To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
             //make new initial state
 
@@ -270,7 +306,7 @@ public class TemporalModel extends TemporalBean {
         result.append("end init\n");
 
 
-        if (needArtificialInitialState && InitialStates.size()>1) {
+        if (!supportsMultipleInitialStates && InitialStates.size()>1) {
             //add artificial transitions
             result.append("begin trans\n");
             result.append("%artificial transitions to original initial states\n");
@@ -384,6 +420,9 @@ public class TemporalModel extends TemporalBean {
 
 
         if (InitialStates.size()>1) {
+            result.append("// Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
+            result.append("// Requires that formulas need to be modified: f => X(f), where X is the next Operator\n");
+            result.append("// To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
             result.append("int ");
             //out of memory error on ITS above 30.000
             String artifical_StartState=""+ (stateList.size()+1); //statecount plus 1
@@ -601,10 +640,10 @@ public class TemporalModel extends TemporalBean {
                 ArrayList<String> apindex = new ArrayList<>();
                 if (doTransformation) {
 
-                    String deadprop = getPropositionIndex(deadProposition, true);
+                    String deadprop = getPropositionIndex(terminalProposition, true);
                     if (!deadprop.equals("")) { // model has 'dead' as an atomic  property
-                        sortedsubstitionvalues.add(deadProposition);
-                        sortedparameters.add(deadProposition); // consider 'dead' as a kind of parameter
+                        sortedsubstitionvalues.add(terminalProposition);
+                        sortedparameters.add(terminalProposition); // consider 'dead' as a kind of parameter
                     }
 
                     for (String v : sortedsubstitionvalues
@@ -622,15 +661,13 @@ public class TemporalModel extends TemporalBean {
                         String formulalvl0 = rawFormula;
 
                         if( !tFormalism.supportsMultiInitialStates && InitialStates.size()>1){
-                            // ETF models for ITS can only have  1 initial state. ETF by LTSMIN can handle multiple
-                            //when there are initial states added to the model, the formula alter:
+                            //when there are initial states added to the model, the formula alters:
                             //satisfaction of the formula starts after the artificial state, hence the X-operator.
-                            if (tFormalism == TemporalFormalism.CTL ||
-                                tFormalism == TemporalFormalism.CTL_ITS){ //||tFormalism == TemporalFormalism.CTL_LTSMIN){
+                            if (tFormalism == TemporalFormalism.CTL_ITS||tFormalism == TemporalFormalism.CTL_GAL){
                                 formulalvl0="AX("+rawFormula+")";
                             }
-                            if (tFormalism == TemporalFormalism.LTL_ITS){ //|| tFormalism == TemporalFormalism.LTL_LTSMIN){
-                                formulalvl0="X("+rawFormula+")"; //@todo test ltsmin on set of initial states
+                            if (tFormalism == TemporalFormalism.LTL_ITS|| tFormalism == TemporalFormalism.LTL_SPOT){
+                                formulalvl0="X("+rawFormula+")";
                             }
 
                         }

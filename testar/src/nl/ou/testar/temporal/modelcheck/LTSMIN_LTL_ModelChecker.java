@@ -30,7 +30,7 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf3lts-seq  --ltl='..0..'  model.etf &> results.txt;
         //repeat for each formula: relative inefficient as the automaton has to be loaded again for very formula.
         try {
-            List<String> lines = Files.readAllLines(Paths.get(formula), StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(Paths.get(formulaFile.getAbsolutePath()), StandardCharsets.UTF_8);
             boolean first = true;
             String cli;
 

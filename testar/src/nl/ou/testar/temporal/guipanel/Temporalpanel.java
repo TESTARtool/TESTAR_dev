@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.guipanel;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import nl.ou.testar.temporal.behavior.TemporalController;
+import nl.ou.testar.temporal.control.TemporalController;
 import nl.ou.testar.temporal.ioutils.CSVHandler;
 import nl.ou.testar.temporal.ioutils.StreamConsumer;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
@@ -58,7 +58,9 @@ public class Temporalpanel {
     private JTextField PythonVisualizer_Path;
     private JButton selectFilePython_VIZ;
     private JButton testDbButton;
-    private JComboBox<String> tacticComboBox;
+    //private JComboBox<String> tacticComboBox; // Test: suppress unchecked warnings at compile time css 202005
+    @SuppressWarnings("rawtypes")
+    private JComboBox tacticComboBox;
     private JButton defaultPropositionMgrBtn;
     private JButton sampleOracleBtn;
     private JButton graphMLBtn;

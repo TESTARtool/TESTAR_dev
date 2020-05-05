@@ -2,6 +2,7 @@ package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.*;
 import nl.ou.testar.temporal.ioutils.CSVConvertTemporalType;
+import nl.ou.testar.temporal.modelcheck.*;
 
 import java.util.List;
 
@@ -31,7 +32,19 @@ public class TemporalPatternBase implements Cloneable{
     }
 
     public void setPattern_TemporalFormalism(TemporalFormalism pattern_TemporalFormalism) {
-        this.pattern_TemporalFormalism = pattern_TemporalFormalism;
+        //convert defaults when reading CSV files
+        switch (pattern_TemporalFormalism) {
+            case CTL:
+                this.pattern_TemporalFormalism = TemporalFormalism.CTL_LTSMIN;
+                break;
+             case LTL:
+                 this.pattern_TemporalFormalism = TemporalFormalism.LTL_SPOT;
+                break;
+            default:
+               this.pattern_TemporalFormalism = pattern_TemporalFormalism;
+                break;
+        }
+
     }
     @SuppressWarnings("unused")
     public String getPattern_Scope() {

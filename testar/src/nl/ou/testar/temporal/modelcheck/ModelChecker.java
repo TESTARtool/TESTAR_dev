@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.model.TemporalModel;
 import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
@@ -113,6 +112,13 @@ public abstract class ModelChecker {
             e.printStackTrace();
         }
     }
+    /**
+     *
+     * @param oracleColl nnn collection is updated!
+     * @param output nnn
+     * @param doTransformation nn
+     * @link saveStringToFile()
+     */
     private void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
 
         String contents = tmodel.validateAndMakeFormulas(oracleColl, doTransformation);
@@ -130,10 +136,10 @@ public abstract class ModelChecker {
     }
     public  void validateAndSaveFormulas() {
         if ((temporalFormalism == TemporalFormalism.LTL_ITS) || (temporalFormalism == TemporalFormalism.LTL_LTSMIN) ||
-                (temporalFormalism == TemporalFormalism.LTL) || (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
+                (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
             //formula ltl model variant converter
             // instrumentTerminalState will determine whether this return value is ""
-            String aliveprop = tmodel.getPropositionIndex("!" + TemporalModel.getDeadProposition());
+            String aliveprop = tmodel.getPropositionIndex("!" + TemporalModel.getTerminalProposition());
             if (!aliveprop.equals("")) {
                 saveFormulasForChecker(oracleColl, formulaFile, false);
                 List<String> tmpformulas = FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile);

@@ -12,10 +12,13 @@ public static final String csvsep = ";";
     public static final String kvsep = ":";
 
     @Override
-    protected Object convert( String value)
-            throws IllegalArgumentException  {
+    protected Object convert( String value)        throws IllegalArgumentException  {
+
+
         Map<String,String> mappie;
         Pattern pat = Pattern.compile(csvsep+"+");
+        // https://stackoverflow.com/questions/51926704/why-is-guavas-eventbus-marked-unstable-in-intellij-2018-2
+        // noinspection all
         mappie =Splitter.on(pat).withKeyValueSeparator(kvsep).split(value);
         return mappie;
     }

@@ -3,6 +3,9 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
 
+//    compileJava {
+//       options.compilerArgs += ["-Xlint:unchecked"]  // test css 202005
+//    }
     sourceSets {
         main {
             java {

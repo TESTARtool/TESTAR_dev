@@ -27,8 +27,8 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-import nl.ou.testar.temporal.behavior.TemporalController;
-import nl.ou.testar.temporal.behavior.TemporalControllerFactory;
+import nl.ou.testar.temporal.control.TemporalController;
+import nl.ou.testar.temporal.control.TemporalControllerFactory;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.monkey.ConfigTags;
