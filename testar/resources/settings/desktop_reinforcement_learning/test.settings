@@ -138,6 +138,7 @@ MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
 RewardFunction = WidgetTreeBasedRewardFunction
+Policy = GreedyPolicy
 
 #################################################################
 # Other more advanced settings

@@ -22,6 +22,7 @@ public class RewardFunctionFactory {
         }
 
         System.out.printf("Using rewardFunction='%S'", selectedRewardFunction.getClass().getName());
+
         return selectedRewardFunction;
     }
 }

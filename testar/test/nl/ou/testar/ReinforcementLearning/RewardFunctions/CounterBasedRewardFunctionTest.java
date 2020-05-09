@@ -3,7 +3,6 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +39,8 @@ public class CounterBasedRewardFunctionTest {
     public void getReward() {
         // given
         when(executedAction.getAttributes()).thenReturn(taggableBase);
-        taggableBase.set(RLTags.counter, 0); //this is an final method, therefore it can not be mocked
-        doNothing().when(taggableBase).set(eq(RLTags.counter), anyInt());
+        taggableBase.set(RLTags.Counter, 0); //this is an final method, therefore it can not be mocked
+        doNothing().when(taggableBase).set(eq(RLTags.Counter), anyInt());
 
         // when
         double reward = rewardFunction.getReward(currentAbstractState, executedAction);

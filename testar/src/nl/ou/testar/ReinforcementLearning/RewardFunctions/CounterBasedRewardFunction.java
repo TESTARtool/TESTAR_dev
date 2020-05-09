@@ -16,8 +16,8 @@ public class CounterBasedRewardFunction implements RewardFunction {
      */
     @Override
     public double getReward(final AbstractState currentAbstractState, final AbstractAction executedAction) {
-        int executionCounter = executedAction.getAttributes().get(RLTags.counter, 0) + 1;
-        executedAction.getAttributes().set(RLTags.counter, executionCounter);
+        int executionCounter = executedAction.getAttributes().get(RLTags.Counter, 0) + 1;
+        executedAction.getAttributes().set(RLTags.Counter, executionCounter);
         double reward = DEFAULT_REWARD;
 
         System.out.println("DEBUG: executionCounter= " + executionCounter);

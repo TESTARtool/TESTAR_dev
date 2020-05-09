@@ -46,15 +46,16 @@ public class RLTags extends TagsBase  {
 	 */
 	public static final Tag<Double> SarsaValue = from("SarsaValue", Double.class);
 
-	public static final Tag<Integer> counter = from("counter", Integer.class);
+	public static final Tag<Integer> Counter = from("counter", Integer.class);
 	
-	private static Set<Tag<Double>> reinforcementLearningTags = new HashSet<Tag<Double>>() {
+	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
 		{
 			add(SarsaValue);
+			add(Counter);
 		}
 	};
 
-	public static Set<Tag<Double>> getReinforcementLearningTags() {
+	public static Set<Tag<?>> getReinforcementLearningTags() {
 		return reinforcementLearningTags;
 	}
 

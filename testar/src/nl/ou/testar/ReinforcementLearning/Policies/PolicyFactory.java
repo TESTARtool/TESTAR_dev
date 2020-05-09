@@ -26,6 +26,8 @@ public class PolicyFactory {
                 selectedPolicy = getGreedyPolicy(settings);
         }
 
+        System.out.println(String.format("Using policy=%s", selectedPolicy.getClass().getName()));
+
         return selectedPolicy;
     }
 

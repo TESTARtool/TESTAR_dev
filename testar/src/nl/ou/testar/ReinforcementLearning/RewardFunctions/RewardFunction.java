@@ -11,7 +11,9 @@ public interface RewardFunction {
 
     /**
      * Get the reward for a given action
-     * @return The reward
+     * @param currentAbstractState The {@link AbstractState} the SUT is in
+     * @param executedAction The {@link AbstractAction} that was executed
+     * @return The calculated reward
      */
     public double getReward(final AbstractState currentAbstractState, final AbstractAction executedAction);
 }
