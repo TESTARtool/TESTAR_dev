@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
 import nl.ou.testar.temporal.foundation.ValStatus;
@@ -10,43 +11,42 @@ import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
-
+//@JsonPropertyOrder({  "formatVersion", "atomicPropositions","initialStates", "stateList", "transitionList"})//,"traces","stateEncodings" })
+@JsonPropertyOrder(alphabetic = true)
 public class TemporalModel extends ModelBean {
 
     private List<StateEncoding> stateEncodings; //Integer: to concretstateID
-    private Set<String> InitialStates;
+    private Set<String> initialStates;
     private List<TemporalTrace> traces; //
     private List<String> stateList;
     private List<String> transitionList;
-    private Set<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion = "20200402";
-    //private static String APPrefix = "ap";  //used in model and in formulas
-    //private static String terminalProposition = "dead"; //used in model and in formulas
-    //private String APSeparator;
+    private Set<String> atomicPropositions; //AP<digits> to widget property map:
+    private String formatVersion = "20200510";
+
 
     public TemporalModel() {
         super(); // needed ?
         this.stateEncodings = new ArrayList<>();
         this.stateList = new ArrayList<>();
         this.transitionList = new ArrayList<>();
-        this.modelAPs = new LinkedHashSet<>();  //must maintain order
+        this.atomicPropositions = new LinkedHashSet<>();  //must maintain order
     }
 
     @SuppressWarnings("unused")
     public Set<String> getInitialStates() {
-        return InitialStates;
+        return initialStates;
     }
 
     public void setInitialStates(Set<String> initialStates) {
-        InitialStates = initialStates;
+        this.initialStates = initialStates;
     }
 
-    public Set<String> getModelAPs() {
-        return modelAPs;
+    public Set<String> getAtomicPropositions() {
+        return atomicPropositions;
     }
 
-    public void setModelAPs(Set<String> modelAPs) {
-        this.modelAPs = modelAPs;
+    public void setAtomicPropositions(Set<String> atomicPropositions) {
+        this.atomicPropositions = atomicPropositions;
     }
     @SuppressWarnings("unused")
     public List<String> getStateList() {
@@ -83,8 +83,8 @@ public class TemporalModel extends ModelBean {
         this.stateEncodings = stateEncodings;
         stateList.clear();
         for (StateEncoding stateEnc : stateEncodings) {
-            this.modelAPs.addAll(stateEnc.getStateAPs());
-            this.modelAPs.addAll(stateEnc.retrieveAllTransitionAPs());
+            this.atomicPropositions.addAll(stateEnc.getStateAPs());
+            this.atomicPropositions.addAll(stateEnc.retrieveAllTransitionAPs());
             stateList.add(stateEnc.getState());
             for (TransitionEncoding trenc : stateEnc.getTransitionColl()
             ) {
@@ -95,12 +95,12 @@ public class TemporalModel extends ModelBean {
     }
 
     @SuppressWarnings("unused")
-    public String get_formatVersion() {
+    public String getformatVersion() {
         return formatVersion;
     }
     @SuppressWarnings("unused")
-    public void set_formatVersion(String _formatVersion) {
-        this.formatVersion = _formatVersion;
+    public void setformatVersion(String formatVersion) {
+        this.formatVersion = formatVersion;
     }
 
 
@@ -108,8 +108,8 @@ public class TemporalModel extends ModelBean {
     public void addStateEncoding(StateEncoding stateEncoding, boolean updateTransitionsImmediate) {
 
         stateEncodings.add(stateEncoding);
-        this.modelAPs.addAll(stateEncoding.getStateAPs());
-        this.modelAPs.addAll(stateEncoding.retrieveAllTransitionAPs());
+        this.atomicPropositions.addAll(stateEncoding.getStateAPs());
+        this.atomicPropositions.addAll(stateEncoding.retrieveAllTransitionAPs());
         stateList.add(stateEncoding.getState());
         for (TransitionEncoding trenc : stateEncoding.getTransitionColl()
         ) {
@@ -123,7 +123,7 @@ public class TemporalModel extends ModelBean {
 
     public void finalizeTransitions() {
         for (StateEncoding stateEnc : stateEncodings) {// observer pattern?
-            stateEnc.updateAPConjuncts(modelAPs);
+            stateEnc.updateAPConjuncts(atomicPropositions);
         }
 
     }
@@ -139,7 +139,7 @@ public class TemporalModel extends ModelBean {
                 append(this.getApplicationVersion()).append(", modelid= ").append(this.getApplication_ModelIdentifier()).
                 append(", abstraction= ").append(this.getApplication_AbstractionAttributes()).append("\"\n");
         result.append("States: ");
-        if (InitialStates.size()>1) {
+        if (initialStates.size()>1) {
             result.append(stateEncodings.size()+1);//artificial state will be added
         }else{
             result.append(stateEncodings.size());
@@ -149,7 +149,7 @@ public class TemporalModel extends ModelBean {
         result.append("\n");
 
         int stateindex;
-        if (InitialStates.size()>1){
+        if (initialStates.size()>1){
             result.append("/*Multiple Initial States found: Adding Artificial start-state that forks to original initial-states */\n");
             result.append("/*Requires that formulas need to be modified: f => X(f), where X is the next Operator */\n");
             result.append("/*To always satisfy the new artificial initial state and maintaining the semantics of the original model */\n");
@@ -159,7 +159,7 @@ public class TemporalModel extends ModelBean {
             resultartifical.append("State: ");
             resultartifical.append(artificialStart);
             resultartifical.append("\n");
-            for (String initialState : InitialStates
+            for (String initialState : initialStates
             ) {
                 stateindex = stateList.indexOf(initialState);
                 assert stateindex == -1 : "initial state not in statelist";
@@ -173,7 +173,7 @@ public class TemporalModel extends ModelBean {
                 resultartifical.append(" {0}\n");  //all are in the same buchi acceptance set
             }
         }else {
-            for (String initialState : InitialStates
+            for (String initialState : initialStates
             ) {
                 stateindex = stateList.indexOf(initialState);
                 assert stateindex == -1 : "initial state not in statelist";
@@ -184,9 +184,9 @@ public class TemporalModel extends ModelBean {
 
         result.append("Acceptance: 1 Inf(0)\n");  //==Buchi
         result.append("AP: ");
-        result.append(modelAPs.size());
+        result.append(atomicPropositions.size());
         int i = 0;
-        for (String ignored : modelAPs) {
+        for (String ignored : atomicPropositions) {
             result.append(" \"").append(PropositionConstants.SETTING.outputPrefix);
             result.append(i);
             result.append("\"");
@@ -196,7 +196,7 @@ public class TemporalModel extends ModelBean {
 
         result.append("--BODY--\n");
 
-        if (InitialStates.size()>1){
+        if (initialStates.size()>1){
             result.append(resultartifical);
         }
         int s = 0;
@@ -245,7 +245,7 @@ public class TemporalModel extends ModelBean {
         int chunk = 25;
         int i = 0;
         //   result.append("stateid:stateid\n");
-        for (String ignored : modelAPs) {
+        for (String ignored : atomicPropositions) {
             result.append(PropositionConstants.SETTING.outputPrefix).append(i).append(":bool ");
             if (i > 0 && (i % chunk) == 0) {
                 result.append("\n");
@@ -260,20 +260,20 @@ public class TemporalModel extends ModelBean {
 
         result.append("begin init\n");
 
-        if (!supportsMultipleInitialStates && InitialStates.size()>1) {
+        if (!supportsMultipleInitialStates && initialStates.size()>1) {
             result.append("%Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
             result.append("%Requires that formulas need to be modified: f => X(f), where X is the next Operator\n");
             result.append("%To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
             //make new initial state
 
-            for (String ignore :modelAPs) {
+            for (String ignore : atomicPropositions) {
                 result.append("0 ");
             }
             result.append("\n");
 
         }
         else{
-            for (String initstate : InitialStates  //max one !!
+            for (String initstate : initialStates  //max one !!
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -298,11 +298,11 @@ public class TemporalModel extends ModelBean {
         result.append("end init\n");
 
 
-        if (!supportsMultipleInitialStates && InitialStates.size()>1) {
+        if (!supportsMultipleInitialStates && initialStates.size()>1) {
             //add artificial transitions
             result.append("begin trans\n");
             result.append("%artificial transitions to original initial states\n");
-            for (String initstate : InitialStates
+            for (String initstate : initialStates
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -411,7 +411,7 @@ public class TemporalModel extends ModelBean {
         int i = 0;
 
 
-        if (InitialStates.size()>1) {
+        if (initialStates.size()>1) {
             result.append("// Multiple Initial States found: Adding Artificial start-state that forks to original initial-states\n");
             result.append("// Requires that formulas need to be modified: f => X(f), where X is the next Operator\n");
             result.append("// To always satisfy the new artificial initial state and maintaining the semantics of the original model\n");
@@ -420,7 +420,7 @@ public class TemporalModel extends ModelBean {
             String artifical_StartState=""+ (stateList.size()+1); //statecount plus 1
             result.append("stateindex = ").append(artifical_StartState).append(" ;\n");
 
-            for (String ignored : modelAPs) {
+            for (String ignored : atomicPropositions) {
                 result.append("int ");
                 result.append(PropositionConstants.SETTING.outputPrefix).append(i).append( " = 0 ; ");
                 if (i > 0 && (i % chunk) == 0) {
@@ -433,7 +433,7 @@ public class TemporalModel extends ModelBean {
 
 
             result.append("// BEGIN artificial initial states\n");
-            for (String initstate : InitialStates
+            for (String initstate : initialStates
             ) {
                 for (StateEncoding stenc : stateEncodings
                 ) {
@@ -474,7 +474,7 @@ public class TemporalModel extends ModelBean {
         else{
             result.append("// BEGIN initial state\n");
             result.append("int ");
-            for (String initstate : InitialStates
+            for (String initstate : initialStates
             ) {
 
                 result.append("stateindex = ").append(stateList.indexOf(initstate)).append(" ;\n");
@@ -610,13 +610,13 @@ public class TemporalModel extends ModelBean {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
             }
             if (importStatus)
-                importStatus = getModelAPs().containsAll(sortedsubstitionvalues);
+                importStatus = getAtomicPropositions().containsAll(sortedsubstitionvalues);
 
             if (!importStatus) {
                 candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
                 for (String subst : sortedsubstitionvalues
                 ) {
-                    if (!getModelAPs().contains(subst)) candidateOracle.addLog("not found: " + subst);
+                    if (!getAtomicPropositions().contains(subst)) candidateOracle.addLog("not found: " + subst);
                 }
             }
             if (!importStatus) {
@@ -628,7 +628,7 @@ public class TemporalModel extends ModelBean {
             } else {
 
                 HashBiMap<Integer, String> aplookup = HashBiMap.create();
-                aplookup.putAll(getSimpleModelMap());
+                aplookup.putAll(getPropositionMap());
                 ArrayList<String> apindex = new ArrayList<>();
                 if (doTransformation) {
 
@@ -652,7 +652,7 @@ public class TemporalModel extends ModelBean {
                       //  String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
                         String formulalvl0 = rawFormula;
 
-                        if( !tFormalism.supportsMultiInitialStates && InitialStates.size()>1){
+                        if( !tFormalism.supportsMultiInitialStates && initialStates.size()>1){
                             //when there are initial states added to the model, the formula alters:
                             //satisfaction of the formula starts after the artificial state, hence the X-operator.
                             if (tFormalism == TemporalFormalism.CTL_ITS||tFormalism == TemporalFormalism.CTL_GAL){
@@ -702,7 +702,7 @@ public class TemporalModel extends ModelBean {
 
     public String getPropositionIndex(String proposition, boolean raw) {
         HashBiMap<Integer, String> aplookup = HashBiMap.create();
-        aplookup.putAll(getSimpleModelMap());
+        aplookup.putAll(getPropositionMap());
         String encodedAP = "";
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
@@ -716,21 +716,21 @@ public class TemporalModel extends ModelBean {
     }
 
 
-    @JsonGetter("modelAPs")
-    public LinkedHashMap<Integer, String> getSimpleModelMap() {
+    @JsonGetter("atomicPropositions")
+    public LinkedHashMap<Integer, String> getPropositionMap() {
         LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
 
         int i = 0;
-        for (String ap : modelAPs) {
+        for (String ap : atomicPropositions) {
             map.put(i, ap);
             i++;
         }
         return map;
     }
 
-    @JsonSetter("modelAPs")
+    @JsonSetter("atomicPropositions")
     @SuppressWarnings("unused")
-    private void setFromSimpleModelMap(LinkedHashMap<Integer, String> map) {
-        this.modelAPs.addAll(map.values());
+    private void setPropositionMap(LinkedHashMap<Integer, String> map) {
+        this.atomicPropositions.addAll(map.values());
     }
 }

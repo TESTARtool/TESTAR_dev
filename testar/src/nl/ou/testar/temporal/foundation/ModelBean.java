@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.foundation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvRecurse;
@@ -9,7 +10,9 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.windows.UIAMapping;
 
 import java.util.*;
-
+//@JsonPropertyOrder({  "applicationName","applicationNameVersion", "application_ModelIdentifier",
+//        "application_AbstractionAttributes", "application_BackendAbstractionAttributes","logData" })
+@JsonPropertyOrder(alphabetic = true)
 public class ModelBean {
 
     protected static final String csvsep=";";

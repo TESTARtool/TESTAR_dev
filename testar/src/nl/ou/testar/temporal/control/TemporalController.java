@@ -1,15 +1,9 @@
-package nl.ou.testar.temporal.control;
+ package nl.ou.testar.temporal.control;
 
-import com.orientechnologies.orient.core.record.ODirection;
-import com.orientechnologies.orient.core.record.OEdge;
-import com.orientechnologies.orient.core.record.OVertex;
-import com.orientechnologies.orient.core.sql.executor.OResult;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 
-import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.foundation.ValStatus;
 import nl.ou.testar.temporal.ioutils.CSVHandler;
 import nl.ou.testar.temporal.ioutils.JSONHandler;
@@ -17,9 +11,7 @@ import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.model.*;
 import nl.ou.testar.temporal.modelcheck.*;
 import nl.ou.testar.temporal.oracle.*;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.proposition.PropositionManager;
-import nl.ou.testar.temporal.foundation.TagBean;
 import nl.ou.testar.temporal.util.*;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
@@ -28,11 +20,9 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,63 +36,78 @@ import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
  * Temporal Controller: orchestrates the Model Check function of TESTAR
  */
 public class TemporalController {
-    private final String ApplicationName;
-    private final String ApplicationVersion;
+    private  String ApplicationName;
+    private  String ApplicationVersion;
     private String Modelidentifier;
-    private final String outputDir;
+    private  String outputDir;
 
-    private final boolean ltlSPOTToWSLPath;
-    private final String ltlSPOTMCCommand;
-    private final boolean ltlSPOTEnabled;
+    private  boolean ltlSPOTToWSLPath;
+    private  String ltlSPOTMCCommand;
+    private  boolean ltlSPOTEnabled;
 
-    private final boolean ctlITSToWSLPath;
-    private final String ctlITSMCCommand;
-    private final boolean ctlITSEnabled;
+    private  boolean ctlITSToWSLPath;
+    private  String ctlITSMCCommand;
+    private  boolean ctlITSEnabled;
 
-    private final boolean ctlGALToWSLPath;
-    private final String ctlGALMCCommand;
-    private final boolean ctlGALEnabled;
+    private  boolean ctlGALToWSLPath;
+    private  String ctlGALMCCommand;
+    private  boolean ctlGALEnabled;
 
-    private final boolean ltlITSToWSLPath;
-    private final String ltlITSMCCommand;
-    private final boolean ltlITSEnabled;
+    private  boolean ltlITSToWSLPath;
+    private  String ltlITSMCCommand;
+    private  boolean ltlITSEnabled;
 
-    private final boolean ltlLTSMINToWSLPath;
-    private final String ltlLTSMINMCCommand;
-    private final boolean ltlLTSMINEnabled;
+    private  boolean ltlLTSMINToWSLPath;
+    private  String ltlLTSMINMCCommand;
+    private  boolean ltlLTSMINEnabled;
 
-    private final boolean ctlLTSMINToWSLPath;
-    private final String ctlLTSMINMCCommand;
-    private final boolean ctlLTSMINEnabled;
+    private  boolean ctlLTSMINToWSLPath;
+    private  String ctlLTSMINMCCommand;
+    private  boolean ctlLTSMINEnabled;
 
-    private final String propositionManagerFile;
-    private final String oracleFile;
-    private final boolean verbose;
-    private final boolean counterExamples;
+    private  String propositionManagerFile;
+    private  String oracleFile;
+    private  boolean verbose;
+    private  boolean counterExamples;
 
-    private final boolean instrumentDeadlockState;
+    private  boolean instrumentDeadlockState;
 
-    private PropositionManager propositionManager;
-    private TemporalModel tModel;
-    private final TemporalDBManager tDBManager;
-    private List<TemporalOracle> oracleColl;
-    private final SimpleLog simpleLog;
+    private  PropositionManager propositionManager;
+    private  TemporalModel tModel;
+    private  TemporalDBManager tDBManager;
+    private  List<TemporalOracle> oracleColl;
+    private  SimpleLog simpleLog;
 
-    public TemporalController(final Settings settings,  String outputDir) {
+    public TemporalController(final Settings settings) {
+
+
+        outputDir = createTemporalFolder(settings);
+        String logFileName = outputDir + "log.txt";
+        simpleLog= new SimpleLog(logFileName,true);
+        simpleLog.append(prettyCurrentTime() + " | " +"Temporal Component uses output folder: "+outputDir+"\n");
+        tDBManager = new TemporalDBManager(settings,simpleLog);
+        tModel = new TemporalModel();
+        updateSettings(settings);
+    }
+
+//    public TemporalController(final Settings settings) {
+//        this(settings, "");
+//    }
+
+    /**
+     * no params
+     * @return outputdirectory
+     */
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    public void updateSettings(final Settings settings) {
 
         this.ApplicationName = settings.get(ConfigTags.ApplicationName);
         this.ApplicationVersion = settings.get(ConfigTags.ApplicationVersion);
         setModelidentifier(settings);
-        if (outputDir.equals("")) {
-            this.outputDir = createTemporalFolder(settings);
-        } else {
-            this.outputDir = outputDir;
-        }
-        String logFileName = this.outputDir + "log.txt";
-        simpleLog= new SimpleLog(logFileName,true);
-        simpleLog.append(prettyCurrentTime() + " | " +"Temporal Component uses output folder: "+this.outputDir+"\n");
-        tDBManager = new TemporalDBManager(settings,simpleLog);
-        tModel = new TemporalModel();
+
         ltlSPOTToWSLPath = settings.get(ConfigTags.TemporalLTL_SPOTCheckerWSL);
         ltlSPOTMCCommand = settings.get(ConfigTags.TemporalLTL_SPOTChecker);
         ltlSPOTEnabled = settings.get(ConfigTags.TemporalLTL_SPOTChecker_Enabled);
@@ -133,21 +138,9 @@ public class TemporalController {
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
         instrumentDeadlockState = settings.get(ConfigTags.TemporalInstrumentDeadlockState);
 
-        setDefaultPropositionManager();
-
     }
 
-    public TemporalController(final Settings settings) {
-        this(settings, "");
-    }
 
-    /**
-     * no params
-     * @return outputdirectory
-     */
-    public String getOutputDir() {
-        return outputDir;
-    }
 
     private void setTemporalModelMetaData(AbstractStateModel abstractStateModel) {
         if (abstractStateModel != null) {
@@ -160,9 +153,9 @@ public class TemporalController {
 
     private void setModelidentifier(Settings settings) {
 
-        //assumption is that the model is created with the same abstraction pon concrete layer as on the abstract layer.
+        //assumption is that the model is created with the same abstraction on concrete layer as on the abstract layer.
         // we can inspect the graphmodel for the abstract layer,
-        // but we cannot inspect the graphmodel for the abstraction that used on the concretelayer.
+        // but we cannot inspect the concretelayer metadata in the graphmodel for the abstraction that used.
         // for new models we enforce this by setting "TemporalConcreteEqualsAbstract = true" in the test.settings file
         // copied from Main.initcodingmanager
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
@@ -199,7 +192,7 @@ public class TemporalController {
     }
 
     private void loadPropositionManager(String filename) {
-        this.propositionManager = (PropositionManager) JSONHandler.load(filename, propositionManager.getClass());
+        this.propositionManager = (PropositionManager) JSONHandler.load(filename, PropositionManager.class);
         tDBManager.setPropositionManager(this.propositionManager);
     }
 
@@ -235,7 +228,13 @@ public class TemporalController {
 
 
     //*********************************
+
     private void settModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
+        tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
+    }
+/*
+    private void xxsettModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
+        tDBManager.computeTemporalModel(abstractStateModel,tModel,instrumentTerminalState);
         //candidate for refactoring as maintaining Oresultset is responsibility of TemporalDBManager
         long start_time = System.currentTimeMillis();
         int runningWcount=0;
@@ -368,6 +367,7 @@ public class TemporalController {
         tDBManager.dbClose();
 
     }
+*/
 
 
     private AbstractStateModel getAbstractStateModel() {
@@ -454,7 +454,7 @@ public class TemporalController {
                 saveToGraphMLFile("GraphML.XML", false);
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true);
                 }
-                List<TemporalOracle> initialoraclelist = new ArrayList<>();
+                //List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
                     FormulaVerifier.INSTANCE.setPathToExecutable(ltlSpotMCCommand);
                     FormulaVerifier.INSTANCE.setToWslPath(ltlSpotWSLPath);
@@ -471,8 +471,8 @@ public class TemporalController {
                             filter(o -> !(o.getOracle_validationstatus() ==ValStatus.ACCEPTED ||
                                     o.getOracle_validationstatus() ==ValStatus.CANDIDATE)).
                             collect(Collectors.toList());
-                    initialoraclelist.addAll(acceptedOracleList);
-                    initialoraclelist.addAll(rejectedOracleList);
+                    //initialoraclelist.addAll(acceptedOracleList);
+                    //initialoraclelist.addAll(rejectedOracleList);
 
                     simpleLog.append(prettyCurrentTime() + " | " + oracleType + " invoking the " + "backend model-checker");
 
@@ -496,7 +496,7 @@ public class TemporalController {
                     if(ctlltsminEnabled && (oracleType == TemporalFormalism.CTL_LTSMIN)){
                         int maxap=450;
                         int maxstate=25000;
-                        if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
+                        if (tModel.getAtomicPropositions().size()>maxap ||tModel.getStateList().size()>maxstate){
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType +
                                     " Warning:  model check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
                         }
@@ -515,7 +515,7 @@ public class TemporalController {
                     if (ctlGalEnabled &&  (oracleType == TemporalFormalism.CTL_GAL )) {
                         int maxap=200;
                         int maxstate=25000;
-                        if (tModel.getModelAPs().size()>maxap ||tModel.getStateList().size()>maxstate){
+                        if (tModel.getAtomicPropositions().size()>maxap ||tModel.getStateList().size()>maxstate){
                             simpleLog.append(prettyCurrentTime() + " | " + oracleType +
                                     " Warning:  model check is not executed: explicit model too complex (propositions>"+maxap+" or states>"+maxstate);
                         }
@@ -572,11 +572,12 @@ public class TemporalController {
                 simpleLog.append("Error: StateModel not available");
             } else {
                 setTemporalModelMetaData(abstractStateModel);
-                if (propositionManagerFile.equals("")) {
-                    setDefaultPropositionManager();
-                    savePropositionManager("PropositionManager_default.json");
-                }
-                else {
+//                if (propositionManagerFile.equals("")) {
+//                    setDefaultPropositionManager();
+//                    savePropositionManager("PropositionManager_default.json");
+//                }
+//                else
+                    {
                     String APCopy = "copy_of_applied_" + Paths.get(propositionManagerFile).getFileName().toString();
                     if (verbose) {
                         Files.copy((new File(propositionManagerFile).toPath()),
@@ -584,7 +585,8 @@ public class TemporalController {
                     }
                 }
                 loadPropositionManager(propositionManagerFile);
-                settModel(abstractStateModel, instrumentTerminalState);
+                tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
+                //settModel(abstractStateModel, instrumentTerminalState);
                 if (verbose) {
                     saveModelAsJSON("PropositionEncodedModel.json");
                 }
@@ -628,7 +630,7 @@ public class TemporalController {
         // the impact is low as a duplicate oracle will be executed , only twice!
         // refactor to Set? nr of oracles will then be less than the 'tactic'
         List<TemporalOracle> potentialOracleColl = new ArrayList<>();
-        List<String> modelAPSet = new ArrayList<>(tModel.getModelAPs());
+        List<String> modelAPSet = new ArrayList<>(tModel.getAtomicPropositions());
         int trylimitConstraint = Math.min(250, 2 * modelAPSet.size());
         Random APRnd = new Random(5000000);
         for (TemporalPattern pat : patterns

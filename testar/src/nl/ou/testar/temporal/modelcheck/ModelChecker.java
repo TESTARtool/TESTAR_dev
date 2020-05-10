@@ -225,13 +225,13 @@ public abstract class ModelChecker {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
             }
             if (importStatus)
-                importStatus = tmodel.getModelAPs().containsAll(sortedsubstitionvalues);
+                importStatus = tmodel.getAtomicPropositions().containsAll(sortedsubstitionvalues);
 
             if (!importStatus) {
                 candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
                 for (String subst : sortedsubstitionvalues
                 ) {
-                    if (!tmodel.getModelAPs().contains(subst)) candidateOracle.addLog("not found: " + subst);
+                    if (!tmodel.getAtomicPropositions().contains(subst)) candidateOracle.addLog("not found: " + subst);
                 }
             }
             if (!importStatus) {
@@ -243,7 +243,7 @@ public abstract class ModelChecker {
             } else {
 
                 HashBiMap<Integer, String> aplookup = HashBiMap.create();
-                aplookup.putAll(tmodel.getSimpleModelMap());
+                aplookup.putAll(tmodel.getPropositionMap());
                 ArrayList<String> apindex = new ArrayList<>();
                 if (doTransformation) {
 

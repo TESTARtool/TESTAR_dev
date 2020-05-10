@@ -6,10 +6,10 @@ import nl.ou.testar.temporal.foundation.PairBean;
 
 import java.util.Set;
 
-public class WidgetConditionPart extends PropositionSelector {
+public class PropositionConditionPart extends PropositionSelector {
 
 
-    public WidgetConditionPart() {
+    public PropositionConditionPart() {
         super();
     }
     @JsonGetter("conditionAttributes")

@@ -105,7 +105,18 @@ public class PropositionSelector {
         minve.add(new PairBean<>(InferrableExpression.exists, ""));// use always
         return minve;
     }
-    public static Set<PairBean<InferrableExpression,String>> useMinimalTransSelectedExpressions() {
+    public static Set<PairBean<InferrableExpression,String>> useVKSelectedExpressions() {
+        // following list is derived by inspecting AnnotatingActionCompiler
+        Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Replace ').*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Append ').*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Shortcut Key).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Key).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Bring the system to the foreground).*"));
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i: Kill Process).*"));
+        return minie;
+    }
+    public static Set<PairBean<InferrableExpression,String>> useDefaultTransSelectedExpressions() {
         // following list is derived by inspecting AnnotatingActionCompiler
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Left Click).*"));
@@ -116,9 +127,6 @@ public class PropositionSelector {
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Replace ').*"));
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Append ').*"));
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Shortcut Key).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Hit Key).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:Bring the system to the foreground).*"));
-        minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i: Kill Process).*"));
         return minie;
     }
 
@@ -144,6 +152,16 @@ public class PropositionSelector {
                 "(?i:RUN)|(?i:SAVE)|(?i:EXIT)|(?i:CLOSE)|(?i:REMOVE)|(?i:ERROR)|" +
                 "(?i:SUBMIT)|(?i:OPEN)|(?i:IGNORE)|(?i:PROCEED)|(?i:PRINT)|(?i:VIEW)|" +
                 "(?i:UP)|(?i:DOWN)|(?i:LEFT)|(?i:RIGHT)"));
+        return minie;
+    }
+    public static Set<PairBean<InferrableExpression,String>> useVirtualKeyConditionalExpressions() {
+        Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "undefined"));  // use always
+        return minie;
+    }
+    public static Set<PairBean<InferrableExpression,String>> useCatchAllConditionalExpressions() {
+        Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
+        minie.add(new PairBean<>(InferrableExpression.textmatch, "DON'T CARE"));  // use always
         return minie;
     }
     //
@@ -252,7 +270,12 @@ public class PropositionSelector {
 
     //custom
 
-    public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
+    public boolean matchExists( String attrib, String value) {
+        Set<String> dummy = getPropositionStrings("dummy", attrib, value);
+        return !dummy.isEmpty();
+    }
+    public Set<String> getPropositionStrings(String propositionKey, String attrib, String value) {
+        //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    nanotime: "+System.nanoTime());
         Set<String> apset = new LinkedHashSet<>();
         String attributeTagName = getTagFromAttribute(attrib);
 
@@ -271,7 +294,7 @@ public class PropositionSelector {
             if (tag != null) {
                 if (tag.type() == Boolean.class) {
                     if (Boolean.parseBoolean(value)) {
-                        apset.add(widgetkey + attrib + "__");//encode only TRUE for genuine booleans
+                        apset.add(propositionKey + attrib + "__");//encode only TRUE for genuine booleans
                     }
                 } else {
                     for (PairBean<InferrableExpression, String> iap : getSelectedExpressions()
@@ -281,21 +304,21 @@ public class PropositionSelector {
                             int intVal = (int) Double.parseDouble(value);
                             if (((iap.left() == InferrableExpression.value_eq) && (intVal == Integer.parseInt(iap.right()))) ||
                                     ((iap.left() == InferrableExpression.value_lt) && (intVal < Integer.parseInt(iap.right())))) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
+                                apset.add(propositionKey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
                             }
                         }
                         if (iap.left().typ.equals("text")) {
 
                             if (((iap.left() == InferrableExpression.textlength_eq) && (value.length() == Integer.parseInt(iap.right()))) ||
                                     ((iap.left() == InferrableExpression.textlength_lt) && (value.length() < Integer.parseInt(iap.right())))) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + "_" + iap.right());
+                                apset.add(propositionKey + attrib + "_" + iap.left().name() + "_" + iap.right());
                             }
 
                             if (((iap.left() == InferrableExpression.textmatch))) {
                                 Pattern pat = CachedRegexPatterns.addAndGet(iap.right());
                                 Matcher m = pat.matcher(value);
                                 if (m.matches()) {
-                                    apset.add(widgetkey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
+                                    apset.add(propositionKey + attrib + "_" + iap.left().name()  + "_"+ iap.right() );
                                 }
                             }
 
@@ -311,17 +334,17 @@ public class PropositionSelector {
                             if (((iap.left() == InferrableExpression.width_lt) && (width < Integer.parseInt(iap.right()))) ||
                                     ((iap.left() == InferrableExpression.heigth_lt) && (heigth < Integer.parseInt(iap.right())))
                             ) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() + "_" + iap.right() );
+                                apset.add(propositionKey + attrib + "_" + iap.left().name() + "_" + iap.right() );
                             }
                         }
 
                         if (iap.left().typ.equals("boolean")) {   //add these regardless of the tag-type
                             //format:     <data key="Abc"></data>
                             if ((iap.left() == InferrableExpression.is_blank) && value.equals("")) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() );
+                                apset.add(propositionKey + attrib + "_" + iap.left().name() );
                             }
                             if ((iap.left() == InferrableExpression.exists)) {
-                                apset.add(widgetkey + attrib + "_" + iap.left().name() );
+                                apset.add(propositionKey + attrib + "_" + iap.left().name() );
                             }
 
                         }
@@ -329,6 +352,7 @@ public class PropositionSelector {
                 }
             }
         }
+        //  System.out.println("DEBUG: checking done    nanotime: "+System.nanoTime());
         return apset;
     }
 }

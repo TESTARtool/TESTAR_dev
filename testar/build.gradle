@@ -134,11 +134,17 @@ prepareOracles.dependsOn(oracleClasses)
 /**
  * Set the arguments of the jvm in the start scripts.
  * To debug build TESTAR with the -DDEBUG=true.
+ * use -DDEBUGSUSPEND=true to start and then wait until a remote debugger is connected
  */
 startScripts {
-    if(System.getProperty('DEBUG', 'false') ) {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
-                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+    if(System.getProperty('DEBUG', 'false')  ) {
+        if(System.getProperty('DEBUGSUSPEND', 'false') ) {
+            applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
+                                         '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+        }else{
+            applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
+                                         '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005']
+        }
     } else {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
     }

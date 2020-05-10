@@ -2,35 +2,30 @@
 package nl.ou.testar.temporal.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.fruit.alayer.Tags;
 
 import java.util.*;
 
-
+@JsonPropertyOrder({  "comments","formatVersion", "propositionSubKeySeparator", "stateFilters", "widgetFilters","transitionFilters" })
+//@JsonPropertyOrder(alphabetic = true)
 public class PropositionManager {
 
-
-    private  String freeFormatText;
-    private PropositionSelector stateFilter;
-    private PropositionSelector transitionFilter;
+    private String formatVersion="20200508";
+    private List<String> comments = new ArrayList<>();
     private List<String> propositionKey = new ArrayList<>();
     private String propositionSubKeySeparator;
-    private Set<WidgetFilter> widgetfilters;
-    private String formatVersion="20200101";
-    private List<String> comments = new ArrayList<>();
+    private Set<PropositionFilter> stateFilters;
+    private Set<PropositionFilter> transitionFilters;
+    private Set<PropositionFilter> widgetFilters;
+
 
 
     public PropositionManager() {
-        super();
-        stateFilter = new PropositionSelector();
-        transitionFilter = new PropositionSelector();
-        widgetfilters = new LinkedHashSet<>();
-        comments.add(" !!!! if the stateFilter is EMPTY, then this will be enriched. 'selectedattributes' with 'Role,IsTerminalState' 'valuedexpression' with 'exists__' and  expressions");
-        comments.add(" An EMPTY widget condition results in rejection");
-        comments.add("Note that when you are inspecting  propositions in a Model:  An entry in the map of modelAPs indicates that the property is true somewhere in the model. ");
-        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp");
-        comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
+        //super();
+        transitionFilters = new LinkedHashSet<>();
+        stateFilters = new LinkedHashSet<>();
+        widgetFilters= new LinkedHashSet<>();
 
     }
     public PropositionManager(boolean initializeWithDefaults) {
@@ -40,19 +35,32 @@ public class PropositionManager {
     public PropositionManager(boolean initializeWithDefaults, List<String> propositionKey) {
         this();
         if (initializeWithDefaults){
-            updateFreeFormatText("This is a Sample APModelManager with two widget filters.");
-            stateFilter = new PropositionSelector();
-            transitionFilter = new PropositionSelector();
-            stateFilter.setSelectedStateAttributes(PropositionSelector.useMinimalAttributes());
-            stateFilter.setSelectedExpressions(PropositionSelector.useMinimalSelectedExpressions());
-            transitionFilter.setSelectedAttributes(PropositionSelector.useMinimalTransAttributes());
-            transitionFilter.setSelectedExpressions(PropositionSelector.useMinimalTransSelectedExpressions());
-            WidgetFilter wf = new WidgetFilter();
+            comments.add("This is a Sample APModelManager with  filters: two edge-filters, two wdiget filters, one state-filters.");
+            comments.add("An EMPTY list of conditionAttributes results in rejection. Use one '*' as wildcard");
+            comments.add("Note: An entry in the map of modelAPs indicates that the proposition is true somewhere in the model. ");
+            comments.add("In other words: if a property is always FALSE (i.e. in all states/edges)  then it is NOT regarded as a proposition");
+            comments.add("the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late'");
+
+            PropositionFilter wf = new PropositionFilter();
             wf.setDefaultWidgetFilter();
-            widgetfilters.add(wf);
-            WidgetFilter wf1 = new WidgetFilter();
+            widgetFilters.add(wf);
+            PropositionFilter wf1 = new PropositionFilter();
             wf1.setMinimalWidgetFilter();
-            widgetfilters.add(wf1);
+            widgetFilters.add(wf1);
+
+            PropositionFilter tfilter = new PropositionFilter();
+            tfilter.setDefaultVKEdgeFilter();
+            transitionFilters.add(tfilter);
+            PropositionFilter tfilter1 = new PropositionFilter();
+            tfilter1.setCatchAllEdgeFilter();
+            transitionFilters.add(tfilter1);
+
+            PropositionFilter sfilter = new PropositionFilter();
+            sfilter.setDefaultStateFilter();
+            stateFilters.add(sfilter);
+
+
+
             if (propositionKey ==null){
                 setRoleTitlePathAsAPKey();  }
             else{
@@ -63,33 +71,35 @@ public class PropositionManager {
     }
     //*********************
 
-    @JsonGetter("stateFilter")
-    private PropositionSelector getStateFilter() {
-        return stateFilter;
+
+
+    @JsonGetter("transitionFilters")
+   @SuppressWarnings("unused")
+    private Set<PropositionFilter> getTransitionFilters() {
+        return transitionFilters;
     }
 
-    public Set<String> getAPsOfStateAttribute(String apkey, String transitionProperty, String value) {
-        return getStateFilter().getAPsOfAttribute(apkey, transitionProperty, value);
+    @SuppressWarnings("unused")
+    public void setTransitionFilters(Set<PropositionFilter> transitionFilters) {
+        this.transitionFilters=transitionFilters;
     }
     @SuppressWarnings("unused")
-    public void setStateFilter(PropositionSelector stateFilter) {
-        // let the AP selector check for the minimal set
-        this.stateFilter.setSelectedStateAttributes(stateFilter.getSelectedAttributes());
-        this.stateFilter.setSelectedExpressions(stateFilter.getSelectedExpressions());
+    public Set<PropositionFilter> getWidgetFilters() {
+        return widgetFilters;
     }
-    @JsonGetter("transitionFilter")
-    private PropositionSelector getTransitionFilter() {
-        return transitionFilter;
+    @SuppressWarnings("unused")
+    public void setWidgetFilters(Set<PropositionFilter> widgetFilters) {
+        this.widgetFilters = widgetFilters;
+    }
+    @SuppressWarnings("unused")
+    public Set<PropositionFilter> getStateFilters() {
+        return stateFilters;
+    }
+    @SuppressWarnings("unused")
+    public void setStateFilters(Set<PropositionFilter> stateFilters) {
+        this.stateFilters = stateFilters;
     }
 
-    public Set<String> getAPsOfTransitionAttribute(String apkey, String transitionProperty, String value) {
-        return getTransitionFilter().getAPsOfAttribute(apkey, transitionProperty, value);
-    }
-    @SuppressWarnings("unused")
-    public void setTransitionFilter(PropositionSelector transitionFilter) {
-        this.transitionFilter.setSelectedAttributes(transitionFilter.getSelectedAttributes());
-        this.transitionFilter.setSelectedExpressions(transitionFilter.getSelectedExpressions());
-    }
     public String getPropositionSubKeySeparator() {
         return propositionSubKeySeparator;
     }
@@ -97,11 +107,7 @@ public class PropositionManager {
     public void setPropositionSubKeySeparator(String propositionSubKeySeparator) {
         this.propositionSubKeySeparator = propositionSubKeySeparator;
     }
-    @JsonIgnore
-    @SuppressWarnings("unused")
-    private  List<String> getPropositionKey() {  // kept for compatability
-       return propositionKey;
-    }
+
 
     public void updateAPKey(List<String> APKey) {
         this.propositionKey = APKey;
@@ -122,14 +128,7 @@ public class PropositionManager {
     public void setFormatVersion(String formatVersion) {
         this.formatVersion = formatVersion;
     }
-    @SuppressWarnings("unused")
-    public Set<WidgetFilter> getWidgetfilters() {
-        return widgetfilters;
-    }
-    @SuppressWarnings("unused")
-    public void setWidgetfilters(Set<WidgetFilter> widgetfilters) {
-        this.widgetfilters = widgetfilters;
-    }
+
 
 
     public void setRoleTitlePathAsAPKey(){
@@ -140,36 +139,22 @@ public class PropositionManager {
 
     }
 
-    public String getFreeFormatText() {
-        return freeFormatText;
-    }
-
-
-    public void updateFreeFormatText(String freeFormatText) {
-        this.freeFormatText = freeFormatText;
-    }
-    @SuppressWarnings("unused")
-    public void addWidgetFilter(WidgetFilter w){
-        widgetfilters.add(w);
-    }
-
-
-    public List<WidgetFilter> passWidgetFilters(Map<String,String> attribmap){
-        List<WidgetFilter> passedWidgetFilters= new ArrayList<>();
+    public List<PropositionFilter> passPropositionConditions(Map<String,String> attribmap){
+        List<PropositionFilter> passedPropositionFilters = new ArrayList<>();
         //pass if each entry in the attribmap matches at least one FilterPart ('disjunction of FilterParts')
         // all values in attribmap are non-empty
 
         boolean pass = false;
-        for (WidgetFilter wf : widgetfilters
+        for (PropositionFilter wf : stateFilters
         ) {
             for (Map.Entry<String, String> entry : attribmap.entrySet()
             ) {
                 pass = false;
-                for (WidgetConditionPart wfConditionPart : wf.getWidgetConditionParts()
+                for (PropositionConditionPart wfConditionPart : wf.getPropositionConditionParts()
                 ) {
                     if (wfConditionPart.getSelectedAttributes().contains(entry.getKey())) {
                       //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    time: "+System.nanoTime());
-                        Set<String> dummy = wfConditionPart.getAPsOfAttribute("dummy", entry.getKey(), entry.getValue());
+                        Set<String> dummy = wfConditionPart.getPropositionStrings("dummy", entry.getKey(), entry.getValue());
                       //  System.out.println("DEBUG: checking done    time: "+System.nanoTime());
                         if (dummy != null && !dummy.isEmpty()) {
                             pass = true;
@@ -180,9 +165,58 @@ public class PropositionManager {
                 if (!pass) break; // entry doesn't fulfill condition, no need to check remaining entries on this filter
             }
             if (pass) {// all entries fulfill a condition
-                passedWidgetFilters.add(wf);
+                passedPropositionFilters.add(wf);
             }
         }
-        return passedWidgetFilters; //pass;
+        return passedPropositionFilters; //pass;
+    }
+    public List<PropositionFilter> setPassingFilters(PropositionFilterType filterType, Map<String,String> attribmap){
+        List<PropositionFilter> passedPropositionFilters = new ArrayList<>();
+        //pass if  all Conditions in a Filter are fulfilled. ('conjunct of FilterConditionParts')
+        boolean pass = false;
+        Set<PropositionFilter> filters;
+        switch (filterType){
+            case STATE:
+                filters=stateFilters;
+                break;
+            case WIDGET:
+                filters=widgetFilters;
+                break;
+            case TRANSITION:
+                filters=transitionFilters;
+                break;
+            default:
+                filters=null;
+        }
+        for (PropositionFilter wf : filters
+        ) {
+            pass = false;
+            for (PropositionConditionPart wfConditionPart : wf.getPropositionConditionParts()
+            ) {
+                // a wildcard trumps other conditions
+                if (wfConditionPart.getSelectedAttributes().contains("*")){
+                    pass=true;
+                    continue;
+                }
+                if (attribmap.keySet().containsAll(wfConditionPart.getSelectedAttributes())) {
+                    for (String attribute : wfConditionPart.getSelectedAttributes()
+                        //ConditionPart may contain multiple attributes, only one value-match is required to pass
+                    ) {
+                       pass = wfConditionPart.matchExists( attribute, attribmap.get(attribute));
+                        if (pass) {
+                            break; // current 'entry' fulfills the condition
+                        }
+                    }
+                if (!pass) break; // doesn't fulfill this condition, no need to check remaining conditions of this filter
+                }
+            }
+
+
+
+            if (pass) {// all entries fulfill a condition
+                passedPropositionFilters.add(wf);
+            }
+        }
+        return passedPropositionFilters; //pass;
     }
 }

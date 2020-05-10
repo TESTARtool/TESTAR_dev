@@ -482,11 +482,12 @@ public class Temporalpanel {
         PythonVisualizer_Path.setText(settings.get(ConfigTags.TemporalVisualizerServer));
         VisualizerURL = settings.get(ConfigTags.TemporalVisualizerURL);
         VisualizerURLStop = settings.get(ConfigTags.TemporalVisualizerURLStop);
-        if (outputDir != null && !outputDir.equals("")) {// when triggered by save button on the general panel
-            tcontrol = new TemporalController(settings, outputDir);// look for better location
-        } else
+        if (tcontrol == null) {// when NOT triggered by save button on the general panel
             tcontrol = new TemporalController(settings);
-        outputDir = tcontrol.getOutputDir();
+            outputDir = tcontrol.getOutputDir();
+        } else {
+            tcontrol.updateSettings(settings);
+        }
         statemodelEnabled = settings.get(ConfigTags.StateModelEnabled);
     }
 
