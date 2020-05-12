@@ -144,7 +144,7 @@ public class Temporalpanel {
      */
     private void $$$setupUI$$$() {
         mainTemporalPanel = new JPanel();
-        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:51px:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:367px:noGrow"));
+        mainTemporalPanel.setLayout(new FormLayout("right:269px:grow,left:5dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:51px:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:367px:noGrow"));
         mainTemporalPanel.setEnabled(true);
         mainTemporalPanel.setMinimumSize(new Dimension(621, 350));
         mainTemporalPanel.setPreferredSize(new Dimension(621, 350));
@@ -273,7 +273,7 @@ public class Temporalpanel {
         enableLTSMIN_CTL.setVisible(true);
         setupPanel.add(enableLTSMIN_CTL, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
-        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:66px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:36px:noGrow,left:4dlu:noGrow,fill:15px:noGrow,left:111px:noGrow,left:45dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:66px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:57px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:36px:noGrow,left:4dlu:noGrow,fill:15px:noGrow,left:111px:noGrow,left:45dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         containerTab.addTab("Miner", minerPanel);
         final JLabel label7 = new JLabel();
         label7.setText("Oracles:");
@@ -567,7 +567,7 @@ public class Temporalpanel {
                 ltsminLTLChecker.getText(), WSLCheckBoxLTLLTSMIN.isSelected(), enableLTSMIN_LTL.isSelected(),
                 galCTLChecker.getText(), WSLCheckBoxCTLGAL.isSelected(), enableGAL_CTL.isSelected(),
                 ltsminCTLChecker.getText(), WSLCheckBoxCTLLTSMIN.isSelected(), enableLTSMIN_CTL.isSelected(),
-                sourceIsDb.isSelected(),modelFile.getText()
+                sourceIsDb.isSelected(), modelFile.getText()
         );
     }
 

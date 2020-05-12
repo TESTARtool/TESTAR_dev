@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.util;
 
 public class StringFinder {
 
-   public int findClosingParenthesis(String data, int openPos) {
+   public static int findClosingParenthesis(String data, int openPos) {
 
         char[] text=data.toCharArray();
 
@@ -18,7 +18,7 @@ public class StringFinder {
         }
         return closePos;
     }
-    int findOpeningParenthesis(String data, int closePos) {
+    public static int findOpeningParenthesis(String data, int closePos) {
         char[] text=data.toCharArray();
         int openPos = closePos;
         int unmatchedCounter = 1;
@@ -46,20 +46,21 @@ public class StringFinder {
      * customized  for TESTAR
      */
 
-    void findClosingParenthesisAndInsert(String data, String toSearch, String replaceStr, String closing) {
+    public static String findClosingParenthesisAndInsert(String data, String toSearch, String replaceStr, String closing) {
         // Get the first occurrence
        int pos = data.indexOf(toSearch);
-
-        // Repeat till end is reached
-        while (pos != -1) {
+        while (pos != -1) { // Repeat till end is reached
             // Replace this occurrence of Sub String
             //find matching bracket
             int bracketpos = findClosingParenthesis(data, pos + toSearch.length() - 1); //assume last char is the "("
-            String orginalblock = data.substring(pos + toSearch.length() - 1, bracketpos - pos - 1);
-            data=data.replaceAll(toSearch + orginalblock+closing, toSearch + replaceStr + orginalblock + closing);
+            String orginalblock = data.substring(pos + toSearch.length() - 1, bracketpos  );
+            String prepend=data.substring(0,pos) ;
+            String append= data.substring(bracketpos);
+            data=prepend+toSearch + replaceStr + orginalblock + closing+append;
             // Get the next occurrence from the current position
             pos = data.indexOf(toSearch, pos + toSearch.length() + replaceStr.length() + orginalblock.length() + closing.length());
         }
+        return data;
     }
     /**
      * Find any matching substring and surround all occurrences with 'replacestring' + 'substring' + 'closing'
@@ -73,26 +74,23 @@ public class StringFinder {
      * inspired by https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
      * customized  for TESTAR
      */
-    void findOpeningParenthesisAndInsert(String data, String toSearch, String replaceStr, String opening) {
+    public static String  findOpeningParenthesisAndInsert(String data, String toSearch, String replaceStr, String opening) {
         // Get the first occurrence
         int pos = data.indexOf(toSearch);
-
-        // Repeat till end is reached
-        while (pos != -1) {
+        while (pos != -1) {   // Repeat till end is reached
             // Replace this occurrence of Sub String
             //find matching bracket
-            int bracketpos = findOpeningParenthesis(data, pos - toSearch.length() + 1); //assume first char is the "("
-            String orginalblock = data.substring(bracketpos, pos - bracketpos + 1);
-            data=data.replaceAll(opening + orginalblock + toSearch,opening + orginalblock + replaceStr + toSearch);
+            //not validated: check bracket position
+            int bracketpos = findOpeningParenthesis(data, pos - toSearch.length() + 1); //assume first char is the ")"
+            String orginalblock = data.substring(bracketpos, pos-1);
+            String prepend=data.substring(0,bracketpos) ;
+            String append= data.substring(pos+toSearch.length());
+            data=prepend+opening + orginalblock + replaceStr + toSearch+append;
             // Get the next occurrence from the current position
-            pos = data.indexOf(toSearch,
-                    bracketpos + opening.length() + orginalblock.length() + replaceStr.length() + toSearch.length());
+            pos = data.indexOf(toSearch,bracketpos + opening.length() + orginalblock.length() + replaceStr.length() + toSearch.length());
         }
+        return data;
     }
 
-//    findForwardAndInsertAll(ltlf_string, "F(", "(!" + ltlf_alive_ap + ")|", ")");
-//    findForwardAndInsertAll(ltlf_string, "X(", "(!" + ltlf_alive_ap + ")|", ")");
-//    findForwardAndInsertAll(ltlf_string, "U (", "(!" + ltlf_alive_ap + ")|", ")");
-//    findBackwardAndInsertAll(ltlf_string, ") M", "|(!" + ltlf_alive_ap + ")", "(");
 }
 

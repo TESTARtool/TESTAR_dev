@@ -3,8 +3,8 @@
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
     <rowspec value="top:367px:noGrow"/>
-    <colspec value="right:245px:grow"/>
-    <colspec value="left:4dlu:noGrow"/>
+    <colspec value="right:269px:grow"/>
+    <colspec value="left:5dlu:noGrow"/>
     <colspec value="fill:45px:noGrow"/>
     <colspec value="left:7dlu:noGrow"/>
     <colspec value="fill:51px:grow"/>
@@ -368,7 +368,7 @@
             <colspec value="fill:66px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="fill:46px:noGrow"/>
+            <colspec value="fill:57px:noGrow"/>
             <colspec value="fill:43px:noGrow"/>
             <colspec value="fill:19px:noGrow"/>
             <colspec value="fill:11px:noGrow"/>

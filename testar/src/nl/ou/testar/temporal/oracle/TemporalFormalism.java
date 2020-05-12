@@ -31,7 +31,7 @@ public enum TemporalFormalism {
     LTL_LTSMIN("("," == \"1\")","","",
                        new PairBean<>("F","<>"),new PairBean<>("G","[]"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),true,"etf"),
+            new PairBean<>("~~unlikely",""),false,"etf"),
     CTL_LTSMIN("("," == \"1\")","","",
                        new PairBean<>("F","<>"),new PairBean<>("G","[]"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),

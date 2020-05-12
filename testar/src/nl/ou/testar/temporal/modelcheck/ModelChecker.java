@@ -147,39 +147,46 @@ public abstract class ModelChecker {
         result = ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
         //System.out.println("debug: ");
     }
-    private  void validateFormulasForChecker() {
-        if ((temporalFormalism == TemporalFormalism.LTL_ITS) || (temporalFormalism == TemporalFormalism.LTL_LTSMIN) ||
-                (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
-            //formula ltl model variant converter
-            // instrumentTerminalState will determine whether this return value is ""
-            String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition);
-            if (!aliveprop.equals("")) {
-                saveFormulasForChecker(oracleColl, formulaFile, false);
-                List<String> tmpformulas = FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile);
-                List<TemporalOracle> tmporacleList = new ArrayList<>();
-                int j = 0;
-                for (TemporalOracle ora : oracleColl
-                ) {
-                    TemporalOracle oraClone = null;
-                    try {
-                        oraClone = ora.clone();
-                        TemporalPatternBase pat = oraClone.getPatternBase();
-                        pat.setPattern_Formula(tmpformulas.get(j));
-                        tmporacleList.add(oraClone);
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    }
-                    j++;
-                }
-                saveFormulasForChecker(tmporacleList, formulaFile, true);
-            } else {
-                saveFormulasForChecker(oracleColl, formulaFile, true);
+
+    private void validateFormulasForChecker() {
+        String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition);
+        if (!aliveprop.equals("")) {// instrumentTerminalState will determine whether this return value is ""
+
+            List<String> tmpformulas = new ArrayList<>();
+            if ((temporalFormalism == TemporalFormalism.LTL_ITS) ||
+                    (temporalFormalism == TemporalFormalism.LTL_LTSMIN) ||
+                    (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
+                 saveFormulasForChecker(oracleColl, formulaFile, false);
+                tmpformulas = FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile,
+                        "!" +PropositionConstants.SETTING.terminalProposition);
+            } else if ((temporalFormalism == TemporalFormalism.CTL_GAL) ||
+                    (temporalFormalism == TemporalFormalism.CTL_ITS) ||
+                    (temporalFormalism == TemporalFormalism.CTL_LTSMIN)) {
+                tmpformulas = FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
+                        "!" +PropositionConstants.SETTING.terminalProposition);
             }
+            List<TemporalOracle> tmporacleList = new ArrayList<>();
+            int j = 0;
+            for (TemporalOracle ora : oracleColl
+            ) {
+                try {
+                    TemporalOracle oraClone = ora.clone();
+                    TemporalPatternBase pat = oraClone.getPatternBase();
+                    pat.setPattern_Formula(tmpformulas.get(j));
+                    tmporacleList.add(oraClone);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
+                j++;
+            }
+            saveFormulasForChecker(tmporacleList, formulaFile, true);
         } else {
             saveFormulasForChecker(oracleColl, formulaFile, true);
         }
         updateOracleCollMetaData(oracleColl);
     }
+
+
     public void removeFiles(){
         if (!verbose) {
             try {
