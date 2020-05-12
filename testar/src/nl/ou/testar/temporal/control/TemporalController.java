@@ -85,14 +85,11 @@ public class TemporalController {
         String logFileName = outputDir + "log.txt";
         simpleLog= new SimpleLog(logFileName,true);
         simpleLog.append(prettyCurrentTime() + " | " +"Temporal Component uses output folder: "+outputDir+"\n");
-        tDBManager = new TemporalDBManager(settings,simpleLog);
+        tDBManager = new TemporalDBManager(simpleLog);
         tModel = new TemporalModel();
         updateSettings(settings);
     }
 
-//    public TemporalController(final Settings settings) {
-//        this(settings, "");
-//    }
 
     /**
      * no params
@@ -137,6 +134,7 @@ public class TemporalController {
         verbose = settings.get(ConfigTags.TemporalVerbose);
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
         instrumentDeadlockState = settings.get(ConfigTags.TemporalInstrumentDeadlockState);
+        tDBManager.updateSettings(settings);
 
     }
 
@@ -404,7 +402,8 @@ public class TemporalController {
                 ltlITSMCCommand, ltlITSToWSLPath, ltlITSEnabled,
                 ltlLTSMINMCCommand, ltlLTSMINToWSLPath, ltlLTSMINEnabled,
                 ctlGALMCCommand, ctlGALToWSLPath, ctlGALEnabled,
-                ctlLTSMINMCCommand, ctlLTSMINToWSLPath, ctlLTSMINEnabled);
+                ctlLTSMINMCCommand, ctlLTSMINToWSLPath, ctlLTSMINEnabled,
+                true,"");
 
     }
 
@@ -416,7 +415,8 @@ public class TemporalController {
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
                        String ltlLtsminMCCommand, boolean ltlLtsminWSLPath, boolean ltlltsminEnabled,
                        String ctlGalMCCommand, boolean ctlGalWSLPath, boolean ctlGalEnabled,
-                       String ctlLtsminMCCommand, boolean ctlLtsminWSLPath, boolean ctlltsminEnabled
+                       String ctlLtsminMCCommand, boolean ctlLtsminWSLPath, boolean ctlltsminEnabled,
+                       boolean sourceIsDb, String modelFile
                        ) {
         try {
 
@@ -441,11 +441,9 @@ public class TemporalController {
                 String filename = Paths.get(oracleFile).getFileName().toString();
                 if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
                 else strippedFile = filename;
-                //File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
+
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-
-
-                makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState);
+                    makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,sourceIsDb,modelFile);
                 setOracleColl(fromcoll);
 
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
@@ -561,37 +559,42 @@ public class TemporalController {
             f.printStackTrace();
         }
     }
-
     public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState) {
+        makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,true,"");
+    }
+    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean sourceIsDB,String modelFile) {
         try {
             simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model started");
-            tModel = new TemporalModel();
+            if (verbose) {
+                String APCopy = "copy_of_applied_" + Paths.get(propositionManagerFile).getFileName().toString();
+                Files.copy((new File(propositionManagerFile).toPath()),
+                        new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+            loadPropositionManager(propositionManagerFile);
+            if (!sourceIsDB) {
+                simpleLog.append(prettyCurrentTime() + " | " + "temporal model loading from file");
+                tModel = (TemporalModel) JSONHandler.load(modelFile, TemporalModel.class);
+                simpleLog.append(prettyCurrentTime() + " | " + "temporal model loaded from file");
+                String modelCopy = "copy_of_applied_" + Paths.get(modelFile).getFileName().toString();
+                if (verbose) {
+                    Files.copy((new File(modelFile).toPath()),
+                            new File(outputDir + modelCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
 
-            AbstractStateModel abstractStateModel = getAbstractStateModel();
-            if (abstractStateModel == null) {
-                simpleLog.append("Error: StateModel not available");
             } else {
-                setTemporalModelMetaData(abstractStateModel);
-//                if (propositionManagerFile.equals("")) {
-//                    setDefaultPropositionManager();
-//                    savePropositionManager("PropositionManager_default.json");
-//                }
-//                else
-                    {
-                    String APCopy = "copy_of_applied_" + Paths.get(propositionManagerFile).getFileName().toString();
+                tModel = new TemporalModel();
+                AbstractStateModel abstractStateModel = getAbstractStateModel();
+                if (abstractStateModel == null) {
+                    simpleLog.append("Error: StateModel not available");
+                } else {
+                    setTemporalModelMetaData(abstractStateModel);
+                    tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
+                    simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
                     if (verbose) {
-                        Files.copy((new File(propositionManagerFile).toPath()),
-                                new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        saveModelAsJSON("PropositionEncodedModel.json");
                     }
                 }
-                loadPropositionManager(propositionManagerFile);
-                tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
-                //settModel(abstractStateModel, instrumentTerminalState);
-                if (verbose) {
-                    saveModelAsJSON("PropositionEncodedModel.json");
-                }
 
-                simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
             }
         } catch (Exception f) {
             f.printStackTrace();

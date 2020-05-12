@@ -23,6 +23,9 @@ public class SimpleLog {
     }
 
     public void append(String str) {
+        append(str, alsoToConsole);
+    }
+    public void append(String str,boolean alsoToConsole) {
         if (alsoToConsole) {System.out.println(str);}
         try {
             if (str.endsWith("\n")){ out.write(str);
@@ -33,7 +36,6 @@ public class SimpleLog {
             e.printStackTrace();
         }
     }
-
     public void close() {
         try {
             out.flush();

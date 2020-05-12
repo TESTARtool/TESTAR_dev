@@ -13,7 +13,7 @@ public class StateEncoding {
     public StateEncoding(String state) {
         this.state = state;
     }
-
+    public StateEncoding() { }
 
     public String getState() {
         return state;

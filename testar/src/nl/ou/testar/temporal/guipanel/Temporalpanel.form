@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.guipanel.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
-    <rowspec value="top:328px:noGrow"/>
+    <rowspec value="top:367px:noGrow"/>
     <colspec value="right:245px:grow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:45px:noGrow"/>
@@ -362,13 +362,19 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:42px:noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="left:132px:noGrow"/>
-            <colspec value="fill:121px:noGrow"/>
-            <colspec value="fill:37px:noGrow"/>
+            <colspec value="fill:66px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="fill:46px:noGrow"/>
             <colspec value="fill:43px:noGrow"/>
             <colspec value="fill:19px:noGrow"/>
             <colspec value="fill:11px:noGrow"/>
-            <colspec value="fill:33px:noGrow"/>
+            <colspec value="fill:36px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:15px:noGrow"/>
             <colspec value="left:111px:noGrow"/>
             <colspec value="left:45dlu:noGrow"/>
             <constraints>
@@ -397,7 +403,7 @@
               </component>
               <component id="b9b70" class="javax.swing.JTextField" binding="oracleFile">
                 <constraints>
-                  <grid row="13" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="13" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -406,7 +412,7 @@
               </component>
               <component id="55810" class="javax.swing.JTextField" binding="patternFile">
                 <constraints>
-                  <grid row="11" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="11" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -426,7 +432,7 @@
               </component>
               <component id="1e04" class="javax.swing.JTextField" binding="PropositionManagerFile">
                 <constraints>
-                  <grid row="7" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="7" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -444,7 +450,7 @@
               </component>
               <component id="f800a" class="javax.swing.JTextField" binding="patternConstraintsFile">
                 <constraints>
-                  <grid row="9" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="9" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -453,7 +459,7 @@
               </component>
               <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
                 <constraints>
-                  <grid row="11" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="11" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -488,7 +494,7 @@
               </component>
               <component id="a1231" class="javax.swing.JButton" binding="defaultPropositionMgrBtn">
                 <constraints>
-                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -499,23 +505,9 @@
                   <toolTipText value="Generate a sample Proposition Manager"/>
                 </properties>
               </component>
-              <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
-                <constraints>
-                  <grid row="6" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties>
-                  <preferredSize width="110" height="30"/>
-                  <text value="Sample Oracle"/>
-                  <toolTipText value="Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint"/>
-                </properties>
-                <clientProperties>
-                  <html.disable class="java.lang.Boolean" value="false"/>
-                </clientProperties>
-              </component>
               <component id="11461" class="javax.swing.JButton" binding="generateBtn">
                 <constraints>
-                  <grid row="11" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="11" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -526,20 +518,9 @@
                   <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB &lt;/html&gt;"/>
                 </properties>
               </component>
-              <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
-                <constraints>
-                  <grid row="13" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <horizontalTextPosition value="0"/>
-                  <text value="Model Check"/>
-                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
-                </properties>
-              </component>
               <component id="73a81" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -549,7 +530,7 @@
               </component>
               <component id="8a066" class="javax.swing.JCheckBox" binding="CounterExamples">
                 <constraints>
-                  <grid row="2" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -559,7 +540,7 @@
               </component>
               <component id="8e7a8" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -570,7 +551,7 @@
               </component>
               <component id="e7209" class="javax.swing.JCheckBox" binding="enforceAbstractionEquality">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -581,7 +562,7 @@
               </component>
               <component id="655bc" class="javax.swing.JCheckBox" binding="instrumentDeadlockStatesCheckBox">
                 <constraints>
-                  <grid row="4" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -591,7 +572,7 @@
               </component>
               <component id="54d5f" class="javax.swing.JButton" binding="testDbButton">
                 <constraints>
-                  <grid row="2" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -601,7 +582,7 @@
               </component>
               <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
                 <constraints>
-                  <grid row="6" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -613,7 +594,7 @@
               </component>
               <component id="6174" class="javax.swing.JButton" binding="ModelOnlyBtn">
                 <constraints>
-                  <grid row="6" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -624,7 +605,7 @@
               </component>
               <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
                 <constraints>
-                  <grid row="7" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                  <grid row="7" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
                     <maximum-size width="30" height="-1"/>
                   </grid>
@@ -636,7 +617,7 @@
               </component>
               <component id="e8bb" class="javax.swing.JButton" binding="selectFilePatternConstraints">
                 <constraints>
-                  <grid row="9" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                  <grid row="9" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
                     <maximum-size width="30" height="-1"/>
                   </grid>
@@ -648,7 +629,7 @@
               </component>
               <component id="25d53" class="javax.swing.JButton" binding="selectFilePatterns">
                 <constraints>
-                  <grid row="11" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                  <grid row="11" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
                     <maximum-size width="30" height="-1"/>
                   </grid>
@@ -660,7 +641,7 @@
               </component>
               <component id="d20dc" class="javax.swing.JButton" binding="selectFileOracles">
                 <constraints>
-                  <grid row="13" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                  <grid row="13" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
                     <maximum-size width="30" height="-1"/>
                   </grid>
@@ -668,6 +649,76 @@
                 </constraints>
                 <properties>
                   <text value="..."/>
+                </properties>
+              </component>
+              <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
+                <constraints>
+                  <grid row="6" column="5" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <preferredSize width="110" height="30"/>
+                  <text value="Sample Oracle"/>
+                  <toolTipText value="Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint"/>
+                </properties>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
+              </component>
+              <component id="af878" class="javax.swing.JCheckBox" binding="sourceIsDb">
+                <constraints>
+                  <grid row="4" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="DB as source"/>
+                  <toolTipText value="&lt;html&gt;&#10;When checked: uses Graph Database as source for Model checking&lt;br&gt;&#10;else: The Model file is the sourc&lt;br&gt;&#10;Use-case: checking a new formula against  an 'old' Model&lt;bre&gt;&#10;This setting has only effect when used in the GUI.&lt;Br&gt;&#10;Model-checking during TESTAR test runs always use the DB as source.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="f670d" class="javax.swing.JTextField" binding="modelFile">
+                <constraints>
+                  <grid row="15" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="7c258" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Model File"/>
+                </properties>
+              </component>
+              <component id="954b8" class="javax.swing.JButton" binding="selectFileModel">
+                <constraints>
+                  <grid row="15" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="false"/>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
+                <constraints>
+                  <grid row="15" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalTextPosition value="0"/>
+                  <text value="Model Check"/>
+                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
             </children>

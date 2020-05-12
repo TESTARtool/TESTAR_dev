@@ -32,6 +32,7 @@ public class Temporalpanel {
     private StreamConsumer webAnalyzerErr;
     private StreamConsumer webAnalyzerOut;
     TemporalController tcontrol;
+    private Settings settings;
     private String outputDir;
     boolean statemodelEnabled;
     //**** custom
@@ -89,6 +90,9 @@ public class Temporalpanel {
     private JTextField ltsminCTLChecker;
     private JCheckBox WSLCheckBoxCTLLTSMIN;
     private JCheckBox enableLTSMIN_CTL;
+    private JCheckBox sourceIsDb;
+    private JTextField modelFile;
+    private JButton selectFileModel;
 
     public Temporalpanel() {
         $$$setupUI$$$();
@@ -114,28 +118,16 @@ public class Temporalpanel {
         generateBtn.addActionListener(e -> generateOracles());
         selectFilePatterns.addActionListener(e -> chooserHelper(patternFile));
         selectFilePatternConstraints.addActionListener(e -> chooserHelper(patternConstraintsFile));
+        selectFileModel.addActionListener(e -> chooserHelper(modelFile));
 
-        containerTab.addFocusListener(new FocusAdapter() {
+        sourceIsDb.addItemListener(new ItemListener() {
             @Override
-            public void focusGained(FocusEvent e) {
-                super.focusGained(e);
+            public void itemStateChanged(ItemEvent e) {
+                modelFile.setEnabled(!sourceIsDb.isSelected());
+                selectFileModel.setEnabled(!sourceIsDb.isSelected());
             }
         });
 
-        mainTemporalPanel.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                super.focusGained(e);
-//                if (statemodelEnabled) {
-//                    //works crappy todo: improve
-//                    JOptionPane.showMessageDialog(setupPanel,
-//                            "The State Model must be enabled and setup completely before using the Temporal Features." +
-//                                    "Restart TESTAR or switch settings to apply",
-//                            "Warning",
-//                            JOptionPane.WARNING_MESSAGE);
-//                }
-            }
-        });
     }
 
     public static Temporalpanel createTemporalPanel() {
@@ -152,7 +144,7 @@ public class Temporalpanel {
      */
     private void $$$setupUI$$$() {
         mainTemporalPanel = new JPanel();
-        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:51px:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:328px:noGrow"));
+        mainTemporalPanel.setLayout(new FormLayout("right:245px:grow,left:4dlu:noGrow,fill:45px:noGrow,left:7dlu:noGrow,fill:51px:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:195px:noGrow,fill:8px:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:367px:noGrow"));
         mainTemporalPanel.setEnabled(true);
         mainTemporalPanel.setMinimumSize(new Dimension(621, 350));
         mainTemporalPanel.setPreferredSize(new Dimension(621, 350));
@@ -281,7 +273,7 @@ public class Temporalpanel {
         enableLTSMIN_CTL.setVisible(true);
         setupPanel.add(enableLTSMIN_CTL, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
-        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:121px:noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:33px:noGrow,left:111px:noGrow,left:45dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow"));
+        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:66px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:37px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:36px:noGrow,left:4dlu:noGrow,fill:15px:noGrow,left:111px:noGrow,left:45dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         containerTab.addTab("Miner", minerPanel);
         final JLabel label7 = new JLabel();
         label7.setText("Oracles:");
@@ -290,20 +282,20 @@ public class Temporalpanel {
         label8.setText("Oracle Patterns:");
         minerPanel.add(label8, cc.xy(1, 12, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         oracleFile = new JTextField();
-        minerPanel.add(oracleFile, cc.xyw(2, 14, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        minerPanel.add(oracleFile, cc.xyw(2, 14, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         patternFile = new JTextField();
         patternFile.setText("");
-        minerPanel.add(patternFile, cc.xyw(2, 12, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        minerPanel.add(patternFile, cc.xyw(2, 12, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label9 = new JLabel();
         label9.setText("Proposition Manager:");
         minerPanel.add(label9, cc.xy(1, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         PropositionManagerFile = new JTextField();
-        minerPanel.add(PropositionManagerFile, cc.xyw(2, 8, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        minerPanel.add(PropositionManagerFile, cc.xyw(2, 8, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label10 = new JLabel();
         label10.setText("Pattern Constraints:");
         minerPanel.add(label10, cc.xy(1, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         patternConstraintsFile = new JTextField();
-        minerPanel.add(patternConstraintsFile, cc.xyw(2, 10, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        minerPanel.add(patternConstraintsFile, cc.xyw(2, 10, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         tacticComboBox = new JComboBox();
         tacticComboBox.setEnabled(true);
         tacticComboBox.setMaximumSize(new Dimension(130, 38));
@@ -320,7 +312,8 @@ public class Temporalpanel {
         tacticComboBox.setPreferredSize(new Dimension(150, 30));
         tacticComboBox.setToolTipText("<HTML>tactic to generate oracles from the supplied Pattern collection.<BR>\nShows the number of potential oracles to generate per pattern\n</HTML>");
         tacticComboBox.setVerifyInputWhenFocusTarget(true);
-        minerPanel.add(tacticComboBox, cc.xy(9, 12, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        tacticComboBox.putClientProperty("html.disable", Boolean.FALSE);
+        minerPanel.add(tacticComboBox, cc.xy(13, 12, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label11 = new JLabel();
         label11.setText("Generate:");
         minerPanel.add(label11, cc.xy(1, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
@@ -330,93 +323,109 @@ public class Temporalpanel {
         defaultPropositionMgrBtn.setPreferredSize(new Dimension(130, 30));
         defaultPropositionMgrBtn.setText("Proposition Mgr");
         defaultPropositionMgrBtn.setToolTipText("Generate a sample Proposition Manager");
-        minerPanel.add(defaultPropositionMgrBtn, cc.xy(2, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
-        sampleOracleBtn = new JButton();
-        sampleOracleBtn.setPreferredSize(new Dimension(110, 30));
-        sampleOracleBtn.setText("Sample Oracle");
-        sampleOracleBtn.setToolTipText("Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint");
-        sampleOracleBtn.putClientProperty("html.disable", Boolean.FALSE);
-        minerPanel.add(sampleOracleBtn, cc.xyw(3, 7, 4, CellConstraints.LEFT, CellConstraints.CENTER));
+        minerPanel.add(defaultPropositionMgrBtn, cc.xyw(2, 7, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         generateBtn = new JButton();
         generateBtn.setEnabled(true);
         generateBtn.setHorizontalTextPosition(0);
         generateBtn.setMaximumSize(new Dimension(81, 30));
         generateBtn.setText("<html>Generate</html>");
         generateBtn.setToolTipText("<html>Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. <BR>\nPattern Constraints can be applied to control the ramdom instantiation.\n<BR>\nThe list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB </html>");
-        minerPanel.add(generateBtn, cc.xy(8, 12));
-        modelCheckBtn = new JButton();
-        modelCheckBtn.setHorizontalTextPosition(0);
-        modelCheckBtn.setText("Model Check");
-        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired input: <BR>\n\t+ Proposition Manager. This file is used for filtering atomic propositions from the Model<BR>\n\t+ Oracles. This file contains the formulas to be checked. <BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
-        minerPanel.add(modelCheckBtn, cc.xy(8, 14));
+        minerPanel.add(generateBtn, cc.xy(12, 12));
         enableTemporalOfflineOraclesCheckBox = new JCheckBox();
         enableTemporalOfflineOraclesCheckBox.setText("Enable Temporal Offline Oracles");
         enableTemporalOfflineOraclesCheckBox.setToolTipText("<html>Temporal oracles are automatically evaluated after each TESTAR run and use the settings in this form.<BR>\nProtocol (JAVA) modification might apply</html>");
-        minerPanel.add(enableTemporalOfflineOraclesCheckBox, cc.xyw(1, 3, 2));
+        minerPanel.add(enableTemporalOfflineOraclesCheckBox, cc.xyw(1, 3, 4));
         CounterExamples = new JCheckBox();
         CounterExamples.setText("Counter Examples");
         CounterExamples.setToolTipText("<html>Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).<BR>\n(not all implemented modelcheckers can produce such traces) </html>");
-        minerPanel.add(CounterExamples, cc.xyw(3, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(CounterExamples, cc.xyw(5, 3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         verboseCheckBox = new JCheckBox();
         verboseCheckBox.setSelected(true);
         verboseCheckBox.setText("Verbose");
         verboseCheckBox.setToolTipText("<html> When checked: keeps the intermediate files on disk ,<br>\nelse: these files are deleted after the Checker has run.\n</html>");
-        minerPanel.add(verboseCheckBox, cc.xy(8, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(verboseCheckBox, cc.xy(12, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         enforceAbstractionEquality = new JCheckBox();
         enforceAbstractionEquality.setSelected(true);
         enforceAbstractionEquality.setText("Enforce Abstraction equality");
         enforceAbstractionEquality.setToolTipText("<html>Concrete Abstraction attributes in <b>NEW</b> models will be the same as on the Abstract Layer.<br>\n(this overrules the ConcreteStateAttributes parameter in the settings file and <br>\nthe default uses <b>ALL</b> StateAttributes as ConcreteStateAttributes)<br>\nIt is advised to leave this setting enabled.</html>");
-        minerPanel.add(enforceAbstractionEquality, cc.xyw(1, 5, 2));
+        minerPanel.add(enforceAbstractionEquality, cc.xyw(1, 5, 4));
         instrumentDeadlockStatesCheckBox = new JCheckBox();
         instrumentDeadlockStatesCheckBox.setText("Instrument terminal states");
         instrumentDeadlockStatesCheckBox.setToolTipText("<html> In case that the Graph-model has terminal states (~ no outgoing transitions):<BR>\n1. a new artificial state  with a selfloop is added<BR>\n2. forall terminal states, a transition will be added to that newly created artificial state.<BR>\n3. the transitions have a single atomic proposition that indicates that the target state is terminal.<BR>\nThis 'enriched' model will be provided to the model-checker.<BR>\n(not the original Graph-model) </html>");
-        minerPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(3, 5, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(5, 5, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         testDbButton = new JButton();
         testDbButton.setText("Show DB ");
         testDbButton.setToolTipText("Exports the existing models in the Graph database to a file.");
-        minerPanel.add(testDbButton, cc.xy(9, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(testDbButton, cc.xy(13, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         graphMLBtn = new JButton();
         graphMLBtn.setMaximumSize(new Dimension(83, 38));
         graphMLBtn.setPreferredSize(new Dimension(90, 30));
         graphMLBtn.setText("GraphML");
         graphMLBtn.setToolTipText("<html>Exports the model** from the graphDB  into (GRAPHML.XML) format. <br>\n<BR>\n** Ensure that the correct <BR>\n1. Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel<BR>\nare saved before invoking this function!!! <BR>\nUse the 'Show Db' to view the available models </html> ");
-        minerPanel.add(graphMLBtn, cc.xy(8, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(graphMLBtn, cc.xy(12, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         ModelOnlyBtn = new JButton();
         ModelOnlyBtn.setPreferredSize(new Dimension(78, 30));
         ModelOnlyBtn.setText("Model");
         ModelOnlyBtn.setToolTipText("<html>Exports/transforms the model from the graphDB  into (JSON) format. <br>\n\n** Ensure that <BR>\n1. Proposition Manager is available. This file is used for filtering atomic propositions <BR>\n2. Application name and version settings on General panel and <BR>\n3. Abstraction settings on the State model panel<BR> \nare saved before invoking this function!!! <BR>\nUse the 'Show Db'  to view the available models </html> ");
-        minerPanel.add(ModelOnlyBtn, cc.xy(9, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        minerPanel.add(ModelOnlyBtn, cc.xy(13, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         selectFilePropositionManager = new JButton();
         selectFilePropositionManager.setText("...");
-        minerPanel.add(selectFilePropositionManager, cc.xy(7, 8));
+        minerPanel.add(selectFilePropositionManager, cc.xyw(9, 8, 3));
         selectFilePatternConstraints = new JButton();
         selectFilePatternConstraints.setText("...");
-        minerPanel.add(selectFilePatternConstraints, cc.xy(7, 10));
+        minerPanel.add(selectFilePatternConstraints, cc.xyw(9, 10, 3));
         selectFilePatterns = new JButton();
         selectFilePatterns.setText("...");
-        minerPanel.add(selectFilePatterns, cc.xy(7, 12));
+        minerPanel.add(selectFilePatterns, cc.xyw(9, 12, 3));
         selectFileOracles = new JButton();
         selectFileOracles.setText("...");
-        minerPanel.add(selectFileOracles, cc.xy(7, 14));
+        minerPanel.add(selectFileOracles, cc.xyw(9, 14, 3));
+        sampleOracleBtn = new JButton();
+        sampleOracleBtn.setPreferredSize(new Dimension(110, 30));
+        sampleOracleBtn.setText("Sample Oracle");
+        sampleOracleBtn.setToolTipText("Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint");
+        sampleOracleBtn.putClientProperty("html.disable", Boolean.FALSE);
+        minerPanel.add(sampleOracleBtn, cc.xyw(6, 7, 6, CellConstraints.LEFT, CellConstraints.CENTER));
+        sourceIsDb = new JCheckBox();
+        sourceIsDb.setSelected(true);
+        sourceIsDb.setText("DB as source");
+        sourceIsDb.setToolTipText("<html>\nWhen checked: uses Graph Database as source for Model checking<br>\nelse: The Model file is the sourc<br>\nUse-case: checking a new formula against  an 'old' Model<bre>\nThis setting has only effect when used in the GUI.<Br>\nModel-checking during TESTAR test runs always use the DB as source.\n</html>");
+        minerPanel.add(sourceIsDb, cc.xy(12, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        modelFile = new JTextField();
+        modelFile.setEnabled(false);
+        modelFile.setText("");
+        minerPanel.add(modelFile, cc.xyw(2, 16, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label12 = new JLabel();
+        label12.setText("Model File");
+        minerPanel.add(label12, cc.xy(1, 16, CellConstraints.RIGHT, CellConstraints.DEFAULT));
+        selectFileModel = new JButton();
+        selectFileModel.setEnabled(false);
+        selectFileModel.setText("...");
+        minerPanel.add(selectFileModel, cc.xyw(9, 16, 3));
+        modelCheckBtn = new JButton();
+        modelCheckBtn.setHorizontalTextPosition(0);
+        modelCheckBtn.setText("Model Check");
+        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired input: <BR>\n\t+ Proposition Manager. This file is used for filtering atomic propositions from the Model<BR>\n\t+ Oracles. This file contains the formulas to be checked. <BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        minerPanel.add(modelCheckBtn, cc.xy(12, 16));
         visualizerPanel = new JPanel();
         visualizerPanel.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:78dlu:noGrow,left:4dlu:noGrow,left:115px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:47px:noGrow,left:27dlu:noGrow,fill:max(d;4px):noGrow", "center:49px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         visualizerPanel.setEnabled(false);
         containerTab.addTab("Visualizer", visualizerPanel);
         PythonEnv_Path = new JTextField();
         visualizerPanel.add(PythonEnv_Path, cc.xyw(3, 1, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label12 = new JLabel();
-        label12.setText("Python Env. :");
-        label12.setToolTipText("Path to Active Virtual environment");
-        visualizerPanel.add(label12, cc.xy(1, 1));
+        final JLabel label13 = new JLabel();
+        label13.setText("Python Env. :");
+        label13.setToolTipText("Path to Active Virtual environment");
+        visualizerPanel.add(label13, cc.xy(1, 1));
         selectFilePython_ENV = new JButton();
         selectFilePython_ENV.setText("...");
         visualizerPanel.add(selectFilePython_ENV, cc.xy(9, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         PythonVisualizer_Path = new JTextField();
         visualizerPanel.add(PythonVisualizer_Path, cc.xyw(3, 3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final JLabel label13 = new JLabel();
-        label13.setText("Visualizer:");
-        label13.setToolTipText("Usually this is the path to run.py");
-        visualizerPanel.add(label13, cc.xy(1, 3));
+        final JLabel label14 = new JLabel();
+        label14.setText("Visualizer:");
+        label14.setToolTipText("Usually this is the path to run.py");
+        visualizerPanel.add(label14, cc.xy(1, 3));
         selectFilePython_VIZ = new JButton();
         selectFilePython_VIZ.setText("...");
         visualizerPanel.add(selectFilePython_VIZ, cc.xy(9, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
@@ -475,6 +484,8 @@ public class Temporalpanel {
         patternFile.setText(settings.get(ConfigTags.TemporalPatterns));
         PropositionManagerFile.setText(settings.get(ConfigTags.TemporalPropositionManager));
         patternConstraintsFile.setText(settings.get(ConfigTags.TemporalPatternConstraints));
+        modelFile.setText(settings.get(ConfigTags.TemporalModelFile));
+        sourceIsDb.setSelected(settings.get(ConfigTags.TemporalDBisSource));
         String[] comboBoxLabels = settings.get(TemporalGeneratorTactics).stream().filter(Objects::nonNull).toArray(String[]::new);
         DefaultComboBoxModel<String> cbModel = new DefaultComboBoxModel<>(comboBoxLabels); // read only
         tacticComboBox.setModel(cbModel);
@@ -482,13 +493,16 @@ public class Temporalpanel {
         PythonVisualizer_Path.setText(settings.get(ConfigTags.TemporalVisualizerServer));
         VisualizerURL = settings.get(ConfigTags.TemporalVisualizerURL);
         VisualizerURLStop = settings.get(ConfigTags.TemporalVisualizerURLStop);
+        this.settings = settings;
         if (tcontrol == null) {// when NOT triggered by save button on the general panel
             tcontrol = new TemporalController(settings);
             outputDir = tcontrol.getOutputDir();
         } else {
-            tcontrol.updateSettings(settings);
+            tcontrol.updateSettings(this.settings);
         }
-        statemodelEnabled = settings.get(ConfigTags.StateModelEnabled);
+        modelFile.setEnabled(!sourceIsDb.isSelected());
+        selectFileModel.setEnabled(!sourceIsDb.isSelected());
+        statemodelEnabled = this.settings.get(ConfigTags.StateModelEnabled);
     }
 
 
@@ -519,6 +533,8 @@ public class Temporalpanel {
         settings.set(ConfigTags.TemporalOracles, oracleFile.getText());
         settings.set(ConfigTags.TemporalPropositionManager, PropositionManagerFile.getText());
         settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsFile.getText());
+        settings.set(ConfigTags.TemporalModelFile, modelFile.getText());
+        settings.set(ConfigTags.TemporalDBisSource, sourceIsDb.isSelected());
         settings.set(ConfigTags.TemporalInstrumentDeadlockState, instrumentDeadlockStatesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalPythonEnvironment, PythonEnv_Path.getText());
         settings.set(ConfigTags.TemporalVisualizerServer, PythonVisualizer_Path.getText());
@@ -550,7 +566,8 @@ public class Temporalpanel {
                 itsLTLChecker.getText(), WSLCheckBoxLTLITS.isSelected(), enableITS_LTL.isSelected(),
                 ltsminLTLChecker.getText(), WSLCheckBoxLTLLTSMIN.isSelected(), enableLTSMIN_LTL.isSelected(),
                 galCTLChecker.getText(), WSLCheckBoxCTLGAL.isSelected(), enableGAL_CTL.isSelected(),
-                ltsminCTLChecker.getText(), WSLCheckBoxCTLLTSMIN.isSelected(), enableLTSMIN_CTL.isSelected()
+                ltsminCTLChecker.getText(), WSLCheckBoxCTLLTSMIN.isSelected(), enableLTSMIN_CTL.isSelected(),
+                sourceIsDb.isSelected(),modelFile.getText()
         );
     }
 
