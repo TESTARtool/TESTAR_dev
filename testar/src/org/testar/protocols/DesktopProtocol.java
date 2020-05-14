@@ -31,7 +31,6 @@
 
 package org.testar.protocols;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Environment;
@@ -47,7 +46,7 @@ import java.util.Set;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class DesktopProtocol extends ClickFilterLayerProtocol {
+public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
@@ -314,7 +313,4 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         }
         return actions;
     }
-
-
-
 }
