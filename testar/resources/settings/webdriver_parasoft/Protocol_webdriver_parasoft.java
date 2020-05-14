@@ -1,5 +1,4 @@
 /**
- * 
  * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
  * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
  *
@@ -30,33 +29,37 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
-import org.fruit.Pair;
+import nl.ou.testar.SutVisualization;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.DesktopProtocol;
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Pattern;
+import org.sikuli.script.Region;
+import org.sikuli.script.Screen;
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_statemodel extends WebdriverProtocol {
+public class Protocol_webdriver_parasoft extends WebdriverProtocol {
 
+	String extensionId = "";
+	String extensionVersion = "";
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -74,7 +77,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
+		deniedExtensions = Arrays.asList("pdf", "jpg", "png","pfx");
 
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
@@ -90,16 +93,23 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		/*policyAttributes = new HashMap<String, String>() {{ 
-			put("id", "sncmp-banner-btn-agree");
+		/*policyAttributes = new HashMap<String, String>() {{
+			put("class", "iAgreeButton");
 		}};*/
-		
+
 		WdDriver.fullScreen = true;
+		
+		/**
+		 * Local Path to the desired Chrome Extension
+		 * Example: "C:\\Users\\*username*\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\*extension id*\\*extension version*";
+		 */
+		
+		WdDriver.additionalExtension = "C:\\Users\\testar\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\"
+		+ extensionId + "\\" + extensionVersion;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 	}
-	
 	
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -110,20 +120,29 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state){
 
+		// Starting Parasoft Chrome plugin
+		WdDriver.loadingExtension = true;
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_recorder_chrome_icon.jpg");
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_start_recording_icon.jpg");
+		WdDriver.loadingExtension = false;
+		//parasoftStartRecording();
+
+		Util.pause(5);
+
 		// When a TESTAR sequence begins we will login in to the application
 		for(Widget w : state) {
 			
 			// Find username Input widget to type the username
 			if(w.get(WdTags.WebName,"").equals("username")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "username", true);
+				Action a = ac.clickTypeInto(w, "parasoft", true);
 				executeAction(system, state, a);
 			}
 			
 			// Find password Input widget to type the password
 			if(w.get(WdTags.WebName,"").equals("password")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "password", true);
+				Action a = ac.clickTypeInto(w, "demo", true);
 				executeAction(system, state, a);
 			}
 		}
@@ -141,9 +160,36 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		Util.pause(5);
 		
 		// Update the state to retrieve the new one after login
-		state = getState(system);
+		state = super.getState(system);
 		
 		super.beginSequence(system, state);
+	}
+	
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
+
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		//--------------------------------------------------------
+
+		for(Widget w : state) {
+			if(w.get(WdTags.WebTextContext,"").contains("internal error")) {
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
+						"Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContext,"") + "'.");
+			}
+		}
+		
+		return verdict;
 	}
 
 	/**
@@ -161,6 +207,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
+		Set<Action> filteredActions = new HashSet<>();
 
 		//If we are on the admin web page, go back to the previous page
 		if(WdDriver.getCurrentUrl().contains("parabank.parasoft.com/parabank/admin.htm")) {
@@ -179,25 +226,34 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
-
+			
 			// Skip Admin and logout page widget
 			if(widget.get(WdTags.WebHref,"").contains("admin.htm")
-					|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
+					|| widget.get(WdTags.WebHref,"").contains("logout.htm")
+					|| widget.get(WdTags.WebHref,"").contains("wadl")
+					|| widget.get(WdTags.WebHref,"").contains("wsdl")) {
+				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}
-
+			
 			// If the State contains the login panel, create a login action
 			if(widget.get(WdTags.WebId,"").contains("loginPanel")) {
 				loginParasoft("username", "password", state, actions, ac);
 			}
+			
+			// only consider enabled widgets
+			if (!widget.get(Enabled, true)) {
+				continue;
+			}
 
-			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
+			// filter tabu widgets
+			if (blackListed(widget)) {
+				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			addSlidingActions(actions, ac, SCROLL_ARROW_SIZE, SCROLL_THICK, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
@@ -213,11 +269,56 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
 					actions.add(ac.leftClickAt(widget));
+				}else{
+					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
+		if(actions.isEmpty()) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
 		return actions;
+	}
+	
+	@Override
+	protected void stopSystem(SUT system) {
+		// Stop recording with Parasoft Chrome plugin
+		WdDriver.loadingExtension = true;
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_recorder_chrome_icon_stop.jpg");
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_stop_recording_icon.jpg");
+		
+		Util.pause(1);
+		
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_test_name.jpg");
+		
+		Util.pause(1);
+		
+		Keyboard kb = AWTKeyboard.build();
+		kb.press(KBKeys.VK_TAB);
+		kb.release(KBKeys.VK_TAB);
+		
+		new CompoundAction.Builder()   
+		.add(new Type(OutputStructure.startOuterLoopDateString +"_"+ OutputStructure.executedSUTname),1).build()
+		.run(system, null, 1);
+		
+		Util.pause(1);
+		
+		executeClickOnTextOrImagePath("settings/webdriver_parasoft/parasoft_download_record.jpg");
+		
+		Util.pause(5);
+		
+		kb.press(KBKeys.VK_ENTER);
+		kb.release(KBKeys.VK_ENTER);
+		
+		Util.pause(5);
+		
+		WdDriver.loadingExtension = false;
+		
+		super.stopSystem(system);
 	}
 	
 	/**
@@ -295,29 +396,45 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	}
 
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
+	 * Using SikuliX library to click on text on screen
+	 * @param textToFindOrImagePath
 	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			//using the action selector of the state model:
-			retAction = stateModelManager.getAbstractActionToExecute(actions);
+	protected  static void executeClickOnTextOrImagePath(String textToFindOrImagePath){
+		Screen sikuliScreen = new Screen();
+		try {
+			//System.out.println("DEBUG: sikuli clicking on text (or image path): "+textToFindOrImagePath);
+			sikuliScreen.click(textToFindOrImagePath);
+		} catch (FindFailed findFailed) {
+			findFailed.printStackTrace();
 		}
-		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
-		}
-		return retAction;
 	}
 
+	protected  static boolean textOrImageExists(String textOrImagePath){
+		if(getRegionOfTextOrImage(textOrImagePath)==null){
+			// text or image not found
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 *
+	 * @param textOrImagePath
+	 * @return null if not found
+	 */
+	protected  static Region getRegionOfTextOrImage(String textOrImagePath){
+		Screen sikuliScreen = new Screen();
+		Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.90));
+		Region region = sikuliScreen.exists(pattern);
+		return region;
+	}
+	
+	protected void parasoftStartRecording() {
+		WdDriver.followLinks = true;
+		String extensionURL = "\"chrome-extension://" + extensionId + "/html/popup.html\"";
+		WdDriver.executeScript("window.open(" + extensionURL + ");");
+		Util.pause(1);
+		WdDriver.executeScript("$(\"#startRecordingButton\").click()");
+		WdDriver.followLinks = followLinks;
+	}
 }

@@ -148,14 +148,17 @@ public final class WdState extends WdWidget implements State {
 			ret = w.element.enabled;
 		}
 		else if (t.equals(Tags.Title)) {
-			ret = w.element.name;
+			ret = w.element.genericTitle;
+		}
+		else if (t.equals(WdTags.WebGenericTitle)) {
+			ret = w.element.genericTitle;
 		}
 		else if (t.equals(Tags.ValuePattern)) {
-			ret = w.element.valuePattern;
+			ret = w.element.href;
 		}
-		else if (t.equals(Tags.ToolTipText)) {
+		/*else if (t.equals(Tags.ToolTipText)) {
 			ret = w.element.helpText;
-		}
+		}*/
 		else if (t.equals(Tags.PID)) {
 			ret = w == this ? ((WdRootElement) element).pid : null;
 		}
@@ -177,9 +180,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebName)) {
 			ret = w.element.name;
 		}
-		else if (t.equals(WdTags.WebOrientation)) {
+		/*else if (t.equals(WdTags.WebOrientation)) {
 			ret = (long)0;
-		}
+		}*/
 		else if (t.equals(WdTags.WebCssClasses)) {
 			ret = w.element.cssClasses.toString();
 		}
@@ -189,9 +192,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsWindowModal)) {
 			ret = w.element.isModal;
 		}
-		else if (t.equals(WdTags.WebIsTopmostWindow)) {
+		/*else if (t.equals(WdTags.WebIsTopmostWindow)) {
 			ret = true;
-		}
+		}*/
 		else if (t.equals(WdTags.WebIsContentElement)) {
 			ret = w.element.isContentElement;
 		}
@@ -219,21 +222,21 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebScrollVerticalPercent)) {
 			ret = w.element.vScrollPercent;
 		}
-		else if (t.equals(WdTags.WebHelpText)) {
+		/*else if (t.equals(WdTags.WebHelpText)) {
 			ret = w.element.helpText;
-		}
+		}*/
 		else if (t.equals(WdTags.WebTagName)) {
 			ret = w.element.tagName;
 		}
-		else if (t.equals(WdTags.WebControlType)) {
+		/*else if (t.equals(WdTags.WebControlType)) {
 			ret = null;
-		}
-		else if (t.equals(WdTags.WebCulture)) {
+		}*/
+		/*else if (t.equals(WdTags.WebCulture)) {
 			ret = w.element.culture;
-		}
-		else if (t.equals(WdTags.WebFrameworkId)) {
+		}*/
+		/*else if (t.equals(WdTags.WebFrameworkId)) {
 			ret = null;
-		}
+		}*/
 		else if (t.equals(WdTags.WebHasKeyboardFocus)) {
 			ret = w.element.hasKeyboardFocus;
 		}
@@ -281,6 +284,9 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
+		}
+		else if (t.equals(WdTags.WebSrc)) {
+			ret = w.element.src;
 		}
 		else if (t.equals(WdTags.WebZIndex)) {
 			ret = w.element.zindex;

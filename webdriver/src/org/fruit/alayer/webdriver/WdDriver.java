@@ -79,6 +79,9 @@ public class WdDriver extends SUTBase {
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
+  
+  public static String additionalExtension = "";
+  public static boolean loadingExtension = false;
 
   private WdDriver(String sutConnector) {
 	
@@ -158,7 +161,14 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
-    options.addArguments("load-extension=" + extensionPath);
+    
+    if(!additionalExtension.isEmpty()) {
+    	options.addArguments("load-extension=" + extensionPath + "," + additionalExtension);
+    	System.out.println("AdditionalExtension loaded, path: " + additionalExtension);
+    } else {
+    	options.addArguments("load-extension=" + extensionPath);
+    }
+    
     options.addArguments("disable-infobars");
     if(fullScreen)
     	options.addArguments("--start-maximized");
@@ -407,7 +417,7 @@ public class WdDriver extends SUTBase {
     updateHandlesList();
 
     // Nothing to activate
-    if (windowHandles.size() < 1) {
+    if (windowHandles.size() < 1 || loadingExtension) {
       return;
     }
 

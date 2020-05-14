@@ -198,4 +198,9 @@ public class WdCanvas implements Canvas {
 
     return true;
   }
+  
+	@Override
+	public String toString() {
+		return "x: " + x() + ", y: " + y() + ", width: " + width() + ", height: " + height() ;
+	}
 }

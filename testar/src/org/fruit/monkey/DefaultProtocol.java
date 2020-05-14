@@ -959,23 +959,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			cv.begin(); Util.clear(cv);
 
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
+			
+			//in Spy-mode, always visualize the widget info under the mouse cursor:
+			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv, state);
 
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
+			
 			cv.end();
 
-			//TODO: Prepare Spy Mode refresh time on settings file
-			//Wait 500ms to show the actions
+			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
+			
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(msRefresh);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -991,7 +991,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		cv.end();
 		
 		//finishSequence() content, but SPY mode is not a sequence
-		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		}
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
@@ -1523,9 +1525,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
+		//if(viewPort != null){
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
+		//}
 	}
 
 	@Override
