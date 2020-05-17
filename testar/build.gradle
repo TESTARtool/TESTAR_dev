@@ -84,8 +84,9 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.2'
     runtime project(':windows')
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
 evaluationDependsOn(':windows')
 
@@ -131,10 +132,10 @@ prepareOracles.dependsOn(oracleClasses)
  */
 startScripts {
     if(System.getProperty('DEBUG', 'false') ) {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
+        applicationDefaultJvmArgs = ['-Dlog4j.configurationFile=log4j2.xml',
                                      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
     } else {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+        applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.xml"]
     }
     
     doLast {
