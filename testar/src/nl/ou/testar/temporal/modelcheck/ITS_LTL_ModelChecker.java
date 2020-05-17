@@ -67,7 +67,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
             List<String> emptyList = Collections.emptyList();
             Oracle.setExampleRun_Prefix_States(emptyList);
             Oracle.setExampleRun_Prefix_Transitions(emptyList); //test only
-            Oracle.set_comments(new ArrayList<>(Collections.singletonList("Encoded Formula: " + encodedFormula)));
+            Oracle.addLog("Encoded Formula: " + encodedFormula);
             Oracle.setExampleRun_Cycle_States(emptyList);
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.contains("FALSE")) Oracle.setOracle_verdict(Verdict.FAIL);

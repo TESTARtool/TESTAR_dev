@@ -774,12 +774,12 @@ public  class TemporalDBManager {
             String mapAsString = commentWidgetDistri.keySet().stream()
                     .map(key -> key + "->" + commentWidgetDistri.get(key))
                     .collect(Collectors.joining(", ", "{", "}"));
-            tModel.addComments("#Widgets per State : " + mapAsString);
-
+            tModel.addLog("#Widgets per State : " + mapAsString);
+            tModel.addLog("Total #Widgets = " + runningWcount);
             mapAsString = logNonDeterministicTransitions.keySet().stream()
                     .map(key -> key + "->" + logNonDeterministicTransitions.get(key).toString())
                     .collect(Collectors.joining(", ", "{", "}"));
-            tModel.addLog("non-deterministic transitions per State: " + mapAsString);
+            tModel.addLog("non-deterministic transitions by State: " + mapAsString);
 
 
             tModel.setTraces(fetchTraces(tModel.getApplication_ModelIdentifier()));
@@ -790,19 +790,18 @@ public  class TemporalDBManager {
                 initStates.add(traceevent.getState());
             }
             tModel.setInitialStates(initStates);
-            tModel.addComments("Total #Widgets = " + runningWcount);
+
 
             simpleLog.append(prettyCurrentTime() + " | " + "Total States : " + tModel.getStateList().size());
             simpleLog.append(prettyCurrentTime() + " | " + "Total Widgets : " + runningWcount);
             simpleLog.append(prettyCurrentTime() + " | " + "Total Transitions : " + tModel.getTransitionList().size());
-
             simpleLog.append(prettyCurrentTime() + " | " + "Total Atomic Propositions detected : " + tModel.getAtomicPropositions().size());
             simpleLog.append(prettyCurrentTime() + " | " + "Model has " + (logTerminalStates.size() == 0 ? "no" : "" + logTerminalStates.size()) + " terminal states");
             simpleLog.append(prettyCurrentTime() + " | " + "Model has " + tModel.getInitialStates().size() + " initial states");
 
             long end_time = System.currentTimeMillis();
             long difference = (end_time - start_time) / 1000;
-            tModel.addComments("Duration to create the model:" + difference + " (s)");
+            tModel.addLog("Duration to create the model:" + difference + " (s)");
             dbClose();
 
         }

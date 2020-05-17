@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.oracle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.*;
 import nl.ou.testar.temporal.foundation.ModelBean;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
@@ -18,7 +19,8 @@ public class TemporalOracle extends ModelBean implements Cloneable{
 
     @CsvBindAndJoinByName(column = "(?i)PATTERN_SUBSTITUTION_P[0-9]+", elementType = String.class)
     private MultiValuedMap<String,String> pattern_Substitutions;
-    @CsvBindByName
+    //@CsvBindByName
+    @CsvIgnore
     private int pattern_ConstraintSet;  // based on which set of constraints
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
@@ -194,14 +196,14 @@ public class TemporalOracle extends ModelBean implements Cloneable{
         pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+ PropositionConstants.SETTING.subKeySeparator +"exists");
         to.setPattern_Substitutions(pattern_Substitutions);
 
-        List<String> comments= new ArrayList<>();
-        comments.add("Format version: "+version);
-        comments.add("This is a sample oracle. for valid substitutions, please see the APEncodedModel.json");
-        comments.add("Formula, parameter and substitutions are the key elements. parameter syntax: 'p[0-9]+'");
-        comments.add("Substitution must match a parameter. Header syntax: 'pattern_Substitution_P[0-9]+'");
-        comments.add("AVOID using literals 'X,F,G,U,W,R,M' as substitutions, as they are used in LTL syntax");
-        comments.add("Column order is not important. Header names are case insensitive but structure is important");
-        to.set_comments(comments);
+        to.set_comments(Collections.singletonList("User remarks"));
+        to.addLog("Format version: "+version);
+        to.addLog("This is a sample oracle. for valid substitutions, please see the Model file");
+        to.addLog("Formula is instantiated by parameters and substitutions. parameter syntax: 'p[0-9]+'");
+        to.addLog("Substitution must match a parameter. Header syntax: 'pattern_Substitution_P[0-9]+'");
+        to.addLog("AVOID literals 'A,E,X,F,G,U,W,R,M' as substitutions: syntactical elements of Formulas");
+        to.addLog("Column order is not important. Header names are case insensitive");
+        to.set_modifieddate("(populated by TESTAR)");
         return to;
     }
 }

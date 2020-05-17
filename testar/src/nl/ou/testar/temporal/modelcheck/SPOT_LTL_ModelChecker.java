@@ -150,7 +150,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                     }
                     Oracle.setExampleRun_Prefix_States(prefixStateList);
                     Oracle.setExampleRun_Prefix_Transitions(prefixTransitionList); //test only
-                    Oracle.set_comments(new ArrayList<>(Collections.singletonList("Encoded Formula: " + encodedFormula)));
+                    Oracle.addLog("Encoded Formula: " + encodedFormula);
                     for (int j = 0; j < cycleStateList.size(); j++) {
                         String targetState ;
                         String sourceState = cycleStateList.get(j);

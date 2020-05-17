@@ -696,7 +696,7 @@ public class Main {
 	 * concrete and abstract state ids, if provided of course.
 	 * @param settings
 	 */
-	private static void XinitCodingManager(Settings settings) {
+	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 
@@ -722,7 +722,7 @@ public class Main {
 			}
 		}
 	}
-	private static void initCodingManager(Settings settings) {
+	private static void Org_initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 

@@ -51,7 +51,6 @@ public enum FormulaVerifier {
                 //∀(Φ W Ψ) =   ¬∃( (Φ ∧ ¬Ψ) U(¬Φ ∧ ¬Ψ) )
             String phi = aliveProp;
             String theta ="AG(!"+aliveProp+")";
-            //String append= " & (A("+aliveProp+" U (AG (!"+aliveProp+")))";
             String append = " & !(E(("+phi+" & "+ "!("+theta+")) U (!("+phi+") & "+ "!("+theta+"))))";
             String newformula=formula;
             newformula= StringFinder.findClosingParenthesisAndInsert(newformula,"AF(", "(!" + aliveProp + ") | ", ")");

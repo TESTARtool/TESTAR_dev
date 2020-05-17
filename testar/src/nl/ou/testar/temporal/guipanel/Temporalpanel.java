@@ -100,8 +100,7 @@ public class Temporalpanel {
 
         startAnalyzerBtn.addActionListener(this::startTemporalWebAnalyzer);
         stopAnalyzerBtn.addActionListener(this::stopTemporalWebAnalyzer);
-        ModelOnlyBtn.addActionListener(this::exportTemporalmodel
-        );
+        ModelOnlyBtn.addActionListener(this::exportTemporalmodel);
         testDbButton.addActionListener(this::testdbconnection);
         selectFilePython_ENV.addActionListener(e -> chooserHelper(PythonEnv_Path));
         selectFilePython_VIZ.addActionListener(e -> chooserHelper(PythonVisualizer_Path));
@@ -109,11 +108,7 @@ public class Temporalpanel {
         selectFileOracles.addActionListener(e -> chooserHelper(oracleFile));
         modelCheckBtn.addActionListener(e -> ModelCheck());
         defaultPropositionMgrBtn.addActionListener(e -> testSaveDefaultPropositionManagerJSON());
-        sampleOracleBtn.addActionListener(e -> {
-            testOracleCSV();
-            testPatternCSV();
-            testPatternConstraintCSV();
-        });
+        sampleOracleBtn.addActionListener(this::testOracleSamples);
         graphMLBtn.addActionListener(this::testgraphml);
         generateBtn.addActionListener(e -> generateOracles());
         selectFilePatterns.addActionListener(e -> chooserHelper(patternFile));
@@ -332,8 +327,8 @@ public class Temporalpanel {
         generateBtn.setToolTipText("<html>Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. <BR>\nPattern Constraints can be applied to control the ramdom instantiation.\n<BR>\nThe list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB </html>");
         minerPanel.add(generateBtn, cc.xy(12, 12));
         enableTemporalOfflineOraclesCheckBox = new JCheckBox();
-        enableTemporalOfflineOraclesCheckBox.setText("Enable Temporal Offline Oracles");
-        enableTemporalOfflineOraclesCheckBox.setToolTipText("<html>Temporal oracles are automatically evaluated after each TESTAR run and use the settings in this form.<BR>\nProtocol (JAVA) modification might apply</html>");
+        enableTemporalOfflineOraclesCheckBox.setText("Model Check in Generate Mode");
+        enableTemporalOfflineOraclesCheckBox.setToolTipText("<html>Temporal oracles are automatically evaluated after each TESTAR run.<BR>\nProtocol (JAVA) modification might apply</html>");
         minerPanel.add(enableTemporalOfflineOraclesCheckBox, cc.xyw(1, 3, 4));
         CounterExamples = new JCheckBox();
         CounterExamples.setText("Counter Examples");
@@ -351,7 +346,7 @@ public class Temporalpanel {
         minerPanel.add(enforceAbstractionEquality, cc.xyw(1, 5, 4));
         instrumentDeadlockStatesCheckBox = new JCheckBox();
         instrumentDeadlockStatesCheckBox.setText("Instrument terminal states");
-        instrumentDeadlockStatesCheckBox.setToolTipText("<html> In case that the Graph-model has terminal states (~ no outgoing transitions):<BR>\n1. a new artificial state  with a selfloop is added<BR>\n2. forall terminal states, a transition will be added to that newly created artificial state.<BR>\n3. the transitions have a single atomic proposition that indicates that the target state is terminal.<BR>\nThis 'enriched' model will be provided to the model-checker.<BR>\n(not the original Graph-model) </html>");
+        instrumentDeadlockStatesCheckBox.setToolTipText("<html> In case that the Graph-model has terminal states (~ no outgoing transitions):<BR>\n1. a new artificial state  with a selfloop is added<BR>\n2. forall terminal states, a transition will be added to that newly created artificial state.<BR>\n3. the transitions have a single atomic proposition that indicates that the target state is terminal.<BR>\n4. formulas are modified to be only susceptible in the 'live' part of the Model.\nThis 'enriched' model will be provided to the model-checker.<BR>\n(not the original Graph-model) </html>");
         minerPanel.add(instrumentDeadlockStatesCheckBox, cc.xyw(5, 5, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
         testDbButton = new JButton();
         testDbButton.setText("Show DB ");
@@ -643,27 +638,22 @@ public class Temporalpanel {
         tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
     }
 
-    public void testOracleCSV() {
-        System.out.println("Writing an oracle to CSV file\n");
+    private void testOracleSamples(ActionEvent evt) {
+        System.out.println("Genrating CSV files for  an oracle,pattern and pattern constraint\n");
         TemporalOracle to = TemporalOracle.getSampleLTLOracle();
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
         CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
-    }
 
-    public void testPatternCSV() {
-        System.out.println("Writing a pattern to CSV file\n");
         TemporalPattern pat = TemporalPattern.getSamplePattern();
         List<TemporalPattern> patcoll = new ArrayList<>();
         patcoll.add(pat);
         CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
-    }
 
-    public void testPatternConstraintCSV() {
-        System.out.println("Writing a pattern-constraint to CSV file\n");
         List<TemporalPatternConstraint> patconstraintcoll = TemporalPatternConstraint.getSampleConstraints();
         CSVHandler.save(patconstraintcoll, outputDir + "temporalPatternConstraintSample.csv");
     }
+
 
     public void testSaveDefaultPropositionManagerJSON() {
         tcontrol.setDefaultPropositionManager();

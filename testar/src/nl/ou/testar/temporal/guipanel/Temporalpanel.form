@@ -524,8 +524,8 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Enable Temporal Offline Oracles"/>
-                  <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after each TESTAR run and use the settings in this form.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
+                  <text value="Model Check in Generate Mode"/>
+                  <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after each TESTAR run.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="8a066" class="javax.swing.JCheckBox" binding="CounterExamples">
@@ -567,7 +567,7 @@
                 </constraints>
                 <properties>
                   <text value="Instrument terminal states"/>
-                  <toolTipText value="&lt;html&gt; In case that the Graph-model has terminal states (~ no outgoing transitions):&lt;BR&gt;&#10;1. a new artificial state  with a selfloop is added&lt;BR&gt;&#10;2. forall terminal states, a transition will be added to that newly created artificial state.&lt;BR&gt;&#10;3. the transitions have a single atomic proposition that indicates that the target state is terminal.&lt;BR&gt;&#10;This 'enriched' model will be provided to the model-checker.&lt;BR&gt;&#10;(not the original Graph-model) &lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; In case that the Graph-model has terminal states (~ no outgoing transitions):&lt;BR&gt;&#10;1. a new artificial state  with a selfloop is added&lt;BR&gt;&#10;2. forall terminal states, a transition will be added to that newly created artificial state.&lt;BR&gt;&#10;3. the transitions have a single atomic proposition that indicates that the target state is terminal.&lt;BR&gt;&#10;4. formulas are modified to be only susceptible in the 'live' part of the Model.&#10;This 'enriched' model will be provided to the model-checker.&lt;BR&gt;&#10;(not the original Graph-model) &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="54d5f" class="javax.swing.JButton" binding="testDbButton">

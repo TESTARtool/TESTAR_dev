@@ -142,10 +142,11 @@ public class TemporalPatternConstraint {
         Map<String,String> constraintset3= new HashMap<>();
         constraintset3.put("p0",".*UIAButton.*");
         c.addConstraintSet(3,constraintset3);
-        c.addComments("Format Version: "+version);
-        c.addComments("Sample of a constraint on a temporal pattern. constraint key and value must be aligned with the APEncodedModel.json");
-        c.addComments("Column order is not important. Header names are case insensitive but structure requirements apply");
-        c.addComments("ConstraintSet syntax: 'ConstraintSet_[1-9][0-9]*_P[0-9]' , where 'P' must match a parameter in the formula.");
+        c.set_comments(Collections.singletonList("User remarks"));
+        c.addLog("Format Version: "+version);
+        c.addLog("Sample of a constraint on a temporal pattern. All constraints in a set must be an atomic proposition in the Model file");
+        c.addLog("Column order is not important. Header names are case insensitive");
+        c.addLog("ConstraintSet syntax: 'ConstraintSet_[1-9][0-9]*_P[0-9]' , where 'P' must match a parameter in the formula.");
         constraints.add(c);
         return constraints;
     }

@@ -50,10 +50,10 @@ public class TemporalPattern extends TemporalPatternBase {
         pat.setPattern_Class("precedence");
         pat.setPattern_Formula("!p1 U p0");
         pat.setPattern_Parameters(Arrays.asList("p0", "p1"));
-        pat.addComments("Format version: "+version);
-        pat.addComments("This is a sample temporal pattern. Formula,parameters and formalism are the key elements. parameter syntax: p[0-9]+");
-        pat.addComments("AVOID using literals 'X,F,G,U,W,R,M' as  substitutions, as they are used in LTL syntax");
-        pat.addComments("Column order is not important. Header names are case insensitive but structure is important");
+       pat.set_comments(Collections.singletonList("User remarks"));
+        pat.addLog("Format version: "+version);
+        pat.addLog("This is a sample temporal pattern. Formula,parameters and formalism are the key elements. parameter syntax: p[0-9]+");
+        pat.addLog("Column order is not important. Header names are case insensitive but structure is important");
 
         return   pat;
     }
