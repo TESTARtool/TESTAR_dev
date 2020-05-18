@@ -19,8 +19,8 @@ public class AbstractStateSettings extends JDialog {
     private Tag<?>[] currentlySelectedStateTags;
     private Tag<?>[] defaultTags;
 
-    private JLabel label1 = new JLabel("Please choose the widget attributes to use in " +
-                                            "creating the abstract state model.");
+    private JLabel label1 = new JLabel("Please choose the widget attributes to use in "
+    + "creating the abstract state model. Control + Left Click");
     private JLabel label2 = new JLabel("General attributes");
     private JLabel label3 = new JLabel("Control patterns");
     private JLabel label4 = new JLabel("WebDrivers attributes");
@@ -54,7 +54,7 @@ public class AbstractStateSettings extends JDialog {
     }
 
     private void init() {
-        label1.setBounds(10, 10, 400, 27);
+        label1.setBounds(10, 10, 600, 27);
         add(label1);
 
         /////// GENERAL STATE MANAGEMENT TAGS ////////
