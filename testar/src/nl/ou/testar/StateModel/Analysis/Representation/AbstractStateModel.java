@@ -47,7 +47,7 @@ public class AbstractStateModel {
         this.modelIdentifier = modelIdentifier;
     }
 
-    public Set<String> getAbstractionAttributes() {
+    public Set getAbstractionAttributes() {
         return abstractionAttributes;
     }
 

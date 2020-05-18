@@ -47,6 +47,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.fruit.alayer.windows.Windows10;
 
 import static org.fruit.monkey.ConfigTags.*;
@@ -508,9 +510,9 @@ public class Main {
 			}));
 			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<String>() {
 				{
-					add("WidgetControlType");
-					add("WidgetPath");
 					add("WidgetTitle");
+					add("WidgetPath");
+					add("WidgetControlType");
 				}
 			}));
 
@@ -709,6 +711,10 @@ public class Main {
 		if (settings.get(ConfigTags.TemporalConcreteEqualsAbstract)) {
 			Tag<?>[] abstractTags = CodingManager.getCustomTagsForAbstractId();
 			CodingManager.setCustomTagsForConcreteId(abstractTags);
+			// does this work??
+			settings.set(ConfigTags.ConcreteStateAttributes, Arrays.stream(abstractTags).
+					map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toList()));
+
 		} else {
 			if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
 				Tag<?>[] concreteTags = settings.get(ConcreteStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
@@ -722,22 +728,22 @@ public class Main {
 			}
 		}
 	}
-	private static void Org_initCodingManager(Settings settings) {
-		// we look if there are user-provided custom state tags in the settings
-		// if so, we provide these to the coding manager
-
-		Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-		// for the concrete state tags we use all the state management tags that are available
-		if (!stateManagementTags.isEmpty()) {
-			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
-		}
-
-		// then the attributes for the abstract state id
-		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-			Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
-			CodingManager.setCustomTagsForAbstractId(abstractTags);
-		}
-	}
+//	private static void initCodingManager(Settings settings) {
+//		// we look if there are user-provided custom state tags in the settings
+//		// if so, we provide these to the coding manager
+//
+//		Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+//		// for the concrete state tags we use all the state management tags that are available
+//		if (!stateManagementTags.isEmpty()) {
+//			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
+//		}
+//
+//		// then the attributes for the abstract state id
+//		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+//			Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+//			CodingManager.setCustomTagsForAbstractId(abstractTags);
+//		}
+//	}
 
 	/**
 	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.

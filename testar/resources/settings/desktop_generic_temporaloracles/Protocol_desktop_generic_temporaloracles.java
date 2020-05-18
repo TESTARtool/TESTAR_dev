@@ -30,7 +30,9 @@
 import nl.ou.testar.temporal.control.TemporalController;
 import nl.ou.testar.temporal.control.TemporalControllerFactory;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
@@ -79,6 +81,41 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 
 
 	/**
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @return  a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		Set<Action> actions = super.deriveActions(system,state);
+
+
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
+
+		//return the set of derived actions
+		return actions;
+	}
+
+	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
 	 * @param state the SUT's current state
@@ -103,6 +140,23 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 		}
 		return retAction;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	@Override
 	protected void postSequenceProcessing() {
 		super.postSequenceProcessing();
