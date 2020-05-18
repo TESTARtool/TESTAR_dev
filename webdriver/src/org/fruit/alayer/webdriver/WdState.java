@@ -258,7 +258,7 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebId)) {
 			ret = w.element.id;
 		}
-		else if (t.equals(WdTags.WebTextContext)) {
+		else if (t.equals(WdTags.WebTextContent)) {
 			ret = w.element.textContent;
 		}
 		else if (t.equals(WdTags.WebTitle)) {

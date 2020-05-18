@@ -72,18 +72,17 @@ import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
-public class WebdriverProtocol extends ClickFilterLayerProtocol {
-	//Attributes for adding slide actions
-	protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
-	protected static double SCROLL_THICK = 16; //scroll thickness
-	protected HtmlSequenceReport htmlReport;
-	protected State latestState;
-
-	private Set<String> existingCssClasses = new HashSet<>();
+public class WebdriverProtocol extends GenericUtilsProtocol {
+    //Attributes for adding slide actions
+    protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
+    protected static double SCROLL_THICK = 16; //scroll thickness
+    protected HtmlSequenceReport htmlReport;
+    protected State latestState;
+    
+    protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// Classes that are deemed clickable by the web framework
 	protected List<String> clickableClasses = new ArrayList<>();
@@ -114,154 +113,178 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 				put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 			}};
 
-	/**
-	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-	 */
-	@Override
-	protected void preSequencePreparations() {
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
-	}
+    /**
+     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+     */
+    @Override
+    protected void preSequencePreparations() {
+        //initializing the HTML sequence report:
+        htmlReport = new HtmlSequenceReport();
+    }
+    
+    /**
+     * This method is called when TESTAR starts the System Under Test (SUT). The method should
+     * take care of
+     * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+     * out what executable to run)
+     * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuratio files etc.)
+     * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+     * seconds until they have finished loading)
+     *
+     * @return a started SUT, ready to be tested.
+     */
+    @Override
+    protected SUT startSystem() throws SystemStartException {
+    	SUT sut = super.startSystem();
 
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException {
-		SUT sut = super.startSystem();
+    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+    	// webdriver in the constructor of WdDriver.
+    	// A possible solution could be creating a snapshot of the running browser processes before and after
+    	if(System.getProperty("os.name").contains("Windows")
+    			&& sut.get(Tags.HWND, null) == null) {
+    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    		// window handle. The running browser needs to be in the foreground when we reach this part.
+    		long hwnd = Windows.GetForegroundWindow();
+    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    		// Safe to set breakpoints again.
+    		if (WinProcess.procName(pid).contains("chrome")) {
+    			sut.set(Tags.HWND, hwnd);
+    			sut.set(Tags.PID, pid);
+    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    		}
+    	}
 
-		// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
-		// webdriver in the constructor of WdDriver.
-		// A possible solution could be creating a snapshot of the running browser processes before and after
-		if(System.getProperty("os.name").contains("Windows")
-				&& sut.get(Tags.HWND, null) == null) {
-			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
-			// window handle. The running browser needs to be in the foreground when we reach this part.
-			long hwnd = Windows.GetForegroundWindow();
-			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-			// Safe to set breakpoints again.
-			if (WinProcess.procName(pid).contains("chrome")) {
-				sut.set(Tags.HWND, hwnd);
-				sut.set(Tags.PID, pid);
-				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
-			}
-		}
-
-		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
+		double displayScale = getDisplayScale(sut);
 
 		// See remarks in WdMouse
-		mouse = sut.get(Tags.StandardMouse);
-		mouse.setCursorDisplayScale(displayScale);
+        mouse = sut.get(Tags.StandardMouse);
+        mouse.setCursorDisplayScale(displayScale);
 
-		return sut;
-	}
-
-	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
-	 */
-	@Override
-	protected void beginSequence(SUT system, State state) {
-		super.beginSequence(system, state);
-	}
+    	return sut;
+    }
 
 	/**
-	 * This method is called when the TESTAR requests the state of the SUT.
-	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-	 * state is erroneous and if so why.
-	 * @return  the current state of the SUT with attached oracle.
+	 * Returns the display scale based on the settings, if the user has set the override webdriver display scale
+	 * we return the override value otherwise the display scale obtained from the system.
+	 * @param sut The system under test
+	 * @return The display scale.
 	 */
-	@Override
-	protected State getState(SUT system) throws StateBuildException {
+	private double getDisplayScale(SUT sut) {
+		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
-		WdDriver.waitDocumentReady();
-
-		State state = super.getState(system);
-
-		if(settings.get(ConfigTags.ForceForeground)
-				&& System.getProperty("os.name").contains("Windows")
-				&& system.get(Tags.PID, (long)-1) != (long)-1 
-				&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
-				&& !WinProcess.isForeground(system.get(Tags.PID))){
-			WinProcess.politelyToForeground(system.get(Tags.HWND));
-			LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
-					+ WinProcess.procName(system.get(Tags.PID)) + "\n");
-		}
-
-		latestState = state;
-
-		//Spy mode didn't use the html report
-		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-
-			for(Widget w : state) {
-				WdElement element = ((WdWidget) w).element;
-				for(String s : element.cssClasses) {
-					existingCssClasses.add(s);
+		// If the user has specified a scale override the display scale obtained from the system.
+		String overrideDisplayScaleAsString = settings().get(ConfigTags.OverrideWebDriverDisplayScale, "");
+		if (!overrideDisplayScaleAsString.isEmpty()) {
+			try {
+				double webDriverDisplayScaleOverride = Double.parseDouble(overrideDisplayScaleAsString);
+				if (webDriverDisplayScaleOverride != 0) {
+					displayScale = webDriverDisplayScaleOverride;
 				}
+			} catch (NumberFormatException nfe) {
+				System.out.printf("WARNING Unable to convert display scale override to double: %s, will use %f\n", overrideDisplayScaleAsString, displayScale);
 			}
-
-			return state;
 		}
-
-		//adding state to the HTML sequence report:
-		htmlReport.addState(latestState);
-		return latestState;
+		return displayScale;
 	}
 
 	/**
-	 * Overwriting to add HTML report writing into it
-	 *
-	 * @param state
-	 * @param actions
-	 * @return
-	 */
-	@Override
-	protected Action preSelectAction(State state, Set<Action> actions){
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
-		return(super.preSelectAction(state, actions));
-	}
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
+    @Override
+    protected void beginSequence(SUT system, State state) {
+    	super.beginSequence(system, state);
+    }
+    
+    /**
+     * This method is called when the TESTAR requests the state of the SUT.
+     * Here you can add additional information to the SUT's state or write your
+     * own state fetching routine. The state should have attached an oracle
+     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+     * state is erroneous and if so why.
+     * @return  the current state of the SUT with attached oracle.
+     */
+    @Override
+    protected State getState(SUT system) throws StateBuildException {
+    	
+    	WdDriver.waitDocumentReady();
 
-	/**
-	 * Execute the selected action.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-		// adding the action that is going to be executed into HTML report:
-		htmlReport.addSelectedAction(state, action);
-		return super.executeAction(system, state, action);
-	}
+    	State state = super.getState(system);
 
-	/**
-	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-	 */
-	@Override
-	protected void postSequenceProcessing() {
-		htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+    	if(settings.get(ConfigTags.ForceForeground)
+    			&& System.getProperty("os.name").contains("Windows")
+    			&& system.get(Tags.PID, (long)-1) != (long)-1 
+    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
+    			&& !WinProcess.isForeground(system.get(Tags.PID))){
+    		WinProcess.politelyToForeground(system.get(Tags.HWND));
+    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
+    		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
+    	}
 
-		String sequencesPath = getGeneratedSequenceName();
-		try {
-			sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-		}catch (Exception e) {}
+    	latestState = state;
+    	
+    	//Spy mode didn't use the html report
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
-		String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+    		for(Widget w : state) {
+    			WdElement element = ((WdWidget) w).element;
+    			for(String s : element.cssClasses) {
+    				existingCssClasses.add(s);
+    			}
+    		}
+    		
+        	return state;
+    	}
+    	
+        //adding state to the HTML sequence report:
+        htmlReport.addState(latestState);
+        return latestState;
+    }
+
+    /**
+     * Overwriting to add HTML report writing into it
+     *
+     * @param state
+     * @param actions
+     * @return
+     */
+    @Override
+    protected Action preSelectAction(State state, Set<Action> actions){
+        // adding available actions into the HTML report:
+        htmlReport.addActions(actions);
+        return(super.preSelectAction(state, actions));
+    }
+
+    /**
+     * Execute the selected action.
+     * @param system the SUT
+     * @param state the SUT's current state
+     * @param action the action to execute
+     * @return whether or not the execution succeeded
+     */
+    @Override
+    protected boolean executeAction(SUT system, State state, Action action){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state, action);
+        return super.executeAction(system, state, action);
+    }
+
+    /**
+     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+     */
+    @Override
+    protected void postSequenceProcessing() {
+        htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+        
+        String sequencesPath = getGeneratedSequenceName();
+        try {
+        	sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+        }catch (Exception e) {}
+        		
+        String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
 		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
 
 		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
@@ -284,35 +307,33 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 		//With webdriver version we don't use the call SystemProcessHandling.killTestLaunchedProcesses
 	}
 
-	@Override
-	protected void stopSystem(SUT system) {
-		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+    @Override
+    protected void stopSystem(SUT system) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
-			try {
+    		try {
+    			
+    			File folder = new File(settings.getSettingsPath());
+    			File file = new File(folder, "existingCssClasses.txt");
+    			if(!file.exists())
+    				file.createNewFile();
 
-				File folder = new File(settings.getSettingsPath());
-				File file = new File(folder, "existingCssClasses.txt");
-				if(!file.exists())
-					file.createNewFile();
-
-				Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
-				stream.forEach(line -> existingCssClasses.add(line));
-				stream.close();
-
-				PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
-				for(String s : existingCssClasses)
-					write.println(s);
-				write.close();
-
-			} catch (IOException e) {System.out.println(e.getMessage());}
-
-			//System.out.println("* " + existingCssClasses.size()+ " * Existing Css Classes: " + existingCssClasses.toString());
-
-		}
-		super.stopSystem(system);
-	}
-
-	@Override
+    			Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
+    			stream.forEach(line -> existingCssClasses.add(line));
+    			stream.close();
+    			
+    			PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
+    			for(String s : existingCssClasses)
+    			    write.println(s);
+    			write.close();
+    		
+    		} catch (IOException e) {System.out.println(e.getMessage());}
+    	}
+    	
+    	super.stopSystem(system);
+    }
+    
+    @Override
 	protected void closeTestSession() {
 		super.closeTestSession();
 		NativeLinker.cleanWdDriverOS();
