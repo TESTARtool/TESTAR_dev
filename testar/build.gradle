@@ -113,7 +113,7 @@ task prepareOutputFolder(type: Copy) {
  * Copy existing testar/resources/windows10/windows.dll as temporally file
  */
 task prepareCopyOfExistingWindows10dll(type: Copy) {
-    from 'resources/windows10'
+    from '../testar/resources/windows10'
     into 'target/scripts'
     include 'windows.dll'
 }
@@ -122,9 +122,11 @@ task prepareCopyOfExistingWindows10dll(type: Copy) {
  * so it can be used with the creation of the distribution.
  */
 task prepareWindowsDLL(type: Copy) {
-    from '../windows/target/resources/main'
-    into 'target/scripts'
-    include 'windows.dll'
+    if(new File('../windows/target/resources/main/windows.dll').exists()) {
+        from '../windows/target/resources/main'
+        into 'target/scripts'
+        include 'windows.dll'
+    }
 }
 
 applicationDistribution.from("../webdriver/resources/web-extension") {
