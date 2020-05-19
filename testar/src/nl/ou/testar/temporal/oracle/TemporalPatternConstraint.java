@@ -104,10 +104,10 @@ public class TemporalPatternConstraint {
         updateConstraintmapper();
     }
     public void set_comments(List< String > _comments) {
-        logData.set_comments(_comments);
+        logData.set_userComments(_comments);
     }
     public void addComments ( String  comment) {
-        logData.addComments( comment);
+        logData.addUserComments( comment);
     }
 
     public void set_modifieddate(String _modifieddate){

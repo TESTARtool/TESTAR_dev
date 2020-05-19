@@ -144,7 +144,7 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		// Comment the following if-block if model check is required per test sequence
-		// !!At the moment, this is the only option to run temporal model-check ion the background
+		// !!At the moment, this is the only option to execute temporal model-check in the background
 		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
 			temporalController = TemporalControllerFactory.getTemporalController(settings);
 			temporalController.MCheck();

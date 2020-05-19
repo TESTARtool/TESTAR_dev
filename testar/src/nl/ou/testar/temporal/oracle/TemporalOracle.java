@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.oracle;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.*;
 import nl.ou.testar.temporal.foundation.ModelBean;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
@@ -196,7 +195,7 @@ public class TemporalOracle extends ModelBean implements Cloneable{
         pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+ PropositionConstants.SETTING.subKeySeparator +"exists");
         to.setPattern_Substitutions(pattern_Substitutions);
 
-        to.set_comments(Collections.singletonList("User remarks"));
+        to.set_userComments(Collections.singletonList("User remarks"));
         to.addLog("Format version: "+version);
         to.addLog("This is a sample oracle. for valid substitutions, please see the Model file");
         to.addLog("Formula is instantiated by parameters and substitutions. parameter syntax: 'p[0-9]+'");

@@ -1,20 +1,21 @@
 package nl.ou.testar.temporal.foundation;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 
 import java.util.*;
 
 import static nl.ou.testar.temporal.util.Common.prettyCurrentDateTime;
-import static nl.ou.testar.temporal.util.Common.prettyCurrentTime;
 
 public class LogData {
 protected static final String csvsep=";";
 
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> _log;
+    @JsonAlias("comments")
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> _comments;
+    private List<String> _userComments;
     @CsvBindByName
     private String _modifieddate;
 
@@ -22,7 +23,7 @@ protected static final String csvsep=";";
 
     public LogData() {
         _log = new ArrayList<>();
-        _comments = new ArrayList<>();
+        _userComments = new ArrayList<>();
         _modifieddate = prettyCurrentDateTime();
     }
 
@@ -41,17 +42,17 @@ protected static final String csvsep=";";
         this._log = _log;
     }
 
-    public List<String> get_comments() {
-        return _comments;
+    public List<String> get_userComments() {
+        return _userComments;
     }
 
 
-    public void set_comments(List<String> _comments) {
-        this._comments = _comments;
+    public void set_userComments(List<String> _userComments) {
+        this._userComments = _userComments;
     }
 
-    public void addComments(String comment) {
-        this._comments.add(comment);
+    public void addUserComments(String comment) {
+        this._userComments.add(comment);
     }
 
 

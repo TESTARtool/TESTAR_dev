@@ -123,11 +123,11 @@ public class ModelBean {
     }
 
     @JsonIgnore
-    public void set_comments(List < String > _comments) {
-        logData.set_comments(_comments);
+    public void set_userComments(List < String > _comments) {
+        logData.set_userComments(_comments);
     }
     public void addComments ( String  comment) {
-        logData.addComments( comment);
+        logData.addUserComments( comment);
     }
     public String get_modifieddate() {
         return logData.get_modifieddate();
