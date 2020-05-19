@@ -110,7 +110,7 @@ public  class TemporalDBManager {
     private void dbClose() {
         if (!db.isClosed())  {
             db.close();
-            orientDB.close();}
+            orientDB.close(); }
     }
     private boolean dbReopen() {
         boolean success=false;

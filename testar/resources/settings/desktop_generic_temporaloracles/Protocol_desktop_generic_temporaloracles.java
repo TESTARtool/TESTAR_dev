@@ -61,22 +61,10 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-		if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
-			if (settings.get(ConfigTags.TemporalOffLineEnabled) &&
-					!settings.get(ConfigTags.TemporalSubDirectories)){
-				temporalController = TemporalControllerFactory.getTemporalController(settings);
-			}
-		}
 	}
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-				if ( mode() == Modes.Generate || mode() == Modes.Record  ) {
-					if (settings.get(ConfigTags.TemporalOffLineEnabled)	&&
-							settings.get(ConfigTags.TemporalSubDirectories)) {
-					temporalController = TemporalControllerFactory.getTemporalController(settings);
-					}
-				}
 	}
 
 
@@ -143,32 +131,22 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	@Override
 	protected void postSequenceProcessing() {
 		super.postSequenceProcessing();
-		// uncomment the following if-block if model check is required per test sequence
-		/*		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
-				temporalController.MCheck();
-		} */
+		// Uncomment the following if-block if model check is required per test sequence
+		// !!At the moment, this doesn't work because the database is locked by the state-model-manager
+		//		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+		//		temporalController = TemporalControllerFactory.getTemporalController(settings);
+		//		temporalController.MCheck();
+		//}
 	}
 	@Override
 	protected void closeTestSession() {
-		// comment the following if-block if model check is required per test sequence
+		// Comment the following if-block if model check is required per test sequence
+		// !!At the moment, this is the only option to run temporal model-check ion the background
 		if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
+			temporalController = TemporalControllerFactory.getTemporalController(settings);
 			temporalController.MCheck();
 		}
 		super.closeTestSession();
