@@ -159,30 +159,17 @@ public class SutVisualization {
                             sb.append("\t");
                         }
                     }
-                    if (i > 0)
+                    if (i > 0) {
                         canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
+                    }
 
                     for(Tag<?> t : cursorWidget.tags()){
-                        canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
-                                cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-                        // (multi-line display without abbreviation)
-							/*final int MAX_TEXT = 50;
-							String text = Util.abbreviate(Util.toString(cursorWidget.get(t)), Integer.MAX_VALUE, "NO_SENSE");
-							int fragment = 0, limit;
-							while (fragment < text.length()){
-								limit = fragment + MAX_TEXT > text.length() ? text.length() : fragment + MAX_TEXT;
-								canvas.text((t.equals(Tags.Title) || t.equals(Tags.Role)) ? rpen : apen, cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " +
-									text.substring(fragment,limit));
-								fragment = limit;
-							}*/
+                    	if(cursorWidget.get(t,null) != null && !cursorWidget.get(t).toString().isEmpty()) {
+                    		canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
+                    				cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
+                    	}
                     }
                 }
-
-                // Disabled functionality - not useful:
-//                    if (settings.get(ConfigTags.DrawWidgetTree)){
-//                        canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-//                        protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);
-//                    }
             }
         }
     }
