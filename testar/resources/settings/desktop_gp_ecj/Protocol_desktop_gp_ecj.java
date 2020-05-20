@@ -1,32 +1,3 @@
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
-import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
-import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
-import static org.fruit.monkey.ConfigTags.InputFileText;
-
 /***************************************************************************************************
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
@@ -57,8 +28,38 @@ import static org.fruit.monkey.ConfigTags.InputFileText;
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
+import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
+import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+import org.testar.protocols.DesktopProtocol;
+
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
+import static org.fruit.monkey.ConfigTags.InputFileText;
+
 @SuppressWarnings("WrongPackageStatement")
-public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
+public class Protocol_desktop_gp_ecj extends DesktopProtocol {
 
     //Attributes for adding slide actions
     static double scrollArrowSize = 36; // sliding arrows
@@ -214,8 +215,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
                     // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
                     // We want to create actions that consist of left clicking on them
                     if (isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Store the widget in the Graphdatabase
-                        storeWidget(state.get(Tags.ConcreteID), w);
                         //Create a left click action with the Action Compiler, and add it to the set of derived actions
                         actions.add(ac.leftClickAt(w));
                     }
@@ -227,8 +226,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
                     // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
                     // We want to create actions that consist of typing into them
                     if (isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Store the widget in the Graphdatabase
-                        storeWidget(state.get(Tags.ConcreteID), w);
 
                         String text;
                         if (this.inputText.isPresent()) {
