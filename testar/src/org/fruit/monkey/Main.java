@@ -288,6 +288,8 @@ public class Main {
 		try {
 			settings = loadSettings(args, testSettingsFileName);
 		} catch (ConfigException ce) {
+			System.out.println("Exception: There is an issue with the configuration file:");
+			ce.printStackTrace();
 			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
