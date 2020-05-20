@@ -126,39 +126,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // Add your login sequence here
 
-    // When a TESTAR sequence begins we will login in to the application
-    for(Widget w : state) {
+    /*
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
 
-      // Find username Input widget to type the username
-      if(w.get(WdTags.WebName,"").equals("username")) {
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-        Action a = ac.clickTypeInto(w, "john", true);
-        executeAction(system, state, a);
-      }
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
 
-      // Find password Input widget to type the password
-      if(w.get(WdTags.WebName,"").equals("password")) {
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-        Action a = ac.clickTypeInto(w, "demo", true);
-        executeAction(system, state, a);
-      }
-    }
-
-    // Credentials are typed, now we need to find Log In button and click
-    for(Widget w : state) {
-      if(w.get(WdTags.WebValue,"").equals("Log In")) {
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-        Action a = ac.leftClickAt(w);
-        executeAction(system, state, a);
-      }
-    }
-
-    // Pause a bit, SUT will refresh
-    Util.pause(5);
-
-    // Update the state to retrieve the new one after login
-    state = super.getState(system);
-
+    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
+*/
   }
 
   /**

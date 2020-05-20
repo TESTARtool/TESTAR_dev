@@ -108,6 +108,32 @@ GraphDBUser =
 GraphDBPassword =
 
 #################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore =
+DataStoreType = remote
+DataStoreServer =
+DataStoreDirectory =
+DataStoreDB =
+DataStoreUser =
+DataStorePassword =
+DataStoreMode = none
+ApplicationName = Parabank
+ApplicationVersion =
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = true
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WidgetControlType
+
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
