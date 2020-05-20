@@ -209,5 +209,4 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
 	protected abstract void closeTestSession();
-
 }

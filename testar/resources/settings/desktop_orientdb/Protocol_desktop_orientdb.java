@@ -28,24 +28,11 @@
  *******************************************************************************************************/
 
 
-import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import org.fruit.alayer.*;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import java.util.Set;
+
 import org.testar.protocols.DesktopProtocol;
 
 public class Protocol_desktop_orientdb extends DesktopProtocol {
@@ -79,6 +66,7 @@ public class Protocol_desktop_orientdb extends DesktopProtocol {
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+
 		}
 
 		//return the set of derived actions

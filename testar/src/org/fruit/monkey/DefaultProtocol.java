@@ -72,7 +72,6 @@ import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -93,6 +92,8 @@ import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
+
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -800,7 +801,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// THERE MUST ALMOST BE ONE ACTION!
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+				Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
 				CodingManager.buildEnvironmentActionIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
@@ -1063,7 +1064,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// THERE MUST ALMOST BE ONE ACTION!
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+				Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
 				CodingManager.buildEnvironmentActionIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
@@ -1276,7 +1277,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	@Override
 	protected void initTestSession() {
 
-	}
+    }
 
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -1684,7 +1685,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		else if (this.forceNextActionESC){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			Action a = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
 			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceNextActionESC = false;
 			return a;
@@ -1801,8 +1802,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	@Override
 	public void mouseMoved(double x, double y) {} //for iEventListener
 
-	@Override
-	protected void stopSystem(SUT system) {
+    @Override
+    protected void stopSystem(SUT system) {
 
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
@@ -1814,10 +1815,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
-	@Override
-	protected void postSequenceProcessing() {
+    @Override
+    protected void postSequenceProcessing() {
 
-	}
+    }
 
 	/**
 	 * method for closing the internal TESTAR test session
@@ -1868,8 +1869,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
 				return null;
 			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
-			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+		} else if (userEvent[0] instanceof Integer) // key events
+            return (new AnnotatingActionCompiler()).hitKey((int) userEvent[0]);
 		else if (userEvent[0] instanceof String){ // type events
 			if (lastExecutedAction == null)
 				return null;

@@ -770,46 +770,48 @@ public final class Util {
   }
 
   public static void compileProtocol(String settingsDir, String protocolClass) {
-    File compileDir = new File(settingsDir +
-        new StringTokenizer(protocolClass, "/").nextToken());
-    List<File> dir = Collections.singletonList(compileDir);
+	  File compileDir = new File(settingsDir +
+			  new StringTokenizer(protocolClass, "/").nextToken());
+	  List<File> dir = Collections.singletonList(compileDir);
 
-    try {
-      JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-      if (compiler == null) {
-        throw new RuntimeException("JDK required (running inside of JRE)");
-      }
-      DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-      StandardJavaFileManager fileManager =
-          compiler.getStandardFileManager(diagnostics, null, null);
-      try {
-        Iterable<? extends JavaFileObject> compilationUnits =
-            fileManager.getJavaFileObjectsFromFiles(getAllFiles(dir, ".java"));
+	  try {
+		  JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		  if (compiler == null) {
+			  //throw new RuntimeException("JDK required (running inside of JRE)");
+			  System.out.println("WARNING: JDK required (running inside of JRE)");
+		  } else {
+			  DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+			  StandardJavaFileManager fileManager =
+					  compiler.getStandardFileManager(diagnostics, null, null);
+			  try {
+				  Iterable<? extends JavaFileObject> compilationUnits =
+						  fileManager.getJavaFileObjectsFromFiles(getAllFiles(dir, ".java"));
 
-        ArrayList<String> options = new ArrayList<>();
-        options.add("-classpath");
-        options.add(System.getProperty("java.class.path"));
-        options.add("-d");
-        options.add(settingsDir);
-        JavaCompiler.CompilationTask task = compiler.getTask(
-            null,
-            fileManager,
-            diagnostics,
-            options,
-            null,
-            compilationUnits);
-        if (!task.call()) {
-          for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
-            System.err.format("Error on line %d in %s",
-                diagnostic.getLineNumber(), diagnostic);
-          }
-          throw new RuntimeException("compile errors");
-        }
-      }
-      finally {
-        fileManager.close();
-      }
-    }
+				  ArrayList<String> options = new ArrayList<>();
+				  options.add("-classpath");
+				  options.add(System.getProperty("java.class.path"));
+				  options.add("-d");
+				  options.add(settingsDir);
+				  JavaCompiler.CompilationTask task = compiler.getTask(
+						  null,
+						  fileManager,
+						  diagnostics,
+						  options,
+						  null,
+						  compilationUnits);
+				  if (!task.call()) {
+					  for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
+						  System.err.format("Error on line %d in %s",
+								  diagnostic.getLineNumber(), diagnostic);
+					  }
+					  throw new RuntimeException("compile errors");
+				  }
+			  }
+			  finally {
+				  fileManager.close();
+			  }
+		  }
+	  }
     catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException("Exception: " + t.getMessage());

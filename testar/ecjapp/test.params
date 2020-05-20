@@ -1,0 +1,230 @@
+# Copyright 2006 by Sean Luke and George Mason University
+# Licensed under the Academic Free License version 3.0
+# See the file "LICENSE" for more information
+
+parent.0 = ../../gp/koza/koza.params
+generations		= 10
+pop.subpop.0.size 		= 100
+
+jobs = 1
+
+select.tournament.size = 15
+
+gp.koza.half.min-depth = 1
+gp.koza.half.max-depth = 8
+gp.koza.half.growp = 0.7
+
+gp.koza.grow.min-depth = 1
+gp.koza.grow.max-depth = 9
+
+gp.koza.ns.terminals = 0.3
+gp.koza.ns.nonterminals = 0.4
+gp.koza.ns.root = 0.3
+
+pop.subpop.0.species.pipe = ec.breed.MultiBreedingPipeline
+# Koza's decision here was odd...
+pop.subpop.0.species.pipe.generate-max = false
+# Subsidiary pipelines:
+pop.subpop.0.species.pipe.num-sources = 5
+pop.subpop.0.species.pipe.source.0 = ec.gp.koza.CrossoverPipeline
+pop.subpop.0.species.pipe.source.0.prob = 0.2
+pop.subpop.0.species.pipe.source.1 = ec.breed.ReproductionPipeline
+pop.subpop.0.species.pipe.source.1.prob = 0.2
+pop.subpop.0.species.pipe.source.2 = ec.gp.breed.MutateAllNodesPipeline
+pop.subpop.0.species.pipe.source.2.prob = 0.2
+pop.subpop.0.species.pipe.source.3 = ec.gp.breed.MutateOneNodePipeline
+pop.subpop.0.species.pipe.source.3.prob = 0.2
+pop.subpop.0.species.pipe.source.4 = ec.gp.koza.MutationPipeline
+pop.subpop.0.species.pipe.source.4.prob = 0.2
+
+gp.breed.mutate-one-node.source.0 = ec.select.TournamentSelection
+gp.breed.mutate-one-node.source.1 = same
+gp.breed.mutate-one-node.ns.0 = ec.gp.koza.KozaNodeSelector
+gp.breed.mutate-one-node.ns.1 = same
+gp.breed.mutate-one-node.maxdepth = 17
+gp.breed.mutate-one-node.tries = 1
+
+gp.breed.mutate-all-nodes.source.0 = ec.select.TournamentSelection
+gp.breed.mutate-all-nodes.source.1 = same
+gp.breed.mutate-all-nodes.ns.0 = ec.gp.koza.KozaNodeSelector
+gp.breed.mutate-all-nodes.ns.1 = same
+gp.breed.mutate-all-nodes.maxdepth = 17
+gp.breed.mutate-all-nodes.tries = 1
+
+
+breed.elite.0=10
+
+
+
+#Data types
+gp.type.a.size = 4
+gp.type.a.0.name = number
+gp.type.a.1.name = action
+gp.type.a.2.name = boolean
+gp.type.a.3.name = actiontype
+gp.type.s.size = 0
+
+gp.tc.size = 1
+gp.tc.0 = ec.gp.GPTreeConstraints
+gp.tc.0.name = tc0
+gp.tc.0.fset = f0
+gp.tc.0.returns = action
+
+#Function types
+gp.nc.size = 12
+
+gp.nc.0 = ec.gp.GPNodeConstraints
+gp.nc.0.name = num
+gp.nc.0.returns = number
+gp.nc.0.size = 0
+
+gp.nc.1 = ec.gp.GPNodeConstraints
+gp.nc.1.name = act
+gp.nc.1.returns = action
+gp.nc.1.size = 0
+
+gp.nc.2 = ec.gp.GPNodeConstraints
+gp.nc.2.name = bool-nn
+gp.nc.2.returns = boolean
+gp.nc.2.size = 2
+gp.nc.2.child.0 = number
+gp.nc.2.child.1 = number
+
+gp.nc.3 = ec.gp.GPNodeConstraints
+gp.nc.3.name = act-baa
+gp.nc.3.returns = action
+gp.nc.3.size = 3
+gp.nc.3.child.0 = boolean
+gp.nc.3.child.1 = action
+gp.nc.3.child.2 = action
+ 
+gp.nc.4 = ec.gp.GPNodeConstraints
+gp.nc.4.name = acttype
+gp.nc.4.returns = actiontype
+gp.nc.4.size = 0
+
+gp.nc.5 = ec.gp.GPNodeConstraints
+gp.nc.5.name = act-t
+gp.nc.5.returns = action
+gp.nc.5.size = 1
+gp.nc.5.child.0 = actiontype
+
+gp.nc.6 = ec.gp.GPNodeConstraints
+gp.nc.6.name = acttype-a
+gp.nc.6.returns = actiontype
+gp.nc.6.size = 1
+gp.nc.6.child.0 = action
+
+gp.nc.7 = ec.gp.GPNodeConstraints
+gp.nc.7.name = bool-bb
+gp.nc.7.returns = boolean
+gp.nc.7.size = 2
+gp.nc.7.child.0 = boolean
+gp.nc.7.child.1 = boolean
+
+gp.nc.8 = ec.gp.GPNodeConstraints
+gp.nc.8.name = bool-b
+gp.nc.8.returns = boolean
+gp.nc.8.size = 1
+gp.nc.8.child.0 = boolean
+
+gp.nc.9 = ec.gp.GPNodeConstraints
+gp.nc.9.name = bool
+gp.nc.9.returns = boolean
+gp.nc.9.size = 0
+
+gp.nc.10 = ec.gp.GPNodeConstraints
+gp.nc.10.name = num-t
+gp.nc.10.returns = number
+gp.nc.10.size = 1
+gp.nc.10.child.0 = actiontype
+
+gp.nc.11 = ec.gp.GPNodeConstraints
+gp.nc.11.name = bool-tt
+gp.nc.11.returns = boolean
+gp.nc.11.size = 2
+gp.nc.11.child.0 = actiontype
+gp.nc.11.child.1 = actiontype
+
+# We have one function set, of class GPFunctionSet
+gp.fs.size = 1
+gp.fs.0 = ec.gp.GPFunctionSet
+# We'll call the function set "f0".
+gp.fs.0.name = f0
+
+# Functions
+gp.fs.0.size = 34
+gp.fs.0.func.0 = ec.app.testar.RandomAction
+gp.fs.0.func.0.nc = act
+gp.fs.0.func.1 = ec.app.testar.RandomNumber
+gp.fs.0.func.1.nc = num
+gp.fs.0.func.2 = ec.app.testar.PreviousAction
+gp.fs.0.func.2.nc = act
+gp.fs.0.func.3 = ec.app.testar.NumOfPreviousActions
+gp.fs.0.func.3.nc = num
+gp.fs.0.func.4 = ec.app.testar.NumOfLeftClicks
+gp.fs.0.func.4.nc = num
+gp.fs.0.func.5 = ec.app.testar.IfThenElse
+gp.fs.0.func.5.nc = act-baa
+gp.fs.0.func.6 = ec.app.testar.Equals
+gp.fs.0.func.6.nc = bool-nn
+gp.fs.0.func.7 = ec.app.testar.RandomActionOfType
+gp.fs.0.func.7.nc = act-t
+gp.fs.0.func.8 = ec.app.testar.ClickAction
+gp.fs.0.func.8.nc = acttype
+gp.fs.0.func.9 = ec.app.testar.TypeAction
+gp.fs.0.func.9.nc = acttype
+gp.fs.0.func.10 = ec.app.testar.NumberOfActions
+gp.fs.0.func.10.nc = num
+gp.fs.0.func.11 = ec.app.testar.TypeOfAction
+gp.fs.0.func.11.nc = acttype-a
+gp.fs.0.func.12 = ec.app.testar.RandomUnexecutedAction
+gp.fs.0.func.12.nc = act
+gp.fs.0.func.13 = ec.app.testar.RandomUnexecutedActionOfType
+gp.fs.0.func.13.nc = act-t
+gp.fs.0.func.14 = ec.app.testar.RandomActionOfTypeOtherThan
+gp.fs.0.func.14.nc = act-t
+gp.fs.0.func.15 = ec.app.testar.RandomLeastExecutedAction
+gp.fs.0.func.15.nc = act
+gp.fs.0.func.16 = ec.app.testar.RandomMostExecutedAction
+gp.fs.0.func.16.nc = act
+gp.fs.0.func.17 = ec.app.testar.NumOfTypeActions
+gp.fs.0.func.17.nc = num
+gp.fs.0.func.18 = ec.app.testar.NumOfUnexecutedTypeActions
+gp.fs.0.func.18.nc = num
+gp.fs.0.func.19 = ec.app.testar.NumOfUnexecutedLeftClicks
+gp.fs.0.func.19.nc = num
+gp.fs.0.func.20 = ec.app.testar.And
+gp.fs.0.func.20.nc = bool-bb
+gp.fs.0.func.21 = ec.app.testar.Or
+gp.fs.0.func.21.nc = bool-bb
+gp.fs.0.func.22 = ec.app.testar.Not
+gp.fs.0.func.22.nc = bool-b
+gp.fs.0.func.23 = ec.app.testar.TypeActionsAvailable
+gp.fs.0.func.23.nc = bool
+gp.fs.0.func.24 = ec.app.testar.LeftClicksAvailable
+gp.fs.0.func.24.nc = bool
+gp.fs.0.func.25 = ec.app.testar.NumberOfActionsOfType
+gp.fs.0.func.25.nc = num-t
+gp.fs.0.func.26 = ec.app.testar.DragAction
+gp.fs.0.func.26.nc = acttype
+gp.fs.0.func.27 = ec.app.testar.DragActionsAvailable
+gp.fs.0.func.27.nc = bool
+gp.fs.0.func.28 = ec.app.testar.NumOfUnexecutedDragActions
+gp.fs.0.func.28.nc = num
+gp.fs.0.func.29 = ec.app.testar.NumOfDragActions
+gp.fs.0.func.29.nc = num
+gp.fs.0.func.30 = ec.app.testar.GreaterThan
+gp.fs.0.func.30.nc = bool-nn
+gp.fs.0.func.31 = ec.app.testar.HitKeyAction
+gp.fs.0.func.31.nc = acttype
+gp.fs.0.func.32 = ec.app.testar.StateHasNotChanged
+gp.fs.0.func.32.nc = bool
+gp.fs.0.func.33 = ec.app.testar.EqualsType
+gp.fs.0.func.33.nc = bool-tt
+
+
+
+eval.problem = ec.app.testar.TestarProblem
+eval.problem.data = ec.app.testar.DoubleData
+

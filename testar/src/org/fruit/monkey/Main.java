@@ -46,6 +46,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.FileSystems;
 import java.util.*;
 import org.fruit.alayer.windows.Windows10;
 
@@ -57,12 +58,14 @@ public class Main {
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
+	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	//Default paths
-	public static String testarDir = "." + File.separator;
-	public static String settingsDir = testarDir + "settings" + File.separator;
-	public static String outputDir = testarDir + "output" + File.separator;
-	public static String tempDir = outputDir + "temp" + File.separator;
+    //public static String resourcesDir = "resources" + File.separator;
+    //Default paths
+	public static String testarDir = FileSystems.getDefault().getPath("").toAbsolutePath() + File.separator; // + "testar" + File.separator + "resources" + File.separator;
+    public static String settingsDir = testarDir + "settings" + File.separator;
+    public static String outputDir = testarDir + "output" + File.separator;
+    public static String tempDir = outputDir + "temp" + File.separator;
 
 
 	/**
@@ -99,6 +102,12 @@ public class Main {
 		isValidJavaEnvironment();
 
 		initTestarSSE(args);
+		
+        Arrays.stream(args).forEach(arg -> System.out.println("Arguments: " + arg));
+        System.out.println("TESTAR dir: " + testarDir);
+        System.out.println("Settings dir: " + settingsDir);
+        System.out.println("Output dir: " + outputDir);
+        System.out.println("Temp dir: " + tempDir);
 
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
