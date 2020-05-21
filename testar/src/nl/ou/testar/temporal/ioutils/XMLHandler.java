@@ -39,8 +39,6 @@ public class XMLHandler {
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
                 xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-                //xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                //xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
                 String result = xmlMapper.writeValueAsString(content);
                 if (!zip) {
@@ -66,14 +64,10 @@ public class XMLHandler {
                     fos.close();
 
                 }
-
         } catch (
                 IOException e) {
             e.printStackTrace();
         }
-/*        catch (XMLStreamException e) {
-            e.printStackTrace();
-        }*/
     }
     public  static void save(Object content, String toFile,boolean zip ) {
           save( content,  toFile, true,zip);

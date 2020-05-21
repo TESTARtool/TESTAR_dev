@@ -62,9 +62,6 @@ public class JSONHandler {
                 fos.close();
 
             }
-
-
-
         } catch (
                 IOException e) {
             e.printStackTrace();

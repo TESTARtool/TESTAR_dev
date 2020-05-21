@@ -28,20 +28,11 @@ public class CSVHandler {
     }
     public static <T>void save(List<T> content, String toFile) {
         try {
-            //File output = new File(toFile);
-            //if (output.exists() || output.createNewFile()) {
-
                 FileOutputStream fos = new FileOutputStream(toFile);
                 OutputStreamWriter osw = new OutputStreamWriter(fos,StandardCharsets.UTF_8);
-
-                //BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                //StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
                 StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(osw).withSeparator(';').build();
-
                 beanToCsv.write(content);
-                //writer.close();
                 osw.close();
-           // }
         } catch (
                 IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
             e.printStackTrace();
