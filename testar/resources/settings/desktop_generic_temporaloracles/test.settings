@@ -150,6 +150,7 @@ TemporalOffLineEnabled              = false
 TemporalConcreteEqualsAbstract      = true
 TemporalInstrumentDeadlockState     = true
 TemporalVerbose                     = true
+TemporalZipLargeFiles               = true
 TemporalDBisSource                  = true
 TemporalCounterExamples             = true
 TemporalOracles                     = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\Oracle.csv

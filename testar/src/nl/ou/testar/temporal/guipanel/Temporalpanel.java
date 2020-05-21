@@ -93,6 +93,7 @@ public class Temporalpanel {
     private JCheckBox sourceIsDb;
     private JTextField modelFile;
     private JButton selectFileModel;
+    private JCheckBox zipOutputCheckBox;
 
     public Temporalpanel() {
         $$$setupUI$$$();
@@ -268,7 +269,7 @@ public class Temporalpanel {
         enableLTSMIN_CTL.setVisible(true);
         setupPanel.add(enableLTSMIN_CTL, cc.xy(6, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
         minerPanel = new JPanel();
-        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:66px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:57px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:36px:noGrow,left:4dlu:noGrow,fill:15px:noGrow,left:111px:noGrow,left:45dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        minerPanel.setLayout(new FormLayout("left:132px:noGrow,fill:66px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:57px:noGrow,fill:43px:noGrow,fill:19px:noGrow,fill:11px:noGrow,fill:35px:noGrow,left:4dlu:noGrow,fill:15px:noGrow,left:103px:noGrow,left:50dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:41px:noGrow,center:41px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:4dlu:noGrow,center:max(d;4px):noGrow,top:5dlu:noGrow,center:42px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         containerTab.addTab("Miner", minerPanel);
         final JLabel label7 = new JLabel();
         label7.setText("Oracles:");
@@ -384,11 +385,12 @@ public class Temporalpanel {
         sourceIsDb = new JCheckBox();
         sourceIsDb.setSelected(true);
         sourceIsDb.setText("DB as source");
-        sourceIsDb.setToolTipText("<html>\nWhen checked: uses Graph Database as source for Model checking<br>\nelse: The Model file is the sourc<br>\nUse-case: checking a new formula against  an 'old' Model<bre>\nThis setting has only effect when used in the GUI.<Br>\nModel-checking during TESTAR test runs always use the DB as source.\n</html>");
+        sourceIsDb.setToolTipText("<html>\nWhen checked: uses Graph Database as source for Model checking<br>\nelse: The Model file is the source<br>\nUse-case: checking a new formula against  an 'old' Model<br>\nThis setting has only effect when used in the GUI.<Br>\nModel-checking during TESTAR test runs always use the DB as source.\n</html>");
         minerPanel.add(sourceIsDb, cc.xy(12, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         modelFile = new JTextField();
         modelFile.setEnabled(false);
         modelFile.setText("");
+        modelFile.setToolTipText("Points to a pre-computed Model .JSON file.");
         minerPanel.add(modelFile, cc.xyw(2, 16, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label12 = new JLabel();
         label12.setText("Model File");
@@ -402,6 +404,11 @@ public class Temporalpanel {
         modelCheckBtn.setText("Model Check");
         modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired input: <BR>\n\t+ Proposition Manager. This file is used for filtering atomic propositions from the Model<BR>\n\t+ Oracles. This file contains the formulas to be checked. <BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
         minerPanel.add(modelCheckBtn, cc.xy(12, 16));
+        zipOutputCheckBox = new JCheckBox();
+        zipOutputCheckBox.setSelected(false);
+        zipOutputCheckBox.setText("Zip Output");
+        zipOutputCheckBox.setToolTipText("<html>\nWhen checked: Zips large files to conserve disk. <br>\nApplies to only to  Model JSON files and GraphML.XML\nUse-case: Models, but certainly GraphML.XML files can become very large<br>\n</html>");
+        minerPanel.add(zipOutputCheckBox, cc.xy(13, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         visualizerPanel = new JPanel();
         visualizerPanel.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:78dlu:noGrow,left:4dlu:noGrow,left:115px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:47px:noGrow,left:27dlu:noGrow,fill:max(d;4px):noGrow", "center:49px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         visualizerPanel.setEnabled(false);
@@ -472,6 +479,7 @@ public class Temporalpanel {
 
         instrumentDeadlockStatesCheckBox.setSelected(settings.get(ConfigTags.TemporalInstrumentDeadlockState));
         verboseCheckBox.setSelected(settings.get(ConfigTags.TemporalVerbose));
+        zipOutputCheckBox.setSelected(settings.get(ConfigTags.TemporalZipLargeFiles));
         CounterExamples.setSelected(settings.get(ConfigTags.TemporalCounterExamples));
         enableTemporalOfflineOraclesCheckBox.setSelected(settings.get(ConfigTags.TemporalOffLineEnabled));
         enforceAbstractionEquality.setSelected(settings.get(ConfigTags.TemporalConcreteEqualsAbstract));
@@ -522,6 +530,7 @@ public class Temporalpanel {
         settings.set(ConfigTags.TemporalCTL_LTSMINChecker_Enabled, enableLTSMIN_CTL.isSelected());
 
         settings.set(ConfigTags.TemporalVerbose, verboseCheckBox.isSelected());
+        settings.set(ConfigTags.TemporalZipLargeFiles, zipOutputCheckBox.isSelected());
         settings.set(ConfigTags.TemporalCounterExamples, CounterExamples.isSelected());
         settings.set(ConfigTags.TemporalOffLineEnabled, enableTemporalOfflineOraclesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
@@ -554,6 +563,7 @@ public class Temporalpanel {
                 PropositionManagerFile.getText(),
                 oracleFile.getText(),
                 verboseCheckBox.isSelected(),
+                zipOutputCheckBox.isSelected(),
                 CounterExamples.isSelected(),
                 instrumentDeadlockStatesCheckBox.isSelected(),
                 spotLTLChecker.getText(), WSLCheckBoxLTLSpot.isSelected(), enableSPOT_LTL.isSelected(),
@@ -630,16 +640,16 @@ public class Temporalpanel {
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
-        tcontrol.makeTemporalModel(PropositionManagerFile.getText(), verboseCheckBox.isSelected(), true);
+        tcontrol.makeTemporalModel(PropositionManagerFile.getText(), verboseCheckBox.isSelected(), instrumentDeadlockStatesCheckBox.isSelected(),zipOutputCheckBox.isSelected() );
     }
 
     private void testgraphml(ActionEvent evt) {
-        tcontrol.saveToGraphMLFile("GraphML.XML", false);
-        tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true);
+        tcontrol.saveToGraphMLFile("GraphML.XML", false, zipOutputCheckBox.isSelected());
+        tcontrol.saveToGraphMLFile("GraphML_NoWidgets.XML", true, zipOutputCheckBox.isSelected());
     }
 
     private void testOracleSamples(ActionEvent evt) {
-        System.out.println("Genrating CSV files for  an oracle,pattern and pattern constraint\n");
+        System.out.println("Generating CSV files for  an oracle,pattern and pattern constraint\n");
         TemporalOracle to = TemporalOracle.getSampleLTLOracle();
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);

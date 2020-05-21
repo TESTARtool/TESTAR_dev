@@ -548,7 +548,7 @@ public  class TemporalDBManager {
         }
     }
 
-    public boolean saveToGraphMLFile(AbstractStateModel abstractStateModel,String file,boolean excludeWidget) {
+    public boolean saveToGraphMLFile(AbstractStateModel abstractStateModel,String file,boolean excludeWidget,boolean zip ) {
         //init
         dbReopen();
         String graphXMLID=dbConfig.getDatabase();
@@ -640,7 +640,7 @@ public  class TemporalDBManager {
         tempset.addAll(docnodekeys);
         tempset.addAll(docedgekeys);
         GraphML_DocRoot root = new GraphML_DocRoot(tempset, graph);
-        XMLHandler.save(root, file);
+        XMLHandler.save(root, file,zip);
         return true;
     }
     public String pingDB() {

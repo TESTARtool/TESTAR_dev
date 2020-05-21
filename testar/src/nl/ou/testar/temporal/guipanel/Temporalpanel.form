@@ -372,11 +372,11 @@
             <colspec value="fill:43px:noGrow"/>
             <colspec value="fill:19px:noGrow"/>
             <colspec value="fill:11px:noGrow"/>
-            <colspec value="fill:36px:noGrow"/>
+            <colspec value="fill:35px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:15px:noGrow"/>
-            <colspec value="left:111px:noGrow"/>
-            <colspec value="left:45dlu:noGrow"/>
+            <colspec value="left:103px:noGrow"/>
+            <colspec value="left:50dlu:noGrow"/>
             <constraints>
               <tabbedpane title="Miner"/>
             </constraints>
@@ -408,7 +408,9 @@
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="&lt;html&gt;&#10;Points to a .CSV file that contains the Formulas/Oracles to be checked.&#10;&lt;/html&gt;"/>
+                </properties>
               </component>
               <component id="55810" class="javax.swing.JTextField" binding="patternFile">
                 <constraints>
@@ -419,6 +421,7 @@
                 </constraints>
                 <properties>
                   <text value=""/>
+                  <toolTipText value="&lt;html&gt;&#10;Points to .CSV file that contains the Patterns that will be instantiated to Oracles.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="8b8e4" class="javax.swing.JLabel" default-binding="true">
@@ -437,7 +440,9 @@
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="&lt;html&gt;&#10;Points to .JSON file that contains filters &lt;br&gt;&#10;on propositions to extract from the State model (database)&#10;&lt;/html&gt;&#10;"/>
+                </properties>
               </component>
               <component id="ca661" class="javax.swing.JLabel">
                 <constraints>
@@ -455,7 +460,9 @@
                   </grid>
                   <forms defaultalign-horz="false"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="&lt;html&gt;&#10;Points to .CSV file that contains restrictions per Pattern&lt;br&gt;&#10;on what kind of concrete oracles can be created.&#10;&lt;/html&gt;"/>
+                </properties>
               </component>
               <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
                 <constraints>
@@ -525,7 +532,7 @@
                 </constraints>
                 <properties>
                   <text value="Model Check in Generate Mode"/>
-                  <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after each TESTAR run.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after a TESTAR test-run.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="8a066" class="javax.swing.JCheckBox" binding="CounterExamples">
@@ -673,7 +680,7 @@
                 <properties>
                   <selected value="true"/>
                   <text value="DB as source"/>
-                  <toolTipText value="&lt;html&gt;&#10;When checked: uses Graph Database as source for Model checking&lt;br&gt;&#10;else: The Model file is the sourc&lt;br&gt;&#10;Use-case: checking a new formula against  an 'old' Model&lt;bre&gt;&#10;This setting has only effect when used in the GUI.&lt;Br&gt;&#10;Model-checking during TESTAR test runs always use the DB as source.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;&#10;When checked: uses Graph Database as source for Model checking&lt;br&gt;&#10;else: The Model file is the source&lt;br&gt;&#10;Use-case: checking a new formula against  an 'old' Model&lt;br&gt;&#10;This setting has only effect when used in the GUI.&lt;Br&gt;&#10;Model-checking during TESTAR test runs always use the DB as source.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="f670d" class="javax.swing.JTextField" binding="modelFile">
@@ -686,6 +693,7 @@
                 <properties>
                   <enabled value="false"/>
                   <text value=""/>
+                  <toolTipText value="&lt;/html&gt;&#10;Points to a pre-computed Model .JSON file.&#10;&lt;html&gt;"/>
                 </properties>
               </component>
               <component id="7c258" class="javax.swing.JLabel">
@@ -719,6 +727,17 @@
                   <horizontalTextPosition value="0"/>
                   <text value="Model Check"/>
                   <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="ab953" class="javax.swing.JCheckBox" binding="zipOutputCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="4" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <selected value="false"/>
+                  <text value="Zip Output"/>
+                  <toolTipText value="&lt;html&gt;&#10;When checked: Zips large files to conserve diskspace.&lt;br&gt;&#10;Applies only to Model JSON files and GraphML.XML&lt;br&gt;&#10;Use-case: Models, but certainly GraphML.XML files can become very large&lt;br&gt;&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
             </children>

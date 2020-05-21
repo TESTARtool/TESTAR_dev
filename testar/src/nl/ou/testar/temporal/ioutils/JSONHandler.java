@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class JSONHandler {
     public static <T> Object load(String fromFile, Class<T> cls) { // CLASS method
@@ -28,7 +31,7 @@ public class JSONHandler {
         }
         return null;
     }
-      public static void save(Object content, String toFile, boolean failOnEmptyBean) {
+      public static void save(Object content, String toFile, boolean failOnEmptyBean,boolean zip) {
         try {
             File output = new File(toFile);
             ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -36,18 +39,39 @@ public class JSONHandler {
             objectMapper.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true); //
             String result = objectMapper.writeValueAsString(content);
             // let's write the resulting json to a file
+             if (!zip) {
             if (output.exists() || output.createNewFile()) {
                 BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
                 writer.append(result);
                 writer.close();
             }
+
+            }else {
+                FileOutputStream fos = new FileOutputStream(toFile+".zip");
+                ZipOutputStream zipOut = new ZipOutputStream(fos);
+                InputStream sis = new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8));
+                ZipEntry zipEntry = new ZipEntry(Paths.get(toFile).getFileName().toString());
+                zipOut.putNextEntry(zipEntry);
+                byte[] bytes = new byte[1024];
+                int length;
+                while((length = sis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+                zipOut.close();
+                sis.close();
+                fos.close();
+
+            }
+
+
+
         } catch (
                 IOException e) {
             e.printStackTrace();
         }
     }
-    public static void save(Object content, String toFile ) {
-        save( content,  toFile, true);
+    public static void save(Object content, String toFile, boolean zip ) {
+        save( content,  toFile, true,zip);
 
     }
     public static ArrayList<String> peek(String target, String inFile) {

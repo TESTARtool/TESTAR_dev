@@ -8,6 +8,9 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class XMLHandler {
     /**
@@ -29,10 +32,10 @@ public class XMLHandler {
         }
         return null;
     }
-    public static void save(Object content, String toFile, boolean failOnEmptyBean) {
+    public static void save(Object content, String toFile, boolean failOnEmptyBean,boolean zip) {
         try {
             File output = new File(toFile);
-            if (output.exists() || output.createNewFile()) {
+
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
                 xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
@@ -40,13 +43,30 @@ public class XMLHandler {
                 //xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
                 String result = xmlMapper.writeValueAsString(content);
-                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));//, StandardCharsets.UTF_8));
-                writer.append(result);
-                writer.close();
+                if (!zip) {
+                    if (output.exists() || output.createNewFile()) {
+                        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));//, StandardCharsets.UTF_8));
+                        writer.append(result);
+                        writer.close();
+                    }
+                }else {
+                    FileOutputStream fos = new FileOutputStream(toFile+".zip");
+                    ZipOutputStream zipOut = new ZipOutputStream(fos);
+                    InputStream sis = new ByteArrayInputStream(result.getBytes()); // default charset!
 
+                    ZipEntry zipEntry = new ZipEntry(Paths.get(toFile).getFileName().toString());
+                    zipOut.putNextEntry(zipEntry);
+                    byte[] bytes = new byte[1024];
+                    int length;
+                    while((length = sis.read(bytes)) >= 0) {
+                        zipOut.write(bytes, 0, length);
+                    }
+                    zipOut.close();
+                    sis.close();
+                    fos.close();
 
+                }
 
-            }
         } catch (
                 IOException e) {
             e.printStackTrace();
@@ -55,8 +75,8 @@ public class XMLHandler {
             e.printStackTrace();
         }*/
     }
-    public  static void save(Object content, String toFile ) {
-          save( content,  toFile, true);
+    public  static void save(Object content, String toFile,boolean zip ) {
+          save( content,  toFile, true,zip);
 
     }
 

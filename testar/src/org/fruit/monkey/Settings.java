@@ -54,8 +54,7 @@ import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
 import static java.util.stream.Collectors.toList;
-import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
-import static org.fruit.monkey.ConfigTags.TemporalConcreteEqualsAbstract;
+import static org.fruit.monkey.ConfigTags.*;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -428,6 +427,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
 					+"TemporalInstrumentDeadlockState = false" + Util.lineSep()
 					+"TemporalVerbose = true" + Util.lineSep()
+					+"TTemporalZipLargeFiles = false" + Util.lineSep()
 					+"TemporalDBisSource = true" + Util.lineSep()
 					+"TemporalCounterExamples = true" + Util.lineSep()
 					+"TemporalOracles = TemporalOracles.csv" + Util.lineSep()

@@ -145,6 +145,8 @@ public final class ConfigTags {
 
   public static final Tag<Boolean> TemporalInstrumentDeadlockState= Tag.from("TemporalInstrumentDeadlockState", Boolean.class);
   public static final Tag<Boolean> TemporalVerbose = Tag.from("TemporalVerbose", Boolean.class);
+  public static final Tag<Boolean> TemporalZipLargeFiles = Tag.from("TemporalZipLargeFiles", Boolean.class);
+
   public static final Tag<Boolean> TemporalCounterExamples = Tag.from("TemporalCounterExamples", Boolean.class);
   public static final Tag<Boolean> TemporalDBisSource = Tag.from("TemporalDBisSource", Boolean.class);
 

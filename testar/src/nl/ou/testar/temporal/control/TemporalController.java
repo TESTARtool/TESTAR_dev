@@ -68,6 +68,8 @@ public class TemporalController {
     private  String propositionManagerFile;
     private  String oracleFile;
     private  boolean verbose;
+    private  boolean zip;
+
     private  boolean counterExamples;
 
     private  boolean instrumentDeadlockState;
@@ -132,6 +134,7 @@ public class TemporalController {
         propositionManagerFile = settings.get(ConfigTags.TemporalPropositionManager);
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
+        zip= settings.get(ConfigTags.TemporalZipLargeFiles);
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
         instrumentDeadlockState = settings.get(ConfigTags.TemporalInstrumentDeadlockState);
         tDBManager.updateSettings(settings);
@@ -244,24 +247,24 @@ public class TemporalController {
     }
 
 
-    public boolean saveToGraphMLFile(String file, boolean excludeWidget) {
+    public boolean saveToGraphMLFile(String file, boolean excludeWidget, boolean zip) {
         simpleLog.append(prettyCurrentTime() + " | " + "generating "+file+" file");
         AbstractStateModel abstractStateModel = getAbstractStateModel();
         if (abstractStateModel != null) {
-            return tDBManager.saveToGraphMLFile(abstractStateModel, outputDir + file, excludeWidget);
+            return tDBManager.saveToGraphMLFile(abstractStateModel, outputDir + file, excludeWidget,zip);
         } else return false;
     }
 
-    private void saveModelAsJSON(String toFile) {
+    private void saveModelAsJSON(String toFile, boolean zip) {
         simpleLog.append(prettyCurrentTime() + " | " + "generating Model file: "+toFile);
-        JSONHandler.save(tModel, outputDir + toFile);
+        JSONHandler.save(tModel, outputDir + toFile,zip);
     }
 
 
 
     public void MCheck() {
 
-        MCheck(propositionManagerFile, oracleFile, verbose, counterExamples, instrumentDeadlockState,
+        MCheck(propositionManagerFile, oracleFile, verbose,zip, counterExamples, instrumentDeadlockState,
                 ltlSPOTMCCommand, ltlSPOTToWSLPath, ltlSPOTEnabled,
                 ctlITSMCCommand, ctlITSToWSLPath, ctlITSEnabled,
                 ltlITSMCCommand, ltlITSToWSLPath, ltlITSEnabled,
@@ -274,7 +277,7 @@ public class TemporalController {
 
 
     public void MCheck(String propositionManagerFile, String oracleFile,
-                       boolean verbose, boolean counterExamples, boolean instrumentTerminalState,
+                       boolean verbose, boolean zip,boolean counterExamples, boolean instrumentTerminalState,
                        String ltlSpotMCCommand, boolean ltlSpotWSLPath, boolean ltlSpotEnabled,
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
                        String ltlItsMCCommand, boolean ltlItsWSLPath, boolean ltlItsEnabled,
@@ -308,14 +311,14 @@ public class TemporalController {
                 else strippedFile = filename;
 
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-                    makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,sourceIsDb,modelFile);
+                    makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,sourceIsDb,modelFile);
                 setOracleColl(fromcoll);
 
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
                 if (verbose) {
-                saveToGraphMLFile("GraphML.XML", false);
-                saveToGraphMLFile("GraphML_NoWidgets.XML", true);
+                saveToGraphMLFile("GraphML.XML", false,zip);
+                saveToGraphMLFile("GraphML_NoWidgets.XML", true,zip);
                 }
                 //List<TemporalOracle> initialoraclelist = new ArrayList<>();
                 List<TemporalOracle> finaloraclelist = new ArrayList<>();
@@ -424,10 +427,10 @@ public class TemporalController {
             f.printStackTrace();
         }
     }
-    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState) {
-        makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,true,"");
+    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean zip) {
+        makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,true,"");
     }
-    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean sourceIsDB,String modelFile) {
+    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean zip, boolean sourceIsDB,String modelFile) {
         try {
             simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model started");
             if (verbose) {
@@ -456,7 +459,7 @@ public class TemporalController {
                     tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
                     simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
                     if (verbose) {
-                        saveModelAsJSON("PropositionEncodedModel.json");
+                        saveModelAsJSON("PropositionEncodedModel.json",zip);
                     }
                 }
 
@@ -470,7 +473,7 @@ public class TemporalController {
     public void generateOraclesFromPatterns(String propositionManagerfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
         try {
             simpleLog.append(" potential Oracle generator started \n");
-            makeTemporalModel(propositionManagerfile, false, true);
+            makeTemporalModel(propositionManagerfile, false, true,false);
             List<TemporalPattern> patterns = CSVHandler.load(patternFile, TemporalPattern.class);
             List<TemporalPatternConstraint> patternConstraints = null;
             if (!patternConstraintFile.equals("")) {
