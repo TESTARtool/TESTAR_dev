@@ -37,7 +37,6 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.Util;
-import org.fruit.alayer.Rect;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
@@ -161,6 +160,9 @@ public class AndroidState extends AndroidWidget implements State {
 		}
 		else if (t.equals(Tags.PID)) {
 			ret = (long) -1;
+		}
+		else if (t.equals(Tags.HWND)) {
+			ret = w.element.root.windowsHandle;
 		}
 		else if (t.equals(Tags.IsRunning)) {
 			ret = true;

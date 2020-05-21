@@ -28,69 +28,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.android;
+package org.testar.android.util;
 
-public class AndroidRootElement extends AndroidElement {
-	private static final long serialVersionUID = 7333122749170300870L;
-	
-	public long pid;
-	public long windowsHandle;
-	public long timeStamp;
-	public boolean isRunning;
-	public boolean isForeground;
-	AndroidElementMap elementMap;
+import org.w3c.dom.Node;
 
-	public AndroidRootElement() {
-		super(null);
-		root = this;
-		parent = this;
-		isForeground = false;
-		blocked = false;
-		elementMap = AndroidElementMap.newBuilder().build();
+public final class AndroidNodeParser {
+
+	public static String getStringAttribute(Node xmlNode, String attributeName) {
+		try {
+			xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
+		} catch(Exception e) {
+			return "";
+		}
+
+		return xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue(); 
 	}
 
-	public boolean visibleAt(AndroidElement el, double x, double y){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
+	public static Integer getIntegerAttribute(Node xmlNode, String attributeName) {
+		try {
+			Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
+			return -1;
+		}
+
+		return Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+	}
+
+	public static Double getDoubleAttribute(Node xmlNode, String attributeName) {
+		try {
+			Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
+			return -1.0;
+		}
+
+		return Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+	}
+
+	public static Boolean getBooleanAttribute(Node xmlNode, String attributeName) {
+		try {
+			Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
+		} catch(Exception e) {
 			return false;
 		}
 
-		AndroidElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
+		return Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
 	}
-
-	public boolean visibleAt(AndroidElement el, double x, double y, boolean obscuredByChildFeature){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
-			return false;
-		}
-
-		AndroidElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
-				!obscuredByChildFeature || !obscuredByChildren(el, x, y));
-	}
-
-	boolean obscuredByChildren(AndroidElement el, double x, double y){		
-		for(int i = 0; i < el.children.size(); i++){
-			AndroidElement child = el.children.get(i);
-			if(child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/*public boolean visibleAt(double x, double y) {
-		if(root == null || root.rect == null) {
-			return false;
-		}
-
-		double rootX = root.rect.x(); // 0
-		double rootY = root.rect.y(); // 0
-		return rect.contains(x - rootX, y - rootY);
-
-		//return true;
-	}
-
-	public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-		return visibleAt(x, y);
-	}*/
 }

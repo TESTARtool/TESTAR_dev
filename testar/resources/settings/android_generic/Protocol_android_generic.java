@@ -38,10 +38,14 @@ import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.android.AndroidProtocolUtil;
+import org.testar.android.AppiumFramework;
+import org.testar.android.actions.AndroidActionClick;
+import org.testar.android.enums.AndroidTags;
 import org.testar.protocols.DesktopProtocol;
 
 import es.upv.staq.testar.NativeLinker;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 
@@ -85,27 +89,45 @@ public class Protocol_android_generic extends DesktopProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 			// only consider enabled and non-tabu widgets
-			if (!widget.get(Tags.Enabled, true) || blackListed(widget)) {
+			/*if (!widget.get(Tags.Enabled, true) || blackListed(widget)) {
 				continue;
-			}
+			}*/
 
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Tags.Blocked, false)) {
+			/*if (widget.get(Tags.Blocked, false)) {
 				continue;
-			}
+			}*/
 
 			// type into text boxes
 			if (isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				//actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain
-			if (isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.leftClickAt(widget));
+			if (isClickable(widget)/* && (whiteListed(widget) || isUnfiltered(widget))*/) {
+				actions.add(
+						new AndroidActionClick(state, widget,
+						widget.get(AndroidTags.AndroidText), 
+						widget.get(AndroidTags.AndroidResourceId))
+						);
 			}
+			
+			// Spy mode debugging purposes
+			//actions.add(ac.leftClickAt(widget));
 		}
 
 		return actions;
+	}
+	
+	@Override
+	protected boolean isClickable(Widget w) {
+		return (w.get(AndroidTags.AndroidClassName, "").equals("android.widget.ImageButton")
+		|| w.get(AndroidTags.AndroidClassName, "").equals("android.widget.Button"));
+	}
+	
+	@Override
+	protected boolean isTypeable(Widget w) {
+		return (w.get(AndroidTags.AndroidClassName, "").equals("android.widget.EditText"));
 	}
 
 	@Override

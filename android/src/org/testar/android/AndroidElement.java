@@ -51,6 +51,7 @@ public class AndroidElement extends TaggableBase implements Serializable {
 	boolean enabled;
 	boolean ignore;
 	boolean blocked;
+	boolean isTopLevelContainer;
 
 	double zindex;
 	
@@ -77,17 +78,10 @@ public class AndroidElement extends TaggableBase implements Serializable {
 
 	public AndroidElement(AndroidElement parent){
 		this.parent = parent;
-		if(parent != null)
+		if(parent != null) {
 			root = parent.root;
+		}
 		enabled = true;
-	}
-
-	public boolean visibleAt(double x, double y) {
-		return true;
-	}
-
-	public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-		return visibleAt(x, y);
 	}
 
 	private void writeObject(ObjectOutputStream oos) throws IOException{

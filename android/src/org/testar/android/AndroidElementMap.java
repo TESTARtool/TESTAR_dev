@@ -30,67 +30,77 @@
 
 package org.testar.android;
 
-public class AndroidRootElement extends AndroidElement {
-	private static final long serialVersionUID = 7333122749170300870L;
-	
-	public long pid;
-	public long windowsHandle;
-	public long timeStamp;
-	public boolean isRunning;
-	public boolean isForeground;
-	AndroidElementMap elementMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-	public AndroidRootElement() {
-		super(null);
-		root = this;
-		parent = this;
-		isForeground = false;
-		blocked = false;
-		elementMap = AndroidElementMap.newBuilder().build();
-	}
+import org.fruit.Assert;
+import org.fruit.alayer.Rect;
 
-	public boolean visibleAt(AndroidElement el, double x, double y){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
-			return false;
-		}
+public class AndroidElementMap {
+	final List<AndroidElement> elements;
 
-		AndroidElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
-	}
-
-	public boolean visibleAt(AndroidElement el, double x, double y, boolean obscuredByChildFeature){		
-		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
-			return false;
-		}
-
-		AndroidElement topLevelContainer = elementMap.at(x, y);
-		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
-				!obscuredByChildFeature || !obscuredByChildren(el, x, y));
-	}
-
-	boolean obscuredByChildren(AndroidElement el, double x, double y){		
-		for(int i = 0; i < el.children.size(); i++){
-			AndroidElement child = el.children.get(i);
-			if(child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
-				return true;
+	private static class ElementComp implements Comparator<AndroidElement>{
+		final static int WORSE = 1, BETTER = -1, EVEN = 0;
+		public int compare(AndroidElement o1, AndroidElement o2) {
+			if(o1.zindex < o2.zindex){
+				return WORSE;
+			}else if (o1.zindex > o2.zindex){
+				return BETTER;
+			}else{
+				if(o1.rect != null){
+					if(o2.rect != null){
+						double area1 = Rect.area(o1.rect);
+						double area2 = Rect.area(o2.rect);
+						return area1 < area2 ? BETTER : (area1 > area2 ? WORSE : EVEN);
+					}else{
+						return BETTER;
+					}
+				}else{
+					return WORSE;
+				}
 			}
+		}
+	}
+
+	public static Builder newBuilder(){ return new Builder(); }
+
+	public static final class Builder{
+		final List<AndroidElement> elements = new ArrayList<>();
+
+		public Builder addElement(AndroidElement element){
+			Assert.notNull(element);
+			if(element.rect != null)
+				elements.add(element);		
+			return this;
+		}
+
+		public AndroidElementMap build(){
+			elements.sort(new ElementComp());
+			return new AndroidElementMap(this);
+		}
+	}
+
+
+	private AndroidElementMap(Builder builder){
+		this.elements = builder.elements;
+	}
+
+	public AndroidElement at(double x, double y){
+		for(AndroidElement element : elements){
+			if(element.rect.contains(x, y))
+				return element;
+		}
+		return null;
+	}
+
+	public boolean obstructed(AndroidElement element, double x, double y){
+		for(AndroidElement obstacle : elements){
+			if(obstacle.zindex <= element.zindex || obstacle == element)
+				break;
+			if(obstacle.rect.contains(x, y))
+				return true;
 		}
 		return false;
 	}
-
-	/*public boolean visibleAt(double x, double y) {
-		if(root == null || root.rect == null) {
-			return false;
-		}
-
-		double rootX = root.rect.x(); // 0
-		double rootY = root.rect.y(); // 0
-		return rect.contains(x - rootX, y - rootY);
-
-		//return true;
-	}
-
-	public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-		return visibleAt(x, y);
-	}*/
 }

@@ -30,9 +30,7 @@
 
 package org.testar.android;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.concurrent.Callable;
 
 import org.fruit.alayer.Rect;
@@ -41,29 +39,44 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.windows.Windows;
+import org.openqa.selenium.By;
+import org.testar.android.emulator.AndroidEmulatorFetcher;
+import org.testar.android.emulator.WindowsInitializer;
+import org.testar.android.util.AndroidNodeParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import io.appium.java_client.MobileElement;
 
 public class AndroidStateFetcher implements Callable<AndroidState> {
 
 	private final SUT system;
+	private final AndroidEmulatorFetcher windowsEmulator;
+	private final WindowsInitializer windowsInitializer;
 
 	public AndroidStateFetcher(SUT system) {
 		this.system = system;
+		this.windowsInitializer = new WindowsInitializer();
+		this.windowsEmulator = new AndroidEmulatorFetcher(
+				system,
+				windowsInitializer.getAutomationPointer(),
+				windowsInitializer.getCacheRequestPointer());
 	}
 
 	public static AndroidRootElement buildRoot(SUT system) throws StateBuildException {
-		AndroidRootElement Androidroot = new AndroidRootElement();
-		Androidroot.isRunning = system.isRunning();
-		Androidroot.timeStamp = System.currentTimeMillis();
-		Androidroot.pid = (long)-1; //TODO: Emulator pid + android pid
-		Androidroot.isForeground = false; //TODO: Windows Emulator + android process
+		AndroidRootElement androidroot = new AndroidRootElement();
+		androidroot.isRunning = system.isRunning();
+		androidroot.timeStamp = System.currentTimeMillis();
+		androidroot.pid = (long)-1;
+		androidroot.isForeground = false; //TODO: Windows Emulator + android process
 
-		return Androidroot;
+		return androidroot;
 	}
 
 	@Override
 	public AndroidState call() throws Exception {
+		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
+		
 		AndroidRootElement rootElement = buildAndroidSkeleton(system);
 
 		if (rootElement == null) {
@@ -76,84 +89,118 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		AndroidState root = createWidgetTree(rootElement);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
+		
+		Windows.CoUninitialize();
 
 		return root;
 	}
 
 	private AndroidRootElement buildAndroidSkeleton(SUT system) {
 		AndroidRootElement rootElement = buildRoot(system);
-		
+
 		if(!rootElement.isRunning)
 			return rootElement;
-		
+
 		rootElement.pid = system.get(Tags.PID, (long)-1);
+
+		// Windows API level
+		for(long windowHandle : windowsEmulator.getVisibleTopLevelWindowHandles()) {
+			String windowUIAName = Windows.GetProcessNameFromHWND(windowHandle);
+			if(windowUIAName.contains("qemu-system-i386")) {
+				rootElement.windowsHandle = windowHandle;
+				system.set(Tags.HWND, windowHandle);
+				break;
+			}
+		}
+
+		Rect emulatorRect = windowsEmulator.windowsEmulatorInternalPanel(system.get(Tags.HWND, (long) -1));
+		rootElement.rect = emulatorRect;
+		rootElement.bounds = emulatorRect;
 		
-		Document xmlAndroid = AppiumFramework.getAndroidPageSource();
-		
-		Node stateNode = xmlAndroid.getDocumentElement();
-		//System.out.println("Android XML State Node: " + stateNode.toString());
-		
+		rootElement.text = "Windows Emulator Panel";
+		rootElement.className = "Windows Emulator Panel";
+
 		rootElement.ignore = false;
 		rootElement.enabled = true;
 		rootElement.blocked = false;
 		rootElement.zindex = 0;
-		
-		rootElement.text = "rootLayout";
-		rootElement.className = "rootLayout";
-		
-		rootElement.rect = Rect.from(0, 0, 0, 0);
-		rootElement.bounds = Rect.from(0, 0, 0, 0);
-		
-		if(stateNode.hasChildNodes()) {
-			int childNum = stateNode.getChildNodes().getLength();
-			rootElement.children = new ArrayList<AndroidElement>(childNum);
-			
-			for(int i = 0; i < childNum; i++) {
-				XmlNodeDescend(rootElement, stateNode.getChildNodes().item(i));
+
+		Document xmlAndroid;
+		if((xmlAndroid = AppiumFramework.getAndroidPageSource()) != null) {
+
+			Node stateNode = xmlAndroid.getDocumentElement();
+
+			/*
+			 * Obtain internal Android DrawerLayout
+			 * 
+			 * Because we are using Windows UIA to obtain internal Emulator sub panel
+			 * We don't need to use this implementation right now
+			 * 
+			 * try {
+			MobileElement mainFrame = AppiumFramework.findElements(new By.ByClassName("androidx.drawerlayout.widget.DrawerLayout")).get(0);
+
+			rootElement.rect = Rect.from(
+					emulatorRect.x() + mainFrame.getRect().getX(),
+					emulatorRect.y() + mainFrame.getRect().getY(),
+					mainFrame.getRect().getWidth(),
+					mainFrame.getRect().getHeight());
+
+			rootElement.bounds = Rect.from(
+					emulatorRect.x() + mainFrame.getRect().getX(),
+					emulatorRect.y() + mainFrame.getRect().getY(),
+					mainFrame.getRect().getWidth(),
+					mainFrame.getRect().getHeight());
+
+			}catch(Exception e) {}
+			 */
+
+			if(stateNode.hasChildNodes()) {
+				int childNum = stateNode.getChildNodes().getLength();
+				rootElement.children = new ArrayList<AndroidElement>(childNum);
+
+				for(int i = 0; i < childNum; i++) {
+					XmlNodeDescend(rootElement, stateNode.getChildNodes().item(i));
+				}
 			}
+
 		}
-		
+
+		buildTLCMap(rootElement);
+
 		return rootElement;
 	}
-	
+
 	private void XmlNodeDescend(AndroidElement parent, Node xmlNode) {
 		AndroidElement childElement = new AndroidElement(parent);
 		parent.children.add(childElement);
-		
-		/*System.out.println("Child XML... " + xmlNode.getNodeName() + ", Attributes:");
-		if(xmlNode.getAttributes() != null) {
-			for(int a = 0; a < xmlNode.getAttributes().getLength(); a++) {
-				Node attribute = xmlNode.getAttributes().item(a);
-				System.out.println("Name: " + attribute.getNodeName() + ", Value: " + attribute.getNodeValue());
-			}
-		}*/
-		childElement.zindex = parent.zindex + 1;
-		childElement.enabled = getBooleanAttribute(xmlNode, "enabled");
-		childElement.ignore = false;
-		childElement.blocked = getBooleanAttribute(xmlNode, "focusable"); 
 
-		childElement.nodeIndex = getIntegerAttribute(xmlNode, "index");
-		childElement.text = getStringAttribute(xmlNode, "text");
-		childElement.resourceId = getStringAttribute(xmlNode, "resource-id");
-		childElement.className = getStringAttribute(xmlNode, "class");
-		childElement.packageName = getStringAttribute(xmlNode, "package");
-		childElement.checkable = getBooleanAttribute(xmlNode, "checkable");
-		childElement.checked = getBooleanAttribute(xmlNode, "checked");
-		childElement.clickable = getBooleanAttribute(xmlNode, "clickable");
-		childElement.focusable = getBooleanAttribute(xmlNode, "focusable");
-		childElement.focused = getBooleanAttribute(xmlNode, "focused");
-		childElement.scrollable = getBooleanAttribute(xmlNode, "scrollable");
-		childElement.longclicklable = getBooleanAttribute(xmlNode, "long-clicklable");
-		childElement.password = getBooleanAttribute(xmlNode, "password");
-		childElement.selected = getBooleanAttribute(xmlNode, "selected");
-		
-		childElement.rect = androidBoundsRect(getStringAttribute(xmlNode, "bounds"));
-		childElement.bounds = androidBoundsRect(getStringAttribute(xmlNode, "bounds"));
-		
+		childElement.zindex = parent.zindex + 1;
+		childElement.enabled = AndroidNodeParser.getBooleanAttribute(xmlNode, "enabled");
+		childElement.ignore = false;
+		childElement.blocked = AndroidNodeParser.getBooleanAttribute(xmlNode, "focusable"); 
+
+		childElement.nodeIndex = AndroidNodeParser.getIntegerAttribute(xmlNode, "index");
+		childElement.text = AndroidNodeParser.getStringAttribute(xmlNode, "text");
+		childElement.resourceId = AndroidNodeParser.getStringAttribute(xmlNode, "resource-id");
+		childElement.className = AndroidNodeParser.getStringAttribute(xmlNode, "class");
+		childElement.packageName = AndroidNodeParser.getStringAttribute(xmlNode, "package");
+		childElement.checkable = AndroidNodeParser.getBooleanAttribute(xmlNode, "checkable");
+		childElement.checked = AndroidNodeParser.getBooleanAttribute(xmlNode, "checked");
+		childElement.clickable = AndroidNodeParser.getBooleanAttribute(xmlNode, "clickable");
+		childElement.focusable = AndroidNodeParser.getBooleanAttribute(xmlNode, "focusable");
+		childElement.focused = AndroidNodeParser.getBooleanAttribute(xmlNode, "focused");
+		childElement.scrollable = AndroidNodeParser.getBooleanAttribute(xmlNode, "scrollable");
+		childElement.longclicklable = AndroidNodeParser.getBooleanAttribute(xmlNode, "long-clicklable");
+		childElement.password = AndroidNodeParser.getBooleanAttribute(xmlNode, "password");
+		childElement.selected = AndroidNodeParser.getBooleanAttribute(xmlNode, "selected");
+
+		childElement.rect = androidBoundsRect(childElement.root.rect, AndroidNodeParser.getStringAttribute(xmlNode, "bounds"));
+		childElement.bounds = androidBoundsRect(childElement.root.rect, AndroidNodeParser.getStringAttribute(xmlNode, "bounds"));
+
 		if(xmlNode.hasChildNodes()) {
 			int childNum = xmlNode.getChildNodes().getLength();
 			childElement.children = new ArrayList<AndroidElement>(childNum);
-			
+
 			for(int i = 0; i < childNum; i++) {
 				XmlNodeDescend(childElement, xmlNode.getChildNodes().item(i));
 			}
@@ -183,95 +230,58 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 			createWidgetTree(w, child);
 		}
 	}
-	
-	private String getStringAttribute(Node xmlNode, String attributeName) {
-		try {
-			xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue();
-		} catch(Exception e) {
-			return "";
+
+	private void buildTLCMap(AndroidRootElement root){
+		AndroidElementMap.Builder builder = AndroidElementMap.newBuilder();
+		buildTLCMap(builder, root);
+		root.elementMap = builder.build();
+	}
+
+	private void buildTLCMap(AndroidElementMap.Builder builder, AndroidElement el){
+		if(el.isTopLevelContainer) {
+			builder.addElement(el);
 		}
 
-		return xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue(); 
-	}
-	
-	private Integer getIntegerAttribute(Node xmlNode, String attributeName) {
-		try {
-			Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return -1;
+		for(int i = 0; i < el.children.size(); i++) {
+			buildTLCMap(builder, el.children.get(i));
 		}
-
-		return Integer.parseInt(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
 	}
-	
-	private Double getDoubleAttribute(Node xmlNode, String attributeName) {
-		try {
-			Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return -1.0;
-		}
 
-		return Double.parseDouble(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-	}
-	
-	private Boolean getBooleanAttribute(Node xmlNode, String attributeName) {
-		try {
-			Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-		} catch(Exception e) {
-			return false;
-		}
-
-		return Boolean.parseBoolean(xmlNode.getAttributes().getNamedItem(attributeName).getNodeValue());
-	}
-	
-	private Rect androidBoundsRect(String bounds) {
-		String x = "0";
-		String y = "0";
-		String width = "0";
-		String height = "0";
+	/**
+	 * Create a Rect with Android Elements bounds and rootRect bounds
+	 * 
+	 * Android bounds [24,182][96,254]
+	 * 
+	 * From X1 (24) to X2 (96)
+	 * From Y1 (182) to Y2 (254)
+	 * 
+	 * @param rootRect
+	 * @param bounds
+	 * @return
+	 */
+	private Rect androidBoundsRect(Rect rootRect, String bounds) {
+		String x1 = "0";
+		String y1 = "0";
+		String x2 = "0";
+		String y2 = "0";
 
 		try {
-			x = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
-			y = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
-			
+			x1 = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
+			y1 = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
+
 			bounds = bounds.substring(bounds.indexOf("["), bounds.indexOf("]")+1);
-			
-			width = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
-			height = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
+
+			x2 = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
+			y2 = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
 		} catch(Exception e) {
 			return Rect.from(0, 0, 0, 0);
 		}
+		
+		double x = Double.parseDouble(x1) + rootRect.x();
+		double y = Double.parseDouble(y1) + rootRect.y();
+		double width = Double.parseDouble(x2) - Double.parseDouble(x1);
+		double height = Double.parseDouble(y2) - Double.parseDouble(y1);
 
-		return Rect.from(Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(width), Double.parseDouble(height));
+		return Rect.from(x, y, width, height);
 	}
-
-	/* lists all visible top level windows in ascending z-order (foreground window last) */
-	private Iterable<Long> getVisibleTopLevelWindowHandles(){
-		Deque<Long> ret = new ArrayDeque<Long>();
-		long windowHandle = Windows.GetWindow(Windows.GetDesktopWindow(), Windows.GW_CHILD);
-
-		while(windowHandle != 0){
-			if(Windows.IsWindowVisible(windowHandle)){
-				long exStyle = Windows.GetWindowLong(windowHandle, Windows.GWL_EXSTYLE);
-				if((exStyle & Windows.WS_EX_TRANSPARENT) == 0 && (exStyle & Windows.WS_EX_NOACTIVATE) == 0){
-					ret.addFirst(windowHandle);
-				}				
-			}
-			windowHandle = Windows.GetNextWindow(windowHandle, Windows.GW_HWNDNEXT);
-		}
-
-		System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES");
-
-		return ret;
-	}
-
-	private Rect windowsEmulatorRect(long windowsHandle) {
-		long r[] = Windows.GetWindowRect(windowsHandle);
-		if(r[2] - r[0] >= 0 && r[3] - r[1] >= 0) {
-			return Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
-		}
-
-		return null;
-	}
-
 }

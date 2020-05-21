@@ -28,27 +28,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.android;
+package org.testar.android.actions;
 
-import org.fruit.alayer.HitTester;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.exceptions.ActionFailedException;
+import org.testar.android.AppiumFramework;
+import org.testar.android.enums.AndroidRoles;
 
-public class AndroidHitTester implements HitTester {
-	private static final long serialVersionUID = -5963729249658717638L;
+public class AndroidActionClick extends TaggableBase implements Action {
 
-	private final AndroidElement element;
+	private static final long serialVersionUID = 6663144395605910140L;
 
-	public AndroidHitTester(AndroidElement element) {
-		this.element = element;
+	private String text;
+	private String resourceId;
+
+	public AndroidActionClick(State state, Widget w, String text, String resourceId) {
+		this.set(Tags.Role, AndroidRoles.AndroidWidget);
+		this.set(Tags.OriginWidget, w);
+		this.text = text;
+		this.resourceId = resourceId;
+		this.set(Tags.Desc, toShortString());
 	}
 
 	@Override
-	public boolean apply(double x, double y) {
-		return element.root.visibleAt(element, x, y);
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
+		try {
+			AppiumFramework.clickElementById(this.resourceId);
+		} catch(Exception e) {
+			System.out.println("Exception trying to click Element By Id : " + this.resourceId);
+			System.out.println(e.getMessage());
+			throw new ActionFailedException(toShortString());
+		}
 	}
 
 	@Override
-	public boolean apply(double x, double y, boolean obscuredByChildFeature) {
-		return element.root.visibleAt(element, x, y, obscuredByChildFeature);
+	public String toShortString() {
+		return "Execute Android click in Widget: " + this.text + " with Id: " + this.resourceId;
+	}
+
+	@Override
+	public String toParametersString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toString(Role... discardParameters) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

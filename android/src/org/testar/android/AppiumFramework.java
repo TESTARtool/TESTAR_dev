@@ -49,6 +49,7 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.SUTBase;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -89,12 +90,20 @@ public class AppiumFramework extends SUTBase {
 	public static List<MobileElement> findElements(By by){
 		return driver.findElements(by);
 	}
+	
+	public static void clickElementById(String id){
+		driver.findElementById(id).click();
+	}
 
 	public static Document getAndroidPageSource() {
 		try {
 			return loadXML(driver.getPageSource());
-		} catch (Exception e) {
+		} catch (WebDriverException wde) {
+			System.out.println("ERROR: Exception trying to obtain driver.getPageSource()");
+		} catch (ParserConfigurationException | SAXException | IOException doce) {
 			System.out.println("ERROR: Exception parsing Android Driver Page Source to XML Document");
+		} catch (Exception e) {
+			System.out.println("ERROR: Unknown Exception AppiumFramework getAndroidPageSource()");
 			e.printStackTrace();
 		}
 		return null;

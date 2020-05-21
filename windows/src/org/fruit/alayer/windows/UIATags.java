@@ -812,7 +812,7 @@ public final class UIATags extends TagsBase {
 		}
 	};
 
-	static Set<Tag<Boolean>> getPatternAvailabilityTags() {
+	public static Set<Tag<Boolean>> getPatternAvailabilityTags() {
 		return patternAvailabilityTags;
 	}
 

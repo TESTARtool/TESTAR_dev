@@ -62,15 +62,11 @@ public class SutVisualization {
         Point cursor = mouse.cursor();
         Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
         
-        System.out.println("visualizeState ...." + cursor.x() + " : " + cursor.y());
-        
         if(cursorWidget != null){
             Widget rootW = cursorWidget;
             while (rootW.parent() != null && rootW.parent() != rootW)
                 rootW = rootW.parent();
             Shape cwShape = cursorWidget.get(Tags.Shape, null);
-
-            System.out.println("CursorWidget Shape: " + cwShape);
             
             if(cwShape != null){
                 cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
