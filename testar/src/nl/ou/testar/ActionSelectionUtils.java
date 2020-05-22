@@ -43,7 +43,11 @@ public class ActionSelectionUtils {
             //comparing each current action to each previous action:
             boolean matchingActionFound = false;
             for(Action previousAction:previousActions){
-                matchingActionFound = areSimilarActions(previousAction,currentAction);
+                if(areSimilarActions(previousAction, currentAction)) {
+                	// Match found, we don't need to continue
+                	matchingActionFound = true;
+                	break;
+                }
             }
             if(!matchingActionFound){
                 //new action found, adding to new actions set:

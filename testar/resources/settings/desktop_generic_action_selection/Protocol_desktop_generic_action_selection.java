@@ -80,8 +80,6 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		}
 
-		actions = selector.getPrioritizedActions(actions);
-
 		//return the set of derived actions
 		return actions;
 	}
@@ -97,8 +95,8 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		actions = selector.getPrioritizedActions(actions);
 		Action action = super.selectAction(state, actions);
-		selector.addExecutedAction(action);
 		return(action);
 	}
 
@@ -114,7 +112,9 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		//System.out.println("executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
+		selector.addExecutedAction(action);
+		/*System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
+		+ " -- Times executed: " + selector.timesExecuted(action));*/
 		return super.executeAction(system, state, action);
 	}
 }

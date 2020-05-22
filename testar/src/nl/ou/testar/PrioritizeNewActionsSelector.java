@@ -32,7 +32,9 @@ package nl.ou.testar;
 import org.fruit.alayer.Action;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -55,7 +57,8 @@ public class PrioritizeNewActionsSelector {
     }
 
     private Set<Action> previousActions;
-    private Set<Action> executedActions = new HashSet<Action> ();
+    //private Set<Action> executedActions = new HashSet<Action> ();
+    private Map<Action, Integer> executedActions = new HashMap<>();
 
     public Set<Action> getPrioritizedActions(Set<Action> actions) {
         Set<Action> prioritizedActions = new HashSet<Action>();
@@ -68,36 +71,80 @@ public class PrioritizeNewActionsSelector {
             prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, previousActions);
         }
         if((prioritizedActions.size()>0) && (executedActions.size()>0)) {
+        	
+        	// Do not check reseted Actions, with counter == 0
+        	Set<Action> executedActionsToCheck = new HashSet<>();
+        	for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){
+        		if(entry.getValue() > 0) {
+        			executedActionsToCheck.add(entry.getKey());
+        		}
+        	}
+
             System.out.println("there are new actions to choose from and there are executed actions, checking if they have been already executed");
-            prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, executedActions);
+            prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, executedActionsToCheck);
         }
         if(prioritizedActions.size()==0){
             System.out.println("no new and unexecuted actions, checking if any unexecuted actions");
-            prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions);
+            prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions.keySet());
         }
         if(prioritizedActions.size()==0){
             System.out.println("no unexecuted actions, returning all actions");
             prioritizedActions = actions;
-            System.out.println("removing executed actions, size before="+executedActions.size());
+            
+            /*System.out.println("removing executed actions, size before="+executedActions.size());
             // and removing those actions from executed actions to reset the counter:
-            Set<Action> tempExecutedActions = executedActions; // to prevent concurrent editing while iterating
+            Set<Action> tempExecutedActions = new HashSet<>(executedActions); // to prevent concurrent editing while iterating
             for(Action executedAction:executedActions){
-                for(Action action:actions){
-                    if(ActionSelectionUtils.areSimilarActions(executedAction,action)){
-                        tempExecutedActions.remove(executedAction);
-                    }
-                }
+            	for(Action action:actions){
+            		if(ActionSelectionUtils.areSimilarActions(executedAction,action)){
+            			tempExecutedActions.remove(executedAction);
+            		}
+            	}
             }
             executedActions = tempExecutedActions;
-            System.out.println("removed executed actions, size after="+executedActions.size());
+            System.out.println("removed executed actions, size after="+executedActions.size());*/
+
+            System.out.println("reset executed actions, size = " + executedActions.size());
+            int numberOfCleanedActions = 0;
+            // reset the action counter:
+            for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){
+            	for(Action action : actions){
+            		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)){
+            			entry.setValue(0);
+            			numberOfCleanedActions = numberOfCleanedActions + 1;
+            		}
+            	}
+            }
+            System.out.println("reseted actions = " + numberOfCleanedActions);
+
         }
+        
         //saving the current actions for the next round:
         previousActions = actions;
         return(prioritizedActions);
     }
 
-    public void addExecutedAction(Action action){
+    /*public void addExecutedAction(Action action){
         executedActions.add(action);
+    }*/
+    
+    public void addExecutedAction(Action action){
+    	for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){
+    		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
+    			entry.setValue(entry.getValue()+1);
+    			return;
+    		}
+    	}
+    	executedActions.put(action, 1);
+    }
+
+    public int timesExecuted(Action action) {
+    	for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){
+    		if(ActionSelectionUtils.areSimilarActions(entry.getKey(), action)) {
+    			return entry.getValue();
+    		}
+    	}
+        return 0;
     }
 }
 
