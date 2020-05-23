@@ -31,6 +31,7 @@ public class CSVHandler {
                 FileOutputStream fos = new FileOutputStream(toFile);
                 OutputStreamWriter osw = new OutputStreamWriter(fos,StandardCharsets.UTF_8);
                 StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(osw).withSeparator(';').build();
+
                 beanToCsv.write(content);
                 osw.close();
         } catch (

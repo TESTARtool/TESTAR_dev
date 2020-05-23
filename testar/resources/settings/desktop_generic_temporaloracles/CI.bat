@@ -10,7 +10,7 @@ if "%loops%" == "" (
     @echo Example:
     @echo   %0% 5 desktop_generic_temporaloracles.sse
     @echo Usecase:
-    @echo   Temporal Model check inside TESTAR can only occur after the last test sequence. (State Model locks the database and releases it after the last test run)
+    @echo   Temporal Model check inside TESTAR can only occur after the last test sequence because the State Model database is locked and released after the final test run.
     @echo   With Sequences = 1 in the test.settings file and using this batch file, the effect of model checking after each test sequence can be mimicked. 
     exit /b
 )   

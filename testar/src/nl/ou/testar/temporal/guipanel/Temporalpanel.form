@@ -737,7 +737,7 @@
                 <properties>
                   <selected value="false"/>
                   <text value="Zip Output"/>
-                  <toolTipText value="&lt;html&gt;&#10;When checked: Zips large files to conserve diskspace.&lt;br&gt;&#10;Applies only to Model JSON files and GraphML.XML&lt;br&gt;&#10;Use-case: Models, but certainly GraphML.XML files can become very large&lt;br&gt;&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;&#10;When checked: Zips large files to conserve diskspace&lt;BR&gt;&#10;Applies only to Model JSON files and GraphML.XML&lt;BR&gt;&#10;Use-case: Models, but certainly GraphML.XML files can become very large&lt;BR&gt;&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
             </children>
