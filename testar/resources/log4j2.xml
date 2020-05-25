@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn">
+<Configuration status="WARN">
     <Appenders>
-        <Properties>
-            <Property name="basePath">C:\\logs</Property>
-        </Properties>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
         </Console>
-        <RollingFile name="RollingFile" fileName="${basePath}/testar.log" filePattern="${basePath}/testar-%d{MM-dd-yyyy}.log.gz"
+        <RollingFile name="RollingFile" fileName="C:/logs/testar.log" filePattern="C:/logs/testar-%d{MM-dd-yyyy}.log.gz"
                      ignoreExceptions="false">
             <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
             <Policies>
@@ -25,7 +22,7 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Logger>
-        <Root level="INFO">
+        <Root level="ALL">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>
