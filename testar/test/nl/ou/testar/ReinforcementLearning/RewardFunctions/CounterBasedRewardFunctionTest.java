@@ -43,9 +43,9 @@ public class CounterBasedRewardFunctionTest {
         doNothing().when(taggableBase).set(eq(RLTags.Counter), anyInt());
 
         // when
-        double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(1, reward , 0.01);
+        assertEquals(1f, reward , 0f);
     }
 }

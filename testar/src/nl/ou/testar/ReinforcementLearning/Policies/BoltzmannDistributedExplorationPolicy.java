@@ -14,14 +14,14 @@ public class BoltzmannDistributedExplorationPolicy implements Policy {
     /**
      * Defines with how much the temperature declines every time the policy is used
      */
-    private final double decayRate;
+    private final float decayRate;
 
     /**
      * The boltzmann temperature, can not be zero
      */
-    double boltzmannTemperature;
+    float boltzmannTemperature;
 
-    public BoltzmannDistributedExplorationPolicy(final double decayRate, final double boltzmannTemperature) {
+    public BoltzmannDistributedExplorationPolicy(final float decayRate, final float boltzmannTemperature) {
         this.decayRate = decayRate;
         this.boltzmannTemperature = boltzmannTemperature;
     }
@@ -37,9 +37,9 @@ public class BoltzmannDistributedExplorationPolicy implements Policy {
         try {
             // get sum of utility values for all actions
             double sumOfUtilityForAllActions = actions.stream()
-                    .map(this::getActionUtility)
-                    .mapToDouble(Double::doubleValue).sum();
-            Validate.isTrue(sumOfUtilityForAllActions != 0.0d, "Utility or q-function for all actions results in zero");
+                    .mapToDouble(this::getActionUtility)
+                    .sum();
+            Validate.isTrue(sumOfUtilityForAllActions != 0.0f, "Utility or q-function for all actions results in zero");
 
             // get probability for every action
             actions.forEach(abstractAction -> probabilityOfActions.add(new Pair<>(abstractAction, getProbabilityForAction(abstractAction, sumOfUtilityForAllActions))));
@@ -62,13 +62,13 @@ public class BoltzmannDistributedExplorationPolicy implements Policy {
         return new EnumeratedDistribution<>(probabilityOfActions).sample();
     }
 
-    private Double getProbabilityForAction(AbstractAction abstractAction, double sumOfUtilityForAllActions) {
+    private double getProbabilityForAction(AbstractAction abstractAction, double sumOfUtilityForAllActions) {
         return getActionUtility(abstractAction) / sumOfUtilityForAllActions;
     }
 
     private double getActionUtility(AbstractAction abstractAction) {
-        Double qValue = abstractAction.getAttributes().get(RLTags.SarsaValue, 0d);
-        Validate.isTrue(boltzmannTemperature != 0.0d, "The BoltzmannTemperature is now zero");
+        float qValue = abstractAction.getAttributes().get(RLTags.SarsaValue, 0f);
+        Validate.isTrue(boltzmannTemperature != 0.0f, "The BoltzmannTemperature is now zero");
         return Math.exp(qValue / boltzmannTemperature);
     }
 

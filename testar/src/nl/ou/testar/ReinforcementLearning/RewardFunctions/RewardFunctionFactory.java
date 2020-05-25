@@ -14,7 +14,7 @@ public class RewardFunctionFactory {
                 selectedRewardFunction = new WidgetTreeBasedRewardFunction();
                 break;
             case "ImageRecognitionBasedRewardFunction":
-                final double defaultReward = settings.get(ConfigTags.DefaultReward, 1.0d);
+                final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
                 selectedRewardFunction = new ImageRecognitionBasedRewardFunction(defaultReward);
                 break;
             default:

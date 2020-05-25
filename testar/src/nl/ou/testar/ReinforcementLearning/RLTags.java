@@ -44,7 +44,7 @@ public class RLTags extends TagsBase  {
 	/** 
 	 * Reinforcement Learning Sarsa Value
 	 */
-	public static final Tag<Double> SarsaValue = from("SarsaValue", Double.class);
+	public static final Tag<Float> SarsaValue = from("sarsaValue", Float.class);
 
 	public static final Tag<Integer> Counter = from("counter", Integer.class);
 	

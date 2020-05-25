@@ -31,7 +31,7 @@ public class EpsilonGreedyPolicy implements Policy {
         return ReinforcementLearningUtils.selectAction(actionsSelected);
     }
 
-    double getRandomValue() {
-        return Math.random();
+    float getRandomValue() {
+        return (float) Math.random();
     }
 }

@@ -117,16 +117,16 @@ public final class ConfigTags {
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
 
   // Reinforcement learning specific
-  public static final Tag<Double> Alpha = Tag.from("Alpha", Double.class);
-  public static final Tag<Double> Gamma = Tag.from("Gamma", Double.class);
-  public static final Tag<Double> DefaultValue = Tag.from("DefaultValue", Double.class);
+  public static final Tag<Float> Alpha = Tag.from("Alpha", Float.class);
+  public static final Tag<Float> Gamma = Tag.from("Gamma", Float.class);
+  public static final Tag<Float> DefaultValue = Tag.from("DefaultValue", Float.class);
   public static final Tag<Float> Epsilon = Tag.from("Epsilon", Float.class);
-  public static final Tag<Double> DefaultReward = Tag.from("DefaultReward", Double.class);
+  public static final Tag<Float> DefaultReward = Tag.from("DefaultReward", Float.class);
   public static final Tag<String> RewardFunction = Tag.from("RewardFunction", String.class);
   public static final Tag<String> Policy = Tag.from("Policy", String.class);
-  public static final Tag<Double> DecayRate = Tag.from("DecayRate", Double.class);
-  public static final Tag<Double> Temperature = Tag.from("Temperature", Double.class);
-  public static final Tag<Double> MaxQValue = Tag.from("MaxQValue", Double.class);
+  public static final Tag<Float> DecayRate = Tag.from("DecayRate", Float.class);
+  public static final Tag<Float> Temperature = Tag.from("Temperature", Float.class);
+  public static final Tag<Float> MaxQValue = Tag.from("MaxQValue", Float.class);
 
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);

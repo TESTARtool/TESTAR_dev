@@ -33,32 +33,32 @@ public class PolicyFactory {
 
     private static Policy getEpsilonGreedyPolicy(final Settings settings) {
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
-        final double defaultQValue = settings.get(ConfigTags.DefaultValue, 0.0d);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         return new EpsilonGreedyPolicy(new GreedyPolicy(defaultQValue), epsilon);
     }
 
     private static Policy getGreedyPolicy(final Settings settings) {
-        final double defaultQValue = settings.get(ConfigTags.DefaultValue, 0.0d);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         return new GreedyPolicy(defaultQValue);
     }
 
     private static Policy getOptimisticQValuesInitializationPolicy(final Settings settings) {
-        final double defaultQValue = settings.get(ConfigTags.DefaultValue, 0.0d);
-        final double maxQValue = settings.get(ConfigTags.MaxQValue, 1.0d);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        final float maxQValue = settings.get(ConfigTags.MaxQValue, 0f);
         return new OptimisticQValuesInitializationPolicy(new GreedyPolicy(defaultQValue), maxQValue);
     }
 
     private static Policy getEpsilonGreedyAndBoltzmannDistributedExplorationPolicy(final Settings settings) {
-        final double defaultQValue = settings.get(ConfigTags.DefaultValue, 0.0d);
-        final double decayRate = settings.get(ConfigTags.DecayRate, 0.0001d);
-        final double temperature = settings.get(ConfigTags.Temperature, 1.0d);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        final float decayRate = settings.get(ConfigTags.DecayRate, 0.0001f);
+        final float temperature = settings.get(ConfigTags.Temperature, 1.0f);
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
         return new EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(new GreedyPolicy(defaultQValue), new BoltzmannDistributedExplorationPolicy(decayRate, temperature), epsilon);
     }
 
     private static BoltzmannDistributedExplorationPolicy getBoltzmannDistributedExplorationPolicy(final Settings settings) {
-        final double decayRate = settings.get(ConfigTags.DecayRate, 0.0001d);
-        final double temperature = settings.get(ConfigTags.Temperature, 1.0d);
+        final float decayRate = settings.get(ConfigTags.DecayRate, 0.0001f);
+        final float temperature = settings.get(ConfigTags.Temperature, 1.0f);
         return new BoltzmannDistributedExplorationPolicy(decayRate, temperature);
     }
 }

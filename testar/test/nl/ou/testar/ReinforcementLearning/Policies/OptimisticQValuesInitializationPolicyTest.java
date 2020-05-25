@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class OptimisticQValuesInitializationPolicyTest {
 
-    private final static Policy policy =  new OptimisticQValuesInitializationPolicy(new GreedyPolicy(0.0d), 1.0d);
+    private final static Policy policy =  new OptimisticQValuesInitializationPolicy(new GreedyPolicy(0.0f), 1.0f);
 
     @Test
     public void applyPolicy_returnsAnAction_whenASetWithOneActionIsProvided () {
@@ -19,7 +19,7 @@ public class OptimisticQValuesInitializationPolicyTest {
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractAction = new AbstractAction("1");
-        abstractAction.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractAction.getAttributes().set(RLTags.SarsaValue, 1.0f);
         actions.add(abstractAction);
 
         // when
@@ -72,7 +72,7 @@ public class OptimisticQValuesInitializationPolicyTest {
         actions.add(abstractActionOne);
 
         final AbstractAction abstractActionTwo = new AbstractAction("2");
-        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 0.8d);
+        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 0.8f);
         actions.add(abstractActionTwo);
 
         // when

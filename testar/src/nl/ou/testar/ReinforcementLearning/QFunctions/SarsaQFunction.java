@@ -9,9 +9,9 @@ import nl.ou.testar.StateModel.AbstractAction;
  */
 public class SarsaQFunction implements QFunction {
 
-    private final double alphaDiscount;
-    private final double gammaDiscount;
-    private final double defaultQValue;
+    private final float alphaDiscount;
+    private final float gammaDiscount;
+    private final float defaultQValue;
 
     /**
      * Constructor
@@ -19,7 +19,7 @@ public class SarsaQFunction implements QFunction {
      * @param gammaDiscount
      * @param defaultQValue
      */
-    public SarsaQFunction(double alphaDiscount, final double gammaDiscount, final double defaultQValue) {
+    public SarsaQFunction(float alphaDiscount, final float gammaDiscount, final float defaultQValue) {
         this.alphaDiscount = alphaDiscount;
         this.gammaDiscount = gammaDiscount;
         this.defaultQValue = defaultQValue;
@@ -28,14 +28,14 @@ public class SarsaQFunction implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public double getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final double reward) {
-        double oldQValue = 0.0d;
+    public float getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward) {
+        float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
             oldQValue = previouslyExecutedAction.getAttributes().get(RLTags.SarsaValue, defaultQValue);
         }
-        double newQValue = actionUnderExecution.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+        float newQValue = actionUnderExecution.getAttributes().get(RLTags.SarsaValue, defaultQValue);
 
-        return oldQValue + alphaDiscount * (reward + gammaDiscount * (newQValue) - oldQValue);
+        return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
     }
 }
 

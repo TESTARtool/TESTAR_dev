@@ -31,8 +31,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 3
+Sequences = 3
+SequenceLength = 5
 
 #################################################################
 # Oracles based on suspicious titles
@@ -110,7 +110,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = C:\\orientdb-3.0.28\\databases
+DataStoreDirectory = D:\\orientdb-3.0.28\\databases
 DataStoreDB = testarDB
 DataStoreUser = admin
 DataStorePassword = admin
@@ -138,7 +138,7 @@ MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
 RewardFunction = WidgetTreeBasedRewardFunction
-Policy = GreedyPolicy
+Policy = EpsilonGreedyPolicy
 
 #################################################################
 # Other more advanced settings

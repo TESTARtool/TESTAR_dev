@@ -28,7 +28,7 @@ public class EpsilonGreedyAndBoltzmannDistributedExplorationPolicy implements Po
         return boltzmannDistributedExplorationPolicy.applyPolicy(actions);
     }
 
-    double getRandomValue() {
-        return Math.random();
+    float getRandomValue() {
+        return (float) Math.random();
     }
 }

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  */
 public class ImageRecognitionBasedRewardFunctionTest {
 
-    @Spy private final ImageRecognitionBasedRewardFunction rewardFunction = new ImageRecognitionBasedRewardFunction(1.0d);
+    @Spy private final ImageRecognitionBasedRewardFunction rewardFunction = new ImageRecognitionBasedRewardFunction(1f);
 
     @Mock private AbstractState currentAbstractState;
 
@@ -53,10 +53,10 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshotPreviouslyExecutedAction);
 
         // when
-        final double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(0, reward, 0.05);
+        assertEquals(0f, reward, 0);
     }
 
     @Test
@@ -72,10 +72,10 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(0.25, reward, 0.05);
+        assertEquals(0.25f, reward, 0.05f);
     }
 
     @Test
@@ -91,10 +91,10 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(0.50, reward, 0.05);
+        assertEquals(0.50f, reward, 0.05f);
     }
 
     @Test
@@ -110,10 +110,10 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(0.75, reward, 0.05);
+        assertEquals(0.75f, reward, 0.05f);
     }
 
     @Test
@@ -129,9 +129,9 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final double reward = rewardFunction.getReward(currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
 
         // then
-        assertEquals(1.00, reward, 0.05);
+        assertEquals(1.00f, reward, 0.05f);
     }
 }

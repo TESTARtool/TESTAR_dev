@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class GreedyPolicyTest {
 
-    final private Policy policy = new GreedyPolicy(0.0d);
+    final private Policy policy = new GreedyPolicy(0f);
 
     @Test
     public void applyPolicy_returnsAnAction_whenASetWithOneActionIsProvided () {
@@ -19,7 +19,7 @@ public class GreedyPolicyTest {
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractAction = new AbstractAction("1");
-        abstractAction.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractAction.getAttributes().set(RLTags.SarsaValue, 1f);
         actions.add(abstractAction);
 
         // when
@@ -35,11 +35,11 @@ public class GreedyPolicyTest {
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractActionOne = new AbstractAction("1");
-        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1f);
         actions.add(abstractActionOne);
 
         final AbstractAction abstractActionTwo = new AbstractAction("2");
-        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 1f);
         actions.add(abstractActionTwo);
 
         // when
@@ -55,11 +55,11 @@ public class GreedyPolicyTest {
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractActionOne = new AbstractAction("1");
-        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1f);
         actions.add(abstractActionOne);
 
         final AbstractAction abstractActionTwo = new AbstractAction("2");
-        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 0.8d);
+        abstractActionTwo.getAttributes().set(RLTags.SarsaValue, 0.8f);
         actions.add(abstractActionTwo);
 
         // when

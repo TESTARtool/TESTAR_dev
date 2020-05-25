@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 public class EpsilonGreedyPolicyTest {
 
-    @Spy private final EpsilonGreedyPolicy policy = new EpsilonGreedyPolicy(new GreedyPolicy(0.0d), 0.7f);
+    @Spy private final EpsilonGreedyPolicy policy = new EpsilonGreedyPolicy(new GreedyPolicy(0.0f), 0.7f);
 
     @Before
     public void setup () {
@@ -25,7 +25,7 @@ public class EpsilonGreedyPolicyTest {
     @Test
     public void applyPolicy_returnsAnAction_whenEpsilonIsZero() {
         // given
-        when(policy.getRandomValue()).thenReturn(0.0d);
+        when(policy.getRandomValue()).thenReturn(0.0f);
 
         final Set<AbstractAction> actions = new HashSet<>();
 
@@ -42,7 +42,7 @@ public class EpsilonGreedyPolicyTest {
     @Test
     public void applyPolicy_returnsAnAction_whenEpsilonIsOne() {
         // given
-        when(policy.getRandomValue()).thenReturn(1.0d);
+        when(policy.getRandomValue()).thenReturn(1.0f);
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractAction = new AbstractAction("1");

@@ -269,4 +269,8 @@ public class ModelManager implements StateModelManager {
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
     }
+
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
 }

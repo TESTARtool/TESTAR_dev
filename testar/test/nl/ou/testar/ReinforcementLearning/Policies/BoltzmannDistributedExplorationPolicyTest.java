@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 public class BoltzmannDistributedExplorationPolicyTest {
 
     @Spy
-    private final BoltzmannDistributedExplorationPolicy policy = new BoltzmannDistributedExplorationPolicy(0.0001d, 0.7d);
+    private final BoltzmannDistributedExplorationPolicy policy = new BoltzmannDistributedExplorationPolicy(0.0001f, 0.7f);
 
     @Before
     public void setup () {
@@ -28,7 +28,7 @@ public class BoltzmannDistributedExplorationPolicyTest {
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractActionOne = new AbstractAction("1");
-        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0f);
         actions.add(abstractActionOne);
 
         final AbstractAction abstractActionTwo = new AbstractAction("2");
@@ -62,11 +62,11 @@ public class BoltzmannDistributedExplorationPolicyTest {
     @Test
     public void applyPolicy_returnsARandomAction_whenTheBoltzmannTemperatureIsZero () {
         // given
-        policy.boltzmannTemperature = 0.0d;
+        policy.boltzmannTemperature = 0.0f;
         final Set<AbstractAction> actions = new HashSet<>();
 
         final AbstractAction abstractActionOne = new AbstractAction("1");
-        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0d);
+        abstractActionOne.getAttributes().set(RLTags.SarsaValue, 1.0f);
         actions.add(abstractActionOne);
 
         final AbstractAction abstractActionTwo = new AbstractAction("2");

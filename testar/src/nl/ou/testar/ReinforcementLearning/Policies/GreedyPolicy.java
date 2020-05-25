@@ -15,9 +15,9 @@ import java.util.Set;
  */
 public class GreedyPolicy implements Policy {
 
-    private final double defaultQValue;
+    private final float defaultQValue;
 
-    public GreedyPolicy(final double defaultQValue) {
+    public GreedyPolicy(final float defaultQValue) {
         this.defaultQValue = defaultQValue;
     }
 
@@ -27,15 +27,15 @@ public class GreedyPolicy implements Policy {
      */
     @Override
     public AbstractAction applyPolicy(final Set<AbstractAction> actions) {
-        final Multimap<Double, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
+        final Multimap<Float, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
         actions.forEach(action -> qValuesActionsMultimap.put(action.getAttributes().get(RLTags.SarsaValue, defaultQValue), action));
 
-        final Set<Double> qValues = qValuesActionsMultimap.keySet();
+        final Set<Float> qValues = qValuesActionsMultimap.keySet();
         if (qValues.isEmpty()) {
             return null;
         }
 
-        final Double maxValue = Collections.max(qValues);
+        final float maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
         return ReinforcementLearningUtils.selectAction(actionsSelected);
     }

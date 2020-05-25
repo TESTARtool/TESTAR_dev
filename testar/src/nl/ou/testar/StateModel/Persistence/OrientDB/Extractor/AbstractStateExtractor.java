@@ -78,7 +78,7 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
         }
 
         // get the concrete state ids
-        PropertyValue concreteStateIdValues = entity.getPropertyValue("concreteStateIds");
+        PropertyValue concreteStateIdValues = ((VertexEntity) entity).getPropertyValue("concreteStateIds");
         if (concreteStateIdValues.getType() != OType.EMBEDDEDSET) {
             throw new ExtractionException("Embedded set was expected for concrete state ids. " + concreteStateIdValues.getType().toString() + " was given.");
         }

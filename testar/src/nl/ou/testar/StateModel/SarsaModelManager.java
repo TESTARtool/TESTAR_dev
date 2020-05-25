@@ -1,10 +1,8 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
-import nl.ou.testar.ReinforcementLearning.QFunctions.SarsaQFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
-import nl.ou.testar.ReinforcementLearning.RewardFunctions.WidgetTreeBasedRewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
@@ -55,44 +53,35 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      */
     @Override
     public Action getAbstractActionToExecute(final Set<Action> actions) {
-        return super.getAbstractActionToExecute(actions);
-    }
-
-    /**
-     * This method should be called when an action is about to be executed.
-     * @param action
-     */
-    @Override
-    public void notifyActionExecution(Action action) {
-        updateQValue(action);
-        super.notifyActionExecution(action);
+        final Action selectedAction = super.getAbstractActionToExecute(actions);
+        updateQValue(selectedAction);
+        return selectedAction;
     }
 
     /**
      * Update the Q-value for an {@link Action}
      *
-     * @param actionToExecute, can be null
+     * @param selectedAction, can be null
      */
-    private void updateQValue(final Action actionToExecute) {
+    private void updateQValue(final Action selectedAction) {
         try {
             // validate input
-            Validate.notNull(actionToExecute, "No action was found to execute");
+            Validate.notNull(selectedAction, "No action was found to execute");
 
             // get abstract action which is used in the reward and QFunction
-            final AbstractAction abstractActionToExecute = currentAbstractState.getAction(actionToExecute.get(Tags.AbstractIDCustom, ""));
+            final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
 
             // get reward and Q-value
-            double reward = rewardFunction.getReward(currentAbstractState, abstractActionToExecute);
-            final double qValue = qFunction.getQValue(previousAbstractActionToExecute, abstractActionToExecute, reward);
+            float reward = rewardFunction.getReward(getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+            final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward);
 
             // set attribute for saving in the graph database
-            abstractActionToExecute.addAttribute(RLTags.SarsaValue, qValue);
+            selectedAbstractAction.addAttribute(RLTags.SarsaValue, (float) qValue);
 
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
-            previousAbstractActionToExecute = abstractActionToExecute;
+            previousAbstractActionToExecute = selectedAbstractAction;
         } catch (final Exception e) {
-            System.out.println(String.format("Update of Q-value failed because: %s", e.getMessage()));
+            System.out.println(String.format("Update of Q-value failed because: '%s'", e.getMessage()));
         }
     }
-
 }
