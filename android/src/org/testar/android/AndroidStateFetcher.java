@@ -269,7 +269,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 			x1 = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
 			y1 = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));
 
-			bounds = bounds.substring(bounds.indexOf("["), bounds.indexOf("]")+1);
+			bounds = bounds.substring(bounds.lastIndexOf("["), bounds.lastIndexOf("]")+1);
 
 			x2 = bounds.substring(bounds.indexOf("[")+1, bounds.indexOf(","));
 			y2 = bounds.substring(bounds.indexOf(",")+1, bounds.indexOf("]"));

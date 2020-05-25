@@ -74,14 +74,12 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	@Override
 	public String toParametersString() {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
 	public String toString(Role... discardParameters) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 }

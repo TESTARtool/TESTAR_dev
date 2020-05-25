@@ -31,8 +31,8 @@ SUTConnectorValue = ./settings/android_generic/DesiredCapabilities.json
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 100
+Sequences = 5
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -140,7 +140,7 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 1
+TimeToWaitAfterAction = 2
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

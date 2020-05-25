@@ -63,6 +63,33 @@ public class Protocol_android_generic extends DesktopProtocol {
 		super.initialize(settings);
 		protocolUtil = new AndroidProtocolUtil();
 	}
+	
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
+
+		
+		for(Widget w : state) {
+			if(w.get(AndroidTags.AndroidText, "").toLowerCase().contains("error")
+					|| w.get(AndroidTags.AndroidText, "").toLowerCase().contains("exception")) {
+				return (new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, w.get(AndroidTags.AndroidText, "")));
+			}
+		}
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		//--------------------------------------------------------
+
+		return verdict;
+	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.

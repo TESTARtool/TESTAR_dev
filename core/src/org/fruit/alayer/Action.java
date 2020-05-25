@@ -132,21 +132,15 @@ public interface Action extends Taggable, Serializable {
 
 		returnS[0] += tab + "TEXT = " + action.toString().replaceAll("\\r\\n|\\n", "\n\t\t") + "\n";
 		
-		try {
-			
-			String params = action.toParametersString()
-					.replaceAll("\\)\\(",",")
-					.replaceAll("\\(","")
-					.replaceAll("\\)","")
-					.replaceAll("BUTTON[1,3]","")
-					.replaceAll(",,","")
-					.replaceAll(", ",",");
-			
-			returnS[1] += " [ " + (params.equals(",") ? "" : params + " ]");
-			
-		}catch(Exception e) {
-			System.out.println("Old code Exception getActionRepresentation : 136");
-		}
+		String params = action.toParametersString()
+				.replaceAll("\\)\\(",",")
+				.replaceAll("\\(","")
+				.replaceAll("\\)","")
+				.replaceAll("BUTTON[1,3]","")
+				.replaceAll(",,","")
+				.replaceAll(", ",",");
+
+		returnS[1] += " [ " + (params.equals(",") ? "" : params + " ]");
 
 		return returnS;
 	}

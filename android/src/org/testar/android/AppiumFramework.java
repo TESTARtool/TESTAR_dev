@@ -119,6 +119,7 @@ public class AppiumFramework extends SUTBase {
 	@Override
 	public void stop() throws SystemStopException {
 		driver.closeApp();
+		driver = null;
 	}
 
 	@Override

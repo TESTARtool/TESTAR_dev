@@ -30,10 +30,36 @@
 
 package org.testar.android;
 
+import org.fruit.alayer.AWTCanvas;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Rect;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.testar.android.actions.AndroidActionClick;
+
 import es.upv.staq.testar.ProtocolUtil;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 
 public class AndroidProtocolUtil extends ProtocolUtil {
 
 	public AndroidProtocolUtil() {}
+
+	@Override
+	public String getActionshot(State state, Action action) {
+
+		if(action instanceof AndroidActionClick) {
+			try {
+				AndroidActionClick androidClick = (AndroidActionClick) action;
+				Shape androidClickShape = androidClick.get(Tags.OriginWidget).get(Tags.Shape);
+
+				Rect rect = Rect.from(androidClickShape.x(), androidClickShape.y(), androidClickShape.width(), androidClickShape.height());
+				AWTCanvas scrshot = AWTCanvas.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
+				return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+			} catch(Exception e) {}
+		}
+
+		return super.getActionshot(state, action);
+	}
 
 }
