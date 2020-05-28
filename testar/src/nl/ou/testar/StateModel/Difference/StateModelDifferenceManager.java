@@ -43,9 +43,6 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import org.fruit.Pair;
 import org.fruit.monkey.Main;
 
@@ -67,9 +64,12 @@ public class StateModelDifferenceManager {
 
 	// Helper class to execute queries
 	private StateModelDifferenceDatabase modelDifferenceDatabase;
+	
+	private String modelDifferenceReportDirectory = "";
 
-	public StateModelDifferenceManager(Config initialConfig) {
+	public StateModelDifferenceManager(Config initialConfig, String modelDifferenceReportDirectory) {
 		this.dbConfig = initialConfig;
+		this.modelDifferenceReportDirectory = modelDifferenceReportDirectory;
 	}
 
 	public void obtainAvailableDatabases(Config config, JComboBox<String> listDatabases) {
@@ -89,12 +89,16 @@ public class StateModelDifferenceManager {
 					listDatabases.addItem(database);
 
 		} catch(OSecurityAccessException e) {
-			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, 
-					" User or password not valid for database: " + listDatabases.getSelectedItem().toString() + 
+			String message = "EXCEPTION: User or password not valid for database: " +
+					listDatabases.getSelectedItem().toString() + 
 					"\n plocal databases do not use 'root' user" + 
-					"\n try with customized user");
-			frame.setAlwaysOnTop(true);
+					"\n try with customized user";
+			System.out.println(message);
+
+			/*JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, message);
+			frame.setAlwaysOnTop(true);*/
+
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -146,7 +150,27 @@ public class StateModelDifferenceManager {
 
 		try (ODatabaseSession sessionDB = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())){
 
-			this.modelDifferenceDatabase = new StateModelDifferenceDatabase(sessionDB);
+			// If no directory exists (manual State Model Diff execution)
+			// Create a default directory that will contain Screenshots and HTML report
+			if(modelDifferenceReportDirectory.isEmpty()) {
+				modelDifferenceReportDirectory = Main.outputDir + "StateModelDifference_"
+						+ stateModelOne.left() + "_" + stateModelOne.right() + "_vs_"
+						+ stateModelTwo.left() + "_" + stateModelTwo.right();
+			}
+			
+			File fileModelDiff = new File(modelDifferenceReportDirectory);
+			
+			if ((fileModelDiff).getCanonicalFile().exists()) {
+				System.out.println("\n ************************************************************************************ \n");
+				System.out.println("WARNING: This State Model Difference report already exists: " + fileModelDiff);
+				System.out.println("RECOMMENDATION: Save or Delete and execute again");
+				System.out.println("Current functionality is under development, there may be merged results");
+				System.out.println("\n ************************************************************************************ \n");
+			} else {
+				fileModelDiff.getCanonicalFile().mkdirs();
+			}
+			
+			this.modelDifferenceDatabase = new StateModelDifferenceDatabase(sessionDB, modelDifferenceReportDirectory);
 
 			identifierModelOne = modelDifferenceDatabase.abstractStateModelIdentifier(stateModelOne.left(), stateModelOne.right());
 			identifierModelTwo = modelDifferenceDatabase.abstractStateModelIdentifier(stateModelTwo.left(), stateModelTwo.right());
@@ -201,7 +225,17 @@ public class StateModelDifferenceManager {
 
 			createHTMLreport(sessionDB);
 
-		}catch(Exception e) {
+		} catch(OSecurityAccessException e) {
+			String message = "EXCEPTION: User or password not valid for database: " + dbConfig.getDatabase() + 
+					"\n plocal databases do not use 'root' user" + 
+					"\n try with customized user";
+			System.out.println(message);
+
+			/*JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, message);
+			frame.setAlwaysOnTop(true);*/
+
+		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			orientDB.close();
@@ -225,7 +259,7 @@ public class StateModelDifferenceManager {
 					"<body>"
 			};
 
-			String htmlReportName = Main.outputDir + "ModelDiff" + File.separator + "DifferenceReport.html";
+			String htmlReportName = modelDifferenceReportDirectory + File.separator + "DifferenceReport.html";
 
 			PrintWriter out = new PrintWriter(new File(htmlReportName).getCanonicalPath(), HTMLReporter.CHARSET);
 
@@ -345,7 +379,7 @@ public class StateModelDifferenceManager {
 	}
 
 	// https://stackoverflow.com/questions/25022578/highlight-differences-between-images
-	private static String getDifferenceImage(String img1Disk, String idImg1, String img2Disk, String idImg2) {
+	private String getDifferenceImage(String img1Disk, String idImg1, String img2Disk, String idImg2) {
 		try {
 
 			BufferedImage img1 = ImageIO.read(new File(img1Disk));
@@ -389,19 +423,11 @@ public class StateModelDifferenceManager {
 
 			// Now save the image on disk
 
-			if (!Main.outputDir.substring(Main.outputDir.length() - 1).equals(File.separator)) {
-				Main.outputDir += File.separator;
-			}
-
 			// see if we have a directory for the screenshots yet
-			File screenshotDir = new File(Main.outputDir + "ModelDiff" + /*File.separator + folderName +*/ File.separator);
-
-			if (!screenshotDir.exists()) {
-				screenshotDir.mkdir();
-			}
+			File screenshotDir = new File(modelDifferenceReportDirectory + File.separator);
 
 			// save the file to disk
-			File screenshotFile = new File( screenshotDir, "diff_"+ idImg1 + "_" + idImg2 + ".png");
+			File screenshotFile = new File(screenshotDir, "diff_"+ idImg1 + "_" + idImg2 + ".png");
 			if (screenshotFile.exists()) {
 				try {
 					return screenshotFile.getCanonicalPath();

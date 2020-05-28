@@ -55,9 +55,12 @@ public class StateModelDifferenceDatabase {
 	
 	// Database session to execute queries
 	private ODatabaseSession sessionDB;
+
+	private String modelDifferenceReportDirectory; 
 	
-	public StateModelDifferenceDatabase(ODatabaseSession sessionDB) {
+	public StateModelDifferenceDatabase(ODatabaseSession sessionDB, String modelDifferenceReportDirectory) {
 		this.sessionDB = sessionDB;
+		this.modelDifferenceReportDirectory = modelDifferenceReportDirectory;
 	}
 	
 	/**
@@ -401,14 +404,10 @@ public class StateModelDifferenceDatabase {
 		}
 
 		// see if we have a directory for the screenshots yet
-		File screenshotDir = new File(Main.outputDir + "ModelDiff" + /*File.separator + folderName +*/ File.separator);
-
-		if (!screenshotDir.exists()) {
-			screenshotDir.mkdir();
-		}
+		File screenshotDir = new File(modelDifferenceReportDirectory + File.separator);
 
 		// save the file to disk
-		File screenshotFile = new File( screenshotDir, identifier + ".png");
+		File screenshotFile = new File(screenshotDir, identifier + ".png");
 		if (screenshotFile.exists()) {
 			try {
 				return screenshotFile.getCanonicalPath();

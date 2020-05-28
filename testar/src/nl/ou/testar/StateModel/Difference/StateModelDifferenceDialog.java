@@ -94,7 +94,7 @@ public class StateModelDifferenceDialog extends JDialog {
 		config.setPassword(getPassword(textFieldPassword));
 		config.setDatabaseDirectory(textFieldStoreDirectory.getText());
 		
-		this.modelDifferenceManager = new StateModelDifferenceManager(config);
+		this.modelDifferenceManager = new StateModelDifferenceManager(config, "");
 	}
 
 	private void initialize(String storeType, String storeServer, String storeDirectory) {
