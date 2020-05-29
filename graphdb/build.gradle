@@ -23,8 +23,6 @@ dependencies {
     compile group: 'com.tinkerpop.gremlin', name: 'gremlin-java', version: '2.6.0'
     compile group: 'com.tinkerpop.gremlin', name: 'gremlin-groovy', version: '2.6.0'
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.9'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
-    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.13.2'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 
     jmhCompile project
