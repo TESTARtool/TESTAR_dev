@@ -33,12 +33,16 @@ import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
+import org.apache.commons.lang.StringUtils;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
@@ -46,6 +50,7 @@ import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -53,7 +58,19 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_statemodel extends WebdriverProtocol {
+public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
+
+	private static List<String> alwaysClickableClasses = Arrays.asList("owl-dt-control-button-content");
+
+	private static List<String> typeableClasses = Arrays.asList(
+			//Text input of Menu page
+			"mat-form-field-label-wrapper", //bookTable Page, Sign UP and Email
+			"owl-dt-timer-input" //Calendar dates
+			);
+
+	private static List<String> slidesClasses = Arrays.asList(
+			"mat-slider" //Not working yet, customize these kind of actions
+			);
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -68,7 +85,23 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+		clickableClasses = Arrays.asList(
+				"v-menubar-menuitem", "v-menubar-menuitem-caption",
+				//Main page
+				"mat-button-ripple", "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content", //OK
+				//Menu page
+				"mat-checkbox-label",
+				"mat-select-arrow",
+				"mat-expansion-panel-header-title",
+				"order",
+				//Sort by and options
+				"mat-select-placeholder", "mat-option-ripple",
+				//Calendar
+				"owl-dt-calendar-cell-content",
+				// Reservation cells
+				"mat-cell",
+				"ng-star-inserted"
+				);
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -77,7 +110,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.w3schools.com");
+		domainsAllowed = null;
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -85,15 +118,33 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// Propagate followLinks setting
 		WdDriver.followLinks = followLinks;
+		WdDriver.fullScreen = true;
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{ 
-			put("id", "sncmp-banner-btn-agree");
-		}};
+		policyAttributes = null;
+		
+		login = null;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
+	}
+	
+	/**
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 * out what executable to run)
+	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuratio files etc.)
+	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 * seconds until they have finished loading)
+	 *
+	 * @return a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException {
+		return super.startSystem();
 	}
 
 	/**
@@ -116,6 +167,10 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
+		loginMyThaiStarAction("waiter", "waiter", actions, state, ac);
+
+		registerMyThaiStarAction("email@email.com", "password", actions, state, ac);
+
 		// Check if forced actions are needed to stay within allowed domains
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
@@ -124,13 +179,18 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+			// left clicks, but ignore links outside domain
+			if (isAlwaysClickable(widget)) {
+				actions.add(ac.leftClickAt(widget));
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
@@ -147,6 +207,11 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 				if (!isLinkDenied(widget)) {
 					actions.add(ac.leftClickAt(widget));
 				}
+			}
+
+			// slider widgets
+			if (isAtBrowserCanvas(widget) && isSlider(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+				addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 			}
 		}
 
@@ -174,18 +239,31 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		clickSet.retainAll(element.cssClasses);
 		return clickSet.size() > 0;
 	}
+	
+	protected boolean isAlwaysClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> clickSet = new HashSet<>(alwaysClickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
+	}
 
 	@Override
 	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> clickSet = new HashSet<>(typeableClasses);
+		clickSet.retainAll(element.cssClasses);
+		if(clickSet.size() > 0)
 			return true;
-		}
+
+		return false;
+	}
+
+	protected boolean isSlider(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> clickSet = new HashSet<>(slidesClasses);
+		clickSet.retainAll(element.cssClasses);
+		if(clickSet.size() > 0)
+			return true;
 
 		return false;
 	}
@@ -231,9 +309,29 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 				String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
 				Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
 
+				// We are going to compare same Application
+				String previousApplicationName = currentApplicationName;
+
+				// Do we want to automatically compare in this way ?
+				// Or access to database and check all existing versions < currentVersion ?
+				String previousVersion = "";
+				if(StringUtils.isNumeric(currentVersion)) {
+					previousVersion = String.valueOf(Integer.parseInt(currentVersion) - 1);
+				}
+				else if (Pattern.matches("([0-9]*)\\.([0-9]*)", currentVersion)) {
+					previousVersion = String.valueOf(Double.parseDouble(currentVersion) - 1);
+				}
+				else {
+					System.out.println("WARNING: State Model Difference could not calculate previous application version automatically");
+				}
+
+				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
+
+				/* This is an option to use setting parameter to specify previous model
 				String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
 				String previousVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
 				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
+				*/
 
 				// Obtain Database Configuration, from Settings by default
 				Config config = new Config();
@@ -256,6 +354,70 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		} catch (Exception e) {
 			System.out.println("ERROR: Trying to create an automatic State Model Difference");
 			e.printStackTrace();
+		}
+	}
+
+	//Method to customize login action
+	private void loginMyThaiStarAction(String username, String userPass, Set<Action> actions, State state, StdActionCompiler ac) {
+		Action typeUsername = new NOP();
+		Action typePassword = new NOP();
+
+		for(Widget w : state) {
+			if(w.get(WdTags.WebName,"").equals("username")) {
+				typeUsername = ac.clickTypeInto(w, username, true);
+			}
+			if(w.get(WdTags.WebName,"").equals("password")) {
+				typePassword = ac.clickTypeInto(w, userPass, true);
+			}
+		}
+
+		String NOP_ID = "No Operation";
+
+		if(!typeUsername.toString().contains(NOP_ID) && !typePassword.toString().contains(NOP_ID)){
+			Action userLogin = new CompoundAction.Builder()
+					.add(typeUsername, 1)
+					.add(typePassword, 1)
+					.add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
+			userLogin.set(Tags.OriginWidget, typeUsername.get(Tags.OriginWidget));
+			actions.add(userLogin);
+		}
+	}
+
+	//Method to customize register action
+	private void registerMyThaiStarAction(String email, String emailPass, Set<Action> actions, State state, StdActionCompiler ac) {
+		Action typeEmail = new NOP();
+		Action typePassword = new NOP();
+		Action typeConfirmPassword = new NOP();
+		Action clickAcceptTerms = new NOP();
+
+		for(Widget w : state) {
+			if(w.get(WdTags.WebName,"").equals("email")) {
+				typeEmail = ac.clickTypeInto(w, email, true);
+			}
+			if(w.get(WdTags.WebName,"").equals("password")) {
+				typePassword = ac.clickTypeInto(w, emailPass, true);
+			}
+			if(w.get(WdTags.WebName,"").equals("confirmPassword")) {
+				typeConfirmPassword = ac.clickTypeInto(w, emailPass, true);
+			}
+			if(w.get(WdTags.WebName,"").equals("registerTerms")) {
+				clickAcceptTerms = ac.leftClickAt(w);
+			}
+		}
+
+		String NOP_ID = "No Operation";
+
+		if(!typeEmail.toString().contains(NOP_ID) 
+				&& !typePassword.toString().contains(NOP_ID)&& !typeConfirmPassword.toString().contains(NOP_ID)
+				&& !clickAcceptTerms.toString().contains(NOP_ID)){
+			Action userRegister = new CompoundAction.Builder()
+					.add(typeEmail, 1)
+					.add(typePassword, 1)
+					.add(typeConfirmPassword, 1)
+					.add(clickAcceptTerms, 1)
+					.add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
+			userRegister.set(Tags.OriginWidget, typeEmail.get(Tags.OriginWidget));
+			actions.add(userRegister);
 		}
 	}
 

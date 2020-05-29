@@ -28,16 +28,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+import java.io.File;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
+import org.fruit.Pair;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.Tags;
+import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
+
+import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -46,7 +58,6 @@ import static org.fruit.alayer.Tags.Enabled;
  * Protocol specifically for testing Java Swing applications.
  */
 public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
-
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -107,7 +118,7 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 	}
 	
 	//Force actions on Tree widgets with a wrong accessibility
-	public void widgetTree(Widget w, Set<Action> actions) {
+	private void widgetTree(Widget w, Set<Action> actions) {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		actions.add(ac.leftClickAt(w));
 		w.set(Tags.ActionSet, actions);
@@ -115,4 +126,94 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 			widgetTree(w.child(i), actions);
 		}
 	}
+	
+	/**
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions){
+
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
+		}
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			// if state model fails, use default:
+			retAction = super.selectAction(state, actions);
+		}
+		return retAction;
+	}
+
+	/**
+	 * All TESTAR test sequence sessions are closed (State Model + OrientDB included)
+	 * We can start other connection to create State Model Difference Report
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+
+		try {
+			if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
+				// Define State Model versions we want to compare
+				String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
+				String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
+				Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
+
+				// We are going to compare same Application
+				String previousApplicationName = currentApplicationName;
+
+				// Do we want to automatically compare in this way ?
+				// Or access to database and check all existing versions < currentVersion ?
+				String previousVersion = "";
+				if(StringUtils.isNumeric(currentVersion)) {
+					previousVersion = String.valueOf(Integer.parseInt(currentVersion) - 1);
+				}
+				else if (Pattern.matches("([0-9]*)\\.([0-9]*)", currentVersion)) {
+					previousVersion = String.valueOf(Double.parseDouble(currentVersion) - 1);
+				}
+				else {
+					System.out.println("WARNING: State Model Difference could not calculate previous application version automatically");
+				}
+
+				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
+
+				/* This is an option to use setting parameter to specify previous model
+				String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
+				String previousVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
+				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
+				 */
+
+				// Obtain Database Configuration, from Settings by default
+				Config config = new Config();
+				config.setConnectionType(settings.get(ConfigTags.DataStoreType,""));
+				config.setServer(settings.get(ConfigTags.DataStoreServer,""));
+				config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory,""));
+				config.setDatabase(settings.get(ConfigTags.DataStoreDB,""));
+				config.setUser(settings.get(ConfigTags.DataStoreUser,""));
+				config.setPassword(settings.get(ConfigTags.DataStorePassword,""));
+
+				// State Model Difference Report Directory Name
+				String dirName = OutputStructure.outerLoopOutputDir  + File.separator + "StateModelDifference_"
+						+ previousStateModel.left() + "_" + previousStateModel.right() + "_vs_"
+						+ currentStateModel.left() + "_" + currentStateModel.right();
+
+				// Execute the State Model Difference to create an HTML report
+				StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
+				modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR: Trying to create an automatic State Model Difference");
+			e.printStackTrace();
+		}
+	}
+
 }

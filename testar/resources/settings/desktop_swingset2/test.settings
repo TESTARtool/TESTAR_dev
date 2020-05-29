@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "suts/SwingSet2.jar"
+SUTConnectorValue = java -jar "suts/SimpleModelOne.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -43,7 +43,7 @@ AccessBridgeEnabled = true
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 20
 
 #################################################################
 # Oracles based on suspicious titles
@@ -109,10 +109,22 @@ ProtocolClass = desktop_swingset2/Protocol_desktop_SwingSet2
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBEnabled = true
+GraphDBUrl = remote:/localhost/testar
+GraphDBUser = testar
+GraphDBPassword = testar
+
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
 
 #################################################################
 # State identifier attributes
@@ -120,7 +132,7 @@ GraphDBPassword =
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetTitle
 
 #################################################################
 # Other more advanced settings
@@ -138,13 +150,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.5
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
