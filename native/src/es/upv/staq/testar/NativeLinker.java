@@ -59,6 +59,10 @@ public class NativeLinker {
 	private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
 	private static String osName;
 	
+	public static String getOsName() {
+		return osName;
+	}
+	
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.

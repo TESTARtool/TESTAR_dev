@@ -35,6 +35,7 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.HttpServer.JettyServer;
+import nl.ou.testar.StateModel.Artefact.StateModelArtefactDialog;
 import nl.ou.testar.StateModel.Difference.StateModelDifferenceDialog;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import org.fruit.alayer.Tag;
@@ -92,10 +93,14 @@ public class StateModelPanel extends JPanel {
     private JButton stateTagsButton = new JButton("Advanced");
     private AbstractStateSettings stateTagsDialog;
     private JButton analysisButton = new JButton("Analysis");
+    
+    private JButton exportDBbutton = new JButton("Export DB");
+    private JButton importDBbutton = new JButton("Import DB");
+    private JButton artefactStateModel = new JButton("Model Artefact");
+    private JButton modelDiffbutton = new JButton("Model Diff");
+    
     private Tag<?>[] allStateManagementTags;
     private Tag<?>[] selectedStateManagementTags;
-
-    private JButton modelDiffbutton = new JButton("Model Diff");
 
     private String outputDir;
 
@@ -136,6 +141,9 @@ public class StateModelPanel extends JPanel {
         components.add(stateTagsButton);
         components.add(actionSelectionBox);
         components.add(stateModelWidgetStoreChkBox);
+        components.add(exportDBbutton);
+        components.add(importDBbutton);
+        components.add(artefactStateModel);
         components.add(modelDiffbutton);
 
         // add the components to the panel
@@ -251,7 +259,43 @@ public class StateModelPanel extends JPanel {
         label14.setBounds(330, 280, 300, 27);
         add(label14);
         
-        modelDiffbutton.setBounds(330, 318, 150, 27);
+        exportDBbutton.setBounds(330, 285, 120, 27);
+        exportDBbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	ExportDatabaseDialog exportDBdialog = new ExportDatabaseDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
+            	exportDBdialog.setVisible(true);
+            }
+        });
+        add(exportDBbutton);
+
+        importDBbutton.setBounds(330, 320, 120, 27);
+        importDBbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	ImportDatabaseDialog importDBdialog = new ImportDatabaseDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
+            	importDBdialog.setVisible(true);
+            }
+        });
+        add(importDBbutton);
+
+        artefactStateModel.setBounds(470, 285, 120, 27);
+        artefactStateModel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	StateModelArtefactDialog artefactDialog = new StateModelArtefactDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
+            	artefactDialog.setVisible(true);
+            }
+        });
+        add(artefactStateModel);
+        
+        modelDiffbutton.setBounds(470, 320, 120, 27);
         modelDiffbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
