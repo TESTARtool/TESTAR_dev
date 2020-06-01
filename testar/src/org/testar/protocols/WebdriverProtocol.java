@@ -87,10 +87,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected State latestState;
     
     protected String verdictInfo;
-    SortedSet<String> sequencesOutputDir = new TreeSet<>();
-    SortedSet<String> htmlOutputDir = new TreeSet<>();
-    SortedSet<String> logsOutputDir = new TreeSet<>();
-    SortedSet<String> sequencesVerdicts = new TreeSet<>();
+    private SortedSet<String> sequencesOutputDir = new TreeSet<>();
+    private SortedSet<String> htmlOutputDir = new TreeSet<>();
+    private SortedSet<String> logsOutputDir = new TreeSet<>();
+    private SortedSet<String> sequencesVerdicts = new TreeSet<>();
+    
+    protected String testResultsArtefactDirectory = "";
+    protected String stateModelArtefactDirectory = "";
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
@@ -353,9 +356,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 		NativeLinker.cleanWdDriverOS();
-		JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
+		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
 				logsOutputDir, htmlOutputDir, sequencesVerdicts);
-		StateModelArtefactManager.createAutomaticArtefact(settings);
+		stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings);
 	}
 
 	/*

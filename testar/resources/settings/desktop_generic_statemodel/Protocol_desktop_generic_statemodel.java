@@ -29,19 +29,14 @@
 *******************************************************************************************************/
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.monkey.ConfigTags;
-import org.testar.OutputStructure;
+import org.fruit.monkey.Main;
 import org.testar.protocols.DesktopProtocol;
-
-import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 /**
  * This is a small change to Desktop Generic Protocol to use the learned state model for
@@ -122,61 +117,40 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
-		
+
+		automaticStateModelDifference();
+
+		installNodePackages(new HashSet<>(Arrays.asList("mongodb", "ajv")));
+
 		try {
-			if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
-				// Define State Model versions we want to compare
-				String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
-				String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
-				Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
+			// Prepare the NodeJS command to insert the Test Results Artefact
+			String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
+			String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
+			String commandTestResults = "node" +
+					" " + new File(insertTestResultsJS).getCanonicalPath() +
+					" " + new File(insertTestResultsSchema).getCanonicalPath() +
+					" " + new File(testResultsArtefactDirectory).getCanonicalPath();
 
-				// We are going to compare same Application
-				String previousApplicationName = currentApplicationName;
-				
-				// Do we want to automatically compare in this way ?
-				// Or access to database and check all existing versions < currentVersion ?
-				String previousVersion = "";
-				if(StringUtils.isNumeric(currentVersion)) {
-					previousVersion = String.valueOf(Integer.parseInt(currentVersion) - 1);
-				}
-				else if (Pattern.matches("([0-9]*)\\.([0-9]*)", currentVersion)) {
-					previousVersion = String.valueOf(Double.parseDouble(currentVersion) - 1);
-				}
-				else {
-					System.out.println("WARNING: State Model Difference could not calculate previous application version automatically");
-				}
-				
-				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
-				
-				/* This is an option to use setting parameter to specify previous model
-				String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
-				String previousVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
-				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
-				*/
+			executeNodeJSQueryPKM(commandTestResults);
+		} catch (IOException e) {
+			System.out.println("ERROR! Reading files to insert Test Result Artefacts");
+			e.printStackTrace();
+		}
 
-				// Obtain Database Configuration, from Settings by default
-				Config config = new Config();
-				config.setConnectionType(settings.get(ConfigTags.DataStoreType,""));
-				config.setServer(settings.get(ConfigTags.DataStoreServer,""));
-				config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory,""));
-				config.setDatabase(settings.get(ConfigTags.DataStoreDB,""));
-				config.setUser(settings.get(ConfigTags.DataStoreUser,""));
-				config.setPassword(settings.get(ConfigTags.DataStorePassword,""));
+		try {
+			// Prepare the NodeJS command to insert the State Model Artefact
+			String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
+			String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
+			String commandStateModel = "node" +
+					" " + new File(insertStateModelJS).getCanonicalPath() +
+					" " + new File(insertStateModelSchema).getCanonicalPath() +
+					" " + new File(stateModelArtefactDirectory).getCanonicalPath();
 
-				// State Model Difference Report Directory Name
-				String dirName = OutputStructure.outerLoopOutputDir  + File.separator + "StateModelDifference_"
-						+ previousStateModel.left() + "_" + previousStateModel.right() + "_vs_"
-						+ currentStateModel.left() + "_" + currentStateModel.right();
-
-				// Execute the State Model Difference to create an HTML report
-				StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
-				modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR: Trying to create an automatic State Model Difference");
+			executeNodeJSQueryPKM(commandStateModel);
+		} catch (IOException e) {
+			System.out.println("ERROR! Reading files to insert State Model Artefact");
 			e.printStackTrace();
 		}
 	}
 
 }
-

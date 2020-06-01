@@ -50,7 +50,7 @@ public class JsonArtefactTestResults {
 
 	private static String url = "https://testar.org/images/models/";
 
-	public static void createTestResultsArtefact(Settings settings, SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
+	public static String createTestResultsArtefact(Settings settings, SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
 			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts) {
 
 		SettingsJsonObject settingJson = new SettingsJsonObject(settings);
@@ -76,18 +76,22 @@ public class JsonArtefactTestResults {
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-		String outputPath = OutputStructure.outerLoopOutputDir + File.separator +
+		String outputFile = OutputStructure.outerLoopOutputDir + File.separator +
 				"ArtefactTestResults_"  + OutputStructure.executedSUTname + "_" +
 				OutputStructure.startOuterLoopDateString + ".json";
 
 		try{
-			FileWriter fileWriter = new FileWriter(outputPath);
+			FileWriter fileWriter = new FileWriter(outputFile);
 			gson.toJson(resultsJson, fileWriter);
 			fileWriter.flush();
 			fileWriter.close();
+			System.out.println("Created JSON State Model artefact: " + outputFile);
 		}catch(Exception e){
 			System.out.println("ERROR! Creating JSON ArtefactTestResults!");
+			return "";
 		}
+		
+		return outputFile;
 	}
 
 }

@@ -93,7 +93,7 @@ public class StateModelArtefactManager {
 			orientDB.close();
 	}
 
-	public static void createAutomaticArtefact(Settings settings) {
+	public static String createAutomaticArtefact(Settings settings) {
 
 		String storeType = settings.get(ConfigTags.DataStoreType);
 		String storeServer = settings.get(ConfigTags.DataStoreServer);
@@ -108,9 +108,11 @@ public class StateModelArtefactManager {
 		if(appName == null || appVersion == null) {
 			System.out.println("To create an Artefact of the State Model, "
 					+ "a cutomized Name of the application and the version is required");
-			return;
+			return "";
 		}
 
+		String stateModelArtefact = "";
+		
 		connectionStuff(storeType, storeServer, root, passField, database, databaseDirectory);
 
 		try (ODatabaseSession sessionDB = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())){
@@ -136,7 +138,7 @@ public class StateModelArtefactManager {
 			SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
             System.out.println("Creating JSON State Model artefact...");
-        	JsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
+        	stateModelArtefact = JsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
         			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
         			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
         			storeWidgets, numberOfWidgets, numberOfTestSequences, testSequenceObject);
@@ -147,6 +149,8 @@ public class StateModelArtefactManager {
 			orientDB.close();
 		}
 
+		return stateModelArtefact;
+		
 	}
 
 	public static void createSpecificArtefact(ODatabaseSession sessionDB, 

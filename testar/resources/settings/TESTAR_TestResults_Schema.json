@@ -1,0 +1,401 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "timestamp",
+    "url",
+    "sequencesResult",
+    "htmlsResult",
+    "logsResult",
+    "sequencesVerdicts",
+    "sut",
+    "tool",
+    "settings"
+  ],
+  "properties": {
+    "timestamp": {
+      "$id": "#/properties/timestamp",
+      "type": "string",
+      "title": "The Timestamp Schema",
+      "default": "",
+      "examples": [
+        "2020-01-29_08h36m28s"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "url": {
+      "$id": "#/properties/url",
+      "type": "string",
+      "title": "The Url Schema",
+      "default": "",
+      "examples": [
+        "https://testar.org/images/models/"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "sequencesResult": {
+      "$id": "#/properties/sequencesResult",
+      "type": "array",
+      "title": "The Sequencesresult Schema",
+      "items": {
+        "$id": "#/properties/sequencesResult/items",
+        "type": "string",
+        "title": "The Items Schema",
+        "default": "",
+        "examples": [
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.testar",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.testar",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.testar"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "htmlsResult": {
+      "$id": "#/properties/htmlsResult",
+      "type": "array",
+      "title": "The Htmlsresult Schema",
+      "items": {
+        "$id": "#/properties/htmlsResult/items",
+        "type": "string",
+        "title": "The Items Schema",
+        "default": "",
+        "examples": [
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.html",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.html",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.html"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "logsResult": {
+      "$id": "#/properties/logsResult",
+      "type": "array",
+      "title": "The Logsresult Schema",
+      "items": {
+        "$id": "#/properties/logsResult/items",
+        "type": "string",
+        "title": "The Items Schema",
+        "default": "",
+        "examples": [
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.log",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.log",
+          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.log"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "sequencesVerdicts": {
+      "$id": "#/properties/sequencesVerdicts",
+      "type": "array",
+      "title": "The Sequencesverdicts Schema",
+      "items": {
+        "$id": "#/properties/sequencesVerdicts/items",
+        "type": "string",
+        "title": "The Items Schema",
+        "default": "",
+        "examples": [
+          "2020-01-29_08h37m10s OK No problem detected.",
+          "2020-01-29_08h37m45s OK No problem detected.",
+          "2020-01-29_08h38m01s OK No problem detected."
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "sut": {
+      "$id": "#/properties/sut",
+      "type": "object",
+      "title": "The Sut Schema",
+      "required": [
+        "title",
+        "name",
+        "isOpenSource",
+        "license",
+        "url",
+        "version",
+        "runtimeOS"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/sut/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            "sutTitle"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/sut/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "sutName"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "isOpenSource": {
+          "$id": "#/properties/sut/properties/isOpenSource",
+          "type": "boolean",
+          "title": "The Isopensource Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "license": {
+          "$id": "#/properties/sut/properties/license",
+          "type": "string",
+          "title": "The License Schema",
+          "default": "",
+          "examples": [
+            "license"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "url": {
+          "$id": "#/properties/sut/properties/url",
+          "type": "string",
+          "title": "The Url Schema",
+          "default": "",
+          "examples": [
+            "sutURL"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "version": {
+          "$id": "#/properties/sut/properties/version",
+          "type": "string",
+          "title": "The Version Schema",
+          "default": "",
+          "examples": [
+            "1.X.X"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "runtimeOS": {
+          "$id": "#/properties/sut/properties/runtimeOS",
+          "type": "string",
+          "title": "The Runtimeos Schema",
+          "default": "",
+          "examples": [
+            "Windows 10"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "tool": {
+      "$id": "#/properties/tool",
+      "type": "object",
+      "title": "The Tool Schema",
+      "required": [
+        "title",
+        "name",
+        "isOpenSource",
+        "license",
+        "url",
+        "version",
+        "runtimeOS"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/tool/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            "TESTAR"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/tool/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "TESTAR: Automated Robustness Testing at the GUI level"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "isOpenSource": {
+          "$id": "#/properties/tool/properties/isOpenSource",
+          "type": "boolean",
+          "title": "The Isopensource Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "license": {
+          "$id": "#/properties/tool/properties/license",
+          "type": "string",
+          "title": "The License Schema",
+          "default": "",
+          "examples": [
+            "BSD-3-Clause License"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "url": {
+          "$id": "#/properties/tool/properties/url",
+          "type": "string",
+          "title": "The Url Schema",
+          "default": "",
+          "examples": [
+            "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "version": {
+          "$id": "#/properties/tool/properties/version",
+          "type": "string",
+          "title": "The Version Schema",
+          "default": "",
+          "examples": [
+            "2.2.3 (7-Nov-2019)"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "runtimeOS": {
+          "$id": "#/properties/tool/properties/runtimeOS",
+          "type": "string",
+          "title": "The Runtimeos Schema",
+          "default": "",
+          "examples": [
+            "Windows 10"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "settings": {
+      "$id": "#/properties/settings",
+      "type": "object",
+      "title": "The Settings Schema",
+      "required": [
+        "sutConnector",
+        "sutConnectorValue",
+        "suspiciousTitles",
+        "clickFilter",
+        "protocolClass",
+        "forceForeground",
+        "actionDuration",
+        "timeToWaitAfterAction",
+        "timeToFreeze",
+        "maxReward",
+        "discount"
+      ],
+      "properties": {
+        "sutConnector": {
+          "$id": "#/properties/settings/properties/sutConnector",
+          "type": "string",
+          "title": "The Sutconnector Schema",
+          "default": "",
+          "examples": [
+            "COMMAND_LINE"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "sutConnectorValue": {
+          "$id": "#/properties/settings/properties/sutConnectorValue",
+          "type": "string",
+          "title": "The Sutconnectorvalue Schema",
+          "default": "",
+          "examples": [
+            "c:\\windows\\system32\\notepad.exe"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "suspiciousTitles": {
+          "$id": "#/properties/settings/properties/suspiciousTitles",
+          "type": "string",
+          "title": "The Suspicioustitles Schema",
+          "default": "",
+          "examples": [
+            ".*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "clickFilter": {
+          "$id": "#/properties/settings/properties/clickFilter",
+          "type": "string",
+          "title": "The Clickfilter Schema",
+          "default": "",
+          "examples": [
+            ".*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "protocolClass": {
+          "$id": "#/properties/settings/properties/protocolClass",
+          "type": "string",
+          "title": "The Protocolclass Schema",
+          "default": "",
+          "examples": [
+            "desktop_generic_statemodel/Protocol_desktop_generic_statemodel"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "forceForeground": {
+          "$id": "#/properties/settings/properties/forceForeground",
+          "type": "boolean",
+          "title": "The Forceforeground Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "actionDuration": {
+          "$id": "#/properties/settings/properties/actionDuration",
+          "type": "number",
+          "title": "The Actionduration Schema",
+          "default": 0.0,
+          "examples": [
+            0.1
+          ]
+        },
+        "timeToWaitAfterAction": {
+          "$id": "#/properties/settings/properties/timeToWaitAfterAction",
+          "type": "number",
+          "title": "The Timetowaitafteraction Schema",
+          "default": 0.0,
+          "examples": [
+            0.1
+          ]
+        },
+        "timeToFreeze": {
+          "$id": "#/properties/settings/properties/timeToFreeze",
+          "type": "integer",
+          "title": "The Timetofreeze Schema",
+          "default": 0,
+          "examples": [
+            30
+          ]
+        },
+        "maxReward": {
+          "$id": "#/properties/settings/properties/maxReward",
+          "type": "integer",
+          "title": "The Maxreward Schema",
+          "default": 0,
+          "examples": [
+            9999999
+          ]
+        },
+        "discount": {
+          "$id": "#/properties/settings/properties/discount",
+          "type": "number",
+          "title": "The Discount Schema",
+          "default": 0.0,
+          "examples": [
+            0.95
+          ]
+        }
+      }
+    }
+  }
+}

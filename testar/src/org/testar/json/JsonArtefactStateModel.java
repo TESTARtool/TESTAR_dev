@@ -51,7 +51,7 @@ public class JsonArtefactStateModel {
 	private static String url = "https://testar.org/images/models/";
 
 	@JsonCreator
-	public static void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
+	public static String automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
 			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
@@ -85,7 +85,10 @@ public class JsonArtefactStateModel {
 			System.out.println("Created JSON State Model artefact: " + outputFile);
 		}catch(Exception e){
 			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
+			return "";
 		}
+		
+		return outputFile;
 	}
 
 	@JsonCreator

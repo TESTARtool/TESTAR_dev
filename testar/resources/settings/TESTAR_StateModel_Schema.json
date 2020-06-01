@@ -1,0 +1,463 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "timestamp",
+    "url",
+    "sut",
+    "tool",
+    "stateModelIdentifier",
+    "stateModelAppName",
+    "stateModelAppVersion",
+    "abstractionId",
+    "deterministic",
+    "unvisitedAbstractActions",
+    "numberAbstractStates",
+    "numberAbstractActions",
+    "numberConcreteStates",
+    "numberConcreteActions",
+    "storeWidgets",
+    "numberWidgets",
+    "numberTestSequences",
+    "testSequences"
+  ],
+  "properties": {
+    "timestamp": {
+      "$id": "#/properties/timestamp",
+      "type": "string",
+      "title": "The Timestamp Schema",
+      "default": "",
+      "examples": [
+        "2020-02-17_17h33m24s"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "url": {
+      "$id": "#/properties/url",
+      "type": "string",
+      "title": "The Url Schema",
+      "default": "",
+      "examples": [
+        "https://testar.org/images/models/"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "sut": {
+      "$id": "#/properties/sut",
+      "type": "object",
+      "title": "The Sut Schema",
+      "required": [
+        "title",
+        "name",
+        "isOpenSource",
+        "license",
+        "url",
+        "version",
+        "runtimeOS"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/sut/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            "sutTitle"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/sut/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "sutName"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "isOpenSource": {
+          "$id": "#/properties/sut/properties/isOpenSource",
+          "type": "boolean",
+          "title": "The Isopensource Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "license": {
+          "$id": "#/properties/sut/properties/license",
+          "type": "string",
+          "title": "The License Schema",
+          "default": "",
+          "examples": [
+            "license"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "url": {
+          "$id": "#/properties/sut/properties/url",
+          "type": "string",
+          "title": "The Url Schema",
+          "default": "",
+          "examples": [
+            "sutURL"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "version": {
+          "$id": "#/properties/sut/properties/version",
+          "type": "string",
+          "title": "The Version Schema",
+          "default": "",
+          "examples": [
+            "1.X.X"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "runtimeOS": {
+          "$id": "#/properties/sut/properties/runtimeOS",
+          "type": "string",
+          "title": "The Runtimeos Schema",
+          "default": "",
+          "examples": [
+            "Windows 10"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "tool": {
+      "$id": "#/properties/tool",
+      "type": "object",
+      "title": "The Tool Schema",
+      "required": [
+        "title",
+        "name",
+        "isOpenSource",
+        "license",
+        "url",
+        "version",
+        "runtimeOS"
+      ],
+      "properties": {
+        "title": {
+          "$id": "#/properties/tool/properties/title",
+          "type": "string",
+          "title": "The Title Schema",
+          "default": "",
+          "examples": [
+            "TESTAR"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "name": {
+          "$id": "#/properties/tool/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "TESTAR: Automated Robustness Testing at the GUI level"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "isOpenSource": {
+          "$id": "#/properties/tool/properties/isOpenSource",
+          "type": "boolean",
+          "title": "The Isopensource Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "license": {
+          "$id": "#/properties/tool/properties/license",
+          "type": "string",
+          "title": "The License Schema",
+          "default": "",
+          "examples": [
+            "BSD-3-Clause License"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "url": {
+          "$id": "#/properties/tool/properties/url",
+          "type": "string",
+          "title": "The Url Schema",
+          "default": "",
+          "examples": [
+            "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "version": {
+          "$id": "#/properties/tool/properties/version",
+          "type": "string",
+          "title": "The Version Schema",
+          "default": "",
+          "examples": [
+            "2.2.3 (7-Nov-2019)"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "runtimeOS": {
+          "$id": "#/properties/tool/properties/runtimeOS",
+          "type": "string",
+          "title": "The Runtimeos Schema",
+          "default": "",
+          "examples": [
+            "Windows 10"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "stateModelIdentifier": {
+      "$id": "#/properties/stateModelIdentifier",
+      "type": "string",
+      "title": "The Statemodelidentifier Schema",
+      "default": "",
+      "examples": [
+        "jhew4x18845942042"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "stateModelAppName": {
+      "$id": "#/properties/stateModelAppName",
+      "type": "string",
+      "title": "The Statemodelappname Schema",
+      "default": "",
+      "examples": [
+        "Notepad"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "stateModelAppVersion": {
+      "$id": "#/properties/stateModelAppVersion",
+      "type": "string",
+      "title": "The Statemodelappversion Schema",
+      "default": "",
+      "examples": [
+        "2.0.0"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "abstractionId": {
+      "$id": "#/properties/abstractionId",
+      "type": "string",
+      "title": "The Abstractionid Schema",
+      "default": "",
+      "examples": [
+        "Widget title"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "deterministic": {
+      "$id": "#/properties/deterministic",
+      "type": "boolean",
+      "title": "The Deterministic Schema",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "unvisitedAbstractActions": {
+      "$id": "#/properties/unvisitedAbstractActions",
+      "type": "integer",
+      "title": "The Unvisitedabstractactions Schema",
+      "default": 0,
+      "examples": [
+        43
+      ]
+    },
+    "numberAbstractStates": {
+      "$id": "#/properties/numberAbstractStates",
+      "type": "integer",
+      "title": "The Numberabstractstates Schema",
+      "default": 0,
+      "examples": [
+        13
+      ]
+    },
+    "numberAbstractActions": {
+      "$id": "#/properties/numberAbstractActions",
+      "type": "integer",
+      "title": "The Numberabstractactions Schema",
+      "default": 0,
+      "examples": [
+        21
+      ]
+    },
+    "numberConcreteStates": {
+      "$id": "#/properties/numberConcreteStates",
+      "type": "integer",
+      "title": "The Numberconcretestates Schema",
+      "default": 0,
+      "examples": [
+        17
+      ]
+    },
+    "numberConcreteActions": {
+      "$id": "#/properties/numberConcreteActions",
+      "type": "integer",
+      "title": "The Numberconcreteactions Schema",
+      "default": 0,
+      "examples": [
+        22
+      ]
+    },
+    "storeWidgets": {
+      "$id": "#/properties/storeWidgets",
+      "type": "boolean",
+      "title": "The Storewidgets Schema",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "numberWidgets": {
+      "$id": "#/properties/numberWidgets",
+      "type": "integer",
+      "title": "The Numberwidgets Schema",
+      "default": 0,
+      "examples": [
+        495
+      ]
+    },
+    "numberTestSequences": {
+      "$id": "#/properties/numberTestSequences",
+      "type": "integer",
+      "title": "The Numbertestsequences Schema",
+      "default": 0,
+      "examples": [
+        5
+      ]
+    },
+    "testSequences": {
+      "$id": "#/properties/testSequences",
+      "type": "array",
+      "title": "The Testsequences Schema",
+      "items": {
+        "$id": "#/properties/testSequences/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "required": [
+          "sequenceId",
+          "numberSequenceNodes",
+          "startDateTime",
+          "verdict",
+          "foundErrors",
+          "numberErrors",
+          "sequenceDeterministic",
+          "sequenceActionSteps"
+        ],
+        "properties": {
+          "sequenceId": {
+            "$id": "#/properties/testSequences/items/properties/sequenceId",
+            "type": "string",
+            "title": "The Sequenceid Schema",
+            "default": "",
+            "examples": [
+              "078c0469-3e2a-4f26-b740-5dc1bbdaa03e"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "numberSequenceNodes": {
+            "$id": "#/properties/testSequences/items/properties/numberSequenceNodes",
+            "type": "integer",
+            "title": "The Numbersequencenodes Schema",
+            "default": 0,
+            "examples": [
+              5
+            ]
+          },
+          "startDateTime": {
+            "$id": "#/properties/testSequences/items/properties/startDateTime",
+            "type": "string",
+            "title": "The Startdatetime Schema",
+            "default": "",
+            "examples": [
+              "Mon Feb 17 17:33:48 CET 2020"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "verdict": {
+            "$id": "#/properties/testSequences/items/properties/verdict",
+            "type": "string",
+            "title": "The Verdict Schema",
+            "default": "",
+            "examples": [
+              "COMPLETED_SUCCESFULLY"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "foundErrors": {
+            "$id": "#/properties/testSequences/items/properties/foundErrors",
+            "type": "boolean",
+            "title": "The Founderrors Schema",
+            "default": false,
+            "examples": [
+              false
+            ]
+          },
+          "numberErrors": {
+            "$id": "#/properties/testSequences/items/properties/numberErrors",
+            "type": "integer",
+            "title": "The Numbererrors Schema",
+            "default": 0,
+            "examples": [
+              0
+            ]
+          },
+          "sequenceDeterministic": {
+            "$id": "#/properties/testSequences/items/properties/sequenceDeterministic",
+            "type": "boolean",
+            "title": "The Sequencedeterministic Schema",
+            "default": false,
+            "examples": [
+              true
+            ]
+          },
+          "sequenceActionSteps": {
+            "$id": "#/properties/testSequences/items/properties/sequenceActionSteps",
+            "type": "array",
+            "title": "The Sequenceactionsteps Schema",
+            "items": {
+              "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items",
+              "type": "object",
+              "title": "The Items Schema",
+              "required": [
+                "actionDescription",
+                "timestamp"
+              ],
+              "properties": {
+                "actionDescription": {
+                  "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/actionDescription",
+                  "type": "string",
+                  "title": "The Actiondescription Schema",
+                  "default": "",
+                  "examples": [
+                    "Left Click at 'View'"
+                  ],
+                  "pattern": "^(.*)$"
+                },
+                "timestamp": {
+                  "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/timestamp",
+                  "type": "string",
+                  "title": "The Timestamp Schema",
+                  "default": "",
+                  "examples": [
+                    "Mon Feb 17 17:33:59 CET 2020"
+                  ],
+                  "pattern": "^(.*)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

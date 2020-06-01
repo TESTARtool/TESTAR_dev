@@ -44,13 +44,10 @@ import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 import org.testar.json.JsonArtefactTestResults;
 
-import es.upv.staq.testar.NativeLinker;
-
 import java.io.File;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -62,10 +59,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected State latestState;
 
     protected String verdictInfo;
-    SortedSet<String> sequencesOutputDir = new TreeSet<>();
-    SortedSet<String> htmlOutputDir = new TreeSet<>();
-    SortedSet<String> logsOutputDir = new TreeSet<>();
-    SortedSet<String> sequencesVerdicts = new TreeSet<>();
+    private SortedSet<String> sequencesOutputDir = new TreeSet<>();
+    private SortedSet<String> htmlOutputDir = new TreeSet<>();
+    private SortedSet<String> logsOutputDir = new TreeSet<>();
+    private SortedSet<String> sequencesVerdicts = new TreeSet<>();
+    
+    protected String testResultsArtefactDirectory = "";
+    protected String stateModelArtefactDirectory = "";
 
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -214,9 +214,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void closeTestSession() {
     	super.closeTestSession();
-    	JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
+    	testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
     			logsOutputDir, htmlOutputDir, sequencesVerdicts);
-    	StateModelArtefactManager.createAutomaticArtefact(settings);
+    	stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings);
     }
 
     /**
