@@ -79,6 +79,9 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		}
+		
+		// Generate mode visualization purposes (Shift + Up)
+		actions = selector.getPrioritizedActions(actions);
 
 		//return the set of derived actions
 		return actions;
@@ -95,7 +98,6 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		actions = selector.getPrioritizedActions(actions);
 		Action action = super.selectAction(state, actions);
 		return(action);
 	}

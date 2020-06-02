@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList();
+  private static List<String> domainsAllowed = Arrays.asList("parabank.parasoft.com");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -208,6 +208,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // iterate through all widgets
     for (Widget widget : state) {
+
+    	// Skip Admin and logout page widget
+    	if(widget.get(WdTags.WebHref,"").contains("admin.htm")
+    			|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
+    		continue;
+    	}
+
       // only consider enabled and non-tabu widgets
       if (!widget.get(Enabled, true) || blackListed(widget)) {
         continue;
@@ -234,6 +241,10 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
       }
     }
 
+	if(actions.isEmpty()) {
+		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+	}
+    
     return actions;
   }
 
@@ -452,17 +463,23 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
   @Override
   protected boolean isTypeable(Widget widget) {
-    Role role = widget.get(Tags.Role, Roles.Widget);
-    if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-      // Input type are special...
-      if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) widget).element.type;
-        return WdRoles.typeableInputTypes().contains(type);
-      }
-      return true;
-    }
+	  Role role = widget.get(Tags.Role, Roles.Widget);
+	  if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 
-    return false;
+		  // Specific class="input" for parasoft SUT
+		  if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+			  return true;
+		  }
+
+		  // Input type are special...
+		  if (role.equals(WdRoles.WdINPUT)) {
+			  String type = ((WdWidget) widget).element.type;
+			  return WdRoles.typeableInputTypes().contains(type);
+		  }
+		  return true;
+	  }
+
+	  return false;
   }
 
   /**
