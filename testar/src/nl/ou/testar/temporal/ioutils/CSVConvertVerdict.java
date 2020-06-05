@@ -11,7 +11,7 @@ public  class CSVConvertVerdict<T,I> extends AbstractBeanField<T,I> {
         if (value.equals("")) {
             return null;
         }
-        return Verdict.valueOf(value.trim());
+        return Verdict.valueOf(value.toUpperCase().trim());
 
     }
 }

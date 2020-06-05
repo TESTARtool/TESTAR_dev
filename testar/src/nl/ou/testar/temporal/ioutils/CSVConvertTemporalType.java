@@ -11,7 +11,7 @@ public  class CSVConvertTemporalType<T,I> extends AbstractBeanField<T,I> {
         if (value.equals("")) {
             return null;
         }
-        return TemporalFormalism.valueOf(value.trim());
+        return TemporalFormalism.valueOf(value.toUpperCase().trim());
     }
 }
 

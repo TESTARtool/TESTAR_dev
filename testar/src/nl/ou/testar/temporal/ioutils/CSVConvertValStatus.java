@@ -11,6 +11,6 @@ public class CSVConvertValStatus<T,I> extends AbstractBeanField<T,I> {
         if (value.equals("")) {
             return null;
         }
-        return ValStatus.valueOf(value.trim());
+        return ValStatus.valueOf(value.toUpperCase().trim());
     }
 }
