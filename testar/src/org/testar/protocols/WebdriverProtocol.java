@@ -53,6 +53,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.fruit.Environment;
 import org.fruit.Util;
 import org.fruit.Pair;
@@ -692,6 +693,14 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 	protected String[] getTextInputsFromFile(final String inputFile) {
         try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
             return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+	
+	protected String[] getNumericInputsFromFile(final String inputFile) {
+        try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
+            return lines.filter(line -> !line.startsWith("#") && !line.isEmpty() && StringUtils.isNumeric(line)).toArray(String[]::new);
         } catch (IOException e) {
             return null;
         }

@@ -224,6 +224,13 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		System.out.println("DEBUG 7: clicking login button");
 
 		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebId,"OtpLoginButton",state,system,20,0.5 );
+		
+		System.out.println("-- DEBUG beginSequence_webdriver_statemodel: Internal Web loading widgets...");
+		
+		// Wait Internal Web Page to load widgets
+		Util.pause(5);
+		
+		System.out.println("-- DEBUG beginSequence_webdriver_statemodel: State : " + state.get(Tags.AbstractIDCustom, "No ! AbstractIDCustom"));
 
 		super.beginSequence(system, state);
 
@@ -242,6 +249,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
+		System.out.println("-- DEBUG getState_webdriver_statemodel: State : " + state.get(Tags.AbstractIDCustom, "No ! AbstractIDCustom") + " check with below");
 		return state;
 	}
 
@@ -306,13 +314,11 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if(naughtyStrings) {
-					//Create a type action with the Action Compiler, and add it to the set of derived actions
-					final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
-					final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(widget);
-
-					Action paste = ac.pasteTextInto(widget, textToInsert, true);
-					paste.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml(textToInsert));
-					actions.add(paste);
+					if(widget.get(WdTags.WebCssClasses,"").contains("Numeric")) {
+						actions.add(pasteNaughtyNumeric(ac, widget));
+					} else {
+						actions.add(pasteNaughtyString(ac, widget));
+					}
 				} else {
 					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				}
@@ -326,6 +332,32 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			}
 		}
 		return actions;
+	}
+	
+	/**
+	 * Return a PasteAction with a random text line from the blns file
+	 */
+	private Action pasteNaughtyString(StdActionCompiler ac, Widget widget) {
+		final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
+		final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(widget);
+
+		Action paste = ac.pasteTextInto(widget, textToInsert, true);
+		paste.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml(textToInsert));
+		
+		return paste;
+	}
+	
+	/**
+	 * Return a PasteAction with a random numeric text from the blns file
+	 */
+	private Action pasteNaughtyNumeric(StdActionCompiler ac, Widget widget) {
+		final Optional<String[]> numericList = Optional.ofNullable(getNumericInputsFromFile(settings.get(ConfigTags.InputFileText)));
+		final String numberToInsert = numericList.isPresent() ? numericList.get()[new Random().nextInt(numericList.get().length)] : this.getRandomText(widget);
+
+		Action paste = ac.pasteTextInto(widget, numberToInsert, true);
+		paste.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml(numberToInsert));
+		
+		return paste;
 	}
 
 	@Override
@@ -402,7 +434,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
-		System.out.println("DEBUG: executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable"));
+		System.out.println("DEBUG webdriver_statemodel: executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable"));
 		return super.executeAction(system, state, action);
 	}
 	
