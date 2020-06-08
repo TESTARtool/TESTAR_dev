@@ -84,6 +84,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }

@@ -50,8 +50,10 @@ public class JsonArtefactTestResults {
 
 	private static String url = "https://testar.org/images/models/";
 
-	public static String createTestResultsArtefact(Settings settings, SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
-			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts) {
+	public static String createTestResultsArtefact(Settings settings,
+			SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
+			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts,
+			SortedSet<String> coverageSummary, SortedSet<String> coverageDir) {
 
 		SettingsJsonObject settingJson = new SettingsJsonObject(settings);
 
@@ -73,6 +75,10 @@ public class JsonArtefactTestResults {
 			resultsJson.setHtmlsResult(htmlOutputDir);
 		if(!sequencesVerdicts.isEmpty())
 			resultsJson.setSequencesVerdicts(sequencesVerdicts);
+		if(!coverageSummary.isEmpty())
+			resultsJson.setCoverageSummary(coverageSummary);
+		if(!coverageDir.isEmpty())
+			resultsJson.setCoverageDirectory(coverageDir);
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

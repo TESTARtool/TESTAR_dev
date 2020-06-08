@@ -156,3 +156,54 @@ To start Gremlin run the following command; orientdb-gremlin. This command is de
 edition of Orientdb.
 
 See the manuals of orientdb to learn about the possibilities to query the model.
+
+
+## DECODER
+
+### TESTAR HandsOn:
+https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_Feb_5.pdf
+
+### Webdriver and State Model
+https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
+
+### DECODER Required Environment for distributed TESTAR version:
+1. Windows 10
+2. Java 1.8
+3. Node JS
+
+### TESTAR - DECODER remote API
+TODO: Currently in development
+
+### PKM Connection - Currently MongoDB URL and MongoDB port is defined in JavaScript files:
+1. inside testar\bin\settings\validate_and_insert_testar_test_results.js
+2. inside testar\bin\settings\validate_and_insert_testar_state_model.js
+
+TODO: Implement authentication (In development by CEA + Integration will be done by UPV - TESTAR)
+TODO: Implement TESTAR settings to select MongoDB URL + port
+TODO: Remote API will include parameters to configure this MongoDB TESTAR settings
+
+
+### State Model storage - OrientDB - NECESSARY FOR ALL PROTOCOLS:
+
+Visual information about configuration in Slides 44 - 61:
+https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
+
+1. Download OrientDB Community Edition: https://orientdb.com/download-2/
+2. Extract and execute \orientdb-3.X.X\bin\ ( server.bat | server.sh )
+3. First time admin credential will be required
+4. Use the browser to acces to OrientDB management page localhost:2480 (2480 it is the port by default)
+4. Create a new database with admin credentials
+5. Create new user in the Security tab (user:testar + password:testar is used by default in TESTAR settings)
+6. Now it is possible to connect with remote mode (IPaddress:port) or plocal mode (\orientdb-3.X.X\bin\databases directory)
+7. Configure TESTAR settings - TESTAR GUI -> State Model tab
+
+TODO: Remote API will include parameters to configure this OrientDB TESTAR settings
+
+
+### MyThaiStar protocol:
+1. Download Selenium Chromedriver based on Chrome Browser version
+2. It is necessary to indicate (SUTConnectorValue) the web server IP:port that contains MyThaiStar running
+
+
+### CODEO protocol:
+TODO:

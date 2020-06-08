@@ -42,6 +42,8 @@ public class TestResultsJsonObject {
 	SortedSet<String> htmlsResult;
 	SortedSet<String> logsResult;
 	SortedSet<String> sequencesVerdicts;
+	SortedSet<String> coverageSummary;
+	SortedSet<String> coverageDirectory;
 	SutJsonObject sut;
 	ToolJsonObject tool;
 	SettingsJsonObject settings;
@@ -69,6 +71,14 @@ public class TestResultsJsonObject {
 
 	public void setSequencesVerdicts(SortedSet<String> sequencesVerdicts) {
 		this.sequencesVerdicts = sequencesVerdicts;
+	}
+	
+	public void setCoverageSummary(SortedSet<String> coverageSummary) {
+		this.coverageSummary = coverageSummary;
+	}
+
+	public void setCoverageDirectory(SortedSet<String> coverageDirectory) {
+		this.coverageDirectory = coverageDirectory;
 	}
 
 }

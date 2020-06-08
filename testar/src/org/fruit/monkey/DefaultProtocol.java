@@ -452,7 +452,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Show a popup message to get the user's attention and inform him.
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
-	private void popupMessage(String message) {
+	protected void popupMessage(String message) {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);

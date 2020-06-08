@@ -370,22 +370,26 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * Install Node package dependencies needed to insert Artefacts inside PKM
      */
     protected void installNodePackages(Set<String> packagesName) {
-    	for(String name : packagesName) {
-    		System.out.println("Installing Node package " + name + "...");
-    		ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "npm install " + name);
-    		Process process = null;
-        	try {
-        		process = builder.start();
-        		process.waitFor();
-        	} catch(IOException | InterruptedException e) {
-        		System.out.println("ERROR! Installing " + name + " Node package");
-        		process.destroy();
-        		return;
-        	}
-        	System.out.println("Package " + name + " installed!");
+    	// TODO: Allow Record mode when Listening mode implemented
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+
+    		for(String name : packagesName) {
+    			System.out.println("Installing Node package " + name + "...");
+    			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "npm install " + name);
+    			Process process = null;
+    			try {
+    				process = builder.start();
+    				process.waitFor();
+    			} catch(IOException | InterruptedException e) {
+    				System.out.println("ERROR! Installing " + name + " Node package");
+    				process.destroy();
+    				return;
+    			}
+    			System.out.println("Package " + name + " installed!");
+    		}
+
+    		System.out.println("ALL Node packages installed successfully!");
     	}
-    	
-    	System.out.println("ALL Node packages installed successfully!");
     }
     
     /**
@@ -397,39 +401,50 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param command
      */
     protected void executeNodeJSQueryPKM(String command) {
-    	try {
-    		System.out.println("Executing PKM query: " + command);
+    	// TODO: Allow Record mode when Listening mode implemented
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
 
-    		ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
-    		Process p = builder.start();
+    		try {
+    			System.out.println("Executing PKM query: " + command);
 
-    		BufferedReader stdInput = new BufferedReader(new 
-    				InputStreamReader(p.getInputStream()));
+    			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
+    			Process p = builder.start();
 
-    		BufferedReader stdError = new BufferedReader(new 
-    				InputStreamReader(p.getErrorStream()));
+    			BufferedReader stdInput = new BufferedReader(new 
+    					InputStreamReader(p.getInputStream()));
 
-    		// read the output from the command
-    		System.out.println("Standard output ? :\n");
-    		String s = null;
-    		while ((s = stdInput.readLine()) != null) {
-    			System.out.println(s);
+    			BufferedReader stdError = new BufferedReader(new 
+    					InputStreamReader(p.getErrorStream()));
+
+    			// read the output from the command
+    			System.out.println("Standard output ? :\n");
+    			String s = null;
+    			while ((s = stdInput.readLine()) != null) {
+    				System.out.println(s);
+    			}
+
+    			// read any errors from the attempted command
+    			System.out.println("Standard error ? :\n");
+    			StringBuilder errorContent = new StringBuilder("");
+    			while ((s = stdError.readLine()) != null) {
+    				System.out.println(s);
+    				errorContent.append(s);
+    			}
+
+    			if(errorContent.length() < 1) {
+    				System.out.println(" *****************************************");
+    				System.out.println(" OK: PKM Query successfully executed ");
+    				System.out.println(" *****************************************");
+    			} else {
+    				System.out.println(" ------------------------------------------");
+    				System.out.println(" !! ERROR trying to insert the Artefact !! ");
+    				System.out.println(" ------------------------------------------");
+    			}
+
+    		} catch (IOException e) {
+    			System.out.println("ERROR! : Trying to execute NODE JavaScript command : " + command);
+    			e.printStackTrace();
     		}
-
-    		// read any errors from the attempted command
-    		System.out.println("Standard error ?:\n");
-    		while ((s = stdError.readLine()) != null) {
-    			System.out.println(s);
-    		}
-
-    		System.out.println(" *****************************************");
-    		System.out.println(" PKM Query successfully executed !! ");
-    		System.out.println(" *****************************************");
-
-    	} catch (IOException e) {
-    		System.out.println("ERROR! : Trying to execute NODE JavaScript command : " + command);
-    		e.printStackTrace();
     	}
-
     }
 }

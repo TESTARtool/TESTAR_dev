@@ -92,6 +92,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     private SortedSet<String> logsOutputDir = new TreeSet<>();
     private SortedSet<String> sequencesVerdicts = new TreeSet<>();
     
+	protected SortedSet<String> coverageSummary = new TreeSet<>();
+	protected SortedSet<String> coverageDir = new TreeSet<>();
+    
     protected String testResultsArtefactDirectory = "";
     protected String stateModelArtefactDirectory = "";
     
@@ -357,7 +360,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		super.closeTestSession();
 		NativeLinker.cleanWdDriverOS();
 		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
-				logsOutputDir, htmlOutputDir, sequencesVerdicts);
+				logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
 		stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings);
 	}
 
