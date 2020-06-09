@@ -223,6 +223,11 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 		System.out.println("DEBUG 7: clicking login button");
 
 		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebId,"OtpLoginButton",state,system,20,0.5 );
+		
+		System.out.println("-- DEBUG beginSequence_webdriver_statemodel: Internal Web loading widgets...");
+		
+		// Wait Internal Web Page to load widgets
+		Util.pause(10);
 
 		super.beginSequence(system, state);
 
