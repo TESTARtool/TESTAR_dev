@@ -65,6 +65,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
   boolean enabled, ignore;
   public boolean isClickable;
+  public boolean isShadow;
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
@@ -131,6 +132,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
     blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");
+    isShadow = (parent != null && parent.isShadow) || (Boolean) packedElement.get("isShadowElement");
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 

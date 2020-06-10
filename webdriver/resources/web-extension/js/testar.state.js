@@ -117,6 +117,11 @@ function getChildNodesTestar(parentWrapped) {
         top += parseInt(style.getPropertyValue('padding-top'));
         parentWrapped["yOffset"] = parentWrapped['rect'][1] + top;
     }
+	
+	// Shadow Web Elements
+	if(childNodes.length === 0 && parentWrapped.element.shadowRoot !== null){
+		childNodes = parentWrapped.element.shadowRoot.childNodes;
+	}
 
     return childNodes;
 }
@@ -131,6 +136,11 @@ function getChildNodesTestar(parentWrapped) {
  */
 function wrapElementTestar(element, xOffset, yOffset) {
     var computedStyle = getComputedStyle(element);
+	
+	var shadowElement = false;
+	if(element.shadowRoot !== null){
+		shadowElement = true;
+	}
 
     return {
         element: element,
@@ -148,6 +158,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         dimensions: getDimensionsTestar(element),
         isBlocked: getIsBlockedTestar(element, xOffset, yOffset),
         isClickable: isClickableTestar(element, xOffset, yOffset),
+		isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
 
         wrappedChildren: [],
