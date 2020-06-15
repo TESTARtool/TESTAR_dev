@@ -50,15 +50,14 @@ public class JsonArtefactTestResults {
 
 	private static String url = "https://testar.org/images/models/";
 
-	public static String createTestResultsArtefact(Settings settings,
+	public static String createTestResultsArtefact(Settings settings, Object license,
 			SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
 			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts,
 			SortedSet<String> coverageSummary, SortedSet<String> coverageDir) {
 
 		SettingsJsonObject settingJson = new SettingsJsonObject(settings);
 
-		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
-				NativeLinker.getOsName());
+		SutJsonObject sutJson = new SutJsonObject(license, NativeLinker.getOsName());
 
 		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
 				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,

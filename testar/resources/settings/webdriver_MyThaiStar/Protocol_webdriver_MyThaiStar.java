@@ -38,6 +38,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
@@ -121,6 +122,9 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
+		
+		// Set desired License
+		licenseSUT = new MyThaiStarLicense();
 	}
 	
 	/**
@@ -314,19 +318,21 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 			e.printStackTrace();
 		}
 
-		try {
-			// Prepare the NodeJS command to insert the State Model Artefact
-			String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
-			String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
-			String commandStateModel = "node" +
-					" " + new File(insertStateModelJS).getCanonicalPath() +
-					" " + new File(insertStateModelSchema).getCanonicalPath() +
-					" " + new File(stateModelArtefactDirectory).getCanonicalPath();
+		if(settings.get(ConfigTags.StateModelEnabled, false)) {
+			try {
+				// Prepare the NodeJS command to insert the State Model Artefact
+				String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
+				String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
+				String commandStateModel = "node" +
+						" " + new File(insertStateModelJS).getCanonicalPath() +
+						" " + new File(insertStateModelSchema).getCanonicalPath() +
+						" " + new File(stateModelArtefactDirectory).getCanonicalPath();
 
-			executeNodeJSQueryPKM(commandStateModel);
-		} catch (IOException e) {
-			System.out.println("ERROR! Reading files to insert State Model Artefact");
-			e.printStackTrace();
+				executeNodeJSQueryPKM(commandStateModel);
+			} catch (IOException e) {
+				System.out.println("ERROR! Reading files to insert State Model Artefact");
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -394,4 +400,25 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 		}
 	}
 
+}
+
+/**
+ *  Helper class to customize SUT License as desires
+ */
+class MyThaiStarLicense {
+	
+	String sutTitle = "MyThaiStar";
+	String sutName = "My Thai Star reference application for devonfw";
+	String sutUrl = "https://github.com/devonfw/my-thai-star";
+	String product = "devonfw";
+	String licenseDetails = "https://devonfw.com/website/pages/docs/devonfw-ide-support.asciidoc.html";
+	boolean isOpenSource = true;
+	String sourceCodeLicense = "Apache Public License 2.0";
+	String sourceCodeLicenseUrl = "https://github.com/devonfw/ide/blob/master/LICENSE";
+	String documentationLicense = "Creative Commons License - Attribution-NoDerivatives 4.0 International";
+	String documentationLicenseUrl = "https://creativecommons.org/licenses/by-nd/4.0/";
+
+	public MyThaiStarLicense () { 
+		// Create object for JSON Artefact purposes
+	}
 }

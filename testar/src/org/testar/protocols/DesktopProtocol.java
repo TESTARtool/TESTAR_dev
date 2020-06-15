@@ -41,6 +41,7 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.json.JsonArtefactTestResults;
 
@@ -66,6 +67,8 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     
 	protected SortedSet<String> coverageSummary = new TreeSet<>();
 	protected SortedSet<String> coverageDir = new TreeSet<>();
+	
+	protected Object licenseSUT = "";
     
     protected String testResultsArtefactDirectory = "";
     protected String stateModelArtefactDirectory = "";
@@ -217,9 +220,16 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void closeTestSession() {
     	super.closeTestSession();
-    	testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
-    			logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
-    	stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings);
+    	
+    	// TODO: Allow Record mode when Listening mode implemented
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+    		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
+    				sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
+    		
+    		if(settings.get(ConfigTags.StateModelEnabled, false)) {
+    			stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
+    		}
+    	}
     }
 
     /**

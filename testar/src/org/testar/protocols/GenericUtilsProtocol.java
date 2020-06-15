@@ -301,7 +301,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If no PreviousApplicationVersion specified, try to decrease Integer or Double ApplicationVersion.
      */
     protected void automaticStateModelDifference() {
-    	if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate 
+    			&& settings.get(ConfigTags.StateModelEnabled, false)
+    			&& settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
     		try {
     			// Define current State Model version
     			String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");

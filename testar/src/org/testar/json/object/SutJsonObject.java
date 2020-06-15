@@ -34,23 +34,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class SutJsonObject {
 
-	String title;
-	String name;
-	boolean isOpenSource;
-	String license;
-	String url;
-	String version;
+	Object license;
 	String runtimeOS;
 
 	@JsonCreator
-	public SutJsonObject(String title, String name, boolean isOpenSource, String license, String url, String version,
-			String runtimeOS) {
-		this.title = title;
-		this.name = name;
-		this.isOpenSource = isOpenSource;
+	public SutJsonObject(Object license, String runtimeOS) {
 		this.license = license;
-		this.url = url;
-		this.version = version;
 		this.runtimeOS = runtimeOS;
 	}
 

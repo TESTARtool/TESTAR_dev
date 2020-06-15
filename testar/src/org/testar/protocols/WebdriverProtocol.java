@@ -71,6 +71,7 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.json.JsonArtefactTestResults;
 
@@ -94,6 +95,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     
 	protected SortedSet<String> coverageSummary = new TreeSet<>();
 	protected SortedSet<String> coverageDir = new TreeSet<>();
+	
+	protected Object licenseSUT = "";
     
     protected String testResultsArtefactDirectory = "";
     protected String stateModelArtefactDirectory = "";
@@ -359,9 +362,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 		NativeLinker.cleanWdDriverOS();
-		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
-				logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
-		stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings);
+		
+		// TODO: Allow Record mode when Listening mode implemented
+		if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+			testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
+					sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
+
+			if(settings.get(ConfigTags.StateModelEnabled, false)) {
+				stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
+			}
+		}
 	}
 
 	/*

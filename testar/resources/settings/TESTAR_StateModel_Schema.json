@@ -49,71 +49,17 @@
       "type": "object",
       "title": "The Sut Schema",
       "required": [
-        "title",
-        "name",
-        "isOpenSource",
         "license",
-        "url",
-        "version",
         "runtimeOS"
       ],
       "properties": {
-        "title": {
-          "$id": "#/properties/sut/properties/title",
-          "type": "string",
-          "title": "The Title Schema",
-          "default": "",
-          "examples": [
-            "sutTitle"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "name": {
-          "$id": "#/properties/sut/properties/name",
-          "type": "string",
-          "title": "The Name Schema",
-          "default": "",
-          "examples": [
-            "sutName"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "isOpenSource": {
-          "$id": "#/properties/sut/properties/isOpenSource",
-          "type": "boolean",
-          "title": "The Isopensource Schema",
-          "default": false,
-          "examples": [
-            true
-          ]
-        },
         "license": {
           "$id": "#/properties/sut/properties/license",
-          "type": "string",
+          "type": "object",
           "title": "The License Schema",
           "default": "",
           "examples": [
             "license"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "url": {
-          "$id": "#/properties/sut/properties/url",
-          "type": "string",
-          "title": "The Url Schema",
-          "default": "",
-          "examples": [
-            "sutURL"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "version": {
-          "$id": "#/properties/sut/properties/version",
-          "type": "string",
-          "title": "The Version Schema",
-          "default": "",
-          "examples": [
-            "1.X.X"
           ],
           "pattern": "^(.*)$"
         },

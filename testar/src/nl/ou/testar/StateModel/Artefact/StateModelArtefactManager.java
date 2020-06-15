@@ -93,7 +93,7 @@ public class StateModelArtefactManager {
 			orientDB.close();
 	}
 
-	public static String createAutomaticArtefact(Settings settings) {
+	public static String createAutomaticArtefact(Settings settings, Object license) {
 
 		String storeType = settings.get(ConfigTags.DataStoreType);
 		String storeServer = settings.get(ConfigTags.DataStoreServer);
@@ -139,7 +139,7 @@ public class StateModelArtefactManager {
 
             System.out.println("Creating JSON State Model artefact...");
         	stateModelArtefact = JsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
-        			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
+        			license, abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
         			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
         			storeWidgets, numberOfWidgets, numberOfTestSequences, testSequenceObject);
 
@@ -177,7 +177,7 @@ public class StateModelArtefactManager {
 		SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
         System.out.println("Creating JSON State Model artefact...");
-    	JsonArtefactStateModel.specificStateModelArtefact(pathArtefact, appName, appVersion, stateModelId,
+    	JsonArtefactStateModel.specificStateModelArtefact(pathArtefact, "", appName, appVersion, stateModelId,
     			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
     			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
     			//TODO: storewidgets (next false) Obtain the option from State Model or settings 

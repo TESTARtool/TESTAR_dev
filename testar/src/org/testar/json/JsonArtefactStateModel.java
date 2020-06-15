@@ -52,12 +52,11 @@ public class JsonArtefactStateModel {
 
 	@JsonCreator
 	public static String automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
-			String abstractionId, boolean deterministic, long unvisitedActions,
+			Object license, String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
 			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
 
-		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
-				NativeLinker.getOsName());
+		SutJsonObject sutJson = new SutJsonObject(license, NativeLinker.getOsName());
 
 		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
 				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
@@ -92,14 +91,13 @@ public class JsonArtefactStateModel {
 	}
 
 	@JsonCreator
-	public static void specificStateModelArtefact(String pathArtefact,
+	public static void specificStateModelArtefact(String pathArtefact, Object license,
 			String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
 			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
 
-		SutJsonObject sutJson = new SutJsonObject("sutTitle", "sutName", true, "license", "sutURL", "1.X.X",
-				NativeLinker.getOsName());
+		SutJsonObject sutJson = new SutJsonObject(license, NativeLinker.getOsName());
 
 		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
 				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_master", SettingsDialog.TESTAR_VERSION,

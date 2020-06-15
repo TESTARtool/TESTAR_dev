@@ -130,7 +130,7 @@ public final class WdState extends WdWidget implements State {
 		}
 
 		if (t.equals(Tags.Desc)) {
-			ret = w.element.name;
+			ret = w.element.getElementDescription();
 		}
 		else if (t.equals(Tags.Role)) {
 			ret = WdRoles.fromTypeId(w.element.tagName);

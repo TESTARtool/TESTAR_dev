@@ -296,19 +296,21 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 			e.printStackTrace();
 		}
 
-		try {
-			// Prepare the NodeJS command to insert the State Model Artefact
-			String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
-			String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
-			String commandStateModel = "node" +
-					" " + new File(insertStateModelJS).getCanonicalPath() +
-					" " + new File(insertStateModelSchema).getCanonicalPath() +
-					" " + new File(stateModelArtefactDirectory).getCanonicalPath();
+		if(settings.get(ConfigTags.StateModelEnabled, false)) {
+			try {
+				// Prepare the NodeJS command to insert the State Model Artefact
+				String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
+				String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
+				String commandStateModel = "node" +
+						" " + new File(insertStateModelJS).getCanonicalPath() +
+						" " + new File(insertStateModelSchema).getCanonicalPath() +
+						" " + new File(stateModelArtefactDirectory).getCanonicalPath();
 
-			executeNodeJSQueryPKM(commandStateModel);
-		} catch (IOException e) {
-			System.out.println("ERROR! Reading files to insert State Model Artefact");
-			e.printStackTrace();
+				executeNodeJSQueryPKM(commandStateModel);
+			} catch (IOException e) {
+				System.out.println("ERROR! Reading files to insert State Model Artefact");
+				e.printStackTrace();
+			}
 		}
 	}
 	
