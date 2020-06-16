@@ -62,6 +62,7 @@ var actualCode = '(' + function () {
     };
 
     // Disallow browser dialogs
+	// TODO: Find an appropiate way to customize this feature
     window.alert = function () {};
     window.confirm = function () {};
     window.print = function () {};

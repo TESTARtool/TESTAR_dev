@@ -164,6 +164,11 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
+		if(WdDriver.alertMessage.contains("error")) {
+			return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+					"Discovered suspicious ALERT : " + WdDriver.alertMessage);
+		}
+
 		return verdict;
 	}
 

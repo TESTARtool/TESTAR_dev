@@ -76,6 +76,8 @@ public class WdDriver extends SUTBase {
   private static List<String> windowHandles = new ArrayList<>();
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
+  
+  public static String alertMessage = "";
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -405,6 +407,7 @@ public class WdDriver extends SUTBase {
    */
   public static void activate() {
     updateHandlesList();
+    checkAlertMessages();
 
     // Nothing to activate
     if (windowHandles.size() < 1) {
@@ -481,4 +484,19 @@ public class WdDriver extends SUTBase {
 
     }
   }
+  
+  /**
+   * Try to deal with alert pop-ups using webdriver.
+   * If an alert is detected save the content of the text message.
+   */
+  private static void checkAlertMessages() {
+	  try {
+		  if(webDriver.switchTo().alert() != null && !webDriver.switchTo().alert().getText().isEmpty()) {
+			  alertMessage = webDriver.switchTo().alert().getText();
+			  webDriver.switchTo().alert().accept();
+			  System.out.println(alertMessage);
+		  }
+	  } catch(Exception e) {}
+  }
+  
 }
