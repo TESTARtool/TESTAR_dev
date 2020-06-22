@@ -106,7 +106,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		// Windows API level
 		for(long windowHandle : windowsEmulator.getVisibleTopLevelWindowHandles()) {
 			String windowUIAName = Windows.GetProcessNameFromHWND(windowHandle);
-			if(windowUIAName.contains("qemu-system-i386")) {
+			if(windowUIAName.contains("qemu-system")) {
 				rootElement.windowsHandle = windowHandle;
 				system.set(Tags.HWND, windowHandle);
 				break;

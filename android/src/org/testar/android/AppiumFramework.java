@@ -36,9 +36,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,6 +63,8 @@ import com.google.gson.JsonParser;
 
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
 
 public class AppiumFramework extends SUTBase {
 
@@ -91,10 +96,80 @@ public class AppiumFramework extends SUTBase {
 		return driver.findElements(by);
 	}
 	
+	// Send Click Action
+	
 	public static void clickElementById(String id){
 		driver.findElementById(id).click();
 	}
+	
+	// Send Type Action
+	
+	public static void setValueElementById(String id, String value){
+		driver.findElementById(id).setValue(value);
+	}
+	
+	public static void sendKeysElementById(String id, CharSequence keysToSend){
+		driver.findElementById(id).sendKeys(keysToSend);
+	}
+	
+	public static void pressKeyEvent(KeyEvent keyEvent){
+		driver.pressKey(keyEvent);
+	}
+	
+	// Utility Interactions
+	
+	public static void hideKeyboard(){
+		driver.hideKeyboard();
+	}
+	
+	public static void wakeUpKeyCode(){
+		driver.pressKey(new KeyEvent(AndroidKey.WAKEUP));
+	}
+	
+	public static void activateAppByBundleId(String bundleId){
+		driver.activateApp(bundleId);
+	}
+	
+	public static List<Map<String, Object>> getAllSessionDetails(){
+		return driver.getAllSessionDetails();
+	}
+	
+	public static Set<String> getWindowHandles(){
+		return driver.getWindowHandles();
+	}
+	
+	public static String getTitleOfCurrentPage(){
+		return driver.getTitle();
+	}
+	
+	public static void resetApp(){
+		driver.resetApp();
+	}
+	
+	public static void runAppInBackground(Duration duration){
+		driver.runAppInBackground(duration);
+	}
+	
+	public static void pushFile(String remotePath, File file){
+		try {
+			driver.pushFile(remotePath, file);
+		} catch (IOException e) {
+			System.out.println("Exception: AndroidDriver pushFile request was not properly executed");
+		}
+	}
+	
+	public static void terminateApp(String bundleId){
+		driver.terminateApp(bundleId);
+	}
 
+	/**
+	 * Obtain a Document representation of the Android loaded page DOM.
+	 * 
+	 * Information is about loaded page/application in the foreground,
+	 * not about specific process or SUT.
+	 * 
+	 * @return Document with DOM representation
+	 */
 	public static Document getAndroidPageSource() {
 		try {
 			return loadXML(driver.getPageSource());

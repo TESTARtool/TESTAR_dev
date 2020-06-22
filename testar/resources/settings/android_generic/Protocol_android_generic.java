@@ -39,7 +39,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.android.AndroidProtocolUtil;
 import org.testar.android.AppiumFramework;
-import org.testar.android.actions.AndroidActionClick;
+import org.testar.android.actions.*;
 import org.testar.android.enums.AndroidTags;
 import org.testar.protocols.DesktopProtocol;
 
@@ -62,6 +62,25 @@ public class Protocol_android_generic extends DesktopProtocol {
 		NativeLinker.addAndroidOS();
 		super.initialize(settings);
 		protocolUtil = new AndroidProtocolUtil();
+	}
+	
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
+	 */
+	 @Override
+	protected void beginSequence(SUT system, State state){
+	 	super.beginSequence(system, state);
+	 	
+	 	// Android Action Type example
+	 	for(Widget w : state) {
+	 		if(w.get(AndroidTags.AndroidClassName, "").equals("android.widget.EditText")) {
+	 			Action androidType = new AndroidActionType(state, w, "TypeExample", w.get(AndroidTags.AndroidResourceId,""));
+	 			androidType.run(system, state, 1.0);
+	 		}
+	 	}
 	}
 	
 	/**
@@ -127,15 +146,19 @@ public class Protocol_android_generic extends DesktopProtocol {
 
 			// type into text boxes
 			if (isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				//actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(
+						new AndroidActionType(state, widget,
+						this.getRandomText(widget),
+						widget.get(AndroidTags.AndroidResourceId,""))
+						);
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)/* && (whiteListed(widget) || isUnfiltered(widget))*/) {
 				actions.add(
 						new AndroidActionClick(state, widget,
-						widget.get(AndroidTags.AndroidText), 
-						widget.get(AndroidTags.AndroidResourceId))
+						widget.get(AndroidTags.AndroidText,""), 
+						widget.get(AndroidTags.AndroidResourceId,""))
 						);
 			}
 			

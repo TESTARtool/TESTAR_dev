@@ -41,7 +41,6 @@ import org.fruit.alayer.webdriver.WdStateBuilder;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.*;
-import org.testar.android.AndroidCanvas;
 import org.testar.android.AndroidStateBuilder;
 import org.testar.android.AppiumFramework;
 import org.testar.android.enums.AndroidRoles;
