@@ -64,7 +64,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList("parabank.parasoft.com");
+  private static List<String> domainsAllowed = Arrays.asList();
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -125,14 +125,12 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   protected void beginSequence(SUT system, State state) {
 
     // Add your login sequence here
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId,"login_email", "john", state, system, 5,1.0);
 
-      /*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId,"login_password", "demo", state, system, 5,1.0);
 
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
+    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Inloggen", state, system, 5, 1.0);
 
-    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
-*/
   }
 
   /**

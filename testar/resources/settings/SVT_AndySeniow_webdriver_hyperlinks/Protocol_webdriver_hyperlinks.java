@@ -52,7 +52,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_parabank extends WebdriverProtocol {
+public class Protocol_webdriver_hyperlinks extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "v-menubar-menuitem", "v-menubar-menuitem-caption");
@@ -64,7 +64,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList("parabank.parasoft.com");
+  private static List<String> domainsAllowed = Arrays.asList("breukenrekenmachine.nl");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -72,10 +72,10 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
   // List of atributes to identify and close policy popups
   // Set to null to disable this feature
-  private static Map<String, String> policyAttributes =
+  private static Map<String, String> policyAttributes = 
       new HashMap<String, String>() {{
         put("class", "lfr-btn-label");
-      }};
+      }};   
 
   /**
    * Called once during the life time of TESTAR
@@ -124,15 +124,9 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   @Override
   protected void beginSequence(SUT system, State state) {
 
-    // Add your login sequence here
-
-      /*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
-
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
-
-    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
-*/
+    // Selecting webpage for gui testing
+    //  waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName, "Breuken vereenvoudigen", state, system, 5, 1.0); 
+    
   }
 
   /**
@@ -210,40 +204,22 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     for (Widget widget : state) {
 
     	// Skip Admin and logout page widget
-    	if(widget.get(WdTags.WebHref,"").contains("admin.htm")
-    			|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
-    		continue;
+    	if(widget.get(WdTags.WebHref,"").contains("index.php")
+    			|| widget.get(WdTags.WebHref,"").contains("breuken-vereenvoudigen.php")
+                 || widget.get(WdTags.WebHref,"").contains("breuken-gelijknamig-maken.php")
+                 || widget.get(WdTags.WebHref,"").contains("breuken-en-kommagetallen.php")
+                 || widget.get(WdTags.WebHref,"").contains("breuken-en-procenten.php")
+                 || widget.get(WdTags.WebHref,"").contains("grootste-gemene-deler.php")
+                 || widget.get(WdTags.WebHref,"").contains("kleinste-gemene-veelvoud.php")
+                 || widget.get(WdTags.WebHref,"").contains("staartdeling.php")
+                 || widget.get(WdTags.WebHref,"").contains("over.php")
+                 || widget.get(WdTags.WebHref,"").contains("privacy-en-cookiebeleid.php")
+    
+    ) {
+    		actions.add(ac.leftClickAt(widget));
     	}
-
-      // only consider enabled and non-tabu widgets
-      if (!widget.get(Enabled, true) || blackListed(widget)) {
-        continue;
-      }
-
-      // slides can happen, even though the widget might be blocked
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
-
-      // If the element is blocked, Testar can't click on or type in the widget
-      if (widget.get(Blocked, false)) {
-    	  continue;
-      }
-
-      // type into text boxes
-      if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-      }
-
-      // left clicks, but ignore links outside domain
-      if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-    	  if (!isLinkDenied(widget)) {
-    		  actions.add(ac.leftClickAt(widget));
-    	  }
-      }
+     
     }
-
-	if(actions.isEmpty()) {
-		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-	}
     
     return actions;
   }
@@ -427,18 +403,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   }
 
   /*
-   * We need to check if click position is within the canvas
-   */
-  private boolean isAtBrowserCanvas(Widget widget) {
-    Shape shape = widget.get(Tags.Shape, null);
-    if (shape == null) {
-      return false;
-    }
-
-    // Widget must be completely visible on viewport for screenshots
-    return widget.get(WdTags.WebIsFullOnScreen, false);
-  }
-
   @Override
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
@@ -460,27 +424,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     clickSet.retainAll(element.cssClasses);
     return clickSet.size() > 0;
   }
-
-  @Override
-  protected boolean isTypeable(Widget widget) {
-	  Role role = widget.get(Tags.Role, Roles.Widget);
-	  if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-
-		  // Specific class="input" for parasoft SUT
-		  if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
-			  return true;
-		  }
-
-		  // Input type are special...
-		  if (role.equals(WdRoles.WdINPUT)) {
-			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type);
-		  }
-		  return true;
-	  }
-
-	  return false;
-  }
+*/
+ 
 
   /**
    * Select one of the possible actions (e.g. at random)
