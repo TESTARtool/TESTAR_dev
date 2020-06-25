@@ -37,12 +37,12 @@ windows.h: $(JAVA_CLASSFILE)
 #           $(error "Could not find correct java version, please install 1.5")
 #     endif
 #requires jdk 8
-    javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
+#    javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
 #requires jdk >8  CSS 202004
-#     javac -h  tmp -classpath  .;..\target\classes\java\main\;..\..\core\target\classes\java\main  $(JAVA_SOURCE)
-#     move tmp\*.h .
-#     rename org*.h windows.h
-#     RD /S /Q  tmp
+     javac -h  tmp -classpath  .;..\target\classes\java\main\;..\..\core\target\classes\java\main  $(JAVA_SOURCE)
+     move tmp\*.h .
+     rename org*.h windows.h
+     RD /S /Q  tmp
 
 $(OBJFILES): windows.h
 

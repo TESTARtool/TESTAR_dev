@@ -1,5 +1,8 @@
 package nl.ou.testar.temporal.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringFinder {
 
    public static int findClosingParenthesis(String data, int openPos) {
@@ -46,22 +49,55 @@ public class StringFinder {
      * customized  for TESTAR
      */
 
-    public static String findClosingParenthesisAndInsert(String data, String toSearch, String replaceStr, String closing) {
+    public static String findClosingAndInsert(String data, String toSearch, String replaceStr, String closing) {
+
+
         // Get the first occurrence
-       int pos = data.indexOf(toSearch);
+        int pos = data.indexOf(toSearch);
         while (pos != -1) { // Repeat till end is reached
             // Replace this occurrence of Sub String
             //find matching bracket
             int bracketpos = findClosingParenthesis(data, pos + toSearch.length() - 1); //assume last char is the "("
-            String orginalblock = data.substring(pos + toSearch.length() - 1, bracketpos  );
-            String prepend=data.substring(0,pos) ;
-            String append= data.substring(bracketpos);
-            data=prepend+toSearch + replaceStr + orginalblock + closing+append;
+            String orginalblock = data.substring(pos + toSearch.length() - 1, bracketpos);
+            String prepend = data.substring(0, pos);
+            String append = data.substring(bracketpos);
+            data = prepend + toSearch + replaceStr + orginalblock + closing + append;
             // Get the next occurrence from the current position
-            pos = data.indexOf(toSearch, pos + toSearch.length() + replaceStr.length() + orginalblock.length() + closing.length());
+            //pos = data.indexOf(toSearch, pos + toSearch.length() + replaceStr.length() + orginalblock.length() + closing.length());
+            pos = data.indexOf(toSearch, pos + toSearch.length());
+
         }
         return data;
     }
+        public static String findUntilAndInsert(String data, String replaceAStr, String replaceEStr, String closing)    {
+
+            String replaceStr="";
+            int quantifierPosition;
+            int untilPosition;
+             String wordToFind = "\\)\\s*U\\s*\\(";
+            Pattern word = Pattern.compile(wordToFind);
+            Matcher match = word.matcher(data);
+
+
+            while (match.find()) {
+                untilPosition = match.start();
+                int untilEndPosition = match.end() - 1;
+                quantifierPosition = StringFinder.findOpeningParenthesis(data, untilPosition) - 1;
+                String quantifier = data.substring(quantifierPosition, quantifierPosition+1);
+                if (quantifier.equals("E")) { replaceStr=replaceEStr; }
+                if (quantifier.equals("A")) { replaceStr=replaceAStr; }
+
+                int bracketpos = StringFinder.findClosingParenthesis(data, untilEndPosition); //assume last char is the "("
+                    String orginalblock = data.substring(untilEndPosition, bracketpos);
+                    String prepend = data.substring(0, untilPosition);
+                    String append = data.substring(bracketpos);
+                    data = prepend + match.toString() + replaceStr + orginalblock + closing + append;
+                match = word.matcher(data.substring(untilEndPosition));
+            }
+            return data;
+        }
+
+
     /**
      * Find any matching substring and surround all occurrences with 'replacestring' + 'substring' + 'closing'
      * (search from right to left)
@@ -74,7 +110,7 @@ public class StringFinder {
      * inspired by https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
      * customized  for TESTAR
      */
-    public static String  findOpeningParenthesisAndInsert(String data, String toSearch, String replaceStr, String opening) {
+    public static String findOpeningAndInsert(String data, String toSearch, String replaceStr, String opening) {
         // Get the first occurrence
         int pos = data.indexOf(toSearch);
         while (pos != -1) {   // Repeat till end is reached

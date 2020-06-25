@@ -305,6 +305,7 @@ public class TemporalController {
                             new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
 
+
                 String strippedFile;
                 String filename = Paths.get(oracleFile).getFileName().toString();
                 if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));

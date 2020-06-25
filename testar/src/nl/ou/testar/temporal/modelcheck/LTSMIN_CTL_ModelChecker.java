@@ -1,7 +1,9 @@
 package nl.ou.testar.temporal.modelcheck;
 
+import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.Common;
 
 import java.io.IOException;
@@ -25,7 +27,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
         StringBuilder sb = new StringBuilder();
 
         try {//formulafile to --ctl strings
-            List<String> lines = Files.readAllLines(Paths.get(formula), StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(Paths.get(formulaFile.getAbsolutePath()), StandardCharsets.UTF_8);
             for (String line : lines) {
                 sb.append("--ctl='").append(line).append("' ");
             }
@@ -92,5 +94,10 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
+    public List<String> delegatedFormulaValidation()  {
+        List<String> tmpformulas = FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
+                "!" +PropositionConstants.SETTING.terminalProposition);
+        return tmpformulas;
+    }
 }
 

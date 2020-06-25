@@ -748,9 +748,11 @@ public  class TemporalDBManager {
                     tModel.addStateEncoding(senc, false);
                 }
                 stateCount++;
-                if (stateCount % (Math.floorDiv(totalStates, chunks)) == 0) {
-                    simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + Math.floorDiv((100 * stateCount), totalStates) + "%");
-                }
+
+                    if ((totalStates<=chunks) || stateCount % (Math.floorDiv(totalStates, chunks)) == 0) { //rely on lazy evaluation
+                        simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + Math.floorDiv((100 * stateCount), totalStates) + "%");
+                    }
+
             }
 
 

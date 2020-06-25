@@ -45,7 +45,7 @@ public enum TemporalFormalism {
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
             new PairBean<>("~~unlikely",""),false,"gal");
-    //'dummypropertyname' is a static name for all properties, apparently GAL syntax allows this and we don't refer.
+    //'dummypropertyname' :static for all properties, apparently GAL syntax allows this to be a dummy, we don't need it.
 
     //futures: CTLSTAR,  MUCALC }
 

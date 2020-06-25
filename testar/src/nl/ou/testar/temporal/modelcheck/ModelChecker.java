@@ -103,6 +103,7 @@ public abstract class ModelChecker {
     }
     abstract  void delegatedCheck();
     abstract List<TemporalOracle> delegatedParseResults(String rawInput);
+    abstract List<String> delegatedFormulaValidation();
 
 
 
@@ -132,7 +133,7 @@ public abstract class ModelChecker {
      * @param doTransformation nn
      * @link saveStringToFile()
      */
-    private void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
+    void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
 
         String contents = validateAndMakeFormulas(oracleColl, doTransformation);
         saveStringToFile(contents, output);
@@ -152,19 +153,7 @@ public abstract class ModelChecker {
         String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition);
         if (!aliveprop.equals("")) {// instrumentTerminalState will determine whether this return value is ""
 
-            List<String> tmpformulas = new ArrayList<>();
-            if ((temporalFormalism == TemporalFormalism.LTL_ITS) ||
-                    (temporalFormalism == TemporalFormalism.LTL_LTSMIN) ||
-                    (temporalFormalism == TemporalFormalism.LTL_SPOT)) {
-                 saveFormulasForChecker(oracleColl, formulaFile, false);
-                tmpformulas = FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile,
-                        "!" +PropositionConstants.SETTING.terminalProposition);
-            } else if ((temporalFormalism == TemporalFormalism.CTL_GAL) ||
-                    (temporalFormalism == TemporalFormalism.CTL_ITS) ||
-                    (temporalFormalism == TemporalFormalism.CTL_LTSMIN)) {
-                tmpformulas = FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
-                        "!" +PropositionConstants.SETTING.terminalProposition);
-            }
+            List<String> tmpformulas =delegatedFormulaValidation();
             List<TemporalOracle> tmporacleList = new ArrayList<>();
             int j = 0;
             for (TemporalOracle ora : oracleColl
