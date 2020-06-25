@@ -252,12 +252,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				+ " " + settings.get(ConfigTags.Mode, mode())
 				+ " " + sequencesPath
 				+ " " + status + " \"" + statusInfo + "\"" );
-		
-		//Print into command line the result of the execution, useful to work with CI and timestamps
-		System.out.println(OutputStructure.executedSUTname
-				+ " " + settings.get(ConfigTags.Mode, mode())
-				+ " " + sequencesPath
-				+ " " + status + " \"" + statusInfo + "\"" );
     }
     
     @Override

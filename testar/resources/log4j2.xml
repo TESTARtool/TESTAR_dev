@@ -2,11 +2,11 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n"/>
         </Console>
-        <RollingFile name="RollingFile" fileName="../logs/testar.log" filePattern="../logs/testar-%d{MM-dd-yyyy}.log.gz"
+        <RollingFile name="RollingFile" fileName="index.log" filePattern="../logs/index-%d{MM-dd-yyyy}.log.gz"
                      ignoreExceptions="false">
-            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy />
                 <SizeBasedTriggeringPolicy size="10 MB" />
