@@ -37,6 +37,7 @@ import java.awt.datatransfer.StringSelection;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
@@ -76,7 +77,7 @@ public final class PasteText extends TaggableBase implements Action {
 			throw new IllegalArgumentException("This string is not an ascii string!");
 	}
 
-	public String toString(){ return "Pasted text '" + text + "'"; }
+	public String toString(){ return "Pasted text '" + StringEscapeUtils.escapeHtml4(text) + "'"; }
 
 	@Override
 	public String toString(Role... discardParameters) {

@@ -297,8 +297,7 @@ public class StdActionCompiler {
 			builder.add(new KeyDown(new KBKeys(VK_DELETE), 1).add(new KeyUp(new KBKeys(VK_DELETE), 1);
 		*/
 		// Typing the new text:
-		//builder.add(new Type(text), 1);
-		builder.add(new PasteText(text), 1);
+		builder.add(new Type(text), 1);
 		return builder.build();
 	}
 
@@ -309,7 +308,53 @@ public class StdActionCompiler {
 		// pressing End key to append into the end of the text:
 		builder.add(new KeyDown(VK_END), 0.1).add(new KeyUp(VK_END), 0.1);
 		//inserting text:
-		//builder.add(new Type(text), 1);
+		builder.add(new Type(text), 1);
+		return builder.build();
+	}
+	
+	/**
+	 *
+	 * @param w, widget that allows inserting text
+	 * @param text, text to be pasted
+	 * @param replaceText, true = replace, false = append
+	 * @return Action that paste text into the widget
+	 */
+	public Action pasteTextInto(Widget w, String text, boolean replaceText){
+		return pasteTextInto(w, 0.5, 0.5, text, replaceText);
+	}
+
+	public Action pasteTextInto(Widget w, double relX, double relY, String text, boolean replaceText){
+		Finder wf = abstractor.apply(w);
+		Action ret = null;
+		if(replaceText){
+			ret = pasteAndReplaceText(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		}else{
+			ret = pasteAndAppendText(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		}
+		ret.set(Tags.Targets, Util.newArrayList(wf));
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
+		return ret;
+	}
+
+	public Action pasteAndReplaceText(final Position position, final String text){
+		Assert.notNull(position, text);
+		// clicking the widget to select it:
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+		// pressing Cntr + A keys to select all text:
+		builder.add(new KeyDown(VK_CONTROL), 0.1).add(new KeyDown(VK_A), 0.1).add(new KeyUp(VK_A), 0.1).add(new KeyUp(VK_CONTROL), 0.1);
+
+		builder.add(new PasteText(text), 1);
+		return builder.build();
+	}
+
+	public Action pasteAndAppendText(final Position position, final String text){
+		Assert.notNull(position, text);
+		// clicking the widget to select it:
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+		// pressing End key to append into the end of the text:
+		builder.add(new KeyDown(VK_END), 0.1).add(new KeyUp(VK_END), 0.1);
+
 		builder.add(new PasteText(text), 1);
 		return builder.build();
 	}

@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -49,6 +49,7 @@ import org.fruit.alayer.visualizers.EllipseVisualizer;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.visualizers.TextVisualizer;
 import org.fruit.alayer.visualizers.TrajectoryVisualizer;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class AnnotatingActionCompiler extends StdActionCompiler {
 	
@@ -187,6 +188,24 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + position.toString() + "'");
 		ret.set(Tags.Desc, "Append '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + position.toString() + "'");
 		ret.set(Tags.Role, ActionRoles.ClickTypeInto);
+		return ret;
+	}
+	
+	@Override
+	public Action pasteAndReplaceText(final Position position, final String text){
+		Action ret = super.pasteAndReplaceText(position, text);
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Role, ActionRoles.PasteTextInto);
+		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
+		return ret;
+	}
+
+	@Override
+	public Action pasteAndAppendText(final Position position, final String text){
+		Action ret = super.pasteAndAppendText(position, text);
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Role, ActionRoles.PasteTextInto);
+		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
 	}
 

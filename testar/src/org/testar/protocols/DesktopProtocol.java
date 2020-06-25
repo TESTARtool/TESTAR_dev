@@ -258,9 +258,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
                         final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
-                        final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
-
-                        actions.add(ac.clickTypeInto(w, textToInsert, true));
+                        
+                        //final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
+                        final Action typeAction = textList.isPresent() ?
+                        		ac.pasteTextInto(w, textList.get()[new Random().nextInt(textList.get().length)], true) :
+                        			ac.clickTypeInto(w, this.getRandomText(w), true);
+                        
+                        actions.add(typeAction);
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
@@ -322,9 +326,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
                         final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
-                        final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
-
-                        actions.add(ac.clickTypeInto(w, textToInsert, true));
+                        
+                        //final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
+                        final Action typeAction = textList.isPresent() ?
+                        		ac.pasteTextInto(w, textList.get()[new Random().nextInt(textList.get().length)], true) :
+                        			ac.clickTypeInto(w, this.getRandomText(w), true);
+                        
+                        actions.add(typeAction);
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.

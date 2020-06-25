@@ -114,7 +114,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		for(Widget w :state) {
 			if(w.get(Tags.Title,"").contains("Email, phone, or Skype")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "testarhandson@gmail.com", true);
+				Action a = ac.pasteTextInto(w, "testarhandson@gmail.com", true);
 				executeAction(system, state, a);
 			}
 		}
@@ -140,7 +140,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAEdit")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(system, state, ac.clickTypeInto(w, "0neDrivetestar", true));
+					executeAction(system, state, ac.pasteTextInto(w, "0neDrivetestar", true));
 				}
 			}
 		}
