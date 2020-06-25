@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 01_webdriver_breuken/Protocol_webdriver_breuken
+ProtocolClass = SVT_AndySeniow_webdriver_breuken/Protocol_webdriver_breuken
 
 #################################################################
 # Graphdatabase settings (experimental)

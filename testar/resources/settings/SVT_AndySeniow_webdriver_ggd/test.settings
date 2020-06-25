@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 06_webdriver_ggd/Protocol_webdriver_ggd
+ProtocolClass = SVT_AndySeniow_webdriver_ggd/Protocol_webdriver_ggd
 
 #################################################################
 # Graphdatabase settings (experimental)
