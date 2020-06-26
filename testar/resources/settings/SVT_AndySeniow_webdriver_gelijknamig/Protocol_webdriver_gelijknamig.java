@@ -125,7 +125,7 @@ public class Protocol_webdriver_gelijknamig extends WebdriverProtocol {
   protected void beginSequence(SUT system, State state) {
 
     // Selecting webpage for gui testing
-      waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName, "Breuken gelijknamig maken", state, system, 5, 1.0); 
+      waitAndLeftClickWidgetWithMatchingTag(WdTags.WebName, "Breuken gelijknamig maken", state, system, 5, 1.0);
     
   }
 
