@@ -38,30 +38,23 @@ public class StringFinder {
 
     /**
      * Find any matching substring and surround all occurrences with 'replacestring' + 'substring' + 'closing'
-     *
-     * @param data          string that might contain substrings to search
+     *  @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    prefix of the embedding
-     * @param closing       suffix of the embedding
-     *
-     *
-     * inspired by  https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
-     * customized  for TESTAR
      */
 
-    public static String findClosingAndInsert(String data, String toSearch, String replaceStr, String closing) {
+    public static String findClosingAndInsert(String data, String toSearch, String replaceStr) {
 
-
-        // Get the first occurrence
-        int pos = data.indexOf(toSearch);
+        //refactoring candidate
+        int pos = data.indexOf(toSearch);// Get the first occurrence
         while (pos != -1) { // Repeat till end is reached
             // Replace this occurrence of Sub String
             //find matching bracket
             int bracketpos = findClosingParenthesis(data, pos + toSearch.length() - 1); //assume last char is the "("
-            String orginalblock = data.substring(pos + toSearch.length() - 1, bracketpos);
+            String orginalblock = data.substring(pos + toSearch.length() , bracketpos);
             String prepend = data.substring(0, pos);
             String append = data.substring(bracketpos);
-            data = prepend + toSearch + replaceStr + orginalblock + closing + append;
+            data = prepend + toSearch + replaceStr + "("+orginalblock +")"+ append;
             // Get the next occurrence from the current position
             //pos = data.indexOf(toSearch, pos + toSearch.length() + replaceStr.length() + orginalblock.length() + closing.length());
             pos = data.indexOf(toSearch, pos + toSearch.length());
@@ -69,32 +62,42 @@ public class StringFinder {
         }
         return data;
     }
-        public static String findUntilAndInsert(String data, String replaceAStr, String replaceEStr, String closing)    {
 
-            String replaceStr="";
-            int quantifierPosition;
-            int untilPosition;
-             String wordToFind = "\\)\\s*U\\s*\\(";
-            Pattern word = Pattern.compile(wordToFind);
-            Matcher match = word.matcher(data);
+        public static String findUntilAndInsert(String data, String replaceAStr, String replaceEStr)    {
 
+            //refactoring candidate
+            String target = data;
+            int index = 0;
+            String wordToFind = "\\s*U\\s*";
+            Pattern word = CachedRegexPatterns.addAndGet(wordToFind);
+            String part = target.substring(index);;
+            Matcher match = word.matcher(part);
 
-            while (match.find()) {
-                untilPosition = match.start();
-                int untilEndPosition = match.end() - 1;
-                quantifierPosition = StringFinder.findOpeningParenthesis(data, untilPosition) - 1;
-                String quantifier = data.substring(quantifierPosition, quantifierPosition+1);
-                if (quantifier.equals("E")) { replaceStr=replaceEStr; }
-                if (quantifier.equals("A")) { replaceStr=replaceAStr; }
+            //if (match.find()) {
+             //   match = word.matcher(part);// reset the found index
+                while (match.find()) {
+                    int untilPosition = match.start();
+                    int untilEndPosition = match.end() - 1;
+                    String replaceStr = "";
+                    int quantifierPosition = StringFinder.findOpeningParenthesis(part, untilPosition) - 1;
+                    String quantifier = part.substring(quantifierPosition, quantifierPosition + 1);
+                    if (quantifier.equals("E")) {  replaceStr = replaceEStr;     }
+                    if (quantifier.equals("A")) {  replaceStr = replaceAStr;     }
 
-                int bracketpos = StringFinder.findClosingParenthesis(data, untilEndPosition); //assume last char is the "("
-                    String orginalblock = data.substring(untilEndPosition, bracketpos);
-                    String prepend = data.substring(0, untilPosition);
-                    String append = data.substring(bracketpos);
-                    data = prepend + match.toString() + replaceStr + orginalblock + closing + append;
-                match = word.matcher(data.substring(untilEndPosition));
-            }
-            return data;
+                    int bracketpos = StringFinder.findClosingParenthesis(part, untilEndPosition);
+                    String orginalblock = part.substring(untilEndPosition, bracketpos);
+                    String prepend = part.substring(0, untilPosition);
+                    String append = part.substring(bracketpos);
+                    target = target.substring(0, index) + prepend + part.substring(untilPosition, untilEndPosition + 1) + "(" +replaceStr + "(" + orginalblock + "))" + append;
+                    index = index + prepend.length() + untilEndPosition - untilPosition + 1 + replaceStr.length();
+                    part = target.substring(index);
+                    match = word.matcher(part);
+                }
+            //} else {
+            //    target = data;
+            //}
+
+            return target;
         }
 
 
@@ -110,6 +113,7 @@ public class StringFinder {
      * inspired by https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
      * customized  for TESTAR
      */
+    @SuppressWarnings("unused")
     public static String findOpeningAndInsert(String data, String toSearch, String replaceStr, String opening) {
         // Get the first occurrence
         int pos = data.indexOf(toSearch);
