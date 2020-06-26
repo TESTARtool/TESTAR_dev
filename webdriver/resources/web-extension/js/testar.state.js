@@ -271,6 +271,24 @@ function getDimensionsTestar(element) {
 }
 
 /*
+ * Determine if the document body exceeds the height of the browser window
+ * Used to determine if the browser contains a vertical scrollbar
+ * @return {bool} true if the document body is higher
+ */
+function isPageVerticalScrollable(){
+	return (document.body.clientHeight > window.innerHeight);
+}
+
+/*
+ * Determine if the document body exceeds the width of the browser window
+ * Used to determine if the browser contains a horizontal scrollbar
+ * @return {bool} true if the document body is wider
+ */
+function isPageHorizontalScrollable(){
+	return (document.body.clientWidth > window.innerWidth);
+}
+
+/*
  * Determin if an element is blocked by another element,
  * but does not contain said element (e.g. <img> inside <a>)
  * @param {node} element, the parent HTML element
