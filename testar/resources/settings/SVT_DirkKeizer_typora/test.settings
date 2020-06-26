@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_DirkKeizer_typora/Protocol_desktop_generic_pure_random
+ProtocolClass = SVT_DirkKeizer_typora/Protocol_simple_sequence_Typora
 
 #################################################################
 # Graphdatabase settings (experimental)
