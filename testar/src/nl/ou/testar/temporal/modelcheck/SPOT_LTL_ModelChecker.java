@@ -17,7 +17,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
         String contents = tmodel.makeHOAOutput();
         saveStringToFile(contents,this.automatonFile);
 
-        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead ";
+        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt  ";
         String cli = pathToExecutable;
         cli = cli + " --a " + automat + " --ff " + formula;
         if (counterExamples) cli = cli + " --witness ";

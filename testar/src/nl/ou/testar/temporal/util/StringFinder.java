@@ -37,7 +37,7 @@ public class StringFinder {
     }
 
     /**
-     * Find any matching substring and surround all occurrences with 'replacestring' + 'substring' + 'closing'
+     * Find any matching substring and weave the 'replacestring'  in all occurences
      *  @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    prefix of the embedding
@@ -63,6 +63,18 @@ public class StringFinder {
         return data;
     }
 
+    /**
+     * Find any "..U.."  substring and weave the 'replacestring'  in all occurences
+     * (search from right to left)
+     * @param data          string that might contain substrings "..U.."
+     * @param replaceAStr    substring to replace in case of A(..U..)
+     * @param replaceEStr    substring to replace in case of A(..U..)
+     *
+     *
+     * inspired by https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
+     * customized  for TESTAR
+     */
+
         public static String findUntilAndInsert(String data, String replaceAStr, String replaceEStr)    {
 
             //refactoring candidate
@@ -73,8 +85,7 @@ public class StringFinder {
             String part = target.substring(index);;
             Matcher match = word.matcher(part);
 
-            //if (match.find()) {
-             //   match = word.matcher(part);// reset the found index
+
                 while (match.find()) {
                     int untilPosition = match.start();
                     int untilEndPosition = match.end() - 1;
@@ -93,17 +104,14 @@ public class StringFinder {
                     part = target.substring(index);
                     match = word.matcher(part);
                 }
-            //} else {
-            //    target = data;
-            //}
 
             return target;
         }
 
 
     /**
-     * Find any matching substring and surround all occurrences with 'replacestring' + 'substring' + 'closing'
-     * (search from right to left)
+     * Find any matching substring and weave the 'replacestring'  in all occurences
+     * (search from right to left) method is NOT USED
      * @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    suffix of the embedding
@@ -114,7 +122,7 @@ public class StringFinder {
      * customized  for TESTAR
      */
     @SuppressWarnings("unused")
-    public static String findOpeningAndInsert(String data, String toSearch, String replaceStr, String opening) {
+    private  static String findOpeningAndInsert(String data, String toSearch, String replaceStr, String opening) {
         // Get the first occurrence
         int pos = data.indexOf(toSearch);
         while (pos != -1) {   // Repeat till end is reached
