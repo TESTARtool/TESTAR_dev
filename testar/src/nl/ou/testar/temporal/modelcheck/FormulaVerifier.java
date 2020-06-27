@@ -82,7 +82,7 @@ public enum FormulaVerifier {
 
 
     private static List<String> parse(File rawInput) {
-        boolean keepLTLFModelVariant=true;
+        boolean keepLTLFModelVariant=true; // is this a useful option?
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
