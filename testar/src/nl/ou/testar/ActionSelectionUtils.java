@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,25 +44,11 @@ public class ActionSelectionUtils {
             //comparing each current action to each previous action:
             boolean matchingActionFound = false;
             for(Action previousAction:previousActions){
-                if(currentAction.get(Tags.Desc, "NoCurrentDescAvailable").equalsIgnoreCase(previousAction.get(Tags.Desc, "NoPreviousDescAvailable"))){
-                    // match found -> the action is not a new action
-                    matchingActionFound = true;
-                }// type into actions have a different Desc because the input is different:
-                // if both actions are type into actions:
-                else if((currentAction.get(Tags.Role, null)!=null)&&
-                        (previousAction.get(Tags.Role, null)!=null)&&
-                        (currentAction.get(Tags.Role, null).toString().equalsIgnoreCase("ClickTypeInto"))&&
-                        (previousAction.get(Tags.Role, null).toString().equalsIgnoreCase("ClickTypeInto"))){
-                    String currentTargetDesc = currentAction.get(Tags.Desc, "currentDescNotAvailable");
-                    currentTargetDesc = currentTargetDesc.substring(currentTargetDesc.indexOf("into"));
-                    String previousTargetDesc = previousAction.get(Tags.Desc, "previousDescNotAvailable");
-                    previousTargetDesc = previousTargetDesc.substring(previousTargetDesc.indexOf("into"));
-                    if(currentTargetDesc.equalsIgnoreCase(previousTargetDesc)){
-                        // match found -> the action is not a new action
-                        matchingActionFound = true;
-                    }
+                if(areSimilarActions(previousAction, currentAction)) {
+                	// Match found, we don't need to continue
+                	matchingActionFound = true;
+                	break;
                 }
-                //TODO currently it considers different list items of the same list as different actions - tries out all
             }
             if(!matchingActionFound){
                 //new action found, adding to new actions set:
@@ -70,4 +57,30 @@ public class ActionSelectionUtils {
         }
         return newActions;
     }
+
+    public static boolean areSimilarActions(Action action_1, Action action_2){
+        if(action_1.get(Tags.Desc, "NoCurrentDescAvailable").equalsIgnoreCase(action_2.get(Tags.Desc, "NoPreviousDescAvailable"))){
+            // both have the same (non-empty) description -> match found
+            return true;
+        }
+        // type into actions have a different Desc because the input is different:
+        // if both actions are type into actions:
+        else if((action_1.get(Tags.Role, null)!=null)&&
+                (action_2.get(Tags.Role, null)!=null)&&
+                (action_1.get(Tags.Role, null).toString().equalsIgnoreCase("ClickTypeInto"))&&
+                (action_2.get(Tags.Role, null).toString().equalsIgnoreCase("ClickTypeInto"))){
+            String currentTargetDesc = action_1.get(Tags.Desc, "currentDescNotAvailable");
+            currentTargetDesc = currentTargetDesc.substring(currentTargetDesc.indexOf("into"));
+            String previousTargetDesc = action_2.get(Tags.Desc, "previousDescNotAvailable");
+            previousTargetDesc = previousTargetDesc.substring(previousTargetDesc.indexOf("into"));
+            if(currentTargetDesc.equalsIgnoreCase(previousTargetDesc)){
+                // both are typing actions into same target widgets -> match found
+                return true;
+            }
+        }
+        //TODO currently it considers different list items of the same list as different actions - tries out all
+        //TODO also scroll bar actions get into looping
+        return false;
+    }
+
 }

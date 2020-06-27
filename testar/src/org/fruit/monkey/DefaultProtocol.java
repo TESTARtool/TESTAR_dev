@@ -682,6 +682,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
+				
+				//update state after begin sequence SUT modification
+				state = getState(system);
 
 				//initializing fragment for recording replayable test sequence:
 				initFragmentForReplayableSequence(state);
