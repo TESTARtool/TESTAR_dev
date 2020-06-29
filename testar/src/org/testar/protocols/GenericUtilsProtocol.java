@@ -193,6 +193,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
+     * Creates a TESTAR sliding action on the given Widget
+     *
+     * Returns null if the widget cannot be scrolled
+     *
+     * @param widget
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @return
+     */
+    protected Action createSlidingAction(Widget widget, double scrollArrowSize, double scrollThick){
+        Action action = null;
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        Drag[] drags = null;
+        //If there are scroll (drags/drops) actions possible
+        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                action = ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
+                );
+
+            }
+        }
+        return action;
+    }
+
+    /**
      * Check whether a widget is clickable
      * @param w
      * @return
