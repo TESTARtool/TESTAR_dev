@@ -125,7 +125,9 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   protected void beginSequence(SUT system, State state) {
 
     // Add your login sequence here
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId,"login_email", "john", state, system, 5,1.0);
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId,"login_email", "john@example.com", state, system, 5,1.0);
+
+    state = getState(system);
 
     waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId,"login_password", "demo", state, system, 5,1.0);
 
