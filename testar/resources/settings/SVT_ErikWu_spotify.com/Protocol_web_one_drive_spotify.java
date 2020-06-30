@@ -62,7 +62,11 @@ import static org.fruit.alayer.Tags.Enabled;
  *
  * It also gives examples how to automate setting a username and password into a login screen.
  */
-public class Protocol_web_one_drive extends DesktopProtocol {
+public class Protocol_web_one_drive_spotify extends DesktopProtocol {
+
+    // Spotify username and password to bypass login screen
+    static final String spotifyUsername = "1198900233";
+    static final String spotifyPassword = "340e16a3";
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
@@ -101,19 +105,16 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		Keyboard kb = AWTKeyboard.build();
 
-
-       
-
-        /**
+		/**
 		 * START Option 1: 
 		 * read the widgets of the current state and execute action based on them
 		 */
 		/*state = getState(system);
 
 		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Email")) {
+			if(w.get(Tags.Title,"").contains("Email, phone, or Skype")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "testarjorgoskorres", true);
+				Action a = ac.clickTypeInto(w, "testarhandson", true);
 				executeAction(system, state, a);
 
 				//Based on ENG Keyboard, Shift + 2 typing arroba character
@@ -127,16 +128,24 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			}
 		}
 
-        //Wait a bit
+		for(Widget w :state) {
+			if(w.get(Tags.Title,"").contains("Next")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(system, state, ac.leftClickAt(w));
+				}
+			}
+		}
+
+		//Wait a bit
 		Util.pause(5);
 
 		//Update state
 		state = getState(system);
 
-		
-
 		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Password")) {
+			if(w.get(Tags.Title,"").contains("Enter the password")) {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAEdit")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -146,7 +155,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		}
 
 		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Sign in to your account")) {
+			if(w.get(Tags.Title,"").contains("Sign in")) {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -162,44 +171,51 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		 * END Option 1
 		 */
 
-        /**
-    	 * START Option 2:
-		 *  Work doing keyboard actions, without check the state and widgets
+
+		/**
+		 * START Option 2:
+		 *  Work doing keyboard actions, with check the state and widgets
 		 */
-		new CompoundAction.Builder()   
-		.add(new Type("testarjorgoskorres"),0.5).build() //assume keyboard focus is on the user field   
-		.run(system, null, 0.5);
 
-		kb.press(KBKeys.VK_SHIFT);
-		kb.press(KBKeys.VK_2);
-		kb.release(KBKeys.VK_2);
-		kb.release(KBKeys.VK_SHIFT);
-
-		new CompoundAction.Builder()  
-		.add(new Type("gmail.com"),0.5)
-		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
-		.run(system, null, 1);
-
-		Util.pause(8);
-
-		new CompoundAction.Builder()
-		.add(new Type("0neDrivetestar"),0.5)   
-		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
-		.run(system, null, 1);
-
-		//Wait a bit
-		Util.pause(5);
+        // bypass login screen
+        state = getState(system);
+        for(Widget w : state)
+        {
+            if(w.get(Tags.Title,"").contains("Inloggen") ||
+                w.get(Tags.Title,"").contains("Log in"))
+            {
+            	System.out.println("DEBUG: login sequence");
+                new CompoundAction.Builder()   
+        		.add(new Type(spotifyUsername),0.5)
+                .add(new KeyDown(KBKeys.VK_TAB), 0.5)
+                .build() //assume keyboard focus is on the user field   
+        		.run(system, null, 0.5);
+                
+                // Delay for tab
+                Util.pause(1);
+        
+        		new CompoundAction.Builder()  
+        		.add(new Type(spotifyPassword),0.5)
+                .add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
+        		.run(system, null, 1);
+        
+        		//Wait a bit
+        		Util.pause(3);
+                break;
+            }
+        }
 
 		/**
 		 * END Option 2
 		 */
+
 		
 		/**
 		 * START Option 3: 
 		 * Use TESTAR internal methods to find the desired widget Tag with the Value and execute actions like click or type
 		 */
 		
-		/*if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Email", "testarjorgoskorres@gmail.com", state, system, 5, 1)) {
+		/*if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Email, phone, or Skype", "testarhandson@gmail.com", state, system, 5, 1)) {
 			System.out.println("Typing email credentials was sucessfull.");
 		}
 		
@@ -209,11 +225,11 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		
 		Util.pause(5);
 		
-		if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Password", "0neDrivetestar", state, system, 5, 1)) {
+		if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Enter the password", "0neDrivetestar", state, system, 5, 1)) {
 			System.out.println("Typing password credentials was sucessfull.");
 		}
 		
-		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Sign in to your account", state, system, 5, 1)){
+		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Sign in", state, system, 5, 1)){
 	 		System.out.println("Left click on Sign in button was successful.");
 		}
 		
@@ -222,9 +238,6 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		/**
 		 * END Option 3
 		 */
-
-		
-		
 
 	}
 
@@ -280,9 +293,6 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			// Check that all images have an alternate textual description (accessibility, W3C WAI)
 			verdict = verdict.join(getW3CWAIVerdict(state, w, role, title));				
 
-			// check for too small texts to be legible
-			verdict = verdict.join(getSmallTextVerdict(state, w, role, shape));
-
 			// check for scrollable UI elements whether their size is enough for usability
 			verdict = verdict.join(getScrollsUsabilityVerdict(state, w, shape));
 
@@ -298,15 +308,6 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
 		else
 			return Verdict.OK;
-	}
-
-	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape){
-		final int MINIMUM_FONT_SIZE = 8; // px
-		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
-			return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
-					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
-		else
-			return Verdict.OK;	
 	}
 
 	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){

@@ -49,7 +49,7 @@ import static org.fruit.alayer.Tags.*;
  * <p>
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
+public class Protocol_desktop_generic_wesley extends DesktopProtocol {
     public final class WidgetClick extends TaggableBase implements Action {
         private static final long serialVersionUID = 259015065012204913L;
         private final String widgetPath;

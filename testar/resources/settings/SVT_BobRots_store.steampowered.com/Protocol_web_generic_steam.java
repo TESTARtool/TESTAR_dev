@@ -66,7 +66,7 @@ import static org.fruit.alayer.Tags.Enabled;
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
  */
-public class Protocol_web_generic extends DesktopProtocol {
+public class Protocol_web_generic_steam extends DesktopProtocol {
 
     // Classes that are deemed clickable by the web framework
     private static List<String> clickableClasses = Arrays.asList(
@@ -132,13 +132,14 @@ public class Protocol_web_generic extends DesktopProtocol {
      */
     @Override
     protected void beginSequence(SUT system, State state){
+        System.out.println("beginSequence");
 
         super.beginSequence(system, state);
 
         Keyboard kb = AWTKeyboard.build();
 
         state = getState(system);
-
+        System.out.println("Before login");
         // Do a login attempt
         if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "login", state, system, 5, 1)){
         }

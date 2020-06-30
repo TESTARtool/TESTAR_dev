@@ -52,7 +52,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_parabank extends WebdriverProtocol {
+public class Protocol_webdriver_parabank2 extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "v-menubar-menuitem", "v-menubar-menuitem-caption");
