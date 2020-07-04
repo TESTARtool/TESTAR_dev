@@ -114,7 +114,7 @@ public class TemporalPatternConstraint {
         logData.set_modifieddate( _modifieddate);
     }
 
-    public void set_log(List < String > _log) {
+    public void set_log(LinkedHashSet<String> _log) {
         logData.set_log(_log);
     }
     public void addLog ( String  log) {

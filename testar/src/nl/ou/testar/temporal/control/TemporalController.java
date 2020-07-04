@@ -80,6 +80,7 @@ public class TemporalController {
     private  List<TemporalOracle> oracleColl;
     private  SimpleLog simpleLog;
 
+
     public TemporalController(final Settings settings) {
 
 
@@ -132,6 +133,7 @@ public class TemporalController {
         ctlLTSMINEnabled = settings.get(ConfigTags.TemporalCTL_LTSMINChecker_Enabled);
 
         propositionManagerFile = settings.get(ConfigTags.TemporalPropositionManager);
+
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
         zip= settings.get(ConfigTags.TemporalZipLargeFiles);
@@ -189,7 +191,7 @@ public class TemporalController {
 
     public void savePropositionManager(String filename) {
         simpleLog.append(prettyCurrentTime() + " | " + "generating Proposition Manager file: "+filename);
-        JSONHandler.save(propositionManager, outputDir + filename, true);
+        JSONHandler.save(propositionManager, outputDir + filename, false);
     }
 
     private void loadPropositionManager(String filename) {
@@ -215,7 +217,7 @@ public class TemporalController {
 
 
     public String pingDB() {
-        String info =tDBManager.pingDB();
+        String info =tDBManager.pingDB(); //Q & D
         String dbfilename = outputDir + "Databasemodels.csv";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbfilename))) {
             bw.write(info);
@@ -230,9 +232,9 @@ public class TemporalController {
 
     //*********************************
 
-    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
-        tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
-    }
+//    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
+//        tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
+//    }
 
 
 
@@ -276,7 +278,7 @@ public class TemporalController {
     }
 
 
-    public void MCheck(String propositionManagerFile, String oracleFile,
+    public void MCheck(String propositionManagerFile,String oracleFile,
                        boolean verbose, boolean zip,boolean counterExamples, boolean instrumentTerminalState,
                        String ltlSpotMCCommand, boolean ltlSpotWSLPath, boolean ltlSpotEnabled,
                        String ctlItsMCCommand,  boolean ctlItsWSLPath, boolean ctlItsEnabled,
@@ -457,6 +459,7 @@ public class TemporalController {
                     simpleLog.append("Error: StateModel not available");
                 } else {
                     setTemporalModelMetaData(abstractStateModel);
+                    tModel.setAtomicPropositionKeying(propositionManager.getPropositionKeying());
                     tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
                     simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
                     if (verbose) {

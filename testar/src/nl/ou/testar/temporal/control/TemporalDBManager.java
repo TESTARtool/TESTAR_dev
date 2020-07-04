@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.control;
 
+import com.google.common.collect.HashBiMap;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
@@ -12,6 +13,7 @@ import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
@@ -224,7 +226,7 @@ public  class TemporalDBManager {
         resultSet.close();
         return stateCount;
     }
-    public PairBean<Set<String>,Integer> getWidgetPropositions(String state, List<String> abstractionAttributes) {
+    public PairBean<Set<String>,Integer> getWidgetPropositions(String state, List<String> abstractionAttributes, Map<String,Set<String>> widgetKeyCollisionMap) {
         // concrete widgets
         String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
         Map<String, Object> params = new HashMap<>();
@@ -253,7 +255,8 @@ public  class TemporalDBManager {
 
 
                 for (String propertyName : widgetVertex.getPropertyNames()) {
-                    computeAtomicPropositions( abstractionAttributes,propertyName, widgetVertex, propositions,passedPropositionFilters);
+                    Set<String> props= computeAtomicPropositions( abstractionAttributes,propertyName, widgetVertex, passedPropositionFilters, widgetKeyCollisionMap);
+                    propositions.addAll(props);
                 }
             }
         }
@@ -298,8 +301,10 @@ public  class TemporalDBManager {
                     attribmap.put(attrib, actionEdge.getProperty(attrib));
                 }
                 List<PropositionFilter> passedPropositionFilters = propositionManager.setPassingFilters(PropositionFilterType.TRANSITION,attribmap);
+
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    computeAtomicPropositions( abstractionAttributes,propertyName, actionEdge, propositions,passedPropositionFilters);
+                     Set<String> props=computeAtomicPropositions(abstractionAttributes ,propertyName, actionEdge, passedPropositionFilters,new HashMap<>());
+                    propositions.addAll(props);
                 }
                 trenc.setTransitionAPs(propositions);
 
@@ -524,12 +529,28 @@ public  class TemporalDBManager {
         return convertedValue;
     }
 
-    private void computeAtomicPropositions(List<String> abstractionAttributes,String propertyName, OElement graphElement,
-                                           Set<String> globalPropositions,List<PropositionFilter> passedPropositionFilters)  {
-        StringBuilder apkey = new StringBuilder();
+    private Set<String> computeAtomicPropositions(List<String> keyingAttributes, String propertyName, OElement graphElement,
+                                                  List<PropositionFilter> passedPropositionFilters, Map<String, Set<String>> widgetKeyCollisionMap)  {
+        Set<String> props=new HashSet<>();
+        if (passedPropositionFilters != null && passedPropositionFilters.size() > 0) {
+            String key = getPropositionKey(keyingAttributes,graphElement);
+            for (PropositionFilter wf : passedPropositionFilters) // add the filter-specific selected attributes and expressions
+            {// candidate for refactoring as this requires a double iteration over filters
+                props =wf.getPropositionsOfAttribute(key, propertyName, graphElement.getProperty(propertyName).toString());
+            }
+            if (!props.isEmpty() && (graphElement  instanceof OVertex)){
+               String concreteID= graphElement.getProperty(CodingManager.CONCRETE_ID_CUSTOM).toString();
+                Set<String>  widgetids = widgetKeyCollisionMap.getOrDefault(key,new HashSet<>());
+                widgetids.add(concreteID);
+                widgetKeyCollisionMap.put(key,widgetids);
+            }
+        }
+        return props;
+    }
 
-        //compose APkey
-        for (String k : abstractionAttributes //apModelManager.getAPKey()
+    private String getPropositionKey(List<String> keyingAttributes,OElement graphElement){
+        StringBuilder apkey = new StringBuilder();
+        for (String k : keyingAttributes
         ) {
             Object prop = graphElement.getProperty(k);
             if (prop == null) {
@@ -539,13 +560,10 @@ public  class TemporalDBManager {
             }
             apkey.append(propositionManager.getPropositionSubKeySeparator());
         }
-        if (passedPropositionFilters != null && passedPropositionFilters.size() > 0) {
-            for (PropositionFilter wf : passedPropositionFilters) // add the filter specific elected attributes and expressions
-            {// candidate for refactoring as this requires a double iteration over filters
-                Set<String> props =wf.getPropositionsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString());
-                globalPropositions.addAll(props);
-            }
-        }
+//        if(apkey.toString().contains("UIAMenuItem_||_Help_||_    Application")){
+//            System.out.println(apkey.toString()); // debug
+//        }
+        return apkey.toString();
     }
 
     public boolean saveToGraphMLFile(AbstractStateModel abstractStateModel,String file,boolean excludeWidget,boolean zip ) {
@@ -667,6 +685,7 @@ public  class TemporalDBManager {
         int stateCount = 0;
         int totalStates;
         int chunks = 10;
+        Map<String,String> statetreeKeyCollisionMap= new HashMap<>();
         dbReopen();
 
             OResultSet resultSet = getConcreteStatesFromOrientDb(abstractStateModel);
@@ -722,12 +741,13 @@ public  class TemporalDBManager {
                         attribmap.put(attrib, stateVertex.getProperty(attrib));
                     }
                     List<PropositionFilter> passedPropositionFilters = propositionManager.setPassingFilters(PropositionFilterType.STATE, attribmap);
-
+                    Map<String,Set<String>> widgetKeyCollisionMap= new HashMap<>();
                     for (String propertyName : stateVertex.getPropertyNames()) {
-                        computeAtomicPropositions(tModel.getApplication_BackendAbstractionAttributes(), propertyName, stateVertex, propositions, passedPropositionFilters);
+                        Set<String> props= computeAtomicPropositions(tModel.getAtomicPropositionKeying(), propertyName, stateVertex, passedPropositionFilters,widgetKeyCollisionMap);
+                        propositions.addAll(props);
                     }
 
-                    PairBean<Set<String>, Integer> pb = getWidgetPropositions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes());
+                    PairBean<Set<String>, Integer> pb = getWidgetPropositions(senc.getState(), tModel.getAtomicPropositionKeying(),  widgetKeyCollisionMap);
                     propositions.addAll(pb.left());// concrete widgets
                     commentWidgetDistri.put(senc.getState(), pb.right());
                     runningWcount = runningWcount + pb.right();
@@ -743,9 +763,18 @@ public  class TemporalDBManager {
                         deadTrencList.add(deadTrenc);
                         senc.setTransitionColl(deadTrencList);
                     } else
-                        senc.setTransitionColl(getTransitions(senc.getState(), tModel.getApplication_BackendAbstractionAttributes()));
+                        senc.setTransitionColl(getTransitions(senc.getState(), tModel.getAtomicPropositionKeying()));
 
                     tModel.addStateEncoding(senc, false);
+                    String mapAsString = widgetKeyCollisionMap.entrySet().stream()
+                            .filter(e -> e.getValue().size()>1)
+                            .map(e -> e.getKey() + "->" + e.getValue().toString())
+                            .collect(Collectors.joining(", ", "{", "}"));
+                    if (mapAsString.length()>2){ // larger then "{}"
+
+                        statetreeKeyCollisionMap.put("state "+ stateVertex.getIdentity().toString()+" / " +stateVertex.getProperty(CodingManager.CONCRETE_ID_CUSTOM).toString(),mapAsString);
+                    }
+
                 }
                 stateCount++;
 
@@ -760,29 +789,34 @@ public  class TemporalDBManager {
             tModel.finalizeTransitions(); //update once. this is a costly operation
             for (StateEncoding stenc : tModel.getStateEncodings()
             ) {
-                List<String> encodedConjuncts = new ArrayList<>();
+                Map<String,TransitionEncoding> encodedConjuncts = new HashMap<>();
+
                 for (TransitionEncoding tren : stenc.getTransitionColl()
                 ) {
                     String enc = tren.getEncodedTransitionAPConjunct();
-                    if (encodedConjuncts.contains(enc)) {
-                        logNonDeterministicTransitions.put(stenc.getState(), tren.getTransition());
-                        //tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
-                    } else encodedConjuncts.add(enc);
+                    if (encodedConjuncts.containsKey(enc)) {
+                        TransitionEncoding trenTemp = encodedConjuncts.get(enc);
+                        logNonDeterministicTransitions.put(stenc.getState(), trenTemp.getTransition()+"=>"+trenTemp.getTargetState());
+                        logNonDeterministicTransitions.put(stenc.getState(), tren.getTransition()+"=>"+tren.getTargetState());
+                    } else encodedConjuncts.put(enc, tren);
                 }
             }
-
 
             tModel.addLog("Terminal States : " + logTerminalStates.toString());
             String mapAsString = commentWidgetDistri.keySet().stream()
                     .map(key -> key + "->" + commentWidgetDistri.get(key))
                     .collect(Collectors.joining(", ", "{", "}"));
             tModel.addLog("#Widgets per State : " + mapAsString);
-            tModel.addLog("Total #Widgets = " + runningWcount);
+            tModel.addLog("Total #Widgets : " + runningWcount);
             mapAsString = logNonDeterministicTransitions.keySet().stream()
-                    .map(key -> key + "->" + logNonDeterministicTransitions.get(key).toString())
+                    .map(key -> key + "-> " + logNonDeterministicTransitions.get(key).toString())
                     .collect(Collectors.joining(", ", "{", "}"));
-            tModel.addLog("non-deterministic transitions by State: " + mapAsString);
+            tModel.addLog("Non-deterministic transitions by State: " + mapAsString);
 
+            statetreeKeyCollisionMap.entrySet().stream()
+                .filter(e -> e.getValue().length()>0)
+                .map(e -> "PropositionKey Collisions :  "+e.getKey() + "->" + e.getValue())
+                    .forEachOrdered(tModel::addLog);
 
             tModel.setTraces(fetchTraces(tModel.getApplication_ModelIdentifier()));
             Set<String> initStates = new HashSet<>();

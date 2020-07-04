@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
@@ -11,7 +12,7 @@ import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
-//@JsonPropertyOrder({  "formatVersion", "atomicPropositions","initialStates", "stateList", "transitionList"})//,"traces","stateEncodings" })
+//@JsonPropertyOrder({  "formatVersion", "atomicPropositionKeying,"atomicPropositions","initialStates", "stateList", "transitionList"})//,"traces","stateEncodings" })
 @JsonPropertyOrder(alphabetic = true)
 public class TemporalModel extends ModelBean {
 
@@ -20,8 +21,12 @@ public class TemporalModel extends ModelBean {
     private List<TemporalTrace> traces; //
     private List<String> stateList;
     private List<String> transitionList;
+
+
+
+    private List<String> atomicPropositionKeying;
     private Set<String> atomicPropositions; //AP<digits> to widget property map:
-    private String formatVersion = "20200510";
+    private String formatVersion = "20200702";
 
 
     public TemporalModel() {
@@ -41,6 +46,15 @@ public class TemporalModel extends ModelBean {
         this.initialStates = initialStates;
     }
 
+
+    public List<String> getAtomicPropositionKeying() {    return atomicPropositionKeying;  }
+
+    public void setAtomicPropositionKeying(List<String> atomicPropositionKeying) {
+        if (atomicPropositionKeying.size()==0)
+            this.atomicPropositionKeying=getApplication_BackendAbstractionAttributes();
+        else
+        this.atomicPropositionKeying = atomicPropositionKeying;
+    }
     public Set<String> getAtomicPropositions() {
         return atomicPropositions;
     }

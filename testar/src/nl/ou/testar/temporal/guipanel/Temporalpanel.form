@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.guipanel.Temporalpanel">
   <grid id="27dc6" binding="mainTemporalPanel" layout-manager="FormLayout">
-    <rowspec value="center:d:noGrow"/>
-    <rowspec value="top:367px:noGrow"/>
-    <colspec value="right:269px:grow"/>
-    <colspec value="left:5dlu:noGrow"/>
-    <colspec value="fill:45px:noGrow"/>
-    <colspec value="left:7dlu:noGrow"/>
-    <colspec value="fill:51px:grow"/>
-    <colspec value="left:4dlu:noGrow"/>
+    <rowspec value="fill:401px:noGrow"/>
+    <colspec value="right:296px:grow"/>
+    <colspec value="left:11dlu:noGrow"/>
+    <colspec value="left:128px:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
@@ -17,38 +13,30 @@
     <colspec value="fill:8px:noGrow"/>
     <colspec value="right:max(p;42px):noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
-    <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="20" y="20" width="668" height="369"/>
+      <xy x="20" y="20" width="668" height="397"/>
     </constraints>
     <properties>
       <enabled value="true"/>
-      <minimumSize width="621" height="350"/>
-      <preferredSize width="621" height="350"/>
+      <minimumSize width="621" height="370"/>
+      <preferredSize width="621" height="370"/>
       <visible value="true"/>
     </properties>
     <border type="empty">
       <size top="0" left="2" bottom="2" right="2"/>
     </border>
     <children>
-      <component id="9402f" class="javax.swing.JSeparator">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-          <forms defaultalign-horz="false" defaultalign-vert="false"/>
-        </constraints>
-        <properties/>
-      </component>
       <tabbedpane id="4617a" binding="containerTab">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="16" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="0" column="0" row-span="1" col-span="12" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
           <forms/>
         </constraints>
         <properties>
-          <minimumSize width="617" height="350"/>
-          <preferredSize width="617" height="350"/>
+          <minimumSize width="617" height="380"/>
+          <preferredSize width="617" height="380"/>
           <requestFocusEnabled value="true"/>
           <visible value="true"/>
         </properties>
@@ -350,37 +338,45 @@
           <grid id="d3094" binding="minerPanel" layout-manager="FormLayout">
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="center:28px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:28px:noGrow"/>
+            <rowspec value="top:5dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:41px:noGrow"/>
             <rowspec value="center:41px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="center:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:5dlu:noGrow"/>
-            <rowspec value="center:42px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:p:noGrow"/>
+            <rowspec value="top:9dlu:noGrow"/>
+            <rowspec value="top:d:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="left:132px:noGrow"/>
-            <colspec value="fill:66px:noGrow"/>
+            <colspec value="left:25px:noGrow"/>
+            <colspec value="left:8dlu:noGrow"/>
+            <colspec value="right:73px:noGrow"/>
+            <colspec value="left:82px:noGrow"/>
+            <colspec value="left:57px:noGrow"/>
+            <colspec value="left:24px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:25px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="fill:57px:noGrow"/>
-            <colspec value="fill:43px:noGrow"/>
-            <colspec value="fill:19px:noGrow"/>
-            <colspec value="fill:11px:noGrow"/>
-            <colspec value="fill:35px:noGrow"/>
+            <colspec value="left:6dlu:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:15px:noGrow"/>
-            <colspec value="left:103px:noGrow"/>
-            <colspec value="left:50dlu:noGrow"/>
+            <colspec value="left:26px:noGrow"/>
+            <colspec value="left:32dlu:noGrow"/>
+            <colspec value="left:26dlu:noGrow"/>
             <constraints>
               <tabbedpane title="Miner"/>
             </constraints>
-            <properties/>
+            <properties>
+              <minimumSize width="601" height="400"/>
+              <preferredSize width="601" height="400"/>
+              <requestFocusEnabled value="true"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="dd5b0" class="javax.swing.JLabel">
@@ -403,7 +399,7 @@
               </component>
               <component id="b9b70" class="javax.swing.JTextField" binding="oracleFile">
                 <constraints>
-                  <grid row="13" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="13" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -414,7 +410,7 @@
               </component>
               <component id="55810" class="javax.swing.JTextField" binding="patternFile">
                 <constraints>
-                  <grid row="11" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="11" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -435,7 +431,7 @@
               </component>
               <component id="1e04" class="javax.swing.JTextField" binding="PropositionManagerFile">
                 <constraints>
-                  <grid row="7" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="7" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -455,7 +451,7 @@
               </component>
               <component id="f800a" class="javax.swing.JTextField" binding="patternConstraintsFile">
                 <constraints>
-                  <grid row="9" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="9" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -464,80 +460,19 @@
                   <toolTipText value="&lt;html&gt;&#10;Points to .CSV file that contains restrictions per Pattern&lt;br&gt;&#10;on what kind of concrete oracles can be created.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
-              <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
-                <constraints>
-                  <grid row="11" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <enabled value="true"/>
-                  <maximumSize width="130" height="38"/>
-                  <minimumSize width="130" height="30"/>
-                  <model>
-                    <item value="1"/>
-                    <item value="5"/>
-                    <item value="10"/>
-                    <item value="50"/>
-                    <item value="100"/>
-                    <item value="500"/>
-                    <item value="1000"/>
-                  </model>
-                  <preferredSize width="150" height="30"/>
-                  <toolTipText value="&lt;HTML&gt;tactic to generate oracles from the supplied Pattern collection.&lt;BR&gt;&#10;Shows the number of potential oracles to generate per pattern&#10;&lt;/HTML&gt;" noi18n="true"/>
-                  <verifyInputWhenFocusTarget value="true"/>
-                </properties>
-                <clientProperties>
-                  <html.disable class="java.lang.Boolean" value="false"/>
-                </clientProperties>
-              </component>
-              <component id="59e45" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Generate:"/>
-                </properties>
-              </component>
-              <component id="a1231" class="javax.swing.JButton" binding="defaultPropositionMgrBtn">
-                <constraints>
-                  <grid row="6" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <maximumSize width="130" height="38"/>
-                  <minimumSize width="130" height="38"/>
-                  <preferredSize width="130" height="30"/>
-                  <text value="Proposition Mgr"/>
-                  <toolTipText value="Generate a sample Proposition Manager"/>
-                </properties>
-              </component>
-              <component id="11461" class="javax.swing.JButton" binding="generateBtn">
-                <constraints>
-                  <grid row="11" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <enabled value="true"/>
-                  <horizontalTextPosition value="0"/>
-                  <maximumSize width="81" height="30"/>
-                  <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
-                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB &lt;/html&gt;"/>
-                </properties>
-              </component>
               <component id="73a81" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Model Check in Generate Mode"/>
+                  <text value="MC in Generate Mode"/>
                   <toolTipText value="&lt;html&gt;Temporal oracles are automatically evaluated after a TESTAR test-run.&lt;BR&gt;&#10;Protocol (JAVA) modification might apply&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="8a066" class="javax.swing.JCheckBox" binding="CounterExamples">
                 <constraints>
-                  <grid row="2" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
@@ -545,147 +480,30 @@
                   <toolTipText value="&lt;html&gt;Produce traces of counter examples (when verdict=FAIL) or witness (when verdict=PASS).&lt;BR&gt;&#10;(not all implemented modelcheckers can produce such traces) &lt;/html&gt;"/>
                 </properties>
               </component>
-              <component id="8e7a8" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="2" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text value="Verbose"/>
-                  <toolTipText value="&lt;html&gt; When checked: keeps the intermediate files on disk ,&lt;br&gt;&#10;else: these files are deleted after the Checker has run.&#10;&lt;/html&gt;"/>
-                </properties>
-              </component>
               <component id="e7209" class="javax.swing.JCheckBox" binding="enforceAbstractionEquality">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="Enforce Abstraction equality"/>
+                  <text value="Abstraction equality"/>
                   <toolTipText value="&lt;html&gt;Concrete Abstraction attributes in &lt;b&gt;NEW&lt;/b&gt; models will be the same as on the Abstract Layer.&lt;br&gt;&#10;(this overrules the ConcreteStateAttributes parameter in the settings file and &lt;br&gt;&#10;the default uses &lt;b&gt;ALL&lt;/b&gt; StateAttributes as ConcreteStateAttributes)&lt;br&gt;&#10;It is advised to leave this setting enabled.&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="655bc" class="javax.swing.JCheckBox" binding="instrumentDeadlockStatesCheckBox">
                 <constraints>
-                  <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Instrument terminal states"/>
-                  <toolTipText value="&lt;html&gt; In case that the Graph-model has terminal states (~ no outgoing transitions):&lt;BR&gt;&#10;1. a new artificial state  with a selfloop is added&lt;BR&gt;&#10;2. forall terminal states, a transition will be added to that newly created artificial state.&lt;BR&gt;&#10;3. the transitions have a single atomic proposition that indicates that the target state is terminal.&lt;BR&gt;&#10;4. formulas are modified to be only susceptible in the 'live' part of the Model.&#10;This 'enriched' model will be provided to the model-checker.&lt;BR&gt;&#10;(not the original Graph-model) &lt;/html&gt;"/>
-                </properties>
-              </component>
-              <component id="54d5f" class="javax.swing.JButton" binding="testDbButton">
-                <constraints>
-                  <grid row="2" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <text value="Show DB "/>
-                  <toolTipText value="Exports the existing models in the Graph database to a file."/>
-                </properties>
-              </component>
-              <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
-                <constraints>
-                  <grid row="6" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <maximumSize width="83" height="38"/>
-                  <preferredSize width="90" height="30"/>
-                  <text value="GraphML"/>
-                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that the correct &lt;BR&gt;&#10;1. Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel&lt;BR&gt;&#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db' to view the available models &lt;/html&gt; "/>
-                </properties>
-              </component>
-              <component id="6174" class="javax.swing.JButton" binding="ModelOnlyBtn">
-                <constraints>
-                  <grid row="6" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <preferredSize width="78" height="30"/>
-                  <text value="Model"/>
-                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Proposition Manager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db'  to view the available models &lt;/html&gt; "/>
-                </properties>
-              </component>
-              <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
-                <constraints>
-                  <grid row="7" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="e8bb" class="javax.swing.JButton" binding="selectFilePatternConstraints">
-                <constraints>
-                  <grid row="9" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="25d53" class="javax.swing.JButton" binding="selectFilePatterns">
-                <constraints>
-                  <grid row="11" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="d20dc" class="javax.swing.JButton" binding="selectFileOracles">
-                <constraints>
-                  <grid row="13" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="17" height="30"/>
-                    <maximum-size width="30" height="-1"/>
-                  </grid>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
-                <constraints>
-                  <grid row="6" column="5" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties>
-                  <preferredSize width="110" height="30"/>
-                  <text value="Sample Oracle"/>
-                  <toolTipText value="Generate files with 1. a sample Oracle and 2. a sample Pattern, 3. a sample constraint"/>
-                </properties>
-                <clientProperties>
-                  <html.disable class="java.lang.Boolean" value="false"/>
-                </clientProperties>
-              </component>
-              <component id="af878" class="javax.swing.JCheckBox" binding="sourceIsDb">
-                <constraints>
-                  <grid row="4" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text value="DB as source"/>
-                  <toolTipText value="&lt;html&gt;&#10;When checked: uses Graph Database as source for Model checking&lt;br&gt;&#10;else: The Model file is the source&lt;br&gt;&#10;Use-case: checking a new formula against  an 'old' Model&lt;br&gt;&#10;This setting has only effect when used in the GUI.&lt;Br&gt;&#10;Model-checking during TESTAR test runs always use the DB as source.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt; In case that the Graph-model has terminal states (~ no outgoing transitions):&lt;BR&gt;&#10;1. a new artificial state  with a selfloop is added&lt;BR&gt;&#10;2. forall terminal states, a transition will be added to that newly created artificial state.&lt;BR&gt;&#10;3. the transitions have a single atomic proposition that indicates that the target state is terminal.&lt;BR&gt;&#10;4. formulas are modified to be only susceptible in the 'live' part of the Model.&lt;BR&gt;&#10;This 'enriched' model will be provided to the model-checker.&lt;BR&gt; &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="f670d" class="javax.swing.JTextField" binding="modelFile">
                 <constraints>
-                  <grid row="15" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="15" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -705,9 +523,153 @@
                   <text value="Model File"/>
                 </properties>
               </component>
+              <component id="af878" class="javax.swing.JCheckBox" binding="sourceIsDb">
+                <constraints>
+                  <grid row="4" column="6" row-span="1" col-span="8" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="DB as source"/>
+                  <toolTipText value="&lt;html&gt;&#10;When checked: uses Graph Database as source for Model checking&lt;br&gt;&#10;else: The Model file is the source&lt;br&gt;&#10;Use-case: checking a new formula against  an 'old' Model&lt;br&gt;&#10;This setting has only effect when used in the GUI.&lt;Br&gt;&#10;Model-checking during TESTAR test runs always use the DB as source.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="6174" class="javax.swing.JButton" binding="ModelOnlyBtn">
+                <constraints>
+                  <grid row="6" column="5" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <preferredSize width="78" height="30"/>
+                  <text value="Model"/>
+                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Proposition Manager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db'  to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
+                <constraints>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <maximumSize width="83" height="38"/>
+                  <preferredSize width="90" height="30"/>
+                  <text value="GraphML"/>
+                  <toolTipText value="&lt;html&gt;Exports the model** from the graphDB  into (GRAPHML.XML) format. &lt;br&gt;&#10;&lt;BR&gt;&#10;** Ensure that the correct &lt;BR&gt;&#10;1. Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel&lt;BR&gt;&#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db' to view the available models &lt;/html&gt; "/>
+                </properties>
+              </component>
+              <component id="57749" class="javax.swing.JButton" binding="sampleOracleBtn">
+                <constraints>
+                  <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
+                </constraints>
+                <properties>
+                  <preferredSize width="110" height="30"/>
+                  <text value="Examples"/>
+                  <toolTipText value="&lt;html&gt;Generate files: &lt;BR&gt;&#10;1. sample Proposition Manager&lt;BR&gt;&#10;2. sample Oracle,&lt;BR&gt;&#10;3. sample Pattern,&lt;BR&gt;&#10;4. sample constraint.&lt;BR&gt;&#10;&lt;/html&gt;"/>
+                </properties>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
+              </component>
+              <component id="59e45" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Generate:"/>
+                </properties>
+              </component>
+              <component id="3c50" class="javax.swing.JButton" binding="selectFilePropositionManager">
+                <constraints>
+                  <grid row="7" column="6" row-span="1" col-span="2" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="e8bb" class="javax.swing.JButton" binding="selectFilePatternConstraints">
+                <constraints>
+                  <grid row="9" column="6" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="25d53" class="javax.swing.JButton" binding="selectFilePatterns">
+                <constraints>
+                  <grid row="11" column="6" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="d20dc" class="javax.swing.JButton" binding="selectFileOracles">
+                <constraints>
+                  <grid row="13" column="6" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="11461" class="javax.swing.JButton" binding="generateBtn">
+                <constraints>
+                  <grid row="11" column="8" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <horizontalTextPosition value="0"/>
+                  <maximumSize width="81" height="30"/>
+                  <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB &lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
+                <constraints>
+                  <grid row="11" column="14" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <maximumSize width="70" height="38"/>
+                  <minimumSize width="70" height="30"/>
+                  <model>
+                    <item value="1"/>
+                    <item value="5"/>
+                    <item value="10"/>
+                    <item value="50"/>
+                    <item value="100"/>
+                    <item value="500"/>
+                    <item value="1000"/>
+                  </model>
+                  <preferredSize width="70" height="30"/>
+                  <toolTipText value="&lt;HTML&gt;tactic to generate oracles from the supplied Pattern collection.&lt;BR&gt;&#10;Shows the number of potential oracles to generate per pattern&#10;&lt;/HTML&gt;" noi18n="true"/>
+                  <verifyInputWhenFocusTarget value="true"/>
+                </properties>
+                <clientProperties>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
+              </component>
               <component id="954b8" class="javax.swing.JButton" binding="selectFileModel">
                 <constraints>
-                  <grid row="15" column="8" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                  <grid row="15" column="6" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="17" height="30"/>
                     <maximum-size width="30" height="-1"/>
                   </grid>
@@ -720,8 +682,8 @@
               </component>
               <component id="d0655" class="javax.swing.JButton" binding="modelCheckBtn">
                 <constraints>
-                  <grid row="15" column="11" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="15" column="8" row-span="1" col-span="7" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <horizontalTextPosition value="0"/>
@@ -729,15 +691,38 @@
                   <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
+              <component id="8e7a8" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="2" column="6" row-span="1" col-span="8" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="Verbose"/>
+                  <toolTipText value="&lt;html&gt; When checked: keeps the intermediate files on disk ,&lt;br&gt;&#10;else: these files are deleted after the Checker has run.&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
               <component id="ab953" class="javax.swing.JCheckBox" binding="zipOutputCheckBox" default-binding="true">
                 <constraints>
-                  <grid row="4" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="14" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <selected value="false"/>
                   <text value="Zip Output"/>
                   <toolTipText value="&lt;html&gt;&#10;When checked: Zips large files to conserve diskspace&lt;BR&gt;&#10;Applies only to Model JSON files and GraphML.XML&lt;BR&gt;&#10;Use-case: Models, but certainly GraphML.XML files can become very large&lt;BR&gt;&#10;&lt;/html&gt;"/>
+                </properties>
+              </component>
+              <component id="bf813" class="javax.swing.JButton" binding="testDbButton">
+                <constraints>
+                  <grid row="2" column="14" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <minimumSize width="90" height="38"/>
+                  <preferredSize width="90" height="38"/>
+                  <text value="Show DB "/>
+                  <toolTipText value="Exports the inventory of models in the Graph database to a file."/>
                 </properties>
               </component>
             </children>

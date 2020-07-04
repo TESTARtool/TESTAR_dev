@@ -208,6 +208,11 @@ public class PropositionSelector {
         defie.add(new PairBean<>(InferrableExpression.width_lt, "250"));
         defie.add(new PairBean<>(InferrableExpression.width_lt, "500"));
         defie.add(new PairBean<>(InferrableExpression.width_lt, "1000"));
+        defie.add(new PairBean<>(InferrableExpression.anchorx_lt, "50"));
+        defie.add(new PairBean<>(InferrableExpression.anchorx_lt, "500"));
+        defie.add(new PairBean<>(InferrableExpression.anchory_lt, "50"));
+        defie.add(new PairBean<>(InferrableExpression.anchory_lt, "500"));
+
         defie.add(new PairBean<>(InferrableExpression.textlength_eq, "1"));
         defie.add(new PairBean<>(InferrableExpression.textlength_eq, "2"));
         defie.add(new PairBean<>(InferrableExpression.textlength_eq, "3"));
@@ -330,9 +335,16 @@ public class PropositionSelector {
                             int width = (int) Double.parseDouble(test);
                             test = value.split("h:")[1].split("]")[0];
                             int heigth = (int) Double.parseDouble(test);
+                            test = value.split("x:")[1].split(" ")[0];
+                            int posx = (int) Double.parseDouble(test);
+                            test = value.split("y:")[1].split(" ")[0];
+                            int posy = (int) Double.parseDouble(test);
 
                             if (((iap.left() == InferrableExpression.width_lt) && (width < Integer.parseInt(iap.right()))) ||
-                                    ((iap.left() == InferrableExpression.heigth_lt) && (heigth < Integer.parseInt(iap.right())))
+                                    ((iap.left() == InferrableExpression.heigth_lt) && (heigth < Integer.parseInt(iap.right())))||
+                                    ((iap.left() == InferrableExpression.anchorx_lt) && (posx < Integer.parseInt(iap.right())))||
+                                    ((iap.left() == InferrableExpression.anchory_lt) && (posy < Integer.parseInt(iap.right())))
+
                             ) {
                                 apset.add(propositionKey + attrib + "_" + iap.left().name() + "_" + iap.right() );
                             }

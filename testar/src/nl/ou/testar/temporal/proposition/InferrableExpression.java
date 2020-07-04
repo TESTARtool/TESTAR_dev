@@ -7,6 +7,8 @@ public  enum InferrableExpression {
     textmatch("text"),
     heigth_lt("shape"),
     width_lt("shape"),
+    anchorx_lt("shape"),
+    anchory_lt("shape"),
     textlength_eq("text"),
     textlength_lt("text"),
     is_blank("boolean"),

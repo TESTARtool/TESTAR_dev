@@ -91,7 +91,7 @@ public class ModelBean {
                         }
                     }
                 }
-                //mapp once more
+                //map once more
                 for (Tag<?> t : taglist
                 ) {
                     Tag<?> tempTag;

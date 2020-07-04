@@ -7,13 +7,16 @@ import org.fruit.alayer.Tags;
 
 import java.util.*;
 
-@JsonPropertyOrder({  "comments","formatVersion", "propositionSubKeySeparator", "stateFilters", "widgetFilters","transitionFilters" })
+@JsonPropertyOrder({  "comments","formatVersion","propositionKeying",  "propositionSubKeySeparator", "stateFilters", "widgetFilters","transitionFilters" })
 //@JsonPropertyOrder(alphabetic = true)
 public class PropositionManager {
 
     private String formatVersion="20200508";
     private List<String> comments = new ArrayList<>();
-    private List<String> propositionKey = new ArrayList<>();
+
+
+
+    private List<String> propositionKeying = new ArrayList<>();
     private String propositionSubKeySeparator;
     private Set<PropositionFilter> stateFilters;
     private Set<PropositionFilter> transitionFilters;
@@ -32,7 +35,7 @@ public class PropositionManager {
          this(initializeWithDefaults,null);
     }
 
-    public PropositionManager(boolean initializeWithDefaults, List<String> propositionKey) {
+    public PropositionManager(boolean initializeWithDefaults, List<String> propositionKeying) {
         this();
         if (initializeWithDefaults){
             comments.add("This is a Sample APModelManager with  filters: two edge-filters, two wdiget filters, one state-filters.");
@@ -61,10 +64,10 @@ public class PropositionManager {
 
 
 
-            if (propositionKey ==null){
+            if (propositionKeying ==null){
                 setRoleTitlePathAsAPKey();  }
             else{
-                this.propositionKey = propositionKey;}
+                this.propositionKeying = propositionKeying;}
             this.propositionSubKeySeparator = PropositionConstants.SETTING.subKeySeparator;
         }
 
@@ -109,9 +112,16 @@ public class PropositionManager {
     }
 
 
-    public void updateAPKey(List<String> APKey) {
-        this.propositionKey = APKey;
+    //public void updateAPKey(List<String> APKey) {        this.propositionKey = APKey;    }
+
+    public List<String> getPropositionKeying() {
+        return propositionKeying;
     }
+
+    public void setPropositionKeying(List<String> propositionKeying) {
+        this.propositionKeying = propositionKeying;
+    }
+
 
     public List<String> getComments() {
         return comments;
@@ -132,10 +142,10 @@ public class PropositionManager {
 
 
     public void setRoleTitlePathAsAPKey(){
-        propositionKey.clear();
-        propositionKey.add(Tags.Role.name());
-        propositionKey.add(Tags.Title.name());
-        propositionKey.add(Tags.Path.name());
+        propositionKeying.clear();
+        propositionKeying.add(Tags.Role.name());
+        propositionKeying.add(Tags.Title.name());
+        propositionKeying.add(Tags.Path.name());
 
     }
 

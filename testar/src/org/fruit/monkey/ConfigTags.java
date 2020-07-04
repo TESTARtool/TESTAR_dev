@@ -153,6 +153,7 @@ public final class ConfigTags {
   public static final Tag<String> TemporalOracles = Tag.from("TemporalOracles", String.class);
   public static final Tag<String> TemporalPatterns = Tag.from("TemporalPatterns", String.class);
   public static final Tag<String> TemporalPropositionManager = Tag.from("TemporalPropositionManager", String.class);
+
   public static final Tag<String> TemporalPatternConstraints = Tag.from("TemporalPatternConstraints", String.class);
   public static final Tag<String> TemporalModelFile = Tag.from("TemporalModelFile", String.class);
 

@@ -62,7 +62,14 @@ public final class Tags extends TagsBase {
 	 * draw the widget's shape and to determine whether a point lies within the its shape.
 	 * However, a shape of a widget does not tell whether or not this widget is obscured
 	 * by other widgets (use the <code>HitTester</code> Tag instead!) */
-	public static final Tag<Shape> Shape = from("Shape", Shape.class);	
+	public static final Tag<Shape> Shape = from("Shape", Shape.class);
+
+	/**
+	 *  css  Anchor point (top left upper) of the widget. */
+	public static final Tag<Point> Anchor = from("Anchor", Point.class);
+	///**	   css  Anchor point  of the widget, relative to the size of the root widget. */
+	//public static final Tag<Point> AnchorRel = from("AnchorRel", Point.class);
+
 
 	/** Usually attached to widgets. It tells whether this widget this widget is rendered.
 	 * If so, it does not necessarily mean that it is also visible, since it could still
@@ -89,7 +96,12 @@ public final class Tags extends TagsBase {
 	
 	/** the title of a widget (usually visible text, such as on a button) */
 	public static final Tag<String> Title = from("Title", String.class);
-	
+
+	/** css: the title of a widget parent (f.e. if widget is a button then parent is pane or window title) */
+	public static final Tag<String> ParentTitle = from("ParentTitle", String.class);
+
+
+
 	/** ZIndex of a widget (objects with higher values are drawn on top of objects with lower values) */
 	public static final Tag<Double> ZIndex = from("ZIndex", Double.class);
 	
@@ -137,6 +149,7 @@ public final class Tags extends TagsBase {
 	public static final Tag<String> Abstract_R_T_P_ID = from(CodingManager.ABSTRACT_R_T_P_ID, String.class);
 	public static final Tag<String> ConcreteIDCustom = from(CodingManager.CONCRETE_ID_CUSTOM, String.class);
 	public static final Tag<String> AbstractIDCustom = from(CodingManager.ABSTRACT_ID_CUSTOM, String. class);
+
 	
 	@SuppressWarnings("unchecked")
 	public static final Tag<UnFunc<SUT, String>> DynDesc = from("DynDesc", (Class<UnFunc<SUT, String>>)(Class<?>)UnFunc.class);

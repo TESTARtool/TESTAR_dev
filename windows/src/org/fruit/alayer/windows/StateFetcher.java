@@ -37,6 +37,9 @@ package org.fruit.alayer.windows;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Util;
 import org.fruit.alayer.*;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 
 import java.awt.*;
 import java.io.File;
@@ -105,8 +108,25 @@ public class StateFetcher implements Callable<UIAState>{
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
 		// begin by urueda
-		for (Widget w : root)
+		for (Widget w : root){
 			w.set(Tags.Path,Util.indexString(w));
+		// begin css
+			Widget parent=w.parent();
+			if (parent !=null){
+					String parentTitle=parent.get(Tags.Title);
+					if (parentTitle != null) {
+						w.set(Tags.ParentTitle, parentTitle);
+					}
+			}
+			Shape shape = w.get(Tags.Shape);
+			if (shape!=null){
+				Point anchor = Point.from(shape.x(), shape.y());
+				w.set(Tags.Anchor, anchor);
+			}
+		// end css
+
+		}
+
 		if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)
 			system.getNativeAutomationCache().releaseCachedAutomationElements(); // prevent SUT UI not ready due to caching
 		// end by urueda
