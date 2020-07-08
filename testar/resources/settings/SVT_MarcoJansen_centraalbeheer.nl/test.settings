@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.centraalbeheer.nl/verzekeringen/overlijdensrisicoverzekering/premie-berekenen"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
+Sequences = 1
 SequenceLength = 20
 
 #################################################################
@@ -51,7 +51,7 @@ SequenceLength = 20
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[fF]out.*|.*[mM]is [gG]egaan.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*[sS]luiten.*|
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_MarcoJansen_centraalbeheer.nl/Protocol_webdriver_generic
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -194,7 +194,7 @@ ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = ./output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

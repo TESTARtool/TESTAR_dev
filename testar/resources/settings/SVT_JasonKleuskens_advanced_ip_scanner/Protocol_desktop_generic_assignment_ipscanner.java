@@ -1,8 +1,7 @@
-
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,30 +29,46 @@
  *******************************************************************************************************/
 
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.Settings;
-import org.fruit.Util;
-import org.testar.protocols.DesktopProtocol;
-import nl.ou.testar.PrioritizeNewActionsSelector;
-
-import java.util.Random;
 import java.util.Set;
 
-/**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
- *
- * It uses random action selection algorithm.
- */
-public class Protocol_keepass extends DesktopProtocol {
+import nl.ou.testar.ActionSelectionUtils;
+import nl.ou.testar.PrioritizeNewActionsSelector;
+import org.fruit.Util;
+import org.fruit.alayer.*;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.CompoundAction;
+import org.fruit.alayer.actions.KeyDown;
+import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.Type;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.alayer.Tags;
+import es.upv.staq.testar.NativeLinker;
+import org.testar.protocols.DesktopProtocol;
 
-    private PrioritizeNewActionsSelector selector=new PrioritizeNewActionsSelector();
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
+/**
+ * This protocol provides default TESTAR behaviour to test Advanced IP Scanner.
+ *
+ * It uses random action selection algorithm to perform the following actions: right click, left click, type and scroll.
+ */
+public class Protocol_desktop_generic_assignment_ipscanner extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -98,56 +113,29 @@ public class Protocol_keepass extends DesktopProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
+	 	super.beginSequence(system, state);
 
-		Random r = new Random();
-		String randomString = Integer.toString(Math.abs(r.nextInt()));
+		 System.out.println("Start sequence, setting up performing a first call.");
+		 Util.pause(1.0D);
 
-		// Click new database
-		waitAndLeftClickWidgetWithMatchingTag(Tags.Desc, "New database", state, system, 1, 1.0);
+		 state = this.getState(system);
+		 AWTKeyboard kb = AWTKeyboard.build();
 
-        // Continue wizard
-        //waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
-		
-        // Follow the new database wizard.
-        // Matching by tag was broken here, even though the widgets were in the list of widgets with the specific tags used		
-        // Rely on keyboard actions instead
-                
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Database name field", randomString, state, system, 1, 1.0);
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
-		new CompoundAction.Builder()
-	 		.add(new Type(randomString), 1.0) // Assume focus on the name field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs Continue
-			.build()
-			.run(system, state, 1.5);
+		 //10.0.2.1-254, 169.254.0.1-169.254.255.254, 127.0.0.1-254
 
-        Util.pause(1.0);
+		 kb.press(KBKeys.VK_TAB);
+		 Util.pause(0.1D);
+		 new CompoundAction.Builder().add(new Type("10.0.2.1-254"/*, 169.254.0.1-169.254.255.254, 127.0.0.1-254"*/), 0.5D).build().run(system, (State)null, 0.5D);
+		 Util.pause(0.1D);
+		 kb.press(KBKeys.VK_DELETE);
+		 Util.pause(0.5D);
+		 kb.press(KBKeys.VK_ENTER);
+		 Util.pause(0.1D);
+		 kb.press(KBKeys.VK_TAB);
+		 Util.pause(0.1D);
+		 kb.press(KBKeys.VK_TAB);
 
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
-        new CompoundAction.Builder()
-			.add(new KeyDown(KBKeys.VK_ENTER), 1.0) // Assume that pressing enter performs Continue
-			.build()
-			.run(system, state, 1.0);
-
-        Util.pause(1.0);
-         
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Password field", randomString, state, system, 1, 1.0);
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Confirm password field", randomString, state, system, 1, 1.0);
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Done", state, system, 1, 1.0);
-		new CompoundAction.Builder()
-			.add(new Type(randomString), 1.0) // Assume focus on the password field
-			.add(new KeyDown(KBKeys.VK_TAB), 0.5) // Assume that pressing tab switches to next field
-			.add(new Type(randomString), 1.0) // Assume focus on the confirm password field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs Done
-			.build()
-			.run(system, state, 3.0);
-
-        // Windows file save dialog
-        new CompoundAction.Builder()
-	 		.add(new Type(randomString), 1.0) // Assume focus on the file name field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs OK
-			.build()
-			.run(system, state, 1.5);
+		 System.out.println("Start sequence finished, should have made a first call at this point.");
 	}
 
 	/**
@@ -180,7 +168,7 @@ public class Protocol_keepass extends DesktopProtocol {
 		Verdict verdict = super.getVerdict(state);
 
 		//--------------------------------------------------------
-		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE, but aren't necessary for this application.
 		//--------------------------------------------------------
 
 		return verdict;
@@ -199,19 +187,59 @@ public class Protocol_keepass extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-        for(Widget w : state){ 
-            w.set(Tags.Blocked, false);
-        }
-
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		System.out.println("Derived actions, get the super derived actions.");
 		Set<Action> actions = super.deriveActions(system,state);
+		System.out.println("Derived actions, initial number of actions: " + actions.size());
 
+
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+
+		System.out.println("Derived actions, get all left click, type and scroll actions from the top level window.");
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		System.out.println("Derived actions, number of actions: " + actions.size());
+
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+
+		// Look for right click actions on the enabled widgets in the state.
+		System.out.println("Derived actions, add all right click actions from the top level window.");
+		for (Widget widget : getTopWidgets(state)) {
+			// only consider enabled and non-tabu widgets
+			if (!widget.get(Enabled, true) || blackListed(widget)) {
+				continue;
+			}
+			if (isRightClickable(widget)) {
+				actions.add(ac.rightClickAt(widget));
+			}
+		}
+		System.out.println("Derived actions, number of actions: " + actions.size());
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			System.out.println("Derived actions = No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+			System.out.println("Derived actions, number of actions: " + actions.size());
+		}
 
 		//return the set of derived actions
 		return actions;
+	}
+
+	protected boolean isRightClickable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if(widget.get(Tags.Role).toString().contains("UIATreeItem") || widget.get(Tags.Role).toString().contains("UIAButton"))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -225,7 +253,13 @@ public class Protocol_keepass extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+		Action ac = this.preSelectAction(state, actions);
+
+        if (ac == null) {
+            System.out.println("State model based action selection did not find an action. Using default action selection.");
+			return(super.selectAction(state, actions));
+        }
+        return ac;
 	}
 
 	/**

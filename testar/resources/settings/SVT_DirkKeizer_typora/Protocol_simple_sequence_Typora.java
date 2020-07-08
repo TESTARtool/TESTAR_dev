@@ -63,6 +63,8 @@ public class Protocol_simple_sequence_Typora extends DesktopProtocol {
         Widget widget = getWidgetWithMatchingTag(Tags.Title, "Paragraph", state);
         StdActionCompiler ac = new AnnotatingActionCompiler();
         executeAction(system, state, ac.leftClickAt(widget));
+        System.out.println(widget.childCount());
+        System.out.println("DEBUG" + widget.get(Tags.Title).toString());
         for (int i = 0; i < widget.childCount(); i++) {
             System.out.println("Found in dialog: " + widget.child(i).get(Tags.Title).toString());
             if (widget.child(i).get(Tags.Title).toString().contains("1")) {
@@ -70,6 +72,7 @@ public class Protocol_simple_sequence_Typora extends DesktopProtocol {
                 break;
             }
         }
+
         
         // Type in the document and hit enter.
         waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Role, "UIACustomControl", "TESTAR" + System.currentTimeMillis(), state, system, 5, 1.0);

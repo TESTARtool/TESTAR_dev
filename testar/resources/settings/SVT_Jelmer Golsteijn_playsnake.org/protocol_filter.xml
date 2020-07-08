@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<TESTAR_uifilter version="1.0.20170515">
+	<coding_types>
+		<coding type="Abs(R)ID" desc="ROLE property"/>
+		<coding type="Abs(R,T)ID" desc="ROLE and TITLE properties"/>
+		<coding type="Abs(R,T,P)ID" desc="ROLE, TITLE and PATH properties"/>
+	</coding_types>
+	<filtering_types>
+		<filtering type="-2147483648" desc="TABU LIST"/>
+		<filtering type="-2147483647" desc="WHITE LIST"/>
+		<filtering type="-427" desc="ANY"/>
+		<filtering type="-1" desc="PRIMITIVE_TEXT"/>
+		<filtering type="-2" desc="PRIMITIVE_NUMBER"/>
+		<filtering type="-13451473" desc="BASIC_DATE"/>
+		<filtering type="-1345133417" desc="BASIC_EMAIL"/>
+		<filtering type="-134513313" desc="BASIC_WEBURL"/>
+	</filtering_types>
+	<filters>
+		<filter wid="WT1gjqpmud2189653581" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="635901851" p.title="2102175080" depth="5" children="0"/>
+		<filter wid="STn2pqpw5e34270388063" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WTjkaz1t1d383750779" filtering="-2147483647" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="492262524" p.title="0" depth="5" children="1"/>
+		<filter wid="WTqfrfc5281113427169" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="-802859679" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="WT1qtft87194206032826" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIATabControl" title="-86622466" p.title="555646832" depth="6" children="0"/>
+		<filter wid="WT4n7cc573858452088" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAWindow" title="1668" p.title="-83404148" depth="2" children="1"/>
+		<filter wid="STdhsveu53f1863012149" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="509136561" p.title="509136561" depth="0" children="1"/>
+		<filter wid="WT170mmj93f7940736546" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-1098415314" p.title="2074303433" depth="7" children="1"/>
+		<filter wid="ST1ggwvdr5e23418892881" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WTebzcp5272448475125" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="-1944229995" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="WT1uc9xtle2738771025" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAWindow" title="-41211548" p.title="-1363087058" depth="2" children="0"/>
+		<filter wid="ST1ky8p1y53f1984104234" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="-1257436547" p.title="-1257436547" depth="0" children="1"/>
+		<filter wid="WTha6gku112658377246" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenuBar" title="-1992437605" p.title="-1992437605" depth="3" children="0"/>
+		<filter wid="WT1qa7n2y4e1461250578" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAWindow" p.role="Process" title="-83404148" p.title="-1257436547" depth="1" children="8"/>
+		<filter wid="WT119bd8lb855787321" filtering="-2147483647" coding="Abs(R,T)ID" role="UIAText" p.role="UIAPane" title="185204561" p.title="578035367" depth="7" children="0"/>
+		<filter wid="WT1h6ibpb92248851252" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAPane" title="2102175080" p.title="2102175080" depth="9" children="5"/>
+		<filter wid="WTgyv1ev113821950002" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="1912523443" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="WT1ulocpoe1522863074" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="-2087810053" p.title="1402220646" depth="5" children="0"/>
+		<filter wid="WT3636lk24288135689" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAEdit" p.role="UIAPane" title="288972081" p.title="-546690004" depth="4" children="0"/>
+		<filter wid="WT1100q3he463178938" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAEdit" p.role="UIAPane" title="-1702038972" p.title="2102175080" depth="5" children="0"/>
+		<filter wid="WTvcm9b8112421104252" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAWindow" title="-252476388" p.title="-1363087058" depth="2" children="0"/>
+		<filter wid="WT1m5jrlh1a2133075574" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="-1605806334" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="WTf2se2u20175706558" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="-1001571965" p.title="122599661" depth="5" children="0"/>
+		<filter wid="ST1lxlw0e540757155924" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="509136561" p.title="509136561" depth="0" children="1"/>
+		<filter wid="SToyu5ot5ce3924431576" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WT1r2t0mma3739785473" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAToolBar" p.role="UIAPane" title="2102175080" p.title="2102175080" depth="4" children="2"/>
+		<filter wid="WT1tgcoe82947356654" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAImage" p.role="UIAHyperLink" title="48" p.title="48" depth="10" children="0"/>
+		<filter wid="WT5vx9oa161950937622" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAToolBar" p.role="UIAPane" title="1145374487" p.title="-546690004" depth="4" children="2"/>
+		<filter wid="WTg8oi3x261881635216" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="1501738313" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="ST1v64pvh5e31302567999" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WT1mr00a03f63010144533" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-2096981042" p.title="340758070" depth="7" children="1"/>
+		<filter wid="WTuz35n9183983173881" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="824454848" p.title="1145374487" depth="5" children="0"/>
+		<filter wid="WT1gjuu66d2661006250" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="479032861" p.title="1402220646" depth="5" children="0"/>
+		<filter wid="WT1mkdgew40c4262542645" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="450493871" p.title="-317383239" depth="7" children="1"/>
+		<filter wid="WT1caur2t122373727941" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAToolBar" title="-1702038972" p.title="-1289271641" depth="5" children="0"/>
+		<filter wid="WT1siiqsc1b682456423" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIATabItem" title="-641253930" p.title="-278270370" depth="7" children="0"/>
+		<filter wid="WTi4pvr61d1299858342" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAHyperLink" p.role="UIAPane" title="-498948215" p.title="340758070" depth="7" children="1"/>
+		<filter wid="WT119dzcdb296882670" filtering="-2147483647" coding="Abs(R,T)ID" role="UIAText" p.role="UIAPane" title="2085678563" p.title="340758070" depth="7" children="0"/>
+		<filter wid="WTmtfz6l183361543213" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAEdit" p.role="UIAPane" title="-908076797" p.title="1217252753" depth="4" children="0"/>
+		<filter wid="WT16sth3j102102970308" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAWindow" title="-923564372" p.title="-1363087058" depth="2" children="0"/>
+		<filter wid="WT4vonlid1929251143" filtering="-2147483647" coding="Abs(R,T)ID" role="UIAText" p.role="UIAPane" title="-1681493742" p.title="340758070" depth="7" children="0"/>
+		<filter wid="WT1kd01n6122872925503" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-546690004" p.title="2102175080" depth="3" children="4"/>
+		<filter wid="ST5q11lp52c1258738823" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="509136561" p.title="509136561" depth="0" children="1"/>
+		<filter wid="WTum6vfv3ed1467536014" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-1275048910" p.title="-317383239" depth="7" children="1"/>
+		<filter wid="WTphkxx2153228836851" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="393371261" p.title="1145374487" depth="5" children="0"/>
+		<filter wid="WT1ypw4a14173333140" filtering="-2147483648" coding="Abs(R,T)ID" role="UIATabControl" p.role="UIAPane" title="1282404074" p.title="2102175080" depth="5" children="2"/>
+		<filter wid="WT1175njz3d8658347585" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="1820668211" p.title="2074303433" depth="7" children="1"/>
+		<filter wid="ST135bbgy5e22354701878" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WTqxxf61133164154079" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="847029709" p.title="1402220646" depth="5" children="0"/>
+		<filter wid="WTd16zgx3b1150649902" filtering="-2147483648" coding="Abs(R,T)ID" role="UIATabItem" p.role="UIATabControl" title="-278270370" p.title="555646832" depth="6" children="1"/>
+		<filter wid="STmxczu75a8155134003" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="1244403034" p.title="1244403034" depth="0" children="1"/>
+		<filter wid="WT1llcule4c1427349480" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-83404148" p.title="1668" depth="3" children="1"/>
+		<filter wid="WT1ydikpi102397553189" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuBar" p.role="UIAWindow" title="-1992437605" p.title="-1386079982" depth="2" children="1"/>
+		<filter wid="WThd43ag3d74177089393" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="-394155913" p.title="340758070" depth="7" children="1"/>
+		<filter wid="WTdg88au10488556477" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIAToolBar" title="888954478" p.title="2102175080" depth="5" children="0"/>
+		<filter wid="ST1as73fx53f3261946930" filtering="-2147483648" coding="Abs(R,T)ID" role="Process" p.role="null" title="-1257436547" p.title="-1257436547" depth="0" children="1"/>
+		<filter wid="WT1sm4y351f1214179791" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAToolBar" p.role="UIAPane" title="-1289271641" p.title="1217252753" depth="4" children="3"/>
+		<filter wid="WTfifc2l222866486180" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAToolBar" p.role="UIAPane" title="1402220646" p.title="2102175080" depth="4" children="4"/>
+		<filter wid="WTfzctqo114133458362" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAPane" p.role="UIAPane" title="1217252753" p.title="2102175080" depth="3" children="2"/>
+		<filter wid="WT1ca707tc1438424989" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAHyperLink" p.role="UIAPane" title="1668" p.title="1668" depth="9" children="1"/>
+		<filter wid="WT1ydt7bh19319317617" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAImage" p.role="UIAHyperLink" title="-498948215" p.title="-498948215" depth="8" children="1"/>
+	</filters>
+</TESTAR_uifilter>

@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = "C:\\Program Files (x86)\\XML Notepad 2007\\XmlNotepad.exe"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
+Sequences = 4
 SequenceLength = 20
 
 #################################################################
@@ -51,7 +51,7 @@ SequenceLength = 20
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -64,7 +64,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = 
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_StevenCharpentier_XmlNotepad/Protocol_xml_notepad
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,8 +126,8 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = 
-ApplicationVersion = 
+ApplicationName = xml notepad
+ApplicationVersion = 2.5.2798.17141
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 
@@ -181,7 +181,7 @@ ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
+StartupTime = 10.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true
@@ -194,7 +194,7 @@ ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-27_11h01m08s_xml notepad_2.5.2798.17141\\sequences\\2020-06-27_11h01m08s_xml notepad_2.5.2798.17141_sequence_1.testar
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

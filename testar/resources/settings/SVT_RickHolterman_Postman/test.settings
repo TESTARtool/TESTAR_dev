@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = C:\\Users\\Rick\\AppData\\Local\\Postman\\app-7.27.1\\Postman.exe
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 20
+Sequences = 2
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -64,7 +64,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Process Logs
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*Sluiten.*|.*Minimaliseren.*|.*Maximaliseren.*|.*File.*|.*Edit.*|.*View.*|.*Help.*|.*Systeem*.
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_RickHolterman_Postman/Protocol_desktop_generic_pure_random
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -160,7 +160,7 @@ OverrideWebDriverDisplayScale =
 TypingTextsForExecutedAction = 10
 Discount = 0.95
 TempDir = ./output/temp
-MaxTime = 3.1536E7
+MaxTime = 200.0
 StopGenerationOnFault = true
 ExecuteActions = true
 DrawWidgetTree = false
@@ -181,7 +181,7 @@ ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
+StartupTime = 20.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true
@@ -193,8 +193,8 @@ ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
-AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+AlwaysCompile = false
+PathToReplaySequence = C:\\Users\\Rick\\Desktop\\bin\\output\\2020-06-27_14h04m08s_Postman\\sequences_unexpectedclose\\2020-06-27_14h05m15s_Postman_sequence_3.testar
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

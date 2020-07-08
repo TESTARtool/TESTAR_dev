@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = C:\\Program Files (x86)\\Advanced IP Scanner\\advanced_ip_scanner.exe
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
+Sequences = 10
 SequenceLength = 20
 
 #################################################################
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*F4*.
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_JasonKleuskens_advanced_ip_scanner/Protocol_desktop_generic_assignment_ipscanner
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,8 +126,8 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = 
-ApplicationVersion = 
+ApplicationName = Advanced IP Scanner
+ApplicationVersion = 2.5.3850
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 
@@ -160,7 +160,7 @@ OverrideWebDriverDisplayScale =
 TypingTextsForExecutedAction = 10
 Discount = 0.95
 TempDir = ./output/temp
-MaxTime = 3.1536E7
+MaxTime = 3600.0
 StopGenerationOnFault = true
 ExecuteActions = true
 DrawWidgetTree = false
@@ -172,16 +172,16 @@ DrawWidgetInfo = false
 MaxReward = 9999999.0
 LogLevel = 1
 VisualizeSelectedAction = true
-Delete = 
+Delete = C:\\Users\\testar\\advanced_ip_scanner_Aliases.bin;C:\\Users\\testar\\advanced_ip_scanner_Comments.bin;C:\\Users\\testar\\advanced_ip_scanner_MAC.bin
 MyClassPath = ./settings
 ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
+ProcessesToKillDuringTest = MicrosoftEdge.exe
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
+StartupTime = 8.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true
@@ -191,10 +191,10 @@ TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 1.0
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-28_12h33m50s_advanced_ip_scanner\\HTMLreports\\2020-06-28_12h40m58s_advanced_ip_scanner_sequence_7.html
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

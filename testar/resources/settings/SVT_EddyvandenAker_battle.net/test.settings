@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://eu.battle.net/login/en-us/"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
+Sequences = 1
 SequenceLength = 20
 
 #################################################################
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*[cC]lose.*|.*[nN]ew [tT]ab.*
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_EddyvandenAker_battle.net/Protocol_web_battlenet
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,7 +126,7 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = 
+ApplicationName = battlenet
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -181,7 +181,7 @@ ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
+StartupTime = 10.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true
@@ -194,7 +194,7 @@ ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = ./output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

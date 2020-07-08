@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://thepieslicer.com/login"
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://thepieslicer.com/login"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 20
+Sequences = 2
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -64,7 +64,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs
@@ -74,7 +74,7 @@ SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #
 # Allow TESTAR to store execution logs coming from the processes.
 # You can use the regular expression ProcessLogs below to filter
-# the logs. Use .*.* if you want to store all the outputs of the 
+# the logs. Use .*.* if you want to store all the outputs of the
 # process.
 #################################################################
 
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*Nieuw tabblad.*|.*[eE]mail.*
+ClickFilter = .*[sS]ave.*|.*[fF]ormat.*|.*[pP]rint.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*Forgot password?.*|.*rememberme.*|.*Home.*|.*User Guide.*|.*Contact Support.*|.*Log Out.*|.*Privacy Policy.*|.*Terms of Service.*|.*Credits.*
 
 #################################################################
 # Processfilter
@@ -96,7 +96,7 @@ ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]ri
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = 
+SUTProcesses =
 
 #################################################################
 # Protocolclass
@@ -104,30 +104,30 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_JorgosKorres_thepieslicer.com/Protocol_web_one_drive
+ProtocolClass = SVT_JorgosKorres_thepieslicer.com/Protocol_web_one_drive_jorgos
 
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl = 
-GraphDBUser = 
-GraphDBPassword = 
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
 
 #################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = false
-DataStore = 
+DataStore =
 DataStoreType = remote
-DataStoreServer = 
-DataStoreDirectory = 
-DataStoreDB = 
-DataStoreUser = 
-DataStorePassword = 
+DataStoreServer =
+DataStoreDirectory =
+DataStoreDB =
+DataStoreUser =
+DataStorePassword =
 DataStoreMode = none
-ApplicationName = 
-ApplicationVersion = 
+ApplicationName =
+ApplicationVersion =
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 
@@ -152,12 +152,13 @@ AbstractStateAttributes = WidgetControlType
 # Values should be provided as doubles (1.5).
 #################################################################
 
-OverrideWebDriverDisplayScale = 
+OverrideWebDriverDisplayScale =
 
 #################################################################
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
+|.*Don't = have an account? Sign Up.*|.*rememberme.*
 Discount = 0.95
 TempDir = ./output/temp
 MaxTime = 3.1536E7
@@ -172,16 +173,16 @@ DrawWidgetInfo = false
 MaxReward = 9999999.0
 LogLevel = 1
 VisualizeSelectedAction = true
-Delete = 
+Delete =
 MyClassPath = ./settings
 ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
+ProcessesToKillDuringTest =
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 10.0
+StartupTime = 2.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true

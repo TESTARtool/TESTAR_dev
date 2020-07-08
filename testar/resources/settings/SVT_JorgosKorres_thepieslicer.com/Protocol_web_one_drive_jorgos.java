@@ -1,7 +1,6 @@
-/***************************************************************************************************
- *
+/**
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,66 +25,101 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
-
-
-import java.util.Set;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.AWTKeyboard;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Keyboard;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.alayer.Tags;
-import es.upv.staq.testar.NativeLinker;
-import org.testar.protocols.DesktopProtocol;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Enabled;
-
-/**
- * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
  *
- * It also gives examples how to automate setting a username and password into a login screen.
  */
-public class Protocol_web_one_drive_jorgos extends DesktopProtocol {
 
-	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-	static final int BROWSER_IEXPLORER = 1;
-	static final int BROWSER_FIREFOX = 2;
-	static int browser; // BROWSER_*
-	static Role webController, webText; // browser dependent
-	static double browser_toolbar_filter;	
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import org.fruit.Pair;
+import org.fruit.alayer.*;
+import org.fruit.alayer.actions.*;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.webdriver.*;
+import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+import org.testar.protocols.WebdriverProtocol;
 
-	// check browser
-	private void initBrowser(){
-		browser = 0;
-		webController = NativeLinker.getNativeRole("UIADataItem"); // just init with some value
-		webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
-		String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-		if (sutPath.contains("iexplore.exe")){
-			browser = BROWSER_IEXPLORER;
-			webController = NativeLinker.getNativeRole("UIACustomControl");
-			webText = NativeLinker.getNativeRole("UIAEdit");
-		} else if (sutPath.contains("firefox")){
-			browser = BROWSER_FIREFOX;
-			webController = NativeLinker.getNativeRole("UIADataItem");
-			webText = NativeLinker.getNativeRole("UIAText");
-		}
+import java.util.*;
+
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
+import static org.fruit.alayer.webdriver.Constants.scrollThick;
+
+
+public class Protocol_web_one_drive_jorgos extends WebdriverProtocol {
+	// Classes that are deemed clickable by the web framework
+	private static List<String> clickableClasses = Arrays.asList(
+			"v-menubar-menuitem", "v-menubar-menuitem-caption");
+
+	// Disallow links and pages with these extensions
+	// Set to null to ignore this feature
+	private static List<String> deniedExtensions = Arrays.asList(
+			"pdf", "jpg", "png");
+
+	// Define a whitelist of allowed domains for links and pages
+	// An empty list will be filled with the domain from the sut connector
+	// Set to null to ignore this feature
+	private static List<String> domainsAllowed = null;
+
+	// If true, follow links opened in new tabs
+	// If false, stay with the original (ignore links opened in new tabs)
+	private static boolean followLinks = true;
+
+	// URL + form name, username input id + value, password input id + value
+	// Set login to null to disable this feature
+	private static Pair<String, String> login = null; //Pair.from(
+	//    "https://thepieslicer.com/login", "PieClicer");
+	private static Pair<String, String> username = Pair.from("username", "testarjorgoskorres@gmail.com");
+	private static Pair<String, String> password = Pair.from("password", "0neDrivetestar");
+
+	// List of atributes to identify and close policy popups
+	// Set to null to disable this feature
+	private static Map<String, String> policyAttributes =
+			new HashMap<String, String>() {{
+				put("class", "lfr-btn-label");
+			}};
+
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 *
+	 * @param settings the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		NativeLinker.addWdDriverOS();
+		super.initialize(settings);
+		ensureDomainsAllowed();
+
+		// Propagate followLinks setting
+		WdDriver.followLinks = followLinks;
+
+		WdDriver.fullScreen = true;
+
+		// Override ProtocolUtil to allow WebDriver screenshots
+		protocolUtil = new WdProtocolUtil();
+	}
+
+	/**
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 * out what executable to run)
+	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuratio files etc.)
+	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 * seconds until they have finished loading)
+	 *
+	 * @return a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException {
+		return super.startSystem();
 	}
 
 	/**
@@ -94,234 +128,55 @@ public class Protocol_web_one_drive_jorgos extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
-	protected void beginSequence(SUT system, State state){
-
+	@Override
+	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 
-		Keyboard kb = AWTKeyboard.build();
+		// login sequence
 
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"email", "testarjorgoskorres@gmail.com", state, system, 5,1.0);
 
-       
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "0neDrivetestar", state, system, 5,1.0);
 
-        /**
-		 * START Option 1: 
-		 * read the widgets of the current state and execute action based on them
-		 */
-		/*state = getState(system);
-
-		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Email")) {
-				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "testarjorgoskorres", true);
-				executeAction(system, state, a);
-
-				//Based on ENG Keyboard, Shift + 2 typing arroba character
-				kb.press(KBKeys.VK_SHIFT);
-				kb.press(KBKeys.VK_2);
-				kb.release(KBKeys.VK_2);
-				kb.release(KBKeys.VK_SHIFT);
-
-				executeAction(system, state, ac.clickTypeInto(w, "gmail.com", false));
-
-			}
-		}
-
-        //Wait a bit
-		Util.pause(5);
-
-		//Update state
-		state = getState(system);
-
-		
-
-		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Password")) {
-				Role role = w.get(Tags.Role, Roles.Widget);
-				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAEdit")})) {
-					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(system, state, ac.clickTypeInto(w, "0neDrivetestar", true));
-				}
-			}
-		}
-
-		for(Widget w :state) {
-			if(w.get(Tags.Title,"").contains("Sign in to your account")) {
-				Role role = w.get(Tags.Role, Roles.Widget);
-				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
-					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(system, state, ac.leftClickAt(w));
-				}
-			}
-		}
-
-		//Wait a bit
-		Util.pause(2);*/
-
-		/**
-		 * END Option 1
-		 */
-
-        /**
-    	 * START Option 2:
-		 *  Work doing keyboard actions, without check the state and widgets
-		 */
-		new CompoundAction.Builder()   
-		.add(new Type("testarjorgoskorres"),0.5).build() //assume keyboard focus is on the user field   
-		.run(system, null, 0.5);
-
-		kb.press(KBKeys.VK_SHIFT);
-		kb.press(KBKeys.VK_2);
-		kb.release(KBKeys.VK_2);
-		kb.release(KBKeys.VK_SHIFT);
-
-		new CompoundAction.Builder()  
-		.add(new Type("gmail.com"),0.5)
-		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
-		.run(system, null, 1);
-
-		Util.pause(8);
-
-		new CompoundAction.Builder()
-		.add(new Type("0neDrivetestar"),0.5)   
-		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
-		.run(system, null, 1);
-
-		//Wait a bit
-		Util.pause(5);
-
-		/**
-		 * END Option 2
-		 */
-		
-		/**
-		 * START Option 3: 
-		 * Use TESTAR internal methods to find the desired widget Tag with the Value and execute actions like click or type
-		 */
-		
-		/*if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Email", "testarjorgoskorres@gmail.com", state, system, 5, 1)) {
-			System.out.println("Typing email credentials was sucessfull.");
-		}
-		
-		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Next", state, system, 5, 1)){
-	 		System.out.println("Left click on Next button was successful.");
-		}
-		
-		Util.pause(5);
-		
-		if (waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Password", "0neDrivetestar", state, system, 5, 1)) {
-			System.out.println("Typing password credentials was sucessfull.");
-		}
-		
-		if(waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Sign in to your account", state, system, 5, 1)){
-	 		System.out.println("Left click on Sign in button was successful.");
-		}
-		
-		Util.pause(2);*/
-		
-		/**
-		 * END Option 3
-		 */
-
-		
-		
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebTextContext, "Sign in to your account", state, system, 5, 1.0);
 
 	}
 
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
-	 * @return  the current state of the SUT with attached oracle.
+	 *
+	 * @return the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
-
+	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
-		for(Widget w : state){
-			Role role = w.get(Tags.Role, Roles.Widget);
-			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
-				browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
-		}
-
 		return state;
-
 	}
 
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
+	 *
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 
-		Verdict verdict = super.getVerdict(state);
+		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
 		//-----------------------------------------------------------------------------
 
-		Role role;
-		String title;
-		Shape shape;
+		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		// search all widgets for suspicious titles
-		for(Widget w : state){
-
-			role = w.get(Tags.Role, null);
-			title = w.get(Title, "");
-			shape = w.get(Tags.Shape, null);
-
-			// Check that all images have an alternate textual description (accessibility, W3C WAI)
-			verdict = verdict.join(getW3CWAIVerdict(state, w, role, title));				
-
-			// check for too small texts to be legible
-			verdict = verdict.join(getSmallTextVerdict(state, w, role, shape));
-
-			// check for scrollable UI elements whether their size is enough for usability
-			verdict = verdict.join(getScrollsUsabilityVerdict(state, w, shape));
-
-		}
-
-		return verdict;		
-
-	}
-
-	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title){
-		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty())
-			return new Verdict(Verdict.SEVERITY_WARNING, "Not all images have an alternate textual description",
-					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
-		else
-			return Verdict.OK;
-	}
-
-	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape){
-		final int MINIMUM_FONT_SIZE = 8; // px
-		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
-			return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
-					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
-		else
-			return Verdict.OK;	
-	}
-
-	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
-		final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
-		try {
-			if (NativeLinker.getNativeBooleanProperty(w, "UIAIsScrollPatternAvailable")){
-				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
-					return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
-				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
-					return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
-			}
-		} catch (NoSuchTagException nste) { return Verdict.OK; }
-		return Verdict.OK;
+		return verdict;
 	}
 
 	/**
@@ -330,108 +185,383 @@ public class Protocol_web_one_drive_jorgos extends DesktopProtocol {
 	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
 	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
 	 * will stop generation of the current action and continue with the next one.
+	 *
 	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
+	 * @param state  the SUT's current state
+	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state)
+			throws ActionBuildException {
+		// Kill unwanted processes, force SUT to foreground
+		Set<Action> actions = super.deriveActions(system, state);
 
-		Set<Action> actions = super.deriveActions(system,state);
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
-
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
+		// create an action compiler, which helps us create actions
+		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		//----------------------
-		// BUILD CUSTOM ACTIONS
-		//----------------------		
+		// Check if forced actions are needed to stay within allowed domains
+		Set<Action> forcedActions = detectForcedActions(state, ac);
+		if (forcedActions != null && forcedActions.size() > 0) {
+			return forcedActions;
+		}
 
 		// iterate through all widgets
-		for(Widget w : state){
-
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
-
-					// create left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
-
-					// create double left click
-					if(whiteListed(w) || isDoubleClickable(w)){
-						if(browser == BROWSER_FIREFOX)
-							actions.add(ac.leftDoubleClickAt(w));
-						else if (browser == BROWSER_IEXPLORER)
-							actions.add(ac.dropDownAt(w));
-					}
-
-					// type into text boxes
-					if(isTypeable(w)){
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-
-					// slides
-					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w,state);
-
-				}
-
+		for (Widget widget : state) {
+			// only consider enabled and non-tabu widgets
+			if (!widget.get(Enabled, true) || blackListed(widget)) {
+				continue;
 			}
 
+			// slides can happen, even though the widget might be blocked
+			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+
+			// If the element is blocked, Testar can't click on or type in the widget
+			if (widget.get(Blocked, false)) {
+				continue;
+			}
+
+			// type into text boxes
+			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+			}
+
+			// left clicks, but ignore links outside domain
+			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+				if (!isLinkDenied(widget)) {
+					actions.add(ac.leftClickAt(widget));
+				}
+			}
 		}
 
 		return actions;
 	}
 
-	private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
+	/*
+	 * Check the state if we need to force an action
+	 */
+	private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
+		Set<Action> actions = detectForcedDeniedUrl();
+		if (actions != null && actions.size() > 0) {
+			return actions;
+		}
 
-	@Override
-	protected boolean isClickable(Widget w){		
-		if (!isAtBrowserCanvas(w))
-			return false;	
+		actions = detectForcedLogin(state);
+		if (actions != null && actions.size() > 0) {
+			return actions;
+		}
 
-		String title = w.get(Title, "");
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH)
-			return super.isUnfiltered(w);
-		else
-			return super.isClickable(w);
-	} 	
+		actions = detectForcedPopupClick(state, ac);
+		if (actions != null && actions.size() > 0) {
+			return actions;
+		}
 
-	private boolean isDoubleClickable(Widget w){
-		if (!isAtBrowserCanvas(w))
-			return false;	
+		return null;
+	}
 
-		if (isClickable(w)){
-			Widget wParent = w.parent();
-			if (wParent != null){
-				Role roleP = wParent.get(Tags.Role, null);
-				if (roleP != null && Role.isOneOf(roleP,webController))
-					return isUnfiltered(w);
+	/*
+	 * Detect and perform login if defined
+	 */
+	private Set<Action> detectForcedLogin(State state) {
+		if (login == null || username == null || password == null) {
+			return null;
+		}
+
+		// Check if the current page is a login page
+		String currentUrl = WdDriver.getCurrentUrl();
+		if (currentUrl.startsWith(login.left())) {
+			CompoundAction.Builder builder = new CompoundAction.Builder();
+			// Set username and password
+			for (Widget widget : state) {
+				WdWidget wdWidget = (WdWidget) widget;
+				// Only enabled, visible widgets
+				if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+					continue;
+				}
+
+				if (username.left().equals(wdWidget.getAttribute("id"))) {
+					builder.add(new WdAttributeAction(
+							username.left(), "value", username.right()), 1);
+				}
+				else if (password.left().equals(wdWidget.getAttribute("id"))) {
+					builder.add(new WdAttributeAction(
+							password.left(), "value", password.right()), 1);
+				}
+			}
+			// Submit form, but only if user and pass are filled
+			builder.add(new WdSubmitAction(login.right()), 2);
+			CompoundAction actions = builder.build();
+			if (actions.getActions().size() >= 3) {
+				return new HashSet<>(Collections.singletonList(actions));
 			}
 		}
 
-		return false;
-	}	
+		return null;
+	}
+
+	/*
+	 * Force closing of Policies Popup
+	 */
+	private Set<Action> detectForcedPopupClick(State state,
+											   StdActionCompiler ac) {
+		if (policyAttributes == null || policyAttributes.size() == 0) {
+			return null;
+		}
+
+		for (Widget widget : state) {
+			// Only enabled, visible widgets
+			if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+				continue;
+			}
+
+			WdElement element = ((WdWidget) widget).element;
+			boolean isPopup = true;
+			for (Map.Entry<String, String> entry : policyAttributes.entrySet()) {
+				String attribute = element.attributeMap.get(entry.getKey());
+				isPopup &= entry.getValue().equals(attribute);
+			}
+			if (isPopup) {
+				return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));
+			}
+		}
+
+		return null;
+	}
+
+	/*
+	 * Force back action due to disallowed domain or extension
+	 */
+	private Set<Action> detectForcedDeniedUrl() {
+		String currentUrl = WdDriver.getCurrentUrl();
+
+		// Don't get caught in PDFs etc. and non-whitelisted domains
+		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
+			// If opened in new tab, close it
+			if (WdDriver.getWindowHandles().size() > 1) {
+				return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
+			}
+			// Single tab, go back to previous page
+			else {
+				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+			}
+		}
+
+		return null;
+	}
+
+	/*
+	 * Check if the current address has a denied extension (PDF etc.)
+	 */
+	private boolean isExtensionDenied(String currentUrl) {
+		// If the current page doesn't have an extension, always allow
+		if (!currentUrl.contains(".")) {
+			return false;
+		}
+
+		if (deniedExtensions == null || deniedExtensions.size() == 0) {
+			return false;
+		}
+
+		// Deny if the extension is in the list
+		String ext = currentUrl.substring(currentUrl.lastIndexOf(".") + 1);
+		ext = ext.replace("/", "").toLowerCase();
+		return deniedExtensions.contains(ext);
+	}
+
+	/*
+	 * Check if the URL is denied
+	 */
+	private boolean isUrlDenied(String currentUrl) {
+		if (currentUrl.startsWith("mailto:")) {
+			return true;
+		}
+
+		// Always allow local file
+		if (currentUrl.startsWith("file:///")) {
+			return false;
+		}
+
+		// User wants to allow all
+		if (domainsAllowed == null) {
+			return false;
+		}
+
+		// Only allow pre-approved domains
+		String domain = getDomain(currentUrl);
+		return !domainsAllowed.contains(domain);
+	}
+
+	/*
+	 * Check if the widget has a denied URL as hyperlink
+	 */
+	private boolean isLinkDenied(Widget widget) {
+		String linkUrl = widget.get(Tags.ValuePattern, "");
+
+		// Not a link or local file, allow
+		if (linkUrl == null || linkUrl.startsWith("file:///")) {
+			return false;
+		}
+
+		// Deny the link based on extension
+		if (isExtensionDenied(linkUrl)) {
+			return true;
+		}
+
+		// Mail link, deny
+		if (linkUrl.startsWith("mailto:")) {
+			return true;
+		}
+
+		// Not a web link (or link to the same domain), allow
+		if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("http://"))) {
+			return false;
+		}
+
+		// User wants to allow all
+		if (domainsAllowed == null) {
+			return false;
+		}
+
+		// Only allow pre-approved domains if
+		String domain = getDomain(linkUrl);
+		return !domainsAllowed.contains(domain);
+	}
+
+	/*
+	 * Get the domain from a full URL
+	 */
+	private String getDomain(String url) {
+		if (url == null) {
+			return null;
+		}
+
+		// When serving from file, 'domain' is filesystem
+		if (url.startsWith("file://")) {
+			return "file://";
+		}
+
+		url = url.replace("https://", "").replace("http://", "").replace("file://", "");
+		return (url.split("/")[0]).split("\\?")[0];
+	}
+
+	/*
+	 * If domainsAllowed not set, allow the domain from the SUT Connector
+	 */
+	private void ensureDomainsAllowed() {
+		// Not required or already defined
+		if (domainsAllowed == null || domainsAllowed.size() > 0) {
+			return;
+		}
+
+		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+		String url = parts[parts.length - 1].replace("\"", "");
+		domainsAllowed = Arrays.asList(getDomain(url));
+	}
+
+	/*
+	 * We need to check if click position is within the canvas
+	 */
+	private boolean isAtBrowserCanvas(Widget widget) {
+		Shape shape = widget.get(Tags.Shape, null);
+		if (shape == null) {
+			return false;
+		}
+
+		// Widget must be completely visible on viewport for screenshots
+		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
 
 	@Override
-	protected boolean isTypeable(Widget w){
-		if (!isAtBrowserCanvas(w))
-			return false;	
+	protected boolean isClickable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.clickableInputTypes().contains(type);
+			}
+			return true;
+		}
 
-		Role role = w.get(Tags.Role, null);
-		if (role != null && Role.isOneOf(role, webText))
-			return isUnfiltered(w);
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable) {
+			return true;
+		}
+
+		Set<String> clickSet = new HashSet<>(clickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type);
+			}
+			return true;
+		}
 
 		return false;
 	}
 
-	private boolean isAtBrowserCanvas(Widget w){
-		Shape shape = w.get(Tags.Shape,null);
-		if (shape != null && shape.y() > browser_toolbar_filter)
-			return true;
-		else
-			return false;		
+	/**
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions) {
+		return super.selectAction(state, actions);
 	}
 
+	/**
+	 * Execute the selected action.
+	 *
+	 * @param system the SUT
+	 * @param state  the SUT's current state
+	 * @param action the action to execute
+	 * @return whether or not the execution succeeded
+	 */
+	@Override
+	protected boolean executeAction(SUT system, State state, Action action) {
+		return super.executeAction(system, state, action);
+	}
+
+	/**
+	 * TESTAR uses this method to determine when to stop the generation of actions for the
+	 * current sequence. You could stop the sequence's generation after a given amount of executed
+	 * actions or after a specific time etc.
+	 *
+	 * @return if <code>true</code> continue generation, else stop
+	 */
+	@Override
+	protected boolean moreActions(State state) {
+		return super.moreActions(state);
+	}
+
+	/**
+	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 */
+	@Override
+	protected void finishSequence() {
+		super.finishSequence();
+	}
+
+	/**
+	 * TESTAR uses this method to determine when to stop the entire test.
+	 * You could stop the test after a given amount of generated sequences or
+	 * after a specific time etc.
+	 *
+	 * @return if <code>true</code> continue test, else stop
+	 */
+	@Override
+	protected boolean moreSequences() {
+		return super.moreSequences();
+	}
 }

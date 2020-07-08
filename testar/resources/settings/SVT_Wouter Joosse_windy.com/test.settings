@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://windy.com"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 20
+Sequences = 2
+SequenceLength = 3
 
 #################################################################
 # Oracles based on suspicious titles
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = (?!x)x
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_Wouter Joosse_windy.com/Protocol_webdriver_windy
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,7 +126,7 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = 
+ApplicationName = Windy
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -159,42 +159,42 @@ OverrideWebDriverDisplayScale =
 #################################################################
 TypingTextsForExecutedAction = 10
 Discount = 0.95
-TempDir = ./output/temp
-MaxTime = 3.1536E7
+TempDir = .\\output\\temp\\
+MaxTime = 30.0
 StopGenerationOnFault = true
 ExecuteActions = true
 DrawWidgetTree = false
-UseRecordedActionDurationAndWaitTimeDuringReplay = false
+UseRecordedActionDurationAndWaitTimeDuringReplay = true
 ForceForeground = true
 AlgorithmFormsFilling = false
-FaultThreshold = 1.0E-9
-DrawWidgetInfo = false
+FaultThreshold = 0.1
+DrawWidgetInfo = true
 MaxReward = 9999999.0
 LogLevel = 1
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 Delete = 
-MyClassPath = ./settings
+MyClassPath = .\\settings\\
 ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
+ProcessesToKillDuringTest = (?!x)x
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
-OutputDir = ./output
+OutputDir = .\\output\\
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
-ActionDuration = 0.1
+StartupTime = 6.0
+ActionDuration = 0.0
 NonReactingUIThreshold = 100
 GraphsActivated = true
 GraphResuming = true
 CopyFromTo = 
-TimeToFreeze = 30.0
+TimeToFreeze = 10.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
-TimeToWaitAfterAction = 0.1
-DrawWidgetUnderCursor = true
+TimeToWaitAfterAction = 0.0
+DrawWidgetUnderCursor = false
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = E:\\testar\\bin\\output\\2020-06-27_13h24m53s_Windy\\sequences\\2020-06-27_13h24m53s_Windy_sequence_1.testar
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

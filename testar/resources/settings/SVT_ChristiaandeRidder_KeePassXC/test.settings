@@ -127,7 +127,7 @@ DataStoreUser =
 DataStorePassword = 
 DataStoreMode = none
 ApplicationName = KeePassXC
-ApplicationVersion = 2.3.4
+ApplicationVersion = 2.5.4
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 

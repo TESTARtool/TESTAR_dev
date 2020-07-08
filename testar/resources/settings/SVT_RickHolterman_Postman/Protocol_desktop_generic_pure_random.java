@@ -29,21 +29,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.Settings;
 import org.fruit.Util;
+import java.util.Set;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+import org.fruit.alayer.*;
+import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.AWTKeyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.protocols.DesktopProtocol;
-import nl.ou.testar.PrioritizeNewActionsSelector;
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Title;
+import static org.fruit.alayer.Tags.Enabled;
 
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -51,9 +54,7 @@ import java.util.Set;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_keepass extends DesktopProtocol {
-
-    private PrioritizeNewActionsSelector selector=new PrioritizeNewActionsSelector();
+public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -90,6 +91,8 @@ public class Protocol_keepass extends DesktopProtocol {
 		return super.startSystem();
 	}
 
+    int run = 1;
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -98,57 +101,177 @@ public class Protocol_keepass extends DesktopProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
+        // Give Postman some time to load.
+        Util.pause(5);
 
-		Random r = new Random();
-		String randomString = Integer.toString(Math.abs(r.nextInt()));
+        Keyboard kb = AWTKeyboard.build();
+        
+        Util.pause(5);
 
-		// Click new database
-		waitAndLeftClickWidgetWithMatchingTag(Tags.Desc, "New database", state, system, 1, 1.0);
+        state = getState(system);
 
-        // Continue wizard
-        //waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
-		
-        // Follow the new database wizard.
-        // Matching by tag was broken here, even though the widgets were in the list of widgets with the specific tags used		
-        // Rely on keyboard actions instead
+        // If not signed in yet, sign in.
+        for(Widget w :state) {    
+            if(w.get(Tags.Title ,"").contains("Sign In") && isInMenuBar(w, state) && run == 1) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                Action a = ac.leftClickAt(w);
+                executeAction(system , state , a);
                 
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Database name field", randomString, state, system, 1, 1.0);
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
-		new CompoundAction.Builder()
-	 		.add(new Type(randomString), 1.0) // Assume focus on the name field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs Continue
-			.build()
-			.run(system, state, 1.5);
+                Util.pause(5);
+                state = getState(system);
+                                
+                new CompoundAction.Builder()  
+                .add(new Type("rick.holterman.rh"),0.5).build()
+                .run(system, null, 1);
+                
+                kb.press(KBKeys.VK_SHIFT);
+                kb.press(KBKeys.VK_2);
+                kb.release(KBKeys.VK_2);
+                kb.release(KBKeys.VK_SHIFT);
+                
+                Util.pause(2);
+                state = getState(system);
+                
+                 new CompoundAction.Builder()  
+                .add(new Type("gmail.com"),0.5).build()
+                .run(system, null, 1);
+                
+                kb.press(KBKeys.VK_TAB);
+            
+                Util.pause(1);
+            
+                new CompoundAction.Builder()
+                .add(new Type("TestarPostman"),0.5)   
+                .add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
+                .run(system, null, 1);
+                
+                Util.pause(5);
+                
+                state = getState(system);
+                
+                // Click the "Sign In"-button".
+                for(Widget w2 :state) {    
+                    if(w2.get(Tags.Title ,"").contains("Sign In")) {
+                        StdActionCompiler ac2 = new AnnotatingActionCompiler();
+                        Action a2 = ac2.leftClickAt(w2);
+                        executeAction(system , state , a2);
+                    }
+                }
+                
+                Util.pause(5);
+            }    
+        }
+        
+        Util.pause(5);
+        
+        if (run == 1) {
+            run++;
+            stopSystem(system);
+            
+            Util.pause(5);
 
-        Util.pause(1.0);
+            return;
+        }
+        
+        // Press ctrl + T to open a new request-tab.
+        kb.press(KBKeys.VK_CONTROL);
+        kb.press(KBKeys.VK_T);
+        kb.release(KBKeys.VK_T);
+        kb.release(KBKeys.VK_CONTROL);
+        
+        Util.pause(6);
+        
+        state = getState(system);
+        
+        Util.pause(3);
+        
+        // Target the METHOD-field.
+        for(Widget w :state) {   
+            if(w.get(Tags.Title ,"").contains("METHOD")) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                Action a = ac.leftClickAt(w);
+                executeAction(system , state , a);
+            }
+        }
+        
+        // Tab to the request URL field.
+        kb.press(KBKeys.VK_TAB);
+        kb.press(KBKeys.VK_TAB);
+        
+        // Fill out a URL to the Youtube REST-API.
+        new CompoundAction.Builder()  
+        .add(new Type("https"),0.5).build()
+        .run(system, null, 1);
+        
+        kb.press(KBKeys.VK_SHIFT);
+        kb.press(KBKeys.VK_SEMICOLON);
+        kb.release(KBKeys.VK_SEMICOLON);
+        kb.release(KBKeys.VK_SHIFT);
+        
+        new CompoundAction.Builder()  
+        .add(new Type("//www.googleapis.com/youtube/v3/activities"),0.5).build()
+        .run(system, null, 1);
+        
+        Util.pause(1);
+        
+        // Set a valid API-key as a query param.
+        for(Widget w :state) {    
+            if(w.get(Tags.Title ,"").contains("Key")) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                Action a = ac.clickTypeInto(w, "key", true);
+                executeAction(system , state , a);
+            }
+        }
 
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Continue", state, system, 1, 1.0);
+        for(Widget w :state) {    
+            if(w.get(Tags.Title ,"").contains("Value")) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                Action a = ac.clickTypeInto(w, "AIzaSyCzcNSVwuukMcgkCUk98suvKexNC3wBsNk", true);
+                executeAction(system , state , a);
+            }
+        }
+        
+        // Tab to the request URL field.
+        kb.press(KBKeys.VK_TAB);
+        kb.press(KBKeys.VK_TAB);
+        
+        // Set filter query param to retrieve activity for the OU's Youtube-channel.
+         new CompoundAction.Builder()  
+        .add(new Type("channelId"),0.5)
+        .add(new KeyDown(KBKeys.VK_TAB),0.5).build()
+        .run(system, null, 1);
+    
+        Util.pause(1);
+    
         new CompoundAction.Builder()
-			.add(new KeyDown(KBKeys.VK_ENTER), 1.0) // Assume that pressing enter performs Continue
-			.build()
-			.run(system, state, 1.0);
-
-        Util.pause(1.0);
-         
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Password field", randomString, state, system, 1, 1.0);
-        // waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tags.Title, "Confirm password field", randomString, state, system, 1, 1.0);
-        // waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Done", state, system, 1, 1.0);
-		new CompoundAction.Builder()
-			.add(new Type(randomString), 1.0) // Assume focus on the password field
-			.add(new KeyDown(KBKeys.VK_TAB), 0.5) // Assume that pressing tab switches to next field
-			.add(new Type(randomString), 1.0) // Assume focus on the confirm password field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs Done
-			.build()
-			.run(system, state, 3.0);
-
-        // Windows file save dialog
-        new CompoundAction.Builder()
-	 		.add(new Type(randomString), 1.0) // Assume focus on the file name field
-			.add(new KeyDown(KBKeys.VK_ENTER), 0.5) // Assume that pressing enter performs OK
-			.build()
-			.run(system, state, 1.5);
+        .add(new Type("UCjkqufrGMjBAntXE-EvyG1w"),0.5)   
+        .add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
+        .run(system, null, 1);
+        
+        // Postman-shortcut to send the request.
+        kb.press(KBKeys.VK_CONTROL);
+        kb.press(KBKeys.VK_ENTER);
+        kb.release(KBKeys.VK_ENTER);
+        kb.release(KBKeys.VK_CONTROL);
+        
+        Util.pause(10); 
 	}
+
+    private boolean isInMenuBar(Widget w, State state){
+        Shape shape = w.get(Tags.Shape, null);
+        
+        Widget menuItemAtSameYPosition = null;
+        
+        for(Widget w2 : state){
+         if(w2.get(Tags.Title ,"").contains("New")) {
+                menuItemAtSameYPosition = w2;
+            }
+        }
+        
+        Shape menuItemAtSameYPositionShape = menuItemAtSameYPosition.get(Tags.Shape, null);
+
+        return shape != null ? shape.y() >= menuItemAtSameYPositionShape.y() - 15 && shape.y() <= menuItemAtSameYPositionShape.y() + 15 : false; 
+    }
 
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
@@ -196,23 +319,20 @@ public class Protocol_keepass extends DesktopProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-        for(Widget w : state){ 
-            w.set(Tags.Blocked, false);
-        }
-
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-		Set<Action> actions = super.deriveActions(system,state);
-
+    @Override
+      protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+    
+        Set<Action> actions = super.deriveActions(system,state);
+    
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-		//return the set of derived actions
-		return actions;
-	}
+		if(actions.isEmpty()){
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
+    
+        return actions;
+    }
 
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
@@ -275,15 +395,5 @@ public class Protocol_keepass extends DesktopProtocol {
 	@Override
 	protected void stopSystem(SUT system) {
 		super.stopSystem(system);
-	}
-
-	/**
-	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-	 *
-	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
-	 */
-	@Override
-	protected void postSequenceProcessing() {
-		super.postSequenceProcessing();
 	}
 }

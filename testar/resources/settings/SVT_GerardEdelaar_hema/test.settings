@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnectorValue = "C:\\Windows\\geckodriver.exe" "1920x900+0+0" "https://www.hema.nl/mijn-hema/account"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
+Sequences = 2
 SequenceLength = 20
 
 #################################################################
@@ -51,7 +51,7 @@ SequenceLength = 20
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -64,7 +64,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = .*[eE]xcepti[o?]n.*
 
 #################################################################
 # Process Logs
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*Minim.*|.*Maxim.*|.*Contact.*|.*wachtwoord.*|.*kies hier de.*|.*bestellen.*|.*ga verder.*|.*winkelmandje.*|.*betalen.*|.*klantenservice.*|.*aanmelden.*|.*mijn hema.*|.*facebook.*|.*twitter.*|.*instagram.*|.*snapchat.*|.*pinterest.*|.*youtube.*
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_GerardEdelaar_hema/Protocol_webdriver_hema
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,7 +126,7 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = 
+ApplicationName = HEMA
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -194,7 +194,7 @@ ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = D:\\data\\OU\\Testar\\testarShare\\testar\\bin\\output\\2020-06-25_21h12m13s_\\sequences\\2020-06-25_21h12m13s__sequence_1.testar
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false

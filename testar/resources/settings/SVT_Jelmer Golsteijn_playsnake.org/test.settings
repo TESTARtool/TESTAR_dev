@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.overleaf.com/login"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://playsnake.org/"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 20
+Sequences = 3
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_LeanderHiele_Overleaf/Protocol_webdriver_generic_overleag
+ProtocolClass = SVT_Jelmer Golsteijn_playsnake.org/Protocol_web_generic
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -181,8 +181,8 @@ ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 2.0
-ActionDuration = 0.1
+StartupTime = 5.0
+ActionDuration = 0.01
 NonReactingUIThreshold = 100
 GraphsActivated = true
 GraphResuming = true
@@ -191,10 +191,10 @@ TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.01
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\testar\\bin\\output\\2020-06-19_12h31m57s_overleaf\\sequences\\2020-06-19_12h31m57s_overleaf_sequence_1.testar
+PathToReplaySequence = ./output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
