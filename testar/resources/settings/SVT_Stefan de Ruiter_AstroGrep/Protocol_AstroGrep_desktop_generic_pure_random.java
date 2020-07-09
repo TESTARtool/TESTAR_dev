@@ -34,6 +34,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.windows.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
@@ -93,6 +94,8 @@ public class Protocol_AstroGrep_desktop_generic_pure_random extends DesktopProto
 	 @Override
 	protected void beginSequence(SUT system, State state){
 	 	super.beginSequence(system, state);
+        waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAName,"Search Path", "testar.txt", state, system, 5, 1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(UIATags.UIAName,"File Types", "testar", state, system, 5, 1.0);
 	}
 
 	/**

@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -22,8 +22,8 @@ Mode = Spy
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = C:\\Program Files (x86)\\AstroGrep\\AstroGrep.exe
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://todoist.com/"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -51,7 +51,7 @@ SequenceLength = 20
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -64,7 +64,7 @@ SuspiciousTitles =
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = 
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[cC]lose.*|.*[eE]xit.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_Stefan de Ruiter_AstroGrep/Protocol_AstroGrep_desktop_generic_pure_random
+ProtocolClass = SVT_MatthijsdeBruijn_todoist.com/Protocol_webdriver_todoist
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -126,8 +126,8 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = AstroGrep
-ApplicationVersion = 4.4.7
+ApplicationName = Todoist
+ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 
@@ -160,7 +160,7 @@ OverrideWebDriverDisplayScale =
 TypingTextsForExecutedAction = 10
 Discount = 0.95
 TempDir = ./output/temp
-MaxTime = 3.1536E7
+MaxTime = 300000.0
 StopGenerationOnFault = true
 ExecuteActions = true
 DrawWidgetTree = false
@@ -181,8 +181,8 @@ ForceToSequenceLength = true
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 10.0
-ActionDuration = 0.1
+StartupTime = 15.0
+ActionDuration = 0.2
 NonReactingUIThreshold = 100
 GraphsActivated = true
 GraphResuming = true
@@ -191,10 +191,10 @@ TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.2
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = C:\\Users\\Stefan\\Desktop\\testar\\bin\\output\\2020-06-30_22h35m55s_AstroGrep_4.4.7\\sequences_ok\\2020-06-30_22h35m55s_AstroGrep_4.4.7_sequence_1.testar
+PathToReplaySequence = ./output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
