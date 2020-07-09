@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,8 +30,11 @@
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import org.fruit.alayer.devices.Keyboard;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.Pair;
-import org.fruit.Util;
+import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -52,23 +55,32 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
+public class Protocol_webdriver_generic_centraalbeheer extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "v-menubar-menuitem", "v-menubar-menuitem-caption");
 
-  // Don't allow links and pages with these extensions
+  // Disallow links and pages with these extensions
   // Set to null to ignore this feature
-  private static List<String> deniedExtensions = Arrays.asList("pdf", "jpg", "png","pfx", "xml");
+  private static List<String> deniedExtensions = Arrays.asList(
+      "pdf", "jpg", "png");
 
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList("https://www.kpn.com/service/storingen.htm");
+  private static List<String> domainsAllowed =
+      Arrays.asList("www.centraalbeheer.nl");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
-  private static boolean followLinks = false;
+  private static boolean followLinks = true;
+
+  // URL + form name, username input id + value, password input id + value
+  // Set login to null to disable this feature
+  private static Pair<String, String> login = Pair.from(
+      "https://login.awo.ou.nl/SSO/login", "OUinloggen");
+  private static Pair<String, String> username = Pair.from("username", "");
+  private static Pair<String, String> password = Pair.from("password", "");
 
   // List of atributes to identify and close policy popups
   // Set to null to disable this feature
@@ -123,32 +135,11 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
-	//waiting is already includes in the method?!
-	/*
-	try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-	*/
-	// double click?!
-	waitAndLeftClickWidgetWithMatchingTag(
-	WdTags.WebName, "cookies-accepteren", state, system, 5, 1.0;
-	
-    waitAndLeftClickWidgetWithMatchingTag(
-	WdTags.WebName, "cookies-accepteren", state, system, 5, 1.0;
-
-	waitLeftClickAndTypeIntoWidgetWithMatchingTag(
-	WdTags.WebName, "Postcode", "5629GK", state, system, 5, 1.0);
-	// writing "demo" to password text field:
-	waitLeftClickAndTypeIntoWidgetWithMatchingTag(
-	WdTags.WebName, "Huisnummer", "18", state, system, 5, 1.0);
-	// clicking login-button:
-	waitAndLeftClickWidgetWithMatchingTag(
-	WdTags.WebName, "Bedrijven zoeken", state, system, 5, 1.0);
+    super.beginSequence(system, state);
+                Keyboard kb = AWTKeyboard.build();
+            kb.press(KBKeys.VK_PAGE_DOWN);
+            kb.release(KBKeys.VK_PAGE_DOWN);
   }
-
 
   /**
    * This method is called when TESTAR requests the state of the SUT.
@@ -184,13 +175,6 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
 
     // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-    for(Widget w : state) {
-      if(w.get(WdTags.WebTextContext,"").contains("internal error")) {
-        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-                "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContext,"") + "'.");
-      }
-    }
-
     return verdict;
   }
 
@@ -223,20 +207,13 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
 
     // iterate through all widgets
     for (Widget widget : state) {
-
-    	// Skip Admin and logout page widget
-    	if(widget.get(WdTags.WebHref,"").contains("admin.htm")
-    			|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
-    		continue;
-    	}
-
       // only consider enabled and non-tabu widgets
       if (!widget.get(Enabled, true) || blackListed(widget)) {
         continue;
       }
 
       // slides can happen, even though the widget might be blocked
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+//       addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
@@ -245,7 +222,8 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
 
       // type into text boxes
       if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+//     	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+        	  actions.add(ac.clickTypeInto(widget, getRandomInputValue(), true));
       }
 
       // left clicks, but ignore links outside domain
@@ -256,23 +234,51 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
       }
     }
 
-	if(actions.isEmpty()) {
-		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-	}
-    
     return actions;
+  }
+  
+  private String getRandomInputValue() {
+      long currentTime = System.currentTimeMillis();
+      if (currentTime % 2 == 0) {
+          return getRandomBetween(2500000, 75000);
+      } else {
+          String day = getRandomBetween(31, 1);
+          String month = getRandomBetween(12, 1);
+          String year = getRandomBetween(2025, 1990);
+          return day + "-" + month + "-" + year;
+      }
+  }
+  
+  // Upper and lower are included
+  private String getRandomBetween(int lowerbound, int upperbound) {
+      return ((int)(Math.random() * (upperbound - lowerbound + 1) + lowerbound)) + "";
   }
 
   /*
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-    Set<Action> actions = detectForcedDeniedUrl();
+//    Set<Action> actions = detectForcedDeniedUrl();
+//    if (actions != null && actions.size() > 0) {
+//      return actions;
+//    }
+//
+//    actions = detectForcedLogin(state);
+//    if (actions != null && actions.size() > 0) {
+//      return actions;
+//    }
+//
+//    actions = detectForcedPopupClick(state, ac);
+//    if (actions != null && actions.size() > 0) {
+//      return actions;
+//    }
+
+    Set<Action> actions = detectCookiesBanner(state, ac);
     if (actions != null && actions.size() > 0) {
       return actions;
     }
 
-    actions = detectForcedPopupClick(state, ac);
+    actions = detectWizardButton(state, ac);
     if (actions != null && actions.size() > 0) {
       return actions;
     }
@@ -280,7 +286,94 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
     return null;
   }
 
+  private Set<Action> detectCookiesBanner(State state, StdActionCompiler ac) {
+    for (Widget widget : state) {
+      WdWidget wdWidget = (WdWidget) widget;
+      if (!widget.get(Enabled, true) || wdWidget.get(Blocked, false)) {
+        continue;
+      }
+      if ("button accept".equals(wdWidget.getAttribute("class"))) {
+        return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));
+      }
+    }
+    return null;
+  }
 
+  private Set<Action> detectWizardButton(State state, StdActionCompiler ac) {
+    for (Widget widget : state) {
+      WdWidget wdWidget = (WdWidget) widget;
+      if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+        continue;
+      }
+
+      if ("webtoolrechts-cb-premie-berekenen-anders".equals(wdWidget.getAttribute("id"))) {
+        Set<Action> actions = new HashSet<Action>();
+        actions.add(ac.leftClickAt(widget));
+        return actions;
+      }
+    }
+    return null;
+  }
+  
+  protected Action createSlidingAction(Widget widget, double scrollArrowSize, double scrollThick){
+    Action action = null;
+    StdActionCompiler ac = new AnnotatingActionCompiler();
+    Drag[] drags = null;
+    //If there are scroll (drags/drops) actions possible
+    if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
+        //For each possible drag, create an action and add it to the derived actions
+        for (Drag drag : drags){
+            //Create a slide action with the Action Compiler, and add it to the set of derived actions
+            action = ac.slideFromTo(
+                    new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                    new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                    widget
+            );
+
+        }
+    }
+    return action;
+}
+
+  /*
+   * Detect and perform login if defined
+   */
+  private Set<Action> detectForcedLogin(State state) {
+    if (login == null || username == null || password == null) {
+      return null;
+    }
+
+    // Check if the current page is a login page
+    String currentUrl = WdDriver.getCurrentUrl();
+    if (currentUrl.startsWith(login.left())) {
+      CompoundAction.Builder builder = new CompoundAction.Builder();
+      // Set username and password
+      for (Widget widget : state) {
+        WdWidget wdWidget = (WdWidget) widget;
+        // Only enabled, visible widgets
+        if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+          continue;
+        }
+
+        if (username.left().equals(wdWidget.getAttribute("id"))) {
+          builder.add(new WdAttributeAction(
+              username.left(), "value", username.right()), 1);
+        }
+        else if (password.left().equals(wdWidget.getAttribute("id"))) {
+          builder.add(new WdAttributeAction(
+              password.left(), "value", password.right()), 1);
+        }
+      }
+      // Submit form, but only if user and pass are filled
+      builder.add(new WdSubmitAction(login.right()), 2);
+      CompoundAction actions = builder.build();
+      if (actions.getActions().size() >= 3) {
+        return new HashSet<>(Collections.singletonList(actions));
+      }
+    }
+
+    return null;
+  }
 
   /*
    * Force closing of Policies Popup
@@ -478,23 +571,17 @@ public class Protocol_webdriver_kpnproblemen extends WebdriverProtocol {
 
   @Override
   protected boolean isTypeable(Widget widget) {
-	  Role role = widget.get(Tags.Role, Roles.Widget);
-	  if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+    Role role = widget.get(Tags.Role, Roles.Widget);
+    if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+      // Input type are special...
+      if (role.equals(WdRoles.WdINPUT)) {
+        String type = ((WdWidget) widget).element.type;
+        return WdRoles.typeableInputTypes().contains(type);
+      }
+      return true;
+    }
 
-		  // Specific class="input" for parasoft SUT
-		  if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
-			  return true;
-		  }
-
-		  // Input type are special...
-		  if (role.equals(WdRoles.WdINPUT)) {
-			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type);
-		  }
-		  return true;
-	  }
-
-	  return false;
+    return false;
   }
 
   /**

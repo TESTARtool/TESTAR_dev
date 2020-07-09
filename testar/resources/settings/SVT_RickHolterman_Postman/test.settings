@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_RickHolterman_Postman/Protocol_desktop_generic_pure_random
+ProtocolClass = SVT_RickHolterman_Postman/Protocol_desktop_generic_pure_random_postman
 
 #################################################################
 # Graphdatabase settings (experimental)

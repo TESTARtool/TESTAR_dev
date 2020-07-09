@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = SVT_Jelmer Golsteijn_playsnake.org/Protocol_web_generic
+ProtocolClass = SVT_Jelmer Golsteijn_playsnake.org/Protocol_web_generic_playsnake
 
 #################################################################
 # Graphdatabase settings (experimental)

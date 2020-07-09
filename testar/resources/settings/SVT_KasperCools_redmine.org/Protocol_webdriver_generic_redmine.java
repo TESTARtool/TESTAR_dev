@@ -30,22 +30,22 @@
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.alayer.devices.Keyboard;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.Pair;
-import org.fruit.Drag;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
+import org.fruit.alayer.devices.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+import org.fruit.alayer.actions.*;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
 
 import java.util.*;
 
@@ -55,7 +55,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_generic extends WebdriverProtocol {
+public class Protocol_webdriver_generic_redmine extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "v-menubar-menuitem", "v-menubar-menuitem-caption");
@@ -69,7 +69,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
   private static List<String> domainsAllowed =
-      Arrays.asList("www.centraalbeheer.nl");
+      Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -136,9 +136,35 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   @Override
   protected void beginSequence(SUT system, State state) {
     super.beginSequence(system, state);
-                Keyboard kb = AWTKeyboard.build();
-            kb.press(KBKeys.VK_PAGE_DOWN);
-            kb.release(KBKeys.VK_PAGE_DOWN);
+    
+    state = getState(system);
+ 
+    for(Widget w: state){
+        if(w.get(Tags.Title,"").contains("Login")){
+            StdActionCompiler ac = new AnnotatingActionCompiler();
+            Action a = ac.clickTypeInto(w,"testar_svt",true);
+            executeAction(system,state,a);
+            break;
+        }
+    }
+    Util.pause(2);
+    
+     for(Widget w: state){
+        if(w.get(Tags.Title,"").contains("Password")){
+            StdActionCompiler ac = new AnnotatingActionCompiler();
+            Action a = ac.clickTypeInto(w,"testar_svt",true);
+            executeAction(system,state,a);
+            break;
+        }
+    }
+    
+   Util.pause(2);
+   
+    new CompoundAction.Builder().add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
+    .run(system,null,1);
+    
+    
+   Util.pause(18);
   }
 
   /**
@@ -213,7 +239,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
       }
 
       // slides can happen, even though the widget might be blocked
-//       addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
@@ -222,8 +248,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
       // type into text boxes
       if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-//     	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-        	  actions.add(ac.clickTypeInto(widget, getRandomInputValue(), true));
+    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
       }
 
       // left clicks, but ignore links outside domain
@@ -236,104 +261,28 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
     return actions;
   }
-  
-  private String getRandomInputValue() {
-      long currentTime = System.currentTimeMillis();
-      if (currentTime % 2 == 0) {
-          return getRandomBetween(2500000, 75000);
-      } else {
-          String day = getRandomBetween(31, 1);
-          String month = getRandomBetween(12, 1);
-          String year = getRandomBetween(2025, 1990);
-          return day + "-" + month + "-" + year;
-      }
-  }
-  
-  // Upper and lower are included
-  private String getRandomBetween(int lowerbound, int upperbound) {
-      return ((int)(Math.random() * (upperbound - lowerbound + 1) + lowerbound)) + "";
-  }
 
   /*
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-//    Set<Action> actions = detectForcedDeniedUrl();
-//    if (actions != null && actions.size() > 0) {
-//      return actions;
-//    }
-//
-//    actions = detectForcedLogin(state);
-//    if (actions != null && actions.size() > 0) {
-//      return actions;
-//    }
-//
-//    actions = detectForcedPopupClick(state, ac);
-//    if (actions != null && actions.size() > 0) {
-//      return actions;
-//    }
-
-    Set<Action> actions = detectCookiesBanner(state, ac);
+    Set<Action> actions = detectForcedDeniedUrl();
     if (actions != null && actions.size() > 0) {
       return actions;
     }
 
-    actions = detectWizardButton(state, ac);
+    actions = detectForcedLogin(state);
+    if (actions != null && actions.size() > 0) {
+      return actions;
+    }
+
+    actions = detectForcedPopupClick(state, ac);
     if (actions != null && actions.size() > 0) {
       return actions;
     }
 
     return null;
   }
-
-  private Set<Action> detectCookiesBanner(State state, StdActionCompiler ac) {
-    for (Widget widget : state) {
-      WdWidget wdWidget = (WdWidget) widget;
-      if (!widget.get(Enabled, true) || wdWidget.get(Blocked, false)) {
-        continue;
-      }
-      if ("button accept".equals(wdWidget.getAttribute("class"))) {
-        return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));
-      }
-    }
-    return null;
-  }
-
-  private Set<Action> detectWizardButton(State state, StdActionCompiler ac) {
-    for (Widget widget : state) {
-      WdWidget wdWidget = (WdWidget) widget;
-      if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
-        continue;
-      }
-
-      if ("webtoolrechts-cb-premie-berekenen-anders".equals(wdWidget.getAttribute("id"))) {
-        Set<Action> actions = new HashSet<Action>();
-        actions.add(ac.leftClickAt(widget));
-        return actions;
-      }
-    }
-    return null;
-  }
-  
-  protected Action createSlidingAction(Widget widget, double scrollArrowSize, double scrollThick){
-    Action action = null;
-    StdActionCompiler ac = new AnnotatingActionCompiler();
-    Drag[] drags = null;
-    //If there are scroll (drags/drops) actions possible
-    if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
-        //For each possible drag, create an action and add it to the derived actions
-        for (Drag drag : drags){
-            //Create a slide action with the Action Compiler, and add it to the set of derived actions
-            action = ac.slideFromTo(
-                    new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                    new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-                    widget
-            );
-
-        }
-    }
-    return action;
-}
 
   /*
    * Detect and perform login if defined

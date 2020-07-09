@@ -54,7 +54,7 @@ import java.util.Set;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
+public class Protocol_desktop_generic_pure_random_postman extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -102,7 +102,7 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 @Override
 	protected void beginSequence(SUT system, State state){
         // Give Postman some time to load.
-        Util.pause(5);
+        Util.pause(10);
 
         Keyboard kb = AWTKeyboard.build();
         
