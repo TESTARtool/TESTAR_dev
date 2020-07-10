@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simple Shadow DOM example</title>
+  </head>
+  <body>
+      <section>
+        <p>A Shadow DOM button</p> <div id="shadow"></div>
+        <p>A regular DOM button</p> <div id="regular"></div>
+      </section>
+      <script>
+        var button = document.createElement("button");
+        button.innerHTML = "Click me!";
+        button.onclick = function(){ alert("Clicked!") };
+        
+        var button2 = document.createElement("button");
+        button2.innerHTML = "Click me too!";
+        button2.onclick = function(){ alert("Clicked me too!") };
+        
+        var shadow_div = document.getElementById("shadow");
+        var regular_div = document.getElementById("regular");
+        regular_div.appendChild(button2);
+        var shadow_dom = shadow_div.attachShadow( {mode: 'open'} );
+        shadow_dom.appendChild(button);
+      </script>
+  </body>
+</html>

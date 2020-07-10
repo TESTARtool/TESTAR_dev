@@ -130,7 +130,7 @@ public final class WdState extends WdWidget implements State {
 		}
 
 		if (t.equals(Tags.Desc)) {
-			ret = w.element.name;
+			ret = w.element.getElementDescription();
 		}
 		else if (t.equals(Tags.Role)) {
 			ret = WdRoles.fromTypeId(w.element.tagName);
@@ -289,7 +289,7 @@ public final class WdState extends WdWidget implements State {
 			ret = w.element.src;
 		}
 		else if (t.equals(WdTags.WebZIndex)) {
-			ret = w.element.zindex;
+			ret = w.element.webZIndex;
 		}
 		else if (t.equals(WdTags.WebIsEnabled)) {
 			ret = w.element.enabled;

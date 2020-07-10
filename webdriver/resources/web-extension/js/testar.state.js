@@ -153,7 +153,8 @@ function wrapElementTestar(element, xOffset, yOffset) {
         value: element.value,
         display: computedStyle.getPropertyValue('display'),
 
-        zIndex: getZIndexTestar(element),
+        zIndex: getZIndexTestar(element), // TESTAR z-index value not real value given by web page developers
+		webZIndex: getComputedStyle(element).getPropertyValue('z-index'), // This is the real z-index (integer) given by web page developers
         rect: getRectTestar(element, xOffset, yOffset),
         dimensions: getDimensionsTestar(element),
         isBlocked: getIsBlockedTestar(element, xOffset, yOffset),

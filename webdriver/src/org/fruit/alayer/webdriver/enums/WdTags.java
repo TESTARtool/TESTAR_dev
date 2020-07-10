@@ -134,7 +134,7 @@ public class WdTags extends TagsBase {
   /**
    * Web zIndex of a widget
    */
-  public static final Tag<Double> WebZIndex = from("WebZIndex", Double.class);
+  public static final Tag<Integer> WebZIndex = from("WebZIndex", Integer.class);
 
   /**
    * Web Control Type Identifier of a widget.

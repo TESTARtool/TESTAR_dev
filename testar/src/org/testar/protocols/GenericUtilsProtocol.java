@@ -260,6 +260,29 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 topWidgets.add(w);
         return topWidgets;
     }
+    
+    /**
+     * Given two widgets (child and parent), scale the child widget sub-tree
+     * to check if the child descends from the parent.
+     * The comparison is made with the identifier "ConcreteIDCustom".
+     * If child or parent objects are null, result will be false.
+     * 
+     * @param child
+     * @param parent
+     * @return
+     */
+    protected boolean widgetIsChildOfParent(Widget child, Widget parent) {
+    	if(child == null || parent == null) {
+    		return false;
+    	}
+    	else if (child.get(Tags.ConcreteIDCustom, "nopeOne").equals(parent.get(Tags.ConcreteIDCustom, "nopeTwo"))) {
+    		return true;
+    	}
+    	else if (child.parent() == null) {
+    		return false;
+    	}
+    	return widgetIsChildOfParent(child.parent(), parent);
+    }
 
     protected boolean isNOP(Action action){
         String as = action.toString();

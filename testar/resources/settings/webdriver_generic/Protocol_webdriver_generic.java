@@ -53,6 +53,9 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_generic extends WebdriverProtocol {
 
+    protected int highWebModalZIndex = 0;
+    protected Widget widgetModal;
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -143,6 +146,19 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
+    	// Reset because modal element may disappear
+    	highWebModalZIndex = 0;
+    	widgetModal = state;
+    	
+    	for(Widget w : state) {
+    		// Set highWebModalZIndex value. And the widget that represents that block modal.
+    		// It can be useful for users in their specific protocols.
+    		if(w.get(WdTags.WebIsWindowModal, false) && w.get(WdTags.WebZIndex, -1) > highWebModalZIndex) {
+    			highWebModalZIndex = w.get(WdTags.WebZIndex, -1);
+    			widgetModal = w;
+    		}
+    	}
+		
 		return state;
 	}
 
@@ -204,8 +220,13 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			// slides can happen, even though the widget might be blocked
 			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			// If the element is blocked, Testar can't click on or type in the widget
+			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+				continue;
+			}
+			
+			// Check if the element is blocked by web modal element with high z-index
+			if (isBlockedByModal(widget)) {
 				continue;
 			}
 
@@ -260,6 +281,20 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		}
 
 		return false;
+	}
+	
+	/**
+	 * Check if the desired widget is blocked by some widgetModal.
+	 * By default, this widgetModal object is the TESTAR State widget.
+	 * 
+	 * If a web element with a display "block" property appears,
+	 * the z-index property will be used to determine the new web modal element
+	 * 
+	 * @param w
+	 * @return
+	 */
+	private boolean isBlockedByModal(Widget w) {
+		return !widgetIsChildOfParent(w, widgetModal);
 	}
 
 	/**

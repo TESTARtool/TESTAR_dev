@@ -57,7 +57,8 @@ public class WdElement extends TaggableBase implements Serializable {
 
   public boolean blocked;
   //long culture = 0L;
-  boolean isModal = false; // i.c.w. access key
+  
+  boolean isModal = false;
 
   public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
@@ -72,6 +73,7 @@ public class WdElement extends TaggableBase implements Serializable {
   String valuePattern, href, value, style, target, alt, src;
 
   double zindex;
+  int webZIndex = 0;
   Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
@@ -88,8 +90,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public transient Map<String, String> attributeMap;
 
   @SuppressWarnings("unchecked")
-  public WdElement(Map<String, Object> packedElement,
-		  			WdRootElement root, WdElement parent) {
+  public WdElement(Map<String, Object> packedElement, WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
@@ -125,6 +126,17 @@ public class WdElement extends TaggableBase implements Serializable {
     display = (String) packedElement.get("display");
 
     zindex = (double) (long) packedElement.get("zIndex");
+    
+    try {
+    	webZIndex = Integer.parseInt((String)packedElement.get("webZIndex"));
+    } catch(NumberFormatException e) {
+    	// Not an Integer, webZIndex value remains 0
+    	// Is it better to control this at JS level?
+    }
+
+    // Check if this element is a displayed modal element. Ignore body elements.
+    isModal = (display != null && display.equals("block") && !tagName.equals("body"));
+    
     fillRect(packedElement);
     fillDimensions(packedElement);
     
@@ -177,6 +189,26 @@ public class WdElement extends TaggableBase implements Serializable {
     if (name == null || name.equals("null") || name.isEmpty()) {
       name = textContent;
     }
+  }
+  
+  /**
+   * Check web element parameters and try to find an appropriate one to act as description
+   */
+  public String getElementDescription() {
+	  if(name != null && !name.isEmpty()) {
+		  return name;
+	  }
+	  else if(textContent != null && !textContent.isEmpty()) {
+		  return textContent;
+	  }
+	  else if(href != null && !href.isEmpty()) {
+		  return href;
+	  }
+	  else if(id != null && !id.isEmpty()) {
+		  return id;
+	  }
+
+	  return name;
   }
 
   public boolean getIsFocusable() {
