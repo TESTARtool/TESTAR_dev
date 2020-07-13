@@ -103,6 +103,11 @@ task prepareOracles(type: Copy) {
     into 'target/scripts/settings'
 }
 
+task prepareJacoco(type: Copy) {
+    from 'jacoco'
+    into 'target/scripts/jacoco'
+}
+
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
     into 'target/scripts/output'
