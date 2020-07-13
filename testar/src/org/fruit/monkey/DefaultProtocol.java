@@ -54,7 +54,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -66,6 +65,8 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -91,7 +92,6 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
-import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
@@ -146,7 +146,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
@@ -348,7 +348,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
 
