@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
 
 #################################################################
 # Sequences
@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_generic/Protocol_webdriver_generic
+ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -106,6 +106,32 @@ GraphDBEnabled = false
 GraphDBUrl =
 GraphDBUser =
 GraphDBPassword =
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore =
+DataStoreType = remote
+DataStoreServer =
+DataStoreDirectory =
+DataStoreDB =
+DataStoreUser =
+DataStorePassword =
+DataStoreMode = none
+ApplicationName = Parabank
+ApplicationVersion =
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = true
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WidgetControlType
+
 
 #################################################################
 # Override display scale
