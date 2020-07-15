@@ -205,7 +205,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false)) {
+			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
 				continue;
 			}
 

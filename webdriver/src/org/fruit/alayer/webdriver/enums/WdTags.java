@@ -215,6 +215,11 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsClickable = from("WebIsClickable", Boolean.class);
   
   /**
+   * Whether this widget comes from Shadow Tree.
+   */
+  public static final Tag<Boolean> WebIsShadow = from("WebIsShadow", Boolean.class);
+  
+  /**
    * Whether this widget has keyboard focus (i.e. will receive keyboard input)
    */
   public static final Tag<Boolean> WebHasKeyboardFocus = from("WebHasKeyboardFocus", Boolean.class);
