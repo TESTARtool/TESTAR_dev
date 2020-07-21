@@ -93,6 +93,8 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			put("id", "sncmp-banner-btn-agree");
 		}};
 
+		WdDriver.fullScreen = true;
+		
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 	}
