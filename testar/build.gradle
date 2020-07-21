@@ -109,13 +109,24 @@ task prepareOutputFolder(type: Copy) {
 }
 
 /**
+ * Copy existing testar/resources/windows10/windows.dll as temporally file
+ */
+task prepareCopyOfExistingWindows10dll(type: Copy) {
+    from '../testar/resources/windows10'
+    into 'target/scripts'
+    include 'windows.dll'
+}
+
+/**
  * Copy windows.dll from the subproject windows into target scripts
  * so it can be used with the creation of the distribution.
  */
 task prepareWindowsDLL(type: Copy) {
-    from '../windows/target/resources/main'
-    into 'target/scripts'
-    include 'windows.dll'
+    if(new File('../windows/target/resources/main/windows.dll').exists()) {
+        from '../windows/target/resources/main'
+        into 'target/scripts'
+        include 'windows.dll'
+    }
 }
 
 applicationDistribution.from("../webdriver/resources/web-extension") {
@@ -151,5 +162,26 @@ startScripts.dependsOn {
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
+
+/**
+ * Build TESTAR using Visual Studio Tools to create a windows.dll
+ */
+task windowsDistribution(dependsOn:['buildWindows','installDist','distZip']){
+	group = 'distribution'
+	description ='Build TESTAR distribution for Windows'
+}
+
+task buildWindows(type: Exec) {
+    if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
+        workingDir '../windows/native_src'
+        commandLine 'cmd', '/c', 'compile_w7.bat'
+    } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
+        workingDir '../windows/native_src'
+        commandLine 'cmd', '/c', 'compile_w10.bat'
+    } else  {
+        commandLine './dummy.sh'
+    }
+}
+buildWindows.dependsOn classes
 
 mainClassName='org.fruit.monkey.Main'
