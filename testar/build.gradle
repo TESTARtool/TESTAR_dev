@@ -78,12 +78,12 @@ dependencies {
     compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')
