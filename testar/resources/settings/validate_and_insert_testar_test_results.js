@@ -63,6 +63,7 @@ client.connect(function(err) {
 				}
 				else {
 					console.log("TESTAR Test Results document inserted: " + val);
+					console.log("TestResultsArtefactId: " + document._id);
 					client.close();
 				}
 			});

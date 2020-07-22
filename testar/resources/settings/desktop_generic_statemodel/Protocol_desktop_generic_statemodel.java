@@ -37,7 +37,10 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
+
+import es.upv.staq.testar.NativeLinker;
 
 /**
  * This is a small change to Desktop Generic Protocol to use the learned state model for
@@ -50,6 +53,20 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 *
+	 * @param settings the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		super.initialize(settings);
+		
+		// Set desired License
+		licenseSUT = new ExampleLicense();
+	}
+	
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -156,4 +173,16 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		}
 	}
 
+}
+
+/**
+ *  Helper class to customize SUT License as desires
+ */
+class ExampleLicense {
+	
+	String sutTitle = "ExampleLicense";
+
+	public ExampleLicense () { 
+		// Create object for JSON Artefact purposes
+	}
 }

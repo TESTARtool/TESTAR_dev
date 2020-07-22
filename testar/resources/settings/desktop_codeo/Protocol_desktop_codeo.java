@@ -77,6 +77,9 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 		
+		// Set desired License
+		licenseSUT = new CODEOLicense();
+		
 		// TODO: Prepare a JaCoCo installation verification message
 		//verifyJaCoCoInstallation();
 		
@@ -411,4 +414,16 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		}
 	}
 
+}
+
+/**
+ *  Helper class to customize SUT License as desires
+ */
+class CODEOLicense {
+	
+	String sutTitle = "ExampleLicense";
+
+	public CODEOLicense () { 
+		// Create object for JSON Artefact purposes
+	}
 }

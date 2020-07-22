@@ -66,6 +66,8 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.StateModel.Analysis.AnalysisProtocol;
+
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -258,6 +260,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runRecordLoop(system);
 			} else if (mode() == Modes.Generate) {
 				runGenerateOuterLoop(system);
+			} else if (mode() == Modes.Analysis) {
+				AnalysisProtocol stateModelAnalyzer = new AnalysisProtocol(settings);
+				stateModelAnalyzer.startStateModelAnalysis();
+				Util.pause(5);
+				while(stateModelAnalyzer.isAnalyzerActive()) {
+					// Jetty server is running...
+					// This will stop when user send a GET localhost:8090/shutdown request
+				}
 			}
 
 		}catch(WinApiException we) {

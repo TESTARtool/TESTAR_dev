@@ -1,24 +1,52 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018, 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package nl.ou.testar.StateModel.Analysis.HttpServer;
 
 import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.GraphServlet;
+import nl.ou.testar.StateModel.Analysis.ShutdownServlet;
 import nl.ou.testar.StateModel.Analysis.StateModelServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.fruit.alayer.State;
 
 public class JettyServer {
     private Server server;
+    private ShutdownServlet shutdownServlet;
 
     /**
      * Call this method to start running the jetty server.
@@ -43,6 +71,11 @@ public class JettyServer {
         webAppContext.setResourceBase(resourceBase);
         webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
         webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
+        
+        // Shutdown this server
+        shutdownServlet = new ShutdownServlet(server);
+        webAppContext.addServlet(new ServletHolder(shutdownServlet), "/shutdown");
+        
         webAppContext.setAttribute("analysisManager", analysisManager);
 
         Configuration.ClassList classlist = Configuration.ClassList
@@ -60,6 +93,12 @@ public class JettyServer {
         handlerList.addHandler(webAppContext);
         handlerList.addHandler(new DefaultHandler());
         server.setHandler(handlerList);
+        
+        server.setStopTimeout(10000L);
         server.start();
+    }
+    
+    public boolean isJettyServerRunning() {
+    	return shutdownServlet.isServerRunning();
     }
 }

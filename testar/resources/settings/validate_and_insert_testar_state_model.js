@@ -68,6 +68,7 @@ client.connect(function(err) {
 				}
 				else {
 					console.log("TESTAR State Model document inserted: " + val);
+					console.log("StateModelArtefactId: " + document._id);
 					client.close();
 				}
 			});

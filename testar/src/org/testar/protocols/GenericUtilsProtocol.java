@@ -419,14 +419,16 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     					InputStreamReader(p.getErrorStream()));
 
     			// read the output from the command
-    			System.out.println("Standard output ? :\n");
+    			System.out.println(" ? Standard output ? :\n");
+    			StringBuilder outputContent = new StringBuilder("");
     			String s = null;
     			while ((s = stdInput.readLine()) != null) {
     				System.out.println(s);
+    				outputContent.append(s);
     			}
 
     			// read any errors from the attempted command
-    			System.out.println("Standard error ? :\n");
+    			System.out.println(" ? Standard error ? :\n");
     			StringBuilder errorContent = new StringBuilder("");
     			while ((s = stdError.readLine()) != null) {
     				System.out.println(s);
