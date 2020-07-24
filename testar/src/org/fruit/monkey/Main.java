@@ -48,6 +48,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 import org.fruit.alayer.windows.Windows10;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import static org.fruit.monkey.ConfigTags.*;
 
@@ -107,7 +108,8 @@ public class Main {
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
-		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
+		// Also disabled if TESTAR is executed to offer some Web Server feature.
+		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup) || webServerMode(settings)){
 
 			setTestarDirectory(settings);
 
@@ -218,6 +220,14 @@ public class Main {
 			//Use the only file that was found
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
+	}
+	
+	/**
+	 * Check if TESTAR was launched to offer a Web Server feature
+	 */
+	private static boolean webServerMode(Settings settings) {
+		return (settings.get(ConfigTags.Mode).equals(Modes.Analysis) 
+				|| settings.get(ConfigTags.Mode).equals(Modes.Report));
 	}
 
 	/**
@@ -464,6 +474,7 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(HTMLreportServerFile, outputDir));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

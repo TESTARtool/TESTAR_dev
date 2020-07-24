@@ -59,7 +59,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         Quit,
         View,
         Replay,
-        Analysis;
+        Analysis,
+        Report;
     }
 
     protected Modes mode;

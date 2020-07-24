@@ -94,6 +94,7 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
+import org.testar.HttpReportServer;
 import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
@@ -268,6 +269,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					// Jetty server is running...
 					// This will stop when user send a GET localhost:8090/shutdown request
 				}
+			} else if (mode() == Modes.Report) {
+				if(isHtmlFile()) {
+					try {
+						File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
+						HttpReportServer httpReportServer = new HttpReportServer(file);
+						httpReportServer.runHtmlReport();
+						while(httpReportServer.isJettyServerRunning()) {
+							// HttpReportServer is running...
+							// This will stop when user send a GET localhost:8091/shutdown request
+						}
+					}catch (Exception e) {
+						System.out.println("Exception: Check the path of the file, something is wrong");
+					}
+				}
 			}
 
 		}catch(WinApiException we) {
@@ -421,6 +436,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private boolean isHtmlFile() {
 		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+			return true;
+		
+		else if(settings.get(ConfigTags.HTMLreportServerFile).contains(".html"))
 			return true;
 
 		return false;
