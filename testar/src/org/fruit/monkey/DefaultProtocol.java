@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -96,6 +97,9 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.HttpReportServer;
 import org.testar.OutputStructure;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -270,18 +274,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					// This will stop when user send a GET localhost:8090/shutdown request
 				}
 			} else if (mode() == Modes.Report) {
-				if(isHtmlFile()) {
-					try {
-						File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
+				try {
+					File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
+					
+					File extractedArtefactHtml = null;
+					if(!isHtmlFile() && (extractedArtefactHtml = extractArtefactTestResults()) != null) {
+						file = extractedArtefactHtml;
+					}
+					
+					if(isHtmlFile(file.getCanonicalPath())) {
 						HttpReportServer httpReportServer = new HttpReportServer(file);
 						httpReportServer.runHtmlReport();
 						while(httpReportServer.isJettyServerRunning()) {
 							// HttpReportServer is running...
 							// This will stop when user send a GET localhost:8091/shutdown request
 						}
-					}catch (Exception e) {
-						System.out.println("Exception: Check the path of the file, something is wrong");
 					}
+				}catch (Exception e) {
+					System.out.println("Exception: Check the path of the file, something is wrong");
 				}
 			}
 
@@ -443,6 +453,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
+	
+	private boolean isHtmlFile(String filePath) {
+		if(filePath.contains(".html"))
+			return true;
+
+		return false;
+	}
 
 	/**
 	 * Check if the selected file to View is a log file
@@ -485,6 +502,40 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);
 		}
+	}
+	
+	/**
+	 * If we want to launch TESTAR with the HTML report web service
+	 * using the ArtefactId mapped from TestResultsArtefactIdMap.json file. 
+	 * Get the mapped HTML output directory from this JSON file.
+	 * 
+	 * @return
+	 */
+	private File extractArtefactTestResults() {
+		File file = new File("TestResultsArtefactIdMap.json");
+
+		if(!file.exists())
+			return null;
+
+		try {
+			// Read TestResultsArtefactIdMap.json content
+			FileReader reader = new FileReader(file.getCanonicalPath());
+			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+			
+			// If TestResultsArtefactIdMap.json contains a HTML report mapped for the Artefact Id
+			if(!jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).isJsonNull()) {
+				String mappedHtml = jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).getAsString();
+				reader.close();
+				return new File(mappedHtml).getCanonicalFile();
+			}
+			
+			reader.close();
+		} catch (IOException e) {
+			System.out.println("ERROR DefaultProtocol: extractArtefactTestResults");
+			return null;
+		}
+
+		return null;
 	}
 
 	/**

@@ -35,6 +35,7 @@ import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -74,6 +75,11 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.json.JsonArtefactTestResults;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -373,6 +379,57 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 		}
 	}
+    
+    /**
+     * DECODER needs a Map to have a relation between the TESTAR TestResults output results 
+     * and the TESTAR TestResults ArtefactId. 
+     * This method uses a TESTAR TestResults ArtefactId to update a JSON Map.
+     * 
+     * @param artefactIdTestResults
+     */
+    protected void updateTestResultsJsonMap(String artefactIdTestResults) {
+    	
+    	// If we are not in Generate Mode we do not want to update this JSON map
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
+    		return;
+    	}
+    	
+    	File file = new File("TestResultsArtefactIdMap.json");
+    	try {
+    		if(!file.exists()) {
+    			// First TESTAR execution will create this file map
+    			file.createNewFile();
+
+    			// Create the simple JSON object map "{ artefactId : htmlOutput }"
+    			JsonObject jsonObject = new JsonObject();
+    			jsonObject.addProperty(artefactIdTestResults, htmlOutputDir.first());
+
+    			// Write the JSON object in the new created file
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+    			writer.close();
+    		}
+    		else {
+    			// File JSON map exists, read the content and load the existing JSON objects
+    			FileReader reader = new FileReader(file.getCanonicalPath());
+    			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+
+    			// Add the new JSON object map "{ NEWartefactId : NEWhtmlOutput }"
+    			jsonObject.addProperty(artefactIdTestResults, htmlOutputDir.first());
+
+    			// Write all the JSON objects
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+
+    			reader.close();
+    			writer.close();
+    		}
+    	} catch (IOException e) {
+    		System.out.println("ERROR updateTestResultsJsonMap");
+    	}
+    }
 
 	/*
 	 * Check the state if we need to force an action

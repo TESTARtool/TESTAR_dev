@@ -410,6 +410,12 @@ public class Settings extends TaggableBase implements Serializable {
 					+"AbstractStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# PKM address\n"
+					+"#################################################################\n"					
+					+"PKMaddress =" + Util.lineSep()
+					+"PKMport =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Previous State model difference settings\n"
 					+"#################################################################\n"
 					+"PreviousApplicationName =" + Util.lineSep()

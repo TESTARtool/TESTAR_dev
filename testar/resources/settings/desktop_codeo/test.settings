@@ -124,6 +124,12 @@ DataStoreMode = instant
 AbstractStateAttributes = WidgetTitle
 
 #################################################################
+# PKM address
+#################################################################
+PKMaddress = 127.0.0.1
+PKMport = 27017
+
+#################################################################
 # Previous State model difference settings
 #################################################################
 PreviousApplicationName =

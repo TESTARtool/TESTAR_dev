@@ -310,9 +310,14 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 			String commandTestResults = "node" +
 					" " + new File(insertTestResultsJS).getCanonicalPath() +
 					" " + new File(insertTestResultsSchema).getCanonicalPath() +
-					" " + new File(testResultsArtefactDirectory).getCanonicalPath();
+					" " + new File(testResultsArtefactDirectory).getCanonicalPath() +
+					" " + settings.get(ConfigTags.PKMaddress) +
+					" " + settings.get(ConfigTags.PKMport);
 
-			executeNodeJSQueryPKM(commandTestResults);
+			// Execute the NodeJS query and obtain the TestResults ArtefactId
+			String artefactIdTestResults = executeNodeJSQueryPKM(commandTestResults);
+			// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
+			updateTestResultsJsonMap(artefactIdTestResults);
 		} catch (IOException e) {
 			System.out.println("ERROR! Reading files to insert Test Result Artefacts");
 			e.printStackTrace();
@@ -326,9 +331,11 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 				String commandStateModel = "node" +
 						" " + new File(insertStateModelJS).getCanonicalPath() +
 						" " + new File(insertStateModelSchema).getCanonicalPath() +
-						" " + new File(stateModelArtefactDirectory).getCanonicalPath();
+						" " + new File(stateModelArtefactDirectory).getCanonicalPath() +
+						" " + settings.get(ConfigTags.PKMaddress) +
+						" " + settings.get(ConfigTags.PKMport);
 
-				executeNodeJSQueryPKM(commandStateModel);
+				String artefactIdStateModel = executeNodeJSQueryPKM(commandStateModel);
 			} catch (IOException e) {
 				System.out.println("ERROR! Reading files to insert State Model Artefact");
 				e.printStackTrace();

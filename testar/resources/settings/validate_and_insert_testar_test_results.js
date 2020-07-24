@@ -8,7 +8,9 @@ const fs = require ('fs');
 
 validate(process.argv[2], process.argv[3])
 
-const url = 'mongodb://localhost:27017';
+var pkmAddress = process.argv[4];
+var pkmPort = process.argv[5];
+const url = 'mongodb://' + pkmAddress + ':' + pkmPort;
 const dbName = 'mydb';
 const client = new MongoClient(url,{ useUnifiedTopology: true});
 

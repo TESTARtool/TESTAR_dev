@@ -402,7 +402,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * 
      * @param command
      */
-    protected void executeNodeJSQueryPKM(String command) {
+    protected String executeNodeJSQueryPKM(String command) {
     	// TODO: Allow Record mode when Listening mode implemented
     	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
 
@@ -444,11 +444,38 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				System.out.println(" !! ERROR trying to insert the Artefact !! ");
     				System.out.println(" ------------------------------------------");
     			}
+    			
+        		
+        		if(command.contains("validate_and_insert_testar_test_results.js")) {
+        			 return substringArtefactId(outputContent.toString(), "TestResultsArtefactId:");
+        		}
+        		else if (command.contains("validate_and_insert_testar_state_model.js")) {
+        			 return substringArtefactId(outputContent.toString(), "StateModelArtefactId:");
+        		}
 
     		} catch (IOException e) {
     			System.out.println("ERROR! : Trying to execute NODE JavaScript command : " + command);
     			e.printStackTrace();
     		}
     	}
+    	
+    	return "ErrorArtefactId";
     }
+    
+	/**
+	 * With the TESTAR output message, obtain the Artefact Identifier of desired Artefact Name.
+	 * 
+	 * @param executionOutput
+	 * @param find
+	 * @return artefactId
+	 */
+	private String substringArtefactId(String executionOutput, String find) {
+		String artefactId = "ERROR";
+		String pkmOutputInfo = executionOutput.substring(executionOutput.indexOf(find) + find.length());
+		artefactId = StringUtils.split(pkmOutputInfo, " ")[0];
+		artefactId = artefactId.replace("\n", "").replace("\r", "");
+		artefactId = artefactId.trim();
+		
+		return artefactId;
+	}
 }
