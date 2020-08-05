@@ -63,7 +63,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = true
+ProcessListenerEnabled = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################

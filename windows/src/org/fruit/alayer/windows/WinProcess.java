@@ -60,6 +60,8 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = ""; // by wcoux
+	
+	public static boolean java_execution = false;
 
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
@@ -127,7 +129,30 @@ public final class WinProcess extends SUTBase {
 		try{
 			Assert.notNull(path);
 
-			//Disabled with browsers, only allow it with desktop applications executed with command_line
+			// Force the execution of the SUT via Java
+			if(java_execution) {
+				
+				System.out.println("Executing SUT via Java process...");
+				
+				final Process process = Runtime.getRuntime().exec(path);
+				Field field = process.getClass().getDeclaredField("handle");
+				field.setAccessible(true);
+				
+				long processHandle = field.getLong(process);
+				
+				Util.pause(5);
+				
+				long pid = Windows.GetProcessId(processHandle);
+				
+				WinProcess returnProcess = fromPID(pid);
+				
+				returnProcess.set(Tags.Path, path);
+				returnProcess.set(Tags.Desc, path);
+				return returnProcess;
+			}
+			
+			// Execute the SUT via Windows API
+			// Disabled with browsers, only allow it with desktop applications executed with command_line
 			if(!ProcessListenerEnabled) {
 
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
@@ -140,8 +165,8 @@ public final class WinProcess extends SUTBase {
 				return ret;
 			}
 			
-			//Associate Output / Error from SUT
-
+			// Execute the SUT via Java
+			// And Associate Output / Error from SUT
 			final Process process = Runtime.getRuntime().exec(path);
 			Field field = process.getClass().getDeclaredField("handle");
 			field.setAccessible(true);
@@ -150,7 +175,7 @@ public final class WinProcess extends SUTBase {
 			
 			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
 			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
-			if(path.contains("java -jar"))
+			if(path.contains("java "))
 				Util.pause(5);
 			else
 				Windows.WaitForInputIdle(processHandle);
