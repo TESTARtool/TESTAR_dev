@@ -63,36 +63,40 @@ public final class MBeanClient {
 	 * @param args
 	 * @throws Exception
 	 */
-	public static String dumpJaCoCoReport() throws Exception {
+	public static String dumpJaCoCoReport() {
 
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
 				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
 				+ ".exec";
 
-		// Open connection to the coverage agent:
-		final JMXServiceURL url = new JMXServiceURL(SERVICE_URL);
-		final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
-		final MBeanServerConnection connection = jmxc
-				.getMBeanServerConnection();
+		try {
 
-		final IProxy proxy = (IProxy) MBeanServerInvocationHandler
-				.newProxyInstance(connection,
-						new ObjectName("org.jacoco:type=Runtime"), IProxy.class,
-						false);
+			// Open connection to the coverage agent:
+			final JMXServiceURL url = new JMXServiceURL(SERVICE_URL);
+			final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
+			final MBeanServerConnection connection = jmxc
+					.getMBeanServerConnection();
 
-		// Retrieve JaCoCo version and session id:
-		System.out.println("Version: " + proxy.getVersion());
-		System.out.println("Session: " + proxy.getSessionId());
+			final IProxy proxy = (IProxy) MBeanServerInvocationHandler
+					.newProxyInstance(connection,
+							new ObjectName("org.jacoco:type=Runtime"), IProxy.class,
+							false);
 
-		// Retrieve dump and write to file:
-		final byte[] data = proxy.getExecutionData(false);
-		final FileOutputStream localFile = new FileOutputStream(destFile);
-		localFile.write(data);
-		localFile.close();
+			// Retrieve JaCoCo version and session id:
+			System.out.println("Version: " + proxy.getVersion());
+			System.out.println("Session: " + proxy.getSessionId());
 
-		// Close connection:
-		jmxc.close();
+			// Retrieve dump and write to file:
+			final byte[] data = proxy.getExecutionData(false);
+			final FileOutputStream localFile = new FileOutputStream(destFile);
+			localFile.write(data);
+			localFile.close();
+
+			// Close connection:
+			jmxc.close();
+
+		} catch(Exception e) {e.printStackTrace();}
 
 		return destFile;
 	}
