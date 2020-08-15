@@ -1,10 +1,9 @@
 package nl.ou.testar.temporal.modelcheck;
 
-import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
         }
 
         cli = cli + " " + sb.toString() +" " +automat+ " &> " +  result;
-        Common.RunOSChildProcess(cli);
+        OShelper.RunOSChildProcess(cli);
     }
 
     public List<TemporalOracle> delegatedParseResults(String rawInput) {
@@ -89,15 +88,14 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.equals(Verdict.FAIL.toString())) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.equals(Verdict.PASS.toString())) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
+            Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }
 
     public List<String> delegatedFormulaValidation()  {
-        List<String> tmpformulas = FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
+        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
                 "!" +PropositionConstants.SETTING.terminalProposition);
-        return tmpformulas;
     }
 }
 

@@ -616,7 +616,7 @@ public class Temporalpanel {
     private void stopTemporalWebAnalyzer(ActionEvent evt) {
         try {
             assert webAnalyzerProcess != null;
-            if (webAnalyzerProcess.isAlive()) Common.HTTPGet(VisualizerURLStop);
+            if (webAnalyzerProcess.isAlive()) OShelper.HTTPGet(VisualizerURLStop);
 
             boolean ret = false;
             webAnalyzerProcess.waitFor(1, TimeUnit.SECONDS);

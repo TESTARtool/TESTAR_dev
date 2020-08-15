@@ -5,7 +5,7 @@ import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
         cli = cli + " --a " + automat + " --ff " + formula;
         if (counterExamples) cli = cli + " --witness ";
         cli = cli + " &> " + result;
-        Common.RunOSChildProcess(cli);
+        OShelper.RunOSChildProcess(cli);
     }
 
 
@@ -83,7 +83,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         String[] prefixLines = cleanprefix.split("\\n");
                         if (prefixLines.length>=2){  // only when there is  content in the prefix section
                         for (int j = 0; j < prefixLines.length; j = j + 2) {
-                            int stateindex= stateindex=Integer.parseInt(prefixLines[j].trim());
+                            int stateindex= Integer.parseInt(prefixLines[j].trim()); // was self-assignment
                             if (tmodel.getInitialStates().size()>1){ // SPOT adds the artificial state and silently increases the state count.
                                 stateindex=stateindex-1;
                             }
@@ -107,7 +107,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         String[] cycleLines = cleancycle.split("\\n");
                         if (cycleLines.length>=2){  // only when there is  content in the cycle section
                         for (int j = 0; j < cycleLines.length; j = j + 2) {
-                            int stateindex= stateindex=Integer.parseInt(cycleLines[j].trim());
+                            int stateindex= Integer.parseInt(cycleLines[j].trim()); // was self-assignment
                             if (tmodel.getInitialStates().size()>1){// SPOT adds the artificial state and silently increases the state count.
                                 stateindex=stateindex-1;
                             }
@@ -181,7 +181,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                     if (formulaStatus.equals(Verdict.PASS.toString()))  Oracle.setOracle_verdict(Verdict.PASS);
 
                 }
-                Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
+                Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
                 i++;
             }
         }

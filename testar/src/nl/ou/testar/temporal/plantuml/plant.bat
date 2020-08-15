@@ -1,1 +1,1 @@
-java -jar plantuml-dependency-cli-1.4.0.jar -b . -dp ".*temporal.*" -o plantuml.txt
+java -jar plantuml.jar -b ".." -tlatex -o plant.tex

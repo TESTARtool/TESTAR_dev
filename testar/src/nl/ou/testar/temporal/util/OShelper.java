@@ -17,7 +17,7 @@ import java.util.Date;
 
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 
-public class Common {
+public class OShelper {
     public static String toWSLPath(String windowsFilePath) {
         Path winpath = Paths.get(windowsFilePath);
         StringBuilder wslpath = new StringBuilder();

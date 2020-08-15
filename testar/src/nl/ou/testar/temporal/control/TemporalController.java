@@ -28,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static nl.ou.testar.temporal.util.Common.prettyCurrentTime;
+import static nl.ou.testar.temporal.util.OShelper.prettyCurrentTime;
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
 
@@ -180,9 +180,10 @@ public class TemporalController {
         outputDir = outputDir + settings.get(ConfigTags.TemporalDirectory);
 
         if (settings.get(ConfigTags.TemporalSubDirectories)) {
-            String runFolder = Common.CurrentDateToFolder();
+            String runFolder = OShelper.CurrentDateToFolder();
             outputDir = outputDir + File.separator + runFolder;
         }
+        //noinspection ResultOfMethodCallIgnored
         new File(outputDir).mkdirs();
         outputDir = outputDir + File.separator;
         return outputDir;

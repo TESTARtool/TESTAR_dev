@@ -3,7 +3,7 @@ package nl.ou.testar.temporal.modelcheck;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
 
         cli = cli + " -i " + automat +" -t ETF -LTL " + formula + " -c " + (counterExamples ? "-e" : "");
         cli = cli + " &> " + result;
-        Common.RunOSChildProcess(cli);
+        OShelper.RunOSChildProcess(cli);
     }
     public List<TemporalOracle> delegatedParseResults(String rawInput) {
 
@@ -73,7 +73,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.contains("FALSE")) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.contains("TRUE")) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
+            Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }

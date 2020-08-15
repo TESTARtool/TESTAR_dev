@@ -4,7 +4,7 @@ import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,7 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
 
         cli = cli + " -i " + automat + " -t ETF -ctl " +formula + (counterExamples ? "" : "");// no witness
         cli = cli + " &> " + result;
-        Common.RunOSChildProcess(cli);
+        OShelper.RunOSChildProcess(cli);
     }
 
 
@@ -78,15 +78,14 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.contains("FALSE")) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.contains("TRUE")) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(Common.prettyCurrentDateTime());
+            Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }
 
     public List<String> delegatedFormulaValidation()    {
-        List<String> tmpformulas = FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
+        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
                 "!" + PropositionConstants.SETTING.terminalProposition);
-        return tmpformulas;
     }
 }
 

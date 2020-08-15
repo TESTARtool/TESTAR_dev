@@ -8,7 +8,7 @@ import com.opencsv.bean.CsvBindByName;
 
 import java.util.*;
 
-import static nl.ou.testar.temporal.util.Common.prettyCurrentDateTime;
+import static nl.ou.testar.temporal.util.OShelper.prettyCurrentDateTime;
 
 public class LogData {
 protected static final String csvsep=";";

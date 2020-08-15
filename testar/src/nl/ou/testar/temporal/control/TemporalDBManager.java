@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.control;
 
-import com.google.common.collect.HashBiMap;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
@@ -20,10 +19,19 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.foundation.PairBean;
 import nl.ou.testar.temporal.foundation.DBManagerException;
 import nl.ou.testar.temporal.foundation.TagBean;
-import nl.ou.testar.temporal.graphml.*;
+import nl.ou.testar.temporal.graphml.GraphML_DocEdge;
+import nl.ou.testar.temporal.graphml.GraphML_DocEleProperty;
+import nl.ou.testar.temporal.graphml.GraphML_DocGraph;
+import nl.ou.testar.temporal.graphml.GraphML_DocKey;
+import nl.ou.testar.temporal.graphml.GraphML_DocNode;
+import nl.ou.testar.temporal.graphml.GraphML_DocRoot;
 import nl.ou.testar.temporal.ioutils.SimpleLog;
 import nl.ou.testar.temporal.ioutils.XMLHandler;
-import nl.ou.testar.temporal.model.*;
+import nl.ou.testar.temporal.model.StateEncoding;
+import nl.ou.testar.temporal.model.TemporalModel;
+import nl.ou.testar.temporal.model.TemporalTrace;
+import nl.ou.testar.temporal.model.TemporalTraceEvent;
+import nl.ou.testar.temporal.model.TransitionEncoding;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.proposition.PropositionFilter;
 import nl.ou.testar.temporal.proposition.PropositionFilterType;
@@ -36,7 +44,7 @@ import org.fruit.monkey.Settings;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nl.ou.testar.temporal.util.Common.prettyCurrentTime;
+import static nl.ou.testar.temporal.util.OShelper.prettyCurrentTime;
 
 public  class TemporalDBManager {
     private Config dbConfig;
@@ -60,7 +68,7 @@ public  class TemporalDBManager {
     }
 
     private boolean initOrientDb() {
-        boolean success = false;
+        boolean success ;
         if (dbEnabled) {
             String connectionString = dbConfig.getConnectionType()  + ":/" +
                     (dbConfig.getConnectionType().equals("remote") ?

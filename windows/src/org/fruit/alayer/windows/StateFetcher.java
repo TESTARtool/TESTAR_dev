@@ -112,13 +112,25 @@ public class StateFetcher implements Callable<UIAState>{
 			w.set(Tags.Path,Util.indexString(w));
 		// begin css
 			Widget parent=w.parent();
+			String parentTitle;
+			Shape shape;
 			if (parent !=null){
-					String parentTitle=parent.get(Tags.Title);
-					if (parentTitle != null) {
-						w.set(Tags.ParentTitle, parentTitle);
-					}
+				try {
+					 parentTitle = parent.get(Tags.Title);
+				}
+				catch (NoSuchTagException e) {
+					parentTitle = null;
+				}
+				if (parentTitle != null) {
+					w.set(Tags.ParentTitle, parentTitle);
+				}
 			}
-			Shape shape = w.get(Tags.Shape);
+			try {
+				shape = w.get(Tags.Shape);
+			}
+			catch (NoSuchTagException e) {
+				shape = null;
+			}
 			if (shape!=null){
 				Point anchor = Point.from(shape.x(), shape.y());
 				w.set(Tags.Anchor, anchor);

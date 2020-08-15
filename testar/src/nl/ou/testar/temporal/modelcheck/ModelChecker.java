@@ -7,7 +7,7 @@ import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -143,9 +143,9 @@ public abstract class ModelChecker {
         formulaFile = new File(outputDir + temporalFormalism + "_formulas.txt");
         resultsFile = new File(outputDir + temporalFormalism + "_results.txt");
         syntaxformulaFile = new File(outputDir + temporalFormalism + "_syntaxcheckedformulas.txt");
-        automat = ((toWslPath) ? Common.toWSLPath(automatonFile.getAbsolutePath()) : automatonFile.getAbsolutePath());
-        formula = ((toWslPath) ? Common.toWSLPath(formulaFile.getAbsolutePath()) : formulaFile.getAbsolutePath());
-        result = ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        automat = ((toWslPath) ? OShelper.toWSLPath(automatonFile.getAbsolutePath()) : automatonFile.getAbsolutePath());
+        formula = ((toWslPath) ? OShelper.toWSLPath(formulaFile.getAbsolutePath()) : formulaFile.getAbsolutePath());
+        result = ((toWslPath) ? OShelper.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
         //System.out.println("debug: ");
     }
 
@@ -196,7 +196,7 @@ public abstract class ModelChecker {
             ora.setApplicationVersion(tmodel.getApplicationVersion());
             ora.setApplication_ModelIdentifier(tmodel.getApplication_ModelIdentifier());
             ora.setApplication_AbstractionAttributes(tmodel.getApplication_AbstractionAttributes());
-            ora.set_modifieddate(Common.prettyCurrentDateTime());
+            ora.set_modifieddate(OShelper.prettyCurrentDateTime());
         }
     }
     private String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {

@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
-import nl.ou.testar.temporal.util.Common;
+import nl.ou.testar.temporal.util.OShelper;
 import nl.ou.testar.temporal.util.StringFinder;
 
 import java.io.*;
@@ -11,9 +11,6 @@ import java.util.*;
 public enum FormulaVerifier {
     INSTANCE;//singleton
     private String pathToExecutable;
-
-
-
     private boolean toWslPath;
 
     public void setPathToExecutable(String pathToExecutable) {
@@ -27,12 +24,12 @@ public enum FormulaVerifier {
     public   List<String> verifyLTL(  String formulaFilePath, File resultsFile, String aliveprop) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
         String cli = pathToExecutable;
-        String cli_resultsfile = " " + ((toWslPath) ? Common.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
-        String cli_formulafile = " " + ((toWslPath) ? Common.toWSLPath(formulaFilePath) : formulaFilePath);
+        String cli_resultsfile = " " + ((toWslPath) ? OShelper.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
+        String cli_formulafile = " " + ((toWslPath) ? OShelper.toWSLPath(formulaFilePath) : formulaFilePath);
         String cli_ltlf=" --ltlf "+aliveprop;
         cli = cli + " --fonly --ff " +  cli_formulafile+cli_ltlf;
         cli = cli + " &> " + cli_resultsfile;
-        Common.RunOSChildProcess(cli);
+        OShelper.RunOSChildProcess(cli);
         return parse(resultsFile);
 
     }
