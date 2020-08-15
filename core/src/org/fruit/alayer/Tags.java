@@ -65,7 +65,7 @@ public final class Tags extends TagsBase {
 	public static final Tag<Shape> Shape = from("Shape", Shape.class);
 
 	/**
-	 *  css  Anchor point (top left upper) of the widget. */
+	 *  css  Anchor point (top left) of the widget. */
 	public static final Tag<Point> Anchor = from("Anchor", Point.class);
 	///**	   css  Anchor point  of the widget, relative to the size of the root widget. */
 	//public static final Tag<Point> AnchorRel = from("AnchorRel", Point.class);

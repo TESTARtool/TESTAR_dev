@@ -2,6 +2,7 @@ package es.upv.staq.testar;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import org.fruit.alayer.Point;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
@@ -26,6 +27,11 @@ public class StateManagementTags {
 
     // the widget's title
     public static final Tag<String> WidgetTitle = Tag.from("Widget title", String.class);
+
+    // css the widget's parent title
+    public static final Tag<String> WidgetParentTitle = Tag.from("Widget parent title", String.class);
+    // css the widget's upper left anchor point
+    public static final Tag<Point> WidgetAnchor = Tag.from("Widget anchor", Point.class);
 
     // a help text string that may be set for the widget
     public static final Tag<String> WidgetHelpText = Tag.from("Widget helptext", String.class);
@@ -62,6 +68,8 @@ public class StateManagementTags {
 
     // the path in the widget tree that leads to the widget
     public static final Tag<String> WidgetPath = Tag.from("Path to the widget", String.class);
+
+
 
     // the on-screen boundaries for the widget (coordinates)
     public static final Tag<String> WidgetBoundary = Tag.from("Widget on-screen boundaries", String.class);
@@ -306,6 +314,8 @@ public class StateManagementTags {
             add(WidgetSetPosition);
             add(WidgetSetSize);
             add(WidgetRotation);
+            add(WidgetParentTitle);
+            add(WidgetAnchor);
 
             // patterns
             add(WidgetAnnotationPattern);
@@ -385,6 +395,10 @@ public class StateManagementTags {
         settingsMap.put(WidgetSetPosition, "WidgetSetPosition");
         settingsMap.put(WidgetSetSize, "WidgetSetSize");
         settingsMap.put(WidgetRotation, "WidgetRotation");
+        //2020 css:
+        settingsMap.put(WidgetParentTitle, "WidgetParentTitle");
+        settingsMap.put(WidgetAnchor, "WidgetAnchor");
+        //
         settingsMap.put(WidgetAnnotationPattern, "WidgetAnnotationPattern");
         settingsMap.put(WidgetDockPattern, "WidgetDockPattern");
         settingsMap.put(WidgetDragPattern, "WidgetDragPattern");
@@ -417,6 +431,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
+
     }
 
     // a mapping of a tag to its group
@@ -452,6 +467,10 @@ public class StateManagementTags {
             put(WidgetSetPosition, Group.General);
             put(WidgetSetSize, Group.General);
             put(WidgetRotation, Group.General);
+            //2020 css:
+            put(WidgetParentTitle, Group.General);
+            put(WidgetAnchor, Group.General);
+            //
             put(WidgetAnnotationPattern, Group.ControlPattern);
             put(WidgetDockPattern, Group.ControlPattern);
             put(WidgetDragPattern, Group.ControlPattern);
@@ -737,6 +756,10 @@ public class StateManagementTags {
             put(WidgetTitle, Tags.Title);
             put(WidgetIsEnabled, Tags.Enabled);
             put(WidgetPath, Tags.Path);
+            //2020 css:
+            put(WidgetParentTitle, Tags.ParentTitle);
+            put(WidgetAnchor, Tags.Anchor);
+            //
         }
     };
 
