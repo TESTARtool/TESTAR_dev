@@ -460,6 +460,7 @@ public class TemporalController {
                     simpleLog.append("Error: StateModel not available");
                 } else {
                     setTemporalModelMetaData(abstractStateModel);
+                    simpleLog.append(prettyCurrentTime() + " | " + "Model= Name: "+tModel.getApplicationName()+" ; Ver: "+tModel.getApplicationVersion()+" ; ID: "+tModel.getApplication_ModelIdentifier());
                     tModel.setAtomicPropositionKeying(propositionManager.getPropositionKeying());
                     tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
                     simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
