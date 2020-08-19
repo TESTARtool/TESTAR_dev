@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.ioutils;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,20 +37,15 @@ public class JSONHandler {
             File output = new File(toFile);
             ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-            objectMapper.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true); //
-            String result = objectMapper.writeValueAsString(content);
+            objectMapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
             // let's write the resulting json to a file
-             if (!zip) {
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
-                writer.append(result);
-                writer.close();
-            }
+            objectMapper.writeValue(output, content);
 
-            }else {
+            if (zip) {
                 FileOutputStream fos = new FileOutputStream(toFile+".zip");
                 ZipOutputStream zipOut = new ZipOutputStream(fos);
-                InputStream sis = new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8));
+                InputStream sis = new FileInputStream(toFile); // default charset!
+
                 ZipEntry zipEntry = new ZipEntry(Paths.get(toFile).getFileName().toString());
                 zipOut.putNextEntry(zipEntry);
                 byte[] bytes = new byte[1024];
@@ -60,8 +56,10 @@ public class JSONHandler {
                 zipOut.close();
                 sis.close();
                 fos.close();
-
+                //noinspection ResultOfMethodCallIgnored
+                output.delete();
             }
+
         } catch (
                 IOException e) {
             e.printStackTrace();

@@ -88,7 +88,7 @@ dependencies {
     compile group: 'com.intellij', name: 'forms_rt', version: '6.0.5' //css 20190715 apache lic.
 
     compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version: '3.4.0'  //css 20190706
-    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0" // css20190707
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" // css20190707,20200817
 
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'

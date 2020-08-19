@@ -427,7 +427,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
 					+"TemporalInstrumentDeadlockState = false" + Util.lineSep()
 					+"TemporalVerbose = true" + Util.lineSep()
-					+"TTemporalZipLargeFiles = false" + Util.lineSep()
+					+"TemporalZipLargeFiles = false" + Util.lineSep()
 					+"TemporalDBisSource = true" + Util.lineSep()
 					+"TemporalCounterExamples = true" + Util.lineSep()
 					+"TemporalOracles = TemporalOracles.csv" + Util.lineSep()
