@@ -794,7 +794,9 @@ public  class TemporalDBManager {
 
 
             resultSet.close();
+        simpleLog.append(prettyCurrentTime() + " | " + "Copying state propositions to transitions");
             tModel.finalizeTransitions(); //update once. this is a costly operation
+        simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions");
             for (StateEncoding stenc : tModel.getStateEncodings()
             ) {
                 Map<String,TransitionEncoding> encodedConjuncts = new HashMap<>();

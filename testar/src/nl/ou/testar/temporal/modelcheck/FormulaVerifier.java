@@ -109,8 +109,8 @@ public enum FormulaVerifier {
                     break;
                 }
                 formulaline = endline; //not the end but a new formula
-                String modelVariant = "[LTLF Modelvariant: ";
-                String traceVariant = "[LTLF G&V-2013 variant: ";
+                String modelVariant = "[LTLfl: ";
+                String traceVariant = "[LTLf: ";
 
                 int indexmodel = formulaline.lastIndexOf(modelVariant);
                 int indextrace = formulaline.lastIndexOf(traceVariant);
