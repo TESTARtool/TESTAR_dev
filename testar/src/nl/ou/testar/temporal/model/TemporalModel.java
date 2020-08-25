@@ -1,7 +1,6 @@
 package nl.ou.testar.temporal.model;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
@@ -12,7 +11,7 @@ import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.proposition.PropositionConstants;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
-//@JsonPropertyOrder({  "formatVersion", "atomicPropositionKeying,"atomicPropositions","initialStates", "stateList", "transitionList"})//,"traces","stateEncodings" })
+
 @JsonPropertyOrder(alphabetic = true)
 public class TemporalModel extends ModelBean {
 
@@ -37,7 +36,7 @@ public class TemporalModel extends ModelBean {
         this.atomicPropositions = new LinkedHashSet<>();  //must maintain order
     }
 
-    @SuppressWarnings("unused")
+
     public Set<String> getInitialStates() {
         return initialStates;
     }
@@ -62,7 +61,7 @@ public class TemporalModel extends ModelBean {
     public void setAtomicPropositions(Set<String> atomicPropositions) {
         this.atomicPropositions = atomicPropositions;
     }
-    @SuppressWarnings("unused")
+
     public List<String> getStateList() {
         return stateList;
     }
@@ -70,7 +69,7 @@ public class TemporalModel extends ModelBean {
     public void setStateList(List<String> stateList) {
         this.stateList = stateList;
     }
-    @SuppressWarnings("unused")
+
     public List<String> getTransitionList() {
         return transitionList;
     }
@@ -118,7 +117,7 @@ public class TemporalModel extends ModelBean {
     }
 
 
-    //custom
+
     public void addStateEncoding(StateEncoding stateEncoding, boolean updateTransitionsImmediate) {
 
         stateEncodings.add(stateEncoding);
@@ -599,114 +598,6 @@ public class TemporalModel extends ModelBean {
         result.append("}\n\n");
         result.append("main TESTAR;\n");
         return result.toString();
-    }
-
-
-    public String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
-
-        StringBuilder Formulas = new StringBuilder();
-        String rawFormula;
-        for (TemporalOracle candidateOracle : oracleColl) {
-            String formula;
-            List<String> sortedparameters = new ArrayList<>(candidateOracle.getPatternBase().getPattern_Parameters());//clone list
-            Collections.sort(sortedparameters);
-            List<String> sortedsubstitionvalues = new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
-            sortedsubstitionvalues.removeAll(Collections.singletonList(""));  // discard empty substitutions
-            TemporalFormalism tFormalism = TemporalFormalism.valueOf(candidateOracle.getPatternTemporalType().name());
-
-            boolean importStatus;
-            rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
-            if (rawFormula.toUpperCase().equals("FALSE")){
-                rawFormula="false"; // MS Excel converts 'false' to 'FALSE'. this is interpreted as eventually F(ALSE)
-            }
-            importStatus = sortedparameters.size() == sortedsubstitionvalues.size();
-            if (!importStatus) {
-                candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
-            }
-            if (importStatus)
-                importStatus = getAtomicPropositions().containsAll(sortedsubstitionvalues);
-
-            if (!importStatus) {
-                candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
-                for (String subst : sortedsubstitionvalues
-                ) {
-                    if (!getAtomicPropositions().contains(subst)) candidateOracle.addLog("not found: " + subst);
-                }
-            }
-            if (!importStatus) {
-                String falseFormula="false";
-                candidateOracle.addLog("setting formula to 'false'");
-                String  formulalvl6= tFormalism.line_prepend+StringUtils.replace(falseFormula,tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight()) + tFormalism.line_append;
-                Formulas.append(formulalvl6);
-                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
-            } else {
-
-                HashBiMap<Integer, String> aplookup = HashBiMap.create();
-                aplookup.putAll(getPropositionMap());
-                ArrayList<String> apindex = new ArrayList<>();
-                if (doTransformation) {
-
-                    String deadprop = getPropositionIndex(PropositionConstants.SETTING.terminalProposition, true);
-                    if (!deadprop.equals("")) { // model has 'dead' as an atomic  property
-                        sortedsubstitionvalues.add(PropositionConstants.SETTING.terminalProposition);
-                        sortedparameters.add(PropositionConstants.SETTING.terminalProposition); // consider 'dead' as a kind of parameter
-                    }
-
-                    for (String v : sortedsubstitionvalues
-                    ) {
-                        if (aplookup.inverse().containsKey(v)) {
-                            apindex.add(PropositionConstants.SETTING.outputPrefix + aplookup.inverse().get(v));
-                        } else
-                            apindex.add(PropositionConstants.SETTING.outputPrefix + "_indexNotFound");
-                        // will certainly fail if during model-check, because parameters are not prefixed with 'ap'
-
-                    }
-
-                    {
-                      //  String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
-                        String formulalvl0 = rawFormula;
-
-                        if( !tFormalism.supportsMultiInitialStates && initialStates.size()>1){
-                            //when there are initial states added to the model, the formula alters:
-                            //satisfaction of the formula starts after the artificial state, hence the X-operator.
-                            if (tFormalism == TemporalFormalism.CTL_ITS||tFormalism == TemporalFormalism.CTL_GAL){
-                                formulalvl0="AX("+rawFormula+")";
-                            }
-                            if (tFormalism == TemporalFormalism.LTL_ITS|| tFormalism == TemporalFormalism.LTL_SPOT){
-                                formulalvl0="X("+rawFormula+")";
-                            }
-
-                        }
-                        String formulalvl1a =  tFormalism.line_prepend+formulalvl0;
-                        String formulalvl1 = formulalvl1a + tFormalism.line_append;
-                        String formulalvl2 = StringUtils.replace(formulalvl1,
-                                tFormalism.finally_replace.getLeft(), tFormalism.finally_replace.getRight());
-                        String formulalvl3 = StringUtils.replace(formulalvl2,
-                                tFormalism.globally_replace.getLeft(), tFormalism.globally_replace.getRight());
-                        String formulalvl4 = StringUtils.replace(formulalvl3,
-                                tFormalism.and_replace.getLeft(), tFormalism.and_replace.getRight());
-                        String formulalvl5 = StringUtils.replace(formulalvl4,
-                                tFormalism.or_replace.getLeft(), tFormalism.or_replace.getRight());
-                        String formulalvl6 = StringUtils.replace(formulalvl5,
-                                tFormalism.false_replace.getLeft(), tFormalism.false_replace.getRight());
-
-                        apindex.replaceAll(s -> tFormalism.ap_prepend + s + tFormalism.ap_append);
-
-                        formula = StringUtils.replaceEach(formulalvl6,
-                                sortedparameters.toArray(new String[0]), apindex.toArray(new String[0]));
-
-                    }
-                } else {
-                    formula = candidateOracle.getPatternBase().getPattern_Formula();
-                }
-                Formulas.append(formula);
-            }
-            Formulas.append("\n"); //always a new line . if formula is not validated a blank line appears
-
-        }
-
-        return Formulas.toString();
-
     }
 
     public String getPropositionIndex(String proposition) {

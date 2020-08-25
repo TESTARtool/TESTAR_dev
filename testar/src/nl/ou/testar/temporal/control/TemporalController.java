@@ -231,13 +231,6 @@ public class TemporalController {
     }
 
 
-    //*********************************
-
-//    private void settModel(AbstractStateModel abstractStateModel, boolean instrumentTerminalState) {
-//        tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
-//    }
-
-
 
     private AbstractStateModel getAbstractStateModel() {
         AbstractStateModel abstractStateModel;
@@ -262,7 +255,6 @@ public class TemporalController {
         simpleLog.append(prettyCurrentTime() + " | " + "generating Model file: "+toFile);
         JSONHandler.save(tModel, outputDir + toFile,zip);
     }
-
 
 
     public void MCheck() {
@@ -605,5 +597,3 @@ public class TemporalController {
         return potentialOracleColl;
     }
 }
-
-
