@@ -307,7 +307,7 @@ public class TemporalController {
                 else strippedFile = filename;
 
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-                    makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,sourceIsDb,modelFile);
+                    setTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,sourceIsDb,modelFile);
                 setOracleColl(fromcoll);
 
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
@@ -423,10 +423,8 @@ public class TemporalController {
             f.printStackTrace();
         }
     }
-    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean zip) {
-        makeTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,true,"");
-    }
-    public void makeTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState,boolean zip, boolean sourceIsDB,String modelFile) {
+
+    public void setTemporalModel(String propositionManagerFile, boolean verbose, boolean instrumentTerminalState, boolean zip, boolean sourceIsDB, String modelFile) {
         try {
             simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model started");
             if (verbose) {
@@ -468,10 +466,10 @@ public class TemporalController {
 
     }
 
-    public void generateOraclesFromPatterns(String propositionManagerfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern) {
+    public void generateOraclesFromPatterns(String propositionManagerfile, String patternFile, String patternConstraintFile, int tactic_oraclesPerPattern,boolean sourceIsDB,String modelFile) {
         try {
             simpleLog.append(" potential Oracle generator started \n");
-            makeTemporalModel(propositionManagerfile, false, true,false);
+            setTemporalModel(propositionManagerfile, false, true,false,sourceIsDB,modelFile);
             List<TemporalPattern> patterns = CSVHandler.load(patternFile, TemporalPattern.class);
             List<TemporalPatternConstraint> patternConstraints = null;
             if (!patternConstraintFile.equals("")) {

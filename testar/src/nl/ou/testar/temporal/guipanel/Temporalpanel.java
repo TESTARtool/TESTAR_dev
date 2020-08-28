@@ -583,7 +583,9 @@ public class Temporalpanel {
                 PropositionManagerFile.getText(),
                 patternFile.getText(),
                 patternConstraintsFile.getText(),
-                Integer.parseInt(Objects.requireNonNull(tacticComboBox.getSelectedItem()).toString())); //requirenonnull?
+                Integer.parseInt(Objects.requireNonNull(tacticComboBox.getSelectedItem()).toString()),
+                sourceIsDb.isSelected(), modelFile.getText()
+        ); //requirenonnull?
     }
 
 
@@ -641,7 +643,7 @@ public class Temporalpanel {
     }
 
     private void exportTemporalmodel(ActionEvent evt) {
-        tcontrol.makeTemporalModel(PropositionManagerFile.getText(), verboseCheckBox.isSelected(), instrumentDeadlockStatesCheckBox.isSelected(), zipOutputCheckBox.isSelected());
+        tcontrol.setTemporalModel(PropositionManagerFile.getText(), verboseCheckBox.isSelected(), instrumentDeadlockStatesCheckBox.isSelected(), zipOutputCheckBox.isSelected(), true, "");
     }
 
     private void testgraphml(ActionEvent evt) {
