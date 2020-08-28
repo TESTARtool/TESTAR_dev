@@ -37,7 +37,10 @@ public class StringFinder {
     }
 
     /**
-     * Find any matching substring and weave the 'replacestring'  in all occurences
+     * Find all blocks between tosearch and its corresponding ')' then  weave the 'replacestring'
+     * between tosearch and the found block.
+     * ~ newblock =  replaceStr + "("+block +")"
+     *
      *  @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    prefix of the embedding
@@ -64,11 +67,14 @@ public class StringFinder {
     }
 
     /**
-     * Find any "..U.."  substring and weave the 'replacestring'  in all occurences
+     * Find all blocks between "..U.."   and its corresponding ')' then  weave the 'replaceXstring'
+     * between the ..U.. and the found  block.
+     * ~ newblock =  "("+replaceXStr + "("+block +"))"
+     *
      * (search from right to left)
      * @param data          string that might contain substrings "..U.."
      * @param replaceAStr    substring to replace in case of A(..U..)
-     * @param replaceEStr    substring to replace in case of A(..U..)
+     * @param replaceEStr    substring to replace in case of E(..U..)
      *
      *
      * inspired by https://thispointer.com/find-and-replace-all-occurrences-of-a-sub-string-in-c \n
@@ -82,7 +88,7 @@ public class StringFinder {
             int index = 0;
             String wordToFind = "\\s*U\\s*";
             Pattern word = CachedRegexPatterns.addAndGet(wordToFind);
-            String part = target.substring(index);;
+            String part = target.substring(index);
             Matcher match = word.matcher(part);
 
 
