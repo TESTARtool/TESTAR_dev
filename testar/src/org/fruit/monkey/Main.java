@@ -477,6 +477,7 @@ public class Main {
 			defaults.add(Pair.from(TemporalConcreteEqualsAbstract, true));
 			defaults.add(Pair.from(TemporalInstrumentDeadlockState, false));
 			defaults.add(Pair.from(TemporalVerbose, true));
+			defaults.add(Pair.from(TemporalExportGraphMLOnVerbose, true));
 			defaults.add(Pair.from(TemporalZipLargeFiles, false));
 			defaults.add(Pair.from(TemporalDBisSource, true));
 			defaults.add(Pair.from(TemporalCounterExamples, true));

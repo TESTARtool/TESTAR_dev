@@ -68,6 +68,8 @@ public class TemporalController {
     private  String propositionManagerFile;
     private  String oracleFile;
     private  boolean verbose;
+    // GraphMLOnVerbose: when false=> Model-generation with even less overhead, despite verbosity. setting is NOT in GUI
+    private  boolean exportGraphMLOnVerbose;
     private  boolean zip;
 
     private  boolean counterExamples;
@@ -136,6 +138,8 @@ public class TemporalController {
 
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
+        exportGraphMLOnVerbose = settings.get(ConfigTags.TemporalExportGraphMLOnVerbose);
+
         zip= settings.get(ConfigTags.TemporalZipLargeFiles);
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
         instrumentDeadlockState = settings.get(ConfigTags.TemporalInstrumentDeadlockState);
@@ -308,7 +312,7 @@ public class TemporalController {
                 setOracleColl(fromcoll);
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
-                if (verbose && sourceIsDb) {
+                if (verbose && sourceIsDb & exportGraphMLOnVerbose) {
                 saveToGraphMLFile("GraphML.XML", false,zip);
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true,zip);
                 }

@@ -150,6 +150,7 @@ TemporalOffLineEnabled              = false
 TemporalConcreteEqualsAbstract      = true
 TemporalInstrumentDeadlockState     = true
 TemporalVerbose                     = true
+TemporalExportGraphMLOnVerbose      = true
 TemporalZipLargeFiles               = true
 TemporalDBisSource                  = true
 TemporalCounterExamples             = true
