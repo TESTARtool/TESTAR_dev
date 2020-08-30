@@ -285,34 +285,30 @@ public class TemporalController {
 
             simpleLog.append(prettyCurrentTime() + " | " + "Temporal model-checking started");
             List<TemporalOracle> fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
+
             if (fromcoll == null) {
                 simpleLog.append(prettyCurrentTime()+"Error: verify the file at location '" + oracleFile + "'");
             } else {
-                tModel = new TemporalModel();
-                AbstractStateModel abstractStateModel = getAbstractStateModel();
-                if (abstractStateModel == null){
+                setTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,sourceIsDb,modelFile);
+               if (tModel == null){
                     simpleLog.append("Error: StateModel not available");
                 }
                 else {
-                String OracleCopy = "copy_of_applied_" + Paths.get(oracleFile).getFileName().toString();
+
                 if (verbose) {
+                    String OracleCopy = "copy_of_applied_" + Paths.get(oracleFile).getFileName().toString();
                     Files.copy((new File(oracleFile).toPath()),
                             new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
-
-
                 String strippedFile;
                 String filename = Paths.get(oracleFile).getFileName().toString();
                 if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
                 else strippedFile = filename;
-
                 File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-                    setTemporalModel(propositionManagerFile, verbose, instrumentTerminalState,zip,sourceIsDb,modelFile);
                 setOracleColl(fromcoll);
-
                 Map<TemporalFormalism, List<TemporalOracle>> oracleTypedMap =fromcoll.stream().collect(Collectors.groupingBy(TemporalOracle::getPatternTemporalType));
 
-                if (verbose) {
+                if (verbose && sourceIsDb) {
                 saveToGraphMLFile("GraphML.XML", false,zip);
                 saveToGraphMLFile("GraphML_NoWidgets.XML", true,zip);
                 }
