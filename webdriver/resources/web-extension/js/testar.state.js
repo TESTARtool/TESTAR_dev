@@ -55,6 +55,29 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         traverseElementTestar(childWrapped, rootElement, ignoredTags);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
+	
+	// Descend through Shadow DOM Web Elements
+	if(parentWrapped.element.shadowRoot !== null){
+		var shadowNodes = parentWrapped.element.shadowRoot.childNodes;
+		for (var i = 0; i < shadowNodes.length; i++) {
+			var childShadowElement = shadowNodes[i];
+			
+			// Filter ignored tags or non-element nodes
+			if (childShadowElement.nodeType === 3) {
+				parentWrapped.textContent += childShadowElement.textContent;
+				parentWrapped.textContent = parentWrapped.textContent.trim();
+				continue;
+			}
+			if (childShadowElement.nodeType !== 1 ||
+				ignoredTags.includes(childShadowElement.nodeName.toLowerCase())) {
+				continue;
+			}
+			
+			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
+			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags);
+			parentWrapped.wrappedChildren.push(childShadowWrapped);
+		}
+	}
 
     // No need for it anymore, save serialization effort
     delete parentWrapped['element'];
@@ -117,11 +140,6 @@ function getChildNodesTestar(parentWrapped) {
         top += parseInt(style.getPropertyValue('padding-top'));
         parentWrapped["yOffset"] = parentWrapped['rect'][1] + top;
     }
-	
-	// Shadow Web Elements
-	if(childNodes.length === 0 && parentWrapped.element.shadowRoot !== null){
-		childNodes = parentWrapped.element.shadowRoot.childNodes;
-	}
 
     return childNodes;
 }
