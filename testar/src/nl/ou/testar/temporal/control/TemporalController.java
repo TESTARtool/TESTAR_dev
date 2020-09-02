@@ -81,6 +81,7 @@ public class TemporalController {
     private  TemporalDBManager tDBManager;
     private  List<TemporalOracle> oracleColl;
     private  SimpleLog simpleLog;
+    private boolean logDetailsInModelFile;
 
 
     public TemporalController(final Settings settings) {
@@ -139,6 +140,7 @@ public class TemporalController {
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
         exportGraphMLOnVerbose = settings.get(ConfigTags.TemporalExportGraphMLOnVerbose);
+        logDetailsInModelFile = settings.get(ConfigTags.TemporalLogDetailsInModelFile);
 
         zip= settings.get(ConfigTags.TemporalZipLargeFiles);
         counterExamples = settings.get(ConfigTags.TemporalCounterExamples);
@@ -452,7 +454,7 @@ public class TemporalController {
                     setTemporalModelMetaData(abstractStateModel);
                     simpleLog.append(prettyCurrentTime() + " | " + "Model= Name: "+tModel.getApplicationName()+" ; Ver: "+tModel.getApplicationVersion()+" ; ID: "+tModel.getApplication_ModelIdentifier());
                     tModel.setAtomicPropositionKeying(propositionManager.getPropositionKeying());
-                    tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState);
+                    tDBManager.computeTemporalModel(abstractStateModel, tModel, instrumentTerminalState, logDetailsInModelFile);
                     simpleLog.append(prettyCurrentTime() + " | " + "compute temporal model completed");
                     if (verbose) {
                         saveModelAsJSON("PropositionEncodedModel.json",zip);

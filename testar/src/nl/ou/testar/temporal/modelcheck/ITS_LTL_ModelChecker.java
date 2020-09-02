@@ -78,11 +78,10 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
-    public List<String> delegatedFormulaValidation()
+    public List<String> delegatedFormulaValidation(String aliveProp)
     {
         saveFormulasForChecker(oracleColl, formulaFile, false);
-        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile,
-                "!" + PropositionConstants.SETTING.terminalProposition);
+        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp);
     }
 }
 

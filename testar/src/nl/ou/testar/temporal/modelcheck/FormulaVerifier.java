@@ -26,60 +26,56 @@ public enum FormulaVerifier {
         String cli = pathToExecutable;
         String cli_resultsfile = " " + ((toWslPath) ? OShelper.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
         String cli_formulafile = " " + ((toWslPath) ? OShelper.toWSLPath(formulaFilePath) : formulaFilePath);
-        String cli_ltlf=" --ltlf "+aliveprop;
+
+        String cli_ltlf=!aliveprop.equals("") ? " --ltlf "+aliveprop:"";
         cli = cli + " --fonly --ff " +  cli_formulafile+cli_ltlf;
         cli = cli + " &> " + cli_resultsfile;
         OShelper.RunOSChildProcess(cli);
-        return parse(resultsFile);
+        return parse(resultsFile,aliveprop);
 
     }
     public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList,String aliveProp) {
         List<String> formulas=new ArrayList<>();
-
-        int j = 0;
         for (TemporalOracle ora : temporalOracleList
         ) {
-            // fragile: 'AX(' 'AX (' is detected, but  'AX  ('  is not
-            // requires that formulas are fully parenthesised!!!
-
-                TemporalPatternBase pat = ora.getPatternBase();
-                String formula = pat.getPattern_Formula();
-                String prepend= aliveProp+" & ";
+            // fragile: 'AX(' 'AX (' is detected, but  'AX  (' is not. Requirement: formulas are fully parenthesised!!
+            TemporalPatternBase pat = ora.getPatternBase();
+            String formula= pat.getPattern_Formula();
+            if (!aliveProp.equals("")) {
+                String prepend = aliveProp + " & ";
                 //∀(Φ W Ψ) =   ¬∃( (Φ ∧ ¬Ψ) U(¬Φ ∧ ¬Ψ) )
-            String phi = aliveProp;
-            String theta ="AG(!"+aliveProp+")";
-            String append = " & !(E(("+phi+" & "+ "!("+theta+")) U (!("+phi+") & "+ "!("+theta+"))))";
-            String newformula=formula;
-            newformula= StringFinder.findClosingAndInsert(newformula,"AF(", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EF(", "" + aliveProp + " & ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"AG(", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EG(", "" + aliveProp + " & ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"AX(", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EX(", "" + aliveProp + " & ");
-            newformula= StringFinder.findUntilAndInsert(newformula,"!" + aliveProp + " | ","" + aliveProp + " & ");
-            // no support is given for W,R or M
-            // newformula= StringFinder.findOpeningParenthesisAndInsert(newformula,")W", "(!" + aliveProp + ") | ", ")");
+                String phi = aliveProp;
+                String theta = "AG(!" + aliveProp + ")";
+                String append = " & !(E((" + phi + " & " + "!(" + theta + ")) U (!(" + phi + ") & " + "!(" + theta + "))))";
+                String newformula = formula;
+                newformula = StringFinder.findClosingAndInsert(newformula, "AF(", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EF(", "" + aliveProp + " & ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "AG(", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EG(", "" + aliveProp + " & ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "AX(", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EX(", "" + aliveProp + " & ");
+                newformula = StringFinder.findUntilAndInsert(newformula, "!" + aliveProp + " | ", "" + aliveProp + " & ");
+                // no support is given for W,R or M
+                // newformula= StringFinder.findOpeningParenthesisAndInsert(newformula,")W", "(!" + aliveProp + ") | ", ")");
 
-            newformula= StringFinder.findClosingAndInsert(newformula,"AF (", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EF (", "" + aliveProp + " & ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"AG (", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EG (", "" + aliveProp + " & ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"AX (", "!" + aliveProp + " | ");
-            newformula= StringFinder.findClosingAndInsert(newformula,"EX (", "" + aliveProp + " & ");
-            newformula=newformula.replaceAll("!!",""); // remove double negations
-            newformula=prepend+newformula+append;
-            formulas.add(newformula);
-            j++;
+                newformula = StringFinder.findClosingAndInsert(newformula, "AF (", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EF (", "" + aliveProp + " & ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "AG (", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EG (", "" + aliveProp + " & ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "AX (", "!" + aliveProp + " | ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "EX (", "" + aliveProp + " & ");
+                newformula = newformula.replaceAll("!!", ""); // remove double negations
+                newformula = prepend + newformula + append;
+                formulas.add(newformula);
+            }else{
+                formulas.add(formula);// no modification
+            }
         }
-
-
         return formulas;
-
     }
 
 
-    private static List<String> parse(File rawInput) {
-        boolean keepLTLFModelVariant=true; // is this a useful option?
+    private static List<String> parse(File rawInput,String aliveProp) {
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
@@ -98,9 +94,7 @@ public enum FormulaVerifier {
         }
         String formulaline;
         String formula;
-
         List<String> formulasParsed = new ArrayList<>();
-
         while (scanner.hasNext()) {
             String testtoken = scanner.next();
             if (testtoken.startsWith("Formula")) {
@@ -111,16 +105,18 @@ public enum FormulaVerifier {
                 formulaline = endline; //not the end but a new formula
                 String modelVariant = "[LTLfl: ";
                 String traceVariant = "[LTLf: ";
-
+                //search can be refactored and choice of the LTL subtype can be improved
+                //currently it offers only the genuine LTL formula or the LTLfl- variant.
                 int indexmodel = formulaline.lastIndexOf(modelVariant);
                 int indextrace = formulaline.lastIndexOf(traceVariant);
-                if (keepLTLFModelVariant) {
-                    formula = indexmodel != -1 ? formulaline.substring(indexmodel+modelVariant.length()) : formulaline.substring(0, indextrace - 1);
-                } else {
-                    formula = formulaline.substring(indextrace+traceVariant.length(), indexmodel - 1);//keep the trace variant
+
+                if (aliveProp.equals("")) {
+                    formula = formulaline.substring(0, indextrace - 1);
+                }
+                else {// keep fl- variant. this is last part of the string
+                    formula = indexmodel != -1 ? formulaline.substring(indexmodel + modelVariant.length()) : formulaline.substring(0, indextrace - 1);
                 }
                 formula=formula.substring(0,formula.length()-1);
-
                 formulasParsed.add(formula);
                 scanner.next(); // read the verdict and throw away
             }

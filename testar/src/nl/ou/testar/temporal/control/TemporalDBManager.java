@@ -38,6 +38,7 @@ import nl.ou.testar.temporal.proposition.PropositionFilterType;
 import nl.ou.testar.temporal.proposition.PropositionManager;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.fruit.Pair;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -54,9 +55,6 @@ public  class TemporalDBManager {
     private PropositionManager propositionManager;  // used by computeProps
     private final SimpleLog simpleLog;
 
-
-
-    //public TemporalDBManager() {    }
 
     public TemporalDBManager( SimpleLog simpleLog) {
         this.simpleLog=simpleLog;
@@ -206,7 +204,8 @@ public  class TemporalDBManager {
     }
 
 
-    public OResultSet getConcreteStatesFromOrientDb(AbstractStateModel abstractStateModel){
+    public Pair<List<OResult>,Integer> getConcreteStatesFromOrientDb(AbstractStateModel abstractStateModel){
+        // demanding query: combining the result-set and the count into one call
         String stmt;
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
@@ -214,9 +213,15 @@ public  class TemporalDBManager {
         stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
         OResultSet resultSet = db.query(stmt, params);
+        List<OResult> resultList=resultSet.stream().collect(Collectors.toList());
+        int  stateCount = (int)  resultList.size();
         resultSet.close();
-        return resultSet;
+
+
+        Pair<List<OResult>, Integer> oResultSetIntegerPair = new Pair<>(resultList, stateCount);
+        return oResultSetIntegerPair;
     }
+
     public int getConcreteStateCountFromOrientDb(AbstractStateModel abstractStateModel){
         String stmt;
         int stateCount=0;
@@ -229,11 +234,12 @@ public  class TemporalDBManager {
         if (resultSet.hasNext()) {
             OResult result = resultSet.next();
 
-          stateCount= (int)(long)result.getProperty("Count(*)"); //from Long to long to int
+            stateCount= (int)(long)result.getProperty("Count(*)"); //from Long to long to int
         }
         resultSet.close();
         return stateCount;
     }
+
     public PairBean<Set<String>,Integer> getWidgetPropositions(String state, List<String> abstractionAttributes, Map<String,Set<String>> widgetKeyCollisionMap) {
         // concrete widgets
         String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
@@ -335,7 +341,7 @@ public  class TemporalDBManager {
     //SELECT FROM (TRAVERSE out('FirstNode') FROM (SELECT FROM TestSequence WHERE sequenceId = '15h4sa4152783694157'))  WHERE @class = 'SequenceNode'
 
 
-    public List<TemporalTrace> fetchTraces(String modelIdentifier) {
+    public List<TemporalTrace> fetchTraces(String modelIdentifier,boolean logDetailsInModelFile) {
         List<TemporalTrace> traces = new ArrayList<>();
 
         //String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";
@@ -351,27 +357,30 @@ public  class TemporalDBManager {
                 Optional<OVertex> sequenceOp = sequenceResult.getVertex();
                 if (!sequenceOp.isPresent()) continue;
                 OVertex sequenceVertex = sequenceOp.get();
-
-                // fetch the nr of nodes for the sequence
-                String nodeStmt = "SELECT COUNT(*) as nr FROM SequenceNode WHERE sequenceId = :sequenceId";
-                params = new HashMap<>();
-                params.put("sequenceId", getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId")));
-                OResultSet nodeResultSet = db.query(nodeStmt, params);
-                int nrOfNodes = 0;
-                if (nodeResultSet.hasNext()) {
-                    OResult nodeResult = nodeResultSet.next();
-                    nrOfNodes = (int) getConvertedValue(OType.INTEGER, nodeResult.getProperty("nr"));
-                    if (nrOfNodes > 0) {
-                        nrOfNodes--;
-                    }
-                }
                 trace.setSequenceID(sequenceVertex.getProperty("sequenceId").toString());
-                trace.setTransitionCount((long) nrOfNodes);
                 trace.setRunDate(sequenceVertex.getProperty("startDateTime").toString());
                 trace.setTestSequenceNode(sequenceVertex.getIdentity().toString());
-                trace.setTraceEvents(fetchTraceEvents(trace));
+                if(logDetailsInModelFile) {
+                    // fetch the nr of nodes for the sequence
+                    String nodeStmt = "SELECT COUNT(*) as nr FROM SequenceNode WHERE sequenceId = :sequenceId";
+                    params = new HashMap<>();
+                    params.put("sequenceId", getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId")));
+                    OResultSet nodeResultSet = db.query(nodeStmt, params);
+                    int nrOfNodes = 0;
+                    if (nodeResultSet.hasNext()) {
+                        OResult nodeResult = nodeResultSet.next();
+                        nrOfNodes = (int) getConvertedValue(OType.INTEGER, nodeResult.getProperty("nr"));
+                        if (nrOfNodes > 0) {
+                            nrOfNodes--;//minus one
+                        }
+                    }
+                    nodeResultSet.close();
+                    trace.setTransitionCount((long) nrOfNodes);
+                }
+
+                trace.setTraceEvents(fetchTraceEvents(trace,!logDetailsInModelFile));
                 traces.add(trace);
-                nodeResultSet.close();
+
             }
 
         }
@@ -379,7 +388,7 @@ public  class TemporalDBManager {
         return traces;
     }
 
-    private List<TemporalTraceEvent> fetchTraceEvents(TemporalTrace trace) {
+    private List<TemporalTraceEvent> fetchTraceEvents(TemporalTrace trace,boolean initialNodeOnly) {
         List<TemporalTraceEvent> traceEvents = new ArrayList<>();
         String firstSequenceNode = getFirstSequenceNode(trace);
         List<String> ConcreteStates = new ArrayList<>();
@@ -390,7 +399,16 @@ public  class TemporalDBManager {
         params.put("identifier", firstSequenceNode);
         //stmt = "SELECT @rid.asString() FROM (TRAVERSE out('SequenceStep'),out('Accessed') FROM @rid = :identifier ) WHERE @class ='ConcreteState'";// not yet :-)
         //stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),out('Accessed') FROM (SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class ='ConcreteState'";
-        stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class = 'SequenceNode'";
+        if(initialNodeOnly){
+           // stmt = "SELECT  FROM  SequenceNode WHERE @rid = :identifier AND nodeNr = 1"; //works as well
+           stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM " +
+                   "(SELECT FROM SequenceNode WHERE @rid = :identifier) MAXDEPTH 0) WHERE @class = 'SequenceNode'";
+        }
+        else{
+            stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM " +
+                    "(SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class = 'SequenceNode'";
+        }
+
         //(SELECT FROM SequenceStep WHERE @rid = :identifier??
         // inner query is needed as the single query collapses multiple refeences to concretestate
         resultSet = db.query(stmt, params);
@@ -419,7 +437,14 @@ public  class TemporalDBManager {
         }
         resultSet.close();
 
-        stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class = 'SequenceStep'";
+        if(initialNodeOnly){
+            stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode " +
+                    "WHERE @rid = :identifier) MAXDEPTH 0)  WHERE @class = 'SequenceStep'";
+        }
+        else{
+            stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode " +
+                    "WHERE @rid = :identifier) ) WHERE @class = 'SequenceStep'";
+        }
         //concreteActionId needs to be updated css 20190721
         params.put("identifier", firstSequenceNode);
         resultSet = db.query(stmt, params);
@@ -687,7 +712,7 @@ public  class TemporalDBManager {
         return sb.toString();
     }
 
-    public void computeTemporalModel(AbstractStateModel abstractStateModel, TemporalModel tModel, boolean instrumentTerminalState) {
+    public void computeTemporalModel(AbstractStateModel abstractStateModel, TemporalModel tModel, boolean instrumentTerminalState,boolean logDetailsInModelFile) {
         long start_time = System.currentTimeMillis();
         int runningWcount = 0;
         int stateCount = 0;
@@ -695,114 +720,113 @@ public  class TemporalDBManager {
         int chunks = 10;
         Map<String,String> statetreeKeyCollisionMap= new HashMap<>();
         dbReopen();
+        Pair<List<OResult>,Integer> resultListIntegerPair= getConcreteStatesFromOrientDb(abstractStateModel);
+        List<OResult> concreteStateList = resultListIntegerPair.left();
+        totalStates = resultListIntegerPair.right();
+        Map<String, Integer> commentWidgetDistri = new HashMap<>();
+        MultiValuedMap<String, String> logNonDeterministicTransitions = new HashSetValuedHashMap<>();
+        List<String> logTerminalStates = new ArrayList<>();
+        boolean firstTerminalState = true;
+        StateEncoding terminalStateEnc;
+        terminalStateEnc = new StateEncoding("#" + PropositionConstants.SETTING.terminalProposition);
+        simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + 0 + "%");
+        //while (resultSet.hasNext())
+        for (OResult result : concreteStateList)
+         {
+            //OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()) {
+                Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
+                OVertex stateVertex = op.get();
+                StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
+                Set<String> propositions = new LinkedHashSet<>();
+                boolean terminalState;
+                Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
+                Iterator<OEdge> edgeiter = outedges.iterator();
+                terminalState = !edgeiter.hasNext();
 
-            OResultSet resultSet = getConcreteStatesFromOrientDb(abstractStateModel);
-            totalStates = getConcreteStateCountFromOrientDb(abstractStateModel);
-            Map<String, Integer> commentWidgetDistri = new HashMap<>();
-            MultiValuedMap<String, String> logNonDeterministicTransitions = new HashSetValuedHashMap<>();
-            List<String> logTerminalStates = new ArrayList<>();
-            boolean firstTerminalState = true;
-            StateEncoding terminalStateEnc;
-            terminalStateEnc = new StateEncoding("#" + PropositionConstants.SETTING.terminalProposition);
-            simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + 0 + "%");
-            while (resultSet.hasNext()) {
-                OResult result = resultSet.next();
-                // we're expecting a vertex
-                if (result.isVertex()) {
-                    Optional<OVertex> op = result.getVertex();
-                    if (!op.isPresent()) continue;
-                    OVertex stateVertex = op.get();
-                    StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
-                    Set<String> propositions = new LinkedHashSet<>();
-                    boolean terminalState;
-                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
-                    Iterator<OEdge> edgeiter = outedges.iterator();
-                    terminalState = !edgeiter.hasNext();
-
-                    if (terminalState) {
-                        logTerminalStates.add(stateVertex.getIdentity().toString());
-                        //tModel.addLog("State: " + stateVertex.getIdentity().toString() + " is terminal.");
-                        if (instrumentTerminalState && firstTerminalState) {
-                            //add stateenc for 'Dead', inclusive dead transition selfloop;
-                            //terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
-                            Set<String> terminalStatePropositions = new LinkedHashSet<>();
-                            //terminalStatePropositions.add("dead");   //redundant on transition based automatons
-                            terminalStateEnc.setStateAPs(terminalStatePropositions);
-                            TransitionEncoding deadTrenc = new TransitionEncoding();
-                            deadTrenc.setTransition(PropositionConstants.SETTING.terminalProposition + "_selfloop");
-                            deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
-                            Set<String> deadTransitionPropositions = new LinkedHashSet<>();
-                            deadTransitionPropositions.add(PropositionConstants.SETTING.terminalProposition);
-                            deadTrenc.setTransitionAPs(deadTransitionPropositions);
-                            List<TransitionEncoding> deadTrencList = new ArrayList<>();
-                            deadTrencList.add(deadTrenc);
-                            terminalStateEnc.setTransitionColl(deadTrencList);
-                            tModel.addStateEncoding(terminalStateEnc, false);
-                            firstTerminalState = false;
-                        }
-                        if (!instrumentTerminalState)
-                            stateVertex.setProperty(TagBean.IsTerminalState.name(), true);  //candidate for refactoring
-                    }
-
-                    Map<String, String> attribmap = new HashMap<>();
-                    for (String attrib : stateVertex.getPropertyNames()) {
-                        attribmap.put(attrib, stateVertex.getProperty(attrib));
-                    }
-                    List<PropositionFilter> passedPropositionFilters = propositionManager.setPassingFilters(PropositionFilterType.STATE, attribmap);
-                    Map<String,Set<String>> widgetKeyCollisionMap= new HashMap<>();
-                    for (String propertyName : stateVertex.getPropertyNames()) {
-                        Set<String> props= computeAtomicPropositions(tModel.getAtomicPropositionKeying(), propertyName, stateVertex, passedPropositionFilters,widgetKeyCollisionMap);
-                        propositions.addAll(props);
-                    }
-
-                    PairBean<Set<String>, Integer> pb = getWidgetPropositions(senc.getState(), tModel.getAtomicPropositionKeying(),  widgetKeyCollisionMap);
-                    propositions.addAll(pb.left());// concrete widgets
-                    commentWidgetDistri.put(senc.getState(), pb.right());
-                    runningWcount = runningWcount + pb.right();
-                    senc.setStateAPs(propositions);
-                    if (instrumentTerminalState && terminalState) {
+                if (terminalState) {
+                    logTerminalStates.add(stateVertex.getIdentity().toString());
+                    //tModel.addLog("State: " + stateVertex.getIdentity().toString() + " is terminal.");
+                    if (instrumentTerminalState && firstTerminalState) {
+                        //add stateenc for 'Dead', inclusive dead transition selfloop;
+                        //terminalStateEnc = new StateEncoding("#" + TemporalModel.getDeadProposition());
+                        Set<String> terminalStatePropositions = new LinkedHashSet<>();
+                        //terminalStatePropositions.add("dead");   //redundant on transition based automatons
+                        terminalStateEnc.setStateAPs(terminalStatePropositions);
                         TransitionEncoding deadTrenc = new TransitionEncoding();
-                        deadTrenc.setTransition(terminalStateEnc.getState() + "_" + stateVertex.getIdentity().toString());
+                        deadTrenc.setTransition(PropositionConstants.SETTING.terminalProposition + "_selfloop");
                         deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                         deadTransitionPropositions.add(PropositionConstants.SETTING.terminalProposition);
                         deadTrenc.setTransitionAPs(deadTransitionPropositions);
                         List<TransitionEncoding> deadTrencList = new ArrayList<>();
                         deadTrencList.add(deadTrenc);
-                        senc.setTransitionColl(deadTrencList);
-                    } else
-                        senc.setTransitionColl(getTransitions(senc.getState(), tModel.getAtomicPropositionKeying()));
+                        terminalStateEnc.setTransitionColl(deadTrencList);
+                        tModel.addStateEncoding(terminalStateEnc, false);
+                        firstTerminalState = false;
+                    }
+                    if (!instrumentTerminalState)
+                        stateVertex.setProperty(TagBean.IsTerminalState.name(), true);  //candidate for refactoring
+                }
 
-                    tModel.addStateEncoding(senc, false);
+                Map<String, String> attribmap = new HashMap<>();
+                for (String attrib : stateVertex.getPropertyNames()) {
+                    attribmap.put(attrib, stateVertex.getProperty(attrib));
+                }
+                List<PropositionFilter> passedPropositionFilters = propositionManager.setPassingFilters(PropositionFilterType.STATE, attribmap);
+                Map<String,Set<String>> widgetKeyCollisionMap= new HashMap<>();
+                for (String propertyName : stateVertex.getPropertyNames()) {
+                    Set<String> props= computeAtomicPropositions(tModel.getAtomicPropositionKeying(), propertyName, stateVertex, passedPropositionFilters,widgetKeyCollisionMap);
+                    propositions.addAll(props);
+                }
+
+                PairBean<Set<String>, Integer> pb = getWidgetPropositions(senc.getState(), tModel.getAtomicPropositionKeying(),  widgetKeyCollisionMap);
+                propositions.addAll(pb.left());// concrete widgets
+                commentWidgetDistri.put(senc.getState(), pb.right());
+                runningWcount = runningWcount + pb.right();
+                senc.setStateAPs(propositions);
+                if (instrumentTerminalState && terminalState) {
+                    TransitionEncoding deadTrenc = new TransitionEncoding();
+                    deadTrenc.setTransition(terminalStateEnc.getState() + "_" + stateVertex.getIdentity().toString());
+                    deadTrenc.setTargetState(terminalStateEnc.getState());//"#" + TemporalModel.getDeadProposition());
+                    Set<String> deadTransitionPropositions = new LinkedHashSet<>();
+                    deadTransitionPropositions.add(PropositionConstants.SETTING.terminalProposition);
+                    deadTrenc.setTransitionAPs(deadTransitionPropositions);
+                    List<TransitionEncoding> deadTrencList = new ArrayList<>();
+                    deadTrencList.add(deadTrenc);
+                    senc.setTransitionColl(deadTrencList);
+                } else
+                    senc.setTransitionColl(getTransitions(senc.getState(), tModel.getAtomicPropositionKeying()));
+
+                tModel.addStateEncoding(senc, false);
+                if(logDetailsInModelFile) {//time intensive
                     String mapAsString = widgetKeyCollisionMap.entrySet().stream()
-                            .filter(e -> e.getValue().size()>1)
+                            .filter(e -> e.getValue().size() > 1)
                             .map(e -> e.getKey() + "->" + e.getValue().toString())
                             .collect(Collectors.joining(", ", "{", "}"));
-                    if (mapAsString.length()>2){ // larger then "{}"
-
-                        statetreeKeyCollisionMap.put("state "+ stateVertex.getIdentity().toString()+" / " +stateVertex.getProperty(CodingManager.CONCRETE_ID_CUSTOM).toString(),mapAsString);
+                    if (mapAsString.length() > 2) { // larger then "{}"
+                        statetreeKeyCollisionMap.put("state " + stateVertex.getIdentity().toString() + " / " + stateVertex.getProperty(CodingManager.CONCRETE_ID_CUSTOM).toString(), mapAsString);
                     }
-
                 }
-                stateCount++;
-
-                    if ((totalStates<=chunks) || stateCount % (Math.floorDiv(totalStates, chunks)) == 0) { //rely on lazy evaluation
-                        simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + Math.floorDiv((100 * stateCount), totalStates) + "%");
-                    }
 
             }
+            stateCount++;
+                if ((totalStates<=chunks) || stateCount % (Math.floorDiv(totalStates, chunks)) == 0) { //rely on lazy evaluation
+                    simpleLog.append(prettyCurrentTime() + " | " + "States processed: " + Math.floorDiv((100 * stateCount), totalStates) + "%");
+                }
+            }
 
-
-            resultSet.close();
+        //resultSet.close();
         simpleLog.append(prettyCurrentTime() + " | " + "Copying state propositions to transitions");
-            tModel.finalizeTransitions(); //update once. this is a costly operation
-        simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions");
-            for (StateEncoding stenc : tModel.getStateEncodings()
-            ) {
-                Map<String,TransitionEncoding> encodedConjuncts = new HashMap<>();
+        tModel.finalizeTransitions(); //update once. this is a costly operation
 
-                for (TransitionEncoding tren : stenc.getTransitionColl()
-                ) {
+        if(logDetailsInModelFile){
+            simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions");
+            for (StateEncoding stenc : tModel.getStateEncodings()) {
+                Map<String,TransitionEncoding> encodedConjuncts = new HashMap<>();
+                for (TransitionEncoding tren : stenc.getTransitionColl()) {
                     String enc = tren.getEncodedTransitionAPConjunct();
                     if (encodedConjuncts.containsKey(enc)) {
                         TransitionEncoding trenTemp = encodedConjuncts.get(enc);
@@ -811,44 +835,56 @@ public  class TemporalDBManager {
                     } else encodedConjuncts.put(enc, tren);
                 }
             }
+        }
+        else{
+            simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions is disabled");
+        }
 
-            tModel.addLog("Terminal States : " + logTerminalStates.toString());
-            String mapAsString = commentWidgetDistri.keySet().stream()
-                    .map(key -> key + "->" + commentWidgetDistri.get(key))
-                    .collect(Collectors.joining(", ", "{", "}"));
-            tModel.addLog("#Widgets per State : " + mapAsString);
-            tModel.addLog("Total #Widgets : " + runningWcount);
-            mapAsString = logNonDeterministicTransitions.keySet().stream()
-                    .map(key -> key + "-> " + logNonDeterministicTransitions.get(key).toString())
-                    .collect(Collectors.joining(", ", "{", "}"));
-            tModel.addLog("Non-deterministic transitions by State: " + mapAsString);
+        tModel.addLog("Terminal States : " + logTerminalStates.toString());
+        String mapAsString = commentWidgetDistri.keySet().stream()
+                .map(key -> key + "->" + commentWidgetDistri.get(key))
+                .collect(Collectors.joining(", ", "{", "}"));
+        tModel.addLog("#Widgets per State : " + mapAsString);
+        tModel.addLog("Total #Widgets : " + runningWcount);
+        mapAsString = logNonDeterministicTransitions.keySet().stream()
+                .map(key -> key + "-> " + logNonDeterministicTransitions.get(key).toString())
+                .collect(Collectors.joining(", ", "{", "}"));
+        tModel.addLog("Non-deterministic transitions by State: " + mapAsString);
 
+        if(logDetailsInModelFile) {//time intensive:e.g. 3000 states and 150000 widgets can take 20 minutes
+            simpleLog.append(prettyCurrentTime() + " | " + "Logging PropositionKey Collisions");
             statetreeKeyCollisionMap.entrySet().stream()
-                .filter(e -> e.getValue().length()>0)
-                .map(e -> "PropositionKey Collisions :  "+e.getKey() + "->" + e.getValue())
+                    .filter(e -> e.getValue().length() > 0)
+                    .map(e -> "PropositionKey Collisions :  " + e.getKey() + "->" + e.getValue())
                     .forEachOrdered(tModel::addLog);
+        }
+        else{
+             simpleLog.append(prettyCurrentTime() + " | " + "Logging PropositionKey Collisions is disabled");
+        }
 
-            tModel.setTraces(fetchTraces(tModel.getApplication_ModelIdentifier()));
-            Set<String> initStates = new HashSet<>();
-            for (TemporalTrace trace : tModel.getTraces()
-            ) {
-                TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
-                initStates.add(traceevent.getState());
-            }
-            tModel.setInitialStates(initStates);
+        simpleLog.append(prettyCurrentTime() + " | " + "Logging Test Sequences"+(logDetailsInModelFile ? "" :" is disabled"));
+        List<TemporalTrace> traces = fetchTraces(tModel.getApplication_ModelIdentifier(), logDetailsInModelFile);
+        tModel.setTraces((logDetailsInModelFile ? traces:null));
 
+        simpleLog.append(prettyCurrentTime() + " | " + "Determining Initial States");
+        Set<String> initStates = new HashSet<>();
+        for (TemporalTrace trace : traces
+        ) {
+            TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
+            initStates.add(traceevent.getState());
+        }
 
-            simpleLog.append(prettyCurrentTime() + " | " + "Total States : " + tModel.getStateList().size());
-            simpleLog.append(prettyCurrentTime() + " | " + "Total Widgets : " + runningWcount);
-            simpleLog.append(prettyCurrentTime() + " | " + "Total Transitions : " + tModel.getTransitionList().size());
-            simpleLog.append(prettyCurrentTime() + " | " + "Total Atomic Propositions detected : " + tModel.getAtomicPropositions().size());
-            simpleLog.append(prettyCurrentTime() + " | " + "Model has " + (logTerminalStates.size() == 0 ? "no" : "" + logTerminalStates.size()) + " terminal states");
-            simpleLog.append(prettyCurrentTime() + " | " + "Model has " + tModel.getInitialStates().size() + " initial states");
-
-            long end_time = System.currentTimeMillis();
-            long difference = (end_time - start_time) / 1000;
-            tModel.addLog("Duration to create the model:" + difference + " (s)");
-            dbClose();
+        tModel.setInitialStates(initStates);
+        simpleLog.append(prettyCurrentTime() + " | " + "Total States : " + tModel.getStateList().size());
+        simpleLog.append(prettyCurrentTime() + " | " + "Total Widgets : " + runningWcount);
+        simpleLog.append(prettyCurrentTime() + " | " + "Total Transitions : " + tModel.getTransitionList().size());
+        simpleLog.append(prettyCurrentTime() + " | " + "Total Atomic Propositions : " + tModel.getAtomicPropositions().size());
+        simpleLog.append(prettyCurrentTime() + " | " + "Model has " + (logTerminalStates.size() == 0 ? "no" : "" + logTerminalStates.size()) + " terminal states");
+        simpleLog.append(prettyCurrentTime() + " | " + "Model has " + tModel.getInitialStates().size() + " initial states");
+        long end_time = System.currentTimeMillis();
+        long difference = (end_time - start_time) / 1000;
+        tModel.addLog("Duration to create the model:" + difference + " (s)");
+        dbClose();
 
         }
 }

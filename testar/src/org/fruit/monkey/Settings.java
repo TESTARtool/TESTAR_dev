@@ -428,6 +428,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalInstrumentDeadlockState = false" + Util.lineSep()
 					+"TemporalVerbose = true" + Util.lineSep()
 					+"TemporalExportGraphMLOnVerbose = true" + Util.lineSep()
+					+"TemporalLogDetailsInModelFile = true" + Util.lineSep()
 					+"TemporalZipLargeFiles = false" + Util.lineSep()
 					+"TemporalDBisSource = true" + Util.lineSep()
 					+"TemporalCounterExamples = true" + Util.lineSep()

@@ -83,9 +83,8 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
-    public List<String> delegatedFormulaValidation()    {
-        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl,
-                "!" + PropositionConstants.SETTING.terminalProposition);
+    public List<String> delegatedFormulaValidation(String aliveProp)    {
+        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl, aliveProp);
     }
 }
 

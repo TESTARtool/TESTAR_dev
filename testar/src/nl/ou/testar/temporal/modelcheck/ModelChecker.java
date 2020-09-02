@@ -103,7 +103,7 @@ public abstract class ModelChecker {
     }
     abstract  void delegatedCheck();
     abstract List<TemporalOracle> delegatedParseResults(String rawInput);
-    abstract List<String> delegatedFormulaValidation();
+    abstract List<String> delegatedFormulaValidation(String aliveProp);
 
 
 
@@ -151,9 +151,8 @@ public abstract class ModelChecker {
 
     private void validateFormulasForChecker() {
         String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition);
-        if (!aliveprop.equals("")) {// instrumentTerminalState will determine whether this return value is ""
 
-            List<String> tmpformulas =delegatedFormulaValidation();
+            List<String> tmpformulas =delegatedFormulaValidation(aliveprop);
             List<TemporalOracle> tmporacleList = new ArrayList<>();
             int j = 0;
             for (TemporalOracle ora : oracleColl
@@ -169,9 +168,7 @@ public abstract class ModelChecker {
                 j++;
             }
             saveFormulasForChecker(tmporacleList, formulaFile, true);
-        } else {
-            saveFormulasForChecker(oracleColl, formulaFile, true);
-        }
+
         updateOracleCollMetaData(oracleColl);
     }
 
