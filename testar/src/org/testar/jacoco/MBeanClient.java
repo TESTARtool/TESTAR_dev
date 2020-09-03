@@ -57,19 +57,35 @@ public final class MBeanClient {
 		void reset();
 	}
 
+
+	public static String dumpJaCoCoSequenceReport() {
+
+		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
+				+ "jacoco-"
+				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+				+ ".exec";
+	
+		return dumpJaCoCoReport(destFile);
+	}
+	
+	public static String dumpJaCoCoActionStepReport(String actionCount) {
+
+		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
+				+ "jacoco-"
+				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+				+ "_action_" + actionCount
+				+ ".exec";
+	
+		return dumpJaCoCoReport(destFile);
+	}
+
 	/**
 	 * Execute the example.
 	 *
 	 * @param args
 	 * @throws Exception
 	 */
-	public static String dumpJaCoCoReport() {
-
-		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
-				+ "jacoco-"
-				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
-				+ ".exec";
-
+	private static String dumpJaCoCoReport(String destFile) {
 		try {
 
 			// Open connection to the coverage agent:
