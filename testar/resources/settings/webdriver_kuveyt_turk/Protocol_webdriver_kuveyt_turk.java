@@ -47,6 +47,7 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.sql.Connection;
@@ -246,6 +247,35 @@ public class Protocol_webdriver_kuveyt_turk extends WebdriverProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
+
+		// If we are in Generate mode check and force KuveytTurk desired actions
+		if(mode().equals(Modes.Generate)) {
+			for(Widget widget : state) {
+
+				// If the state contains the web element with the id property "addressCode"
+				// We are in a specific page to introduce desired Email and addressCode
+				if(widget.get(WdTags.WebId,"").equals("addressCode")) {
+					// Type desired values and update the State Model
+					waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId, "Email", "testar@pros.upv.es", state, system, 5, 1);
+					waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId, "addressCode", "0123456789", state, system, 5, 1);
+					// Click Next button to continue
+					waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Next", state, system, 5, 1);
+					// Update before finish
+					state = super.getState(system);
+				}
+
+				// Check current state to find the web element with the id property "CategoryContract_Limit"
+				if(widget.get(WdTags.WebId,"").equals("CategoryContract_Limit")) {
+					// Type desired value and update the State Model
+					waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebId, "CategoryContract_Limit", "0123", state, system, 5, 1);
+					// Click Save button to continue
+					waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Save", state, system, 5, 1);
+					// Update before finish
+					state = super.getState(system);
+				}
+			}
+		}
+
 		return state;
 	}
 

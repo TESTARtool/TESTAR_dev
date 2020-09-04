@@ -84,7 +84,7 @@ ProcessLogs = .*.*
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-ActionFilterWebId = .*logout.*|.*LOGOUT.*
+ActionFilterWebId = .*logout.*|.*LOGOUT.*|ktHelp|.*logOut.*
 ActionFilterWebHref = .*logout.*|.*LOGOUT.*|.*InitialLoginTurkish.*|.*Security.*
 
 #################################################################
