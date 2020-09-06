@@ -502,6 +502,19 @@ public class TemporalController {
         List<String> modelAPSet = new ArrayList<>(tModel.getAtomicPropositions());
         int trylimitConstraint = Math.min(250, 2 * modelAPSet.size());
         Random APRnd = new Random(5000000);
+        Set<String> allParams=new HashSet<>();
+        //get collection of all params, otherwise CSV file is crippled
+        for (TemporalPattern pat : patterns
+        ) {
+            allParams.addAll(pat.getPattern_Parameters());
+        }
+        Map<String, String> defaultpattern_Substitutions = new HashMap<>();
+        for (String param :allParams
+        ) {
+            defaultpattern_Substitutions.put("PATTERN_SUBSTITUTION_" + param, "");// no value
+        }
+
+
         for (TemporalPattern pat : patterns
         ) {
             Map<String, String> ParamSubstitutions;
@@ -580,9 +593,11 @@ public class TemporalController {
                         potentialOracle.setPattern_ConstraintSet(cSetindex + 1);// sets numbers from 1,2,3,...
                     }
                     MultiValuedMap<String, String> pattern_Substitutions = new HashSetValuedHashMap<>();
+                    pattern_Substitutions.putAll(defaultpattern_Substitutions);
                     for (Map.Entry<String, String> paramsubst : ParamSubstitutions.entrySet()
                     ) {
                         pattern_Substitutions.put("PATTERN_SUBSTITUTION_" + paramsubst.getKey(), paramsubst.getValue());// improve?
+                        pattern_Substitutions.removeMapping("PATTERN_SUBSTITUTION_" + paramsubst.getKey(),"");
                     }
                     potentialOracle.setPattern_Substitutions(pattern_Substitutions);
                     potentialOracle.setOracle_validationstatus(ValStatus.CANDIDATE);

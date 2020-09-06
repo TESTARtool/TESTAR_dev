@@ -76,6 +76,7 @@ public enum FormulaVerifier {
 
 
     private static List<String> parse(File rawInput,String aliveProp) {
+        //refactor by using ANTLR?
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
             String sCurrentLine;
@@ -97,28 +98,33 @@ public enum FormulaVerifier {
         List<String> formulasParsed = new ArrayList<>();
         while (scanner.hasNext()) {
             String testtoken = scanner.next();
-            if (testtoken.startsWith("Formula")) {
-                String endline = scanner.next();
-                if (endline.contains("LTL model-check End")) {
-                    break;
-                }
-                formulaline = endline; //not the end but a new formula
-                String modelVariant = "[LTLfl: ";
-                String traceVariant = "[LTLf: ";
-                //search can be refactored and choice of the LTL subtype can be improved
-                //currently it offers only the genuine LTL formula or the LTLfl- variant.
-                int indexmodel = formulaline.lastIndexOf(modelVariant);
-                int indextrace = formulaline.lastIndexOf(traceVariant);
+           if (testtoken.startsWith("Formula")) {
+               String endline = scanner.next();
+               if (endline.contains("LTL model-check End")) {
+                   break;
+               }
+               String syntaxVerdict = scanner.next();//read the verdict
+               if (syntaxVerdict.contains("ERROR")) {
+                   formula = "false";
+               }
+               else {
+                   formulaline = endline; //not the end but a new formula
+                   String modelVariant = "[LTLfl: ";
+                   String traceVariant = "[LTLf: ";
+                   //search can be refactored and choice of the LTL subtype can be improved
+                   //currently it offers only the genuine LTL formula or the LTLfl- variant.
+                   int indexmodel = formulaline.lastIndexOf(modelVariant);
+                   int indextrace = formulaline.lastIndexOf(traceVariant);
 
-                if (aliveProp.equals("")) {
-                    formula = formulaline.substring(0, indextrace - 1);
-                }
-                else {// keep fl- variant. this is last part of the string
-                    formula = indexmodel != -1 ? formulaline.substring(indexmodel + modelVariant.length()) : formulaline.substring(0, indextrace - 1);
-                }
-                formula=formula.substring(0,formula.length()-1);
+                   if (aliveProp.equals("")) {
+                       formula = formulaline.substring(0, indextrace - 1);
+                   } else {// keep fl- variant. this is last part of the string
+                       formula = indexmodel != -1 ? formulaline.substring(indexmodel + modelVariant.length()) : formulaline.substring(0, indextrace - 1);
+                   }
+                   formula = formula.substring(0, formula.length() - 1);
+               }
                 formulasParsed.add(formula);
-                scanner.next(); // read the verdict and throw away
+                //scanner.next(); // read the verdict and throw away
             }
             else {
                 System.out.println("unexpected token <" + testtoken + "> to parse in File:" + rawInput.getName());

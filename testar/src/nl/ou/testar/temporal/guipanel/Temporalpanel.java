@@ -536,6 +536,7 @@ public class Temporalpanel {
         settings.set(ConfigTags.TemporalOffLineEnabled, enableTemporalOfflineOraclesCheckBox.isSelected());
         settings.set(ConfigTags.TemporalConcreteEqualsAbstract, enforceAbstractionEquality.isSelected());
         settings.set(ConfigTags.TemporalOracles, oracleFile.getText());
+        settings.set(ConfigTags.TemporalPatterns, patternFile.getText());
         settings.set(ConfigTags.TemporalPropositionManager, PropositionManagerFile.getText());
         settings.set(ConfigTags.TemporalPatternConstraints, patternConstraintsFile.getText());
         settings.set(ConfigTags.TemporalModelFile, modelFile.getText());

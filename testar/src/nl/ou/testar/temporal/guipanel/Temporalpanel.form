@@ -511,7 +511,7 @@
                 <properties>
                   <enabled value="false"/>
                   <text value=""/>
-                  <toolTipText value="&lt;/html&gt;&#10;Points to a pre-computed Model .JSON file.&#10;&lt;html&gt;"/>
+                  <toolTipText value="&lt;html&gt; Points to a pre-computed Model .JSON file. &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="7c258" class="javax.swing.JLabel">

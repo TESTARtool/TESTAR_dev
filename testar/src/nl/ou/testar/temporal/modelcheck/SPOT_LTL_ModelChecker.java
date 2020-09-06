@@ -28,7 +28,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
 
 
     public List<TemporalOracle> delegatedParseResults(String rawInput) {
-
+        //refactor by using ANTLR?
         List<StateEncoding> stateEncodings = tmodel.getStateEncodings();
         Scanner scanner = new Scanner(rawInput);
         scanner.useDelimiter("\\s*=== Automaton\\s*");
