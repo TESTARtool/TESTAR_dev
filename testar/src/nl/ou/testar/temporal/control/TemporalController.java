@@ -82,6 +82,8 @@ public class TemporalController {
     private  List<TemporalOracle> oracleColl;
     private  SimpleLog simpleLog;
     private boolean logDetailsInModelFile;
+    private boolean sourceIsDB;
+    private String modelFile;
 
 
     public TemporalController(final Settings settings) {
@@ -139,6 +141,8 @@ public class TemporalController {
 
         oracleFile = settings.get(ConfigTags.TemporalOracles);
         verbose = settings.get(ConfigTags.TemporalVerbose);
+        sourceIsDB = settings.get(ConfigTags.TemporalDBisSource);
+        modelFile = settings.get(ConfigTags.TemporalModelFile);
         exportGraphMLOnVerbose = settings.get(ConfigTags.TemporalExportGraphMLOnVerbose);
         logDetailsInModelFile = settings.get(ConfigTags.TemporalLogDetailsInModelFile);
 
@@ -272,7 +276,7 @@ public class TemporalController {
                 ltlLTSMINMCCommand, ltlLTSMINToWSLPath, ltlLTSMINEnabled,
                 ctlGALMCCommand, ctlGALToWSLPath, ctlGALEnabled,
                 ctlLTSMINMCCommand, ctlLTSMINToWSLPath, ctlLTSMINEnabled,
-                true,"");
+                sourceIsDB,modelFile);
 
     }
 
