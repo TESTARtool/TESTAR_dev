@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class ModelChecker {
 
@@ -150,9 +151,10 @@ public abstract class ModelChecker {
     }
 
     private void validateFormulasForChecker() {
-        String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition);
+            String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition,true);
+            String abstract_aliveprop = aliveprop.equals("")?"":"!" + PropositionConstants.SETTING.terminalProposition;
 
-            List<String> tmpformulas =delegatedFormulaValidation(aliveprop);
+            List<String> tmpformulas =delegatedFormulaValidation(abstract_aliveprop);
             List<TemporalOracle> tmporacleList = new ArrayList<>();
             int j = 0;
             for (TemporalOracle ora : oracleColl
@@ -240,7 +242,7 @@ public abstract class ModelChecker {
                 ArrayList<String> apindex = new ArrayList<>();
                 if (doTransformation) {
 
-                    String deadprop = tmodel.getPropositionIndex(PropositionConstants.SETTING.terminalProposition, true);
+                    String deadprop = tmodel.getPropositionIndex(PropositionConstants.SETTING.terminalProposition, false);
                     if (!deadprop.equals("")) { // model has 'dead' as an atomic  property
                         sortedsubstitionvalues.add(PropositionConstants.SETTING.terminalProposition);
                         sortedparameters.add(PropositionConstants.SETTING.terminalProposition); // consider 'dead' as a kind of parameter

@@ -89,6 +89,7 @@ dependencies {
 
     compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version: '3.4.0'  //css 20190706
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" // css20190707,20200817
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'// css20120907
 
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'

@@ -2,6 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
+import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.OShelper;
 import nl.ou.testar.temporal.util.StringFinder;
 
@@ -27,11 +28,11 @@ public enum FormulaVerifier {
         String cli_resultsfile = " " + ((toWslPath) ? OShelper.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
         String cli_formulafile = " " + ((toWslPath) ? OShelper.toWSLPath(formulaFilePath) : formulaFilePath);
 
-        String cli_ltlf=!aliveprop.equals("") ? " --ltlf "+aliveprop:"";
+        String cli_ltlf=!aliveprop.equals("") ? " --ltlf "+ aliveprop:"";
         cli = cli + " --fonly --ff " +  cli_formulafile+cli_ltlf;
         cli = cli + " &> " + cli_resultsfile;
         OShelper.RunOSChildProcess(cli);
-        return parse(resultsFile,aliveprop);
+        return parse(resultsFile,!aliveprop.equals(""));
 
     }
     public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList,String aliveProp) {
@@ -75,7 +76,7 @@ public enum FormulaVerifier {
     }
 
 
-    private static List<String> parse(File rawInput,String aliveProp) {
+    private static List<String> parse(File rawInput,boolean LTLFinite) {
         //refactor by using ANTLR?
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
@@ -116,7 +117,7 @@ public enum FormulaVerifier {
                    int indexmodel = formulaline.lastIndexOf(modelVariant);
                    int indextrace = formulaline.lastIndexOf(traceVariant);
 
-                   if (aliveProp.equals("")) {
+                   if (!LTLFinite) {
                        formula = formulaline.substring(0, indextrace - 1);
                    } else {// keep fl- variant. this is last part of the string
                        formula = indexmodel != -1 ? formulaline.substring(indexmodel + modelVariant.length()) : formulaline.substring(0, indextrace - 1);
