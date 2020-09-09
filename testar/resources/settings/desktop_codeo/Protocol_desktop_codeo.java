@@ -42,6 +42,8 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
@@ -54,18 +56,6 @@ import es.upv.staq.testar.NativeLinker;
 
 public class Protocol_desktop_codeo extends DesktopProtocol {
 
-	// TODO: Make SUT path configurable via settings to allow remote API configuration/execution
-	private static final String DEFAULT_CODEO = "java -jar "
-			+ "C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
-
-	private static final String JACOCO_CODEO = "java"
-			+ " -Dcom.sun.management.jmxremote.port=5000"
-			+ " -Dcom.sun.management.jmxremote.authenticate=false"
-			+ " -Dcom.sun.management.jmxremote.ssl=false"
-			+ " -javaagent:jacoco_0.8.5\\lib\\jacocoagent.jar=jmx=true"
-			+ " -jar"
-			+ " C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar --launcher.library C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher.win32.win32.x86_1.1.400.v20160518-1444 --launcher.GTK_version 2 -vmargs -Dsun.io.useCanonPrefixCache=false -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m";
-	
 	private double menubarFilter;
 	
 	/**
@@ -80,29 +70,34 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		// Set desired License
 		licenseSUT = new CODEOLicense();
 		
+		// TESTAR will execute the SUT with Java
+		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
+		WinProcess.codeo_execution = true;
+		
 		// TODO: Prepare a JaCoCo installation verification message
 		//verifyJaCoCoInstallation();
+	}
+	
+	/**
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 *      out what executable to run)
+	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 *      seconds until they have finished loading)
+	 * @return  a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException {
 		
-		String sutExecution = DEFAULT_CODEO;
+		SUT system = super.startSystem();
 		
-		// TODO: Add TESTAR ConfigSetting or separate in two protocols
-		if(jacocoExecutionMode()) {sutExecution = JACOCO_CODEO;}
-		
-		try {
-			Runtime.getRuntime().exec("cmd /c start \"\" " + sutExecution);
-		} catch (IOException e) {
-			System.out.println("ERROR: Trying to ejecute CODEO application via command line");
-			e.printStackTrace();
-		}
-
 		// Not a beautiful way to deal with Workspace dialog 
 		// TODO: Try to replace with a friendly verification method like predefined-actions
 		// BUT: We need to start the SUT in this initialize method, before SUT_WINDOWS_TITLE attachment
 		// (Here we do not have the widget tree yet - we can not State iteration)
 
-		/*Util.pause(30);
-
-		Keyboard kb = AWTKeyboard.build();
+		/*Keyboard kb = AWTKeyboard.build();
 		kb.press(KBKeys.VK_SHIFT);
 		kb.release(KBKeys.VK_SHIFT);
 		kb.press(KBKeys.VK_SHIFT);
@@ -111,6 +106,24 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		kb.release(KBKeys.VK_ENTER);
 
 		Util.pause(30);*/
+		return system;
+	}
+	
+	/**
+	 * Verify that JaCoCo is correctly installed and configured with TESTAT requirements.
+	 */
+	private void verifyJaCoCoInstallation() {
+		if(!new File("jacoco").exists()) {
+			String message = "Please download and extraxt JaCoCo inside /testar/bin/jacoco directory.";
+			System.out.println(message);
+			popupMessage(message);
+		} else if(!new File("jacoco/build.xml").exists()) {
+			String message = "Please copy /testar/bin/resources/settings/desktop_codeo/build.xml file inside /testar/bin/jacoco directory";
+			System.out.println(message);
+			popupMessage(message);
+		} 
+		// TODO: Verify CODEO .class files (required for build.xml)
+		/* else if () {} */
 	}
 	
 	/**
@@ -258,17 +271,95 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		}
 		return retAction;
 	}
+	
+	/**
+	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
+	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
+	 */
+	@Override
+	protected void finishSequence() {
+
+		// Only create JaCoCo report for Generate Mode
+		// Modify if desired
+		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+
+			// Dump the jacoco report from the remote JVM and Get the name/path of this file
+			// And Create the output Jacoco report
+			prepareJaCoCoReport();
+		}
+
+		super.finishSequence();
+	}
+	
+	/**
+	 * Dump JaCoCo exec file from the JVM that contains the Agent.
+	 * Prepare the JaCoCo report Artefact and his summarize information.
+	 * 
+	 * @param system
+	 */
+	private void prepareJaCoCoReport() {
+		String jacocoFile = "jacoco-client.exec";
+		try {
+			System.out.println("Extract JaCoCO report with MBeanClient...");
+			jacocoFile = MBeanClient.dumpJaCoCoReport();
+			System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+		} catch (Exception e) {
+			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
+		}
+
+		/**
+		 * With the dumped jacocoFile (typical jacoco.exec) 
+		 * and the build.xml file (that includes a reference to the .class SUT files).
+		 * 
+		 * Create the JaCoCo report files.
+		 */
+		
+		try {
+
+			// Create JaCoCo report inside output\SUTexecuted folder
+			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath()
+					+ File.separator + "JaCoCo_reports"
+					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
+			
+			// Update DECODER Artefact information
+			coverageDir.add(reportDir);
+
+			// Launch JaCoCo report (build.xml) and overwrite desired parameters
+			String antCommand = "cd jacoco && ant report"
+					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
+					+ " -DreportCoverageDir=" + reportDir;
+
+			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+			Process p = builder.start();
+			p.waitFor();
+
+			System.out.println("JaCoCo report created successfully!");
+
+			// Update DECODER Artefact information
+			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+			coverageSummary.add(coverageInfo);
+
+			System.out.println(coverageInfo);
+
+		} catch (IOException | InterruptedException e) {
+			System.out.println("ERROR: Creating JaCoCo report !");
+			e.printStackTrace();
+		}
+	}
 
 	/**
-	 * Here you can put graceful shutdown sequence for your SUT
+	 * This methods stops the SUT
+	 *
 	 * @param system
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		if(jacocoExecutionMode()) {
-			prepareJaCoCoReport(system);
-		} else {
-			super.stopSystem(system);
+		super.stopSystem(system);
+		
+		// This is the default JaCoCo generated file, we dumped our desired file with MBeanClient (finishSequence)
+		// In this protocol this one is residual, so just delete
+		if(new File("jacoco.exec").exists()) {
+			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
 	
@@ -323,103 +414,6 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 			}
 		}
 	}
-	
-	/**
-	 * Verify that JaCoCo is correctly installed and configured with TESTAT requirements.
-	 */
-	private void verifyJaCoCoInstallation() {
-		if(!new File("jacoco_0.8.5").exists()) {
-			String message = "Please download and extraxt JaCoCo 0.8.5 inside /testar/bin/jacoco_0.8.5 directory.";
-			System.out.println(message);
-			popupMessage(message);
-		} else if(!new File("jacoco_0.8.5/build.xml").exists()) {
-			String message = "Please copy /testar/bin/resources/settings/desktop_codeo/build.xml file inside /testar/bin/jacoco_0.8.5 directory";
-			System.out.println(message);
-			popupMessage(message);
-		} 
-		// TODO: Verify CODEO .class files (required for build.xml)
-		/* else if () {} */
-	}
-	
-	/**
-	 * Check if we want to execute TESTAR with JaCoCo coverage functionality.
-	 * @return true or false
-	 */
-	private boolean jacocoExecutionMode() {
-		if(settings.get(ConfigTags.Mode) == Modes.Generate) {
-			return false;
-			// Check settings + return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Dump JaCoCo exec file from the JVM that contains the Agent.
-	 * Stop the system.
-	 * Prepare the JaCoCo report Artefact and his summarize information.
-	 * 
-	 * @param system
-	 */
-	private void prepareJaCoCoReport(SUT system) {
-		String jacocoFile = "jacoco-client.exec";
-		try {
-			jacocoFile = MBeanClient.dumpJaCoCoReport();
-		} catch (Exception e) {
-			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
-		}
-
-		// Not a beautiful way trying to close the SUT 
-		// TODO: Implement graceful Actions to close SUT
-		
-		Keyboard kb = AWTKeyboard.build();
-
-		kb.press(KBKeys.VK_ALT);
-		kb.press(KBKeys.VK_F4);
-
-		kb.release(KBKeys.VK_ALT);
-		kb.release(KBKeys.VK_F4);
-
-		Util.pause(10);
-
-		kb.press(KBKeys.VK_SHIFT);
-		kb.release(KBKeys.VK_SHIFT);
-
-		kb.press(KBKeys.VK_ENTER);
-		kb.release(KBKeys.VK_ENTER);
-
-		Util.pause(10);
-
-		super.stopSystem(system);
-
-		try {
-
-			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath()
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
-			
-			coverageDir.add(reportDir);
-
-			//Launch JaCoCo report
-			String antCommand = "cd jacoco_0.8.5 && ant report"
-					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
-
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
-
-			System.out.println("JaCoCo report created successfully!");
-
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			coverageSummary.add(coverageInfo);
-
-			System.out.println(coverageInfo);
-
-		} catch (IOException | InterruptedException e) {
-			System.out.println("ERROR: Creating JaCoCo report !");
-			e.printStackTrace();
-		}
-	}
 
 }
 
@@ -428,7 +422,11 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
  */
 class CODEOLicense {
 	
-	String sutTitle = "ExampleLicense";
+	String sutTitle = "CODEO";
+	String sutName = "PikeOS Certified Hypervisor Eclipse-based CODEO";
+	String sutUrl = "https://www.sysgo.com/products/pikeos-hypervisor/eclipse-based-codeo";
+	String product = "SYSGO";
+	boolean isOpenSource = false;
 
 	public CODEOLicense () { 
 		// Create object for JSON Artefact purposes

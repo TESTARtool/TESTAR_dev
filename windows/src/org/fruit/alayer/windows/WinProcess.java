@@ -59,7 +59,10 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public final class WinProcess extends SUTBase {
 
-	private static final String EMPTY_STRING = ""; // by wcoux
+	private static final String EMPTY_STRING = "";
+	
+	public static boolean codeo_execution = false;
+	public static int codeo_pause = 30;
 
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
@@ -127,7 +130,43 @@ public final class WinProcess extends SUTBase {
 		try{
 			Assert.notNull(path);
 
-			//Disabled with browsers, only allow it with desktop applications executed with command_line
+			// Force the execution of the CODEO SUT via Java with JaCoCo
+			// Check "java.exe" processes name and attach with the new one (CODEO java process)
+			if(codeo_execution) {
+				
+				// Save all processes pid with the name java.exe
+				List<Long> beforePID = Util.newArrayList();
+				for(WinProcHandle winp : runningProcesses()) {
+					if(winp.name()!=null && winp.name().contains("java.exe")) {
+						beforePID.add(winp.pid());
+					}
+				}
+
+				Runtime.getRuntime().exec(new String[] { "cmd", "/c", path });
+				
+				// TODO: Wait until GUI is ready
+				// CODEO takes his time to launch, but maybe 30 sec is too much
+				Util.pause(codeo_pause); 
+
+				// Check all running processes after execute CODEO
+				// Find the new "java.exe" process that should correspond to CODEO SUT
+				long pidCODEO = -1;
+				for(WinProcHandle winp : runningProcesses()) {
+					if(winp.name()!=null && winp.name().contains("java.exe") && !beforePID.contains(winp.pid())) {
+						pidCODEO = winp.pid();
+						break;
+					}
+				}
+
+				WinProcess returnProcess = fromPID(pidCODEO);
+
+				returnProcess.set(Tags.Path, path);
+				returnProcess.set(Tags.Desc, path);
+				return returnProcess;
+			}
+
+			// Execute the SUT via Windows API
+			// Disabled with browsers, only allow it with desktop applications executed with command_line
 			if(!ProcessListenerEnabled) {
 
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
