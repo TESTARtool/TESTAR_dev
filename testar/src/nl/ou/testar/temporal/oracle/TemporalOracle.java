@@ -20,7 +20,7 @@ public class TemporalOracle extends ModelBean implements Cloneable{
     private MultiValuedMap<String,String> pattern_Substitutions;
     //@CsvBindByName
     @CsvIgnore
-    private int pattern_ConstraintSet;  // based on which set of constraints
+    private int pattern_ConstraintSet;  // based on which set of constraints. feature no longer used.
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
     @CsvCustomBindByName(converter = CSVConvertVerdict.class )

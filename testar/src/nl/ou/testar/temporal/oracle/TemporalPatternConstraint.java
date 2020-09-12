@@ -80,9 +80,8 @@ public class TemporalPatternConstraint {
                 String finalkey;
                 finalkey=basekey+entrie.getKey();
                 constraint=entrie.getValue();
-              //  if(!constraintMapper.containsMapping(finalkey,constraint)) {//is a list :-(
+               // if (constraint.equals("")){ constraint=".*";} //regex to match anything
                     constraintMapper.put(finalkey, constraint);
-               // }
             }
         }
     }

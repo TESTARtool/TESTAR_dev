@@ -154,7 +154,7 @@ public class TemporalController {
     }
 
 
-
+    @SuppressWarnings("unchecked") // casting on getAbstractionAttributes
     private void setTemporalModelMetaData(AbstractStateModel abstractStateModel) {
         if (abstractStateModel != null) {
             tModel.setApplicationName(abstractStateModel.getApplicationName());
@@ -542,28 +542,47 @@ public class TemporalController {
             if (patcIndex != -1) {
                 constrainSets = patternConstraint.getConstraintSets();
             }
+            List<Integer> nonEmptySetList=new ArrayList<>();
+            if (constrainSets != null) {
+                for (Map.Entry<Integer, Map<String, String>> d : constrainSets.entrySet()
+                ) {
+                    Map<String, String> tmpCSet = d.getValue();
+                    boolean nonEmptySet = false;
+                    for (Map.Entry<String, String> par : tmpCSet.entrySet()
+                    ) {
+                        if (!par.getValue().equals("")) {
+                            nonEmptySet = true;
+                            break;
+                        }
+                    }
+                    if (nonEmptySet) {
+                        nonEmptySetList.add(d.getKey());
+                    }
+                }
+            }
+            constraintSet = null;
             for (int i = 0; i < tactic_oraclesPerPattern; i++) {
                 TemporalOracle potentialOracle = new TemporalOracle();
-                if (constrainSets != null) {
-                    cSetindex = constraintRnd.nextInt(constrainSets.size());//start set. constrainset number is 1,2,3,...
+                if (nonEmptySetList.size()>0) {
+                    cSetindex = constraintRnd.nextInt(nonEmptySetList.size());//choose a set
+                    constraintSet = constrainSets.get(nonEmptySetList.get(cSetindex));//indirection
                 }
                 ParamSubstitutions = new HashMap<>();
+
                 for (String param : pat.getPattern_Parameters()
                 ) {
                     passConstraint = false;
                     String provisionalParamSubstitution;
-                    if (constrainSets == null) {
+                    if (nonEmptySetList.size()==0) {
                         provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
                         ParamSubstitutions.put(param, provisionalParamSubstitution);
                         passConstraint = true;  //virtually true
+
                     } else {
-                        for (int k = 1; k < constrainSets.size() + 1; k++) {//constrainset number is 1,2,3,...
-                            int ind = (k + cSetindex) % (constrainSets.size() + 1);
-                            constraintSet = constrainSets.get(ind);
-                            if (constraintSet.containsKey(param)) {
+                        if (!constraintSet.getOrDefault(param,"").equals("")) {
                                 Pattern regexPattern = CachedRegexPatterns.addAndGet(constraintSet.get(param));
                                 if (regexPattern == null) {
-                                    continue; //no pass for this constraint-set due to invalid pattern
+                                    break; //no pass for this constraint-set due to invalid pattern
                                 } else {
                                     for (int j = 0; j < trylimitConstraint; j++) {
                                         provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
@@ -575,41 +594,38 @@ public class TemporalController {
                                         }
                                     }
                                 }
-                            } else {
+                            } else { //no param or param constraint value is empty
                                 provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
                                 ParamSubstitutions.put(param, provisionalParamSubstitution);
                                 passConstraint = true;  //virtually true
-                                break;// go to next parameter
+                            //    break;// go to next parameter
                             }
-                            if (passConstraint) {
-                                break;
-                            }
-                        }
                     }
+
                 }
                 potentialOracle.setPatternBase(pat); //downcasting of pat
                 potentialOracle.setApplicationName(tModel.getApplicationName());
                 potentialOracle.setApplicationVersion(tModel.getApplicationVersion());
                 potentialOracle.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
                 potentialOracle.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
+                if (nonEmptySetList.size()==0)
+                    {potentialOracle.addLog("Used No Constraints");}
+                else
+                    {potentialOracle.addLog("Used Constraintset: "+nonEmptySetList.get(cSetindex));}
+                MultiValuedMap<String, String> pattern_Substitutions = new HashSetValuedHashMap<>();
+                pattern_Substitutions.putAll(defaultpattern_Substitutions);
                 if (passConstraint) { //assignment found, save and go to next round for a pattern
-                    if (cSetindex != -1) {
-                        potentialOracle.setPattern_ConstraintSet(cSetindex + 1);// sets numbers from 1,2,3,...
-                    }
-                    MultiValuedMap<String, String> pattern_Substitutions = new HashSetValuedHashMap<>();
-                    pattern_Substitutions.putAll(defaultpattern_Substitutions);
                     for (Map.Entry<String, String> paramsubst : ParamSubstitutions.entrySet()
                     ) {
                         pattern_Substitutions.put("PATTERN_SUBSTITUTION_" + paramsubst.getKey(), paramsubst.getValue());// improve?
                         pattern_Substitutions.removeMapping("PATTERN_SUBSTITUTION_" + paramsubst.getKey(),"");
                     }
-                    potentialOracle.setPattern_Substitutions(pattern_Substitutions);
                     potentialOracle.setOracle_validationstatus(ValStatus.CANDIDATE);
-                } else {
-                    // no assignment found
+                } else { // no assignment found
                     potentialOracle.setOracle_validationstatus(ValStatus.ERROR);
                     potentialOracle.addLog("No valid assignment of substitutions found. Advise: review ConstraintSets");
                 }
+                potentialOracle.setPattern_Substitutions(pattern_Substitutions);
                 potentialOracleColl.add(potentialOracle);
             }
         }
