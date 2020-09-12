@@ -14,7 +14,7 @@ public class LogData {
 protected static final String csvsep=";";
 
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private Set<String> _log;
+    private List<String> _log;
     @JsonAlias("comments")
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> _userComments;
@@ -24,7 +24,7 @@ protected static final String csvsep=";";
 
 
     public LogData() {
-        _log = new LinkedHashSet<>();
+        _log = new LinkedList<>();
         _userComments = new ArrayList<>();
         _modifieddate = prettyCurrentDateTime();
     }
@@ -35,12 +35,12 @@ protected static final String csvsep=";";
     }
 
 
-    public Set<String> get_log() {
+    public List<String> get_log() {
         return _log;
     }
 
 
-    public void set_log(LinkedHashSet<String> _log) {
+    public void set_log(List<String> _log) {
         this._log = _log;
     }
 
