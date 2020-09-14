@@ -30,10 +30,14 @@
 
 package nl.ou.testar.StateModel.Difference;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,13 +47,20 @@ import java.util.Set;
 import org.fruit.Pair;
 import org.fruit.monkey.Main;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
+import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
+import nl.ou.testar.StateModel.Analysis.Json.Edge;
+import nl.ou.testar.StateModel.Analysis.Json.Element;
+import nl.ou.testar.StateModel.Analysis.Json.Vertex;
 
 public class StateModelDifferenceDatabase {
 	
@@ -385,13 +396,6 @@ public class StateModelDifferenceDatabase {
 		resultSet.close();
 		return "";
 	}
-
-	// this helper method formats the @RID property into something that can be used in a web frontend
-	private String formatId(String id) {
-		if (id.indexOf("#") != 0) return id; // not an orientdb id
-		id = id.replaceAll("[#]", "");
-		return id.replaceAll("[:]", "_");
-	}
 	
 	/**
 	 * This method saves screenshots to disk.
@@ -437,4 +441,148 @@ public class StateModelDifferenceDatabase {
 
 		return "";
 	}
+	
+	/*
+	 *  Extract Widget Tree information, based on AnalysisManager fetchWidgetTree
+	 */
+
+	/**
+	 * This method fetches a complete widget tree for a given concrete state id.
+	 * @param concreteStateIdentifier
+	 * @return
+	 */
+	public String fetchWidgetTree(String concreteStateIdentifier) {
+		ArrayList<Element> elements = new ArrayList<>();
+
+		// first get all the widgets using the State ConcreteIDCustom property
+		String stmt = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE ConcreteIDCustom = :concreteId))";
+		Map<String, Object> params = new HashMap<>();
+		params.put("concreteId", concreteStateIdentifier);
+		OResultSet resultSet = sessionDB.query(stmt, params);
+		elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
+		resultSet.close();
+
+		// then get the parent/child relationship between the widgets
+		stmt = "SELECT FROM isChildOf WHERE in IN(SELECT ConcreteIDCustom FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE ConcreteIDCustom = :concreteId)))";
+		resultSet = sessionDB.query(stmt, params);
+		elements.addAll(fetchEdges(resultSet, "isChildOf"));
+		resultSet.close();
+
+		// create a filename
+		StringBuilder builder = new StringBuilder(concreteStateIdentifier);
+		builder.append("_widget_tree.json");
+		String filename = builder.toString();
+		return writeJson(elements, filename);
+
+	}
+
+	/**
+	 * This method transforms a resultset of nodes into elements.
+	 * @param resultSet
+	 * @param className
+	 * @return
+	 */
+	private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent, String modelIdentifier) {
+		ArrayList<Element> elements = new ArrayList<>();
+
+		while (resultSet.hasNext()) {
+			OResult result = resultSet.next();
+			// we're expecting a vertex
+			if (result.isVertex()) {
+				Optional<OVertex> op = result.getVertex();
+				if (!op.isPresent()) continue;
+				OVertex stateVertex = op.get();
+				Vertex jsonVertex = new Vertex("n" + formatId(stateVertex.getIdentity().toString()));
+				for (String propertyName : stateVertex.getPropertyNames()) {
+					if (propertyName.contains("in_") || propertyName.contains("out_")) {
+						// these are edge indicators. Ignore
+						continue;
+					}
+					if (propertyName.equals("screenshot")) {
+						// process the screenshot separately
+						processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
+						continue;
+					}
+					jsonVertex.addProperty(propertyName, stateVertex.getProperty(propertyName).toString());
+				}
+				// optionally add a parent
+				if (parent != null) {
+					jsonVertex.addProperty("parent", parent);
+				}
+				Element element = new Element(Element.GROUP_NODES, jsonVertex, className);
+				if(stateVertex.getPropertyNames().contains("isInitial") && (Boolean)stateVertex.getProperty("isInitial")) {
+					element.addClass("isInitial");
+				}
+				elements.add(element);
+			}
+		}
+		return elements;
+	}
+
+	/**
+	 * This method transforms a resultset of edges into elements.
+	 * @param resultSet
+	 * @param className
+	 * @return
+	 */
+	private ArrayList<Element> fetchEdges(OResultSet resultSet, String className) {
+		ArrayList<Element> elements = new ArrayList<>();
+		while (resultSet.hasNext()) {
+			OResult result = resultSet.next();
+			// we're expecting a vertex
+			if (result.isEdge()) {
+				Optional<OEdge> op = result.getEdge();
+				if (!op.isPresent()) continue;
+				OEdge actionEdge = op.get();
+				OVertexDocument source = actionEdge.getProperty("out");
+				OVertexDocument target = actionEdge.getProperty("in");
+				Edge jsonEdge = new Edge("e" + formatId(actionEdge.getIdentity().toString()), "n" + formatId(source.getIdentity().toString()), "n" + formatId(target.getIdentity().toString()));
+				for (String propertyName : actionEdge.getPropertyNames()) {
+					if (propertyName.contains("in") || propertyName.contains("out")) {
+						// these are edge indicators. Ignore
+						continue;
+					}
+					jsonEdge.addProperty(propertyName, actionEdge.getProperty(propertyName).toString());
+				}
+				elements.add(new Element(Element.GROUP_EDGES, jsonEdge, className));
+			}
+		}
+		return elements;
+	}
+    
+	// this helper method formats the @RID property into something that can be used in a web frontend
+	private String formatId(String id) {
+		if (id.indexOf("#") != 0) return id; // not an orientdb id
+		id = id.replaceAll("[#]", "");
+		return id.replaceAll("[:]", "_");
+	}
+    
+    // this helper method will write elements to a file in json format
+    private String writeJson(ArrayList<Element> elements, String filename) {
+        // check if the subfolder already exists
+        File subFolder = new File(modelDifferenceReportDirectory + File.separator + "widgetTrees");
+        
+        if(!subFolder.exists()) {subFolder.mkdirs();}
+
+        File output = new File(subFolder, filename);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String result = mapper.writeValueAsString(elements);
+            // let's write the resulting json to a file
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
+                writer.write(result);
+                writer.close();
+            }
+            
+            return output.getCanonicalPath();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return output.toString();
+    }
 }

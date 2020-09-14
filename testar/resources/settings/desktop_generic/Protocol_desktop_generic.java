@@ -29,21 +29,38 @@
  *******************************************************************************************************/
 
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
+import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
 
+import es.upv.staq.testar.CodingManager;
+import nl.ou.testar.StateModel.Difference.StateModelDifferenceWidgetTree;
+import nl.ou.testar.a11y.reporting.HTMLReporter;
+
 /**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
+ * This protocol provides default TESTAR behavior to test Windows desktop applications.
  *
  * It uses random action selection algorithm.
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
 
+	private HTMLDifference htmlDifference;
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -52,42 +69,8 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-	}
-
-	/**
-	 * This methods is called before each test sequence, before startSystem(),
-	 * allowing for example using external profiling software on the SUT
-	 *
-	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
-	 */
-	@Override
-	protected void preSequencePreparations() {
-		super.preSequencePreparations();
-	}
-
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-	 * @return  a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException{
-		return super.startSystem();
-	}
-
-	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
-	 */
-	 @Override
-	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		htmlDifference = new HTMLDifference();
+		
 	}
 
 	/**
@@ -103,7 +86,24 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+		
+		// Save previous state object
+		State previousState = latestState;
+		
+		// Update state information
+		State state = super.getState(system);
+		
+		if(previousState != null && previousState.get(Tags.ScreenshotPath, null) != null && state.get(Tags.ScreenshotPath, null) != null) {
+			
+			String differenceScreenshot = getDifferenceImage(
+					previousState.get(Tags.ScreenshotPath), previousState.get(Tags.ConcreteIDCustom, ""),
+					state.get(Tags.ScreenshotPath), state.get(Tags.ConcreteIDCustom, "")
+					);
+			
+			htmlDifference.addStateDifferenceStep(actionCount, previousState.get(Tags.ScreenshotPath), state.get(Tags.ScreenshotPath), differenceScreenshot);
+		}
+		
+		return state;
 	}
 
 	/**
@@ -118,6 +118,15 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// non-responsiveness
 		// suspicious titles
 		Verdict verdict = super.getVerdict(state);
+		
+		// DEBUGGING purposes
+		if(latestState != null) {
+			System.out.println("Widget Tree Comparing Tags..." + Arrays.toString(CodingManager.getCustomTagsForAbstractId()));
+			StateModelDifferenceWidgetTree diffWidgetTree = new StateModelDifferenceWidgetTree(latestState, state);
+			for(String s : diffWidgetTree.getAbstractPropertiesDifference()) {
+				System.out.println(s);
+			}
+		}
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
@@ -160,77 +169,156 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		//return the set of derived actions
 		return actions;
 	}
-
+	
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
+	 * State image difference 
+	 * 
+	 * https://stackoverflow.com/questions/25022578/highlight-differences-between-images
+	 * 
+	 * @param previousStateDisk
+	 * @param namePreviousState
+	 * @param stateDisk
+	 * @param nameState
+	 * @return
 	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+	private String getDifferenceImage(String previousStateDisk, String namePreviousState, String stateDisk, String nameState) {
+		try {
+
+			// State Images paths
+			String previousStatePath = new File(previousStateDisk).getCanonicalFile().toString();
+			String statePath = new File(stateDisk).getCanonicalFile().toString();
+			
+			System.out.println("Action: " + actionCount);
+			System.out.println("PreviousState: " + previousStatePath);
+			System.out.println("CurrentState: " + statePath);
+			
+			// TESTAR launches the process to create the image and move forward without wait if exists
+			// thats why we need to check and wait to obtain the image-diff
+			while(!new File(previousStatePath).exists() || !new File(statePath).exists()){
+				System.out.println("Waiting for Screenshot creation");
+				System.out.println("Waiting... PreviousState: " + previousStatePath);
+				System.out.println("Waiting... CurrentState: " + statePath);
+				Util.pause(2);
+			}
+			
+			BufferedImage img1 = ImageIO.read(new File(previousStatePath));
+			BufferedImage img2 = ImageIO.read(new File(statePath));
+
+			int width1 = img1.getWidth(); // Change - getWidth() and getHeight() for BufferedImage
+			int width2 = img2.getWidth(); // take no arguments
+			int height1 = img1.getHeight();
+			int height2 = img2.getHeight();
+			if ((width1 != width2) || (height1 != height2)) {
+				System.out.println("Error: Images dimensions mismatch");
+				return "";
+			}
+
+			// NEW - Create output Buffered image of type RGB
+			BufferedImage outImg = new BufferedImage(width1, height1, BufferedImage.TYPE_INT_RGB);
+
+			// Modified - Changed to int as pixels are ints
+			int diff;
+			int result; // Stores output pixel
+			for (int i = 0; i < height1; i++) {
+				for (int j = 0; j < width1; j++) {
+					int rgb1 = img1.getRGB(j, i);
+					int rgb2 = img2.getRGB(j, i);
+					int r1 = (rgb1 >> 16) & 0xff;
+					int g1 = (rgb1 >> 8) & 0xff;
+					int b1 = (rgb1) & 0xff;
+					int r2 = (rgb2 >> 16) & 0xff;
+					int g2 = (rgb2 >> 8) & 0xff;
+					int b2 = (rgb2) & 0xff;
+					diff = Math.abs(r1 - r2); // Change
+					diff += Math.abs(g1 - g2);
+					diff += Math.abs(b1 - b2);
+					diff /= 3; // Change - Ensure result is between 0 - 255
+					// Make the difference image gray scale
+					// The RGB components are all the same
+					result = (diff << 16) | (diff << 8) | diff;
+					outImg.setRGB(j, i, result); // Set result
+				}
+			}
+
+			// Now save the image on disk
+			// check if we have a directory for the screenshots yet
+			File screenshotDir = new File(OutputStructure.htmlOutputDir + File.separator);
+
+			// save the file to disk
+			File screenshotFile = new File(screenshotDir, "diff_"+ namePreviousState + "_" + nameState + ".png");
+			if (screenshotFile.exists()) {
+				try {
+					return screenshotFile.getCanonicalPath();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(outImg, "png", baos);
+			byte[] bytes = baos.toByteArray();
+
+			outputStream.write(bytes);
+			outputStream.flush();
+			outputStream.close();
+
+			return screenshotFile.getCanonicalPath();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return "";
 	}
+}
 
-	/**
-	 * Execute the selected action.
-	 *
-	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
-	 *
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-		return super.executeAction(system, state, action);
+/**
+ * Helper Class to prepare HTML State report Difference
+ */
+class HTMLDifference {
+	
+	PrintWriter out = null;
+
+	public HTMLDifference () { 
+		String[] HEADER = new String[] {
+				"<!DOCTYPE html>",
+				"<html>",
+				"<style>",
+				".container {display: flex;}",
+				".float {display:inline-block;}",
+				"</style>",
+				"<head>",
+				"<title>TESTAR State Model difference report</title>",
+				"</head>",
+				"<body>"
+		};
+		
+		String htmlReportName =  OutputStructure.htmlOutputDir + File.separator + "StateDifferenceReport.html";
+
+		try {
+			out = new PrintWriter(new File(htmlReportName).getCanonicalPath(), HTMLReporter.CHARSET);
+		} catch (IOException e) { e.printStackTrace(); }
+
+		for(String s:HEADER){
+			out.println(s);
+			out.flush();
+		}
 	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You can stop deriving more actions after:
-	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-		return super.moreActions(state);
-	}
-
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test sequence
-	 * You could stop the test after:
-	 * - a specified amount of sequences, which is specified through the Sequences setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue test, else stop
-	 */
-	@Override
-	protected boolean moreSequences() {
-		return super.moreSequences();
-	}
-
-	/**
-	 * Here you can put graceful shutdown sequence for your SUT
-	 * @param system
-	 */
-	@Override
-	protected void stopSystem(SUT system) {
-		super.stopSystem(system);
-	}
-
-	/**
-	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-	 *
-	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
-	 */
-	@Override
-	protected void postSequenceProcessing() {
-		super.postSequenceProcessing();
+	
+	public void addStateDifferenceStep(int actionCount, String previousState, String state, String difference) {
+		out.println("<h2> Specific State changes for action " + actionCount + " </h2>");
+		try {
+			out.println("<p><img src=\"" + new File(previousState).getCanonicalFile().toString() + "\">");
+			out.println("<img src=\"" + new File(state).getCanonicalFile().toString() + "\">");
+			out.println("<img src=\"" + new File(difference).getCanonicalFile().toString() + "\"></p>");
+		} catch (IOException e) {
+			out.println("<p> ERROR ADDING IMAGES </p>");;
+		}
+		out.flush();
 	}
 }

@@ -39,6 +39,7 @@ import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;

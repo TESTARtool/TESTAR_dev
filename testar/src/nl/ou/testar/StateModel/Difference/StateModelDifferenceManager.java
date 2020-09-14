@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -47,6 +48,9 @@ import org.fruit.Pair;
 import org.fruit.monkey.Main;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -94,10 +98,6 @@ public class StateModelDifferenceManager {
 					"\n plocal databases do not use 'root' user" + 
 					"\n try with customized user";
 			System.out.println(message);
-
-			/*JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
-			frame.setAlwaysOnTop(true);*/
 
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
@@ -231,10 +231,6 @@ public class StateModelDifferenceManager {
 					"\n try with customized user";
 			System.out.println(message);
 
-			/*JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
-			frame.setAlwaysOnTop(true);*/
-
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -350,9 +346,9 @@ public class StateModelDifferenceManager {
 
 					if(!Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne).isEmpty()) {
 
+						// Image Difference
 						String diffDisk = getDifferenceImage(disappearedStatesImages.get(dissStateModelOne), dissStateModelOne,
 								newStatesImages.get(newStateModelTwo), newStateModelTwo);
-
 
 						out.println("<p><img src=\"" + disappearedStatesImages.get(dissStateModelOne) + "\">");
 						out.println("<img src=\"" + newStatesImages.get(newStateModelTwo) + "\">");
@@ -360,6 +356,9 @@ public class StateModelDifferenceManager {
 
 						out.println("<p style=\"color:blue;\">" + "We have reached this State with Action: " + Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne) + "</p>");
 
+						// Widget Tree Abstract Properties Difference
+						jsonWidgetTreeDifference(dissStateModelOne, newStateModelTwo);
+						
 						out.flush();
 					}
 				}
@@ -456,5 +455,30 @@ public class StateModelDifferenceManager {
 		}
 
 		return "";
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param dissStateModelOne
+	 * @param newStateModelTwo
+	 */
+	private void jsonWidgetTreeDifference(String dissStateModelOne, String newStateModelTwo) {
+		try {
+			// From the Abstract State that disappeared, get one Concrete State Id and fetch the widget tree
+			String dissapearedConcreteStateIdentifier = modelDifferenceDatabase.concreteStateId(dissStateModelOne);
+			String jsonDissapearedWidgetTree = modelDifferenceDatabase.fetchWidgetTree(dissapearedConcreteStateIdentifier);
+			FileReader readerDissapearedWidgetTree = new FileReader(new File(jsonDissapearedWidgetTree).getCanonicalFile());
+			JsonArray jsonArrayDissapearedWidgetTree = new JsonParser().parse(readerDissapearedWidgetTree).getAsJsonArray();
+
+			// From the new Abstract State, get one Concrete State Id and fetch the widget tree
+			String newConcreteStateIdentifier = modelDifferenceDatabase.concreteStateId(newStateModelTwo);
+			String jsonNewWidgetTree = modelDifferenceDatabase.fetchWidgetTree(newConcreteStateIdentifier);
+			FileReader readerNewWidgetTree = new FileReader(new File(jsonNewWidgetTree).getCanonicalFile());
+			JsonArray jsonObjectNewWidgetTree = new JsonParser().parse(readerNewWidgetTree).getAsJsonArray();
+
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
