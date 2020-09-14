@@ -146,6 +146,12 @@ public final class WinProcess extends SUTBase {
 				
 				WinProcess returnProcess = fromPID(pid);
 				
+				if(ProcessListenerEnabled) {
+					returnProcess.set(Tags.StdErr,process.getErrorStream());
+					returnProcess.set(Tags.StdOut, process.getInputStream());
+					returnProcess.set(Tags.StdIn, process.getOutputStream());
+				}
+				
 				returnProcess.set(Tags.Path, path);
 				returnProcess.set(Tags.Desc, path);
 				return returnProcess;
