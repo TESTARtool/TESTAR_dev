@@ -1,9 +1,8 @@
- package nl.ou.testar.temporal.control;
+package nl.ou.testar.temporal.control;
 
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
-
 import nl.ou.testar.temporal.foundation.ValStatus;
 import nl.ou.testar.temporal.ioutils.CSVHandler;
 import nl.ou.testar.temporal.ioutils.JSONHandler;
@@ -18,7 +17,6 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,7 +25,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import static nl.ou.testar.temporal.util.OShelper.prettyCurrentTime;
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
@@ -573,19 +570,19 @@ public class TemporalController {
                 ) {
                     passConstraint = false;
                     String provisionalParamSubstitution;
-                    if (nonEmptySetList.size()==0) {
+                    if (nonEmptySetList.size()==0 || constraintSet.getOrDefault(param,"").equals("")) {
                         provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
                         ParamSubstitutions.put(param, provisionalParamSubstitution);
                         passConstraint = true;  //virtually true
 
                     } else {
-                        if (!constraintSet.getOrDefault(param,"").equals("")) {
+                        if (nonEmptySetList.size()!=0 ) {
                                 Pattern regexPattern = CachedRegexPatterns.addAndGet(constraintSet.get(param));
                                 if (regexPattern == null) {
                                     break; //no pass for this constraint-set due to invalid pattern
                                 } else {
                                     for (int j = 0; j < trylimitConstraint; j++) {
-                                        provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
+                                       provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
                                         Matcher m = regexPattern.matcher(provisionalParamSubstitution);
                                         if (m.matches()) {
                                             ParamSubstitutions.put(param, provisionalParamSubstitution);
@@ -594,11 +591,6 @@ public class TemporalController {
                                         }
                                     }
                                 }
-                            } else { //no param or param constraint value is empty
-                                provisionalParamSubstitution = modelAPSet.get(APRnd.nextInt(modelAPSet.size() - 1));
-                                ParamSubstitutions.put(param, provisionalParamSubstitution);
-                                passConstraint = true;  //virtually true
-                            //    break;// go to next parameter
                             }
                     }
 
