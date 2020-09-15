@@ -36,7 +36,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,7 +76,6 @@ public class StateModelDifferenceDatabase {
 	/**
 	 * Obtain the existing State Model Identifier from the name and version of one application
 	 * 
-	 * @param sessionDB
 	 * @param appName
 	 * @param appVer
 	 * @return modelIdentifier
@@ -103,6 +101,38 @@ public class StateModelDifferenceDatabase {
 
 				resultSet.close();
 				return modelVertex.getProperty("modelIdentifier");
+			}
+		}
+		resultSet.close();
+		
+		return "";
+	}
+	
+	/**
+	 * Obtain the Abstract Attributes of one Abstract State Model using the Model Identifier
+	 * 
+	 * @param modelIdentifier
+	 * @return
+	 */
+	public String abstractStateModelAbstractionAttributes(String modelIdentifier) {
+		String stmt = "SELECT FROM AbstractStateModel where modelIdentifier = :modelIdentifier";
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("modelIdentifier", modelIdentifier);
+
+		OResultSet resultSet = sessionDB.query(stmt, params);
+
+		if (resultSet.hasNext()) {
+			OResult result = resultSet.next();
+			// we're expecting a vertex
+			if (result.isVertex()) {
+				Optional<OVertex> op = result.getVertex();
+				if (!op.isPresent()) {resultSet.close(); return "";}
+				OVertex modelVertex = op.get();
+
+				resultSet.close();
+				Set<String> abstractionAttributes = (Set)modelVertex.getProperty("abstractionAttributes");
+				return String.join(",", abstractionAttributes);
 			}
 		}
 		resultSet.close();
