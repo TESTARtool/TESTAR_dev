@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
@@ -65,6 +67,78 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		
 		// Set desired License
 		licenseSUT = new ExampleLicense();
+	}
+	
+	/**
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+	}
+
+	/**
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 *      out what executable to run)
+	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 *      seconds until they have finished loading)
+	 * @return  a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException{
+		return super.startSystem();
+	}
+
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
+	 */
+	 @Override
+	protected void beginSequence(SUT system, State state){
+	 	super.beginSequence(system, state);
+	}
+
+	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException{
+		return super.getState(system);
+	}
+
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
+
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		//--------------------------------------------------------
+
+		return verdict;
 	}
 	
 	/**
@@ -126,6 +200,65 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 			retAction = super.selectAction(state, actions);
 		}
 		return retAction;
+	}
+	
+	/**
+	 * Execute the selected action.
+	 *
+	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
+	 *
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @param action the action to execute
+	 * @return whether or not the execution succeeded
+	 */
+	@Override
+	protected boolean executeAction(SUT system, State state, Action action){
+		return super.executeAction(system, state, action);
+	}
+
+	/**
+	 * TESTAR uses this method to determine when to stop the generation of actions for the
+	 * current sequence. You can stop deriving more actions after:
+	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
+	 * - after a specific time, that is set in the MaxTime setting
+	 * @return  if <code>true</code> continue generation, else stop
+	 */
+	@Override
+	protected boolean moreActions(State state) {
+		return super.moreActions(state);
+	}
+
+
+	/**
+	 * TESTAR uses this method to determine when to stop the entire test sequence
+	 * You could stop the test after:
+	 * - a specified amount of sequences, which is specified through the Sequences setting, or
+	 * - after a specific time, that is set in the MaxTime setting
+	 * @return  if <code>true</code> continue test, else stop
+	 */
+	@Override
+	protected boolean moreSequences() {
+		return super.moreSequences();
+	}
+
+	/**
+	 * Here you can put graceful shutdown sequence for your SUT
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
+		super.stopSystem(system);
+	}
+
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
 	}
 	
 	/**

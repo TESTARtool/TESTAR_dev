@@ -16,7 +16,7 @@ var queryValue = process.argv[5];
 
 validate(pkmAddress, pkmPort, queryKey, queryValue)
 
-const url = 'mongodb://' + pkmAddress + ':' + pkmPort;
+const url = 'mongodb://admin:admin@' + pkmAddress + ':' + pkmPort;
 const dbName = 'mydb';
 const client = new MongoClient(url,{ useUnifiedTopology: true});
 
@@ -42,7 +42,7 @@ client.connect(function(err) {
 	
 	// Prepare the connection to the Test Results Collection
 	const db = client.db(dbName);
-	const collection = db.collection('TESTAR_Test_Results');
+	const collection = db.collection('TESTARTestResults');
 	
 	// Prepare the query to find the desired document or property, using regex for the object value
 	var query = {};

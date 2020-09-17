@@ -10,7 +10,7 @@ validate(process.argv[2], process.argv[3])
 
 var pkmAddress = process.argv[4];
 var pkmPort = process.argv[5];
-const url = 'mongodb://' + pkmAddress + ':' + pkmPort;
+const url = 'mongodb://admin:admin@' + pkmAddress + ':' + pkmPort;
 const dbName = 'mydb';
 const client = new MongoClient(url,{ useUnifiedTopology: true});
 
@@ -47,7 +47,7 @@ client.connect(function(err) {
 	//Prepare db name and collection name
 	assert.equal(null,err);
 	const db = client.db(dbName);
-	const collection = db.collection('TESTAR_State_Model');
+	const collection = db.collection('TESTARStateModel');
 	const val = process.argv[3];
 	
 	//Prepare document
