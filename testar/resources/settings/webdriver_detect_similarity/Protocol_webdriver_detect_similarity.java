@@ -1,5 +1,4 @@
 /**
- * 
  * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
  * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
  *
@@ -30,22 +29,23 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.OutputStructure;
+import org.testar.action.priorization.ActionTags;
+import org.testar.action.priorization.SimilarityDetection;
+import org.testar.action.priorization.WeightedAction;
 import org.testar.protocols.WebdriverProtocol;
 
-import java.io.File;
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -54,7 +54,9 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_statemodel extends WebdriverProtocol {
+public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
+	
+	private SimilarityDetection similarActions;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -78,25 +80,43 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.w3schools.com");
+		domainsAllowed = null;
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
 		followLinks = true;
-
 		// Propagate followLinks setting
 		WdDriver.followLinks = followLinks;
 
+		// URL + form name, username input id + value, password input id + value
+		// Set login to null to disable this feature
+		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+		username = Pair.from("username", "");
+		password = Pair.from("password", "");
+
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{ 
-			put("id", "sncmp-banner-btn-agree");
+		policyAttributes = new HashMap<String, String>() {{
+			put("class", "lfr-btn-label");
 		}};
 
 		WdDriver.fullScreen = true;
-		
+
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
+
+	}
+
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
+	 */
+	@Override
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
+		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
 	}
 
 	/**
@@ -111,7 +131,8 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+	protected Set<Action> deriveActions(SUT system, State state)
+			throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 
@@ -194,72 +215,64 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	}
 
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 * Select one of the possible actions (e.g. at random)
 	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(State state, Set<Action> actions) {
+		actions = similarActions.modifySimilarActions(actions);
 
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			//using the action selector of the state model:
-			retAction = stateModelManager.getAbstractActionToExecute(actions);
+		System.out.println("---------------------- DEBUG SIMILARITY VALUES ----------------------------------------");
+		for(Action a : actions) {
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
+					" with similarity : " + a.get(ActionTags.SimilarityValue, 0));
 		}
-		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
-		}
-		return retAction;
+		
+		return reduceProbabilityBySimilarity(state, actions);
 	}
 	
+	private Action reduceProbabilityBySimilarity(State state, Set<Action> actions) {
+		// Check the totalWeight
+		double totalWeight = 0;
+		for(Action a : actions) {
+			totalWeight = totalWeight + (1.0 / a.get(ActionTags.SimilarityValue));
+		}
+		
+		// Just in case, if something wrong return purely random
+		if(totalWeight == 0) {
+			return super.selectAction(state, actions);
+		}
+		
+		System.out.println("*************************** DEBUG SIMILARITY PROBABILITY ***************************");
+		
+		// Create a percentage weight of each action based on the totalWeight
+		WeightedAction actionProbability = new WeightedAction();
+		for(Action a : actions) {
+			double actionWeight = (1.0 / a.get(ActionTags.SimilarityValue)) / totalWeight * 100;
+			actionProbability.addEntry(a, actionWeight);
+			
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
+					" with similarity : " + actionWeight);
+		}
+		
+		return actionProbability.getRandom();
+	}
+
 	/**
-	 * All TESTAR test sequence sessions are closed (State Model + OrientDB included)
-	 * We can start other connection to create State Model Difference Report
+	 * Execute the selected action.
+	 *
+	 * @param system the SUT
+	 * @param state  the SUT's current state
+	 * @param action the action to execute
+	 * @return whether or not the execution succeeded
 	 */
 	@Override
-	protected void closeTestSession() {
-		super.closeTestSession();
-		
-		try {
-			if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
-				// Define State Model versions we want to compare
-				String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
-				String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
-				Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
-
-				String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
-				String previousVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
-				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
-
-				// Obtain Database Configuration, from Settings by default
-				Config config = new Config();
-				config.setConnectionType(settings.get(ConfigTags.DataStoreType,""));
-				config.setServer(settings.get(ConfigTags.DataStoreServer,""));
-				config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory,""));
-				config.setDatabase(settings.get(ConfigTags.DataStoreDB,""));
-				config.setUser(settings.get(ConfigTags.DataStoreUser,""));
-				config.setPassword(settings.get(ConfigTags.DataStorePassword,""));
-
-				// State Model Difference Report Directory Name
-				String dirName = OutputStructure.outerLoopOutputDir  + File.separator + "StateModelDifference_"
-						+ previousStateModel.left() + "_" + previousStateModel.right() + "_vs_"
-						+ currentStateModel.left() + "_" + currentStateModel.right();
-
-				// Execute the State Model Difference to create an HTML report
-				StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
-				modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR: Trying to create an automatic State Model Difference");
-			e.printStackTrace();
-		}
+	protected boolean executeAction(SUT system, State state, Action action) {
+		similarActions.increaseSpecificExecutedAction(action);
+		return super.executeAction(system, state, action);
 	}
 
 }
