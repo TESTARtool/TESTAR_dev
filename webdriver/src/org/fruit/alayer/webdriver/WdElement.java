@@ -73,8 +73,8 @@ public class WdElement extends TaggableBase implements Serializable {
   String valuePattern, href, value, style, target, alt, src;
 
   double zindex;
-  int webZIndex = 0;
-  Rect rect;
+  public int webZIndex = 0;
+  public Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
