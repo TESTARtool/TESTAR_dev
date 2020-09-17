@@ -35,22 +35,33 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
 import org.fruit.Pair;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.webdriver.enums.WdMapping;
+import org.fruit.alayer.windows.UIAMapping;
 import org.fruit.monkey.Main;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.exception.OSecurityAccessException;
+
+import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
 
@@ -95,10 +106,6 @@ public class StateModelDifferenceManager {
 					"\n try with customized user";
 			System.out.println(message);
 
-			/*JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
-			frame.setAlwaysOnTop(true);*/
-
 		} catch(Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -116,6 +123,11 @@ public class StateModelDifferenceManager {
 	// Identifiers of the State Models we want to compare
 	private String identifierModelOne;
 	private String identifierModelTwo;
+	
+	// Abstract Attributes used to create the Abstract Layer of the State Model
+	private String abstractAttributesModelOne;
+	private String abstractAttributesModelTwo;
+	private Set<Tag<?>> abstractAttributesTags = new HashSet<>();
 
 	// Set Collection with all existing Abstract States of the State Models we want to compare
 	private Set<String> allAbstractStatesModelOne = new HashSet<>();
@@ -174,7 +186,47 @@ public class StateModelDifferenceManager {
 
 			identifierModelOne = modelDifferenceDatabase.abstractStateModelIdentifier(stateModelOne.left(), stateModelOne.right());
 			identifierModelTwo = modelDifferenceDatabase.abstractStateModelIdentifier(stateModelTwo.left(), stateModelTwo.right());
-
+			
+			abstractAttributesModelOne = modelDifferenceDatabase.abstractStateModelAbstractionAttributes(identifierModelOne);
+			abstractAttributesModelTwo = modelDifferenceDatabase.abstractStateModelAbstractionAttributes(identifierModelTwo);
+			
+			// IF Abstract Attributes are different, Abstract Layer is different and no sense to continue
+			if(!abstractAttributesModelOne.equals(abstractAttributesModelTwo)) {
+				System.out.println("\n ************************************************************************************ \n");
+				System.out.println("ERROR: Abstract Attributes are different ");
+				System.out.println("Model One: " + abstractAttributesModelOne);
+				System.out.println("Model Two: " + abstractAttributesModelTwo);
+				System.out.println("\n ************************************************************************************ \n");
+				return;
+			} else {
+				// Update Set object "abstractAttributesTags" with the Tags
+				// we need to check for Widget Tree difference
+				String[] stateModelTags = abstractAttributesModelOne.split(",");
+				
+				// Transform the String of abstractAttributesTag into a StateManagementTag
+				Set<Tag<?>> stateManagementTags = new HashSet<>();
+				for(int i = 0; i < stateModelTags.length; i++) {
+					String settingString = capitalizeWordsAndRemoveSpaces(stateModelTags[i]);
+					stateManagementTags.add(StateManagementTags.getTagFromSettingsString(settingString));
+				}
+				
+				// Now check UIAWindows and WdWebriver Maps
+				// To extract the specific API Tag attribute that matches with the State Management Tag
+				// It could match for both:  
+				// StateManagementTag: Widget title matches with UIAWindows: UIAName
+				// StateManagementTag: Widget title matches with WdTag: WebGenericTitle
+				for(Tag<?> stateManagementTag : stateManagementTags) {
+					Tag<?> windowsTag = UIAMapping.getMappedStateTag(stateManagementTag);
+					if(windowsTag != null) {
+						abstractAttributesTags.add(windowsTag);
+					}
+					Tag<?> webdriverTag = WdMapping.getMappedStateTag(stateManagementTag);
+					if(webdriverTag != null) {
+						abstractAttributesTags.add(webdriverTag);
+					}
+				}
+			}
+			
 			allAbstractStatesModelOne = new HashSet<>(modelDifferenceDatabase.abstractState(identifierModelOne));
 			allAbstractStatesModelTwo = new HashSet<>(modelDifferenceDatabase.abstractState(identifierModelTwo));
 
@@ -230,10 +282,6 @@ public class StateModelDifferenceManager {
 					"\n plocal databases do not use 'root' user" + 
 					"\n try with customized user";
 			System.out.println(message);
-
-			/*JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
-			frame.setAlwaysOnTop(true);*/
 
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -350,9 +398,9 @@ public class StateModelDifferenceManager {
 
 					if(!Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne).isEmpty()) {
 
+						// Image Difference
 						String diffDisk = getDifferenceImage(disappearedStatesImages.get(dissStateModelOne), dissStateModelOne,
 								newStatesImages.get(newStateModelTwo), newStateModelTwo);
-
 
 						out.println("<p><img src=\"" + disappearedStatesImages.get(dissStateModelOne) + "\">");
 						out.println("<img src=\"" + newStatesImages.get(newStateModelTwo) + "\">");
@@ -360,6 +408,12 @@ public class StateModelDifferenceManager {
 
 						out.println("<p style=\"color:blue;\">" + "We have reached this State with Action: " + Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne) + "</p>");
 
+						// Widget Tree Abstract Properties Difference
+						List<String> widgetTreeDifference = jsonWidgetTreeDifference(dissStateModelOne, newStateModelTwo);
+						for(String widgetInformation : widgetTreeDifference) {
+							out.println("<p style=\"color:black;\">" + widgetInformation + "</p>");
+						}
+						
 						out.flush();
 					}
 				}
@@ -456,5 +510,179 @@ public class StateModelDifferenceManager {
 		}
 
 		return "";
+	}
+	
+	/**
+	 * Given two Abstract States identifiers, the one that disappeared and the new that takes his place 
+	 * extract the Widget Tree from both States and make a comparison to detect the differences.
+	 * 
+	 * A List<String> of information about Widgets with changes will be returned.
+	 * 
+	 * @param dissStateModelOne
+	 * @param newStateModelTwo
+	 */
+	private List<String> jsonWidgetTreeDifference(String dissStateModelOne, String newStateModelTwo) {
+		List<String> widgetTreeInformation = new ArrayList<>();
+		
+		// From the Abstract State that disappeared, extract the widget tree
+		JsonArray jsonArrayDisappearedWidgetTree = extractJsonWidgetTreeFromAbstractState(dissStateModelOne);
+		// From the new Abstract State, extract the widget tree
+		JsonArray jsonArrayNewWidgetTree = extractJsonWidgetTreeFromAbstractState(newStateModelTwo);
+
+		// Iterate over all disappeared widgets from the widget-tree
+		for(int i = 0; i < jsonArrayDisappearedWidgetTree.size(); i++) {
+			JsonElement disElement = jsonArrayDisappearedWidgetTree.get(i);
+			if(jsonElementIsWidget(disElement)) {
+
+				// Check if the Element that represents a Widget exists inside the New Widget Tree Array
+				if(!checkIfJsonWidgetAbstracIdExistsInsideJsonWidgetTree(disElement, jsonArrayNewWidgetTree)) {
+					String widgetAbstractId = disElement.getAsJsonObject().getAsJsonObject("data").get("AbstractIDCustom").getAsString();
+					widgetTreeInformation.add("This Widget no loger exists in the new Model: " + widgetAbstractId);
+					widgetTreeInformation.add(extractAttributesFromWidgetJsonElement(disElement));
+				}
+			}
+		}
+
+		// Iterate over all new widgets from the widget-tree
+		for(int j = 0; j < jsonArrayNewWidgetTree.size(); j++) {
+			JsonElement newElement = jsonArrayNewWidgetTree.get(j);
+			if(jsonElementIsWidget(newElement)) {
+
+				// Check if the Element that represents a Widget exists inside the New Widget Tree Array
+				if(!checkIfJsonWidgetAbstracIdExistsInsideJsonWidgetTree(newElement, jsonArrayDisappearedWidgetTree)) {
+					String widgetAbstractId = newElement.getAsJsonObject().getAsJsonObject("data").get("AbstractIDCustom").getAsString();
+					widgetTreeInformation.add("This Widget is completely new in the new Model: " + widgetAbstractId);
+					widgetTreeInformation.add(extractAttributesFromWidgetJsonElement(newElement));
+				}
+			}
+		}
+		
+		return widgetTreeInformation;
+	}
+	
+	/**
+	 * Using the desired the Abstract State Identifier, 
+	 * get one of his Concrete State Id and fetch the widget tree as JSON
+	 * 
+	 * @param abstractStateId
+	 * @return
+	 */
+	private JsonArray extractJsonWidgetTreeFromAbstractState(String abstractStateId) {
+		String concreteStateId = modelDifferenceDatabase.concreteStateId(abstractStateId);
+		String jsonWidgetTree = modelDifferenceDatabase.fetchWidgetTree(concreteStateId);
+		
+		try(FileReader readerWidgetTree = new FileReader(new File(jsonWidgetTree).getCanonicalFile())){
+			return new JsonParser().parse(readerWidgetTree).getAsJsonArray();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new JsonArray();
+	}
+	
+	/**
+	 * Helper class to check if the JSON element is a node Widget
+	 * "classes": ["Widget"]
+	 * 
+	 * And check that the JSON element is not a node State
+	 * data { "AbstractIDCustom": "SAC1he7ngze41331129227" }
+	 * 
+	 * @param element
+	 * @return
+	 */
+	private boolean jsonElementIsWidget(JsonElement element) {
+		try {
+			boolean isWidget = element.getAsJsonObject().getAsJsonArray("classes").get(0).getAsString().equals("Widget");
+			
+			// State is the root Widget, but ignore in this level of the difference report
+			boolean isState = element.getAsJsonObject().getAsJsonObject("data").get("AbstractIDCustom").getAsString().contains("SAC");
+			
+			return (isWidget && !isState);
+		} catch(Exception e) {e.printStackTrace();}
+		return false;
+	}
+	
+	/**
+	 * Check if one JSON Element that represents a Widget, exists inside one JSON Array that represents a Widget-Tree
+	 * 
+	 * @param jsonWidget
+	 * @param jsonWidgetTree
+	 * @return
+	 */
+	private boolean checkIfJsonWidgetAbstracIdExistsInsideJsonWidgetTree(JsonElement jsonWidget, JsonArray jsonWidgetTree) {
+		// Iterate over all widget from the JSON Widget Tree
+		for(int i = 0; i < jsonWidgetTree.size(); i++) {
+			JsonElement widgetElement = jsonWidgetTree.get(i);
+			// Check if the element it is a Widget class
+			if(jsonElementIsWidget(widgetElement)) {
+				// Check if both Widget Elements have the same AbstractIDCustom property
+				if(compareWidgetJsonElementByAbstractId(jsonWidget, widgetElement)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if two JSON Elements that represents two Widgets, have the same AbstractIDCustom attribute
+	 * 
+	 * @param disWidget
+	 * @param newWidget
+	 * @return
+	 */
+	private boolean compareWidgetJsonElementByAbstractId(JsonElement disWidget, JsonElement newWidget) {
+		try {
+			String disWidgetAbstractIDCustom = disWidget.getAsJsonObject().getAsJsonObject("data").get("AbstractIDCustom").getAsString();
+			String newWidgetAbstractIDCustom = newWidget.getAsJsonObject().getAsJsonObject("data").get("AbstractIDCustom").getAsString();
+			
+			return disWidgetAbstractIDCustom.equals(newWidgetAbstractIDCustom);
+		} catch(Exception e) {}
+
+		return false;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param dissWidget
+	 * @param newWidget
+	 * @return
+	 */
+	private String extractAttributesFromWidgetJsonElement(JsonElement jsonWidget) {
+		StringBuilder attributes = new StringBuilder("");
+		
+		for(Tag<?> tag : abstractAttributesTags) {
+			// Check that the Tag Attribute exists inside JSON data (Widget Tag property)
+			if(jsonWidget.getAsJsonObject().getAsJsonObject("data").has(tag.name())) {
+				try {
+					String tagValue = jsonWidget.getAsJsonObject().getAsJsonObject("data").get(tag.name()).getAsString();
+					attributes.append(tag.name() + ":" + tagValue + " ");
+				} catch (Exception e) {}
+			}
+		}
+
+		return attributes.toString();
+	}
+	
+	/**
+	 * Helper class to transform State Model String attribute
+	 * into a StateManagementTag Setting String
+	 * 
+	 * From: widget control type
+	 * To: WidgetControlType
+	 * 
+	 * @return
+	 */
+	private String capitalizeWordsAndRemoveSpaces(String attribute) {
+		String words[] = attribute.split("\\s");  
+		StringBuilder capitalizeWord = new StringBuilder("");  
+		for(String w : words){  
+			String first = w.substring(0,1);  
+			String afterfirst = w.substring(1);  
+			capitalizeWord.append(first.toUpperCase() + afterfirst);  
+		}  
+		return capitalizeWord.toString().trim();  
 	}
 }

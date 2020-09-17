@@ -300,6 +300,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsClickable)) {
 			ret = w.element.isClickable;
 		}
+		else if (t.equals(WdTags.WebIsShadow)) {
+			ret = w.element.isShadow;
+		}
 		else if (t.equals(WdTags.WebBoundingRectangle)) {
 			ret = w.element.rect;
 		}

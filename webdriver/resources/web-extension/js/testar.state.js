@@ -117,6 +117,11 @@ function getChildNodesTestar(parentWrapped) {
         top += parseInt(style.getPropertyValue('padding-top'));
         parentWrapped["yOffset"] = parentWrapped['rect'][1] + top;
     }
+	
+	// Shadow Web Elements
+	if(childNodes.length === 0 && parentWrapped.element.shadowRoot !== null){
+		childNodes = parentWrapped.element.shadowRoot.childNodes;
+	}
 
     return childNodes;
 }
@@ -131,6 +136,11 @@ function getChildNodesTestar(parentWrapped) {
  */
 function wrapElementTestar(element, xOffset, yOffset) {
     var computedStyle = getComputedStyle(element);
+	
+	var shadowElement = false;
+	if(element.shadowRoot !== null){
+		shadowElement = true;
+	}
 
     return {
         element: element,
@@ -148,6 +158,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         dimensions: getDimensionsTestar(element),
         isBlocked: getIsBlockedTestar(element, xOffset, yOffset),
         isClickable: isClickableTestar(element, xOffset, yOffset),
+		isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
 
         wrappedChildren: [],
@@ -257,6 +268,24 @@ function getDimensionsTestar(element) {
         borderWidth: parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10),
         borderHeight: parseInt(style.borderTopWidth, 10) + parseInt(style.borderBottomWidth, 10)
     };
+}
+
+/*
+ * Determine if the document body exceeds the height of the browser window
+ * Used to determine if the browser contains a vertical scrollbar
+ * @return {bool} true if the document body is higher
+ */
+function isPageVerticalScrollable(){
+	return (document.body.clientHeight > window.innerHeight);
+}
+
+/*
+ * Determine if the document body exceeds the width of the browser window
+ * Used to determine if the browser contains a horizontal scrollbar
+ * @return {bool} true if the document body is wider
+ */
+function isPageHorizontalScrollable(){
+	return (document.body.clientWidth > window.innerWidth);
 }
 
 /*
