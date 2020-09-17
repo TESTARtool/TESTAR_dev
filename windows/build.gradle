@@ -12,32 +12,20 @@ dependencies {
     compile project(':core')
 }
 
-task buildWindows(type:Exec) {
+task cleanWindows(type: Exec) {
+	group = 'build'
+	description ='Clean the files created by windowsDistribution task'
     if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
-        workingDir 'native_src'
-        commandLine 'cmd', '/c', 'compile_w7.bat'
-    } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
-        workingDir 'native_src'
-        commandLine 'cmd', '/c', 'compile_w10.bat'
-    } else  {
-        commandLine './dummy.sh'
-    }
-}
-
-task cleanWindows(type:Exec) {
-    if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
-        workingDir 'native_src'
+        workingDir '../windows/native_src'
         commandLine 'cmd', '/c', 'clean_w7.bat'
     } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
-        workingDir 'native_src'
+        workingDir '../windows/native_src'
         commandLine 'cmd', '/c', 'clean_w10.bat'
     } else  {
         commandLine './dummy.sh'
     }
 }
 
-buildWindows.dependsOn classes
-
-jar.dependsOn buildWindows
-clean.dependsOn cleanWindows
+//jar.dependsOn buildWindows
+//clean.dependsOn cleanWindows
 
