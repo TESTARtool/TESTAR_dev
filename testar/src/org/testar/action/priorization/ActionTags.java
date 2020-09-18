@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,12 +28,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package org.testar.action.priorization;
 
-package org.fruit.alayer.devices;
+import java.util.HashSet;
+import java.util.Set;
 
-public interface Keyboard {	
-	void press(KBKeys k);
-	void release(KBKeys k);	
-	void isPressed(KBKeys k);
-	void paste();
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.TagsBase;
+
+public class ActionTags extends TagsBase  {
+
+	private ActionTags() {}
+
+	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
+
+	private static Set<Tag<Integer>> actionTags = new HashSet<Tag<Integer>>() {
+		{
+			add(SimilarityValue);
+		}
+	};
+
+	public static Set<Tag<Integer>> getActionTags() {
+		return actionTags;
+	}
+
 }

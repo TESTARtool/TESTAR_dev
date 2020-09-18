@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,12 +28,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package org.testar.action.priorization;
 
-package org.fruit.alayer.devices;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-public interface Keyboard {	
-	void press(KBKeys k);
-	void release(KBKeys k);	
-	void isPressed(KBKeys k);
-	void paste();
+import org.fruit.alayer.Action;
+
+
+// https://gamedev.stackexchange.com/questions/162976
+public class WeightedAction {
+
+    private class Entry {
+        double accumulatedWeight;
+        Action action;
+    }
+
+    private List<Entry> entries = new ArrayList<>();
+    private double accumulatedWeight;
+    private Random rand = new Random();
+
+    public void addEntry(Action action, double weight) {
+        accumulatedWeight += weight;
+        Entry e = new Entry();
+        e.action = action;
+        e.accumulatedWeight = accumulatedWeight;
+        entries.add(e);
+    }
+
+    public Action getRandom() {
+        double r = rand.nextDouble() * accumulatedWeight;
+
+        for (Entry entry: entries) {
+            if (entry.accumulatedWeight >= r) {
+                return entry.action;
+            }
+        }
+        return null; //should only happen when there are no entries
+    }
 }

@@ -31,10 +31,8 @@
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
@@ -43,32 +41,22 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.action.priorization.ActionTags;
+import org.testar.action.priorization.SimilarityDetection;
+import org.testar.action.priorization.WeightedAction;
 import org.testar.protocols.WebdriverProtocol;
 
-import com.google.common.base.Strings;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
+import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
-	/**
-	 * Customize the clickable css classes using TESTAR Spy mode + Control button over widget
-	 * The file "settings/webdriver_spy_custom/customizedCssClasses.txt"
-	 * Will act as input/reader of clickable css classes
-	 */
-	protected Set<String> customizedCssClasses = new HashSet<>();
-	protected File fileCustomizedCssClasses;
+public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
+	
+	private SimilarityDetection similarActions;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -82,63 +70,53 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 		super.initialize(settings);
 		ensureDomainsAllowed();
 
+		// Classes that are deemed clickable by the web framework
+		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
+		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
 
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.smartclient.com");
+		domainsAllowed = null;
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
 		followLinks = true;
-
 		// Propagate followLinks setting
 		WdDriver.followLinks = followLinks;
+
+		// URL + form name, username input id + value, password input id + value
+		// Set login to null to disable this feature
+		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+		username = Pair.from("username", "");
+		password = Pair.from("password", "");
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = new HashMap<String, String>() {{
-			put("class", "iAgreeButton");
+			put("class", "lfr-btn-label");
 		}};
+
+		WdDriver.fullScreen = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 
-		try {
-			File folder = new File(settings.getSettingsPath());
-			fileCustomizedCssClasses = new File(folder, "customizedCssClasses.txt");
-			if(!fileCustomizedCssClasses.exists())
-				fileCustomizedCssClasses.createNewFile();
-
-			Stream<String> stream = Files.lines(Paths.get(fileCustomizedCssClasses.getCanonicalPath()));
-			stream.forEach(line -> customizedCssClasses.add(line));
-			stream.close();
-
-			customizedCssClasses.removeIf(Strings::isNullOrEmpty);
-		} catch (IOException e) {
-			System.out.println("ERROR reading customizedCssClasses.txt file");
-		}
-
 	}
 
 	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
+		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
 	}
 
 	/**
@@ -176,8 +154,7 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,
-			//     state);
+			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -217,11 +194,9 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 			return true;
 		}
 
-		for(String s : element.cssClasses)
-			if (customizedCssClasses.contains(s))
-				return true;
-
-		return false;
+		Set<String> clickSet = new HashSet<>(clickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
 	}
 
 	@Override
@@ -240,56 +215,64 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 	}
 
 	/**
-	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the filtering of actions by clicking on them
-	 * @param key
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
 	 */
 	@Override
-	public void keyDown(KBKeys key) {    	
-		super.keyDown(key);        
-		if (mode() == Modes.Spy){ 
-			if (key == KBKeys.VK_RIGHT) {
-				try {
+	protected Action selectAction(State state, Set<Action> actions) {
+		actions = similarActions.modifySimilarActions(actions);
 
-					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
-
-					WdElement element = ((WdWidget) w).element;
-					for(String s : element.cssClasses)
-						if(s!=null && !s.isEmpty())
-							customizedCssClasses.add(s);
-
-				}catch(Exception e) {
-					System.out.println("ERROR reading and adding the widget from point: "
-							+ "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
-				}
-			}
-
-			if (key == KBKeys.VK_LEFT) {
-				try {
-					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
-
-					WdElement element = ((WdWidget) w).element;
-					for(String s : element.cssClasses)
-						if(s!=null && !s.isEmpty())
-							customizedCssClasses.remove(s);
-				}catch(Exception e) {
-					System.out.println("ERROR reading and removing the widget from point: "
-							+ "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
-				}
-			}
+		System.out.println("---------------------- DEBUG SIMILARITY VALUES ----------------------------------------");
+		for(Action a : actions) {
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
+					" with similarity : " + a.get(ActionTags.SimilarityValue, 0));
 		}
+		
+		return reduceProbabilityBySimilarity(state, actions);
+	}
+	
+	private Action reduceProbabilityBySimilarity(State state, Set<Action> actions) {
+		// Check the totalWeight
+		double totalWeight = 0;
+		for(Action a : actions) {
+			totalWeight = totalWeight + (1.0 / a.get(ActionTags.SimilarityValue));
+		}
+		
+		// Just in case, if something wrong return purely random
+		if(totalWeight == 0) {
+			return super.selectAction(state, actions);
+		}
+		
+		System.out.println("*************************** DEBUG SIMILARITY PROBABILITY ***************************");
+		
+		// Create a percentage weight of each action based on the totalWeight
+		WeightedAction actionProbability = new WeightedAction();
+		for(Action a : actions) {
+			double actionWeight = (1.0 / a.get(ActionTags.SimilarityValue)) / totalWeight * 100;
+			actionProbability.addEntry(a, actionWeight);
+			
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
+					" with similarity : " + actionWeight);
+		}
+		
+		return actionProbability.getRandom();
 	}
 
+	/**
+	 * Execute the selected action.
+	 *
+	 * @param system the SUT
+	 * @param state  the SUT's current state
+	 * @param action the action to execute
+	 * @return whether or not the execution succeeded
+	 */
 	@Override
-	protected void stopSystem(SUT system) {
-		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-			try (PrintWriter write = new PrintWriter(new FileWriter(fileCustomizedCssClasses.getCanonicalPath()))){
-				for(String s : customizedCssClasses)
-					if(s!=null && !s.isEmpty())
-						write.println(s);
-			}catch(Exception e) {
-				System.out.println("ERROR writing customizedCssClasses.txt file");
-			}
-		}
-		super.stopSystem(system);
+	protected boolean executeAction(SUT system, State state, Action action) {
+		similarActions.increaseSpecificExecutedAction(action);
+		return super.executeAction(system, state, action);
 	}
+
 }
