@@ -368,7 +368,6 @@ public class TemporalController {
                         else{
                             checker.setExecutable(ctlLtsminMCCommand, ctlLtsminWSLPath);
                             modelCheckedOracles = checker.modelcheck();
-                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
 
                     }
@@ -387,7 +386,6 @@ public class TemporalController {
                         else{
                             checker.setExecutable(ctlGalMCCommand, ctlGalWSLPath);
                             modelCheckedOracles = checker.modelcheck();
-                            simpleLog.append(prettyCurrentTime() + " | " + oracleType + " verifying results for this Model checker is not possible yet");
                         }
                     }
 
