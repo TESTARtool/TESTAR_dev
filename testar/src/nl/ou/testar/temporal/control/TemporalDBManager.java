@@ -862,25 +862,25 @@ public  class TemporalDBManager {
              simpleLog.append(prettyCurrentTime() + " | " + "Logging PropositionKey Collisions is disabled");
         }
 
-        simpleLog.append(prettyCurrentTime() + " | " + "Logging Test Sequences"+(logDetailsInModelFile ? "" :" is disabled"));
-        List<TemporalTrace> traces = fetchTraces(tModel.getApplication_ModelIdentifier(), logDetailsInModelFile);
-        tModel.setTraces((logDetailsInModelFile ? traces:null));
-
         simpleLog.append(prettyCurrentTime() + " | " + "Determining Initial States");
+        List<TemporalTrace> traces = fetchTraces(tModel.getApplication_ModelIdentifier(), logDetailsInModelFile);
         Set<String> initStates = new HashSet<>();
         for (TemporalTrace trace : traces
         ) {
             TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
             initStates.add(traceevent.getState());
         }
-
         tModel.setInitialStates(initStates);
+        simpleLog.append(prettyCurrentTime() + " | " + "Logging Test Sequences"+(logDetailsInModelFile ? "" :" is disabled"));
+        tModel.setTraces((logDetailsInModelFile ? traces:null));
         simpleLog.append(prettyCurrentTime() + " | " + "Total States : " + tModel.getStateList().size());
         simpleLog.append(prettyCurrentTime() + " | " + "Total Widgets : " + runningWcount);
         simpleLog.append(prettyCurrentTime() + " | " + "Total Transitions : " + tModel.getTransitionList().size());
         simpleLog.append(prettyCurrentTime() + " | " + "Total Atomic Propositions : " + tModel.getAtomicPropositions().size());
         simpleLog.append(prettyCurrentTime() + " | " + "Model has " + (logTerminalStates.size() == 0 ? "no" : "" + logTerminalStates.size()) + " terminal states");
         simpleLog.append(prettyCurrentTime() + " | " + "Model has " + tModel.getInitialStates().size() + " initial states");
+        simpleLog.append(prettyCurrentTime() + " | " + "Model is deterministic?: " + (!logDetailsInModelFile?"Not calculated":(logNonDeterministicTransitions.size()!=0?"No":"Yes")));
+
         long end_time = System.currentTimeMillis();
         long difference = (end_time - start_time) / 1000;
         tModel.addLog("Duration to create the model:" + difference + " (s)");
