@@ -63,14 +63,16 @@ public class GAL_CTL_ModelChecker extends ModelChecker {
             i++;
             String formulaStatus = "ERROR";
             String encodedFormula = "";
+            String fSubResult ="";
             Scanner forumlascanner = new Scanner(fResult);
             if (forumlascanner.hasNext()) {
                 encodedFormula = forumlascanner.nextLine(); //firstline contains the formula
                 forumlascanner.useDelimiter("\\sFormula is\\s");
             if (forumlascanner.hasNext()) {forumlascanner.next();} //throw away
             if (forumlascanner.hasNext()) {
-                formulaStatus=forumlascanner.next().replaceAll(" !","");
-                //process witness?
+                fSubResult=forumlascanner.next();
+                formulaStatus=fSubResult.split(" !")[0];
+                //process witness? then parse fSubResult
             }
             else {//in case there is a change in the future how the checker provide log details
                     System.out.println("Error parsing results from model checker");

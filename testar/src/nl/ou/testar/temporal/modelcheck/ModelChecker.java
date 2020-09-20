@@ -135,7 +135,7 @@ public abstract class ModelChecker {
      */
     void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
 
-        String contents = validateAndMakeFormulas(oracleColl, doTransformation);
+        String contents = validateAndMakeFormulas(oracleColl, doTransformation,this.temporalFormalism.parenthesesNextOperator );
         saveStringToFile(contents, output);
     }
     private void setFiles(){
@@ -197,7 +197,7 @@ public abstract class ModelChecker {
             ora.set_modifieddate(OShelper.prettyCurrentDateTime());
         }
     }
-    private String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation) {
+    private String validateAndMakeFormulas(List<TemporalOracle> oracleColl, boolean doTransformation, boolean parenthesesNextOperator) {
 
         StringBuilder Formulas = new StringBuilder();
         String rawFormula;
@@ -258,20 +258,21 @@ public abstract class ModelChecker {
                     }
 
                     {
-                        //  String rawFormula = candidateOracle.getPatternBase().getPattern_Formula();
                         String formulalvl0 = rawFormula;
 
-                        if( !tFormalism.supportsMultiInitialStates && tmodel.getInitialStates().size()>1){
+                        if( !tFormalism.supportsMultiInitialStates && tmodel.getInitialStates().size()>1) {
                             //when there are initial states added to the model, the formula alters:
                             //satisfaction of the formula starts after the artificial state, hence the X-operator.
-                            if (tFormalism == TemporalFormalism.CTL_ITS||tFormalism == TemporalFormalism.CTL_GAL){
-                                formulalvl0="AX("+rawFormula+")";
+                            formulalvl0 = "X(" + rawFormula + ")";
+                            if (parenthesesNextOperator) {
+                                formulalvl0 = "(" + formulalvl0 + ")";
                             }
-                            if (tFormalism == TemporalFormalism.LTL_ITS|| tFormalism == TemporalFormalism.LTL_SPOT){
-                                formulalvl0="X("+rawFormula+")";
+                            if (tFormalism.name().contains("CTL_")) {
+                                formulalvl0 = "A" + formulalvl0;
                             }
                         }
-                        String formulalvl1a =  tFormalism.line_prepend+formulalvl0;
+
+                        String formulalvl1a =  tFormalism.line_prepend+ formulalvl0;
                         String formulalvl1 = formulalvl1a + tFormalism.line_append;
                         String formulalvl2 = StringUtils.replace(formulalvl1,
                                 tFormalism.finally_replace.getLeft(), tFormalism.finally_replace.getRight());
