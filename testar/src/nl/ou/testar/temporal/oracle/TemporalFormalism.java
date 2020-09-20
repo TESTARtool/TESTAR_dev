@@ -13,38 +13,38 @@ public enum TemporalFormalism {
 
 
     LTL("","","","",new PairBean<>(),new PairBean<>(),
-            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,""),
+            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,"",false),
     CTL("","","","",new PairBean<>(),new PairBean<>(),
-            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,""),
+            new PairBean<>(),new PairBean<>(), new PairBean<>(),true,"",true),
 
 
     LTL_SPOT("","","","",
                      new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
             new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
-            new PairBean<>("~~unlikely",""),false,"txt"),
+            new PairBean<>("~~unlikely",""),false,"txt",false),
         //spot adds untractable edges when model is disconnect: observed on a 'singular'  initial state
     LTL_ITS("(\""," = 1\")","","",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             //new PairBean<>("~~unlikely",""),new PairBean<>("~~unlikely",""),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),false,"txt"),
+            new PairBean<>("~~unlikely",""),false,"txt",false),
     LTL_LTSMIN("("," == \"1\")","","",
                        new PairBean<>("F","<>"),new PairBean<>("G","[]"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),false,"etf"),
+            new PairBean<>("~~unlikely",""),false,"etf",false),
     CTL_LTSMIN("("," == \"1\")","","",
                        new PairBean<>("F","<>"),new PairBean<>("G","[]"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),true,"etf"),
+            new PairBean<>("~~unlikely",""),true,"etf",true),
 
     CTL_ITS("("," = \"1\")",";","",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),false,"txt"),
+            new PairBean<>("~~unlikely",""),false,"txt",false),
     CTL_GAL("("," == 1)",";","property dummypropertyname [ctl] : ",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),false,"gal");
+            new PairBean<>("~~unlikely",""),false,"gal",true);
     //'dummypropertyname' :static for all properties, apparently GAL syntax allows this to be a dummy, we don't need it.
 
     //futures: CTLSTAR,  MUCALC }
@@ -59,7 +59,8 @@ public enum TemporalFormalism {
     public final PairBean<String, String> or_replace;
     public final PairBean<String, String> false_replace;
     public final boolean supportsMultiInitialStates;
-    public final String fileExtension; //LTSMIN determines the type base don the extension
+    public final String fileExtension; //LTSMIN determines the type based on the extension
+    public final boolean parenthesesNextOperator;
 
 
     TemporalFormalism(String ap_prepend , String ap_append,
@@ -70,7 +71,8 @@ public enum TemporalFormalism {
                       PairBean<String, String> or_replace,
                       PairBean<String, String> false_replace,
                       boolean supportsMultiInitialStates,
-                      String fileExtension
+                      String fileExtension,
+                      boolean parenthesesNextOperator
     ) {
 
         this.ap_prepend = ap_prepend;
@@ -84,6 +86,7 @@ public enum TemporalFormalism {
         this.false_replace=false_replace;
         this.supportsMultiInitialStates=supportsMultiInitialStates;
         this.fileExtension=fileExtension;
+        this.parenthesesNextOperator=parenthesesNextOperator;
     }
 
 }

@@ -1,8 +1,8 @@
 package nl.ou.testar.temporal.modelcheck;
 
+import com.google.common.collect.Lists;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.OShelper;
 
 import java.io.IOException;
@@ -21,33 +21,46 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
 
         //String cli = "ubuntu1804 run ~/ltsminv3.0.2/bin/etf2lts-sym  --ctl='..0..' --ctl='..n..'  model.etf &> results.txt;
         //LTSMIN does not provide counter examples for CTL, does not allow the implies ('->') operator, crashes on large ETF models.
+        //repeat for chunks of 100 formulas max: relative inefficient as the automaton has to be loaded again for very formula.
+        //length of commandline is limited by Java.io. (in linux the limit is much larger :-) )
+        int chunksize=50; // to be safe
 
-        String cli = pathToExecutable;
-        StringBuilder sb = new StringBuilder();
-
-        try {//formulafile to --ctl strings
-            List<String> lines = Files.readAllLines(Paths.get(formulaFile.getAbsolutePath()), StandardCharsets.UTF_8);
-            for (String line : lines) {
-                sb.append("--ctl='").append(line).append("' ");
+         try {
+             List<String> lines = Files.readAllLines(Paths.get(formulaFile.getAbsolutePath()), StandardCharsets.UTF_8);
+             List<List<String>> chunks = Lists.partition(lines,chunksize);
+             boolean first = true;
+             for (List<String> chunk : chunks){//formulafile to --ctl strings
+                 String cli = pathToExecutable;
+                 StringBuilder sb = new StringBuilder();
+                 for (String line : chunk) {
+                     sb.append("--ctl='").append(line).append("' ");
+                 }
+                 cli = cli + " " + sb.toString() +" " +automat;
+                 cli = cli + (first ? " &> " : "&>>") + result;
+                 first = false;
+                 OShelper.RunOSChildProcess(cli);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        cli = cli + " " + sb.toString() +" " +automat+ " &> " +  result;
-        OShelper.RunOSChildProcess(cli);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
     }
+
+
+
+
+
 
     public List<TemporalOracle> delegatedParseResults(String rawInput) {
         Scanner scanner = new Scanner(rawInput);
          while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if(line.matches("\\s*\\*\\* error \\*\\*\\s*")) {
+            if(line.matches(".*\\s*\\*\\* error \\*\\*\\s*.*")) {
                 return null; // there is a line with ** error ** somewhere in the results file
             }
         }
         scanner = new Scanner(rawInput);
-        scanner.useDelimiter("\\s*Formula\\s+");
+        scanner.useDelimiter("\\setf2lts-sym: Formula\\s+");
         if (scanner.hasNext()) scanner.next(); // throw away the content before the first formula result
         List<String> formularesults = new ArrayList<>();
         while (scanner.hasNext()) formularesults.add(scanner.next());
@@ -93,8 +106,8 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
-    public List<String> delegatedFormulaValidation(String aliveProp)   {
-        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl, aliveProp);
+    public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)   {
+        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl, aliveProp,parenthesesNextOperator );
     }
 }
 

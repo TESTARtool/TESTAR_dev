@@ -37,29 +37,43 @@ public class StringFinder {
     }
 
     /**
+     * Find all blocks between tosearch and its corresponding ')' then  replace and add a closing parethesis
+     * between tosearch and the found block.
+     * ~ newblock =  replaceStr + "("+block +"))". E.g.: EX(p0 |p1) becomes E(X(p0 |p1))
+     *   @param data          string that might contain substrings to search
+     * @param toSearch      substring X(   to search for
+     * @param replaceStr    usually (X(
+     */
+    public static String parenthesesNextOperator(String data, String toSearch, String replaceStr) {
+        return findClosingAndInsert( data,  toSearch,  replaceStr, true);
+    }
+    /**
      * Find all blocks between tosearch and its corresponding ')' then  weave the 'replacestring'
      * between tosearch and the found block.
      * ~ newblock =  replaceStr + "("+block +")"
-     *
-     *  @param data          string that might contain substrings to search
+     *   @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    prefix of the embedding
      */
-
     public static String findClosingAndInsert(String data, String toSearch, String replaceStr) {
+    return findClosingAndInsert( data,  toSearch,  replaceStr, false);
+    }
+
+    private  static String findClosingAndInsert(String data, String toSearch, String replaceStr, boolean ltsmin) {
 
         //refactoring candidate
         int pos = data.indexOf(toSearch);// Get the first occurrence
-        while (pos != -1) { // Repeat till end is reached
-            // Replace this occurrence of Sub String
+        while (pos != -1) {
             //find matching bracket
             int bracketpos = findClosingParenthesis(data, pos + toSearch.length() - 1); //assume last char is the "("
             String orginalblock = data.substring(pos + toSearch.length() , bracketpos);
             String prepend = data.substring(0, pos);
             String append = data.substring(bracketpos);
-            data = prepend + toSearch + replaceStr + "("+orginalblock +")"+ append;
-            // Get the next occurrence from the current position
-            //pos = data.indexOf(toSearch, pos + toSearch.length() + replaceStr.length() + orginalblock.length() + closing.length());
+            if (!ltsmin) {
+                data = prepend + toSearch + replaceStr + "(" + orginalblock + ")" + append;
+            }else{
+                data = prepend + replaceStr + "(" + orginalblock + "))" + append; //for LTSMIN conversion of EX to E(X
+            }
             pos = data.indexOf(toSearch, pos + toSearch.length());
 
         }

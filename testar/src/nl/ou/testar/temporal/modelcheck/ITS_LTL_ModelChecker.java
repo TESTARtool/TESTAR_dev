@@ -2,7 +2,6 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.OShelper;
 
 import java.util.*;
@@ -78,7 +77,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
-    public List<String> delegatedFormulaValidation(String aliveProp)
+    public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)
     {
         saveFormulasForChecker(oracleColl, formulaFile, false);
         return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp);

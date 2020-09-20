@@ -2,7 +2,6 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.OShelper;
 import nl.ou.testar.temporal.util.StringFinder;
 
@@ -35,7 +34,7 @@ public enum FormulaVerifier {
         return parse(resultsFile,!aliveprop.equals(""));
 
     }
-    public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList,String aliveProp) {
+    public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList, String aliveProp, boolean parenthesesNextOperator) {
         List<String> formulas=new ArrayList<>();
         for (TemporalOracle ora : temporalOracleList
         ) {
@@ -49,24 +48,27 @@ public enum FormulaVerifier {
                 String theta = "AG(!" + aliveProp + ")";
                 String append = " & !(E((" + phi + " & " + "!(" + theta + ")) U (!(" + phi + ") & " + "!(" + theta + "))))";
                 String newformula = formula;
-                newformula = StringFinder.findClosingAndInsert(newformula, "AF(", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EF(", "" + aliveProp + " & ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "AG(", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EG(", "" + aliveProp + " & ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "AX(", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EX(", "" + aliveProp + " & ");
+                newformula = StringFinder.findClosingAndInsert(newformula, "AF(", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "AF (", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EF(", "" + aliveProp + " & " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EF (", "" + aliveProp + " & " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "AG(", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "AG (", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EG(", "" + aliveProp + " & " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EG (", "" + aliveProp + " & " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "AX(", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "AX (", "!" + aliveProp + " | " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EX(", "" + aliveProp + " & " );
+                newformula = StringFinder.findClosingAndInsert(newformula, "EX (", "" + aliveProp + " & " );
+                if(parenthesesNextOperator) {
+                    newformula = StringFinder.parenthesesNextOperator(newformula, "X(", "(X(");
+                    newformula = StringFinder.parenthesesNextOperator(newformula, "X (", "(X(");
+                }
                 newformula = StringFinder.findUntilAndInsert(newformula, "!" + aliveProp + " | ", "" + aliveProp + " & ");
                 // no support is given for W,R or M
                 // newformula= StringFinder.findOpeningParenthesisAndInsert(newformula,")W", "(!" + aliveProp + ") | ", ")");
-
-                newformula = StringFinder.findClosingAndInsert(newformula, "AF (", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EF (", "" + aliveProp + " & ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "AG (", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EG (", "" + aliveProp + " & ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "AX (", "!" + aliveProp + " | ");
-                newformula = StringFinder.findClosingAndInsert(newformula, "EX (", "" + aliveProp + " & ");
-                newformula = newformula.replaceAll("!!", ""); // remove double negations
                 newformula = prepend + newformula + append;
+                newformula = newformula.replaceAll("!!", ""); // remove double negations
                 formulas.add(newformula);
             }else{
                 formulas.add(formula);// no modification

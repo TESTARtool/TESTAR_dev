@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class ModelChecker {
 
@@ -104,7 +103,7 @@ public abstract class ModelChecker {
     }
     abstract  void delegatedCheck();
     abstract List<TemporalOracle> delegatedParseResults(String rawInput);
-    abstract List<String> delegatedFormulaValidation(String aliveProp);
+    abstract List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator);
 
 
 
@@ -154,7 +153,7 @@ public abstract class ModelChecker {
             String aliveprop = tmodel.getPropositionIndex("!" + PropositionConstants.SETTING.terminalProposition,true);
             String abstract_aliveprop = aliveprop.equals("")?"":"!" + PropositionConstants.SETTING.terminalProposition;
 
-            List<String> tmpformulas =delegatedFormulaValidation(abstract_aliveprop);
+            List<String> tmpformulas =delegatedFormulaValidation(abstract_aliveprop,this.temporalFormalism.parenthesesNextOperator );
             List<TemporalOracle> tmporacleList = new ArrayList<>();
             int j = 0;
             for (TemporalOracle ora : oracleColl

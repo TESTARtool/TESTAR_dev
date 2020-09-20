@@ -3,7 +3,6 @@ package nl.ou.testar.temporal.modelcheck;
 import nl.ou.testar.temporal.model.StateEncoding;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.foundation.Verdict;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
 import nl.ou.testar.temporal.util.OShelper;
 
 import java.util.ArrayList;
@@ -83,8 +82,8 @@ public class ITS_CTL_ModelChecker extends ModelChecker {
         return this.oracleColl;
     }
 
-    public List<String> delegatedFormulaValidation(String aliveProp)    {
-        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl, aliveProp);
+    public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)    {
+        return FormulaVerifier.INSTANCE.rewriteCTL(oracleColl, aliveProp,parenthesesNextOperator );
     }
 }
 
