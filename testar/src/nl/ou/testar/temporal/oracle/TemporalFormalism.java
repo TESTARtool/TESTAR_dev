@@ -44,7 +44,7 @@ public enum TemporalFormalism {
     CTL_GAL("("," == 1)",";","property dummypropertyname [ctl] : ",
                     new PairBean<>("<>","F"),new PairBean<>("[]","G"),
             new PairBean<>("&","&&"),new PairBean<>("|","||"),
-            new PairBean<>("~~unlikely",""),false,"gal",true);
+            new PairBean<>("~~unlikely",""),false,"gal",false);
     //'dummypropertyname' :static for all properties, apparently GAL syntax allows this to be a dummy, we don't need it.
 
     //futures: CTLSTAR,  MUCALC }

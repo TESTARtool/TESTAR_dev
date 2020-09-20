@@ -69,7 +69,7 @@ public class GAL_CTL_ModelChecker extends ModelChecker {
                 forumlascanner.useDelimiter("\\sFormula is\\s");
             if (forumlascanner.hasNext()) {forumlascanner.next();} //throw away
             if (forumlascanner.hasNext()) {
-                formulaStatus=forumlascanner.nextLine().replaceAll(" !","");
+                formulaStatus=forumlascanner.next().replaceAll(" !","");
                 //process witness?
             }
             else {//in case there is a change in the future how the checker provide log details
