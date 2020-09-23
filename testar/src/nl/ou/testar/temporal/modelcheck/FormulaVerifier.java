@@ -41,13 +41,14 @@ public enum FormulaVerifier {
             // fragile: 'AX(' 'AX (' is detected, but  'AX  (' is not. Requirement: formulas are fully parenthesised!!
             TemporalPatternBase pat = ora.getPatternBase();
             String formula= pat.getPattern_Formula();
+            String newformula = formula;
             if (!aliveProp.equals("")) {
                 String prepend = aliveProp + " & ";
                 //∀(Φ W Ψ) =   ¬∃( (Φ ∧ ¬Ψ) U(¬Φ ∧ ¬Ψ) )
                 String phi = aliveProp;
                 String theta = "AG(!" + aliveProp + ")";
                 String append = " & !(E((" + phi + " & " + "!(" + theta + ")) U (!(" + phi + ") & " + "!(" + theta + "))))";
-                String newformula = formula;
+
                 newformula = StringFinder.findClosingAndInsert(newformula, "AF(", "!" + aliveProp + " | " );
                 newformula = StringFinder.findClosingAndInsert(newformula, "AF (", "!" + aliveProp + " | " );
                 newformula = StringFinder.findClosingAndInsert(newformula, "EF(", "" + aliveProp + " & " );
@@ -60,19 +61,17 @@ public enum FormulaVerifier {
                 newformula = StringFinder.findClosingAndInsert(newformula, "AX (", "!" + aliveProp + " | " );
                 newformula = StringFinder.findClosingAndInsert(newformula, "EX(", "" + aliveProp + " & " );
                 newformula = StringFinder.findClosingAndInsert(newformula, "EX (", "" + aliveProp + " & " );
-                if(parenthesesNextOperator) {
-                    newformula = StringFinder.parenthesesNextOperator(newformula, "X(", "(X(");
-                    newformula = StringFinder.parenthesesNextOperator(newformula, "X (", "(X(");
-                }
                 newformula = StringFinder.findUntilAndInsert(newformula, "!" + aliveProp + " | ", "" + aliveProp + " & ");
                 // no support is given for W,R or M
                 // newformula= StringFinder.findOpeningParenthesisAndInsert(newformula,")W", "(!" + aliveProp + ") | ", ")");
                 newformula = prepend + newformula + append;
-                newformula = newformula.replaceAll("!!", ""); // remove double negations
-                formulas.add(newformula);
-            }else{
-                formulas.add(formula);// no modification
             }
+            newformula = newformula.replaceAll("!!", ""); // remove double negations
+            if(parenthesesNextOperator) {
+                newformula = StringFinder.parenthesesNextOperator(newformula, "X(", "(X(");
+                newformula = StringFinder.parenthesesNextOperator(newformula, "X (", "(X(");
+            }
+            formulas.add(newformula);
         }
         return formulas;
     }
