@@ -90,7 +90,7 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
                 }
                 else {
                     //in case there is a change in the future how LTSMIN provide log details
-                    System.out.println("Error parsing results from model checker");
+                    Oracle.addLog("Error parsing formula result from model checker");
                 }
             }
             List<String> emptyList = Collections.emptyList();
@@ -101,6 +101,8 @@ public class LTSMIN_CTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.equals(Verdict.FAIL.toString())) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.equals(Verdict.PASS.toString())) Oracle.setOracle_verdict(Verdict.PASS);
+            if (formulaStatus.equals(Verdict.ERROR.toString())) Oracle.setOracle_verdict(Verdict.ERROR);
+
             Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;

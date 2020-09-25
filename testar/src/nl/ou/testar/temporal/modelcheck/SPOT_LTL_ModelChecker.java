@@ -178,7 +178,11 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
 
                     if (formulaStatus.equals(Verdict.FAIL.toString()))  Oracle.setOracle_verdict(Verdict.FAIL);
                     if (formulaStatus.equals(Verdict.PASS.toString()))  Oracle.setOracle_verdict(Verdict.PASS);
+                    if (formulaStatus.equals(Verdict.ERROR.toString())) Oracle.setOracle_verdict(Verdict.ERROR);
 
+                }
+                else {//in case there is a change in the future how the checker provide log details
+                    Oracle.addLog("Error parsing formula result from model checker");
                 }
                 Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
                 i++;
@@ -190,7 +194,7 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
     public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)
     {
         saveFormulasForChecker(oracleColl, formulaFile, false);
-        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp);
+        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp,parenthesesNextOperator );
     }
 
 

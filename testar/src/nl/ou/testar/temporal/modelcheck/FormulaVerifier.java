@@ -21,7 +21,7 @@ public enum FormulaVerifier {
     }
 
 
-    public   List<String> verifyLTL(  String formulaFilePath, File resultsFile, String aliveprop) {
+    public   List<String> verifyLTL(String formulaFilePath, File resultsFile, String aliveprop, boolean parenthesesNextOperator) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
         String cli = pathToExecutable;
         String cli_resultsfile = " " + ((toWslPath) ? OShelper.toWSLPath(resultsFile.getAbsolutePath()) : resultsFile.getAbsolutePath());
@@ -31,7 +31,7 @@ public enum FormulaVerifier {
         cli = cli + " --fonly --ff " +  cli_formulafile+cli_ltlf;
         cli = cli + " &> " + cli_resultsfile;
         OShelper.RunOSChildProcess(cli);
-        return parse(resultsFile,!aliveprop.equals(""));
+        return parse(resultsFile,!aliveprop.equals(""),parenthesesNextOperator );
 
     }
     public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList, String aliveProp, boolean parenthesesNextOperator) {
@@ -77,7 +77,7 @@ public enum FormulaVerifier {
     }
 
 
-    private static List<String> parse(File rawInput,boolean LTLFinite) {
+    private static List<String> parse(File rawInput, boolean LTLFinite, boolean parenthesesNextOperator) {
         //refactor by using ANTLR?
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
@@ -124,6 +124,10 @@ public enum FormulaVerifier {
                        formula = indexmodel != -1 ? formulaline.substring(indexmodel + modelVariant.length()) : formulaline.substring(0, indextrace - 1);
                    }
                    formula = formula.substring(0, formula.length() - 1);
+                   if(parenthesesNextOperator) {
+                       formula = StringFinder.parenthesesNextOperator(formula, "X(", "(X(");
+                       formula = StringFinder.parenthesesNextOperator(formula, "X (", "(X(");
+                   }
                }
                 formulasParsed.add(formula);
                 //scanner.next(); // read the verdict and throw away

@@ -67,9 +67,10 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
             String formulaStatus = "ERROR";
             String encodedFormula = "";
             String  hold="Empty product with LTL!";
+            String  hold_true="Empty buchi automaton";
             String  nothold="Accepting cycle FOUND!";
 
-            if (fResult.contains(hold)) {
+            if (fResult.contains(hold) || fResult.contains(hold_true)) {
                 formulaStatus = "PASS";
                 encodedFormula = fResult.split("\\r?\\n")[0];
             }
@@ -80,7 +81,7 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
                 }
                 else {
                     //in case there is a change in the future how LTSMIN provide log details
-                    System.out.println("Error parsing results from model checker");
+                    Oracle.addLog("Error parsing formula result from model checker");
                 }
             }
             List<String> emptyList = Collections.emptyList();
@@ -91,7 +92,9 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.equals(Verdict.FAIL.toString())) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.equals(Verdict.PASS.toString())) Oracle.setOracle_verdict(Verdict.PASS);
-            Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
+            if (formulaStatus.equals(Verdict.ERROR.toString())) Oracle.setOracle_verdict(Verdict.ERROR);
+
+             Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;
     }
@@ -99,7 +102,7 @@ public class LTSMIN_LTL_ModelChecker extends ModelChecker {
     public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)
     {
         saveFormulasForChecker(oracleColl, formulaFile, false);
-        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp);
+        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp, parenthesesNextOperator);
     }
 }
 

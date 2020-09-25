@@ -61,7 +61,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
                     //process witness?
                 }
                 else {//in case there is a change in the future how the checker provide log details
-                    System.out.println("Error parsing results from model checker");
+                    Oracle.addLog("Error parsing formula result from model checker");
                 }
             }
             List<String> emptyList = Collections.emptyList();
@@ -72,6 +72,8 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
             Oracle.setExampleRun_Cycle_Transitions(emptyList);
             if (formulaStatus.contains("FALSE")) Oracle.setOracle_verdict(Verdict.FAIL);
             if (formulaStatus.contains("TRUE")) Oracle.setOracle_verdict(Verdict.PASS);
+            if (formulaStatus.equals(Verdict.ERROR.toString())) Oracle.setOracle_verdict(Verdict.ERROR);
+
             Oracle.setLog_RunDate(OShelper.prettyCurrentDateTime());
         }
         return this.oracleColl;
@@ -80,7 +82,7 @@ public class ITS_LTL_ModelChecker extends ModelChecker {
     public List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator)
     {
         saveFormulasForChecker(oracleColl, formulaFile, false);
-        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp);
+        return FormulaVerifier.INSTANCE.verifyLTL(formulaFile.getAbsolutePath(), syntaxformulaFile, aliveProp,parenthesesNextOperator );
     }
 }
 
