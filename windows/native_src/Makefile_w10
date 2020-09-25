@@ -29,6 +29,8 @@ CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
+	del -f org_fruit_alayer_windows_Windows.h
+	del -f windows.h
 	"$(JAVA_HOME)\bin\javac" $(JAVA_FILE) -d . -h .
 	ren "org_fruit_alayer_windows_Windows.h" "windows.h"
 	rmdir "org" /s /q
