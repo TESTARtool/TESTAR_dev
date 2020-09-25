@@ -128,13 +128,16 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 PKMaddress = 127.0.0.1
 PKMport = 27017
+PKMdatabase = mydb
+PKMusername = admin
+PKMkey = admin
 
 #################################################################
 # Previous State model difference settings
 #################################################################
 PreviousApplicationName =
 PreviousApplicationVersion =
-StateModelDifferenceAutomaticReport = false
+StateModelDifferenceAutomaticReport = true
 
 #################################################################
 # Other more advanced settings
@@ -152,13 +155,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

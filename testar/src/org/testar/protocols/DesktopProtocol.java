@@ -41,9 +41,12 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
+import org.testar.json.JsonArtefactStateModel;
 import org.testar.json.JsonArtefactTestResults;
+import org.testar.json.object.StateModelDifferenceJsonObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -80,6 +83,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     
     protected String testResultsArtefactDirectory = "";
     protected String stateModelArtefactDirectory = "";
+    protected String reportHTMLStateModelDifference = "";
 
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -223,141 +227,90 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void closeTestSession() {
     	super.closeTestSession();
-    	
+
     	// TODO: Allow Record mode when Listening mode implemented
     	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
     		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
     				sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
-    		
+
     		if(settings.get(ConfigTags.StateModelEnabled, false)) {
-    			stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
+    			JsonArtefactStateModel jsonArtefactStateModel = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
+
+    			// If StateModelDifferenceAutomaticReport setting is enabled try to create the report automatically
+    			// And extract the information in a JSON Object format
+    			StateModelDifferenceJsonObject stateModelDifferenceJsonObject = automaticStateModelDifference();
+    			jsonArtefactStateModel.setStateModelDifference(stateModelDifferenceJsonObject);
+    			
+    			// Save State Model Difference HTML report to associate to updateStateModelDifferenceJsonMap
+    			reportHTMLStateModelDifference = stateModelDifferenceJsonObject.getStateModelDifferenceReport();
+
+    			stateModelArtefactDirectory = jsonArtefactStateModel.createJsonFileStateModelArtefact();
     		}
     	}
     }
-
+    
     /**
-     * Iterating through all widgets of the given state
-     *
-     * Adding derived actions into the given set of actions and returning the modified set of actions.
-     *
-     * @param actions
-     * @param system
-     * @param state
-     * @return
+     * DECODER 
+     * This method checks the needed files (JS insert file, Test Result Schema, Test Result Artifact) 
+     * and TESTAR setting (PKM ip, port, db, user, key) 
+     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * 
+     * @return NodeJS query
      */
-    protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
-        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-
-        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
-
-            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
-
-            // Only consider enabled and non-blocked widgets
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-                // Do not build actions for widgets on the blacklist
-                // The blackListed widgets are those that have been filtered during the SPY mode with the
-                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-                if (!blackListed(w)){
-
-                    //For widgets that are:
-                    // - clickable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of left clicking on them
-                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.leftClickAt(w));
-                    }
-
-                    //For widgets that are:
-                    // - typeable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of typing into them
-                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-                    }
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
-                }
-            }
-        }
-        return actions;
-    }
-
-
-    /**
-     * Adding derived actions into the given set of actions and returning the modified set of actions.
-     *
-     * @param actions
-     * @param system
-     * @param state
-     * @return
-     */
-    protected Set<Action> deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, SUT system, State state){
-        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-
-        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for(Widget w : getTopWidgets(state)){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
-
-            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
-
-            // Only consider enabled and non-blocked widgets
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-                // Do not build actions for widgets on the blacklist
-                // The blackListed widgets are those that have been filtered during the SPY mode with the
-                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-                if (!blackListed(w)){
-
-                    //For widgets that are:
-                    // - clickable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of left clicking on them
-                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.leftClickAt(w));
-                    }
-
-                    //For widgets that are:
-                    // - typeable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of typing into them
-                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-                    }
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
-                }
-            }
-        }
-        return actions;
+    protected String prepareTestResultNodeCommand() {
+    	String commandTestResults = "";
+    	try {
+    		// Prepare the NodeJS command to insert the Test Results Artefact
+    		String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
+    		String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
+    		commandTestResults = "node" +
+    				" " + new File(insertTestResultsJS).getCanonicalPath() +
+    				" " + new File(insertTestResultsSchema).getCanonicalPath() +
+    				" " + new File(testResultsArtefactDirectory).getCanonicalPath() +
+    				" " + settings.get(ConfigTags.PKMaddress) +
+    				" " + settings.get(ConfigTags.PKMport) +
+    				" " + settings.get(ConfigTags.PKMdatabase) +
+    				" " + settings.get(ConfigTags.PKMusername) +
+    				" " + settings.get(ConfigTags.PKMkey);
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing Node JS command to insert Test Results Artefact");
+    		e.printStackTrace();
+    	}
+    	
+    	return commandTestResults;
     }
     
+    /**
+     * DECODER 
+     * This method checks the needed files (JS insert file, State Model Schema, State Model Artifact) 
+     * and TESTAR setting (PKM ip, port, db, user, key) 
+     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * 
+     * @return NodeJS query
+     */
+    protected String prepareStateModelNodeCommand() {
+    	String commandStateModel = "";
+    	try {
+    		// Prepare the NodeJS command to insert the State Model Artefact
+    		String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
+    		String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
+    		commandStateModel = "node" +
+    				" " + new File(insertStateModelJS).getCanonicalPath() +
+    				" " + new File(insertStateModelSchema).getCanonicalPath() +
+    				" " + new File(stateModelArtefactDirectory).getCanonicalPath() +
+    				" " + settings.get(ConfigTags.PKMaddress) +
+    				" " + settings.get(ConfigTags.PKMport) +
+    				" " + settings.get(ConfigTags.PKMdatabase) +
+    				" " + settings.get(ConfigTags.PKMusername) +
+    				" " + settings.get(ConfigTags.PKMkey);
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing Node JS command to insert State Model Artefact");
+    		e.printStackTrace();
+    	}
+
+    	return commandStateModel;
+    }
+
     /**
      * DECODER needs a Map to have a relation between the TESTAR TestResults output results 
      * and the TESTAR TestResults ArtefactId. 
@@ -366,13 +319,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @param artefactIdTestResults
      */
     protected void updateTestResultsJsonMap(String artefactIdTestResults) {
-    	
+
     	// If we are not in Generate Mode we do not want to update this JSON map
     	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
     		return;
     	}
-    	
-    	File file = new File("TestResultsArtefactIdMap.json");
+
+    	File file = new File("ArtefactIdMap.json");
     	try {
     		if(!file.exists()) {
     			// First TESTAR execution will create this file map
@@ -407,5 +360,179 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	} catch (IOException e) {
     		System.out.println("ERROR updateTestResultsJsonMap");
     	}
+    }
+    
+    /**
+     * DECODER needs a Map to have a relation between the TESTAR StateModelDifference Report output results 
+     * and the TESTAR StateModel ArtefactId. 
+     * This method uses a TESTAR StateModel ArtefactId to update a JSON Map.
+     * 
+     * @param artefactIdStateModel
+     */
+    protected void updateStateModelDifferenceJsonMap(String artefactIdStateModel) {
+
+    	// If we are not in Generate Mode we do not want to update this JSON map
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
+    		return;
+    	}
+
+    	File file = new File("ArtefactIdMap.json");
+    	try {
+    		if(!file.exists()) {
+    			// First TESTAR execution will create this file map
+    			file.createNewFile();
+
+    			// Create the simple JSON object map "{ artefactId : reportHTMLStateModelDifference }"
+    			JsonObject jsonObject = new JsonObject();
+    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
+
+    			// Write the JSON object in the new created file
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+    			writer.close();
+    		}
+    		else {
+    			// File JSON map exists, read the content and load the existing JSON objects
+    			FileReader reader = new FileReader(file.getCanonicalPath());
+    			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+
+    			// Add the new JSON object map "{ NEWartefactId : NEWreportHTMLStateModelDifference }"
+    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
+
+    			// Write all the JSON objects
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+
+    			reader.close();
+    			writer.close();
+    		}
+    	} catch (IOException e) {
+    		System.out.println("ERROR updateStateModelDifferenceJsonMap");
+    	}
+    }
+
+    /**
+     * Iterating through all widgets of the given state
+     *
+     * Adding derived actions into the given set of actions and returning the modified set of actions.
+     *
+     * @param actions
+     * @param system
+     * @param state
+     * @return
+     */
+    protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
+    	// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+
+    	// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+    	for(Widget w : state){
+    		//optional: iterate through top level widgets based on Z-index:
+    		//for(Widget w : getTopWidgets(state)){
+
+    		if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+    			// filtering out actions on menu-containers (that would add an action in the middle of the menu)
+    			continue; // skip this iteration of the for-loop
+    		}
+
+    		// Only consider enabled and non-blocked widgets
+    		if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+    			// Do not build actions for widgets on the blacklist
+    			// The blackListed widgets are those that have been filtered during the SPY mode with the
+    			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+    			if (!blackListed(w)){
+
+    				//For widgets that are:
+    				// - clickable
+    				// and
+    				// - unFiltered by any of the regular expressions in the Filter-tab, or
+    				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+    				// We want to create actions that consist of left clicking on them
+    				if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+    					//Create a left click action with the Action Compiler, and add it to the set of derived actions
+    					actions.add(ac.leftClickAt(w));
+    				}
+
+    				//For widgets that are:
+    				// - typeable
+    				// and
+    				// - unFiltered by any of the regular expressions in the Filter-tab, or
+    				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+    				// We want to create actions that consist of typing into them
+    				if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+    					//Create a type action with the Action Compiler, and add it to the set of derived actions
+    					actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+    				}
+    				//Add sliding actions (like scroll, drag and drop) to the derived actions
+    				//method defined below.
+    				addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+    			}
+    		}
+    	}
+    	return actions;
+    }
+
+
+    /**
+     * Adding derived actions into the given set of actions and returning the modified set of actions.
+     *
+     * @param actions
+     * @param system
+     * @param state
+     * @return
+     */
+    protected Set<Action> deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, SUT system, State state){
+    	// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+
+    	// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+    	for(Widget w : getTopWidgets(state)){
+    		//optional: iterate through top level widgets based on Z-index:
+    		//for(Widget w : getTopWidgets(state)){
+
+    		if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+    			// filtering out actions on menu-containers (that would add an action in the middle of the menu)
+    			continue; // skip this iteration of the for-loop
+    		}
+
+    		// Only consider enabled and non-blocked widgets
+    		if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+    			// Do not build actions for widgets on the blacklist
+    			// The blackListed widgets are those that have been filtered during the SPY mode with the
+    			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+    			if (!blackListed(w)){
+
+    				//For widgets that are:
+    				// - clickable
+    				// and
+    				// - unFiltered by any of the regular expressions in the Filter-tab, or
+    				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+    				// We want to create actions that consist of left clicking on them
+    				if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+    					//Create a left click action with the Action Compiler, and add it to the set of derived actions
+    					actions.add(ac.leftClickAt(w));
+    				}
+
+    				//For widgets that are:
+    				// - typeable
+    				// and
+    				// - unFiltered by any of the regular expressions in the Filter-tab, or
+    				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+    				// We want to create actions that consist of typing into them
+    				if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+    					//Create a type action with the Action Compiler, and add it to the set of derived actions
+    					actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+    				}
+    				//Add sliding actions (like scroll, drag and drop) to the derived actions
+    				//method defined below.
+    				addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+    			}
+    		}
+    	}
+    	return actions;
     }
 }

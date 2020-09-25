@@ -46,12 +46,18 @@ import es.upv.staq.testar.NativeLinker;
 
 public class JsonArtefactStateModel {
 
-	private JsonArtefactStateModel() {}
+	private StateModelJsonObject modelJson;
 
-	private static String url = "https://testar.org/images/models/";
+	private String url = "https://testar.org/images/models/";
+
+	private String outputFile;
+
+	public JsonArtefactStateModel() {
+		//
+	}
 
 	@JsonCreator
-	public static String automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
+	public void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
 			Object license, String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
 			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
@@ -62,7 +68,7 @@ public class JsonArtefactStateModel {
 				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
 				NativeLinker.getOsName());
 
-		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
+		modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
 				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
 				abstractionId, deterministic, unvisitedActions,
 				abstractStates, abstractActions, concreteStates, concreteActions,
@@ -70,28 +76,13 @@ public class JsonArtefactStateModel {
 
 		modelJson.setTestSequences(testSequenceObject);
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-		String outputFile = OutputStructure.outerLoopOutputDir + File.separator +
+		outputFile = OutputStructure.outerLoopOutputDir + File.separator +
 				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + "_" +
 				modelIdentifier + "_" + OutputStructure.startOuterLoopDateString + ".json";
-
-		try{
-			FileWriter fileWriter = new FileWriter(outputFile);
-			gson.toJson(modelJson, fileWriter);
-			fileWriter.flush();
-			fileWriter.close();
-			System.out.println("Created JSON State Model artefact: " + outputFile);
-		}catch(Exception e){
-			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
-			return "";
-		}
-		
-		return outputFile;
 	}
 
 	@JsonCreator
-	public static void specificStateModelArtefact(String pathArtefact, Object license,
+	public void specificStateModelArtefact(String pathArtefact, Object license,
 			String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
@@ -103,7 +94,7 @@ public class JsonArtefactStateModel {
 				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_master", SettingsDialog.TESTAR_VERSION,
 				NativeLinker.getOsName());
 
-		StateModelJsonObject modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
+		modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
 				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
 				abstractionId, deterministic, unvisitedActions,
 				abstractStates, abstractActions, concreteStates, concreteActions,
@@ -111,11 +102,26 @@ public class JsonArtefactStateModel {
 
 		modelJson.setTestSequences(testSequenceObject);
 
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-		String outputFile =  pathArtefact + File.separator +
+		outputFile =  pathArtefact + File.separator +
 				"ArtefactStateModel_" + applicationName + "_" + applicationVersion + "_" +
 				modelIdentifier + ".json";
+	}
+	
+	/**
+	 * Add into the State Model Artefact the information about the difference with previous State Model.
+	 * @param stateModelDifference
+	 */
+	public void setStateModelDifference(StateModelDifferenceJsonObject stateModelDifference) {
+		modelJson.setStateModelDifference(stateModelDifference);
+	}
+
+	/**
+	 * Create the JSON File that contains the State Model Artefact Information.
+	 * 
+	 * @return JsonFileStateModelArtefact Path
+	 */
+	public String createJsonFileStateModelArtefact() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		try{
 			FileWriter fileWriter = new FileWriter(outputFile);
@@ -125,7 +131,9 @@ public class JsonArtefactStateModel {
 			System.out.println("Created JSON State Model artefact: " + outputFile);
 		}catch(Exception e){
 			System.out.println("ERROR! Creating JSON ArtefactStateModel!");
+			return "";
 		}
-	}
 
+		return outputFile;
+	}
 }

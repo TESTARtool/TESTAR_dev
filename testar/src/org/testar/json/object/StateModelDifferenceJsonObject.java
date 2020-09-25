@@ -30,33 +30,49 @@
 
 package org.testar.json.object;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.fruit.Pair;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class StateModelDifferenceJsonObject {
 
-	List<String> stateModelOne;
-	List<String> stateModelTwo;
-	Set<String> disappearedAbstractStates;
-	Set<String> newAbstractStates;
-	Map<String, Set<Pair<String,String>>> disappearedActions;
-	Map<String, Set<Pair<String,String>>> newActions;
+	String previousStateModelAppName;
+	String previousStateModelAppVersion;
+	boolean existsPreviousStateModel;
+	int numberDisappearedAbstractStates;
+	int numberNewAbstractStates;
+	String stateModelDifferenceReport;
 
 	@JsonCreator
-	public StateModelDifferenceJsonObject(List<String> stateModelOne, List<String> stateModelTwo,
-			Set<String> disappearedAbstractStates, Set<String> newAbstractStates,
-			Map<String, Set<Pair<String,String>>> disappearedActions, Map<String, Set<Pair<String,String>>> newActions) {
-		this.stateModelOne = stateModelOne;
-		this.stateModelTwo = stateModelTwo;
-		this.disappearedAbstractStates = disappearedAbstractStates;
-		this.newAbstractStates = newAbstractStates;
-		this.disappearedActions = disappearedActions;
-		this.newActions = newActions;
+	public StateModelDifferenceJsonObject(String previousStateModelAppName, String previousStateModelAppVersion) {
+		this.previousStateModelAppName = previousStateModelAppName;
+		this.previousStateModelAppVersion = previousStateModelAppVersion;
+	}
+	
+	public void setPreviousStateModelAppName(String previousStateModelAppName) {
+		this.previousStateModelAppName = previousStateModelAppName;
+	}
+
+	public void setPreviousStateModelAppVersion(String previousStateModelAppVersion) {
+		this.previousStateModelAppVersion = previousStateModelAppVersion;
+	}
+
+	public void setExistsPreviousStateModel(boolean existsPreviousStateModel) {
+		this.existsPreviousStateModel = existsPreviousStateModel;
+	}
+
+	public void setNumberDisappearedAbstractStates(int numberDisappearedAbstractStates) {
+		this.numberDisappearedAbstractStates = numberDisappearedAbstractStates;
+	}
+
+	public void setNumberNewAbstractStates(int numberNewAbstractStates) {
+		this.numberNewAbstractStates = numberNewAbstractStates;
+	}
+
+	public void setStateModelDifferenceReport(String stateModelDifferenceReport) {
+		this.stateModelDifferenceReport = stateModelDifferenceReport;
+	}
+
+	public String getStateModelDifferenceReport() {
+		return stateModelDifferenceReport;
 	}
 
 }

@@ -10,8 +10,12 @@ validate(process.argv[2], process.argv[3])
 
 var pkmAddress = process.argv[4];
 var pkmPort = process.argv[5];
-const url = 'mongodb://admin:admin@' + pkmAddress + ':' + pkmPort;
-const dbName = 'mydb';
+var pkmdatabase = process.argv[6];
+var pkmuser = process.argv[7];
+var pkmkey = process.argv[8];
+
+const url = 'mongodb://' + pkmuser + ':' + pkmkey + '@' + pkmAddress + ':' + pkmPort;
+const dbName = pkmdatabase;
 const client = new MongoClient(url,{ useUnifiedTopology: true});
 
 function validate(schema, data) {

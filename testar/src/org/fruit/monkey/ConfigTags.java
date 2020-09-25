@@ -132,6 +132,9 @@ public final class ConfigTags {
   public static final Tag<String> HTMLreportServerFile = Tag.from("HTMLreportServerFile", String.class);
   public static final Tag<String> PKMaddress = Tag.from("PKMaddress", String.class);
   public static final Tag<String> PKMport = Tag.from("PKMport", String.class);
+  public static final Tag<String> PKMdatabase = Tag.from("PKMdatabase", String.class);
+  public static final Tag<String> PKMusername = Tag.from("PKMusername", String.class);
+  public static final Tag<String> PKMkey = Tag.from("PKMkey", String.class);
 
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);

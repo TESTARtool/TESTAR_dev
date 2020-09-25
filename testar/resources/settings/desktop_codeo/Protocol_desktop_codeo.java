@@ -371,47 +371,28 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 
-		automaticStateModelDifference();
-
+		// Install Node JS packages
 		installNodePackages(new HashSet<>(Arrays.asList("mongodb", "ajv")));
 
-		try {
-			// Prepare the NodeJS command to insert the Test Results Artefact
-			String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
-			String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
-			String commandTestResults = "node" +
-					" " + new File(insertTestResultsJS).getCanonicalPath() +
-					" " + new File(insertTestResultsSchema).getCanonicalPath() +
-					" " + new File(testResultsArtefactDirectory).getCanonicalPath() +
-					" " + settings.get(ConfigTags.PKMaddress) +
-					" " + settings.get(ConfigTags.PKMport);
+		// Prepare NodeJS query based on created Test Results Artifact Files
+		String commandTestResults = prepareTestResultNodeCommand();
 
-			// Execute the NodeJS query and obtain the TestResults ArtefactId
-			String artefactIdTestResults = executeNodeJSQueryPKM(commandTestResults);
-			// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
-			updateTestResultsJsonMap(artefactIdTestResults);
-		} catch (IOException e) {
-			System.out.println("ERROR! Reading files to insert Test Result Artefacts");
-			e.printStackTrace();
-		}
+		// Execute the NodeJS query and obtain the TestResults ArtefactId
+		String artefactIdTestResults = executeNodeJSQueryPKM(commandTestResults);
+
+		// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
+		updateTestResultsJsonMap(artefactIdTestResults);
 
 		if(settings.get(ConfigTags.StateModelEnabled, false)) {
-			try {
-				// Prepare the NodeJS command to insert the State Model Artefact
-				String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
-				String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
-				String commandStateModel = "node" +
-						" " + new File(insertStateModelJS).getCanonicalPath() +
-						" " + new File(insertStateModelSchema).getCanonicalPath() +
-						" " + new File(stateModelArtefactDirectory).getCanonicalPath() +
-						" " + settings.get(ConfigTags.PKMaddress) +
-						" " + settings.get(ConfigTags.PKMport);
 
-				String artefactIdStateModel = executeNodeJSQueryPKM(commandStateModel);
-			} catch (IOException e) {
-				System.out.println("ERROR! Reading files to insert State Model Artefact");
-				e.printStackTrace();
-			}
+			// Prepare NodeJS query based on created State Model Artifact Files
+			String commandStateModel = prepareStateModelNodeCommand();
+
+			// Execute the NodeJS query and obtain the StateModels ArtefactId
+			String artefactIdStateModel = executeNodeJSQueryPKM(commandStateModel);
+			
+			// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
+			updateStateModelDifferenceJsonMap(artefactIdStateModel);
 		}
 	}
 

@@ -134,13 +134,16 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 PKMaddress = 127.0.0.1
 PKMport = 27017
+PKMdatabase = mydb
+PKMusername = admin
+PKMkey = admin
 
 #################################################################
 # Previous State model difference settings
 #################################################################
 PreviousApplicationName =
 PreviousApplicationVersion =
-StateModelDifferenceAutomaticReport = false
+StateModelDifferenceAutomaticReport = true
 
 #################################################################
 # Override display scale
@@ -173,13 +176,13 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 1.0
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 1.0
+TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

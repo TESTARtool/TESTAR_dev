@@ -72,9 +72,12 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
+import org.testar.json.JsonArtefactStateModel;
 import org.testar.json.JsonArtefactTestResults;
+import org.testar.json.object.StateModelDifferenceJsonObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -106,6 +109,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     
     protected String testResultsArtefactDirectory = "";
     protected String stateModelArtefactDirectory = "";
+    protected String reportHTMLStateModelDifference = "";
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
@@ -368,11 +372,83 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
 					sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
 
-			if(settings.get(ConfigTags.StateModelEnabled, false)) {
-				stateModelArtefactDirectory = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
-			}
+    		if(settings.get(ConfigTags.StateModelEnabled, false)) {
+    			JsonArtefactStateModel jsonArtefactStateModel = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
+
+    			// If StateModelDifferenceAutomaticReport setting is enabled try to create the report automatically
+    			// And extract the information in a JSON Object format
+    			StateModelDifferenceJsonObject stateModelDifferenceJsonObject = automaticStateModelDifference();
+    			jsonArtefactStateModel.setStateModelDifference(stateModelDifferenceJsonObject);
+    			
+    			// Save State Model Difference HTML report to associate to updateStateModelDifferenceJsonMap
+    			reportHTMLStateModelDifference = stateModelDifferenceJsonObject.getStateModelDifferenceReport();
+
+    			stateModelArtefactDirectory = jsonArtefactStateModel.createJsonFileStateModelArtefact();
+    		}
 		}
 	}
+    
+    /**
+     * DECODER 
+     * This method checks the needed files (JS insert file, Test Result Schema, Test Result Artifact) 
+     * and TESTAR setting (PKM ip, port, db, user, key) 
+     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * 
+     * @return NodeJS query
+     */
+    protected String prepareTestResultNodeCommand() {
+    	String commandTestResults = "";
+    	try {
+    		// Prepare the NodeJS command to insert the Test Results Artefact
+    		String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
+    		String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
+    		commandTestResults = "node" +
+    				" " + new File(insertTestResultsJS).getCanonicalPath() +
+    				" " + new File(insertTestResultsSchema).getCanonicalPath() +
+    				" " + new File(testResultsArtefactDirectory).getCanonicalPath() +
+    				" " + settings.get(ConfigTags.PKMaddress) +
+    				" " + settings.get(ConfigTags.PKMport) +
+    				" " + settings.get(ConfigTags.PKMdatabase) +
+    				" " + settings.get(ConfigTags.PKMusername) +
+    				" " + settings.get(ConfigTags.PKMkey);
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing Node JS command to insert Test Results Artefact");
+    		e.printStackTrace();
+    	}
+    	
+    	return commandTestResults;
+    }
+    
+    /**
+     * DECODER 
+     * This method checks the needed files (JS insert file, State Model Schema, State Model Artifact) 
+     * and TESTAR setting (PKM ip, port, db, user, key) 
+     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * 
+     * @return NodeJS query
+     */
+    protected String prepareStateModelNodeCommand() {
+    	String commandStateModel = "";
+    	try {
+    		// Prepare the NodeJS command to insert the State Model Artefact
+    		String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
+    		String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
+    		commandStateModel = "node" +
+    				" " + new File(insertStateModelJS).getCanonicalPath() +
+    				" " + new File(insertStateModelSchema).getCanonicalPath() +
+    				" " + new File(stateModelArtefactDirectory).getCanonicalPath() +
+    				" " + settings.get(ConfigTags.PKMaddress) +
+    				" " + settings.get(ConfigTags.PKMport) +
+    				" " + settings.get(ConfigTags.PKMdatabase) +
+    				" " + settings.get(ConfigTags.PKMusername) +
+    				" " + settings.get(ConfigTags.PKMkey);
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing Node JS command to insert State Model Artefact");
+    		e.printStackTrace();
+    	}
+
+    	return commandStateModel;
+    }
     
     /**
      * DECODER needs a Map to have a relation between the TESTAR TestResults output results 
@@ -388,7 +464,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		return;
     	}
     	
-    	File file = new File("TestResultsArtefactIdMap.json");
+    	File file = new File("ArtefactIdMap.json");
     	try {
     		if(!file.exists()) {
     			// First TESTAR execution will create this file map
@@ -422,6 +498,57 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		}
     	} catch (IOException e) {
     		System.out.println("ERROR updateTestResultsJsonMap");
+    	}
+    }
+    
+    /**
+     * DECODER needs a Map to have a relation between the TESTAR StateModelDifference Report output results 
+     * and the TESTAR StateModel ArtefactId. 
+     * This method uses a TESTAR StateModel ArtefactId to update a JSON Map.
+     * 
+     * @param artefactIdStateModel
+     */
+    protected void updateStateModelDifferenceJsonMap(String artefactIdStateModel) {
+
+    	// If we are not in Generate Mode we do not want to update this JSON map
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
+    		return;
+    	}
+
+    	File file = new File("ArtefactIdMap.json");
+    	try {
+    		if(!file.exists()) {
+    			// First TESTAR execution will create this file map
+    			file.createNewFile();
+
+    			// Create the simple JSON object map "{ artefactId : reportHTMLStateModelDifference }"
+    			JsonObject jsonObject = new JsonObject();
+    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
+
+    			// Write the JSON object in the new created file
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+    			writer.close();
+    		}
+    		else {
+    			// File JSON map exists, read the content and load the existing JSON objects
+    			FileReader reader = new FileReader(file.getCanonicalPath());
+    			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+
+    			// Add the new JSON object map "{ NEWartefactId : NEWreportHTMLStateModelDifference }"
+    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
+
+    			// Write all the JSON objects
+    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    			FileWriter writer = new FileWriter(file.getCanonicalPath());
+    			gson.toJson(jsonObject, writer);
+
+    			reader.close();
+    			writer.close();
+    		}
+    	} catch (IOException e) {
+    		System.out.println("ERROR updateStateModelDifferenceJsonMap");
     	}
     }
 

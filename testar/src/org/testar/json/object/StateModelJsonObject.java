@@ -44,6 +44,7 @@ public class StateModelJsonObject {
 	String stateModelIdentifier;
 	String stateModelAppName;
 	String stateModelAppVersion;
+	StateModelDifferenceJsonObject stateModelDifference;
 	String abstractionId;
 	boolean deterministic;
 	long unvisitedAbstractActions;
@@ -79,6 +80,10 @@ public class StateModelJsonObject {
 		this.storeWidgets = storeWidgets;
 		this.numberWidgets = numberWidgets;
 		this.numberTestSequences = numberTestSequences;
+	}
+	
+	public void setStateModelDifference(StateModelDifferenceJsonObject stateModelDifference) {
+		this.stateModelDifference = stateModelDifference;
 	}
 
 	public void setTestSequences(SortedSet<StateModelTestSequenceJsonObject> testSequences) {

@@ -47,6 +47,7 @@ import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
+import org.testar.json.object.StateModelDifferenceJsonObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -336,10 +337,15 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If no PreviousApplicationName specified, use current ApplicationName.
      * If no PreviousApplicationVersion specified, try to decrease Integer or Double ApplicationVersion.
      */
-    protected void automaticStateModelDifference() {
+    protected StateModelDifferenceJsonObject automaticStateModelDifference() {
+    	
+		// Create the JSON Object that contains the information about State Model Difference
+		StateModelDifferenceJsonObject stateModelDifferenceJsonObject = new StateModelDifferenceJsonObject("","");
+    	
     	if(settings.get(ConfigTags.Mode) == Modes.Generate 
     			&& settings.get(ConfigTags.StateModelEnabled, false)
     			&& settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
+    		
     		try {
     			// Define current State Model version
     			String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
@@ -372,8 +378,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				else {
     					System.out.println("WARNING: State Model Difference could not calculate previous application version automatically");
     					System.out.println("Try to use manual State Model Difference");
+    					
+    					stateModelDifferenceJsonObject.setExistsPreviousStateModel(false);
+    					
     					// We cannot obtain previous version, finish
-    					return;
+    					return stateModelDifferenceJsonObject;
     				}
     			}
 
@@ -396,12 +405,22 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     			// Execute the State Model Difference to create an HTML report
     			StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
     			modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
+    			
+    			// Update State Model Difference JSON Object with the Difference Report information
+    			stateModelDifferenceJsonObject.setPreviousStateModelAppName(previousApplicationName);
+    			stateModelDifferenceJsonObject.setPreviousStateModelAppVersion(previousVersion);
+    			stateModelDifferenceJsonObject.setExistsPreviousStateModel(modelDifferenceManager.existsPreviousStateModel());
+    			stateModelDifferenceJsonObject.setNumberDisappearedAbstractStates(modelDifferenceManager.getNumberDisappearedAbstractStates());
+    			stateModelDifferenceJsonObject.setNumberNewAbstractStates(modelDifferenceManager.getNumberNewAbstractStates());
+    			stateModelDifferenceJsonObject.setStateModelDifferenceReport(modelDifferenceManager.getStateModelDifferenceHTMLReport());
 
     		} catch (Exception e) {
     			System.out.println("ERROR: Trying to create an automatic State Model Difference");
     			e.printStackTrace();
     		}
     	}
+    	
+    	return stateModelDifferenceJsonObject;
     }
     
     /**
@@ -507,10 +526,15 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	 */
 	private String substringArtefactId(String executionOutput, String find) {
 		String artefactId = "ERROR";
-		String pkmOutputInfo = executionOutput.substring(executionOutput.indexOf(find) + find.length());
-		artefactId = StringUtils.split(pkmOutputInfo, " ")[0];
-		artefactId = artefactId.replace("\n", "").replace("\r", "");
-		artefactId = artefactId.trim();
+		
+		try {
+			String pkmOutputInfo = executionOutput.substring(executionOutput.indexOf(find) + find.length());
+			artefactId = StringUtils.split(pkmOutputInfo, " ")[0];
+			artefactId = artefactId.replace("\n", "").replace("\r", "");
+			artefactId = artefactId.trim();
+		} catch(Exception e) {
+			System.out.println("ERROR! : Trying to obtain : " + find);
+		}
 		
 		return artefactId;
 	}

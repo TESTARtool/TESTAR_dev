@@ -146,6 +146,28 @@ public class StateModelDifferenceManager {
 	private HashMap<String, String> newStatesImages = new HashMap<>();
 	// Prepare a Map to associate an Abstract State identifier with all the new Action Description
 	private HashMap<String, Set<Pair<String, String>>> newActions = new HashMap<>();
+	
+	// Information for the State Model Difference JSON Object
+	private boolean existsPreviousStateModel = false;
+	private int numberDisappearedAbstractStates = 0;
+	private int numberNewAbstractStates = 0;
+	private String stateModelDifferenceHTMLReport = "";
+	
+	public boolean existsPreviousStateModel() {
+		return existsPreviousStateModel;
+	}
+
+	public int getNumberDisappearedAbstractStates() {
+		return numberDisappearedAbstractStates;
+	}
+
+	public int getNumberNewAbstractStates() {
+		return numberNewAbstractStates;
+	}
+
+	public String getStateModelDifferenceHTMLReport() {
+		return stateModelDifferenceHTMLReport;
+	}
 
 	public void calculateModelDifference(Config config, Pair<String,String> stateModelOne, Pair<String,String> stateModelTwo) {
 		if(stateModelOne.left().isEmpty() || stateModelOne.right().isEmpty() || stateModelTwo.left().isEmpty() || stateModelTwo.right().isEmpty()) {
@@ -274,6 +296,11 @@ public class StateModelDifferenceManager {
 					newActions.put(abstractStateId, modelDifferenceDatabase.outgoingActionIdDesc(identifierModelTwo, abstractStateId));
 				}
 			});
+			
+			// Update information for State Model Difference JSON Object
+			existsPreviousStateModel = true;
+			numberDisappearedAbstractStates = disappearedAbstractStates.size();
+			numberNewAbstractStates = newAbstractStates.size();
 
 			createHTMLreport(sessionDB);
 
@@ -308,6 +335,9 @@ public class StateModelDifferenceManager {
 			};
 
 			String htmlReportName = modelDifferenceReportDirectory + File.separator + "DifferenceReport.html";
+			
+			// Update information for State Model Difference JSON Object
+			stateModelDifferenceHTMLReport = htmlReportName;
 
 			PrintWriter out = new PrintWriter(new File(htmlReportName).getCanonicalPath(), HTMLReporter.CHARSET);
 

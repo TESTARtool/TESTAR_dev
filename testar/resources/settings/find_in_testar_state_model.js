@@ -41,7 +41,7 @@ client.connect(function(err) {
 	
 	// Prepare the connection to the State Model Collection
 	const db = client.db(dbName);
-	const collection = db.collection('TESTARStateModel');
+	const collection = db.collection('TESTARStateModels');
 	
 	// Prepare the query to find the desired document or property, using regex for the object value
 	var query = {};

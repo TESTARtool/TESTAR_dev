@@ -414,6 +414,9 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"					
 					+"PKMaddress =" + Util.lineSep()
 					+"PKMport =" + Util.lineSep()
+					+"PKMdatabase =" + Util.lineSep()
+					+"PKMusername =" + Util.lineSep()
+					+"PKMkey =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Previous State model difference settings\n"

@@ -190,6 +190,86 @@
       ],
       "pattern": "^(.*)$"
     },
+	"stateModelDifference": {
+        "$id": "#/properties/stateModelDifference",
+        "type": "object",
+        "title": "The stateModelDifference schema",
+        "default": {},
+        "examples": [
+            {
+                "previousStateModelAppName": "demo",
+                "previousStateModelAppVersion": "1",
+                "existsPreviousStateModel": true,
+                "numberDisappearedAbstractStates": 3,
+                "numberNewAbstractStates": 3,
+                "stateModelDifferenceReport": "./output\\2020-09-25_10h54m43s_demo_2\\StateModelDifference_demo_1_vs_demo_2\\DifferenceReport.html"
+            }
+        ],
+        "required": [
+            "previousStateModelAppName",
+            "previousStateModelAppVersion",
+            "existsPreviousStateModel",
+            "numberDisappearedAbstractStates",
+            "numberNewAbstractStates",
+            "stateModelDifferenceReport"
+        ],
+        "properties": {
+            "previousStateModelAppName": {
+                "$id": "#/properties/stateModelDifference/properties/previousStateModelAppName",
+                "type": "string",
+                "title": "The previousStateModelAppName schema",
+                "default": "",
+                "examples": [
+                    "demo"
+                ]
+            },
+            "previousStateModelAppVersion": {
+                "$id": "#/properties/stateModelDifference/properties/previousStateModelAppVersion",
+                "type": "string",
+                "title": "The previousStateModelAppVersion schema",
+                "default": "",
+                "examples": [
+                    "1"
+                ]
+            },
+            "existsPreviousStateModel": {
+                "$id": "#/properties/stateModelDifference/properties/existsPreviousStateModel",
+                "type": "boolean",
+                "title": "Check if existsPreviousStateModel",
+                "default": false,
+                "examples": [
+                    true
+                ]
+            },
+            "numberDisappearedAbstractStates": {
+                "$id": "#/properties/stateModelDifference/properties/numberDisappearedAbstractStates",
+                "type": "integer",
+                "title": "The numberDisappearedAbstractStates schema",
+                "default": 0,
+                "examples": [
+                    3
+                ]
+            },
+            "numberNewAbstractStates": {
+                "$id": "#/properties/stateModelDifference/properties/numberNewAbstractStates",
+                "type": "integer",
+                "title": "The numberNewAbstractStates schema",
+                "default": 0,
+                "examples": [
+                    3
+                ]
+            },
+            "stateModelDifferenceReport": {
+                "$id": "#/properties/stateModelDifference/properties/stateModelDifferenceReport",
+                "type": "string",
+                "title": "The stateModelDifferenceReport schema",
+                "default": "",
+                "examples": [
+                    "./output\\2020-09-25_10h54m43s_demo_2\\StateModelDifference_demo_1_vs_demo_2\\DifferenceReport.html"
+                ]
+            }
+        }
+    },
     "abstractionId": {
       "$id": "#/properties/abstractionId",
       "type": "string",

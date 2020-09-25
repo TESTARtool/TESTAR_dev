@@ -100,6 +100,7 @@ public class HttpReportServer {
 
 		} catch (Exception e) {
 			System.out.println("Error running HTML report");
+			e.printStackTrace();
 		}
 	}
 
@@ -108,7 +109,7 @@ public class HttpReportServer {
 	}
 
 	/**
-	 * Get dynamic output content : 2020-07-24_09h22m12s_notepad_1
+	 * Get dynamic output content : output\\2020-07-24_09h22m12s_notepad_1
 	 * Using default structure : \\output\\2020-07-24_09h22m12s_notepad_1\\HTMLreports\\
 	 * 
 	 * @return
@@ -116,13 +117,15 @@ public class HttpReportServer {
 	private String getDynamicOutputDirectory(String htmlPath) {
 		String runDirectory = "";
 		try {
-			String startIndex = File.separator + "output" + File.separator;
-			String endIndex = File.separator + "HTMLreports";
-			runDirectory = htmlPath.substring(htmlPath.lastIndexOf(startIndex) + 1, htmlPath.lastIndexOf(endIndex));
+			String output = File.separator + "output" + File.separator;
+			int startIndex = htmlPath.lastIndexOf(output);
+			int endIndex = htmlPath.indexOf(File.separator, startIndex + 8);
+			runDirectory = htmlPath.substring(startIndex + 1, endIndex);
 
 			return new File(runDirectory).getCanonicalPath();
 		} catch (IOException e) {
 			System.out.println("ERROR: getDynamicOutputDirectory: from : " + htmlPath);
+			e.printStackTrace();
 		}
 
 		return runDirectory;

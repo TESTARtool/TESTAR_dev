@@ -478,6 +478,9 @@ public class Main {
 			defaults.add(Pair.from(HTMLreportServerFile, outputDir));
 			defaults.add(Pair.from(PKMaddress, "127.0.0.1"));
 			defaults.add(Pair.from(PKMport, "27017"));
+			defaults.add(Pair.from(PKMdatabase, "mydb"));
+			defaults.add(Pair.from(PKMusername, "admin"));
+			defaults.add(Pair.from(PKMkey, "admin"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

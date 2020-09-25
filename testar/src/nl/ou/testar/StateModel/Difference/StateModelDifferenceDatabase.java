@@ -443,12 +443,7 @@ public class StateModelDifferenceDatabase {
 		// save the file to disk
 		File screenshotFile = new File(screenshotDir, identifier + ".png");
 		if (screenshotFile.exists()) {
-			try {
-				return screenshotFile.getCanonicalPath();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			return new File(screenshotFile.getName()).getPath();
 		}
 		try {
 			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
@@ -462,14 +457,7 @@ public class StateModelDifferenceDatabase {
 			e.printStackTrace();
 		}
 
-		try {
-			return screenshotFile.getCanonicalPath();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return "";
+		return new File(screenshotFile.getName()).getPath();
 	}
 	
 	/*

@@ -128,13 +128,16 @@ AbstractStateAttributes = WidgetTitle
 #################################################################
 PKMaddress = 127.0.0.1
 PKMport = 27017
+PKMdatabase = mydb
+PKMusername = admin
+PKMkey = admin
 
 #################################################################
 # Previous State model difference settings
 #################################################################
 PreviousApplicationName =
 PreviousApplicationVersion =
-StateModelDifferenceAutomaticReport = false
+StateModelDifferenceAutomaticReport = true
 
 #################################################################
 # Other more advanced settings

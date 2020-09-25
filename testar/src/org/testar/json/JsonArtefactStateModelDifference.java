@@ -42,11 +42,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * OLD implementation
+ */
 public class JsonArtefactStateModelDifference {
 
 	private JsonArtefactStateModelDifference() {}
 
-	@JsonCreator
+	/*@JsonCreator
 	public static void createModelDifferenceArtefact(List<String> stateModelOne, List<String> stateModelTwo,
 			String directory, Set<String> disappearedAbstractStates, Set<String> newAbstractStates,
 			Map<String, Set<Pair<String,String>>> disappearedActions, Map<String, Set<Pair<String,String>>> newActions) {
@@ -70,6 +73,6 @@ public class JsonArtefactStateModelDifference {
 			System.out.println("ERROR! Creating JSON ArtefactModelSifference!");
 		}
 
-	}
+	}*/
 
 }

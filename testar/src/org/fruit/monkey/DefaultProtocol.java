@@ -67,6 +67,8 @@ import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import nl.ou.testar.StateModel.Analysis.AnalysisProtocol;
+import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -265,33 +267,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} else if (mode() == Modes.Generate) {
 				runGenerateOuterLoop(system);
 			} else if (mode() == Modes.Analysis) {
-				AnalysisProtocol stateModelAnalyzer = new AnalysisProtocol(settings);
-				stateModelAnalyzer.startStateModelAnalysis();
-				Util.pause(5);
-				while(stateModelAnalyzer.isAnalyzerActive()) {
-					// Jetty server is running...
-					// This will stop when user send a GET localhost:8090/shutdown request
-				}
+				runAnalysisMode();
 			} else if (mode() == Modes.Report) {
-				try {
-					File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
-					
-					File extractedArtefactHtml = null;
-					if(!isHtmlFile() && (extractedArtefactHtml = extractArtefactTestResults()) != null) {
-						file = extractedArtefactHtml;
-					}
-					
-					if(isHtmlFile(file.getCanonicalPath())) {
-						HttpReportServer httpReportServer = new HttpReportServer(file);
-						httpReportServer.runHtmlReport();
-						while(httpReportServer.isJettyServerRunning()) {
-							// HttpReportServer is running...
-							// This will stop when user send a GET localhost:8091/shutdown request
-						}
-					}
-				}catch (Exception e) {
-					System.out.println("Exception: Check the path of the file, something is wrong");
-				}
+				runReportMode();
+			} else if (mode() == Modes.ModelDiff) {
+				runModelDifferenceMode();
 			}
 
 		}catch(WinApiException we) {
@@ -444,11 +424,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Check if the selected file to View is a html file
 	 */
 	private boolean isHtmlFile() {
-		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html")) {
 			return true;
-		
-		else if(settings.get(ConfigTags.HTMLreportServerFile).contains(".html"))
+		} else if(settings.get(ConfigTags.HTMLreportServerFile).contains(".html")) {
 			return true;
+		}
 
 		return false;
 	}
@@ -504,24 +484,118 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 	
 	/**
+	 * Analysis Mode starts a web Jetty server to Analyze the State Model remotely. 
+	 * 
+	 * Example to Execute with command line:
+	 * testar ShowVisualSettingsDialogOnStartup=false Mode=Analysis DataStoreType=plocal DataStoreDirectory="C:\\Users\\testar\\Desktop\\orientdb-3.0.28\\databases" DataStoreDB=testar DataStoreUser=testar DataStorePassword=testar 
+	 * 
+	 * Running on:
+	 * http://127.0.0.1:8090/models
+	 * 
+	 * Stop with:
+	 * http://127.0.0.1:8090/shutdown
+	 */
+	private void runAnalysisMode() {
+		AnalysisProtocol stateModelAnalyzer = new AnalysisProtocol(settings);
+		stateModelAnalyzer.startStateModelAnalysis();
+		Util.pause(5);
+		while(stateModelAnalyzer.isAnalyzerActive()) {
+			// Jetty server is running...
+			// This will stop when user send a GET localhost:8090/shutdown request
+		}
+	}
+	
+	/**
+	 * Report Mode starts a web Jetty server to View the HTML reports remotely. 
+	 * For DECODER purposes we use the ArtifactId associated with the HTML Test Report. 
+	 * 
+	 * Example to Execute with command line:
+	 * testar ShowVisualSettingsDialogOnStartup=false Mode=Report HTMLreportServerFile=5f64ba3bf87fe8088421ba7e
+	 * 
+	 * Running on:
+	 * http://127.0.0.1:8091
+	 * 
+	 * Stop with:
+	 * http://127.0.0.1:8091/shutdown
+	 */
+	private void runReportMode() {
+		try {
+			File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
+			
+			File extractedArtefactHtml = null;
+			if(!isHtmlFile() && (extractedArtefactHtml = extractArtefactTestResults()) != null) {
+				file = extractedArtefactHtml;
+			}
+			
+			if(isHtmlFile(file.getCanonicalPath())) {
+				HttpReportServer httpReportServer = new HttpReportServer(file);
+				httpReportServer.runHtmlReport();
+				while(httpReportServer.isJettyServerRunning()) {
+					// HttpReportServer is running...
+					// This will stop when user send a GET localhost:8091/shutdown request
+				}
+			}
+		}catch (Exception e) {
+			System.out.println("Exception: Check the path of the file, something is wrong");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Model Difference Mode compares two State Model creating a model difference report
+	 */
+	private void runModelDifferenceMode() {
+		try {
+			// Obtain Database Configuration, from Settings by default
+			Config config = new Config();
+			config.setConnectionType(settings.get(ConfigTags.DataStoreType,""));
+			config.setServer(settings.get(ConfigTags.DataStoreServer,""));
+			config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory,""));
+			config.setDatabase(settings.get(ConfigTags.DataStoreDB,""));
+			config.setUser(settings.get(ConfigTags.DataStoreUser,""));
+			config.setPassword(settings.get(ConfigTags.DataStorePassword,""));
+
+			String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
+			String previousApplicationVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
+			Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousApplicationVersion);
+
+			String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
+			String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
+			Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
+
+			// State Model Difference Report Directory Name
+			String dirName = OutputStructure.outerLoopOutputDir  + File.separator + "StateModelDifference_"
+					+ previousApplicationName + "_" + previousApplicationVersion + "_vs_"
+					+ currentApplicationName + "_" + currentVersion;
+
+			// Execute the State Model Difference to create an HTML report
+			StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
+			modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
+		} catch(Exception e) {
+			System.out.println("ERROR runModelDifferenceMode: Trying to create an automatic State Model Difference");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * If we want to launch TESTAR with the HTML report web service
-	 * using the ArtefactId mapped from TestResultsArtefactIdMap.json file. 
+	 * using the ArtefactId mapped from ArtefactIdMap.json file. 
 	 * Get the mapped HTML output directory from this JSON file.
 	 * 
 	 * @return
 	 */
 	private File extractArtefactTestResults() {
-		File file = new File("TestResultsArtefactIdMap.json");
+		File file = new File("ArtefactIdMap.json");
 
 		if(!file.exists())
 			return null;
 
 		try {
-			// Read TestResultsArtefactIdMap.json content
+			// Read ArtefactIdMap.json content
 			FileReader reader = new FileReader(file.getCanonicalPath());
 			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 			
-			// If TestResultsArtefactIdMap.json contains a HTML report mapped for the Artefact Id
+			// If ArtefactIdMap.json contains a HTML report mapped for the Artefact Id
 			if(!jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).isJsonNull()) {
 				String mappedHtml = jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).getAsString();
 				reader.close();
@@ -531,6 +605,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			reader.close();
 		} catch (IOException e) {
 			System.out.println("ERROR DefaultProtocol: extractArtefactTestResults");
+			e.printStackTrace();
 			return null;
 		}
 

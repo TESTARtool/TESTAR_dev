@@ -93,7 +93,9 @@ public class StateModelArtefactManager {
 			orientDB.close();
 	}
 
-	public static String createAutomaticArtefact(Settings settings, Object license) {
+	public static JsonArtefactStateModel createAutomaticArtefact(Settings settings, Object license) {
+		
+        JsonArtefactStateModel jsonArtefactStateModel = new JsonArtefactStateModel();
 
 		String storeType = settings.get(ConfigTags.DataStoreType);
 		String storeServer = settings.get(ConfigTags.DataStoreServer);
@@ -108,10 +110,8 @@ public class StateModelArtefactManager {
 		if(appName == null || appVersion == null) {
 			System.out.println("To create an Artefact of the State Model, "
 					+ "a cutomized Name of the application and the version is required");
-			return "";
+			return jsonArtefactStateModel;
 		}
-
-		String stateModelArtefact = "";
 		
 		connectionStuff(storeType, storeServer, root, passField, database, databaseDirectory);
 
@@ -138,7 +138,7 @@ public class StateModelArtefactManager {
 			SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
             System.out.println("Creating JSON State Model artefact...");
-        	stateModelArtefact = JsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
+        	jsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
         			license, abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
         			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
         			storeWidgets, numberOfWidgets, numberOfTestSequences, testSequenceObject);
@@ -149,13 +149,12 @@ public class StateModelArtefactManager {
 			orientDB.close();
 		}
 
-		return stateModelArtefact;
+		return jsonArtefactStateModel;
 		
 	}
 
-	public static void createSpecificArtefact(ODatabaseSession sessionDB, 
-			String pathArtefact, String appName, String appVersion, String database) {
-
+	public static void createSpecificArtefact(ODatabaseSession sessionDB, String pathArtefact, String appName, String appVersion, String database) {
+		
 		// Search and get the State Model identifier to start the queries
 		String stateModelId = getAbstractStateModelIdentifier(sessionDB, appName, appVersion);
 
@@ -177,11 +176,13 @@ public class StateModelArtefactManager {
 		SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
         System.out.println("Creating JSON State Model artefact...");
-    	JsonArtefactStateModel.specificStateModelArtefact(pathArtefact, "", appName, appVersion, stateModelId,
+		JsonArtefactStateModel jsonArtefactStateModel = new JsonArtefactStateModel();
+		jsonArtefactStateModel.specificStateModelArtefact(pathArtefact, "", appName, appVersion, stateModelId,
     			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
     			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
     			//TODO: storewidgets (next false) Obtain the option from State Model or settings 
     			false, numberOfWidgets, numberOfTestSequences, testSequenceObject);
+		jsonArtefactStateModel.createJsonFileStateModelArtefact();
 	}
 
 	private static String getAbstractStateModelIdentifier(ODatabaseSession sessionDB, String appName, String appVer) {
