@@ -65,6 +65,40 @@ task customZipDistribution(type: Zip) {
    	destinationDir(file('target/install'))
 }
 
+/**
+ * Prepare folder structure to run debuggin mode from IDE
+ */
+task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
+    group = 'custom_testar'
+    description ='debuggingDistribution'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task debugFiles(type: Copy) {
+    from 'target/scripts/.'
+    into '.'
+}
+
+task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
+    group = 'custom_testar'
+    description ='cleanDebugging'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task deleteDebugging(type: Delete){
+	delete 'settings'
+	delete 'suts'
+	delete 'output'
+	delete 'testar'
+	delete 'testar.bat'
+	delete 'windows.dll'
+	delete 'index.log'
+}
+
 dependencies {
     compile project(':core')
     compile project(':native')
@@ -151,5 +185,6 @@ startScripts.dependsOn {
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
+debuggingDistribution.dependsOn(build)
 
 mainClassName='org.fruit.monkey.Main'

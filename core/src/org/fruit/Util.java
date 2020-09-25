@@ -739,7 +739,9 @@ public final class Util {
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       if (compiler == null) {
-        throw new RuntimeException("JDK required (running inside of JRE)");
+    	  //throw new RuntimeException("JDK required (running inside of JRE)");
+    	  System.out.println("WARNING: JDK required (running inside of JRE)");
+    	  return;
       }
       DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
       StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
@@ -777,7 +779,9 @@ public final class Util {
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       if (compiler == null) {
-        throw new RuntimeException("JDK required (running inside of JRE)");
+    	  //throw new RuntimeException("JDK required (running inside of JRE)");
+    	  System.out.println("WARNING: JDK required (running inside of JRE)");
+    	  return;
       }
       DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
       StandardJavaFileManager fileManager =
