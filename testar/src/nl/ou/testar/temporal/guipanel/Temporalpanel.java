@@ -289,13 +289,13 @@ public class Temporalpanel {
         label9.setText("Proposition Manager:");
         minerPanel.add(label9, cc.xy(1, 8, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         PropositionManagerFile = new JTextField();
-        PropositionManagerFile.setToolTipText("<html>\nPoints to .JSON file that contains filters <br>\non propositions to extract from the State model (database)\n</html>\n");
+        PropositionManagerFile.setToolTipText("<html>\nPoints to .JSON file that contains (widget and action) filters <br>\nto reduce the propositions to be extracted from the State model DB\n</html>\n");
         minerPanel.add(PropositionManagerFile, cc.xyw(2, 8, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label10 = new JLabel();
         label10.setText("Pattern Constraints:");
         minerPanel.add(label10, cc.xy(1, 10, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         patternConstraintsFile = new JTextField();
-        patternConstraintsFile.setToolTipText("<html>\nPoints to .CSV file that contains restrictions per Pattern<br>\non what kind of concrete oracles can be created.\n</html>");
+        patternConstraintsFile.setToolTipText("<html>\nPoints to .CSV file that contains restrictions/filters per Pattern<br>\nwith the intend to create only meaningful oracles.\n</html>");
         minerPanel.add(patternConstraintsFile, cc.xyw(2, 10, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         enableTemporalOfflineOraclesCheckBox = new JCheckBox();
         enableTemporalOfflineOraclesCheckBox.setText("MC in Generate Mode");
@@ -317,7 +317,7 @@ public class Temporalpanel {
         modelFile = new JTextField();
         modelFile.setEnabled(false);
         modelFile.setText("");
-        modelFile.setToolTipText("</html>\nPoints to a pre-computed Model .JSON file.\n<html>");
+        modelFile.setToolTipText("<html> Points to a pre-computed Model .JSON file. </html>");
         minerPanel.add(modelFile, cc.xyw(2, 16, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label11 = new JLabel();
         label11.setText("Model File");
@@ -330,7 +330,7 @@ public class Temporalpanel {
         ModelOnlyBtn = new JButton();
         ModelOnlyBtn.setPreferredSize(new Dimension(78, 30));
         ModelOnlyBtn.setText("Model");
-        ModelOnlyBtn.setToolTipText("<html>Exports/transforms the model from the graphDB  into (JSON) format. <br>\n\n** Ensure that <BR>\n1. Proposition Manager is available. This file is used for filtering atomic propositions <BR>\n2. Application name and version settings on General panel and <BR>\n3. Abstraction settings on the State model panel<BR> \nare saved before invoking this function!!! <BR>\nUse the 'Show Db'  to view the available models </html> ");
+        ModelOnlyBtn.setToolTipText("<html>Exports/transforms the model from the graphDB  into (JSON) format. <br>\n\n** Ensure that <BR>\n1. Proposition Manager is available. <BR>\n2. Application name and version settings on General panel and <BR>\n3. Abstraction settings on the State model panel<BR> \nare saved before invoking this function!!! <BR>\nUse the 'Show Db'  to view the available models </html> ");
         minerPanel.add(ModelOnlyBtn, cc.xyw(6, 7, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
         graphMLBtn = new JButton();
         graphMLBtn.setMaximumSize(new Dimension(83, 38));
@@ -364,7 +364,7 @@ public class Temporalpanel {
         generateBtn.setHorizontalTextPosition(0);
         generateBtn.setMaximumSize(new Dimension(81, 30));
         generateBtn.setText("<html>Generate</html>");
-        generateBtn.setToolTipText("<html>Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. <BR>\nPattern Constraints can be applied to control the ramdom instantiation.\n<BR>\nThe list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB </html>");
+        generateBtn.setToolTipText("<html>Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's)<BR>\nfrom the Model to generate (Potential) Oracles. <BR>\nPattern Constraints can be applied to control/filter the random instantiation.\n</html>");
         minerPanel.add(generateBtn, cc.xyw(9, 12, 6));
         tacticComboBox = new JComboBox();
         tacticComboBox.setEnabled(true);
@@ -391,7 +391,7 @@ public class Temporalpanel {
         modelCheckBtn = new JButton();
         modelCheckBtn.setHorizontalTextPosition(0);
         modelCheckBtn.setText("Model Check");
-        modelCheckBtn.setToolTipText("<html>Perform a Model** Check against the (potential) Oracles. <BR>\nrequired input: <BR>\n\t+ Proposition Manager. This file is used for filtering atomic propositions from the Model<BR>\n\t+ Oracles. This file contains the formulas to be checked. <BR>\n** Ensure that <BR>\n1. the Application name and version settings on General panel and <BR>\n2. Abstraction settings on the State model panel are saved before invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html> ");
+        modelCheckBtn.setToolTipText("<html>Perform a Model Check against the (potential) Oracles. <BR>\nrequired input:<BR>\n- Oracle file that  contains the formulas to be checked. <BR>\n- Model file or direct from Graph DB**.<BR><BR>\n** Assign a PropositionManager and set the Graphmodel: <BR>\n- Application name and version on General panel and <BR>\n- Matching Abstraction settings on the State model panel <BR>\nare  <b>saved before </b> invoking this function!!! <BR>\nUse the Show Db Models on the Setup-tab to view the available models </html>");
         minerPanel.add(modelCheckBtn, cc.xyw(9, 16, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         verboseCheckBox = new JCheckBox();
         verboseCheckBox.setSelected(true);

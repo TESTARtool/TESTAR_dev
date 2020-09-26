@@ -437,7 +437,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <toolTipText value="&lt;html&gt;&#10;Points to .JSON file that contains filters &lt;br&gt;&#10;on propositions to extract from the State model (database)&#10;&lt;/html&gt;&#10;"/>
+                  <toolTipText value="&lt;html&gt;&#10;Points to .JSON file that contains (widget and action) filters &lt;br&gt;&#10;to reduce the propositions to be extracted from the State model DB&#10;&lt;/html&gt;&#10;"/>
                 </properties>
               </component>
               <component id="ca661" class="javax.swing.JLabel">
@@ -457,7 +457,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <toolTipText value="&lt;html&gt;&#10;Points to .CSV file that contains restrictions per Pattern&lt;br&gt;&#10;on what kind of concrete oracles can be created.&#10;&lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;&#10;Points to .CSV file that contains restrictions/filters per Pattern&lt;br&gt;&#10;with the intend to create only meaningful oracles.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="73a81" class="javax.swing.JCheckBox" binding="enableTemporalOfflineOraclesCheckBox" default-binding="true">
@@ -542,7 +542,7 @@
                 <properties>
                   <preferredSize width="78" height="30"/>
                   <text value="Model"/>
-                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Proposition Manager is available. This file is used for filtering atomic propositions &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db'  to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Exports/transforms the model from the graphDB  into (JSON) format. &lt;br&gt;&#10;&#10;** Ensure that &lt;BR&gt;&#10;1. Proposition Manager is available. &lt;BR&gt;&#10;2. Application name and version settings on General panel and &lt;BR&gt;&#10;3. Abstraction settings on the State model panel&lt;BR&gt; &#10;are saved before invoking this function!!! &lt;BR&gt;&#10;Use the 'Show Db'  to view the available models &lt;/html&gt; "/>
                 </properties>
               </component>
               <component id="f8a92" class="javax.swing.JButton" binding="graphMLBtn">
@@ -638,7 +638,7 @@
                   <horizontalTextPosition value="0"/>
                   <maximumSize width="81" height="30"/>
                   <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
-                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control the ramdom instantiation.&#10;&lt;BR&gt;&#10;The list of  AP's in the model is computed by applying the Proposition Manager filters the graph DB &lt;/html&gt;"/>
+                  <toolTipText value="&lt;html&gt;Instantiates the parameters in the Oracle Patterns with Atomic Propositions (AP's)&lt;BR&gt;&#10;from the Model to generate (Potential) Oracles. &lt;BR&gt;&#10;Pattern Constraints can be applied to control/filter the random instantiation.&#10;&lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="480a9" class="javax.swing.JComboBox" binding="tacticComboBox">
@@ -688,7 +688,7 @@
                 <properties>
                   <horizontalTextPosition value="0"/>
                   <text value="Model Check"/>
-                  <toolTipText value="&lt;html&gt;Perform a Model** Check against the (potential) Oracles. &lt;BR&gt;&#10;required input: &lt;BR&gt;&#10;&#9;+ Proposition Manager. This file is used for filtering atomic propositions from the Model&lt;BR&gt;&#10;&#9;+ Oracles. This file contains the formulas to be checked. &lt;BR&gt;&#10;** Ensure that &lt;BR&gt;&#10;1. the Application name and version settings on General panel and &lt;BR&gt;&#10;2. Abstraction settings on the State model panel are saved before invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt; "/>
+                  <toolTipText value="&lt;html&gt;Perform a Model Check against the (potential) Oracles. &lt;BR&gt;&#10;required input:&lt;BR&gt;&#10;- Oracle file that  contains the formulas to be checked. &lt;BR&gt;&#10;- Model file or direct from Graph DB**.&lt;BR&gt;&lt;BR&gt;&#10;** Assign a PropositionManager and set the Graphmodel: &lt;BR&gt;&#10;- Application name and version on General panel and &lt;BR&gt;&#10;- Matching Abstraction settings on the State model panel &lt;BR&gt;&#10;are  &lt;b&gt;saved before &lt;/b&gt; invoking this function!!! &lt;BR&gt;&#10;Use the Show Db Models on the Setup-tab to view the available models &lt;/html&gt;"/>
                 </properties>
               </component>
               <component id="8e7a8" class="javax.swing.JCheckBox" binding="verboseCheckBox" default-binding="true">
