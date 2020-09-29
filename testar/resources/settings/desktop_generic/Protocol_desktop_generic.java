@@ -85,9 +85,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 
 		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);

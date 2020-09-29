@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar "suts\\SimpleModelOne.jar"
 
 #################################################################
 # Sequences
@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_statemodel/Protocol_desktop_generic_statemodel
+ProtocolClass = desktop_swing_statemodel/Protocol_desktop_swing_statemodel
 
 #################################################################
 # Graphdatabase settings (experimental)

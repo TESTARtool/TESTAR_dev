@@ -410,6 +410,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"AbstractStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Previous State model difference settings\n"
+					+"#################################################################\n"
+					+"PreviousApplicationName =" + Util.lineSep()
+					+"PreviousApplicationVersion =" + Util.lineSep()
+					+"StateModelDifferenceAutomaticReport =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Override display scale\n"
 					+"#\n"
 					+"# Overrides the displayscale obtained from the system.\n"

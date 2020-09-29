@@ -128,6 +128,13 @@ DataStoreMode = instant
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# Previous State model difference settings
+#################################################################
+PreviousApplicationName =
+PreviousApplicationVersion =
+StateModelDifferenceAutomaticReport = false
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

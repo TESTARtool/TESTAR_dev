@@ -36,9 +36,13 @@ import org.apache.commons.lang.StringUtils;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
 
 import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
@@ -52,7 +56,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
  *
  *  It only changes the selectAction() method.
  */
-public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
+public class Protocol_desktop_swing_statemodel extends DesktopProtocol {
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -67,26 +71,59 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
+		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
+		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		
+		//----------------------
+		// BUILD CUSTOM ACTIONS
+		//----------------------
+		
+		// iterate through all widgets
+		for(Widget w : getTopWidgets(state)){
 
-		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+				
+				if (!blackListed(w)){  // do not build actions for tabu widgets  
+					
+					// left clicks
+					if(whiteListed(w) || isClickable(w))
+						actions.add(ac.leftClickAt(w));
+	
+					// type into text boxes
+					if(isTypeable(w))
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					
+					//Force actions on some widgets with a wrong accessibility
+					//Optional, comment this changes if your Swing applications doesn't need it
 
-		if(actions.isEmpty()){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+					if(w.get(Tags.Role).toString().contains("Tree") ||
+						w.get(Tags.Role).toString().contains("ComboBox") ||
+						w.get(Tags.Role).toString().contains("List")) {
+						widgetTree(w, actions);
+					}
+					//End of Force action
+
+				}
+				
+			}
+
 		}
-
-		//return the set of derived actions
+		
 		return actions;
+
+	}
+	
+	//Force actions on Tree widgets with a wrong accessibility
+	public void widgetTree(Widget w, Set<Action> actions) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		actions.add(ac.leftClickAt(w));
+		w.set(Tags.ActionSet, actions);
+		for(int i = 0; i<w.childCount(); i++) {
+			widgetTree(w.child(i), actions);
+		}
 	}
 
 	/**
