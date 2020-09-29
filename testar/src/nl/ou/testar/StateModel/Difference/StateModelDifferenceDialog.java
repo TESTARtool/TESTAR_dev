@@ -48,6 +48,9 @@ import org.fruit.Pair;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
+/**
+ * Model Difference GUI Dialog that allows users to manually select two State Models to compare.
+ */
 public class StateModelDifferenceDialog extends JDialog {
 
 	private static final long serialVersionUID = -7681898049512465816L;
@@ -267,7 +270,4 @@ public class StateModelDifferenceDialog extends JDialog {
 		}
 		return  result.toString();
 	}  
-
-
-
 }
