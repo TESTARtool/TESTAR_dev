@@ -148,10 +148,11 @@ public class StateModelDifferenceManager {
 	private HashMap<String, Set<Pair<String, String>>> newActions = new HashMap<>();
 	
 	// Information for the State Model Difference JSON Object
+	// Default values are empty parameters, by default we consider previous model doesn't exist
 	private boolean existsPreviousStateModel = false;
-	private int numberDisappearedAbstractStates = 0;
-	private int numberNewAbstractStates = 0;
-	private String stateModelDifferenceHTMLReport = "";
+	private int numberDisappearedAbstractStates = -1;
+	private int numberNewAbstractStates = -1;
+	private String stateModelDifferenceHTMLReport = "Previous State Model doesn't exist";
 	
 	public boolean existsPreviousStateModel() {
 		return existsPreviousStateModel;

@@ -114,6 +114,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -121,7 +123,7 @@ DataStoreMode = instant
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetTitle
+AbstractStateAttributes = WidgetTitle,WidgetPath,WidgetControlType
 
 #################################################################
 # PKM address

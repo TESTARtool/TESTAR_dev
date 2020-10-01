@@ -28,8 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,6 +75,9 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.codeo_execution = true;
+		
+		// CODEO takes his time to start, wait 30s by default
+		WinProcess.codeo_pause = 30;
 		
 		// TODO: Prepare a JaCoCo installation verification message
 		//verifyJaCoCoInstallation();
@@ -328,10 +333,36 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 			String antCommand = "cd jacoco && ant report"
 					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
 					+ " -DreportCoverageDir=" + reportDir;
+			
+			System.out.println("Creating JaCoCo report...");
+			System.out.println(antCommand);
 
 			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
 			Process p = builder.start();
 			p.waitFor();
+			
+			BufferedReader stdInput = new BufferedReader(new 
+					InputStreamReader(p.getInputStream()));
+
+			BufferedReader stdError = new BufferedReader(new 
+					InputStreamReader(p.getErrorStream()));
+
+			// read the output from the command
+			System.out.println(" JACOCO REPORT Standard output ? :\n");
+			StringBuilder outputContent = new StringBuilder("");
+			String s = null;
+			while ((s = stdInput.readLine()) != null) {
+				System.out.println(s);
+				outputContent.append(s);
+			}
+
+			// read any errors from the attempted command
+			System.out.println(" JACOCO REPORT Standard error ? :\n");
+			StringBuilder errorContent = new StringBuilder("");
+			while ((s = stdError.readLine()) != null) {
+				System.out.println(s);
+				errorContent.append(s);
+			}
 
 			System.out.println("JaCoCo report created successfully!");
 

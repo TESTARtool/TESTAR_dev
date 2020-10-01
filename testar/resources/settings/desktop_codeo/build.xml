@@ -16,12 +16,12 @@
 				
 				<!-- Folder directory of codeo.jar classes -->
 				<classfiles>
-					<fileset dir="C:\Users\testar\Desktop\CODEO_classes">
+					<fileset dir="C:\Users\testar\Desktop\codeo_classes">
 						<include name="**/*.class" />
 					</fileset>
 				</classfiles>
 				<sourcefiles encoding="UTF-8">
-					<fileset file="C:\Users\testar\Desktop\CODEO_classes/*.jar"/>
+					<fileset file="C:\Users\testar\Desktop\codeo_classes/*.jar"/>
 				</sourcefiles>
 				<!-- all filetests here -->
 				

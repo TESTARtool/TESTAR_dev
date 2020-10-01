@@ -340,7 +340,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     protected StateModelDifferenceJsonObject automaticStateModelDifference() {
     	
 		// Create the JSON Object that contains the information about State Model Difference
-		StateModelDifferenceJsonObject stateModelDifferenceJsonObject = new StateModelDifferenceJsonObject("","");
+		StateModelDifferenceJsonObject stateModelDifferenceJsonObject = new StateModelDifferenceJsonObject();
     	
     	if(settings.get(ConfigTags.Mode) == Modes.Generate 
     			&& settings.get(ConfigTags.StateModelEnabled, false)
@@ -378,8 +378,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				else {
     					System.out.println("WARNING: State Model Difference could not calculate previous application version automatically");
     					System.out.println("Try to use manual State Model Difference");
-    					
-    					stateModelDifferenceJsonObject.setExistsPreviousStateModel(false);
     					
     					// We cannot obtain previous version, finish
     					return stateModelDifferenceJsonObject;

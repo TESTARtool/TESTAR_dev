@@ -465,6 +465,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	}
     	
     	File file = new File("ArtefactIdMap.json");
+    	
+    	// If something wrong append and file was created empty, we need to delete or always will be failing
+    	if(file.exists() && file.length() == 0) {
+    		file.delete();
+    	}
+    	
     	try {
     		if(!file.exists()) {
     			// First TESTAR execution will create this file map

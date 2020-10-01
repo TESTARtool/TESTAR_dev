@@ -34,17 +34,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class StateModelDifferenceJsonObject {
 
+	boolean existsPreviousStateModel;
 	String previousStateModelAppName;
 	String previousStateModelAppVersion;
-	boolean existsPreviousStateModel;
 	int numberDisappearedAbstractStates;
 	int numberNewAbstractStates;
 	String stateModelDifferenceReport;
 
 	@JsonCreator
-	public StateModelDifferenceJsonObject(String previousStateModelAppName, String previousStateModelAppVersion) {
-		this.previousStateModelAppName = previousStateModelAppName;
-		this.previousStateModelAppVersion = previousStateModelAppVersion;
+	public StateModelDifferenceJsonObject() {
+		// Default values are empty parameters, by default we consider previous model doesn't exist
+		this.existsPreviousStateModel = false;
+		this.previousStateModelAppName = "";
+		this.previousStateModelAppVersion = "";
+		this.numberDisappearedAbstractStates = -1;
+		this.numberNewAbstractStates = -1;
+		this.stateModelDifferenceReport = "Previous State Model doesn't exist";
 	}
 	
 	public void setPreviousStateModelAppName(String previousStateModelAppName) {
