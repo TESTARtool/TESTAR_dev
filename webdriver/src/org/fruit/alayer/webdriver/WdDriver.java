@@ -54,6 +54,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -64,6 +65,8 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
@@ -87,7 +90,7 @@ public class WdDriver extends SUTBase {
     String driverPath = parts[0].replace("\"", "");
 
     String osName = System.getProperty("os.name");
-    if(!driverPath.contains(".exe") && osName.contains("Windows")) {
+    if(!sutConnector.startsWith("remote") && !driverPath.contains(".exe") && osName.contains("Windows")) {
     	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
     	driverPath = driverPath.replace("\"", "");
     	parts = sutConnector.substring(sutConnector.indexOf(".exe")).split(" ");
@@ -122,7 +125,11 @@ public class WdDriver extends SUTBase {
     else if (driverPath.toLowerCase().contains("microsoft")) {
       webDriver = startEdgeDriver(driverPath, extensionPath);
     }
-    else {
+    else  if (parts[0].startsWith("remote")) {
+     System.out.println("remote webdriver: Usage remote <grid location> <website to test>");
+     webDriver = startRemoteDriver(sutConnector);        
+        
+      } else {
 		String msg = " \n ******** Not a valid webdriver Exception ********"
 				+ "\n Something looks wrong with the webdriver path: \n "
 				+ sutConnector
@@ -149,6 +156,18 @@ public class WdDriver extends SUTBase {
     CanvasDimensions.startThread();
 
     wdDriver = this;
+  }
+
+  private RemoteWebDriver startRemoteDriver(String sutConnector) {
+    DesiredCapabilities caps = DesiredCapabilities.chrome();
+    String[] params = sutConnector.split(" ");
+    String grid = params[1];
+    try{
+       webDriver = new RemoteWebDriver(new URL(grid), caps);
+    }
+    catch (MalformedURLException e){}
+
+    return webDriver;
   }
 
   private static RemoteWebDriver startChromeDriver(String chromeDriverPath,
