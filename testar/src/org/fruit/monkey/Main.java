@@ -145,6 +145,7 @@ public class Main {
 
 	private static boolean isValidJavaEnvironment() {
 
+		System.out.println("Check Java environment");
 		try {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
