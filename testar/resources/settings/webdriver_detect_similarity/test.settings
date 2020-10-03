@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.smartclient.com/smartgwt/showcase/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "file:///C:/Users/testar/Desktop/webdriver/testar/bin/suts/similar_menu.html"
 
 #################################################################
 # Sequences
@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_spy_custom/Protocol_webdriver_spy_custom
+ProtocolClass = webdriver_detect_similarity/Protocol_webdriver_detect_similarity
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -106,6 +106,14 @@ GraphDBEnabled = false
 GraphDBUrl =
 GraphDBUser =
 GraphDBPassword =
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WebWidgetId
 
 #################################################################
 # Override display scale

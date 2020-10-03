@@ -73,6 +73,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class);
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
+  public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class);
 
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
