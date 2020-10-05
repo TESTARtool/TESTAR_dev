@@ -2,14 +2,16 @@ package nl.ou.testar.temporal.oracle;
 
 import nl.ou.testar.temporal.foundation.PairBean;
 
+/**
+ * Model checker dependant configurations to be applied to each formula/property or model file
+ */
 public enum TemporalFormalism {
-//    LTL,    LTL_SPOT,
+//    LTL,  LTL_SPOT,
 //    LTL_ITS,
 //    LTL_LTSMIN,
-//    CTL,  CTL_ITS;
-//    CTL_LTSMIN,
+//    CTL, CTL_LTSMIN
+//    CTL_ITS
 //    CTL_GAL
-
 
 
     LTL("","","","",new PairBean<>(),new PairBean<>(),
@@ -63,6 +65,20 @@ public enum TemporalFormalism {
     public final boolean parenthesesNextOperator;
 
 
+    /**
+     * @param ap_prepend if used, this is usually  an opening bracket
+     * @param ap_append if used, this is usually  a closing bracket
+     * @param line_append fixed text string at every formula line
+     * @param line_prepend fixed text string at every formula line
+     * @param finally_replace replacement string for 'F', when used it is usually '<>'
+     * @param globally_replace replacement string for 'G', when used it is usually '[]'
+     * @param and_replace replacement string for '&', when used it is usually '&&'
+     * @param or_replace replacement string for '|', when used it is usually '||'
+     * @param false_replace replacement string for 'FALSE, when used it is usually '0' NOT IN USE!!
+     * @param supportsMultiInitialStates boolean to indicate whether an artificial initial state is needed
+     * @param fileExtension fixed extension as required by the model checker to be applied to the model file
+     * @param parenthesesNextOperator boolean:  the Next operator ('X') need to be parenthesised.
+     */
     TemporalFormalism(String ap_prepend , String ap_append,
                       String line_append,String line_prepend,
                       PairBean<String, String> finally_replace,

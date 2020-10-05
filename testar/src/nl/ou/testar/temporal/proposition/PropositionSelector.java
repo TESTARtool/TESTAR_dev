@@ -17,6 +17,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Combination of an attribute(s) selection and expressions
+ * comparable to a complete PROJECTION clause in SQL
+ */
 public class PropositionSelector {
     private Set<String> selectedAttributes;
     private Set<PairBean<InferrableExpression,String>> selectedExpressions;
@@ -31,7 +35,7 @@ public class PropositionSelector {
     }
 
 
-    public static Set<String> getAllAttributeNames(){
+    private static Set<String> getAllAttributeNames(){
         Set<TagBean<?>> tags = getAllAttributeTags();
         Set<String> tmptagset=new LinkedHashSet<>();
         Iterator<TagBean<?>> iterator;
@@ -43,7 +47,7 @@ public class PropositionSelector {
         return  tmptagset;
     }
     @SuppressWarnings("unused")
-    public static Set<TagBean<?>> getAllAttributeTags(){
+    private static Set<TagBean<?>> getAllAttributeTags(){
         // WORKAROUND CSS 20190629
         // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
         // both classes Tags and UIATags inherit from abstract class TagBase
@@ -65,19 +69,27 @@ public class PropositionSelector {
         return  tmptagset;
     }
 
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<String> useMinimalAttributes(){
         Set<String> tmptagset=new LinkedHashSet<>();
         Tag<?> t = Tags.Role;// is the only attribute existing for ALL states.
         tmptagset.add(Validation.sanitizeAttributeName(t.name())); //orientdb style tags
         return  tmptagset;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<String> useMinimalTransAttributes(){
         Set<String> tmptagset=new LinkedHashSet<>();
         Tag<?> t = Tags.Desc;// is the only attribute existing for ALL transactions. (e.g.ROLE doesn't exist for a Virtual Key)
         tmptagset.add(Validation.sanitizeAttributeName(t.name())); //orientdb style tags
         return  tmptagset;
     }
-
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<String> useBasicAttributes() {
         Set<String> tmptagset=new LinkedHashSet<>();
         Set<String> basicset = new HashSet<>();
@@ -99,12 +111,17 @@ public class PropositionSelector {
         return tmptagset;
     }
 
-
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useMinimalSelectedExpressions() {
         Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
         minve.add(new PairBean<>(InferrableExpression.exists, ""));// use always
         return minve;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useVKSelectedExpressions() {
         // following list is derived by inspecting AnnotatingActionCompiler
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
@@ -116,6 +133,9 @@ public class PropositionSelector {
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i: Kill Process).*"));
         return minie;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useDefaultTransSelectedExpressions() {
         // following list is derived by inspecting AnnotatingActionCompiler
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
@@ -130,8 +150,9 @@ public class PropositionSelector {
         return minie;
     }
 
-
-
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useRoleConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
         minie.add(new PairBean<>(InferrableExpression.textmatch, UIARoles.UIAButton.name()+"|"+
@@ -139,13 +160,18 @@ public class PropositionSelector {
                 UIARoles.UIARadioButton.name()+"|"+ UIARoles.UIAWindow.name()));  // use always
         return minie;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> usePathConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
        minie.add(new PairBean<>(InferrableExpression.textmatch, ".*\\[(\\d+, )*\\d+\\]"));// use always
         return minie;
 
     }
-
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression, String>> useTitleConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
         minie.add(new PairBean<>(InferrableExpression.textmatch, "(?i:OK)|(?i:CANCEL)|(?i:YES)|(?i:NO)|" +
@@ -154,18 +180,26 @@ public class PropositionSelector {
                 "(?i:UP)|(?i:DOWN)|(?i:LEFT)|(?i:RIGHT)"));
         return minie;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useVirtualKeyConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
         minie.add(new PairBean<>(InferrableExpression.textmatch, "undefined"));  // use always
         return minie;
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useCatchAllConditionalExpressions() {
         Set<PairBean<InferrableExpression, String>> minie = new LinkedHashSet<>();
         minie.add(new PairBean<>(InferrableExpression.textmatch, "DON'T CARE"));  // use always
         return minie;
     }
     //
-
+    /**
+     * used for writing a default proposition manager
+     */
     public static Set<PairBean<InferrableExpression,String>> useBasicSelectedExpressions() {
         Set<PairBean<InferrableExpression, String>> defie = new LinkedHashSet<>(useMinimalSelectedExpressions());
         defie.add(new PairBean<>(InferrableExpression.value_eq, "0"));
@@ -225,10 +259,17 @@ public class PropositionSelector {
         return defie;
     }
 
+    /**
+     * @return widget attributes that are to be selected for propositions
+     * comparable to column names in a SELECT clause in SQL
+     * used when reading a proposition manager JSON file
+     */
     public Set<String> getSelectedAttributes() {
         return selectedAttributes;
     }
-
+    /**
+     * used for writing a default proposition manager
+     */
     public void setSelectedAttributes(Set<String> selectedAttributes) {
         if (selectedAttributes.size()==0){
             this.selectedAttributes.addAll(useMinimalAttributes());
@@ -236,6 +277,9 @@ public class PropositionSelector {
             this.selectedAttributes = selectedAttributes; //responsibility of the test manager
         }
     }
+    /**
+     * used for writing a default proposition manager
+     */
     public void setSelectedStateAttributes(Set<String> selectedAttributes) {
         if (selectedAttributes.size()==0){
             this.selectedAttributes.addAll(useMinimalAttributes());
@@ -245,7 +289,7 @@ public class PropositionSelector {
         }
     }
 
-    public String getTagFromAttribute(String attrib){
+    private String getTagFromAttribute(String attrib){
         String ret=null;
         for (String tag : selectedAttributes  // consider to pass if selected atributes = empty?
         ) {
@@ -257,14 +301,18 @@ public class PropositionSelector {
         return  ret;
     }
 
-/*    public boolean containsTag(String attrib){
-        return getTagFromAttribute(attrib) != null;
-    }*/
 
+    /**
+     * @return expressions for the selected attributes
+     * comparable to column values in a SELECT clause in SQL
+     * used when reading a proposition manager JSON file
+     */
     public Set<PairBean<InferrableExpression, String>> getSelectedExpressions() {
         return selectedExpressions;
     }
-
+    /**
+     * used for writing a default proposition manager
+     */
     public void setSelectedExpressions(Set<PairBean<InferrableExpression, String>> selectedExpressions) {
         if (selectedExpressions.size()==0){
             this.selectedExpressions.addAll(useMinimalSelectedExpressions());
@@ -275,10 +323,22 @@ public class PropositionSelector {
 
     //custom
 
+    /**
+     * @param attrib atrtibute to check o=for existence
+     * @param value matching value of the atti=ribute
+     * @return true if the the widget has an attribute with the specified value
+     */
     public boolean matchExists( String attrib, String value) {
         Set<String> dummy = getPropositionStrings("dummy", attrib, value);
         return !dummy.isEmpty();
     }
+
+    /**
+     * @param propositionKey prefix-identifier for each of the proposition that are to be found
+     * @param attrib widget attribute
+     * @param value value of the widget attribute
+     * @return list of propositions derived from a widget attribute-value pair
+     */
     public Set<String> getPropositionStrings(String propositionKey, String attrib, String value) {
         //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    nanotime: "+System.nanoTime());
         Set<String> apset = new LinkedHashSet<>();

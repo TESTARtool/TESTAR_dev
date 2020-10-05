@@ -17,6 +17,11 @@ SETTING("_||_","ap","dead");
     public final String terminalProposition; //used in model and formulas both HCi and model checkers
 
 
+    /**
+     * @param subKeySeparator unique string to separate abstration parts. set hardcoded to "_||_",
+     * @param outputPrefix leading string added to the index of a proposition. set hardcoded to  "ap"
+     * @param terminalProposition string indication the special terminal proposition.  set hardcoded to "dead"
+     */
     PropositionConstants(String subKeySeparator, String outputPrefix, String terminalProposition) {
         this.subKeySeparator = subKeySeparator;
         this.outputPrefix=outputPrefix;

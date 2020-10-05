@@ -3,9 +3,13 @@ package nl.ou.testar.temporal.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Used for CTL fpormula transformations.
+ * In case that the model has terminal states and the terminal proposition must be weaved into the formula.
+ */
 public class StringFinder {
 
-   public static int findClosingParenthesis(String data, int openPos) {
+   private static int findClosingParenthesis(String data, int openPos) {
 
         char[] text=data.toCharArray();
 
@@ -21,7 +25,7 @@ public class StringFinder {
         }
         return closePos;
     }
-    public static int findOpeningParenthesis(String data, int closePos) {
+    private static int findOpeningParenthesis(String data, int closePos) {
         char[] text=data.toCharArray();
         int openPos = closePos;
         int unmatchedCounter = 1;
@@ -81,9 +85,9 @@ public class StringFinder {
     }
 
     /**
-     * Find all blocks between "..U.."   and its corresponding ')' then  weave the 'replaceXstring'
+     * Find all blocks between "..U.."   and its corresponding ')' then  weave the 'replace[AE]string'
      * between the ..U.. and the found  block.
-     * ~ newblock =  "("+replaceXStr + "("+block +"))"
+     * ~ newblock =  "("+replace[AE]Str + "("+block +"))"
      *
      * (search from right to left)
      * @param data          string that might contain substrings "..U.."
@@ -131,7 +135,7 @@ public class StringFinder {
 
     /**
      * Find any matching substring and weave the 'replacestring'  in all occurences
-     * (search from right to left) method is NOT USED
+     * This (search from right to left) method is NOT USED !! because W operator in CTL is not supported
      * @param data          string that might contain substrings to search
      * @param toSearch      substring to search for
      * @param replaceStr    suffix of the embedding

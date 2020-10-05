@@ -17,7 +17,16 @@ import java.util.Date;
 
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 
+/**
+ * operating System related helper methods
+ */
 public class OShelper {
+    /**
+     * Convert a absolute Windows path to Unix path
+     * E.g. C:\Wndows\Temp becomes /mnt/c/Windows/Temp
+     * @param windowsFilePath
+     * @return
+     */
     public static String toWSLPath(String windowsFilePath) {
         Path winpath = Paths.get(windowsFilePath);
         StringBuilder wslpath = new StringBuilder();
@@ -29,6 +38,10 @@ public class OShelper {
         return wslpath.toString();
     }
 
+    /**
+     * Perform a browser GET operation.
+     * @param url the url to invoke
+     */
     public static void HTTPGet(String url) {
         // HTTP GET request from https://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
         URL obj = null;
@@ -57,9 +70,19 @@ public class OShelper {
             ex.printStackTrace();
         }
     }
+    /**
+     * Launches a child process on the underlying OS and printing all output to console
+     * @param command command to execute
+     */
     public static void RunOSChildProcess(String command) {
         RunOSChildProcess(command, "");
     }
+
+    /**
+     * Launches a child process on the underlying OS, capturing the all the output  in a file
+     * @param command command to execute
+     * @param resultsFileName  output  in a file
+     */
     public static void RunOSChildProcess(String command, String resultsFileName) {
 
         Process theProcess = null;
@@ -109,20 +132,26 @@ public class OShelper {
         }
     }
 
+    /** converts the system date-time to a string with filename safe characters
+     * @return date-time as string in format "yyyyMMdd-HHmmss"
+     */
     public static String CurrentDateToFolder() {
         Date aDate = Calendar.getInstance().getTime();
-        return DateToFolder(aDate);
-    }
-
-    public static String DateToFolder(Date aDate) {
         // inspired from https://alvinalexander.com/java/simpledateformat-convert-date-to-string-formatted-parse
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd-HHmmss");
         return formatter.format(aDate);
     }
+
+    /** converts the system time to a string
+     * @return time as string
+     */
     public static String prettyCurrentTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss,SSS");
         return LocalTime.now().format(dtf);
     }
+    /** converts the system date-time to a string
+     * @return date-time as string
+     */
     public static String prettyCurrentDateTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
         return LocalDateTime.now().format(dtf);

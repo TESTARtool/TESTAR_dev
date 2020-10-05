@@ -7,15 +7,17 @@ import org.fruit.alayer.Tags;
 
 import java.util.*;
 
+/**
+ * The proposition manager contains the filter rules to be applied when a Model is retrieved from the Graph Db
+ * to be transformed to an implementation independent format that can be used in the next phase
+ * to be transformed to a model-checker dependant model.
+ */
 @JsonPropertyOrder({  "comments","formatVersion","propositionKeying",  "propositionSubKeySeparator", "stateFilters", "widgetFilters","transitionFilters" })
-//@JsonPropertyOrder(alphabetic = true)
+
 public class PropositionManager {
 
     private String formatVersion="20200508";
     private List<String> comments = new ArrayList<>();
-
-
-
     private List<String> propositionKeying = new ArrayList<>();
     private String propositionSubKeySeparator;
     private Set<PropositionFilter> stateFilters;
@@ -23,19 +25,28 @@ public class PropositionManager {
     private Set<PropositionFilter> widgetFilters;
 
 
-
     public PropositionManager() {
-        //super();
         transitionFilters = new LinkedHashSet<>();
         stateFilters = new LinkedHashSet<>();
         widgetFilters= new LinkedHashSet<>();
 
     }
+
+    /**
+    *  candidate for refactoring: only used for writing a default proposition manager
+    *  used for writing a default proposition manager
+    * @param initializeWithDefaults is always true
+    */
     public PropositionManager(boolean initializeWithDefaults) {
          this(initializeWithDefaults,null);
     }
 
-    public PropositionManager(boolean initializeWithDefaults, List<String> propositionKeying) {
+    /**
+     * candidate for refactoring: propositionKeying is no longer needed in a constructor
+     * @param initializeWithDefaults
+     * @param propositionKeying
+     */
+    private  PropositionManager(boolean initializeWithDefaults, List<String> propositionKeying) {
         this();
         if (initializeWithDefaults){
             comments.add("This is a Sample APModelManager with  filters: two edge-filters, two wdiget filters, one state-filters.");
@@ -62,71 +73,119 @@ public class PropositionManager {
             sfilter.setDefaultStateFilter();
             stateFilters.add(sfilter);
 
-
-
-            if (propositionKeying ==null){
-                setRoleTitlePathAsAPKey();  }
+            if (propositionKeying ==null){ //canditate for refactoring
+                this.propositionKeying.clear();
+                this.propositionKeying.add(Tags.Role.name());
+                this.propositionKeying.add(Tags.Title.name());
+                this.propositionKeying.add(Tags.Path.name());
+            }
             else{
                 this.propositionKeying = propositionKeying;}
             this.propositionSubKeySeparator = PropositionConstants.SETTING.subKeySeparator;
         }
 
     }
-    //*********************
 
 
-
+    /**
+     * * used for writing a proposition manager JSON file
+     * @return Transition filters (Actions in TESTAR)
+     */
     @JsonGetter("transitionFilters")
    @SuppressWarnings("unused")
     private Set<PropositionFilter> getTransitionFilters() {
         return transitionFilters;
     }
 
+    /**
+     * used when reading a proposition manager JSON file
+     * @param transitionFilters
+     */
     @SuppressWarnings("unused")
     public void setTransitionFilters(Set<PropositionFilter> transitionFilters) {
         this.transitionFilters=transitionFilters;
     }
+    /**
+     * used for writing a proposition manager JSON file
+     * @return widget filters
+     */
     @SuppressWarnings("unused")
     public Set<PropositionFilter> getWidgetFilters() {
         return widgetFilters;
     }
+
+    /**
+     * used when reading a proposition manager JSON file
+     * @param widgetFilters
+     */
     @SuppressWarnings("unused")
     public void setWidgetFilters(Set<PropositionFilter> widgetFilters) {
         this.widgetFilters = widgetFilters;
     }
+    /**
+     * used for writing a proposition manager JSON file
+     * @return statefilters
+     */
     @SuppressWarnings("unused")
     public Set<PropositionFilter> getStateFilters() {
         return stateFilters;
     }
+
+    /**
+     * used when reading a proposition manager JSON file
+     * @param stateFilters
+     */
     @SuppressWarnings("unused")
     public void setStateFilters(Set<PropositionFilter> stateFilters) {
         this.stateFilters = stateFilters;
     }
 
+    /**
+     * used for writing a proposition manager JSON file
+     * @return the subkey separator . E.g. "_||_"
+     */
     public String getPropositionSubKeySeparator() {
         return propositionSubKeySeparator;
     }
+
+    /**
+     * used when reading a proposition manager JSON file
+     * @param propositionSubKeySeparator
+     */
     @SuppressWarnings("unused")
     public void setPropositionSubKeySeparator(String propositionSubKeySeparator) {
         this.propositionSubKeySeparator = propositionSubKeySeparator;
     }
 
-
-    //public void updateAPKey(List<String> APKey) {        this.propositionKey = APKey;    }
-
+    /**
+     * used for writing a proposition manager JSON file
+     * @return keying of the proposition . E.g. Role-Title-Path
+     */
     public List<String> getPropositionKeying() {
         return propositionKeying;
     }
 
+    /**
+     * used when reading a proposition manager JSON file
+     * @param propositionKeying
+     */
     public void setPropositionKeying(List<String> propositionKeying) {
         this.propositionKeying = propositionKeying;
     }
 
 
+    /**
+     * used for writing a proposition manager JSON file
+     * @return comments to write
+     */
     public List<String> getComments() {
         return comments;
     }
 
+    /**
+     * used when reading a proposition manager JSON file
+     * @param comments
+     */
     public void setComments(List<String> comments) {
         this.comments = comments;
     }
@@ -134,52 +193,23 @@ public class PropositionManager {
     public String getFormatVersion() {
         return formatVersion;
     }
+
+    /**
+     * used when reading a proposition manager JSON file
+     * @param formatVersion
+     */
     @SuppressWarnings("unused")
     public void setFormatVersion(String formatVersion) {
         this.formatVersion = formatVersion;
     }
 
 
-
-    public void setRoleTitlePathAsAPKey(){
-        propositionKeying.clear();
-        propositionKeying.add(Tags.Role.name());
-        propositionKeying.add(Tags.Title.name());
-        propositionKeying.add(Tags.Path.name());
-
-    }
-
-    public List<PropositionFilter> passPropositionConditions(Map<String,String> attribmap){
-        List<PropositionFilter> passedPropositionFilters = new ArrayList<>();
-        //pass if each entry in the attribmap matches at least one FilterPart ('disjunction of FilterParts')
-        // all values in attribmap are non-empty
-
-        boolean pass = false;
-        for (PropositionFilter wf : stateFilters
-        ) {
-            for (Map.Entry<String, String> entry : attribmap.entrySet()
-            ) {
-                pass = false;
-                for (PropositionConditionPart wfConditionPart : wf.getPropositionConditionParts()
-                ) {
-                    if (wfConditionPart.getSelectedAttributes().contains(entry.getKey())) {
-                      //  System.out.println("DEBUG: checking expressions on Atrribute: "+entry.getKey()+","+entry.getValue()+"    time: "+System.nanoTime());
-                        Set<String> dummy = wfConditionPart.getPropositionStrings("dummy", entry.getKey(), entry.getValue());
-                      //  System.out.println("DEBUG: checking done    time: "+System.nanoTime());
-                        if (dummy != null && !dummy.isEmpty()) {
-                            pass = true;
-                            break; // current 'entry' fulfills the condition
-                        }
-                    }
-                }
-                if (!pass) break; // entry doesn't fulfill condition, no need to check remaining entries on this filter
-            }
-            if (pass) {// all entries fulfill a condition
-                passedPropositionFilters.add(wf);
-            }
-        }
-        return passedPropositionFilters; //pass;
-    }
+    /**
+     * get a list of all filters in the proposition manager that pass : the widget attribute-values pairs conform.
+     * @param filterType filter is one of STATE, WIDGET, TRANSITION.
+     * @param attribmap map of widget attributes and their corresponding values
+     * @return
+     */
     public List<PropositionFilter> setPassingFilters(PropositionFilterType filterType, Map<String,String> attribmap){
         List<PropositionFilter> passedPropositionFilters = new ArrayList<>();
         //pass if  all Conditions in a Filter are fulfilled. ('conjunct of FilterConditionParts')

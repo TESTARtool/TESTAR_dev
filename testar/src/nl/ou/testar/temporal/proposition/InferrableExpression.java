@@ -1,5 +1,8 @@
 package nl.ou.testar.temporal.proposition;
 
+/**
+ * Used by the Proposition Manager to make filters on widgets.
+ */
 public  enum InferrableExpression {
 
     value_eq("number"),
@@ -18,6 +21,9 @@ public  enum InferrableExpression {
 
     public final String typ;
 
+    /**
+     * @param typ the type of the expression. Can be one of number,text,shape,boolean
+     */
     InferrableExpression(String typ) {
         this.typ=typ;
     }

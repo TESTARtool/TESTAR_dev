@@ -3,10 +3,10 @@ package nl.ou.testar.temporal.util;
 @startuml
 
 class CachedRegexPatterns {
-    - Map<String, Pattern> cachedRegExPatterns1;
+    - Map<String, Pattern> cachedRegExPatterns;
     -{static} Map<String, Pattern> cachedRegExPatterns = new HashMap<>();
-    +{static} boolean add(String regexString ) {}
-    +{static} boolean contains(String regexString) {    }
+    -{static} boolean add(String regexString ) {}
+    -{static} boolean contains(String regexString) {    }
     +{static} Pattern addAndGet(String regexString) {}
 }
 @enduml
@@ -19,12 +19,8 @@ import java.util.regex.PatternSyntaxException;
 
 public final class CachedRegexPatterns {
     private static Map<String, Pattern> cachedRegExPatterns = new HashMap<>();
-    //private static int cacheHits=0;
-    //private static int cacheMisses=0;
 
-
-    public static boolean add(String regexString ) {
-
+    private static boolean add(String regexString ) {
         if (!contains(regexString)) {
             boolean success =true;
             Pattern p;
@@ -41,18 +37,19 @@ public final class CachedRegexPatterns {
         {return true;}
     }
 
-    public static boolean contains(String regexString) {
+    private static boolean contains(String regexString) {
         return cachedRegExPatterns.containsKey(regexString);
     }
 
+    /**
+     * Converts a string to a Pattern and adds the Pattern to the cache if not available in the cache
+     * @param regexString regular expression string
+     * @return Pattern derived from the cache
+     */
     public static Pattern addAndGet(String regexString) {
         if (!contains(regexString)){
-            //CachedRegexPatterns.cacheMisses++;
             add(regexString);
         }
-        //else{
-        //  CachedRegexPatterns.cacheHits++;
-        //}
         return cachedRegExPatterns.get(regexString);
     }
 }

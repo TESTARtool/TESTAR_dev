@@ -11,6 +11,9 @@ import java.util.Set;
 
 import static nl.ou.testar.temporal.proposition.PropositionSelector.*;
 
+/**
+ * filter on widgets : comparable to a combination of SELECT and WHERE clause in SQL.
+ */
 public class PropositionFilter {
 
     private  String comment;
@@ -23,20 +26,44 @@ public class PropositionFilter {
     }
 
 
+    /**
+     * * used for writing a default proposition manager
+     * @param comment
+     */
     @JsonIgnore
     public void updateComment(String comment) {
         this.comment = comment;
     }
+
+    /**
+     * @return string  from the comment attribute
+     * value is not used/ignored. The method is just required to parse the comment field
+     */
     public String getComment() {
         return comment;
     }
+
+    /**
+     * @return list of attribute conditions
+     * used when reading a proposition manager JSON file
+     */
     public List<PropositionConditionPart> getPropositionConditionParts() {
         return propositionConditionParts;
     }
+
+    /**
+     * @param propositionConditionParts
+     * used for writing a default proposition manager
+     */
     @SuppressWarnings("unused")
     public void setPropositionConditionParts(List<PropositionConditionPart> propositionConditionParts) {
         this.propositionConditionParts = propositionConditionParts;
     }
+
+    /**
+     * @return list of attributesto select from the Widgets
+     * used when reading a proposition manager JSON file
+     */
     @JsonGetter("propositionSelectorPart")
     private PropositionSelector getPropositionSelectorPart() {
         return propositionSelectorPart;
@@ -45,11 +72,19 @@ public class PropositionFilter {
     public Set<String> getPropositionsOfAttribute(String apkey, String transitionProperty, String value) {
         return getPropositionSelectorPart().getPropositionStrings(apkey, transitionProperty, value);
     }
+
+    /**
+     * @param propositionSelectorPart
+     * used for writing a default proposition manager
+     */
     @SuppressWarnings("unused")
     public void setPropositionSelectorPart(PropositionSelector propositionSelectorPart) {
         this.propositionSelectorPart = propositionSelectorPart;
     }
 
+    /**
+     * used for writing a default proposition manager
+     */
     public void  setDefaultWidgetFilter() {
         updateComment("==================This is a Sample Filter, with 3 filter conditions");
         PropositionConditionPart wfp = new PropositionConditionPart();
@@ -74,6 +109,10 @@ public class PropositionFilter {
         propositionSelectorPart.setSelectedAttributes(useBasicAttributes());
         propositionSelectorPart.setSelectedExpressions(useBasicSelectedExpressions());
     }
+
+    /**
+     * * used for writing a default proposition manager
+     */
     public void  setDefaultVKEdgeFilter() {
         updateComment("==================This is a Sample EdgeFilter to filter on Virtual Keypress");
         PropositionConditionPart wfp = new PropositionConditionPart();
@@ -85,6 +124,10 @@ public class PropositionFilter {
         propositionSelectorPart.setSelectedAttributes(useMinimalTransAttributes());
         propositionSelectorPart.setSelectedExpressions(useVKSelectedExpressions());
     }
+
+    /**
+     * * used for writing a default proposition manager
+     */
     public void  setDefaultStateFilter() {
         updateComment("==================This is a Sample StateFilter to collect the "+useMinimalAttributes()+" propositions");
         PropositionConditionPart wfp = new PropositionConditionPart();
@@ -97,6 +140,9 @@ public class PropositionFilter {
         propositionSelectorPart.setSelectedExpressions(useMinimalSelectedExpressions());
     }
 
+    /**
+     * * used for writing a default proposition manager
+     */
     public void  setCatchAllEdgeFilter() {
         updateComment("==================This is a Sample EdgeFilter with a 'catch all' condition");
         PropositionConditionPart wfp = new PropositionConditionPart();
@@ -110,6 +156,9 @@ public class PropositionFilter {
     }
 
 
+    /**
+     * * used for writing a default proposition manager
+     */
     public void setMinimalWidgetFilter() {
         updateComment("==================This is a Sample Filter, with 1 filter condition");
         PropositionConditionPart wfp2 = new PropositionConditionPart();
