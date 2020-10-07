@@ -32,6 +32,7 @@
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -212,9 +213,9 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			// if state model fails, using random:
+			retAction = RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
 	}
