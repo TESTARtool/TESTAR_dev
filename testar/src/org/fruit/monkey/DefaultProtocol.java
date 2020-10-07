@@ -321,6 +321,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void initialize(Settings settings) {
 
+		visualizationOn = settings.get(ConfigTags.VisualizeActions);
+
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
