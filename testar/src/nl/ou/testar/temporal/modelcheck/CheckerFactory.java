@@ -4,6 +4,11 @@ import nl.ou.testar.temporal.oracle.TemporalFormalism;
 
 
 public class CheckerFactory {
+    /**
+     * Create a concrete model-checker based on the temporal formalism given
+     * @param temporalFormalism e.g. LTL_SPOT, CTL_LTSMIN
+     * @return concrete model-checker
+     */
     public static ModelChecker getModelChecker(TemporalFormalism temporalFormalism) {
         ModelChecker modelChecker;
         switch (temporalFormalism) {

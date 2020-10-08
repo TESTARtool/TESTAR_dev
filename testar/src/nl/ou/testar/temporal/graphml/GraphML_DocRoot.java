@@ -28,22 +28,4 @@ public class GraphML_DocRoot {
         this.key = keys;
         this.graph = graph;
     }
-
-
-    //id="#72:1" source="#41:0" target="#41:0"
-    // public List<GraphML_DocKey> getKeys() {
-    //        return key;
-    //    }
-    //
-    //    public void setKeys(List<GraphML_DocKey> key) {
-    //        this.key = key;
-    //    }
-    //
-    //    public GraphML_DocGraph getGraph() {
-    //        return graph;
-    //    }
-    //
-    //    public void setGraph(GraphML_DocGraph graph) {
-    //        this.graph = graph;
-    //    }
 }

@@ -3,20 +3,13 @@ package nl.ou.testar.temporal.oracle;
 import nl.ou.testar.temporal.foundation.PairBean;
 
 /**
- * Model checker dependant configurations to be applied to each formula/property or model file
+ * Model checker dependant configurations to be applied for each formula/property or model file
  */
 public enum TemporalFormalism {
-//    LTL,  LTL_SPOT,
-//    LTL_ITS,
-//    LTL_LTSMIN,
-//    CTL, CTL_LTSMIN
-//    CTL_ITS
-//    CTL_GAL
 
-
-    LTL("","","","",new PairBean<>(),new PairBean<>(),
+    LTL("","","","",new PairBean<>(),new PairBean<>(), //equals LTL_SPOT
             new PairBean<>(),new PairBean<>(), new PairBean<>(),true,"",false),
-    CTL("","","","",new PairBean<>(),new PairBean<>(),
+    CTL("","","","",new PairBean<>(),new PairBean<>(), //equals CTL_LTSMIN
             new PairBean<>(),new PairBean<>(), new PairBean<>(),true,"",true),
 
 
@@ -74,10 +67,10 @@ public enum TemporalFormalism {
      * @param globally_replace replacement string for 'G', when used it is usually '[]'
      * @param and_replace replacement string for '&', when used it is usually '&&'
      * @param or_replace replacement string for '|', when used it is usually '||'
-     * @param false_replace replacement string for 'FALSE, when used it is usually '0' NOT IN USE!!
+     * @param false_replace replacement string for 'FALSE, when used it is usually '0'
      * @param supportsMultiInitialStates boolean to indicate whether an artificial initial state is needed
-     * @param fileExtension fixed extension as required by the model checker to be applied to the model file
-     * @param parenthesesNextOperator boolean:  the Next operator ('X') need to be parenthesised.
+     * @param fileExtension fixed model-file extension as mandated by the model checker
+     * @param parenthesesNextOperator boolean:  the Next operator ('X') need to be parenthesised for CTL formulas.
      */
     TemporalFormalism(String ap_prepend , String ap_append,
                       String line_append,String line_prepend,

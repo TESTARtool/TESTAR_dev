@@ -24,6 +24,12 @@ import java.util.concurrent.TimeUnit;
 
 import static org.fruit.monkey.ConfigTags.TemporalGeneratorTactics;
 
+/**
+ * GUI panel for temporal settings. created with INTELLIJ IDEA IDE
+ * requires the  'com.intellij forms_rt' library to use the Intellij UI designer this lib. is Apache licensed.
+ * Build with JGoodies layout manager. layout is hard  to maintain manually.
+ * Do NOT edit code marked as being controlled by the IDE.
+ */
 public class Temporalpanel {
     //****custom
     private Process webAnalyzerProcess = null;

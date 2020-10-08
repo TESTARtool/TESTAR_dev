@@ -78,8 +78,11 @@ public abstract class ModelChecker {
     }
 
 
-
-
+    /**
+     * Concrete method that imperatively performs the model-check:
+     * validate the formulas, execute the model-check, parse the results, remove temporary files
+     * @return list of model-checked oracles
+     */
     public  List<TemporalOracle> modelcheck(){
         validateFormulasForChecker();
         delegatedCheck();
@@ -101,16 +104,33 @@ public abstract class ModelChecker {
         return contentBuilder.toString();
 
     }
+
+    /**
+     * To be implemented by each model-checker to cope with specifics like: path to executable and commandline construction
+     */
     abstract  void delegatedCheck();
+
+    /**
+     * To be implemented by each model-checker to cope with specific format/grammar of the result files
+     * @param rawInput result file as procuced by the model-checker
+     * @return list of model-checked Oracles
+     */
     abstract List<TemporalOracle> delegatedParseResults(String rawInput);
+
+    /**
+     * To be implemented by each model-checker perform the formula validation
+     * @param aliveProp Usually "!dead" if the model has terminal states, blank otherwise
+     * @param parenthesesNextOperator flag to determine if the X-operator needs to be parenthesised
+     * @return list of furmulas to be fed into the model-checker
+     */
     abstract List<String> delegatedFormulaValidation(String aliveProp, boolean parenthesesNextOperator);
 
 
 
     /**
-     * @see  #saveStringToFile(String, File)
-     * @param contents jj
-     * @param output jj
+     * helper method to write a large string to a file
+     * @param contents filecontent
+     * @param output file to be written on disk
      */
     static void saveStringToFile(String contents, File output) {
 
@@ -129,8 +149,8 @@ public abstract class ModelChecker {
     /**
      *
      * @param oracleColl nnn collection is updated!
-     * @param output nnn
-     * @param doTransformation nn
+     * @param output file with formulas
+     * @param doTransformation flag to transform the formulas according to their temporal formalism (~ actual model checker). false is used save the formulas for external verification prior to do a model-cjheck.     *
      * @link saveStringToFile()
      */
     void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {
@@ -174,6 +194,9 @@ public abstract class ModelChecker {
     }
 
 
+    /**
+     * removal of temporary files
+     */
     public void removeFiles(){
         if (!verbose) {
             try {

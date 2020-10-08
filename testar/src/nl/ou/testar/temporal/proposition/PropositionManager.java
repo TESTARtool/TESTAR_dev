@@ -88,7 +88,7 @@ public class PropositionManager {
 
 
     /**
-     * * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return Transition filters (Actions in TESTAR)
      */
     @JsonGetter("transitionFilters")
@@ -106,7 +106,7 @@ public class PropositionManager {
         this.transitionFilters=transitionFilters;
     }
     /**
-     * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return widget filters
      */
     @SuppressWarnings("unused")
@@ -123,7 +123,7 @@ public class PropositionManager {
         this.widgetFilters = widgetFilters;
     }
     /**
-     * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return statefilters
      */
     @SuppressWarnings("unused")
@@ -141,7 +141,7 @@ public class PropositionManager {
     }
 
     /**
-     * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return the subkey separator . E.g. "_||_"
      */
     public String getPropositionSubKeySeparator() {
@@ -158,7 +158,7 @@ public class PropositionManager {
     }
 
     /**
-     * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return keying of the proposition . E.g. Role-Title-Path
      */
     public List<String> getPropositionKeying() {
@@ -175,7 +175,7 @@ public class PropositionManager {
 
 
     /**
-     * used for writing a proposition manager JSON file
+     * used for writing a default proposition manager JSON file
      * @return comments to write
      */
     public List<String> getComments() {

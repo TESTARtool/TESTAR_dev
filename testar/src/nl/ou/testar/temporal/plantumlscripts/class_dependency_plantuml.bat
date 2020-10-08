@@ -1,0 +1,1 @@
+java -jar plantuml-dependency-cli-1.4.0.jar  -b ..  -dp ^(?!java)(?!com)(?!org\.apache)(.+)$  -o plantuml_dep.txt

@@ -6,7 +6,14 @@ import nl.ou.testar.temporal.modelcheck.*;
 
 import java.util.List;
 
+/**
+ * Contains the core elements of a pattern: formula as string, formalism, parameters in the formula and descriptions
+ */
 public class TemporalPatternBase implements Cloneable{
+    /**
+     * candidate for refactoring
+     * csvsep is declared in the same way in several classes
+     */
     protected static final String csvsep=";";
 
     @CsvCustomBindByName(converter = CSVConvertTemporalType.class)

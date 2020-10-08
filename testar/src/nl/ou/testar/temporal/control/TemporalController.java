@@ -65,7 +65,7 @@ public class TemporalController {
     private  String propositionManagerFile;
     private  String oracleFile;
     private  boolean verbose;
-    // GraphMLOnVerbose: when false=> Model-generation with even less overhead, despite verbosity. setting is NOT in GUI
+    // exportGraphMLOnVerbose: false=> Model-generation with less overhead, despite verbosity. setting is NOT in GUI
     private  boolean exportGraphMLOnVerbose;
     private  boolean zip;
 
@@ -78,6 +78,7 @@ public class TemporalController {
     private  TemporalDBManager tDBManager;
     private  List<TemporalOracle> oracleColl;
     private  SimpleLog simpleLog;
+    // logDetailsInModelFile: false=> no trace info. Model-generation with less overhead. setting is NOT in GUI
     private boolean logDetailsInModelFile;
     private boolean sourceIsDB;
     private String modelFile;

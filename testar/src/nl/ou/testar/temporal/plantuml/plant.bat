@@ -1,1 +1,0 @@
-java -jar plantuml.jar -b ".." -tlatex -o plant.tex

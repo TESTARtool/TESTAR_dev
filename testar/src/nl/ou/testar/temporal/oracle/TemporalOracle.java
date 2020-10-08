@@ -12,6 +12,9 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import java.util.*;
 
+/**
+ * Container of a Temporal oracle
+ */
 public class TemporalOracle extends ModelBean implements Cloneable{
     @CsvIgnore
     private static String version = "20200104";
@@ -44,42 +47,88 @@ public class TemporalOracle extends ModelBean implements Cloneable{
         super();
     }
 
+    /**
+     * not in actual use anymore
+     * @return hardcoded version of the an oracle.
+     */
     public static String getVersion() {
         return version;
     }
 
+    /**
+     * used when reading an oracle CSV file
+     * @return the oraclePattern, which contains desciptions, but most importantly , the formula and the parameters
+     */
     public TemporalPatternBase getPatternBase() {
         return patternBase;
     }
+
+    /**
+     * used when reading an oracle CSV file
+     * @return enumeration of the Patterntype. E.g. LTL_SPOT, CTL-LTSMIN
+     */
     public TemporalFormalism getPatternTemporalType() {
         return patternBase.getPattern_TemporalFormalism();
     }
 
 
+    /**
+     * used when writing  an oracle CSV file (after they are model-checked)
+     * @param patternBase
+     */
     public void setPatternBase(TemporalPatternBase patternBase) {
         this.patternBase = patternBase;
     }
+
+    /**
+     * used for compatibility when reading an oracle CSV file
+     * traces that are read from an oracle file are not used.
+     * @return sequence of transitions-ids
+     */
     @SuppressWarnings("unused")
     public List<String> getExampleRun_Prefix_Transitions() {
         return exampleRun_Prefix_Transitions;
     }
 
+    /**
+     * used when writing  an oracle CSV file (after they are model-checked)
+     * @param exampleRun_Prefix_Transitions sequence of transitions-ids
+     */
     public void setExampleRun_Prefix_Transitions(List<String> exampleRun_Prefix_Transitions) {
         this.exampleRun_Prefix_Transitions = exampleRun_Prefix_Transitions;
     }
+
+    /**
+     * used for compatibility when reading an oracle CSV file
+     * traces that are read from an oracle file are not used.
+     * @return sequence of transitions-ids
+     */
     @SuppressWarnings("unused")
     public List<String> getExampleRun_Cycle_Transitions() {
         return exampleRun_Cycle_Transitions;
     }
 
+    /**
+     * used when writing  an oracle CSV file (after they are model-checked)
+     * @param exampleRun_Cycle_Transitions sequence of transitions-ids
+     */
     public void setExampleRun_Cycle_Transitions(List<String> exampleRun_Cycle_Transitions) {
         this.exampleRun_Cycle_Transitions = exampleRun_Cycle_Transitions;
     }
+
+    /**
+     * used for  reading an oracle CSV file
+     * @return map of parameters 'pX' in a formula pattern to the actual atomic proposition available the model
+     */
     @SuppressWarnings("unused")
     public MultiValuedMap<String,String> getPattern_Substitutions() {
         return pattern_Substitutions;
     }
 
+    /**
+     * @return lexicographic sorted version of the Substitution Map. parameters are the keys, so p0 before p1, before p2
+     * Implemented as a treemap because this is sirted by default on keys
+     */
     public TreeMap<String,String> getSortedPattern_Substitutions(){
         TreeMap<String, String> treeMap = new TreeMap<>();
         for(String str : pattern_Substitutions.keySet()){
@@ -89,27 +138,51 @@ public class TemporalOracle extends ModelBean implements Cloneable{
       return treeMap;
     }
 
+    /**
+     * used when writing  an oracle CSV file (after they are model-checked)
+     * @param pattern_Substitutions map  of parameters and the atomic proposition  they represent
+     */
     public void setPattern_Substitutions(MultiValuedMap<String,String> pattern_Substitutions) {
 
         this.pattern_Substitutions = pattern_Substitutions;
     }
+
+    /**
+     *  candidate for refactoring. not used anymore
+     * @return
+     */
     @SuppressWarnings("unused")
     public int getPattern_ConstraintSet() {
         return pattern_ConstraintSet;
     }
-
+    /**
+     *  candidate for refactoring. not used anymore
+     * @return
+     */
     public void setPattern_ConstraintSet(int pattern_ConstraintSet) {
         this.pattern_ConstraintSet = pattern_ConstraintSet;
     }
+
+    /**
+     * used for  reading an oracle CSV file
+     * @return indicator whether a human has evaluated the Oracle.
+     */
     @SuppressWarnings("unused")
     public ValStatus getOracle_validationstatus() {
         return oracle_validationstatus;
     }
 
+    /**
+     * used when writing  an oracle CSV file (after they are model-checked)
+     * @param oracle_validationstatus human evaluation of the Oracle.
+     */
     public void setOracle_validationstatus(ValStatus oracle_validationstatus) {
         this.oracle_validationstatus = oracle_validationstatus;
     }
 
+    /**
+     * @return
+     */
     @SuppressWarnings("unused")
     public Verdict getOracle_verdict() {
         return oracle_verdict;

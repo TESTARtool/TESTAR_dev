@@ -8,6 +8,9 @@ import nl.ou.testar.temporal.util.StringFinder;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Singleton class to verify LTL formulas or rewrite CTL formulas
+ */
 public enum FormulaVerifier {
     INSTANCE;//singleton
     private String pathToExecutable;
@@ -21,6 +24,15 @@ public enum FormulaVerifier {
     }
 
 
+    /**
+     * Syntax check on LTL formulas.
+     * @param formulaFilePath txt file with list of formulas
+     * @param resultsFile file with the syntax verdicts, including LTLf variants if aliveprop != blank
+     * @param aliveprop Usually "!dead" if the model has terminal states, blank otherwise
+     * @param parenthesesNextOperator flag to determine if the X-operator needs to be parenthesised
+     * @return list of formulas (possibly their LTLf variant) to use for the model checker. returns false for a formula when it is grammatically not sound
+     *
+     */
     public   List<String> verifyLTL(String formulaFilePath, File resultsFile, String aliveprop, boolean parenthesesNextOperator) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker  --fonly --ff formulas-abc-100.txt ";
         String cli = pathToExecutable;
@@ -34,6 +46,16 @@ public enum FormulaVerifier {
         return parse(resultsFile,!aliveprop.equals(""),parenthesesNextOperator );
 
     }
+
+    /**
+     * rewrites CTL formulas to the finite CTL variant for when applied to a terminal model.
+     * this method does not check for unsound formulas. Fpr now, soundnes is delegated to the user.
+     * Eventually, the model checker will refuse an unsound formula
+     * @param temporalOracleList oracles to be converted
+     * @param aliveProp Usually "!dead" if the model has terminal states, blank otherwise
+     * @param parenthesesNextOperator flag to determine if the X-operator needs to be parenthesised
+     * @return list of formulas (possibly their CTLf variant) to use for the model checker.
+     */
     public   List<String> rewriteCTL(List<TemporalOracle> temporalOracleList, String aliveProp, boolean parenthesesNextOperator) {
         List<String> formulas=new ArrayList<>();
         for (TemporalOracle ora : temporalOracleList
@@ -77,6 +99,13 @@ public enum FormulaVerifier {
     }
 
 
+    /**
+     * Parses the Spot_checker results file with LTL formula when instructed to verify formals syntax
+     * @param rawInput the results file from spot_checker
+     * @param LTLFinite flag to either use the original formula or the LTLf variant that is suplied in the results file
+     * @param parenthesesNextOperator flag to add parenthesis on X-operators
+     * @return list of formulas (possibly their LTLf variant) to use for the model checker. returns false for a formula when it is grammatically not sound
+     */
     private static List<String> parse(File rawInput, boolean LTLFinite, boolean parenthesesNextOperator) {
         //refactor by using ANTLR?
         StringBuilder contentBuilder = new StringBuilder();

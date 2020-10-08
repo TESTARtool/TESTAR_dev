@@ -10,18 +10,17 @@ import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import java.util.*;
 
+/**
+ * Hosts the containsets that can be applied to a widget-pattern combo before deciding to create a (potential) orcle
+ */
 public class TemporalPatternConstraint {
     @CsvBindByName()
     private String pattern_Formula;  // e.g. G(b0->Fb1)
     // e.g.Constraintset_1_p0, Constraintset_9_p23
     @CsvBindAndJoinByName(column = "(?i)CONSTRAINTSET_[1-9][0-9]*_P[0-9]+", elementType = String.class)
     private MultiValuedMap<String,String> constraintMapper;
-
-
     @CsvIgnore
     private TreeMap<Integer, Map<String,String>> constraintSets;
-
-
     @CsvIgnore
     private  static String version = "20200104";
     @CsvRecurse
@@ -45,7 +44,7 @@ public class TemporalPatternConstraint {
         return constraintMapper;
     }
     @SuppressWarnings("unused")
-    public void setConstraintMapper(MultiValuedMap<String, String> constraintMapper) {
+    public void setConstraintMapper(MultiValuedMap<String, String> constraintMapper) { //private?
         this.constraintMapper = constraintMapper;
         for (Map.Entry<String,String> entrie:constraintMapper.entries()
              ) {
@@ -86,6 +85,10 @@ public class TemporalPatternConstraint {
         }
     }
 
+    /**
+     *
+     * @return constraint sets belonging to the pattern (~formula)
+     */
     public TreeMap<Integer, Map<String, String>> getConstraintSets() {
         return constraintSets;
     }
@@ -123,6 +126,11 @@ public class TemporalPatternConstraint {
     public  String getVersion() {
         return version;
     }
+
+    /**
+     * Class method : creates an example of a pattern constraint, to make the pattern constraint format more intuitive to users
+     * @return the sample pattern constraint
+     */
     public static List<TemporalPatternConstraint> getSampleConstraints()  {
        List<TemporalPatternConstraint> constraints =new ArrayList<>();
         TemporalPatternConstraint c;

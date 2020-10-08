@@ -6,6 +6,10 @@ import nl.ou.testar.temporal.foundation.LogData;
 
 import java.util.*;
 
+/**
+ * Class to host the temporal pattern with execution data in the form of a logData object
+ * and provides a feature to produce a sample pattern
+ */
 public class TemporalPattern extends TemporalPatternBase {
 
     @CsvIgnore
@@ -36,11 +40,20 @@ public class TemporalPattern extends TemporalPatternBase {
         logData.addLog(log);
     }
 
+    /**
+     * reads the version of the pattern from the CSV file. Not in use anymore
+     * candidate for refactoring
+     * @return version string
+     */
     @Override
     public  String getVersion() {
         return version;
     }
 
+    /**
+     * Class method : creates an example of a pattern, to make the pattern format more intuitive to users
+     * @return the sample pattern
+     */
     public static TemporalPattern getSamplePattern(){
         TemporalPattern pat = new TemporalPattern(); //new TemporalOracle("notepad","v10","34d23", attrib);
 
