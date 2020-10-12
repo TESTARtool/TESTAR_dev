@@ -99,7 +99,12 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			put("class", "iAgreeButton");
 		}};
 
+		//Force the browser to run in full screen mode
 		WdDriver.fullScreen = true;
+		
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
