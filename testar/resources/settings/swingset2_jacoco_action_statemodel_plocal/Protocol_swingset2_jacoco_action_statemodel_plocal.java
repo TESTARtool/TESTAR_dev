@@ -29,8 +29,12 @@
  *******************************************************************************************************/
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -105,12 +109,14 @@ public class Protocol_swingset2_jacoco_action_statemodel_plocal extends DesktopP
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 
 					// left clicks
-					if(whiteListed(w) || isClickable(w))
+					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
+					}
 
 					// type into text boxes
-					if(isTypeable(w) && !isSourceCodeEditWidget(w))
+					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					}
 
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it
@@ -242,7 +248,9 @@ public class Protocol_swingset2_jacoco_action_statemodel_plocal extends DesktopP
 
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
-
+			
+			//Compress JaCoCo files
+			//compressOutputFile();
 		}
 
 		super.finishSequence();
@@ -301,6 +309,67 @@ public class Protocol_swingset2_jacoco_action_statemodel_plocal extends DesktopP
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Compress desired folder
+	 * https://www.baeldung.com/java-compress-and-uncompress
+	 * 
+	 * @return
+	 */
+	private boolean compressOutputFile() {
+		String originalFolder = "";
+		try {
+			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			System.out.println("Compressing folder... " + originalFolder);
+			
+			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
+		
+			FileOutputStream fos = new FileOutputStream(compressedFile);
+			ZipOutputStream zipOut = new ZipOutputStream(fos);
+			File fileToZip = new File(originalFolder);
+
+			zipFile(fileToZip, fileToZip.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+			
+			System.out.println("OK! Compressed successfully : " + compressedFile);
+			
+			return true;
+		} catch (Exception e) {
+			System.out.println("ERROR Compressing folder: " + originalFolder);
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+		if (fileToZip.isHidden()) {
+			return;
+		}
+		if (fileToZip.isDirectory()) {
+			if (fileName.endsWith("/")) {
+				zipOut.putNextEntry(new ZipEntry(fileName));
+				zipOut.closeEntry();
+			} else {
+				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+				zipOut.closeEntry();
+			}
+			File[] children = fileToZip.listFiles();
+			for (File childFile : children) {
+				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+			}
+			return;
+		}
+		FileInputStream fis = new FileInputStream(fileToZip);
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		zipOut.putNextEntry(zipEntry);
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) {
+			zipOut.write(bytes, 0, length);
+		}
+		fis.close();
 	}
 
 	/**

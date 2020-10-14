@@ -105,12 +105,14 @@ public class Protocol_desktop_swingset2_jacoco_action extends DesktopProtocol {
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 
 					// left clicks
-					if(whiteListed(w) || isClickable(w))
+					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
+					}
 
 					// type into text boxes
-					if(isTypeable(w) && !isSourceCodeEditWidget(w))
+					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					}
 
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it
