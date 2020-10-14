@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.foundation;
+package nl.ou.testar.temporal.control;
 
 public class DBManagerException extends RuntimeException {
 

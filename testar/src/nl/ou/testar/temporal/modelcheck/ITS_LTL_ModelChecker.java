@@ -1,8 +1,8 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
-import nl.ou.testar.temporal.foundation.Verdict;
-import nl.ou.testar.temporal.util.OShelper;
+import nl.ou.testar.temporal.util.foundation.Verdict;
+import nl.ou.testar.temporal.util.io.OShelper;
 
 import java.util.*;
 

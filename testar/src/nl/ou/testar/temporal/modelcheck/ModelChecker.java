@@ -1,13 +1,13 @@
 package nl.ou.testar.temporal.modelcheck;
 
 import com.google.common.collect.HashBiMap;
-import nl.ou.testar.temporal.foundation.ValStatus;
+import nl.ou.testar.temporal.util.foundation.ValStatus;
 import nl.ou.testar.temporal.model.TemporalModel;
 import nl.ou.testar.temporal.oracle.TemporalFormalism;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.util.OShelper;
+import nl.ou.testar.temporal.model.proposition.PropositionConstants;
+import nl.ou.testar.temporal.util.io.OShelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;

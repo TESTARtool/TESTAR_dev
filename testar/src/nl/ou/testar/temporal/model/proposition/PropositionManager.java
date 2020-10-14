@@ -1,5 +1,5 @@
 
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

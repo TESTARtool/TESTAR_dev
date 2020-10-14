@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.util.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

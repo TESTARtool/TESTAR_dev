@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.util.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;

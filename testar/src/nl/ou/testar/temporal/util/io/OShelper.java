@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.util;
+package nl.ou.testar.temporal.util.io;
 
 import java.io.*;
 import java.net.HttpURLConnection;

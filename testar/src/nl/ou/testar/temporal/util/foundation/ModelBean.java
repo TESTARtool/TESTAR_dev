@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.foundation;
+package nl.ou.testar.temporal.util.foundation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

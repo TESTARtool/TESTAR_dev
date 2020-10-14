@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 /**
  * Used by the Proposition Manager to make filters on widgets.

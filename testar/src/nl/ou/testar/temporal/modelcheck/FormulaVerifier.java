@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.modelcheck;
 
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPatternBase;
-import nl.ou.testar.temporal.util.OShelper;
+import nl.ou.testar.temporal.util.io.OShelper;
 import nl.ou.testar.temporal.util.StringFinder;
 
 import java.io.*;

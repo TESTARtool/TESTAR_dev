@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.CsvIgnore;
 import com.opencsv.bean.CsvRecurse;
-import nl.ou.testar.temporal.foundation.LogData;
+import nl.ou.testar.temporal.util.foundation.LogData;
 
 import java.util.*;
 

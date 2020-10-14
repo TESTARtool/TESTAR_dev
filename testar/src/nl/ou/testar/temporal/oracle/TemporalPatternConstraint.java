@@ -4,7 +4,7 @@ import com.opencsv.bean.CsvBindAndJoinByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvIgnore;
 import com.opencsv.bean.CsvRecurse;
-import nl.ou.testar.temporal.foundation.LogData;
+import nl.ou.testar.temporal.util.foundation.LogData;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 

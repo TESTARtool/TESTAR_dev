@@ -1,9 +1,9 @@
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import nl.ou.testar.temporal.util.CachedRegexPatterns;
-import nl.ou.testar.temporal.foundation.PairBean;
-import nl.ou.testar.temporal.foundation.TagBean;
+import nl.ou.testar.temporal.util.foundation.PairBean;
+import nl.ou.testar.temporal.util.foundation.TagBean;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;

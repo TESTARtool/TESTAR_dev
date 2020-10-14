@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.foundation;
+package nl.ou.testar.temporal.util.foundation;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -8,7 +8,7 @@ import com.opencsv.bean.CsvBindByName;
 
 import java.util.*;
 
-import static nl.ou.testar.temporal.util.OShelper.prettyCurrentDateTime;
+import static nl.ou.testar.temporal.util.io.OShelper.prettyCurrentDateTime;
 
 public class LogData {
 protected static final String csvsep=";";

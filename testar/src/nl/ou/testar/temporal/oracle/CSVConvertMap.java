@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.oracle;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;

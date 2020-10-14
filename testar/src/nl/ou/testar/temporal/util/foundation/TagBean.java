@@ -35,7 +35,7 @@
 /*
  * forked CSS 2019-20120
  */
-package nl.ou.testar.temporal.foundation;
+package nl.ou.testar.temporal.util.foundation;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -4,12 +4,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
-import nl.ou.testar.temporal.foundation.ValStatus;
-import nl.ou.testar.temporal.foundation.ModelBean;
-import nl.ou.testar.temporal.oracle.TemporalFormalism;
-import nl.ou.testar.temporal.oracle.TemporalOracle;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
-import org.apache.commons.lang3.StringUtils;
+import nl.ou.testar.temporal.util.foundation.ModelBean;
+import nl.ou.testar.temporal.model.proposition.PropositionConstants;
+
 import java.util.*;
 
 @JsonPropertyOrder(alphabetic = true)

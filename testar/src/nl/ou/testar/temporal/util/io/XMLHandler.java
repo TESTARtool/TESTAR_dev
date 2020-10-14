@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.util.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

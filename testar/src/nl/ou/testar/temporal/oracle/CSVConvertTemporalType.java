@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.AbstractBeanField;
 import nl.ou.testar.temporal.oracle.TemporalFormalism;

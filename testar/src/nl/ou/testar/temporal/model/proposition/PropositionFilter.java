@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nl.ou.testar.temporal.proposition.PropositionSelector.*;
+import static nl.ou.testar.temporal.model.proposition.PropositionSelector.*;
 
 /**
  * filter on widgets : comparable to a combination of SELECT and WHERE clause in SQL.

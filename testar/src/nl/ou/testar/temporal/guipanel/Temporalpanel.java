@@ -3,12 +3,12 @@ package nl.ou.testar.temporal.guipanel;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import nl.ou.testar.temporal.control.TemporalController;
-import nl.ou.testar.temporal.ioutils.CSVHandler;
-import nl.ou.testar.temporal.ioutils.StreamConsumer;
+import nl.ou.testar.temporal.util.io.CSVHandler;
+import nl.ou.testar.temporal.util.io.OShelper;
+import nl.ou.testar.temporal.util.io.StreamConsumer;
 import nl.ou.testar.temporal.oracle.TemporalOracle;
 import nl.ou.testar.temporal.oracle.TemporalPattern;
 import nl.ou.testar.temporal.oracle.TemporalPatternConstraint;
-import nl.ou.testar.temporal.util.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 

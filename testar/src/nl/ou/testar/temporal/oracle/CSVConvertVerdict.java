@@ -1,7 +1,7 @@
-package nl.ou.testar.temporal.ioutils;
+package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.AbstractBeanField;
-import nl.ou.testar.temporal.foundation.Verdict;
+import nl.ou.testar.temporal.util.foundation.Verdict;
 
 public  class CSVConvertVerdict<T,I> extends AbstractBeanField<T,I> {
 

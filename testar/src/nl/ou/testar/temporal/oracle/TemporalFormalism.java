@@ -1,6 +1,6 @@
 package nl.ou.testar.temporal.oracle;
 
-import nl.ou.testar.temporal.foundation.PairBean;
+import nl.ou.testar.temporal.util.foundation.PairBean;
 
 /**
  * Model checker dependant configurations to be applied for each formula/property or model file

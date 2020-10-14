@@ -1,8 +1,6 @@
 package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.*;
-import nl.ou.testar.temporal.ioutils.CSVConvertTemporalType;
-import nl.ou.testar.temporal.modelcheck.*;
 
 import java.util.List;
 

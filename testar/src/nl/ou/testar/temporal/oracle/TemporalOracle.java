@@ -1,12 +1,10 @@
 package nl.ou.testar.temporal.oracle;
 
 import com.opencsv.bean.*;
-import nl.ou.testar.temporal.foundation.ModelBean;
-import nl.ou.testar.temporal.proposition.PropositionConstants;
-import nl.ou.testar.temporal.foundation.ValStatus;
-import nl.ou.testar.temporal.foundation.Verdict;
-import nl.ou.testar.temporal.ioutils.CSVConvertValStatus;
-import nl.ou.testar.temporal.ioutils.CSVConvertVerdict;
+import nl.ou.testar.temporal.util.foundation.ModelBean;
+import nl.ou.testar.temporal.model.proposition.PropositionConstants;
+import nl.ou.testar.temporal.util.foundation.ValStatus;
+import nl.ou.testar.temporal.util.foundation.Verdict;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 

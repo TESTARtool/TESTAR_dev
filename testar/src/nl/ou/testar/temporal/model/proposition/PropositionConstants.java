@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 public enum PropositionConstants {
 //utf 8 encoding required for non-ascii chars. // difficult to maintain manually and also with Excel !?

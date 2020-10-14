@@ -1,4 +1,4 @@
-package nl.ou.testar.temporal.proposition;
+package nl.ou.testar.temporal.model.proposition;
 
 /**
  * discrimination of the type of filter. Must be one of STATE,WIDGET,TRANSITION
