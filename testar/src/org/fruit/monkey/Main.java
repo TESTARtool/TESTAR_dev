@@ -435,10 +435,6 @@ public class Main {
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
 			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));

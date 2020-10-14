@@ -377,14 +377,6 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProtocolClass = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
-					+"# Graphdatabase settings (experimental)\n"
-					+"#################################################################\n"
-					+"GraphDBEnabled = false" + Util.lineSep()
-					+"GraphDBUrl =" + Util.lineSep()
-					+"GraphDBUser =" + Util.lineSep()
-					+"GraphDBPassword =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
 					+"# State model inference settings\n"
 					+"#################################################################\n"
 					+"StateModelEnabled = false" + Util.lineSep()
