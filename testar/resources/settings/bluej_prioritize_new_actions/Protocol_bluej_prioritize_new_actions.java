@@ -1,42 +1,56 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2020 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
+
+import java.util.HashSet;
+import java.util.Set;
+
+import nl.ou.testar.ActionSelectionUtils;
+import nl.ou.testar.PrioritizeNewActionsSelector;
+import org.fruit.alayer.*;
+import org.fruit.alayer.exceptions.*;
+import org.fruit.monkey.Settings;
+import org.testar.protocols.DesktopProtocol;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
@@ -47,9 +61,6 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.Tags;
 import org.testar.OutputStructure;
-import org.testar.protocols.DesktopProtocol;
-
-import org.fruit.alayer.windows.WinProcess;
 import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
 
@@ -58,46 +69,34 @@ import com.google.common.io.Files;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-// FROM DESKTOP GENERIC STATEMODEL
-import org.fruit.alayer.*;
-
 import java.io.FileWriter;
-import java.io.IOException;
 
-
-public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
+/**
+ * This protocol together with the settings provides a specific behavior to test BlueJ 4.1.4
+ * We will use Windows Accessibility API for widget tree extraction
+ *
+ * It uses PrioritizeNewActionsSelector algorithm.
+ */
+public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	
 	private long startSequenceTime;
-	private String reportTimeDir;	
-	
-	private QLearningActionSelector actionSelector;
-	
+	private String reportTimeDir;
 
-
+	// PrioritizeNewActionsSelector: Instead of random, we will prioritize new actions for action selection
+	private PrioritizeNewActionsSelector selector = new PrioritizeNewActionsSelector();
 	
-	/** 
+	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		// initializing simple GUI state graph for Q-learning:
-		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
-		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
-		
+
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
-
 	}
 	
 	/**
@@ -117,11 +116,8 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 				e.printStackTrace();
 		}
 	 	super.beginSequence(system, state);
-
 	}
-	
-	
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -139,41 +135,30 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
-
-
-		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
-
-		if(actions.isEmpty()){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-		}
 		
-		//-------------------------------------------------------- QLEARNING
-		
-				
-		//-----------------------------------------------------------------------------------------------------------BEGIN FROM DESKTOP_GENERIC Z
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
+        
+        /**
+         * Specific Action Derivation for BlueJ 4.1.4 SUT
+         * To avoid deriving actions on non-desired widgets
+         * 
+         * Optional : iterate through top level widgets based on Z-index
+         * for(Widget w : getTopWidgets(state))
+         * If selected also change it for all BlueJ protocols
+         */
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        // for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-        for(Widget w : getTopWidgets(state)){
+        for(Widget w : state){
 
+        	// GENERIC: filtering out actions on menu-containers (that would add an action in the middle of the menu)
             if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
                 continue; // skip this iteration of the for-loop
             }
             
-			// BLUEJ
-            // Residual and strange widgets to ignore the click action
+			// BLUEJ: Residual and strange widgets, ignore actions
             if(w.get(Tags.Desc,"").equals("decrement") || w.get(Tags.Desc,"").equals("increment")){
-                continue;
+                continue; // skip this iteration of the for-loop
             }
 
             // Only consider enabled and non-blocked widgets
@@ -203,84 +188,32 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         
-                        // BLUEJ
-                        // Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
+                        // BLUEJ: Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
                         if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
                             //Create a type action with the Action Compiler, and add it to the set of derived actions
                             actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
                         }
                         
                     }
+                    
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
                     addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
                 }
             }
         }
-		//------------------------------------------------------------------------------------------------------------------------END FROM DESKTOP_GENERIC Z
-		
-		
-		
-		//-------------------------------------------------------- SWINGSET2
-		/*
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		// iterate through all widgets
-		for(Widget w : getTopWidgets(state)){
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
-					// left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
-					// type into text boxes
-					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-						//Force actions on some widgets with a wrong accessibility
-					//Optional, comment this changes if your Swing applications doesn't need it
-					if(w.get(Tags.Role).toString().contains("Tree") ||
-						w.get(Tags.Role).toString().contains("ComboBox") ||
-						w.get(Tags.Role).toString().contains("List")) {
-						widgetTree(w, actions);
-					}
-					//End of Force action
-				}
-			}
-		}
-		*/
-		//-------------------------------------------------------- SWINGSET2
-		//-------------------------------------------------------- QLEARNING
-		
-		return actions;
+        
+		// PrioritizeNewActionsSelector: pick prioritized actions
+		actions = selector.getPrioritizedActions(actions);
 
+		//return the set of derived actions
+		return actions;
 	}
-	
-		/**
-	 * SwingSet2 application contains a TabElement called "SourceCode"
-	 * that internally contains UIAEdit widgets that are not modifiable.
-	 * Because these widgets have the property ToolTipText with the value "text/html",
-	 * use this Tag to recognize and ignore.
-	 */
-	private boolean isSourceCodeEditWidget(Widget w) {
-		return w.get(Tags.ToolTipText, "").contains("text/html");
-	}
-	
-	
-	//Force actions on Tree widgets with a wrong accessibility
-	public void widgetTree(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
-		for(int i = 0; i<w.childCount(); i++) {
-			widgetTree(w.child(i), actions);
-		}
-	}
-	
 	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
-	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
-	 * overwrite it, not always running it, we have take care of the HTML report here
+	 * super.selectAction(state, actions) updates information to the HTML sequence report
 	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -288,24 +221,20 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			retAction = actionSelector.selectAction(state,actions);
-		}
-		return retAction;
+		// PrioritizeNewActionsSelector: we select randomly one of the prioritize actions
+		Action action = super.selectAction(state, actions);
+		return(action);
 	}
-	
-	
-		/**
+
+	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+		// PrioritizeNewActionsSelector: add executed action, next iteration we will prioritize least executed actions
+		selector.addExecutedAction(action);
+		
 		boolean actionExecuted = super.executeAction(system, state, action);
 
 		// Only create JaCoCo report for Generate Mode
@@ -314,8 +243,8 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 
 			// Dump the jacoco report from the remote JVM and Get the name/path of this file
 			try {
-				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-					
+				System.out.println("Extract JaCoCo report for Action number: " + actionCount);
+				
 				// Write sequence duration to CLI and to file
 				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
 				System.out.println();
@@ -336,7 +265,6 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 					System.out.println("An error occurred.");
 					e.printStackTrace();
 				}
-		
 				
 				String jacocoFile = MBeanClient.dumpJaCoCoActionStepReport(Integer.toString(actionCount));
 				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
@@ -355,30 +283,20 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
 				Process p = builder.start();
 				p.waitFor();
-				/*
-				// Code for ending a sequence after reaching a certain amount of coverage
+
+				System.out.println("JaCoCo report created : " + reportDir);
+
 				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-				System.out.println();
 				System.out.println(coverageInfo);
-				int index = coverageInfo.indexOf( '%' );
-				String instructionCoverage = coverageInfo.substring(index-2, index);
-				System.out.println(instructionCoverage);
-				String s = instructionCoverage;
-				int intCoverage = Integer.parseInt(s);  
-				if (intCoverage > 72) finishSequence();
-				System.out.println();
-				*/
+
 			} catch (Exception e) {
 				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
 			}
 
 		}
-		
 
 		return actionExecuted;
 	}
-
-	
 	
 	
 	/**
@@ -397,9 +315,13 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
+			
+			//TODO: Disabled by default, we also need to delete original folder after compression
+			//Compress JaCoCo files
+			//compressOutputFile();
 
 		}
-
+ 
 		super.finishSequence();
 		
 		// Write sequence duration to CLI and to file
@@ -421,7 +343,7 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * TESTAR has finished executing the actions
 	 * Call MBeanClient to dump a jacoco.exec file
@@ -476,6 +398,67 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Compress desired folder
+	 * https://www.baeldung.com/java-compress-and-uncompress
+	 * 
+	 * @return
+	 */
+	private boolean compressOutputFile() {
+		String originalFolder = "";
+		try {
+			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			System.out.println("Compressing folder... " + originalFolder);
+
+			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
+
+			FileOutputStream fos = new FileOutputStream(compressedFile);
+			ZipOutputStream zipOut = new ZipOutputStream(fos);
+			File fileToZip = new File(originalFolder);
+
+			zipFile(fileToZip, fileToZip.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+
+			System.out.println("OK! Compressed successfully : " + compressedFile);
+
+			return true;
+		} catch (Exception e) {
+			System.out.println("ERROR Compressing folder: " + originalFolder);
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+		if (fileToZip.isHidden()) {
+			return;
+		}
+		if (fileToZip.isDirectory()) {
+			if (fileName.endsWith("/")) {
+				zipOut.putNextEntry(new ZipEntry(fileName));
+				zipOut.closeEntry();
+			} else {
+				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+				zipOut.closeEntry();
+			}
+			File[] children = fileToZip.listFiles();
+			for (File childFile : children) {
+				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+			}
+			return;
+		}
+		FileInputStream fis = new FileInputStream(fileToZip);
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		zipOut.putNextEntry(zipEntry);
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) {
+			zipOut.write(bytes, 0, length);
+		}
+		fis.close();
+	}
 
 	/**
 	 * This methods stops the SUT
@@ -493,5 +476,3 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 		}
 	}
 }
-
-

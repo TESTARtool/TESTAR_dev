@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -51,7 +51,7 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -63,7 +63,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = true
+ProcessListenerEnabled = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -104,28 +104,15 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_statemodel_jacoco_action/Protocol_desktop_statemodel_jacoco_action
+ProtocolClass = swingset2_prioritize_new_actions/Protocol_swingset2_prioritize_new_actions
 
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################\n"
-# State model inference settings
-#################################################################\n"
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = instant
-
+GraphDBEnabled = false
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
 
 #################################################################
 # State identifier attributes
@@ -151,13 +138,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.3
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.3
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
