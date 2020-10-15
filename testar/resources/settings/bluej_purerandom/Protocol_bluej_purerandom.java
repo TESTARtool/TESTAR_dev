@@ -63,6 +63,7 @@ import java.io.FileWriter;
 
 import org.fruit.alayer.*;
 
+import org.fruit.monkey.Main;
 
 /**
  * This protocol together with the settings provides a specific behavior to test BlueJ 4.1.4
@@ -82,6 +83,29 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		
+		// For experimental purposes we need to disconnect from Windows Remote Desktop
+		// without close the GUI session.
+		/*try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(30);*/
+		
 		super.initialize(settings);
 
 		// TESTAR will execute the SUT with Java

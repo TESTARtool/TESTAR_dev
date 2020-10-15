@@ -62,7 +62,6 @@ import com.google.common.io.Files;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -70,6 +69,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.*;
 
 import java.io.FileWriter;
+
+import org.fruit.monkey.Main;
 
 /**
  * This protocol together with the settings provides a specific behavior to test Spaghetti
@@ -92,6 +93,29 @@ public class Protocol_spaghetti_qlearning extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		
+		// For experimental purposes we need to disconnect from Windows Remote Desktop
+		// without close the GUI session.
+		/*try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(30);*/
+		
 		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
