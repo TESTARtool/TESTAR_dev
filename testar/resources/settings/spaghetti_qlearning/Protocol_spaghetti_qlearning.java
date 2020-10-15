@@ -29,8 +29,12 @@
 *******************************************************************************************************/
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -62,25 +66,24 @@ import static org.fruit.alayer.Tags.Enabled;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 
-// FROM DESKTOP GENERIC STATEMODEL
 import org.fruit.alayer.*;
 
 import java.io.FileWriter;
-import java.io.IOException;
 
-
-public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
+/**
+ * This protocol together with the settings provides a specific behavior to test Spaghetti
+ * We will use Java Access Bridge settings (AccessBridgeEnabled = true) for widget tree extraction
+ *
+ * It uses QLearningActionSelector algorithm.
+ */
+public class Protocol_spaghetti_qlearning extends DesktopProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;	
 	
+	// QLearningActionSelector: Instead of random, we will use QLearning action selector
 	private QLearningActionSelector actionSelector;
-	
-
-
 	
 	/** 
 	 * Called once during the life time of TESTAR
@@ -89,15 +92,17 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		// initializing simple GUI state graph for Q-learning:
+		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 		
+		// SwingSet2: Requires Java Access Bridge
+		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
+		
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
-
 	}
 	
 	/**
@@ -117,164 +122,79 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 				e.printStackTrace();
 		}
 	 	super.beginSequence(system, state);
-
 	}
 	
-	
-	
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	 * will stop generation of the current action and continue with the next one.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
-	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	 /**
+	  * This method is used by TESTAR to determine the set of currently available actions.
+	  * You can use the SUT's current state, analyze the widgets and their properties to create
+	  * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	  * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	  * will stop generation of the current action and continue with the next one.
+	  * @param system the SUT
+	  * @param state the SUT's current state
+	  * @return  a set of actions
+	  */
+	 protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-		Set<Action> actions = super.deriveActions(system,state);
+		 //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		 //the foreground. You should add all other actions here yourself.
+		 // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		 Set<Action> actions = super.deriveActions(system,state);
 
+		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+		 StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		 /**
+		  * Specific Action Derivation for Spaghetti SUT
+		  * To avoid deriving actions on non-desired widgets
+		  * 
+		  * Optional : iterate through top level widgets based on Z-index
+		  * for(Widget w : getTopWidgets(state))
+		  * If selected also change it for all Spaghetti protocols
+		  */
 
-		if(actions.isEmpty()){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-		}
-		
-		//-------------------------------------------------------- QLEARNING
-		
-				
-		//-----------------------------------------------------------------------------------------------------------BEGIN FROM DESKTOP_GENERIC Z
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-        StdActionCompiler ac = new AnnotatingActionCompiler();
+		 // iterate through all widgets
+		 for(Widget w : state){
 
-        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        // for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-        for(Widget w : getTopWidgets(state)){
+			 if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
-            
-			// BLUEJ
-            // Residual and strange widgets to ignore the click action
-            if(w.get(Tags.Desc,"").equals("decrement") || w.get(Tags.Desc,"").equals("increment")){
-                continue;
-            }
+				 if (!blackListed(w)){  // do not build actions for tabu widgets  
 
-            // Only consider enabled and non-blocked widgets
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+					 // left clicks
+					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						 actions.add(ac.leftClickAt(w));
+					 }
 
-                // Do not build actions for widgets on the blacklist
-                // The blackListed widgets are those that have been filtered during the SPY mode with the
-                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-                if (!blackListed(w)){
+					 // type into text boxes
+					 if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						 actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					 }
 
-                    //For widgets that are:
-                    // - clickable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of left clicking on them
-                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.leftClickAt(w));
-                    }
+					 // GENERIC: All swing apps
+					 //Force actions on some widgets with a wrong accessibility
+					 //Optional, comment this changes if your Swing applications doesn't need it
+					 if(w.get(Tags.Role).toString().contains("Tree") ||
+							 w.get(Tags.Role).toString().contains("ComboBox") ||
+							 w.get(Tags.Role).toString().contains("List")) {
+						 widgetTree(w, actions);
+					 }
+					 //End of Force action
+				 }
+			 }
+		 }
 
-                    //For widgets that are:
-                    // - typeable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of typing into them
-                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        
-                        // BLUEJ
-                        // Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
-                        if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
-                            //Create a type action with the Action Compiler, and add it to the set of derived actions
-                            actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-                        }
-                        
-                    }
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
-                }
-            }
-        }
-		//------------------------------------------------------------------------------------------------------------------------END FROM DESKTOP_GENERIC Z
-		
-		
-		
-		//-------------------------------------------------------- SWINGSET2
-		/*
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		// iterate through all widgets
-		for(Widget w : getTopWidgets(state)){
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
-					// left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
-					// type into text boxes
-					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-						//Force actions on some widgets with a wrong accessibility
-					//Optional, comment this changes if your Swing applications doesn't need it
-					if(w.get(Tags.Role).toString().contains("Tree") ||
-						w.get(Tags.Role).toString().contains("ComboBox") ||
-						w.get(Tags.Role).toString().contains("List")) {
-						widgetTree(w, actions);
-					}
-					//End of Force action
-				}
-			}
-		}
-		*/
-		//-------------------------------------------------------- SWINGSET2
-		//-------------------------------------------------------- QLEARNING
-		
-		return actions;
+		 return actions;
+	 }
 
-	}
-	
-		/**
-	 * SwingSet2 application contains a TabElement called "SourceCode"
-	 * that internally contains UIAEdit widgets that are not modifiable.
-	 * Because these widgets have the property ToolTipText with the value "text/html",
-	 * use this Tag to recognize and ignore.
-	 */
-	private boolean isSourceCodeEditWidget(Widget w) {
-		return w.get(Tags.ToolTipText, "").contains("text/html");
-	}
-	
-	
-	//Force actions on Tree widgets with a wrong accessibility
-	public void widgetTree(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
-		for(int i = 0; i<w.childCount(); i++) {
-			widgetTree(w.child(i), actions);
-		}
-	}
-	
+	 //Force actions on Tree widgets with a wrong accessibility
+	 public void widgetTree(Widget w, Set<Action> actions) {
+		 StdActionCompiler ac = new AnnotatingActionCompiler();
+		 actions.add(ac.leftClickAt(w));
+		 w.set(Tags.ActionSet, actions);
+		 for(int i = 0; i<w.childCount(); i++) {
+			 widgetTree(w.child(i), actions);
+		 }
+	 }
 	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
@@ -292,15 +212,14 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
 		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
+			// QLearningActionSelector: we select randomly one of the prioritize actions
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
 			retAction = actionSelector.selectAction(state,actions);
 		}
 		return retAction;
 	}
 	
-	
-		/**
+	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
 	 */
@@ -355,6 +274,11 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
 				Process p = builder.start();
 				p.waitFor();
+
+				System.out.println("JaCoCo report created : " + reportDir);
+
+				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+				System.out.println(coverageInfo);
 				/*
 				// Code for ending a sequence after reaching a certain amount of coverage
 				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
@@ -373,13 +297,9 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 			}
 
 		}
-		
 
 		return actionExecuted;
 	}
-
-	
-	
 	
 	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
@@ -397,6 +317,10 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
+			
+			//TODO: Disabled by default, we also need to delete original folder after compression
+			//Compress JaCoCo files
+			//compressOutputFile();
 
 		}
 
@@ -476,6 +400,67 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Compress desired folder
+	 * https://www.baeldung.com/java-compress-and-uncompress
+	 * 
+	 * @return
+	 */
+	private boolean compressOutputFile() {
+		String originalFolder = "";
+		try {
+			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			System.out.println("Compressing folder... " + originalFolder);
+
+			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
+
+			FileOutputStream fos = new FileOutputStream(compressedFile);
+			ZipOutputStream zipOut = new ZipOutputStream(fos);
+			File fileToZip = new File(originalFolder);
+
+			zipFile(fileToZip, fileToZip.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+
+			System.out.println("OK! Compressed successfully : " + compressedFile);
+
+			return true;
+		} catch (Exception e) {
+			System.out.println("ERROR Compressing folder: " + originalFolder);
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+		if (fileToZip.isHidden()) {
+			return;
+		}
+		if (fileToZip.isDirectory()) {
+			if (fileName.endsWith("/")) {
+				zipOut.putNextEntry(new ZipEntry(fileName));
+				zipOut.closeEntry();
+			} else {
+				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+				zipOut.closeEntry();
+			}
+			File[] children = fileToZip.listFiles();
+			for (File childFile : children) {
+				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+			}
+			return;
+		}
+		FileInputStream fis = new FileInputStream(fileToZip);
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		zipOut.putNextEntry(zipEntry);
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) {
+			zipOut.write(bytes, 0, length);
+		}
+		fis.close();
+	}
 
 	/**
 	 * This methods stops the SUT
@@ -493,5 +478,3 @@ public class Protocol_desktop_qlearning_jacoco_action extends DesktopProtocol {
 		}
 	}
 }
-
-

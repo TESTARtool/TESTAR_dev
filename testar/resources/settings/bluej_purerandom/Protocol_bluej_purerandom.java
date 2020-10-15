@@ -46,7 +46,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Set;
 import com.google.common.io.Files;
 
 import org.fruit.Util;
@@ -57,13 +56,10 @@ import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
 
-import com.google.common.io.Files;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 import java.io.FileWriter;
-import java.io.IOException;
 
 import org.fruit.alayer.*;
 

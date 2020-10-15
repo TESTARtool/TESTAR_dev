@@ -293,8 +293,7 @@ public class Protocol_swingset2_prioritize_new_actions extends DesktopProtocol {
 		return actionExecuted;
 	}
 	
-	
-		/**
+	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
 	 */
