@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,41 +28,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-import java.util.HashSet;
-import java.util.Set;
-
-import nl.ou.testar.ActionSelectionUtils;
-import nl.ou.testar.PrioritizeNewActionsSelector;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.fruit.alayer.windows.WinProcess;
+import org.testar.jacoco.JacocoReportReader;
+import org.testar.jacoco.MBeanClient;
+import org.testar.OutputStructure;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Set;
+import com.google.common.io.Files;
 
 import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
-import org.fruit.alayer.Tags;
-import org.testar.OutputStructure;
-import org.testar.jacoco.JacocoReportReader;
-import org.testar.jacoco.MBeanClient;
-
 
 import com.google.common.io.Files;
 
@@ -72,18 +65,34 @@ import static org.fruit.alayer.Tags.Enabled;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.fruit.alayer.*;
+
+
 /**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
+ * This protocol together with the settings provides a specific behavior to test BlueJ 4.1.4
+ * We will use Windows Accessibility API for widget tree extraction
  *
- * It uses random action selection algorithm.
+ * It uses Random Selection algorithm.
  */
-public class Protocol_desktop_generic_action_selection_action extends DesktopProtocol {
+public class Protocol_bluej_purerandom extends DesktopProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;
-
-	private PrioritizeNewActionsSelector selector = new PrioritizeNewActionsSelector();
 	
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+		super.initialize(settings);
+
+		// TESTAR will execute the SUT with Java
+		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
+		WinProcess.java_execution = true;
+	}
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -103,111 +112,95 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 	 	super.beginSequence(system, state);
 	}
 
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	 * will stop generation of the current action and continue with the next one.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
-	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	 /**
+	  * This method is used by TESTAR to determine the set of currently available actions.
+	  * You can use the SUT's current state, analyze the widgets and their properties to create
+	  * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	  * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	  * will stop generation of the current action and continue with the next one.
+	  * @param system the SUT
+	  * @param state the SUT's current state
+	  * @return  a set of actions
+	  */
+	 @Override
+	 protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-		Set<Action> actions = super.deriveActions(system,state);
+		 //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		 //the foreground. You should add all other actions here yourself.
+		 // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		 Set<Action> actions = super.deriveActions(system,state);
 
+		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+		 StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		 /**
+		  * Specific Action Derivation for BlueJ 4.1.4 SUT
+		  * To avoid deriving actions on non-desired widgets
+		  * 
+		  * Optional : iterate through top level widgets based on Z-index
+		  * for(Widget w : getTopWidgets(state))
+		  * If selected also change it for all BlueJ protocols
+		  */
 
-		if(actions.isEmpty()){
-			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
-			// Derive left-click actions, click and type actions, and scroll actions from
-			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-		}
-		
-		// Generate mode visualization purposes (Shift + Up)
-		actions = selector.getPrioritizedActions(actions);
-		
-		
-		//-----------------------------------------------------------------------------------------------------------BEGIN FROM DESKTOP_GENERIC Z
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-        StdActionCompiler ac = new AnnotatingActionCompiler();
+		 // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+		 for(Widget w : state){
 
-        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
+			 // GENERIC: filtering out actions on menu-containers (that would add an action in the middle of the menu)
+			 if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+				 continue; // skip this iteration of the for-loop
+			 }
 
-            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
-            
-			// BLUEJ
-            // Residual and strange widgets to ignore the click action
-            if(w.get(Tags.Desc,"").equals("decrement") || w.get(Tags.Desc,"").equals("increment")){
-                continue;
-            }
+			 // BLUEJ: Residual and strange widgets, ignore actions
+			 if(w.get(Tags.Desc,"").equals("decrement") || w.get(Tags.Desc,"").equals("increment")){
+				 continue; // skip this iteration of the for-loop
+			 }
 
-            // Only consider enabled and non-blocked widgets
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+			 // Only consider enabled and non-blocked widgets
+			 if(w.get(Enabled, true) && !w.get(Blocked, false)){
 
-                // Do not build actions for widgets on the blacklist
-                // The blackListed widgets are those that have been filtered during the SPY mode with the
-                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-                if (!blackListed(w)){
+				 // Do not build actions for widgets on the blacklist
+				 // The blackListed widgets are those that have been filtered during the SPY mode with the
+				 //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+				 if (!blackListed(w)){
 
-                    //For widgets that are:
-                    // - clickable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of left clicking on them
-                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.leftClickAt(w));
-                    }
+					 //For widgets that are:
+					 // - clickable
+					 // and
+					 // - unFiltered by any of the regular expressions in the Filter-tab, or
+					 // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					 // We want to create actions that consist of left clicking on them
+					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						 //Create a left click action with the Action Compiler, and add it to the set of derived actions
+						 actions.add(ac.leftClickAt(w));
+					 }
 
-                    //For widgets that are:
-                    // - typeable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of typing into them
-                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        
-                        // BLUEJ
-                        // Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
-                        if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
-                            //Create a type action with the Action Compiler, and add it to the set of derived actions
-                            actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-                        }
-                        
-                    }
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
-                }
-            }
-        }
-		//------------------------------------------------------------------------------------------------------------------------END FROM DESKTOP_GENERIC Z
-		
-		
-		
+					 //For widgets that are:
+					 // - typeable
+					 // and
+					 // - unFiltered by any of the regular expressions in the Filter-tab, or
+					 // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					 // We want to create actions that consist of typing into them
+					 if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 
-		//return the set of derived actions
-		return actions;
-	}
-	
+						 // BLUEJ: Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
+						 if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
+							 //Create a type action with the Action Compiler, and add it to the set of derived actions
+							 actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+						 }
+
+					 }
+
+					 //Add sliding actions (like scroll, drag and drop) to the derived actions
+					 //method defined below.
+					 addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+				 }
+			 }
+		 }
+
+		 //return the set of derived actions
+		 return actions;
+	 }
+
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
@@ -219,8 +212,8 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		Action action = super.selectAction(state, actions);
-		return(action);
+		// RandomSelector: Desktop protocol will return a random action
+		return(super.selectAction(state, actions));
 	}
 
 	/**
@@ -292,8 +285,7 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 		return actionExecuted;
 	}
 	
-	
-		/**
+	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
 	 */
@@ -309,6 +301,10 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
+			
+			//TODO: Disabled by default, we also need to delete original folder after compression
+			//Compress JaCoCo files
+			//compressOutputFile();
 
 		}
  
@@ -333,11 +329,8 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
-	
-		/**
+
+	/**
 	 * TESTAR has finished executing the actions
 	 * Call MBeanClient to dump a jacoco.exec file
 	 * 
@@ -391,6 +384,67 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Compress desired folder
+	 * https://www.baeldung.com/java-compress-and-uncompress
+	 * 
+	 * @return
+	 */
+	private boolean compressOutputFile() {
+		String originalFolder = "";
+		try {
+			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			System.out.println("Compressing folder... " + originalFolder);
+
+			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
+
+			FileOutputStream fos = new FileOutputStream(compressedFile);
+			ZipOutputStream zipOut = new ZipOutputStream(fos);
+			File fileToZip = new File(originalFolder);
+
+			zipFile(fileToZip, fileToZip.getName(), zipOut);
+			zipOut.close();
+			fos.close();
+
+			System.out.println("OK! Compressed successfully : " + compressedFile);
+
+			return true;
+		} catch (Exception e) {
+			System.out.println("ERROR Compressing folder: " + originalFolder);
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+		if (fileToZip.isHidden()) {
+			return;
+		}
+		if (fileToZip.isDirectory()) {
+			if (fileName.endsWith("/")) {
+				zipOut.putNextEntry(new ZipEntry(fileName));
+				zipOut.closeEntry();
+			} else {
+				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+				zipOut.closeEntry();
+			}
+			File[] children = fileToZip.listFiles();
+			for (File childFile : children) {
+				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+			}
+			return;
+		}
+		FileInputStream fis = new FileInputStream(fileToZip);
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		zipOut.putNextEntry(zipEntry);
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) {
+			zipOut.write(bytes, 0, length);
+		}
+		fis.close();
+	}
 
 	/**
 	 * This methods stops the SUT
@@ -407,9 +461,4 @@ public class Protocol_desktop_generic_action_selection_action extends DesktopPro
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
-
-
-
-	
-	
 }
