@@ -120,7 +120,7 @@ GraphDBPassword =
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
 # Other more advanced settings
