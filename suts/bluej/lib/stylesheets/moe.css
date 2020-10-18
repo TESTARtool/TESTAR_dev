@@ -1,0 +1,148 @@
+.moe-top-bar {
+    -fx-padding: 0.75em 1em 0.75em 1em;
+    -fx-background-color: hsb(0, 0%, 50%), rgb(225, 225, 225);
+    -fx-background-insets: 0 0 0 0, 0 0 1 0;
+}
+.moe-top-bar-buttons {
+    /*This is the minimum gap; more may be added in code using the
+      tile pane margins to separate different groups of buttons */
+    -fx-hgap: 0.5em;
+}
+.moe-top-bar-buttons > .button {
+    -fx-label-padding: 0 0.3em 0 0.3em;
+}
+.moe-bottom-bar {
+    -fx-background-color: hsb(0, 0%, 50%), rgb(225, 225, 225);
+    -fx-background-insets: 0 0 0 0, 1 0 0 0;
+}
+.moe-bottom-status-row {
+    -fx-padding: 0.3em 0.5em 0.3em 0.5em;
+}
+.moe-status-label-wrapper {
+    -fx-border-style: solid inside;
+    -fx-border-color: hsb(0, 0%, 70%);
+    -fx-border-width: 0 0 0 1;
+}
+.moe-status-label-wrapper:bj-status-error {
+    -fx-cursor: hand;
+}
+.moe-status-label-wrapper .label {
+    -fx-font-family: "Source Sans Pro";
+    -fx-font-style: italic;
+    -fx-text-fill: hsb(0, 0%, 70%);
+    -fx-label-padding: 0 8 0 8;
+    -fx-text-alignment: center;
+
+    -fx-min-width: 5em;
+    -fx-alignment: top-center;
+}
+.moe-status-label-wrapper .error-count-label {
+    -fx-font-style: normal;
+    -fx-text-fill: hsb(5, 43%, 66%);
+    -fx-underline: true;
+}
+.moe-info {
+    -fx-font-family: "Source Sans Pro";
+}
+.moe-info-text {
+    -fx-fill: hsb(0, 0%, 40%);
+}
+
+.moe-find-panel {
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-border-style: solid inside;
+    -fx-border-color: hsb(0, 0%, 70%);
+    -fx-border-width: 0 0 1 0;
+    -fx-border-insets: 0 5 0 5;
+}
+.moe-find-label {
+    -fx-alignment: center-right;
+    -fx-text-alignment: right;
+}
+.moe-find-panel .button {
+    -fx-label-padding: 0 0.5em 0 0.5em;
+}
+.moe-find-options {
+    -fx-spacing: 3em;
+}
+.moe-find-grid {
+    -fx-vgap: 0.5em;
+    -fx-hgap: 0.5em;
+}
+
+
+.moe-line-label {
+    -fx-font-size: 10px;
+    -fx-alignment: center-right;
+    -fx-graphic-text-gap: 0;
+    -fx-label-padding: 0 2 0 0;
+    -fx-background-color: gray, rgb(255, 255, 255);
+    /* Note there is an inset of 3 pixels to right of this item,
+      but it's added in code */
+}
+/* Since lines can wrap when printing, move line numbers to top
+   alignment, otherwise they can get centered between the two parts
+   of the wrapped line, which looks weird: */
+.moe-editor-pane:bj-printing:bj-line-numbers .moe-line-label {
+    -fx-alignment: top-right;
+    -fx-label-padding: 4 2 0 0;
+}
+.moe-line-label:bj-odd {
+    /* -fx-background-color: rgb(245, 245, 245); */
+}
+.moe-editor-pane:bj-printing:bj-line-numbers .moe-line-label {
+    -fx-font-size: 4pt;
+}
+.moe-editor-pane:bj-screen .moe-line-label, .moe-editor-pane:bj-printing:bj-line-numbers .moe-line-label {
+    -fx-min-width: 24;
+    -fx-pref-width: 24;
+    -fx-max-width: 24;
+    -fx-background-insets: 0 0 0 0, 0 1 0 0;
+}
+/* Hide when printing without line numbers */
+.moe-editor-pane:bj-printing .moe-line-label {
+    -fx-min-width: 0;
+    -fx-pref-width: 0;
+    -fx-max-width: 0;
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+.moe-editor-pane:bj-uncompiled .moe-line-label {
+    -fx-background-color: gray, hsb(0, 0%, 75%);
+    -fx-background-insets: -1 0 -1 0, -1 1 -1 0;
+}
+.moe-line-label:bj-breakpoint, .moe-line-label:bj-step-mark {
+    -fx-label-padding: 0;
+}
+.moe-editor-pane:bj-uncompiled .moe-line-label:bj-error {
+    -fx-background-color: hsb(0, 70%, 50%);
+}
+.moe-editor-pane {
+    -fx-caret-blink-rate: 0s;
+}
+.moe-background {
+    -fx-background-color: -fx-base;
+    /*-fx-background-image: url("../images/grey-diagonal.png");*/
+}
+
+.moe-code-error {
+    /* In theory we could set the underline image from CSS as below.
+       However it seems there is a bug (JavaFX, not RichTextFX) which
+       prevents use of URLs relative to the style file in image patterns.
+       So we do it in code until the bug is fixed: */
+    /*-rtfx-underline-color: repeating-image-pattern("../images/error-underline.png");*/
+    /* -rtfx-underline-width: 2; */
+}
+.moe-find-field:bj-no-find-result {
+    -fx-text-fill: red;
+}
+/* Don't show when printing */
+.moe-editor-pane:bj-screen .moe-bracket-highlight {
+    -rtfx-background-color: hsb(0, 0%, 70%);
+}
+
+/* colors are in java-colors.css */
+.moe-step-mark-icon {
+    -fx-stroke-width: 1;
+    -fx-stroke-type: outside;
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+$COMMENT
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>$TITLE アプレット</title>
+    </head>
+    <body>
+        <h1>$TITLE アプレット</h1>
+        <hr>
+        <applet code="$CLASSFILE"
+            width=$APPLETWIDTH 
+            height=$APPLETHEIGHT
+            codebase=$CODEBASE
+            archive="$ARCHIVE"
+            alt="このブラウザはアプレットを実行できない状態になっています"
+        >
+            $PARAMETERS
+         <p>このブラウザは &lt;APPLET&gt; タグに対応していません</p>
+        </applet>
+        <hr>
+    </body>
+</html>

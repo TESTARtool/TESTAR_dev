@@ -1,0 +1,1 @@
+Copyright (c) for all BlueJ icons: Michael Kolling.The icons are available for use and distribution under the GNU GENERALPUBLIC LICENSE, Version 2, with Classpath Exception, the full text ofwhich can be found in the LICENSE.txt file accompanying the BlueJ sourcedistribution.

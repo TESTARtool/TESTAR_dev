@@ -1,0 +1,286 @@
+.root {
+    class-target: rgb(239, 204, 149);
+    test-target: rgb(166, 191, 137);
+    css-target: rgb(197, 205, 206);
+    window-background: rgb(229, 229, 229);
+    class-diagram: rgb(249,247,242);
+    object-bench: rgb(239,237,232);
+    codepad: rgb(239,237,232);
+    codepad-input: rgb(249,247,242);
+    pane-border-color: gray;
+}
+
+.pmf-root {
+    /* Less padding at bottom because status bar is there anyway */
+    -fx-padding: 10px 10px 4px 10px;
+    -fx-background-color: window-background;
+}
+.split-pane {
+    -fx-padding: 0;
+    -fx-background-insets: 20;
+    -fx-background-color: window-background;
+}
+.split-pane > .split-pane-divider {
+   -fx-border-color:  transparent;
+   -fx-background-color: transparent;
+   -fx-padding: 2px 2px 2px 2px;
+}
+.pmf-central-pane {
+    -fx-border-width: 1;
+    -fx-border-color: pane-border-color;
+}
+.pmf-empty-project-msg {
+    -fx-text-fill: gray;
+    -fx-font-size: 14pt;
+}
+.pmf-no-classes-msg {
+    -fx-text-fill: gray;
+    -fx-font-size: 14pt;
+}
+
+.triangle-arrow {
+    -fx-cursor: hand;
+    -fx-fill: darkgray;
+}
+.triangle-arrow:hover {
+    -fx-fill: derive(darkgray, 20%);
+}
+.pmf-triangle-foldout-wrapper:bj-hover-long {
+    -fx-background-color: white;
+    -fx-cursor: hand;
+}
+
+.team-test-foldout-content {
+    -fx-padding: 10px 0 0 0;
+    -fx-spacing: 10px;
+}
+.pmf-tools {
+    -fx-padding: 0 0 8px 0;
+    -fx-alignment: center;
+}
+.pmf-tools, .pmf-tools-top, .pmf-tools-team-items, .pmf-tools-test-items {
+    -fx-spacing: 8px;
+    -fx-fill-width: true;
+    -fx-max-width: 130px;
+}
+.pmf-tools .button {
+    -fx-padding: 0.333333em;
+    -fx-max-width: 9999;
+}
+.pmf-tools > .titled-pane > .content > * {
+    -fx-padding: 0;
+}
+.pmf-tools-top, .pmf-tools > .titled-pane > .content {
+    -fx-padding: 8px;
+}
+
+.pmf-tools-test > .title, .pmf-tools-team > .title {
+    -fx-padding: 0.3333em 0.75em 0em 0; /* remove left padding and bottom padding */
+    -fx-background-color: transparent;
+}
+.pmf-tools-test > .title > .text, .pmf-tools-team > .title > .text {
+    /* Despite JavaFX documentation, we must use -fx-fill not -fx-text-fill: */
+    -fx-fill: gray;
+    -fx-font-weight: bold;
+}
+.pmf-tools-test > .content, .pmf-tools-team > .content {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+.pmf-tools-test-recording-button {
+    -fx-padding: 0 0 0 16px;
+}
+.machine-icon-container {
+    -fx-min-width: 160px;
+    -fx-alignment: center;
+    -fx-spacing: 3px;
+}
+.machine-icon-bar-holder {
+    -fx-border-width: 1;
+    -fx-border-style: solid inside;
+    -fx-border-color: rgb(190, 190, 190);
+    -fx-border-radius: 4;
+}
+.machine-icon-bar:bj-active {
+    -fx-stroke: lightgray;
+    -fx-fill: navy;
+}
+.machine-icon-bar {
+    -fx-arc-height: 6;
+    -fx-arc-width: 6;
+    -fx-stroke-width: 1;
+    -fx-stroke: transparent;
+    -fx-fill: transparent;
+    -fx-stroke-type: inside;
+}
+.reset-vm-button {
+    -fx-padding: 3 5 0 5;
+}
+.reset-vm-button:bj-no-hover {
+    -fx-background-color: transparent, transparent, transparent, transparent;
+}
+.reset-vm-button-arrow {
+    -fx-stroke-width: 2;
+    -fx-stroke: rgb(140, 140, 140);
+}
+
+.test-status-message {
+    -fx-label-padding: 0 20px 0 0;
+}
+
+/* Class Diagram */
+.class-diagram, .package-target-preview {
+    -fx-background-color: class-diagram;
+}
+.class-diagram:bj-drawing-extends {
+    -fx-background-color: derive(class-diagram, -15%);
+}
+.class-diagram {
+    /* Without this padding, classes in the diagram appear up against the very edge in right/bottom.
+       This padding leaves a little space below/right of them: */
+    -fx-padding: 0 10 10 0;
+}
+.package-target-preview-wrapper {
+    -fx-padding: 5;
+}
+.package-target-preview {
+    -fx-opacity: 0.7;
+    -fx-border-width: 0.5;
+    -fx-border-color: black;
+    -fx-border-style: solid outside;
+}
+.class-target, .package-target, .package-target-preview-item, .css-target {
+    -fx-border-width: 1;
+    -fx-border-color: black;
+    -fx-border-style: solid outside; /* Prevents relayout when border gets thicker */
+    /* We set this programatically because we vary it when the mouse moves to the bottom corner: */
+    /*-fx-cursor: hand; */
+}
+.css-target {
+    -fx-background-color: css-target;
+}
+
+.class-target, .class-target:bj-resizing, .class-target:bj-resizing:hover,
+  .package-target-preview-item {
+    -fx-background-color: class-target;
+}
+.class-target:hover {
+    -fx-background-color: derive(class-target, 25%);
+}
+.class-target:bj-unittest {
+    -fx-background-color: test-target;
+}
+.class-target:bj-unittest:hover {
+    -fx-background-color: derive(test-target, 25%);
+}
+.class-target:bj-selected, .package-target:bj-selected, .css-target:bj-selected {
+    -fx-border-width: 3;
+}
+.class-target-name {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: black;
+}
+.class-target-name, .package-target-name {
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-font-size: 10pt;
+}
+.class-target-extra {
+    -fx-alignment: center;
+    -fx-font-size: 8pt;
+}
+.class-action-inbuilt > .label, .object-action-inbuilt > .label {
+    -fx-text-fill: darkred;
+}
+.object-action-inbuilt > .label {
+    -fx-font-style: italic;
+}
+.package-target, .package-target:bj-resizing, .package-target:bj-resizing:hover {
+    -fx-background-color: rgb(189, 133, 170);
+}
+.package-target:hover {
+    -fx-background-color: derive(rgb(189, 133, 170), 25%);
+}
+.marquee {
+    -fx-stroke-width: 2;
+    -fx-stroke: black;
+    -fx-stroke-type: outside;
+    -fx-fill: rgba(0, 0, 0, 0.2);
+}
+.pmf-create-extends-tip {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-label-padding: 3px;
+    -fx-background-radius: 4px;
+}
+
+
+/* Object Bench */
+.object-bench {
+    -fx-border-width: 1;
+    -fx-border-color: pane-border-color;
+}
+.object-bench > .viewport {
+    -fx-background-color: object-bench;
+}
+.object-bench-panel {
+    -fx-background-color: object-bench;
+    /* Padding so that the fold-out arrow doesn't appear in front of any objects: */
+    -fx-padding: 0 12px 0 0;
+}
+.object-wrapper {
+    -fx-padding: 5px;
+}
+.object-wrapper-text {
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+}
+
+/* Code Pad */
+.codepad {
+    -fx-border-width: 1;
+    -fx-border-color: pane-border-color;
+}
+.codepad-history {
+    -fx-min-height: 50;
+    -fx-background-color: codepad;
+}
+.codepad-row {
+    -fx-text-fill: black;
+    -fx-wrap-text: false;
+    -fx-background-color: codepad;
+    -fx-padding: 4px 0px 0px 10px;
+}
+.codepad-row:selected {
+    -fx-background-color: lightblue;
+}
+.codepad-row:bj-codepad-error {
+    -fx-text-fill: hsb(355, 95%, 50%);
+
+}
+.codepad-row:bj-codepad-output {
+    -fx-text-fill: hsb(110, 95%, 45%);
+}
+.codepad-row:bj-codepad-error,
+.codepad-row:bj-codepad-output {
+    -fx-padding: 0px 0px 0px 10px;
+    -fx-graphic-text-gap: 10px;
+}
+
+.codepad .text-field {
+    /* This is the modena.css version:
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -10%), -fx-text-box-border),
+            linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);
+       And here's our translation to use our background colour:*/
+    -fx-background-color: lightgray, codepad-input;
+}
+.codepad .text-field:focused {
+    -fx-background-color: black, codepad-input;
+}
+
+.codepad-add-object-arrow {
+    -fx-stroke: rgba(120, 80, 80, 0.8);
+    -fx-stroke-width: 6;
+    /*-fx-stroke-line-cap: round;*/
+    -fx-stroke-line-join: round;
+}

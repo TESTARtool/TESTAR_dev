@@ -1,0 +1,525 @@
+####################################################################
+##               BlueJ properties default values
+#####################################################################
+##
+## All settings in this file may be changed to configure BlueJ.
+## Settings in this file are system wide and apply to all users.
+##
+## BlueJ property settings may also be specified on a per-user basis
+## in the user property file. The user property file is in
+##
+##    <USER_HOME>/.bluej/bluej.properties                     (Unix)
+##    C:\Users\<USER_NAME>\bluej\bluej.properties           (Windows)
+##
+## (The location of the properties file is the same as the location
+##  of the debug log file, and this location is displayed in the
+##  "About BlueJ" dialog).
+##
+## Each of the properties in this file may be copied to the user
+## properties file. Settings in the user file override the system
+## wide settings here.
+##
+#####################################################################
+
+#####################################################################
+## The interface language. A directory must exist for the language in
+## <BLUEJ_HOME>/lib. Language directories can be created by copying
+## an existing language directory and translating the contents of the
+## text files in that directory. If you make a language version for
+## a new language, please send it to bluej@bluej.org
+#####################################################################
+
+#bluej.language=english
+
+# A list of available languages, in the form:
+#   internal-name:human-readable-name:iso639-2
+# The internal-name controls the name of the directory that BlueJ
+# will look for translations in. The iso639-2 code is optional;
+# it allows auto-detection of the correct language setting.
+
+bluej.language1=english:English:eng
+bluej.language2=afrikaans:Afrikaans:afr
+bluej.language3=arabic:Arabic:ara
+bluej.language4=catalan:Catalan:cat
+bluej.language5=chinese:Chinese:zho
+bluej.language6=czech:Czech:ces
+bluej.language7=danish:Danish:dan
+bluej.language8=dutch:Dutch:nld
+bluej.language9=french:French:fra
+bluej.language10=german:German:deu
+bluej.language11=greek:Greek:ell
+bluej.language12=italian:Italian:ita
+bluej.language13=japanese:Japanese:jpn
+bluej.language14=korean:Korean:kor
+bluej.language15=polish:Polish:pol
+bluej.language16=portuguese:Portuguese:por
+bluej.language17=russian:Russian:rus
+bluej.language18=slovak:Slovak:slk
+bluej.language19=spanish:Spanish:spa
+bluej.language20=swedish:Swedish:swe
+
+
+
+#####################################################################
+## The JVM language and region. 
+## This is different to the value above which sets the language for 
+## BlueJ's labels.
+## In most cases the values below can be left commented out.
+## Its intended usage is for the scenario where you want the Java VM that
+## BlueJ runs on to use a different language than its default Locale.
+## For instance, you are using a machine that has its region set to 
+## China and you want to run BlueJ in English. Default UI elements
+## in Java such as File Choosers and dialogs
+## will show the local language for the Region as set in the OS. This 
+## allows you to override that value. To get the desired language of
+## interface for your OS's Regional Settings it may be necessary to
+## set both vm.language and vm.region. These map to Java's environment
+## variables user.language and user.country.
+## 
+## The two letter language code that is required is the ISO-639 code, see:
+## http://www.unicode.org/unicode/onlinedat/languages.html
+## The two letter country code that is required is the ISO-3166 code, see:
+## http://www.unicode.org/unicode/onlinedat/countries.html
+##
+## By default these are commented out, you can specify either or both
+## to get the desired combination for your system.
+## Note: these settings are used for the VM that runs BlueJ and also
+## for the Debug VM that is used to run code, create objects etc. 
+#####################################################################
+
+#vm.language=en
+#vm.language=zh
+#vm.language=fr
+#vm.language=cz
+#vm.language=dk
+
+#vm.country=US
+#vm.country=CN
+#vm.country=FR
+#vm.country=CZ
+#vm.country=DK
+
+#####################################################################
+## URLs for the BlueJ manuals and documentation. If you have the
+## documents installed locally and want to use your local version,
+## edit these URLs.
+#####################################################################
+
+bluej.url.bluej=http://www.bluej.org
+bluej.url.onlinedoc=http://www.bluej.org/doc/documentation.html
+bluej.url.reference=http://www.bluej.org/reference/manual.pdf
+
+# The URL for the Java API documentation can be specified here, however
+# this will only apply the first time you use BlueJ. After that, the
+# setting is saved in the user preferences file (and the setting here
+# is ignored). You can adjust the user preferences via the preferences
+# dialog (found under the "tools" menu) in BlueJ.
+bluej.url.javaStdLib=http://download.oracle.com/javase/8/docs/api/
+
+# Location of the Java standard library sources. This does not need to
+# be specified if the "src.jar" file is in the standard location (in
+# the Java home directory) - only when it is elsewhere. This is used
+# to show comments for standard methods in code completion.
+
+#bluej.jdk.source=/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/src.jar
+
+
+# do not change the following:
+bluej.url.versionCheck=http://www.bluej.org/version.info
+
+
+#####################################################################
+## Additional help menu items. Users can add their own menu items to
+## the help menu here. Each menu item, when selected, will open a URL
+## in a web browser. The items are listed in the help.menu.items
+## property in the form
+##    bluej.help.items=<tag1> <tag2> ...
+## Tags can be any identifier. For every tag, there should be two
+## additional properties:
+##    bluej.help.<tag>.label=<menu label>
+##    bluej.help.<tag>.url=<URL to open>
+## The label will appear in the menu, the URL will be opened in the
+## browser. See (commented out) example below.
+#####################################################################
+
+#bluej.help.items=myCustomLib courseInfo
+#bluej.help.myCustomLib.label=My CS1 libraries
+#bluej.help.myCustomLib.url=http://www.google.com/
+#bluej.help.courseInfo.label=CS1 course info
+#bluej.help.courseInfo.url=http://www.bluej.org/help/archive.html
+
+
+#####################################################################
+## The number of past projects that will be shown on the 
+## File/Open Recent... menu.
+#####################################################################
+
+bluej.numberOfRecentProjects=12
+
+
+#####################################################################
+## User's home directory. This is also defined by Java, and if that's
+## fine for you, don't specify this property. This property, if
+## specified, will override Java's user.home property.
+##
+## You can specify multiple values by appending consecutive numbers
+## (starting at 2) to the property name, eg:
+##
+##   bluej.userHome=/home/mik/tmp
+##   bluej.userHome2=/some/other/directory
+##   bluej.userHome3=/yet/another/directory
+##
+## In this case the first location that is writable will be selected. 
+#####################################################################
+
+#bluej.userHome=/home/mik/tmp
+
+#####################################################################
+## Where the "userlib" directory is. This directory contains java
+## libraries, in the form of jar and zip files, which will be
+## available to all projects opened in BlueJ.
+##
+## If you leave this commented out the userlib directory is:
+##   <BLUEJ_HOME>/lib/userlib
+##
+## Generally this can be left alone, though it may be useful in a
+## lab environment to move userlib to a location the instructor has
+## write permissions for.
+##
+## Note: As with all entries in this file, backslashes in the path
+## should be doubled, and colons should also be preceded by a single
+## backslash, as in the example setting.
+#####################################################################
+
+#bluej.userlibLocation=C\:\\some\\directory\\somewhere
+
+#####################################################################
+## Where the extensions folder is. This is the folder which is
+## searched for extensions (in jar files) when BlueJ starts.
+##
+## The default is:
+##   <BLUEJ_HOME>/lib/extensions
+#####################################################################
+
+#bluej.extensions.systempath=C\:\\some\\other\\directory
+
+#####################################################################
+## Allow BlueJ to automatically open any projects that were open when 
+## it was last closed down.   
+#####################################################################
+
+bluej.autoOpenLastProject=true
+
+#####################################################################
+## Web browser. The following are the commands used for opening a
+## web browser. (Only relevant for systems other than Windows and
+## MacOS. On Win and MacOS, the mechanism is built-in.)
+##
+## When running on Java 6, BlueJ will first attempt to use Java 6's
+## desktop integration features to launch the browser. The commands
+## specified here will only be used if that fails.
+#####################################################################
+
+# First, try to open the URL in a running firefox process. If that 
+# fails, start firefox.  The first dollar sign ($) will be 
+# replaced by the URL to be opened.
+browserCmd1=firefox -remote openURL($)
+browserCmd2=firefox $
+
+#######################################################################
+## Documentation generation. This specifies the command used for
+## generating documentation and the directory name within the project
+## directory where the documentation is stored.
+## Most of the options are sensible as they are.
+##
+## If the doctool.command line is commented out (default), the javadoc
+## command is located in the JDK directory that was used to launch BlueJ
+##
+## If you want private methods included in the documentation,
+## change "-package" in the options to "-private".
+## If "linkToStandardLib" is true, we will try to use the URL specified
+## above as "bluej.url.javaStdLib" to create links. If that URL is
+## not accessible, documentation generation will fail. Therefore, if
+## you want to work offline, set "linkToStandardLib" to false (you
+## can also do that from within BlueJ in the Preferences dialog).
+#######################################################################
+
+#doctool.command=javadoc
+doctool.options=-author -version -nodeprecated -package -Xdoclint:none
+doctool.outputdir=doc
+doctool.linkToStandardLib=true
+
+
+#######################################################################
+## Applets. Preferences for how applets are generated and executed.
+##
+## If the appletViewer.command line is commented out (default), the viewer 
+## command is located in the JDK directory that was used to launch BlueJ
+#######################################################################
+
+#appletViewer.command=appletviewer
+
+
+#######################################################################
+## For Mac OS only: indicate whether to place the menu bar at top of 
+## screen (screenmenubar=true), or top of each window 
+## (screenmenubar=false).
+#######################################################################
+
+bluej.macos.screenmenubar=true
+
+
+#####################################################################
+## The VM that the windows client should use
+##
+## This setting can be used in lab environment where there is a
+## shared instance of BlueJ on a network drive, along with
+## a shared instance of a JDK somewhere.
+##
+## This setting should not be uncommented except in that situation.
+##
+## NOTE: this setting is _only_ used under windows, and only when
+##       BlueJ is launched with the standard windows launcher (not if
+##       launched using a windows batch file)
+##
+## The commented out examples below are just to show the
+## syntax used
+#####################################################################
+
+#bluej.windows.vm=X\:\\Programming Apps\\J2SDK_1.4.1_02
+
+
+#######################################################################
+## Class templates for new class generation. When creating a new class
+## a list of templates is presented to choose from. This property
+## defines this list. To add additional templates, you should
+##  - choose a name <template-name> for the template
+##  - create a file named <template-name>.tmpl in
+##    <bluej>/lib/<language>/templates/newclass/ that contains the text
+##  - add <template-name> to the classTemplates list below (optional)
+##  - add a property named "pkgmgr.newClass.<template-name>" in the
+##    language label files for all languages you intend to use
+##    (<bluej>/lib/<language>/labels), defining the label to appear in
+##    the dialogue. (optional)
+## If the template is for an applet, interface or abstract class, the
+## name you choose should start with "applet", "interface" or
+## "abstract", respectively. Everything else will be treated as a
+## standard class.
+##
+## More information is in
+##      <bluej-home>/lib/<language>/templates/newclass/README
+##
+## The bluej.templatePath property can be used to choose a different
+## directory to store the templates (the default is
+## <bluej_home>/lib/<language>/templates).
+## Note: if the path contains backslashes, they must be written as
+## double-backslashes (see example).
+#######################################################################
+
+bluej.classTemplates.java = stdclass abstract interface unittest enum
+bluej.classTemplates.stride = stdclass abstract interface
+#bluej.templatePath = /home/mik/bluej/lib/english/templates
+#bluej.templatePath = F:\\shared\\bluej\\templates
+
+#######################################################################
+## Fonts. You can choose a font size for most of the interface
+## components, and a font face and size for the editor. The editor font
+## size can be redefined by a user in their preference dialogue.
+#######################################################################
+
+#######################################################################
+# Theme fonts for User Interface components
+# fonts for menus
+bluej.menu.font=SansSerif-bold
+bluej.menu.fontsize=12
+# END OF THEME FONTS
+#######################################################################
+
+# default fontsize for the editor (can be changed in Preferences dialog)
+bluej.editor.fontsize=12
+
+# font and fontsize for the terminal (the size defaults to the editor font size
+# if not specified here)
+bluej.terminal.font=Monospaced
+#bluej.terminal.font=Monospaced-bold
+
+# The editor font. Only the font face is specified here, the font
+# size is specified in the BlueJ preference dialogue.  You can specify
+# any font name which has a corresponding TTF file in the lib/fonts directory:
+
+bluej.editor.font=Roboto Mono
+bluej.editor.MacOS.font=Roboto Mono
+
+
+#######################################################################
+## Printing settings.
+#######################################################################
+
+# fonts for printing source text
+bluej.fontsize.printText=10
+bluej.fontsize.printTitle=14
+
+# scale factor for printing the class diagram. The value is in percent.
+# (a value of 100 will print at approx same size as the diagram on 
+# screen, a value of 50 will reduce the printed version to 50%, etc.)
+bluej.print.scale=60
+
+#######################################################################
+## Terminal settings. Height and width are in number of characters.
+#######################################################################
+
+bluej.terminal.clearscreen=false
+bluej.terminal.recordcalls=false
+bluej.terminal.buffering=false
+
+# If not specified, the VM default encoding will be used.
+# Note that this also sets the file.encoding property (default encoding)
+# for the user VM.
+bluej.terminal.encoding=UTF-8
+
+
+#######################################################################
+## Some settings for editor preferences.
+## These are the initial defaults - the settings can be changed by
+## users in their preferences dialogue. (values: true / false)
+#######################################################################
+
+bluej.editor.autoIndent=true
+bluej.editor.syntaxHilighting=true
+bluej.editor.displayLineNumbers=false
+bluej.editor.makeBackup=false
+bluej.editor.matchBrackets=true
+
+bluej.editor.tabsize=4
+
+## Code Completion. When true it is enabled; when false it is disabled
+## There is no option to change this from the preferences dialogue
+bluej.editor.codecompletion=true
+
+#######################################################################
+## Settings for test, teamwork, and Java ME tools preferences.
+## These are the initial defaults - the settings can be changed by
+## users in their preferences dialogue. (values: true / false)
+#######################################################################
+
+bluej.testing.showtools=false
+bluej.teamwork.showtools=false
+
+
+#####################################################################
+## Compiler options. 
+## 
+## Here, you can add compile options for the Java compiler.
+## If this attribute is not specified, the compiler is run with
+## default options.
+## 
+## The following options will ALWAYS be added internally in BlueJ. If
+## you change these, funny things might happen (such as BlueJ not 
+## working at all!):
+##
+## -deprecation (Show description of each use of a deprecated method)
+## -g           (Generate all debugging information)
+## -d           (set the output directory)
+##
+## The following is also added internally, but is safe to change:
+## -source      (set by BlueJ to the version of the JDK)
+##
+#####################################################################
+
+#bluej.compiler.options=-source 1.4 -target 1.4
+
+# Whether to show the "unchecked" warnings generated when using generic
+# classes in a non-typesafe manner (java 1.5+ only)
+bluej.compiler.unchecked=true
+
+#####################################################################
+## Options for starting the internal virtual machine.
+## bluej.vm.args provides arguments to the debug VM that 
+## is launched to run Java code, the code pad and the object bench. 
+## This setting is likely to not be needed in most instances.
+## It is provided for situations where bluej and/or Java defaults
+## need to be modified.
+##
+## Settings here have the ability to stop BlueJ running correctly
+## if not configured properly.  
+##
+## Each separate argument should be separated by white space.
+## Double-quotes (") can surround text which not should be split
+## into separate arguments. The backslash (\) always escapes the
+## next character (however: backslashes are also escaped according
+## to Java's property file handling).
+##
+## Examples:  one two three  => 3 arguments: 'one', 'two', 'three'
+##            one "two three" => 2 arguments: 'one', 'two three'
+##            abcde\\\\fg => 1 argument: 'abcde\fg'
+#####################################################################
+
+bluej.vm.args=-ea
+
+# -ea : enable assertions
+
+#####################################################################
+## bluej.windows.vm.args provides arguments to the Java VM that 
+## launches the bluej GUI on Windows only. These arguments do not apply to  
+## the debug VM that is launched to run Java code, the code pad and  
+## the object bench. At present there is no equivalent for Linux, 
+## Unix or Mac. On Unix & Linux the launch script can be edited 
+## manually to add these arguments, on Mac they can be added by 
+## editing the Info.plist file found inside the BlueJ.app package 
+## contents. This setting is likely to not be needed in most  
+## instances. It is provided for situations where bluej and/or 
+## Java defaults need to be modified.  
+#####################################################################
+
+bluej.windows.vm.args=-Xmx512M -Djavafx.embed.singleThread=true
+
+
+#####################################################################
+## Transport used to communicate with the debug VM. Available
+## transports are "dt_socket" (TCP/IP transport) and "dt_shmem"
+## (shared memory transport, which is available on Windows only).
+##
+## Normally, this setting should be left alone.
+##
+## The default is to try shared memory first, if it is available,
+## and then to fall back to TCP/IP. TCP/IP may not work if an overly
+## restrictive firewall is installed. The transport actually used
+## will be noted in the debuglog file.
+#####################################################################
+
+bluej.vm.transport=dt_shmem
+
+#######################################################################
+## Debugging. When true, debug output goes to console; when false, it
+##  is written to a log file in the user's bluej settings directory.
+#######################################################################
+
+bluej.debug=false
+
+#######################################################################
+## Images.
+#######################################################################
+
+# README in main frame:
+image.readme=readme.png
+image.readme-selected=readme-selected.png
+
+# editor breakpoint and step mark
+image.editor.breakmark=break.gif
+image.editor.stepmark=stepmark.gif
+image.editor.breakstepmark=stepbreak.gif
+
+#text eval area
+image.eval.prompt=prompt.gif
+image.eval.continue=prompt-continue.gif
+image.eval.object=small-object.gif
+
+#editor-divider panel
+image.editordivider.open=bluej_arrow_naviview_open.gif
+image.editordivider.close=bluej_arrow_naviview_close.gif
+
+# extensions manager help page
+image.extmgr.info=extmgr-info.gif
+
+#inspector object reference arrow
+image.inspector.objectref=objectref.gif

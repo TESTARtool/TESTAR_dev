@@ -1,0 +1,24 @@
+.tabbed-editor > .tab-header-area > .tab-header-background {
+    -fx-background-color: hsb(0, 0%, 50%);
+}
+
+.tabbed-editor > .tab-header-area .tab {
+    -fx-border-width: 0 0 2 0;
+    -fx-border-color: hsb(0, 0%, 30%);
+}
+.tabbed-editor > .tab-header-area .bj-tab-error .tab-label {
+    -fx-border-width : 0 0 2 0;
+    -fx-border-color: red;
+}
+.tabbed-editor > .tab-header-area .moe-tab:selected {
+    /* Remove border at bottom of tab when selected: */
+    -fx-background-color: rgb(225, 225, 225) !important;
+    -fx-border-color: transparent !important;
+}
+.tabbed-editor > .tab-header-area  {
+    -fx-padding: 2 5 -1 5;
+}
+
+.tabbed-editor .tab-close-button:hover {
+    -fx-background-color: darkred;
+}

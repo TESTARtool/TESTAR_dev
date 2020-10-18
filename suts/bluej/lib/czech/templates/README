@@ -1,0 +1,18 @@
+--------------------------------------------------------------------
+Soubor je ulozen v kodovani UTF-8.
+Kontrola kodovani: Příliš žluťoučký kůň úpěl ďábelské ódy.
+--------------------------------------------------------------------
+Tato složka obsahuje některé šablony,
+které BlueJ používá pro generování zdrojových souborů a jejich částí.
+Změnou těchto šablon dosáhnete změny obsahu generovaných souborů.
+
+ - "readme" může být libovolně měněna
+
+ - změny v šabloně "html" provádějte opatrně, mohou nastat problémy
+
+ - opatrně opravujte i šablonu "method", kterou používá editor,
+   když má do programu vložit novou metodu.
+
+Podsložka "newclass" obsahuje šablony pro generování nových tříd a rozhraní
+zadáním příkazu "Nová třída ..." a následným nastavením přepínače
+v dialogovém okně "Vytvořit novou třídu".

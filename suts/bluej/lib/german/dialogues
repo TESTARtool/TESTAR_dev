@@ -1,0 +1,574 @@
+compile-while-executing
+W\u00e4hrend das Programm ausgef\u00fchrt wird, kann 
+nicht kompiliert werden. Dies k\u00f6nnte sonst
+zu eigenartigen Problemen f\u00fchren!
+
+exception-thrown
+Eine Exception (exception)
+wurde ausgel\u00f6st:
+
+break-no-source
+In einer Datei, f\u00fcr die keine Sourcedatei
+gefunden werden kann, wurde ein Haltepunkt
+erreicht. Dateiname:
+
+error-in-file
+In einer Datei, f\u00fcr die kein Sourcetext
+gefunden werden kann, ist ein Fehler 
+aufgetreten.
+Klasse: Zeilennummer:
+
+no-help
+F\u00fcr diese Meldung ist kein Hilfetext 
+verf\u00fcgbar. Bitte senden Sie den Text 
+der Fehlermeldung an mik@bluej.org -
+wir werden dann einen Hilfetext in unserer
+Hilfedatenbank anlegen. Danke!
+
+editor-crashed
+BlueJ scheint abgest\u00fcrzt zu sein, w\u00e4hrend 
+diese Klasse zuletzt auf Festplatte 
+gespeichert wurde. M\u00f6glicherweise fehlt der
+Sourcetext, oder er ist unvollst\u00e4ndig. Ein
+Backup dieser Klasse sollte sich im Projekt-
+ordner befinden. Wenn diese Klasse
+besch\u00e4digt zu sein scheint,
+   1 - beenden Sie BlueJ
+   2 - machen Sie sicherheitshalber ein
+       Backup Ihres Projektordners
+   3 - suchen Sie in Ihrem Projektordner
+       das Backup dieser Java-Datei und
+       benennen Sie es in den urspr\u00fcnglichen
+       Dateinamen um (mit '.java'-Erweiterung)
+
+cannot-run-compiler
+Compiler konnte nicht gestartet werden.
+Ist er im Suchpfad?
+Name des Compilers:
+
+compiler-error
+Compilerfehler:
+
+out-of-bounds
+Der angegebene Arrayindex liegt
+au\u00dferhalb der Arraygrenzen.
+
+cannot-access-element
+Auf das angegebene Arrayelement kann
+nicht zugegriffen werde.
+
+appletviewer-error
+Bei der Ausf\u00fchrung des Applets im
+Applet-Viewer ist ein Fehler aufgetreten.
+
+error-no-name
+Sie m\u00fcssen einen g\u00fcltigen Namen angeben.
+
+error-save-file
+Beim Versuch, die Datei zu speichern, ist
+ein Fehler aufgetreten. Die Datei wurde nicht
+gespeichert.
+
+cannot-save-keys
+Beim Versuch, die Tastenzuordnungen zu
+speichern, ist ein Fehler aufgetreten.
+Die Datei Tastenzuordnungen wurden nicht
+gespeichert.
+
+error-no-templates
+Der angegebene Vorlagenordner (der Ordner, in dem
+BlueJ die Klassenvorlagen findet) ist nicht vorhanden.
+Es ist unter der Eigenschaft "bluej.templatePath"
+in der Datei <bluej-home>/lib/bluej.defs definiert.
+\u00dcberpr\u00fcfen Sie diese Eigenschaft und stellen
+Sie sie richtig.
+
+skeleton-error
+Das Defaultskelett f\u00fcr die Klasse konnte nicht erzeugt
+werden. Die Ursache kann ein Fehler in der Konfiguration
+von BlueJ sein oder ein Dateizugriffsproblem.
+
+error-open-source
+Die Sourcedatei dieser Klasse kann
+nicht ge\u00f6ffnet werden.
+
+error-writing-jar
+Die jar-Datei konnte nicht richtig geschrieben werden.
+(\u00dcberpr\u00fcfen Sie das Dateisystem im Hinblick auf Zugriffs-
+rechte und freien Plattenspeicherplatz.)
+
+error-file-exists
+Die gew\u00e4hlte Datei ist bereits vorhanden.
+Wollen Sie sie \u00fcberschreiben?
+\u00dcberschreiben
+Abbrechen
+null
+
+invalid-class-name
+Ung\u00fcltiger Klassenname.
+
+invalid-package-name
+Ung\u00fcltiger Paket-Name.
+
+must-be-identifier
+Der Name ist nicht erlaubt. Er
+muss ein Java-Bezeichner sein.
+
+directory-exists-file
+Der Ordner kann nicht angelegt werden weil eine
+Datei mit diesem Namen ist bereits existiert.
+
+directory-exists-non-empty
+Dieser Ordner kann nicht benutzt werden, um das
+Projekt zu speichern, weil er nicht leer ist.
+
+cannot-create-directory
+Der Ordner kann nicht erzeugt werden.
+\u00dcberpr\u00fcfen Sie, dass es einen g\u00fcltigen
+Namen hat und dass das Elternverzeichnis
+existiert und beschreibbar ist.
+
+cannot-save-project
+Das Projekt konnte nicht in dem gew\u00e4hlten
+Ordner gespeichert werden. \u00dcberpr\u00fcfen Sie,
+dass Sie Schreibzugriff haben, oder w\u00e4hlen Sie
+einen anderen Ordner.
+
+file-does-not-exist
+Die angegebene Datei ist
+nicht vorhanden.
+
+cannot-import
+Die Datei kann nicht importiert werden.
+Die Datei muss eine Java-Sourcedatei
+sein (die Bezeichnung muss auf ".java" enden).
+
+docdir-blocked-by-file
+Der Ordner f\u00fcr die Interface-Doku konnte
+nicht erstellt werden, weil es bereits eine
+Datei mit demselben Namen gibt.
+
+docdir-not-created
+Der Ordner f\u00fcr die Interface-Doku konnte
+im Projektordner nicht erstellt werden.
+
+no-permission-for-docdir
+Wegen ungen\u00fcgender Zugriffsrechte konnte der
+Ordner f\u00fcr die Interface-Doku im Projekt-
+ordner nicht erstellt werden.
+
+show-or-generate
+Wollen Sie bloss die bereits erzeugte Interface-Doku
+anzeigen, oder wollen Sie die gesamte Interface-Doku
+neu erstellen?
+Nur anzeigen
+Neu erstellen
+Abbrechen
+
+doctool-error
+Javadoc meldete einen Fehler. M\u00f6glicherweise weist
+eine der Dateien, f\u00fcr die Sie die Interface-Doku
+erzeugen wollten, einen Syntaxfehler auf. Es k\u00f6nnte
+auch sein, dass der in "Einstellungen" angegebene
+URL f\u00fcr die JDK-Dokumentation unrichtig ist.
+Vergewissern Sie sich, dass alle Ihre Java-Dateien
+\u00fcbersetzt sind und dass der URL f\u00fcr die JDK-Dokumentation
+erreichbar oder unterdr\u00fcckt ist, und versuchen Sie es
+dann erneut. Wenn diese Meldung wieder erscheint,
+sollten Sie die Log-Datei mit den javadoc-Fehlermeldungen
+\u00fcberpr\u00fcfen:
+
+severe-doc-trouble
+Beim Aufruf des externen Dokumentationstools
+trat eine Exception auf.
+
+no-java-sources-found
+In diesem Ordner wurden keine
+Java-Sourcedateien gefunden.
+
+duplicate-name
+Eine Klasse oder ein Paket mit diesem Namen existiert
+bereits in diesem Paket. Sie k\u00f6nnen keine zwei
+Klassen mit demselben Namen haben.
+
+class-library-conflict
+Eine Klasse mit diesem Namen existiert bereits
+in der Bibliothek "$".
+Wenn Sie diese Klasse erzeugen, k\u00f6nnen Sie sie
+bearbeiten und \u00fcbersetzen, aber ihre Methoden
+nicht aufrufen.
+Abbrechen
+Trotzdem fortfahren
+null
+
+compile-class-library-conflict
+Eine Klasse mit diesem Namen existiert bereits
+in der Bibliothek "$".
+Sie k\u00f6nnen Ihre Klasse bearbeiten und
+\u00fcbersetzen, aber der Aufruf von Methoden
+wird Code aus der Bibliotheksklasse ausf\u00fchren.
+
+windows-reserved-class-name
+Der gew\u00e4hlte Klassenname kann nicht verwendet werden,
+weil er mit einem reservierten Dateinamen bei einigen
+Betriebssystemen kollidiert.
+
+error-in-import
+Beim Versuch, die Datei zu importieren, ist ein
+Fehler aufgetreten. \u00dcberpr\u00fcfen Sie die Zugriffsrechte
+und den freien Plattenspeicherplatz.
+
+no-class-selected-compile
+Keine Klasse zum \u00dcbersetzen markiert.
+W\u00e4hlen Sie eine Klasse durch Anklicken,
+bevor Sie versuchen, diese zu \u00fcbersetzen.
+
+no-class-selected
+Keine Klasse oder Paket zum Entfernen markiert.
+W\u00e4hlen Sie eine Klasse oder ein Paket durch
+Anklicken, bevor Sie versuchen, diese zu entfernen.
+
+really-remove-class
+Beim Entfernen von Klassen werden auch ihre Sourcedateien
+unwiderruflich gel\u00f6scht.
+Wollen Sie fortfahren?
+Entfernen
+Abbrechen
+null
+
+really-remove-package
+Beim Entfernen dieses Paket wird auch der Paket-
+ordner unwiderruflich gel\u00f6scht, inklusive seines
+GESAMTEN Inhalts.
+Wollen Sie fortfahren?
+Entfernen
+Abbrechen
+null
+
+remove-package-open
+In BlueJ sind einige Pakete ge\u00f6ffnet, die dem Paket
+untergeordnet sind, das Sie zum Entfernen ausgew\u00e4hlt haben.
+Sie m\u00fcssen die untergeordneten Pakete schliessen, bevor
+Sie dieses Paket entfernen k\u00f6nnen.
+
+package-does-not-exist
+Fehler beim \u00d6ffnen eines Pakets.
+Paket ist nicht vorhanden:
+
+no-bluej-package
+Fehler beim \u00d6ffnen eines Pakets.
+Die Datei/der Ordner ist kein
+BlueJ-Paket:
+
+applet-height-width
+H\u00f6he und Breite des Applets
+m\u00fcssen angegeben werden.
+
+not-yet-implemented
+Leider nocht nicht implementiert.
+
+quit-all
+Alle ge\u00f6ffneten Projekte beenden?
+Alle beenden
+Abbrechen
+null
+
+really-reload
+"Neu laden" nimmt alle \u00c4nderungen zur\u00fcck, die
+seit dem letzten Speichern vorgenommen wurden.
+Sind Sie sicher?
+Neu laden
+Abbrechen
+null
+
+changed-on-disk
+Die Quelldatei auf der Platte wurde ver\u00e4ndert. Wollen
+Sie sie wirklich neu laden? Dadurch gehen alle
+im Editor gemachten \u00c4nderungen verloren.
+Neu laden
+Abbrechen
+null
+
+really-print
+Dieser Text \u00fcberschreitet die Papierbreite.
+L\u00e4ngere Zeilen werden abgeschnitten. Sie k\u00f6nnen
+das vermeiden, indem Sie das Editorfenster
+schm\u00e4ler machen.
+Wollen Sie trotzdem drucken?
+Drucken
+Abbrechen
+null
+
+open-non-bluej-already-bluej
+Der ausgew\u00e4hlte Ordner enth\u00e4lt bereits
+ein BlueJ-Projekt.
+
+open-non-bluej-no-java
+In diesem Ordner wurden keine
+Java-Sourcedateien gefunden.
+
+open-non-bluej-invalid
+Sie wollen diesen Ordner als BlueJ-Projekt
+\u00f6ffnen, aber es wurde eine Datei mit einer
+"package"-Anweisung gefunden, die nicht mit
+der bestehenden Ordnerstruktur zusammen-
+passt. (Wenn z.B. die Java-Klasse "Shape"
+eine "package"-Anweisung mit "com.aa" enth\u00e4lt,
+dann muss sich die Datei "Shape.java" im
+Ordner "aa" befinden, und dieses wieder
+im Ordner "com". Der Ordner "com"
+schliesslich muss in demjenigen Ordner
+stehen, das Sie ausw\u00e4hlen, wenn Sie das
+Projekt \u00f6ffnen wollen.)
+
+import-into-current
+In diesem Fenster ist derzeit ein Paket ge\u00f6ffnet.
+Wollen Sie in dieses Paket importieren, oder
+wollen Sie ein neues Projekt erstellen und dorthin
+importieren?
+Dieses Paket
+Neues Projekt
+Abbrechen
+
+package-name-invalid
+Sie haben die "package"-Anweisung auf ein Paket
+ge\u00e4ndert, das es in diesem Projekt nicht gibt.
+Wenn Sie diese Klasse in ein anderes Paket
+verschieben wollen, m\u00fcssen sie das Ziel-Paket
+zuerst erstellen. Die "package"-Anweisung wurde
+in ihre urspr\u00fcngliche Form zur\u00fcckversetzt.
+
+package-name-clash
+Sie haben die "package"-Anweisung auf ein Paket
+ge\u00e4ndert, das bereits eine Klasse oder ein Paket
+dieses Namens enth\u00e4lt. Wenn Sie die Klasse verschoben
+wird, werden die existierende Klasse oder das Paket
+\u00fcberschrieben. Daher wurde die "package"-Anweisung
+in ihre urspr\u00fcngliche Form zur\u00fcckversetzt.
+
+package-name-changed
+Sie haben die "package"-Anweisung ge\u00e4ndert, die
+f\u00fcr Java angibt, in welchem Paket sich die
+Klasse befindet. Wollen Sie diese Klasse in das
+angegebene Paket verschieben, oder wollen Sie
+sie dort belassen, wo sie ist (d.h. die
+"package"-Anweisung wird in ihre urspr\u00fcngliche
+Form zur\u00fcckversetzt)?
+Verschieben
+Belassen
+null
+
+ask-index
+Geben Sie den Index des Arrayelements an [...]
+Array betrachten
+null
+
+classmgr-changes-no-effect
+Ihre \u00c4nderungen an den Klassenbibliotheken werden
+erst nach dem Neustart der virtuellen Maschine wirksam.
+
+unittest-new-test-method
+Benennen Sie den Test.
+Die Aufzeichnung wird im Anschluss gestartet.
+Neue Testmethode
+null
+
+unittest-io-error
+W\u00e4hrend versucht wurde, den Test-Quelltest zu
+lesen, ist ein Ein-/Ausgabefehler aufgetreten.
+
+getobject-new-name
+Geben Sie den Namen f\u00fcr das neue Objekt ein.
+Neuer Objektname
+null
+
+unittest-fixture-present
+Diese Testklasse hat bereits einen Objektzustand gespeichert.
+Wenn Sie fortfahren, wird die Definition ersetzt und
+m\u00f6glicherweise unbrauchbar.
+Wollen Sie fortfahren?
+Ersetzen
+Abbrechen
+null
+
+unittest-method-present
+Diese Testklasse hat bereits eine Testmethode mit diesem
+Namen deklariert. Falls Sie weitermachen, wird die
+Definition dieser Methode ersetzt.
+M\u00f6chten Sie weitermachen?
+Ersetzen
+Abbrechen
+null
+
+default-keys
+Wollen Sie wirklich alle Ihre Tastenzuordnungen
+verwerfen und die Default-Tastenzuordnungen
+setzen?
+Default setzen
+Abbrechen
+null
+
+error-create-vm
+BlueJ war nicht in der Lage, eine virtuelle Maschine (VM) zu erzeugen,
+um Projekte auszuf\u00fchren. Dies ist ein ernstes Problem - Sie werden
+nicht in der Lage sein, Objekte zu erzeugen oder Methoden aufzurufen,
+ohne das Problem zu l\u00f6sen. Dies wird oft von \u00fcberm\u00e4\u00dfig
+einschr\u00e4nkenden Einstellungen der Firewall verursacht.
+Siehe <http://www.bluej.org/help/faq.html#socket-exc> f?r mehr Informationen.
+
+project-is-readonly
+Das Projekt, das ge\u00f6ffnet wird, hat nur Lesezugriff:
+:
+    $
+:
+Um das Projekt zu nutzen, m\u00fcssen Sie erst unter einem neuen
+Namen speichern.
+
+project-is-virtualized
+Das Projekt, dass Sie \u00f6ffnen, wird von Windows virtualisiert.
+Das passiert normalerweise, wenn das Projekt im "Programme"-Ordner
+gespeichert ist. Wenn ein Projekt virtualisiert wird, wird das
+erzeugen von Objekten und das Aufrufen von Methoden zu Fehlern
+f\u00fchren. Um das Projekt zu nutzen, sollten Sie es an
+einen anderen Platz verschieben. Das k\u00f6nnen Sie erreichen,
+indem Sie "Speichern unter" aus dem Projekt-Men\u00fc ausw\u00e4hlen,
+nachdem Sie diesen Dialog geschlossen haben.
+
+could-not-write-shell-file
+Die Ausf\u00fchrung hat versagt, weil der Projektordner nicht
+beschreibbar ist. Um Objekte erzeugen und Methoden aufrufen zu k\u00f6nnen,
+muss BlueJ in der Lage sein, in den Projektordner zu schreiben.
+Stellen Sie sicher, dass Ihr Projekt auf einem beschreibbaren
+Dateisystem (keine CD!) abgelegt ist und dass Sie die
+Schreibrechte f\u00fcr den Projektordner und die darin enthaltenen
+Dateien besitzen.
+
+jar-output-dir-exists
+Der Ausgabeordner f\u00fcr das Archive, das gerade entpackt wird,
+existiert bereits. Sie m\u00fcssen den Ordner l\u00f6schen, bevor Sie
+das Archiv entpacken k\u00f6nnen.
+
+jar-output-no-write
+Der Ausgabeordner kann nicht erzeugt werden. Stellen Sie
+sicher, dass Sie das Archiv zuerst in einen beschreibbaren
+Ordner kopieren.
+
+jar-extraction-error
+W\u00e4hrend des Entpackens des Archivs trat ein Fehler auf. Die
+Debug-Logdatei enth\u00e4lt m\u00f6glicherweise weitere Informationen.
+
+file-save-error-before-compile
+Eine oder mehrere Dateien konnten nicht gespeichert werden. Daher
+wurde die \u00dcbersetzung abgebrochen.
+
+generic-file-save-error
+W\u00e4hrend des Versuchs, eine Datei zu speichern, ist ein Fehler aufgetreten.
+
+empty-assertion-text
+Sie haben kein Ergebnis f\u00fcr diesen Methodenaufruf eingegeben.
+Ohne dieses Ergebnis ist Ihr Test unvollst\u00e4ndig und Ihre Testklasse
+wird sich nicht \u00fcbersetzen lassen. Sind Sie sicher, dass Sie ohne die
+Eingabe eines Ergebniswertes fortfahren m\u00f6chten?
+Zur\u00fcck
+Fortsetzen
+null
+
+team-update-first
+Es wurden \u00c4nderungen an Dateien im Repository vorgenommen, die
+in Ihrer Arbeitskopie gel\u00f6scht wurden. Das ist ein Konflikt.
+Bevor Sie ihre \u00c4nderungen abgeben k\u00f6nnen, m\u00fcssen sich eine Aktualisierung
+holen, die die Dateien aus dem Repository wiederherstellt. Die folgenden
+Dateien sind betroffen:
+
+team-resolve-conflicts-delete
+Es gibt Konflikte bei einigen Dateien, die sowohl im Repository als auch
+in Ihrer Arbeitskopie ver\u00e4ndert wurden. Sie m\u00fcssen ihre Versionen der
+folgenden Dateien l\u00f6schen und dann eine Aktualisierung holen, um die
+Konflikte zu beseitigen:
+
+team-resolve-merge-conflicts
+Bei der vorherigen Aktualisierung gab es Konflikte bei Zusammenf\u00fchren
+einiger Dateien. Sie m\u00fcssen die folgenden Dateien bearbeiten und die
+Konflikte aufl\u00f6sen, bevor Sie die Dateien wieder abgeben k\u00f6nnen:
+
+team-unresolved-conflicts
+Es gibt unaufgel\u00f6ste Konflikte bei den folgenden Dateien. Sie m\u00fcssen
+die Dateien in ihrer Arbeitskopie l\u00f6schen, um die Konflikte zu l\u00f6sen:
+
+team-uptodate-failed
+Ihre Arbeitskopie ist nicht mehr aktuell. Holen Sie eine
+Aktualisierung aus dem Repository bevor Sie ihre lokalen
+\u00c4nderungen abgeben k\u00f6nnen.
+
+team-cant-connect
+Kann nicht mit dem Server verbinden. \u00dcberpr\u00fcfen Sie,
+ob die Adresse korrekt in die Team-Einstellungen
+eingetragen wurde.
+
+team-project-exists
+Da Projekt existiert bereits auf dem Server. Entweder
+Sie erstellen von dem existierenden Projekt eine
+Arbeitskopie oder Sie benennen Ihr Projekt um und
+stellen es danach zur gemeinsamen Nutzung bereit.
+
+team-cant-find-path
+Der Pfad kann auch dem Server nicht gefunden werden. Entweder
+die angegebene Gruppe oder das Projekt existiert nicht auf
+dem Server. \u00dcberpr\u00fcfen Sie, ob diese korrekt in die
+Team-Einstellungen eingetragen wurden und ob sie auf dem
+Server existieren.
+
+team-cant-find-module
+Ihr Projekt ist nicht im Repository. Ein Projekt muss gemeinsam
+genutzt werden (in das Repository gestellt werden), bevor Sie eine
+Arbeitskopie davon erstellen k\u00f6nnen.
+
+team-cant-find-repository
+Das Repository kann nicht gefunden werden. \u00dcberpr\u00fcfen
+Sie den Pfad zum Repository in den Team-Einstellungen.
+
+team-empty-message
+Ein unbekannter Fehler ist aufgetreten. \u00dcberpr\u00fcfen Sie die Teamarbeits-
+einstellungen, um sicherzustellen, dass Ihre Repository-Einstellungen
+korrekt sind.
+
+team-invalid-cvsroot
+Ung\u00fcltiges CVS-Wurzelverzeichnis - \u00dcberpr\u00fcfen Sie Ihre Teamarbeits-
+einstellungen.
+
+team-authentication-problem
+Sie konnten sich nicht beim Server anmelden - \u00dcberpr\u00fcfen Sie die Werte
+f\u00fcr Benutzername, Passwort und Repository in den Teamarbeitseinstellungen.
+
+team-binary-conflict
+Ein Konflikt wurde beim Akualisieren der folgenden Datei festgestellt:
+    $
+Die Datei wurde in der Arbeitskopie ge\u00e4ndert, aber es gibt auch
+\u00c4nderungen im Repository.
+Meine Version behalten
+Repository-Version verwenden
+null
+
+team-error-saving-project
+W\u00e4hrend versucht wurde, die Projektdateien zu speichern, ist
+ein Fehler aufgetreten:
+	$
+Abgeben oder Aktualisieren kann unerwartete Ergebnisse
+haben.
+
+team-cannot-import-into-existing-project
+Sie k\u00f6nnen ein Projekt nicht in ein existierendes Projekt
+importieren. W\u00e4hlen Sie einen normalen Ordner als Ziel
+ f\u00fcr den Import.
+
+stuck-at-breakpoint
+Ihr Programm l\u00e4uft bereits und hat an einem Haltepunkt angehalten.
+Sie k\u00f6nnen keine weitere Ausf\u00fchrung starten, w\u00e4hrend die aktuelle
+noch aktiv ist. Benutzen Sie die Steuerelemente des Debuggers, um die aktuelle 
+Ausf\u00e4hrung entweder fortzuf\u00fchren oder zu beenden.
+
+already-executing
+Ihr Programm l\u00e4uft bereits. Sie k\u00f6nnen keine weitere 
+Ausf\u00fchrung starten (oder eine Klasse inspizieren), w\u00e4hrend 
+die aktuelle noch aktiv ist. Benutzen Sie die Steuerelemente des 
+Debuggers, um die aktuelle Ausf\u00e4hrung entweder fortzuf\u00fchren oder zu beenden.

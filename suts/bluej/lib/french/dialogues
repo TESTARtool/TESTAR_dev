@@ -1,0 +1,537 @@
+compile-while-executing
+Vous ne pouvez pas compiler pendant
+une ex\u00e9cution.  Cela pourrait cr\u00e9er
+des probl\u00e8mes !
+
+exception-thrown
+Une exception a \u00e9t\u00e9 lev\u00e9e :
+
+break-no-source
+Point d'interruption dans un fichier dont
+le source est introuvable.  Nom du fichier :
+
+error-in-file
+Une erreur a eu lieu dans un fichier dont
+le source est introuvable.
+classe : ligne de la source :
+
+no-help
+Pas d'aide disponible pour ce message.
+Faites suivre le texte du message d'erreur \u00e0
+mik@bluej.org - nous ajouterons un texte d'aide
+\u00e0 notre banque de donn\u00e9es d'aide.  Merci.
+
+editor-crashed
+Il semble que BlueJ se soit plant\u00e9 pendant l'\u00e9criture
+de cette classe sur disque.  Le code source pourrait
+\u00eatre endommag\u00e9 ou incomplet.  Il devrait y avoir une
+sauvegarde de cette classe dans le r\u00e9pertoire du
+projet.  Si cette classe est effectivement endommag\u00e9e,
+   1 - quittez BlueJ
+   2 - sauvegardez votre r\u00e9pertoire projet (au cas o\u00f9)
+   3 - cherchez dans le r\u00e9pertoire projet une sauvegarde
+       de ce fichier java.  R\u00e9tablissez-la.
+
+cannot-run-compiler
+Ex\u00e9cution du compilateur impossible.
+Se trouve-t-il dans votre chemin d'acc\u00e8s ?
+Nom du compilateur :
+
+compiler-error
+Erreur de compilation :
+
+stream-incomplete
+Erreur de compilation.  Flot d'erreur incomplet.
+
+out-of-bounds
+L'indice sp\u00e9cifi\u00e9 est hors
+des bornes du tableau.
+
+cannot-access-element
+Impossible d'acc\u00e9der \u00e0 l'\u00e9l\u00e9ment
+de tableau sp\u00e9cifi\u00e9.
+
+appletviewer-error
+Erreur d'ex\u00e9cution du visualiseur d'applet.
+
+error-no-name
+Vous devez sp\u00e9cifier un nom valide.
+
+error-save-file
+Une erreur est survenue lors de l'enregistrement
+du fichier.  Le fichier n'a pas \u00e9t\u00e9 enregistr\u00e9.
+
+cannot-save-keys
+Une erreur est survenue lors de l'enregistrement
+des raccourcis-clavier.  Les raccourcis-clavier
+n'ont pas \u00e9t\u00e9 enregistr\u00e9s.
+
+error-no-templates
+Le r\u00e9pertoire des mod\u00e8les (r\u00e9pertoire o\u00f9 BlueJ cherche
+les mod\u00e8les de classe) n'existe pas.  Corrigez la
+propri\u00e9t\u00e9 "bluej.templatePath" du fichier
+"<bluej-home>/lib/bluej.defs".
+
+skeleton-error
+Impossible de g\u00e9n\u00e9rer le squelette par d\u00e9faut pour
+cette classe.  Cela peut provenir d'une erreur de
+configuration de BlueJ ou d'un probl\u00e8me d'acc\u00e8s au
+syst\u00e8me de fichiers.
+
+error-open-source
+Impossible d'ouvrir le fichier
+source de cette classe.
+
+error-writing-jar
+Le fichier jar n'a pu \u00eatre enregistr\u00e9 correctement.
+Assurez-vous d'avoir les privil\u00e8ges d'acc\u00e8s
+et l'espace disque n\u00e9cessaires.
+
+error-file-exists
+Le fichier jar s\u00e9lectionn\u00e9 existe d\u00e9j\u00e0.
+Voulez-vous continuer ?
+\u00c9craser
+Annuler
+null
+
+invalid-class-name
+Nom de classe invalide.
+
+invalid-package-name
+Nom de paquetage invalide.
+
+must-be-identifier
+Le nom n'est pas valide.
+Ce doit \u00eatre un identificateur Java.
+
+directory-exists
+Un fichier ou r\u00e9pertoire de ce nom
+existe d\u00e9j\u00e0.
+
+cannot-copy-package
+Probl\u00e8me lors de la copie des fichiers du
+paquetage.  Le paquetage n'a pas \u00e9t\u00e9
+enregistr\u00e9 au complet.
+
+cannot-save-project
+Le projet ne peut pas \u00eatre sauvegard\u00e9 \u00e0 l'emplacement
+donn\u00e9. V\u00e9rifiez que vous avez les droits d'\u00e9criture, ou
+choisissez un autre emplacement.
+
+file-does-not-exist
+Le fichier sp\u00e9cifi\u00e9
+n'existe pas.
+
+cannot-import
+Importation du fichier impossible.
+Le fichier doit \u00eatre une source Java
+(son nom doit se terminer par ".java").
+
+docdir-blocked-by-file
+Impossible de cr\u00e9er le r\u00e9pertoire de
+documentation dans le r\u00e9pertoire projet
+car un fichier du m\u00eame nom existe d\u00e9j\u00e0.
+
+docdir-not-created
+Impossible de cr\u00e9er le r\u00e9pertoire de
+documentation dans le r\u00e9pertoire projet.
+
+no-permission-for-docdir
+Vos privil\u00e8ges d'acc\u00e8s ne vous permettent
+pas de cr\u00e9er le r\u00e9pertoire de documentation
+dans le r\u00e9pertoire projet.
+
+show-or-generate
+Voulez-vous voir la documentation
+existante ou r\u00e9g\u00e9n\u00e9rer
+toute la documentation ?
+Existante
+R\u00e9g\u00e9n\u00e9rer
+Annuler
+
+doctool-error
+JavaDoc a signal\u00e9 une erreur.  Il pourrait y avoir
+une erreur de syntaxe dans un des fichiers \u00e0 documenter.
+Il se pourrait aussi que l'adresse Web de la documentation
+du JDK sp\u00e9cifi\u00e9e dans les pr\u00e9f\u00e9rences soit incorrecte.
+Assurez-vous que tous vos fichiers Java soient compil\u00e9s
+et que l'adresse de la documentation soit accessible
+(ou d\u00e9sactiv\u00e9e), puis essayez \u00e0 nouveau.
+Si cela ne suffit pas, consultez le journal de Javadoc :
+
+severe-doc-trouble
+Une exception est survenue lors d'un appel
+\u00e0 l'outil externe de documentation.
+
+no-java-sources-found
+Pas de sources Java dans
+ce r\u00e9pertoire.
+
+duplicate-name
+Une classe ou paquetage de m\u00eame nom existe
+d\u00e9j\u00e0 dans ce projet.  Les noms de classes et
+de paquetages doivent \u00eatre uniques.
+
+class-library-conflict
+Une classe avec ce nom existe d\u00e9j\u00e0 dans la biblioth\u00e8que
+"$".
+Si vous cr\u00e9ez cette classe, vous serez capable de
+l'\u00e9diter et la compiler, mais non d'appeler ses m\u00e9thodes.
+Annuler
+Continuer
+null
+
+compile-class-library-conflict
+Une classe avec ce nom existe d\u00e9j\u00e0 dans la biblioth\u00e8que
+"$".
+Vous \u00eates capable d'\u00e9diter et de compiler votre classe, mais
+appeler des m\u00e9thodes va ex\u00e9cuter du code de la classe de la
+biblioth\u00e8que
+
+windows-reserved-class-name
+Le nom choisi ne peut pas \u00eatre utilis\u00e9, puisqu'en
+conflit avec un nom de fichier r\u00e9serv\u00e9 par le
+syst\u00e8me d'exploitation
+
+error-in-import
+Une erreur est survenue pendant la tentative
+d'importation de ce fichier.  V\u00e9rifiez vos
+privil\u00e8ges d'acc\u00e8s et votre espace disque.
+
+no-class-selected-compile
+Pas de classe s\u00e9lectionn\u00e9e pour la compilation.
+S\u00e9lectionnez une classe en cliquant
+dessus pour la compiler.
+
+no-class-selected
+Pas de classe ni de paquetage s\u00e9lectionn\u00e9.
+Cliquez d'abord sur l'un ou l'autre.
+
+really-remove-class
+Supprimer cette classe supprimera \u00e9galement
+le fichier source de fa\u00e7on d\u00e9finitive.
+Voulez-vous continuer ?
+Supprimer
+Annuler
+null
+
+really-remove-package
+Supprimer ce paquetage supprimera
+d\u00e9finitivement son r\u00e9pertoire (ainsi
+que TOUS les fichiers s'y trouvant).
+Voulez-vous continuer ?
+Supprimer
+Annuler
+null
+
+remove-package-open
+Le paquetage \u00e0 supprimer compte au
+moins un sous-paquetage ouvert par BlueJ.
+Vous devez fermer tous ces
+sous-paquetages avant de pouvoir
+supprimer le paquetage.
+
+package-does-not-exist
+Erreur d'ouverture du paquetage.
+Paquetage inexistant :
+
+no-bluej-package
+Erreur d'ouverture du paquetage.
+Le fichier/r\u00e9pertoire n'est
+pas un paquetage BlueJ :
+
+applet-height-width
+Il faut d\u00e9finir les hauteur et
+largeur de l'applet.
+
+not-yet-implemented
+Pas encore impl\u00e9ment\u00e9 - d\u00e9sol\u00e9.
+
+quit-all
+Quitter tous les projets ouverts ?
+Quitter tout
+Annuler
+null
+
+really-reload
+R\u00e9tablir supprime toutes les modifications effectu\u00e9es
+depuis le dernier enregistrement.  \u00cates-vous certain ?
+R\u00e9tablir
+Annuler
+null
+
+changed-on-disk
+Le fichier source a chang\u00e9. Voulez-vous le
+recharger \u00e0 partir de votre disque? Cela va \u00e9craser les
+modifications courantes.
+Recharger
+Annuler
+null
+
+really-print
+Le texte est plus large que la zone d'impression.  Les
+lignes trop longues seront tronqu\u00e9es.  Vous pouvez
+\u00e9viter cela en r\u00e9tr\u00e9cissant la fen\u00eatre d'\u00e9dition.
+Voulez-vous malgr\u00e9 tout imprimer ?
+Imprimer
+Annuler
+null
+
+open-non-bluej-already-bluej
+Le r\u00e9pertoire s\u00e9lectionn\u00e9 est d\u00e9j\u00e0
+un projet BlueJ.
+
+open-non-bluej-no-java
+Pas de sources Java trouv\u00e9es
+dans ce r\u00e9pertoire.
+
+open-non-bluej-invalid
+Ce r\u00e9pertoire ne semble pas \u00eatre un projet
+BlueJ car un fichier contient une instruction
+de paquetage incompatible avec la structure
+actuelle du r\u00e9pertoire.  Par exemple, si la
+classe Shape contient une instruction
+"package com.aa", le fichier Shape.java doit
+\u00eatre dans le r\u00e9pertoire "aa", qui doit
+lui-m\u00eame \u00eatre dans le r\u00e9pertoire "com".
+Enfin, le r\u00e9pertoire qui contient "com" doit
+\u00eatre celui que vous d\u00e9signez
+\u00e0 BlueJ.
+
+import-into-current
+Vous avez un paquetage ouvert dans cette
+fen\u00eatre.  Voulez-vous importer dans ce
+paquetage ou cr\u00e9er un nouveau projet pour
+l'importation ?
+Courant
+Nouveau projet
+Annuler
+
+package-name-invalid
+Vous avez chang\u00e9 l'instruction "package" en
+indiquant un paquetage qui n'existe pas dans
+ce projet.  Si vous voulez d\u00e9placer cette classe
+vers un autre paquetage, vous devez d'abord cr\u00e9er
+ce dernier.  L'instruction "package" originale a
+\u00e9t\u00e9 r\u00e9tablie.
+
+package-name-clash
+Vous avez chang\u00e9 l'instruction "package" en
+indiquant un paquetage dont le nom est d\u00e9j\u00e0
+utilis\u00e9 par une autre classe ou paquetage.
+Si la classe \u00e9tait d\u00e9plac\u00e9e, le fichier
+original serait \u00e9cras\u00e9, aussi l'ancienne
+instruction "package" a-t-elle \u00e9t\u00e9 r\u00e9tablie.
+
+package-name-changed
+Vous avez chang\u00e9 l'instruction "package"
+qui indique \u00e0 Java dans quel paquetage
+se trouve cette classe.  Voulez-vous d\u00e9placer
+cette classe dans le paquetage indiqu\u00e9 ou
+r\u00e9tablir l'instruction "package"
+originale ?
+D\u00e9placer
+R\u00e9tablir
+null
+
+ask-index
+Sp\u00e9cifiez l'indice de l'\u00e9l\u00e9ment de tableau [...]
+Inspection de tableau
+null
+
+classmgr-changes-no-effect
+Avant que les changements apport\u00e9s aux
+biblioth\u00e8ques de classes ne soient pris en charge,
+vous devrez quitter et relancer BlueJ.
+
+unittest-new-test-method
+Sp\u00e9cifiez un nom pour cette m\u00e9thode de test.
+Son enregistrement d\u00e9butera ensuite.
+Enregistrer une m\u00e9thode de test
+null
+
+unittest-io-error
+Une erreur I/O error a eu lieu en tentant de lire le
+fichier de test unitaire.
+
+getobject-new-name
+Sp\u00e9cifiez un nom pour le nouvel objet
+destin\u00e9 au pr\u00e9sentoir.
+Nom du nouvel objet
+null
+
+unittest-fixture-present
+Cette classe de test comprend d\u00e9j\u00e0 des engagements.
+Si vous continuez, les engagements seront remplac\u00e9s
+par les objets du pr\u00e9sentoir.
+Voulez-vous continuer ?
+Remplacer
+Annuler
+null
+
+unittest-method-present
+Cette classe de test unitaire poss\u00e8de d\u00e9j\u00e0 une m\u00e9thode
+de ce nom. Si vous poursuivez, cette d\u00e9finition
+sera remplac\u00e9 par la nouvelle.
+Voulez-vous poursuivre?
+Remplacer
+Annuler
+null
+
+no-search-string
+Cha\u00eene \u00e0 chercher non d\u00e9finie.
+(S\u00e9lectionnez d'abord du texte ou utilisez 'Chercher').
+
+default-keys
+Voulez-vous vraiment supprimer tous
+vos raccourcis-clavier et r\u00e9tablir
+les raccourcis par d\u00e9faut ?
+R\u00e9tablir
+Annuler
+null
+
+error-create-vm
+BlueJ n'a pas pu cr\u00e9er une machine virtuelle (MV) pour ex\u00e9cuter les projets.
+C'est un probl\u00e8me s\u00e9v\u00e8re - vous ne pourrez pas cr\u00e9er des objets
+ni ex\u00e9cuter des m\u00e9thodes avant de l'avoir r\u00e9solu.
+Le probl\u00e8me le plus fr\u00e9quent est une configuration trop stricte du pare-feu
+qui emp\u00eache les connexions depuis votre ordinateur. Arr\u00eatez le pare-feu
+Si les probl\u00e8mes persistent demandez de l'aide (voir http://www.bluej.org/help/ask-help.html).
+
+project-is-readonly
+Le projet ouvert est en lecture seule:
+:
+    $
+:
+Pour utiliser ce projet, vous devez tout d'abord choisir un nouveau r\u00e9pertoire
+o\u00f9 le sauvegarder.
+
+project-is-virtualized
+le projet que vous ouvrez est virtualis\u00e9 par Windows. Cela
+arrive quand le projet est sauvegard\u00e9 quelque part comme
+le r\u00e9pertoire "Program Files".
+Quand un projet est virtualis\u00e9 par Windows, vous allez avoir des erreurs
+quand vous essaierez de cr\u00e9er des objets et appeler des m\u00e9thodes.
+Pour utiliser ce projet, vous devez d\u00e9placer ce projet dans un r\u00e9pertoire
+diff\u00e9rent. Vous pouvez le faire en utilisant "sauvegarder sous" dans le
+menu Projet, apr\u00e8s avoir ferm\u00e9 cette fen\u00eatre.
+
+could-not-write-shell-file
+\u00c9chec de l'ex\u00e9cution d\u00fb \u00e0 un r\u00e9pertoire de projet en lecture seule.
+Pour cr\u00e9er des objets ou ex\u00e9cuter des m\u00e9thodes, vous devez pouvoir \u00e9crire
+dans le r\u00e9pertoire du projet. Assurez-vous que le projet est
+sur un syst\u00e8me de fichier modifiable (pas un CD!) et que vous avez
+les droits d'\u00e9criture sur le r\u00e9pertoire du projet et ses fichiers.
+
+jar-output-dir-exists
+Le r\u00e9pertoire de destination pour l'archive \u00e0 extraire existe d\u00e9j\u00e0.
+Vous devez tout d'abord supprimer ce r\u00e9pertoire avant de pouvoir
+extraire l'archive.
+
+jar-output-no-write
+Le r\u00e9pertoire de destination ne peut pas \u00eatre cr\u00e9\u00e9. Assurez-vous
+d'avoir copi\u00e9 l'archive dans un dossier accessible en \u00e9criture.
+
+jar-extraction-error
+Une erreur s'est produite dans l'extraction de contenu de l'archive.
+Le journal d'erreur peut contenire plus d'information.
+
+file-save-error-before-compile
+Un ou plusieurs fichiers n'ont pas pu \u00eatre sauv\u00e9, la compilation a \u00e9t\u00e9 annul\u00e9e.
+
+generic-file-save-error
+Une erreur s'est produite lors de la tentative d'enregistrement d'un fichier.
+
+empty-assertion-text
+Vous n'avez pas entr\u00e9 le r\u00e9sultat attendu pour cet appel de m\u00e9thode.
+Sans ce r\u00e9sultat, votre test est incomplet, et votre classe de test ne
+compilera pas. \u00cates-vous s\u00fbr de vouloir continuer sans entrer
+un r\u00e9sultat attendu?
+Retour
+Continuer
+null
+
+team-update-first
+Il y a eu des modifications apport\u00e9es aux fichiers dans le d\u00e9p\u00f4t, mais les
+fichiers ont \u00e9t\u00e9 supprim\u00e9s dans votre environnement. C'est un conflit. Avant que vous
+puissiez faire un commit, vous devez faire un "update", qui va restaurer la version du
+d\u00e9p\u00f4t. Les fichier suivant sont affect\u00e9s:
+
+team-resolve-conflicts-delete
+Il y a des conflits avec certains fichiers qui ont \u00e9t\u00e9 modifi\u00e9s \u00e0 la fois
+dans le d\u00e9pot et votre copie locale. Vous devez supprimer vos versions
+des fichiers suivants puis effectuer une mise \u00e0 jour pour r\u00e9soudre le
+conflit:
+
+team-resolve-merge-conflicts
+Lors d'une pr\u00e9c\u00e9dente mise \u00e0 jour, il y avait des conflits de merge dans certains
+fichiers. Vous devez \u00e9diter les fichiers suivants et r\u00e9soudre les conflits avant
+de pouvoir commiter:
+
+team-unresolved-conflicts
+Il y a des conflits non r\u00e9solus avec les fichiers suivants. Vous devrez supprimer
+les fichiers localement pour r\u00e9soudre le conflit:
+
+team-uptodate-failed
+Votre copie locale n'est pas \u00e0 jour. Mettez \u00e0 jour \u00e0 partir du d\u00e9p\u00f4t avant de pouvoir
+commiter vos changements.
+
+team-cant-connect
+Impossible de se connecter au serveur. V\u00e9rifiez que l'adresse du
+serveur est correcte dans les param\u00e8tres d'\u00e9quipe.
+
+team-project-exists
+Le projet existe d\u00e9j\u00e0 sur le serveur. Peut-\u00eatre d\u00e9sirez-vous utiliser
+Checkout, pour r\u00e9cup\u00e9rer le projet existant, ou bien renommez votre
+projet et tentez de commiter \u00e0 nouveau.
+
+team-cant-find-path
+Le chemin ne peut pas \u00eatre trouv\u00e9 sur le serveur. C'est peut-\u00eatre parce que
+le groupe ou projet sp\u00e9cifi\u00e9 n'existent pas sur le serveur. Assurez-vous
+qu'ils sont correctes dans les param\u00e8tres d'\u00e9quipe, et qu'ils existent sur
+le serveur.
+
+team-cant-find-module
+Projet non pr\u00e9sent dans le d\u00e9pot. A projet doit \u00eatre partag\u00e9 dans le d\u00e9p\u00f4t
+pour que vous puissiez le r\u00e9cup\u00e9rer.
+
+team-cant-find-repository
+Le d\u00e9p\u00f4t n'a pu \u00eatre trouv\u00e9. V\u00e9rifiez le chemin dans les param\u00e8tres
+d'\u00e9quipe.
+
+team-empty-message
+Une erreur inconnue s'est produite. V\u00e9rifiez les param\u00e8tres d'\u00e9quipe pour
+s'assurer que les param\u00e8tres du d\u00e9p\u00f4t sont correctes.
+
+team-invalid-cvsroot
+Chemin CVS invalide - v\u00e9rifiez vos param\u00e8tres d'\u00e9quipe
+
+team-authentication-problem
+Le serveur ne peut pas vous authentifier - v\u00e9rifiez vos noms d'utilisateur /
+mots de passe et d\u00e9p\u00f4ts dans les param\u00e8tres d'\u00e9quipe.
+
+team-binary-conflict
+Un conflit a \u00e9t\u00e9 d\u00e9tect\u00e9 lors de la mise \u00e0 jour du fichier suivant:
+    $
+Le fichier a \u00e9t\u00e9 chang\u00e9 localement, mais aussi sur le d\u00e9p\u00f4t
+distant.
+Conserver ma version
+Utiliser la version distante
+null
+
+team-error-saving-project
+Une erreur s'est produite lors de la tentative de sauvegarde des fichiers suivant:
+	$
+Commiter ou mettre \u00e0 jour peut avoir des r\u00e9sultats inattendus.
+
+stuck-at-breakpoint
+Votre programme est d\u00e9j\u00e0 en cours d'ex\u00e9cution, et s'est arr\u00e9t\u00e9 \u00e0 un point d'arr\u00eat.
+Vous ne pouvez pas commencer une autre ex\u00e9cution alors que l'actuel est encore actif.
+Utilisez tout d'abord les commandes du d\u00e9bogueur pour continuer ou terminer
+l'ex\u00e9cution courante.
+
+already-executing
+Votre programme est en cours d'ex\u00e9cution. Vous ne pouvez pas d\u00e9marrer un autre
+programme (ou inspecter une classe) tant que le programme courant n'a pas fini.
+Si le programme est bloqu\u00e9 dans une boucle, vous pouvez utiliser le d\u00e9bogueur
+pour y mettre fin.

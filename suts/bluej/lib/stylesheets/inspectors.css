@@ -1,0 +1,105 @@
+.inspector {
+    -fx-padding: 1em 2em 2em 2em;
+}
+.inspector-side-buttons {
+    -fx-padding: 1em 1em 1em 2em;
+    -fx-spacing: 1.5em;
+    -fx-fill-width: true;
+}
+.inspector-side-buttons .button {
+    -fx-max-width: 9999.0;
+}
+.field-list .table-row-cell {
+    -fx-background-color: transparent;
+    /*-fx-padding: 0.2em;*/
+}
+.field-list .inspector-field-description, .field-list .inspector-field-value {
+    -fx-border-color: transparent;
+}
+.field-list .inspector-field-description {
+    -fx-alignment: baseline-left;
+    -fx-background-color: transparent;
+    -fx-text-fill: black !important;
+}
+.field-list .inspector-field-value-label {
+    -fx-alignment: baseline-center;
+    -fx-background-color: white;
+    -fx-text-fill: black !important;
+}
+.field-list .inspector-field-value-wrapper {
+    -fx-padding:  0 2 0 2;
+    -fx-alignment: baseline-center;
+    -fx-background-color: white;
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-border-style: solid;
+}
+
+.inspector {
+    -fx-spacing: 1em;
+}
+
+.inspector-class {
+    -fx-background-color: rgb(245,210,170);
+    -fx-border-width: 2px;
+    -fx-border-color: black;
+    -fx-border-style: solid;
+}
+.inspector-header {
+    -fx-alignment: center;
+    -fx-padding: 0 0 1em 0;
+    -fx-font-size: 120%;
+}
+.inspector-object-header .label {
+    -fx-text-fill: white;
+}
+.inspector-class-header .label {
+    -fx-text-fill: black;
+    
+}
+.inspector-object .table-view {
+    -fx-background-color: rgb(244,158,158);
+}
+.inspector-class .table-view {
+    -fx-background-color: rgb(249,230,207);
+}
+.inspector-result .table-view {
+    -fx-background-color: transparent;
+}
+.inspector-result .inspector-result-details {
+    -fx-background-color: rgb(230,230,230);
+}
+.inspector .table-view {
+    -fx-padding: 1em;
+}
+.inspector-result-details-header {
+    -fx-padding: 1em 0.5em 0.5em 0.5em;
+}
+.inspector-result .assert-panel {
+    -fx-spacing: 0.75em;
+    -fx-padding: 2em;
+}
+.inspector-result .assert-panel .assert-row {
+    -fx-spacing: 1.5em;
+    -fx-alignment: baseline-right;
+    -fx-padding: 0 0 0 4em;
+}
+.inspector-result .assert-panel .assert-field-data {
+    -fx-pref-width: 10em;
+    -fx-alignment: baseline-left;
+}
+.inspector-result .assert-panel .assert-field-delta {
+    -fx-pref-width: 5em;
+    -fx-alignment: baseline-left;
+}
+
+.inspector .button:disabled {
+    -fx-opacity: 0.5;
+}
+
+.inspector-object .table-row-cell:selected, .inspector-result .table-row-cell:selected {
+    -fx-background-color: rgb(233, 225, 0); 
+}
+.inspector-class .table-row-cell:selected {
+    -fx-background-color: rgb(180, 220, 240); 
+}

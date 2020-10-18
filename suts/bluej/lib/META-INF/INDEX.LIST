@@ -1,0 +1,10 @@
+JarIndex-Version: 1.0
+
+AppleJavaExtensions.jar
+com
+com/apple
+com/apple/concurrent
+com/apple/eawt
+com/apple/eawt/event
+com/apple/eio
+

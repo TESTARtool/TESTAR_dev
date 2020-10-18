@@ -1,0 +1,180 @@
+# Frame Catalogue:
+frame.catalogue.title=Cheat Sheet
+frame.catalogue.commands=Commands
+frame.catalogue.shortcuts=Shortcuts
+frame.catalogue.selection=Enclose Selection
+frame.catalogue.codecompletion=Code completion
+frame.catalogue.codecompletion.hide=Hide code completion
+frame.catalogue.codecompletion.up=Move up
+frame.catalogue.codecompletion.down=Move down
+frame.catalogue.codecompletion.select=Select
+frame.catalogue.birdseye.exit=Exit view
+frame.catalogue.birdseye.up=Move up
+frame.catalogue.birdseye.down=Move down
+frame.catalogue.birdseye.select=Select
+frame.catalogue.examples=Examples
+frame.catalogue.hint.move=Move forward 3 cells
+frame.catalogue.hint.turn=Turn right 5 degrees
+frame.catalogue.hint.removeobject=Remove touching Crab actors
+
+
+# Stride Dictionary:
+stride.dictionary.call.method.name=Call method
+stride.dictionary.call.method.description=Calls a method
+stride.dictionary.blank.name=Blank
+stride.dictionary.blank.description=A blank line
+stride.dictionary.comment.name=Comment
+stride.dictionary.comment.description=A code comment
+stride.dictionary.assignment.name=Assignment
+stride.dictionary.assignment.description=Assigns a value to a field or a variable
+stride.dictionary.abstract.method.name=Abstract method
+stride.dictionary.abstract.method.interface.description=A method of an interface
+stride.dictionary.abstract.method.class.description=An abstract method of a class
+stride.dictionary.break.name=Break
+stride.dictionary.break.description=Breaks out of loop
+stride.dictionary.constructor.name=Constructor
+stride.dictionary.constructor.description=A constructor of a class
+stride.dictionary.case.name=Case (Switch)
+stride.dictionary.case.description=Handles specific value
+stride.dictionary.constant.name=Constant declaration
+stride.dictionary.constant.description=Declares constant
+stride.dictionary.for.each.name=For-each loop
+stride.dictionary.for.each.description=Loop over a collection
+stride.dictionary.if.name=If
+stride.dictionary.if.description=Conditional execution
+stride.dictionary.else.name=Else
+stride.dictionary.else.description=Else execution
+stride.dictionary.import.name=Import
+stride.dictionary.import.description=Import a class or package
+stride.dictionary.method.name=Method
+stride.dictionary.method.description=A method of a class
+stride.dictionary.return.name=Return
+stride.dictionary.return.description=Returns from method
+stride.dictionary.switch.name=Switch
+stride.dictionary.switch.description=Chooses from several cases
+stride.dictionary.variable.name=Variable declaration
+stride.dictionary.variable.description=Declares variable
+stride.dictionary.while.name=While loop
+stride.dictionary.while.description=Pre-condition loop
+stride.dictionary.throw.name=Throw
+stride.dictionary.throw.description=Throws an exception
+stride.dictionary.try.name=Try/catch
+stride.dictionary.try.description=Try block
+
+
+# Error Bar:
+frame.error.overview.bar.error.single=error
+frame.error.overview.bar.error.plural=errors
+frame.error.overview.bar.error.none=No errors
+frame.error.overview.bar.error.editing=Editing
+
+
+# Class menu:
+frame.classmenu.title=Class
+frame.classmenu.close=Close
+frame.classmenu.move=Move tab...
+frame.classmenu.move.new=To new window
+frame.classmenu.move.existing=Window
+frame.classmenu.print=Print
+frame.classmenu.compile=Compile
+
+
+# Web/documentation menu
+frame.webmenu.title=Documentation
+frame.webmenu.open.external=Open In External Browser
+
+
+# Edit menu:
+frame.editmenu.title=Edit
+
+
+# Slot menu:
+frame.slot.cut=Cut
+frame.slot.copy=Copy
+frame.slot.paste=Paste
+frame.slot.recent=Recent Values
+frame.slot.goto=Go to definition of $$
+
+
+# View menu:
+frame.viewmenu.title=View
+frame.viewmenu.nextError=Next error
+frame.viewmenu.cheatsheet=Cheat sheet
+frame.viewmenu.birdseye=Bird's eye
+frame.viewmenu.birdseye.doc=Bird's eye (with documentation)
+frame.viewmenu.java=Java preview
+frame.viewmenu.fontbigger=Increase font size
+frame.viewmenu.fontsmaller=Decrease font size
+frame.viewmenu.fontdefault=Reset font size
+
+
+# Information:
+# The '$$' will be replaced by the name of the superclass:
+frame.class.inherited.from=Inherited from $$
+
+frame.undobanner.text=You just deleted a large piece of code.  If you didn't mean to, you can
+frame.undobanner.button=Undo this change
+frame.undobanner.close=Close
+
+stride.convert.unsupported.feature=Unsupported feature in Stride
+stride.convert.unsupported.modifier=Unsupported modifier in Stride
+stride.convert.warnings.title=Java to Stride: Unsupported features
+stride.convert.warnings=Conversion from Java to Stride succeeded, but with the following warnings
+stride.convert.paste.errors.title=Stride Paste: Error
+stride.convert.paste.errors=Clipboard not valid Stride code and attempted conversion from Java to Stride failed, with the following errors
+stride.convert.whole.errors.title=Conversion to Stride: Error
+stride.convert.whole.errors=Conversion from Java to Stride failed, with the following errors
+stride.convert.error.stride=Error while trying to unpack Stride code
+stride.convert.error.java=Error while trying to parse Java for conversion to Stride
+convert.to.stride.class=Convert to Stride
+convert.to.java.title=Convert to Java?
+convert.to.java.message=This will convert the Stride class to Java.  Continue?
+convert.to.stride.title=Convert to Stride?
+convert.to.stride.message=This will convert the Java class to Stride.  This operation may not be reversible if the Java code has features unsupported in Stride.  Continue?
+convert.to.stride.error.title=Unexpected error
+convert.to.stride.error.message=Unexpected error during Java to Stride conversion.
+
+
+# Editor
+frame.editor.toplevel.doc.prompt=Write a description of your $CLASSNAME $CAPTION here...
+frame.editor.toplevel.package.prompt=package name
+frame.editor.param.prompt=$CAPTION name
+frame.editor.label.imports=Imports
+frame.editor.label.fields=Fields
+frame.editor.label.constructors=Constructors
+frame.editor.label.methods=Methods
+
+frame.class.add.extends=Add 'extends'
+frame.class.add.extends.declaration=Add extends declaration
+frame.class.add.implements=Add 'implements'
+frame.class.add.super=Add super(..) call
+frame.class.add.this=Add this(..) call
+frame.class.add.throw=Add throws declaration
+frame.class.constructor.doc.prompt=Describe your constructor here...
+frame.class.method.doc.prompt=Describe your method here...
+frame.class.overrides.from=overrides method from $$
+frame.class.remove.extends.from=Remove 'extends $$'
+frame.class.remove.implements=Remove 'implements $$'
+frame.class.remove.super=Remove super/this call
+frame.class.toggle.abstract=Toggle abstract
+frame.switch.remove.default=Remove default, keep contents
+frame.switch.remove.switch=Remove switch/cases, keep contents
+
+
+# Operations
+frame.operation.change=Change
+frame.operation.change.to.abstract=to abstract
+frame.operation.change.to.constructor=to constructor
+frame.operation.change.to.method=to normal method
+frame.operation.copy=Copy
+frame.operation.copy.as.image=Copy As Image
+frame.operation.copy.as.java=Copy As Java
+frame.operation.cut=Cut
+frame.operation.delete=Delete
+frame.operation.delete.outer=Delete outer frame
+frame.operation.disable=Disable
+frame.operation.enable=Enable
+frame.operation.make=Make $$
+frame.operation.paste=Paste
+frame.operation.remove=Remove $$
+frame.operation.toggle=Toggle $$

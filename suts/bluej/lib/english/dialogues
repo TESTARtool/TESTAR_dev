@@ -1,0 +1,594 @@
+compile-while-executing
+You cannot compile while the machine
+is executing. This could cause strange
+problems!
+
+exception-thrown
+An exception was thrown:
+
+break-no-source
+Breakpoint hit in a file for which the
+source cannot be found.  Filename:
+
+error-in-file
+An error occurred in a file for which the
+source cannot be found.
+class: source line number:
+
+no-help
+No help available for this message.
+Please mail the text of the error message
+to mik@bluej.org - we will then
+add a help text to our help database. Thanks.
+
+editor-crashed
+It seems that BlueJ crashed while writing this class
+to disk last time. The source code may be missing or 
+incomplete. There should be a backup of this class 
+in the project folder. If this class seems damaged,
+   1 - quit BlueJ
+   2 - backup your project folder (just in case)
+   3 - look into the project folder for a backup of
+       this java file. Rename it to the original
+       file name (with a '.java' suffix)
+
+cannot-run-compiler
+Cannot run compiler. Is the
+program in your path?
+Name of compiler:
+
+compiler-error
+Compiler error:
+
+out-of-bounds
+Element specified is not
+within array bounds.
+
+cannot-access-element
+Unable to access the array
+element specified.
+
+
+error-no-name
+You must specify a valid name.
+
+error-save-file
+An error occurred when trying to save
+the file. The file was not saved.
+
+cannot-save-keys
+An error occurred while trying to save
+the key bindings. The bindings were not
+saved.
+
+error-no-templates
+The specified template directory (the directory where
+BlueJ finds the class templates) does not exist. It
+is defined with the property "bluej.templatePath" in
+<bluej-home>/lib/bluej.defs. Check and fix this property.
+
+skeleton-error
+The default skeleton for the class could not be
+generated. This may be because of configuration
+error in the setup of BlueJ, or because of file
+system access problems.
+
+error-open-source
+Cannot open the source
+of this class.
+
+error-writing-jar
+The jar file could not be written correctly.
+(Check the file system for access rights and
+disk space availability.)
+
+error-file-exists
+The file you have selected already exists.
+Do you want to overwrite it?
+Overwrite
+Cancel
+null
+
+invalid-class-name
+Invalid class name.
+
+invalid-package-name
+Invalid package name.
+
+must-be-identifier
+The name is not valid. It
+must be a Java identifier.
+
+directory-exists-file
+A file with this name already exists,
+so the directory cannot be created.
+
+directory-exists-non-empty
+This directory is not empty, so cannot
+be used as a destination for a project.
+
+cannot-create-directory
+Cannot create the directory. Check that 
+it has a valid name and that the parent 
+directories exist and are writable.
+
+cannot-save-project
+The project could not be saved to the specified
+location. Check that you have write access, or
+choose another location.
+
+cannot-save-inside-self
+Cannot save a project inside itself.
+Please choose a different location to save to.
+
+file-does-not-exist
+The specified file
+does not exist.
+
+cannot-import
+Cannot import file. The file must
+be a Java source file (its name
+must end in ".java").
+
+docdir-blocked-by-file
+The directory for the documentation could
+not be created in the project directory
+because there is a file with same name.
+
+docdir-not-created
+The directory for the documentation could
+not be created in the project directory.
+
+no-permission-for-docdir
+The directory for the documentation could
+not be created in the project directory
+because of insufficient rights.
+
+show-or-generate
+Do you want to show the documentation
+generated previously, or do you want
+to regenerate the whole documentation?
+Just Show
+Regenerate
+Cancel
+
+doctool-error
+Javadoc reported an error. It could be that there is a
+syntax error in one of the files you tried to generate
+a documentation for. It could also be that the JDK
+documentation URL specified in the preferences is incorrect.
+Make sure that all your Java files are compiled and the
+documentation URL is accessible or disabled. Then try again.
+If this message appears again you should check the log file
+with the error messages from Javadoc:
+
+severe-doc-trouble
+An exception occurred during the call
+to the external documentation tool.
+
+no-java-sources-found
+No Java source files were
+found in this directory.
+
+duplicate-name
+A class, package or file with this name already exists
+in this project. You cannot have two
+classes, packages or files with the same name.
+
+class-library-conflict
+A class with this name already exists in the library
+"$".
+If you create this class, you will be able to
+edit and compile it, but not call its methods.
+Cancel
+Continue Anyway
+null
+
+compile-class-library-conflict
+A class with this name already exists in the library
+"$".
+You are able to edit and compile your class, but 
+calling methods will execute code from the library class.
+
+windows-reserved-class-name
+The chosen class name cannot be used, because it
+conflicts with a reserved filename on some operating
+systems.
+
+error-in-import
+An error occurred during the attempt to
+import the file. Check access rights and
+disk space.
+
+no-class-selected-compile
+No class selected for compilation.
+Select a class by clicking on
+it before trying to compile.
+
+no-class-selected
+Nothing selected for removal.
+Select a class, arrow or package by clicking on
+it before trying to remove.
+
+really-remove-class
+Removing classes will permanently
+delete their source file(s).
+Do you want to continue?
+Remove
+Cancel
+null
+
+really-remove-package
+Removing this package will permanently
+delete the package directory (including ALL
+the contents of that directory).
+Do you want to continue?
+Remove
+Cancel
+null
+
+remove-package-open
+The package you have selected for
+deletion has some sub-packages opened
+within BlueJ. You must close these
+packages before you will be allowed
+to delete this package.
+
+could-not-open-project
+The project could not be opened. Check that you have
+correct permissions on the folder and files within it.
+
+not-yet-implemented
+Not Yet Implemented - sorry.
+
+quit-all
+Quit all open projects?
+Quit All
+Cancel
+null
+
+really-reload
+Reload discards all changes since the last edit.
+Are you sure?
+Reload
+Cancel
+null
+
+changed-on-disk
+The source file has changed on disk. Do you want to
+reload it from disk? This will discard changes made
+here in the editor.
+Reload
+Cancel
+null
+
+really-print
+The text is wider than the paper. Long lines
+will be cut off. You can avoid this by resizing
+the editor window to make it narrower. Do you
+want to print anyway?
+Print
+Cancel
+null
+
+print-no-printers
+Java cannot find any printers.  Please install a printer to be able to print.
+
+open-non-bluej-already-bluej
+The directory you have selected is already
+a BlueJ project.
+
+open-non-bluej-no-java
+No Java source files were
+found in this directory.
+
+open-non-bluej-invalid
+You have indicated you wish to open this
+directory as a BlueJ project, however a file
+has been found with a package statement that
+is incompatible with the current directory
+structure. (For example, if the Java class
+Shape has a package line of com.aa, then the
+file Shape.java must be in a directory aa
+which is itself in a directory com. This com
+directory in turn must be in another directory
+which is the directory you should point BlueJ
+to when attempting to open it).
+
+import-into-current
+You currently have a package open in this window.
+Do you want to import into the current package
+or would you like to create a new project and
+import into that?
+Current
+New Project
+Cancel
+
+package-name-invalid
+You have changed the package statement
+to a package which does not exist in this project.
+If you wish to move this class to another
+package you must create the destination
+package first. The package statement has been
+reverted back to its original form.
+
+package-name-clash
+You have changed the package statement to 
+a package that already has a class or package
+of this name. If the class is moved, the
+existing class or package would be overwritten,
+so the package statement has been reverted
+back to its original form.
+
+package-name-changed
+You have changed the package statement which
+tells Java the package this class is in. Do you
+want to move this class to the indicated package
+or do you want to leave the class where it is
+(the package statement will be reverted back to
+its original form)?
+Move
+Revert
+null
+
+ask-index
+Enter array element index [...]
+Array Inspection
+null
+
+classmgr-changes-no-effect
+The changes you have made to the class libraries
+will not take effect until the next time you
+restart the Virtual Machine.
+
+unittest-new-test-method
+Specify a name for this test.
+Recording will then start.
+New Test Method
+null
+
+unittest-io-error
+An I/O error occurred when trying to read the unit
+test source file.
+
+getobject-new-name
+Enter the name for the new object on the
+object bench.
+New Object Name
+null
+
+unittest-fixture-present
+This unit test class already has a fixture declared
+in it. If you proceed, the definition of this
+fixture will be replaced.
+Do you want to continue?
+Replace
+Cancel
+null
+
+unittest-method-present
+This unit test class already has a test method declared
+within it of the same name. If you proceed, the
+definition of the method will be replaced.
+Do you want to continue?
+Replace
+Cancel
+null
+
+default-keys
+Do you really want to discard all your
+key bindings and set the default
+bindings?
+Set defaults
+Cancel
+null
+
+error-create-vm
+BlueJ was unable to create a virtual machine (VM) to execute projects.
+This is a serious problem - you will not be able to create objects 
+or execute methods without solving it. Often this is caused by overly
+restrictive firewall settings.
+:
+Please see <http://www.bluej.org/help/faq.html#socket-exc> for more
+information.
+
+project-is-readonly
+The project being opened is read-only:
+:
+    $
+:
+To use this project, you will first need to choose a new location to
+save it to.
+
+project-is-virtualized
+The project you are opening is being virtualized by Windows. This 
+usually happens when the project is stored somewhere in the 
+"Program Files" directory.
+:
+When a project is being virtualized by Windows you will get errors 
+when trying to create objects and invoke methods.
+:
+To use this project, you should move the project to a different
+location. This can be accomplished by choosing "save as" from 
+the Project menu after closing this dialog.
+
+could-not-write-shell-file
+Execution failed because the project directory is not writable.
+To create objects or execute methods, we must be able to write
+to the project directory. Make sure your project is on a writable 
+file system (not a CD!) and that you have write permission in
+the project directory and all files in it.
+
+jar-output-dir-exists
+The output directory for the archive being extracted already exists.
+You must remove the existing directory before you can extract the archive.
+
+jar-output-no-write
+The output directory cannot be created. Make sure you copy the 
+archive to a writable folder first.
+
+jar-extraction-error
+An error occurred in extracting the archive contents. The debug
+log may contain more information.
+
+jar-executable-uncompiled-project
+Some classes in the project are uncompiled.
+All classes must be compiled before you can create an executable Jar file.
+
+file-save-error-before-compile
+One or more files could not be saved, so compilation was cancelled.
+
+generic-file-save-error
+An error was encountered when trying to save a file.
+
+empty-assertion-text
+You have not entered an expected result for this method call.
+Without this result, your test is incomplete, and your test class will
+not compile. Are you sure you want to continue without entering
+a result value? 
+Go back
+Continue
+null
+
+team-update-first
+There have been changes made to files in the repository, but the files
+have been deleted in your working copy. This is a conflict. Before you can
+do a commit, you need to perform an update, which will restore the
+repository versions. The following files are affected:
+
+team-resolve-conflicts-delete
+There are conflicts with some files, which have been modified in the
+repository as well as in your working copy. You need to delete your versions
+of the following files and then perform an update in order to resolve the
+conflict:
+
+team-resolve-merge-conflicts
+During a previous update, there were merge conflicts in some files. You need
+to edit the following files and resolve the conflicts before you can perform
+a commit:
+
+team-unresolved-conflicts
+There are unresolved conflicts with the following files. You will
+have to delete the files locally to resolve the conflict:
+
+team-uptodate-failed
+Your local copy is out of date. Update from repository
+before committing your local changes.
+
+team-cant-connect
+Cannot connect to the server. Check that server
+address is correct in the Team Settings.
+
+team-wrong-protocol
+Cannot connect to the server. The server does not seem
+to accept the informed protocol.
+
+team-malformed-uri
+The connection URI is malformed. Please check the connection
+string used.
+
+team-denied-invalidUser
+Access was denied. Check user name, password, and connection URI.
+
+team-noRepository-uri
+Repository not found: $
+
+team-project-exists
+The project already exists on the server. Maybe you 
+want to use Checkout, to check out the existing project
+or rename your project and commit again.
+
+team-cant-find-path
+The path cannot be found on the server. This might be because
+the specified group or project doesn't exist on the server.
+Check that these are correct in the Team Settings, and that 
+they exist on the server.
+
+team-cant-find-module
+Project not in repository. A project must be shared (put 
+in the repository) before you can check it out.
+
+team-cant-find-repository
+The repository could not be found. Check the path to 
+the repository in the team settings.
+
+team-empty-message
+An unknown error occurred. Check the team settings to make sure your
+repository settings are correct.
+
+team-authentication-problem
+The server could not log you in - check your username/password and
+repository in team settings.
+
+team-authorisation-problem
+The operation was not authorised by the server. Check your username,
+password and repository in team settings.
+
+team-binary-conflict
+A conflict was detected when trying to update the following file:
+:
+    $
+:
+The file was changed locally, but there are also changes in the
+repository.
+Keep my version
+Use repository version
+null
+
+team-error-saving-project
+An error occurred when trying to save the project files:
+:
+	$
+:
+Committing or updating may have unexpected results.
+
+team-cannot-import-into-existing-project
+You can't import a project into an existing project. Select
+a normal folder as the destination for the import.
+
+team-commit-needed
+You have local changes that need to be committed before you can
+update.
+
+team-merge-commit-needed
+The update resulted in merges which have not automatically been
+committed. You should commit now.
+
+stuck-at-breakpoint
+Your program is already running, and stopped at a breakpoint.
+You cannot start another execution while the current one is still
+active. Use the debugger controls to either continue or terminate
+the current execution first.
+
+already-executing
+Your program is already running. You cannot start another
+execution (or inspect a class) until the execution finishes. If
+the program is stuck in a loop, you can use the debugger to
+terminate it.
+
+run-on-fx
+This project uses JavaFX.  Would you like BlueJ to run all future
+method invocations in this project on the JavaFX thread, to avoid
+threading exceptions?  You can change this option later in the
+Preferences.  If unsure, say "Use JavaFX thread".
+Use JavaFX thread
+Use separate thread
+null
+
+SVNWorkingCopyNot16
+This project has Subversion meta-data in a format which BlueJ
+might not fully support. (This could be the case if the project
+was checked out using BlueJ version 3.1.6, which created meta-data
+in an unsupported format).
+:
+You can resolve this by checking out the project again into a new
+folder.
+:
+If you continue to work with this project, some Teamwork functions
+(status, commit etc) may not function properly. 
+
+cannot-open-browser
+The web browser could not be opened.
+
+no-extends-arrow-from-no-source-class
+Classes without source code cannot be changed to extend a new class.

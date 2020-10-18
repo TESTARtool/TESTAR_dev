@@ -1,0 +1,545 @@
+/* Shared */
+.dialog-error-label {
+    -fx-text-fill: derive(red, -20%);
+}
+.text-field:bj-dialog-error {
+    -fx-border-color: derive(red, -20%);
+    -fx-border-width: 3;
+    -fx-border-insets: -3;
+    -fx-border-radius: 3;
+    -fx-border-style: solid;
+}
+.combo-box:bj-growable-remove-highlight {
+    -fx-border-color: #404040;
+    -fx-border-width: 2;
+    -fx-border-insets: -2;
+    -fx-border-radius: 2;
+    -fx-border-style: solid;
+}
+.radio-check-border {
+    -fx-padding: 0.5em 1em 0.5em 0.5em !important;
+}
+.radio-check-border > .radio {
+    -fx-background-color: null;
+}
+.radio-check-border > .radio > .dot {
+    /* See http://jxnblk.com/paths/?d=M24%2056%20L64%2016%20L56%208%20L24%2042%20L12%2031%20L5%2038.5%20Z */
+    -fx-shape: "M24 56 L64 16 L56 8 L24 42 L12 31 L5 38.5 Z"/* Thinner: "M24 56 L64 16 L60 12 L24 50 L10 37 L7 40.5 Z"*/;
+    -fx-opacity: 0.0;
+    -fx-background-color: black;
+}
+.radio-check-border:selected > .radio > .dot {
+    -fx-background-color: black;
+    -fx-opacity: 1.0;
+}
+.radio-check-border.left-pill {
+    -fx-background-radius: 9 0 0 9, 9 0 0 9, 8 0 0 8, 7 0 0 7;
+}
+.radio-check-border.left-pill:focused {
+    -fx-background-radius: 9 0 0 9, 8 0 0 8, 7 0 0 7, 10 0 0 10, 6 0 0 6;
+}
+.radio-check-border.right-pill {
+    -fx-background-radius: 0 9 9 0, 0 9 9 0, 0 8 8 0, 0 7 7 0;
+}
+.radio-check-border.right-pill:focused {
+    -fx-background-radius: 0 9 9 0, 0 8 8 0, 0 7 7 0, 0 10 10 0, 0 6 6 0;
+}
+.radio-check-border.center-pill {
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+.radio-check-border.center-pill:focused {
+    -fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0;
+}
+.growable-remove .growable-remove-graphic {
+     /* http://jxnblk.com/paths/?d=M60%2052%20L40%2032%20L60%2012%20L52%204%20L32%2024%20L12%204%20L4%2012%20L24%2032%20L4%2052%20L12%2060%20L32%2040%20L52%2060%20Z */
+    -fx-shape: "M60 52 L40 32 L60 12 L52 4 L32 24 L12 4 L4 12 L24 32 L4 52 L12 60 L32 40 L52 60 Z";
+}
+.growable-add .growable-add-graphic {
+    /* http://jxnblk.com/paths/?d=M38%2060%20L38%2038%20L60%2038%20L60%2026%20L38%2026%20L38%204%20L26%204%20L26%2026%20L4%2026%20L4%2038%20L26%2038%20L26%2060%20Z */
+    -fx-shape: "M38 60 L38 38 L60 38 L60 26 L38 26 L38 4 L26 4 L26 26 L4 26 L4 38 L26 38 L26 60 Z";
+}
+.growable-remove .growable-remove-graphic, .growable-add .growable-add-graphic {
+    -fx-background-color: #404040;
+    -fx-min-width: 10;
+    -fx-min-height: 10;
+    -fx-pref-width: 10;
+    -fx-pref-height: 10;
+    -fx-max-width: 10;
+    -fx-max-height: 10;
+}
+.growable-remove, .growable-add {
+    -fx-border-radius: 10;
+    -fx-border-style: solid;
+    -fx-border-width: 0px;
+    -fx-border-color: grey;
+    -fx-background-radius: 10 10 9 8;
+    
+    -fx-alignment: center;
+    -fx-content-display: center;
+    -fx-min-width: 20;
+    -fx-min-height: 20;
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-max-width: 20;
+    -fx-max-height: 20;
+}
+
+
+/* InputDialog helper class */
+.input-dialog-content {
+    -fx-spacing: 1em;
+}
+
+/* About BlueJ/Greenfoot dialog */
+.about-dialog-content {
+    -fx-padding: 1em;
+    -fx-background-color: white;
+}
+.about-team {
+    -fx-padding: 0 0 1em 0;
+}
+.about-tabs > .tab-header-area > .tab-header-background {
+    -fx-background-color: white;
+}
+.about-more-info {
+    -fx-padding: 1em 0 0 0;
+}
+.about-debuglog {
+    -fx-padding: 1em 0 0 0;
+    -fx-spacing: 2em;
+}
+.about-version {
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 1em 0;
+}
+.about-info-link {
+    -fx-padding: 1em 0 0 0;
+}
+.about-translators-table {
+    -fx-padding: 1em 0.5em 0 0.5em;
+}
+.about-translators-table .column-header-background {
+    -fx-max-height:  0;
+    -fx-pref-height: 0;
+    -fx-min-height:  0;
+}
+.about-translators-table .table-row-cell:empty {
+    -fx-background-color: transparent;
+}
+.about-translators-table .table-row-cell .table-cell {
+    -fx-border-width: 0px;
+}
+.about-contributors-title {
+    -fx-font-weight: bold;
+}
+
+/* Version check dialog */
+.version-check-dialog-content {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+/* Export dialog */
+.export-dialog-content {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+.export-dialog-main-row {
+    -fx-spacing: 2em;
+}
+.export-dialog-userlibs {
+    -fx-padding: 0.5em;
+    -fx-hgap: 1em;
+    -fx-vgap: 1em;
+}
+
+/* Library call dialog */
+.library-call-dialog-content {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+.library-call-class {
+    -fx-spacing: 1em;
+    -fx-alignment: baseline-left;
+}
+.library-call-methods {
+    -fx-pref-height: 300;
+}
+
+
+/* New class dialog */
+.new-class-dialog {
+    -fx-spacing: 1em;
+    -fx-padding: 1em;
+}
+.new-class-dialog .new-class-dialog-hbox {
+    -fx-spacing: 2em;
+}
+.new-class-dialog .radio-button {
+    -fx-padding: 0 0 0 3em; /* Indent the radio buttons */
+}
+
+/* New project dialog */
+.new-project-dialog {
+    -fx-spacing: 1em;
+    -fx-padding: 1em;
+}
+.new-project-dialog .proj-grid {
+    -fx-hgap: 0.5em;
+    -fx-vgap: 0.5em;
+}
+.new-project-dialog .compound-path {
+    -fx-label-padding: 0 0 0 0.65em;
+}
+
+/* Constructor dialog */
+.call-dialog-content, .constructor-dialog-fields {
+    -fx-spacing: 1em;
+}
+.call-dialog-content .combo-box {
+    -fx-min-width: 14em;
+    -fx-max-width: Infinity;
+}
+.call-dialog-content .combo-box .text-input {
+    -fx-prompt-text-fill: hsb(0, 0%, 70%);
+}
+.call-dialog-content .grid {
+    -fx-hgap: 0.5em;
+    -fx-vgap: 0.5em;
+}
+.call-dialog-content .hanging-flow-pane {
+    -bj-row-spacing: 0.5em;
+}
+.constructor-instance-name-row {
+    -fx-spacing: 1em;
+}
+.formatted-print-flow .formatted-print-line {
+    -fx-font-family: "Source Sans Pro";
+    -fx-font-size: 125%;
+}
+.formatted-print-flow .formatted-print-line:bj-bold {
+    -fx-font-weight: bold;
+}
+.formatted-print-flow .formatted-print-line:bj-italic {
+    -fx-font-shape: italic;
+}
+
+/* Extensions Dialog */
+.extension-list {
+    -fx-spacing: 1em;
+}
+.extension-info {
+    -fx-fill-width: true;
+    -fx-spacing: 1em;
+}
+.extension-info .label, .extension-info .hyperlink {
+    -fx-wrap-text: true;
+}
+
+/* Import Problem Dialogs */
+.import-mismatch-content, .import-failed-content {
+    -fx-spacing: 1em;
+    -fx-fill-width: true;
+}
+.import-mismatch-content {
+    -fx-pref-width: 600px;
+}
+.import-failed-content {
+    -fx-pref-width: 450px;
+}
+.import-mismatch-content .scroll-pane, .import-failed-content .scroll-pane {
+    -fx-max-height: 10em;
+    -fx-fit-to-width: true;
+}
+.import-mismatch-content .label, .import-failed-content .label {
+    -fx-wrap-text: true;
+}
+
+/* Blackbox */
+.blackbox-optin-content {
+    -fx-pref-width: 620px;
+    -fx-fill-width: true;
+    -fx-spacing: 1em;
+    -fx-padding: 1em;
+}
+.blackbox-optin-content .blackbox-optin-header {
+    -fx-spacing: 2em;
+}
+.blackbox-optin-content .blackbox-optin-header .blackbox-optin-header-text {
+    -fx-font-weight: bold;
+}
+.blackbox-optin-content .blackbox-optin-explanation {
+    -fx-font-size: 90%;
+}
+
+/* Preference Manager */
+.prefmgr-titled {
+    -fx-collapsible: false;
+}
+.prefmgr-titled > *.content {
+    -fx-border-width: 0;
+}
+.prefmgr-titled .title, .prefmgr-titled .title:hover {
+    -fx-background-color: derive(cornflowerblue, 50%);
+    -fx-background-radius: 5px;
+}
+/* Don't colour when nested: */
+.prefmgr-titled .prefmgr-titled .title, .prefmgr-titled .prefmgr-titled .title:hover {
+    -fx-background-color: transparent;
+}
+
+.prefmgr-titled .title .text {
+    -fx-font-weight: bold;
+
+}
+.prefmgr-titled-content {
+    -fx-padding: 1em 2em 1em 3em;
+    -fx-spacing: 0.5em;
+    -fx-fill-width: true;
+}
+.prefmgr-label-hbox {
+    -fx-spacing: 1em;
+}
+.prefmgr-label-hbox, .prefmgr-label-hbox .label, .prefmgr-label-hbox .text-field, .prefmgr-label-hbox .button {
+    -fx-alignment: baseline-left;
+}
+.prefmgr-text-wrapped {
+    -fx-fill: -fx-text-background-color;
+}
+.prefmgr-tab-pane {
+    -fx-pref-width: 800px;
+}
+.prefmgr-tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: null;
+}
+.prefmgr-tab-pane > .tab-content-area {
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-outer-border;
+}
+.prefmgr-pref-panel {
+    -fx-spacing: 1em;
+    -fx-padding: 2em 4em 2em 4em;
+    -fx-fill-width: true;
+}
+.prefmgr-experiment-participant {
+    -fx-hgap: 1em;
+    -fx-vgap: 0.5em;
+    -fx-padding: 0.5em 0 0 2em;
+}
+.prefmgr-experiment-participant .text-field {
+    -fx-pref-column-count: 25;
+}
+.prefmgr-jdk-url {
+    -fx-pref-column-count: 35;
+}
+.prefmgr-interface-checkboxes {
+    -fx-spacing: 4em;
+    -fx-alignment: baseline-center;
+}
+.prefmgr-interface-panel {
+    -fx-fill-width: false;
+}
+.prefmgr-scope-colour-container {
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-outer-border;
+}
+.prefmgr-scope-colour-rectangles {
+    -fx-padding: 0.5em;
+}
+.prefmgr-java-editor-top {
+    -fx-hgap: 4em;
+    -fx-vgap: 1em;
+    -fx-padding: 0 0 2em 0;
+}
+.prefmgr-java-scope-hbox {
+    -fx-spacing: 5em;
+    -fx-alignment: center;
+}
+.prefmgr-library-listview {
+    -fx-min-height: 8em;
+    -fx-pref-height: 8em;
+}
+.prefmgr-library-userlib-buttons {
+    -fx-padding: 1em 1em 0 2em;
+    -fx-spacing: 1em;
+    -fx-fill-width: true;
+    -fx-alignment: top-center;
+}
+.prefmgr-library-userlib-buttons .button {
+    -fx-max-width: 9999.0;
+}
+.prefmgr-library-panel .prefmgr-titled-content {
+    -fx-padding: 1em 0 1em 0;
+}
+.prefmgr-key-panel .key-bindings-column {
+    -fx-padding: 4em 2em 2em 2em;
+}
+.prefmgr-key-panel .key-bindings-buttons {
+    -fx-spacing: 4em;
+    -fx-padding: 1em;
+}
+.prefmgr-key-panel .key-header-label {
+    -fx-label-padding: 0 0 1em 0;
+}
+
+.not-a-project {
+    -fx-spacing: 0.5em;
+    -fx-min-width: 500.0;
+}
+
+.non-empty-directory {
+    -fx-spacing: 0.5em;
+}
+.non-empty-directory .parent-path {
+    -fx-padding: 0 0 0 4em;
+    -fx-max-width: 400.0;
+    -fx-text-overrun: center-ellipsis;
+    -fx-wrap-text: false;
+}
+.non-empty-directory .subDirRow, .non-empty-directory .subDirRow > * {
+    -fx-alignment: baseline-left;
+}
+
+/* Team */
+.team-settings {
+    -fx-min-width:  30em;
+    -fx-pref-width: 43em;
+
+    -fx-min-height:  35em;
+    -fx-pref-height: 35em;
+
+    -fx-padding-left: 2em;
+    -fx-margin-left: 2em;
+
+     -bj-border-radius: 5;
+     -bj-background-radius: 10;
+     -bj-border-width: 2;
+
+     -fx-border-radius: 5;
+     -fx-background-radius: 10;
+     -fx-border-width: 2;
+}
+
+.team-settings .panel {
+    -fx-padding: 1em 1em 1.5em 2em;
+    -fx-spacing: 0.8em;
+}
+
+.team-settings .panel .serverType-box {
+     -fx-spacing: 0.8em;
+}
+
+.team-settings .grid {
+    -fx-min-width:  40em;
+    -fx-pref-width: 40em;
+
+    -fx-hgap: 0.5em;
+    -fx-vgap: 0.5em;
+
+    -fx-padding: 1em 1em 1.5em 2em;
+}
+
+.team-test-connection {
+    -fx-min-width:  10em;
+    -fx-pref-width: 25em;
+
+    -fx-min-height:  16em;
+    -fx-pref-height: 18em;
+}
+
+.team-test-connection .pane{
+    -fx-padding: 0.833em; /* 10px */
+    -fx-spacing: 0.833em;
+}
+
+.team-commit-push {
+    -fx-min-height:  35em;
+    -fx-pref-height: 50em;
+}
+
+.team-commit-comments {
+    -fx-min-height:  30em;
+    -fx-pref-height: 40em;
+}
+
+.team-commit-push, .team-commit-comments
+ {
+    -fx-min-width:  20em;
+    -fx-pref-width: 34em;
+
+    -fx-padding: 1em;
+
+     -bj-border-radius: 5;
+     -bj-background-radius: 10;
+     -bj-border-width: 2;
+
+     -fx-border-radius: 5;
+     -fx-background-radius: 10;
+     -fx-border-width: 2;
+}
+
+.team-commit-push .main-pane, .team-commit-comments .main-pane {
+    -fx-spacing: 0.5em;
+}
+
+.team-commit-push .main-pane .button-hbox,
+.team-commit-comments .main-pane .button-hbox
+ {
+     -fx-spacing: 0.8em;
+}
+
+.team-update-files {
+    -fx-min-width:  32em;
+    -fx-pref-width: 32em;
+
+    -fx-min-height:  16em;
+    -fx-pref-height: 18em;
+}
+
+.team-update-files .main-pane {
+    -fx-spacing: 0.8em;
+}
+
+.team-update-files > .button-hbox {
+     -fx-spacing: 0.5em;
+     -fx-padding: 0.833em;
+     -fx-alignment: center-right;
+}
+
+.team-status {
+    -fx-min-width:  10em;
+    -fx-pref-width: 40em;
+
+    -fx-min-height:  16em;
+    -fx-pref-height: 24em;
+}
+.replacement-button-bar {
+    -fx-padding: 0.833em; /* 10px */
+}
+.status-table {
+    -fx-border-color: hsb(0, 0%, 70%);
+    -fx-border-width: 1;
+    -fx-border-style: solid;
+}
+
+.team-history {
+    -fx-min-width:  45em;
+    -fx-pref-width: 45em;
+
+    -fx-min-height:  30em;
+    -fx-pref-height: 40em;
+}
+
+.team-history .main-pane {
+    -fx-spacing: 1em;
+}
+
+.team-conflicts,
+.team-module-select
+{
+    -fx-min-width:  10em;
+    -fx-pref-width: 25em;
+
+    -fx-min-height:  16em;
+    -fx-pref-height: 18em;
+}

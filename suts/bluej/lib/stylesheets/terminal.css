@@ -1,0 +1,39 @@
+/*
+.terminal .virtual-flow {
+    -fx-gravity: rear;
+}
+*/
+.terminal-split {
+    -fx-orientation: vertical;
+}
+.terminal-output {
+    -fx-fill: black;
+}
+.terminal-input {
+    -fx-fill: blue;
+}
+.terminal-method-record {
+    -fx-fill: brown;
+}
+.terminal-error {
+    -fx-fill: red;
+}
+.terminal-stack-link {
+    -fx-fill: rgb(255, 96, 96);
+    -rtfx-underline-color: red;
+    -rtfx-underline-width: 2;
+    -fx-cursor: hand;
+}
+.terminal-stack-foreign {
+    -fx-fill: hsb(0, 0%, 70%);
+}
+
+/* Show prompt text even when we are focused: */
+.terminal-input-field {
+    -fx-prompt-text-fill: hsb(0, 0%, 70%);
+}
+
+/* Slightly darker than white to make input field stand out: */
+.terminal, .terminal-error {
+    -fx-background-color: rgb(251, 251, 251);
+}

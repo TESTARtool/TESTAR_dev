@@ -1,0 +1,29 @@
+{
+    -fx-padding: 5 0 5 0;
+}
+
+Label {
+    -fx-padding: 5px;
+    -fx-font-size: 10px;
+}
+
+TextArea {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+WebView {
+    -fx-margin: 5 0 5 0;
+}
+
+.credits {
+    -fx-padding: 0px;
+    -fx-border-color: #C5C5C5;
+    -fx-border-insets: 5 0 5 0;
+    -fx-border-width:1.0;
+}
+
+.app_name {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
