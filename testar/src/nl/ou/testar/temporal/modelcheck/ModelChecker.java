@@ -150,7 +150,8 @@ public abstract class ModelChecker {
      *
      * @param oracleColl nnn collection is updated!
      * @param output file with formulas
-     * @param doTransformation flag to transform the formulas according to their temporal formalism (~ actual model checker). false is used save the formulas for external verification prior to do a model-cjheck.     *
+     * @param doTransformation flag to transform the formulas according to their temporal formalism (~ actual model checker). \n
+     *                         false is used save the formulas for external verification prior to do a model-check.
      * @link saveStringToFile()
      */
     void saveFormulasForChecker(List<TemporalOracle> oracleColl, File output, boolean doTransformation) {

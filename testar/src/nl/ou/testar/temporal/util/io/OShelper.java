@@ -23,7 +23,7 @@ import static com.google.common.net.HttpHeaders.USER_AGENT;
 public class OShelper {
     /**
      * Convert a absolute Windows path to Unix path
-     * E.g. C:\Wndows\Temp becomes /mnt/c/Windows/Temp
+     * E.g. C:\\Windows\\Temp becomes /mnt/c/Windows/Temp
      * @param windowsFilePath
      * @return
      */

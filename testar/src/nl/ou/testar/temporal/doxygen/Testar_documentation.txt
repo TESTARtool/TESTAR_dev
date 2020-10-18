@@ -6,6 +6,26 @@ For move information on TESTAR, please visit https://testar.org/
 */
 
 - - -
+/** \page temporalpackages Temporal Package diagram
+
+- - -
+  \image html "20201018 Temporal_packages.png" "TESTAR temporal module package dependencies"
+- - -
+*/
+
+/** \page dependency Dependency diagrams
+
+The mutual dependencies of the temporal module versus TESTAR core
+- - -
+  \image html "dep_on_testarcore_1of2.png" "Dependency on the TESTAR core part1/2"
+- - -
+  \image html "dep_on_testarcore_2of2.png" "Dependency on the TESTAR core part2/2"
+- - -
+  \image html "dep_on_testartemporal.png" "Dependency of the TESTAR core on the temporal mudule"
+
+- - -
+*/
+- - -
 /** \page scr Screen prints of the application
 The Application is presented as a TAB in the TESTAR GUI.
 
@@ -18,6 +38,7 @@ The Application is presented as a TAB in the TESTAR GUI.
 
 - - -
 */
+
 - - -
 /** \page temporal_settings Temporal backend configuration
 Description of Temporal parameters in TESTAR settings file
@@ -48,6 +69,8 @@ TemporalOffLineEnabled              = false
 TemporalConcreteEqualsAbstract      = true
 TemporalInstrumentDeadlockState     = true
 TemporalVerbose                     = true
+TemporalExportGraphMLOnVerbose      = true
+TemporalLogDetailsInModelFile       = true
 TemporalZipLargeFiles               = true
 TemporalDBisSource                  = true
 TemporalCounterExamples             = true
@@ -63,6 +86,7 @@ TemporalPythonEnvironment           = C:\\Program Files (x86)\\Python38-32\\pyth
 TemporalVisualizerServer            = C:\\Users\\cseng\\git\\Testar_viz\\run.py --port 8050
 TemporalVisualizerURL               = http://localhost:8050
 TemporalVisualizerURLStop           = http://localhost:8050/shutdown
+
 
 \endverbatim
 - - -
