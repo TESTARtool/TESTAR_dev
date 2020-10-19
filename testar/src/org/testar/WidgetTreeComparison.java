@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar.StateModel.Difference;
+package org.testar;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -60,13 +60,13 @@ import es.upv.staq.testar.CodingManager;
  * - Get one ConcreteState (because we are comparing at Abstract level doesn't matter which one)
  * - Get the widget tree of this Concrete State (should have been saved in state model extraction)
  */
-public class StateModelDifferenceWidgetTree {
+public class WidgetTreeComparison {
 
 	private State previousState;
 	private State newState;
 	private Tag<?>[] customTagsForAbstractId;
 
-	public StateModelDifferenceWidgetTree(State previousState, State newState) {
+	public WidgetTreeComparison(State previousState, State newState) {
 		this.previousState = previousState;
 		this.newState = newState;
 
