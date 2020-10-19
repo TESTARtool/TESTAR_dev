@@ -167,7 +167,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
 
         name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
-        textContent: "",
+        textContent: element.textContent,
         value: element.value,
         display: computedStyle.getPropertyValue('display'),
 

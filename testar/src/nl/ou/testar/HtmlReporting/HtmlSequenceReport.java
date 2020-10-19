@@ -97,8 +97,11 @@ public class HtmlSequenceReport {
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
     		// repairing the file paths:
-    		if(imagePath.contains("./output")){
-    			imagePath = imagePath.replace("./output","../");
+    		if(imagePath.contains("output\\")){
+    			//int indexStart = imagePath.indexOf("./output");
+    			int indexScrn = imagePath.indexOf("\\scrshots\\");
+    			String replaceString = imagePath.substring(0, indexScrn + 1);
+    			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h4>State:</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
@@ -126,10 +129,10 @@ public class HtmlSequenceReport {
     private void writeStateIntoReport(State state){
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
-    		if(imagePath.contains("./output")){
-    			int indexStart = imagePath.indexOf("./output");
-    			int indexScrn = imagePath.indexOf("scrshots");
-    			String replaceString = imagePath.substring(indexStart,indexScrn);
+    		if(imagePath.contains("output\\")){
+    			//int indexStart = imagePath.indexOf("./output");
+    			int indexScrn = imagePath.indexOf("\\scrshots\\");
+    			String replaceString = imagePath.substring(0, indexScrn + 1);
     			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h2>State "+innerLoopCounter+"</h2>");
@@ -154,8 +157,6 @@ public class HtmlSequenceReport {
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
-//            try{if(action.get(Tags.Role)!=null) write("--Role="+action.get(Tags.Role));}catch(Exception e){}
-//            try{if(action.get(Tags.Targets)!=null) write("--Targets="+action.get(Tags.Targets));}catch(Exception e){}
             try{
             	if(action.get(Tags.Desc)!=null) {
             		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -238,19 +239,18 @@ public class HtmlSequenceReport {
 
     public void addSelectedAction(State state, Action action){
     	String screenshotDir = OutputStructure.screenshotsOutputDir;
-//        System.out.println("path="+state_path);
     	if(screenshotDir.contains("./output")){
         	int indexStart = screenshotDir.indexOf("./output");
         	int indexScrn = screenshotDir.indexOf("scrshots");
         	String replaceString = screenshotDir.substring(indexStart,indexScrn);
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
-//        System.out.println("path="+actionPath);
+    	
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
         		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
-//        System.out.println("path="+actionPath);
+        
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 
@@ -262,9 +262,12 @@ public class HtmlSequenceReport {
         }catch(Exception e){}
 
         write("</h4>");
-        if(actionPath.contains("./output")){
-            actionPath = actionPath.replace("./output","..");
-        }
+		if(actionPath.contains("output\\")){
+			//int indexStart = imagePath.indexOf("./output");
+			int indexScrn = actionPath.indexOf("\\scrshots\\");
+			String replaceString = actionPath.substring(0, indexScrn + 1);
+			actionPath = actionPath.replace(replaceString,"../");
+		}
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
 

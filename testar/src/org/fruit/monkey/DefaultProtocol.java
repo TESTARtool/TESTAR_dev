@@ -488,6 +488,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * 
 	 * Example to Execute with command line:
 	 * testar ShowVisualSettingsDialogOnStartup=false Mode=Analysis DataStoreType=plocal DataStoreDirectory="C:\\Users\\testar\\Desktop\\orientdb-3.0.28\\databases" DataStoreDB=testar DataStoreUser=testar DataStorePassword=testar 
+	 * testar ShowVisualSettingsDialogOnStartup=false Mode=Analysis DataStoreType=remote DataStoreServer=10.0.0.1 DataStoreDB=testar DataStoreUser=testar DataStorePassword=testar
 	 * 
 	 * Running on:
 	 * http://127.0.0.1:8090/models
