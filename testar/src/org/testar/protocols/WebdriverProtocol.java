@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
 import org.fruit.alayer.Action;
@@ -64,11 +65,13 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -94,7 +97,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	// Define a whitelist of allowed domains for links and pages
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
-	protected List<String> domainsAllowed = null;
+	protected List<String> domainsAllowed = new ArrayList<>();
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)
@@ -108,11 +111,24 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
-	protected Map<String, String> policyAttributes =
-			new HashMap<String, String>() {{
-				put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
-			}};
+	protected Map<String, String> policyAttributes = new HashMap<String, String>() {{ put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton"); }};
 
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+		// Indicate to TESTAR we want to use webdriver package implementation
+		NativeLinker.addWdDriverOS();
+		
+		super.initialize(settings);
+	    
+		// Override ProtocolUtil to allow WebDriver screenshots
+	    protocolUtil = new WdProtocolUtil();
+	}
+	
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
      */
@@ -136,6 +152,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
+    	// Add the domain from the SUTConnectorValue to domainsAllowed List
+    	ensureDomainsAllowed();
+    	
     	SUT sut = super.startSystem();
 
     	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
@@ -541,17 +560,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/*
-	 * If domainsAllowed not set, allow the domain from the SUT Connector
+	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		// Not required or already defined
-		if (domainsAllowed == null || domainsAllowed.size() > 0) {
-			return;
-		}
-
 		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
 		String url = parts[parts.length - 1].replace("\"", "");
-		domainsAllowed = Arrays.asList(getDomain(url));
+
+		if(!domainsAllowed.contains(getDomain(url))) {
+			System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+			String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+			domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+			System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+		}
 	}
 	
 	/*

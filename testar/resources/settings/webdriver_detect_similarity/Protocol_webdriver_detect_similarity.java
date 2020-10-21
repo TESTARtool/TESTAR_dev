@@ -29,17 +29,13 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.SimilarityDetection;
@@ -66,9 +62,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
@@ -106,10 +100,6 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements 
 		WdDriver.forceActivateTab = true;
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
-
 	}
 
 	/**
