@@ -58,7 +58,6 @@ import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.UIManager.*;
-import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 
@@ -154,9 +153,6 @@ public class SettingsDialog extends JFrame implements Observer {
       settings.set(ConfigTags.Mode, mode);
       saveCurrentSettings();
       ret = settings;
-      if (settings.get(ConfigTags.AlwaysCompile)) {
-        compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
-      }
       this.dispose();
     } catch (IllegalStateException ise) {
       JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
