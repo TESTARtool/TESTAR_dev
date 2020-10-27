@@ -111,7 +111,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
-	protected Map<String, String> policyAttributes = new HashMap<String, String>() {{ put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton"); }};
+	@SuppressWarnings("serial")
+	protected Map<String, String> policyAttributes = new HashMap<String, String>()
+	{
+		{ 
+			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+		}
+	};
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -326,7 +332,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     		try {
     			
-    			File folder = new File(settings.getSettingsPath());
+    			File folder = new File(Settings.getSettingsPath());
     			File file = new File(folder, "existingCssClasses.txt");
     			if(!file.exists())
     				file.createNewFile();
