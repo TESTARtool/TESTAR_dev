@@ -170,8 +170,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
     	// webdriver in the constructor of WdDriver.
     	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows")
-    			&& sut.get(Tags.HWND, null) == null) {
+    	if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
     		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
     		// window handle. The running browser needs to be in the foreground when we reach this part.
     		long hwnd = Windows.GetForegroundWindow();
