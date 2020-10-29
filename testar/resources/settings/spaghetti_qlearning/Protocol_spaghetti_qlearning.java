@@ -344,7 +344,7 @@ public class Protocol_spaghetti_qlearning extends DesktopProtocol {
 			
 			//TODO: Disabled by default, we also need to delete original folder after compression
 			//Compress JaCoCo files
-			//compressOutputFile();
+			compressOutputFile();
 
 		}
 

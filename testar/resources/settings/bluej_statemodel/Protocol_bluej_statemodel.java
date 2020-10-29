@@ -51,6 +51,8 @@ import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
 import org.testar.protocols.DesktopProtocol;
 
+import org.fruit.alayer.windows.UIATags;
+
 import com.google.common.io.Files;
 
 import nl.ou.testar.RandomActionSelector;
@@ -133,6 +135,40 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 				System.out.println("sequenceTimeUntilActions.txt can not be created " );
 				e.printStackTrace();
 		}
+		
+		/**
+		 * Lets force the creation of a new project in BlueJ, trying to cover the internal functionality
+		 */
+		// Create a New Project
+		//waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Project", state, system, 5, 1);
+		
+		// Predefined method waitAndLeftClickWidgetWithMatchingTag doesnt work properly with this widget Title
+		// Use Title and Desc Tags to find Project button
+		for(Widget w : state) {
+			if(w.get(Tags.Title,"").equals("Project") && w.get(Tags.Desc,"").equals("Project")) {
+				// Execute click button
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				executeAction(system, state, ac.leftClickAt(w));
+				// Stop this widget tree iteration
+				break;
+			}
+		}
+		
+		// Wait 1 second and Update the state
+		Util.pause(1);
+		state = getState(system);
+		
+		// Find and click New Project button
+		waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "New Project", state, system, 5, 1);
+		
+		// Prepare a name for this new project and click OK
+		String projectName = OutputStructure.startInnerLoopDateString;
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(Tags.ValuePattern, "Enter a name for the new project", projectName, state, system, 5, 1);
+		waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
+		
+		Util.pause(10);
+	
+		
 	 	super.beginSequence(system, state);
 	}
 
@@ -157,6 +193,11 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		 StdActionCompiler ac = new AnnotatingActionCompiler();
 
+		 // Specific - BLUEJ: Force specific Actions for BlueJ SUT
+		 /*if(forceBlueJActions(state, actions, ac)) {
+			 return actions;
+		 }*/
+
 		 /**
 		  * Specific Action Derivation for BlueJ 4.1.4 SUT
 		  * To avoid deriving actions on non-desired widgets
@@ -178,6 +219,9 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 			 if(w.get(Tags.Desc,"").equals("decrement") || w.get(Tags.Desc,"").equals("increment")){
 				 continue; // skip this iteration of the for-loop
 			 }
+			 if(w.get(UIATags.UIAAutomationId,"").equals("JavaFX12") || w.get(UIATags.UIAAutomationId,"").equals("JavaFX13")) {
+				 continue;
+			 }
 
 			 // Only consider enabled and non-blocked widgets
 			 if(w.get(Enabled, true) && !w.get(Blocked, false)){
@@ -193,7 +237,7 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 					 // - unFiltered by any of the regular expressions in the Filter-tab, or
 					 // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					 // We want to create actions that consist of left clicking on them
-					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w)) && !isWindowContainerCloseButton(w)) {
 						 //Create a left click action with the Action Compiler, and add it to the set of derived actions
 						 actions.add(ac.leftClickAt(w));
 					 }
@@ -204,7 +248,7 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 					 // - unFiltered by any of the regular expressions in the Filter-tab, or
 					 // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					 // We want to create actions that consist of typing into them
-					 if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+					 if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w)) && !isWindowContainerCloseButton(w)) {
 
 						 // BLUEJ: Only derive Type Action in UIAEdit widgets, we have lot of residual UIAText
 						 if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
@@ -219,11 +263,68 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 					 addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
 				 }
 			 }
+		 
 		 }
 
 		 //return the set of derived actions
 		 return actions;
 	 }
+	 
+	 	 /**
+	  * BlueJ SUT contains several menus on which TESTAR need to click close to exit.
+	  * - Window Container Close button does not have UIAAutomationId property.
+	  * - BlueJ Close buttons contain UIAAutomationId property.
+	  * 
+	  * Lets use this property trying to filter only the container Close button.
+	  * 
+	  * @param w
+	  * @return
+	  */
+	 private boolean isWindowContainerCloseButton(Widget w) {
+		 return (w.get(Tags.Title,"").contains("Close") && !w.get(UIATags.UIAAutomationId,"").contains("JavaFX"));
+	 }
+	 
+	 /**
+	  * BLUEJ: Detect specific actions we want to force to be executed in BlueJ SUT
+	  * 
+	  * @param state
+	  * @param actions
+	  * @param ac
+	  * @return
+	  */
+	 private boolean forceBlueJActions(State state, Set<Action> actions, StdActionCompiler ac){
+		 for(Widget w : state){
+			 if(w.get(Tags.Role,Roles.Widget).toString().equalsIgnoreCase("UIATitleBar") && w.get(Tags.ValuePattern,"").contains("About BlueJ")){
+				 System.out.println("We are in About BlueJ Window!");
+				 if(forceClickClose(state, actions, ac)) {
+					 return true;
+				 }
+			 }
+		 }
+		 
+		 return false;
+	 }
+	 
+	 /**
+	  * BLUEJ: Force Click Close button if we are in About BlueJ window
+	  * 
+	  * @param state
+	  * @param actions
+	  * @param ac
+	  * @return
+	  */
+	 private boolean forceClickClose(State state, Set<Action> actions, StdActionCompiler ac) {
+		 for(Widget w : state){
+			 if(w.get(Tags.Title, "").contains("Close")) {
+				 actions.add(ac.leftClickAt(w));
+				 System.out.println("Forcing Action Click Close Button...");
+				 return true;
+			 }
+		 }
+		 return false;
+	 }
+
+	 
 	 
 	 /**
 	  * Select one of the available actions using an action selection algorithm (for example random action selection)
@@ -340,7 +441,7 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 			
 			//TODO: Disabled by default, we also need to delete original folder after compression
 			//Compress JaCoCo files
-			//compressOutputFile();
+			compressOutputFile();
 
 		}
  

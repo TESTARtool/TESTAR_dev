@@ -341,7 +341,7 @@ public class Protocol_swingset2_statemodel extends DesktopProtocol {
 			
 			//TODO: Disabled by default, we also need to delete original folder after compression
 			//Compress JaCoCo files
-			//compressOutputFile();
+			compressOutputFile();
 
 		}
  
