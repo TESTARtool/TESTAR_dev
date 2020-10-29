@@ -31,6 +31,7 @@
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -77,7 +78,7 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = null; //Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+		domainsAllowed = null; //Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -129,7 +130,12 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state) {
-		super.beginSequence(system, state);
+		// F-secure specific login:
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebType,"email", "pekka.aho@ou.nl", state, system, 5,1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebType,"password", "Testar12345", state, system, 5,1.0);
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebType,"submit", state, system, 5,1.0);
+		Util.pause(5);
+		// SUT state is automatically updated after beginSequence()
 	}
 
 	/**

@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "e:\\webdriver\\chromedriver.exe" "1920x900+0+0" "https://portal.business.f-secure.com/"
 
 #################################################################
 # Sequences
@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_fsecurefsecure/Protocol_webdriver_fsecure
+ProtocolClass = webdriver_fsecure/Protocol_webdriver_fsecure
 
 #################################################################
 # Graphdatabase settings (experimental)
