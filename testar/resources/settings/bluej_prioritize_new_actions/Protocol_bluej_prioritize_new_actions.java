@@ -29,7 +29,9 @@
  *******************************************************************************************************/
 
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import nl.ou.testar.ActionSelectionUtils;
@@ -84,6 +86,10 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;
+	
+	// BlueJ: Some parts/windows of the SUT may not be interesting to explore
+	// Use the name of the window UIATitleBar to force a close action - "BlueJ:  Debugger" need double space
+	protected List<String> unwantedWindows = Arrays.asList("BlueJ:  Debugger", "BlueJ Quick Introduction - tutorial");
 
 	// PrioritizeNewActionsSelector: Instead of random, we will prioritize new actions for action selection
 	private PrioritizeNewActionsSelector selector = new PrioritizeNewActionsSelector();
@@ -199,10 +205,10 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
         
-		 // Specific - BLUEJ: Force specific Actions for BlueJ SUT
-		 /*if(forceBlueJActions(state, actions, ac)) {
+		 // BLUEJ: Force specific Actions for BlueJ SUT (currently closing unwantedWindows)
+		 if(forceBlueJActions(state, actions, ac)) {
 			 return actions;
-		 }*/
+		 }
 
 		 /**
 		  * Specific Action Derivation for BlueJ 4.1.4 SUT
@@ -278,7 +284,7 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 		return actions;
 	}
 	
-		 /**
+	/**
 	  * BlueJ SUT contains several menus on which TESTAR need to click close to exit.
 	  * - Window Container Close button does not have UIAAutomationId property.
 	  * - BlueJ Close buttons contain UIAAutomationId property.
@@ -302,9 +308,9 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	  */
 	 private boolean forceBlueJActions(State state, Set<Action> actions, StdActionCompiler ac){
 		 for(Widget w : state){
-			 if(w.get(Tags.Role,Roles.Widget).toString().equalsIgnoreCase("UIATitleBar") && w.get(Tags.ValuePattern,"").contains("About BlueJ")){
-				 System.out.println("We are in About BlueJ Window!");
-				 if(forceClickClose(state, actions, ac)) {
+			 if(w.get(Tags.Role,Roles.Widget).toString().equalsIgnoreCase("UIATitleBar") && unwantedWindows.contains(w.get(Tags.ValuePattern,""))){
+				 System.out.println("We are in an Unwanted BlueJ Window : " + w.get(Tags.ValuePattern,""));
+				 if(forceClickClose(w, actions, ac)) {
 					 return true;
 				 }
 			 }
@@ -321,17 +327,16 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	  * @param ac
 	  * @return
 	  */
-	 private boolean forceClickClose(State state, Set<Action> actions, StdActionCompiler ac) {
-		 for(Widget w : state){
-			 if(w.get(Tags.Title, "").contains("Close")) {
-				 actions.add(ac.leftClickAt(w));
+	 private boolean forceClickClose(Widget widget, Set<Action> actions, StdActionCompiler ac) {
+		 for(int i = 0; i < widget.childCount(); i++){
+			 if(widget.child(i).get(Tags.Title, "").contains("Close")) {
+				 actions.add(ac.leftClickAt(widget.child(i)));
 				 System.out.println("Forcing Action Click Close Button...");
 				 return true;
 			 }
 		 }
 		 return false;
 	 }
-
 	
 	
 	/**
