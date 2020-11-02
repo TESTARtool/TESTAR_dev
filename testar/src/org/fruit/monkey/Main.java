@@ -49,6 +49,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 import org.fruit.alayer.windows.Windows10;
 
+import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -115,7 +116,7 @@ public class Main {
 
 			initOperatingSystem();
 
-			startTestar(settings, testSettingsFileName);
+			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
@@ -131,7 +132,7 @@ public class Main {
 
 				initOperatingSystem();
 
-				startTestar(settings, testSettingsFileName);
+				startTestar(settings);
 			}
 		}
 
@@ -320,7 +321,12 @@ public class Main {
 	 * @param settings
 	 * @param testSettings
 	 */
-	private static void startTestar(Settings settings, String testSettings) {
+	private static void startTestar(Settings settings) {
+
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+		}
 
 		URLClassLoader loader = null;
 
@@ -435,10 +441,6 @@ public class Main {
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
 			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));
