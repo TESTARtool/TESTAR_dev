@@ -1737,7 +1737,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
-		Assert.isTrue(actions != null && !actions.isEmpty());
+		Assert.isTrue(actions != null);
+		if(actions.isEmpty()){
+			System.out.println("TESTAR did not find any actions on this state!");
+		}
 
 		Action a = preSelectAction(state, actions);
 		if (a != null){

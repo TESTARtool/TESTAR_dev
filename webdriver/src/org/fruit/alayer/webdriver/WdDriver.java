@@ -460,11 +460,11 @@ public class WdDriver extends SUTBase {
   }
 
   public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait(webDriver, 10);
+    WebDriverWait wait = new WebDriverWait(webDriver, 20);
     ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
       Object result = webDriver.executeScript("return document.readyState");
       //Object result2 = webDriver.executeScript("return jQuery.active == 0");
-      System.out.println("document ready = "+result+ " equals complete = "+ result.equals("complete"));
+      //System.out.println("document ready = "+result+ " equals complete = "+ result.equals("complete"));
       //System.out.println("jQuery active == 0 = "+result2 + " equals true = "+result2.equals(true));
       return result != null && result.equals("complete");// && result2 != null && result2.equals(true);
     };

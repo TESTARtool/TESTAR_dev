@@ -78,7 +78,7 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com");
+		domainsAllowed = Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com", "portal.rdr.f-secure.com");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -189,6 +189,21 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state)
 			throws ActionBuildException {
+
+		Set<Action> actions = getActions(system,state);
+		int retryCounter = 0;
+		int maxRetries = 10;
+		if(actions.isEmpty()&&retryCounter<maxRetries){
+			System.out.println("actions is empty - retrying getState and deriveActions");
+			Util.pause(1);
+			state = getState(system);
+			actions=getActions(system,state);
+		}
+
+		return actions;
+	}
+
+	private Set<Action> getActions(SUT system, State state){
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 
@@ -229,7 +244,6 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 				}
 			}
 		}
-
 		return actions;
 	}
 

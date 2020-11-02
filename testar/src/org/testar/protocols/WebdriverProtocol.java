@@ -457,6 +457,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
+			System.out.println("The URL is not in allowed domains (or the extension is blacklisted)");
 			// If opened in new tab, close it
 			if (WdDriver.getWindowHandles().size() > 1) {
 				return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
