@@ -30,6 +30,7 @@
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.SutVisualization;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -206,6 +207,7 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 	private Set<Action> getActions(SUT system, State state){
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
+		Set<Action> filteredActions = new HashSet<Action>();
 
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
@@ -219,8 +221,15 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+			//if(widget.get(WdTags.))
+
 			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
+			if (!widget.get(Enabled, true) ) {
+				continue;
+			}
+
+			if (blackListed(widget)) {
+				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}
 
@@ -241,9 +250,15 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
 					actions.add(ac.leftClickAt(widget));
+				}else{
+					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+
 		return actions;
 	}
 

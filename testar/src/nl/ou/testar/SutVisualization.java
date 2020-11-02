@@ -49,6 +49,20 @@ import static org.fruit.alayer.Tags.Visualizer;
 public class SutVisualization {
 
     /**
+     * Visualizing filtered actions with grey colored dots
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
+    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
+        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
+        for(Action a : actions){
+            a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+        }
+    }
+
+    /**
      *
      * @param showExtendedWidgetInfo
      * @param markParentWidget
