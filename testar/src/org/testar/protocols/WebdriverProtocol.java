@@ -572,11 +572,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
 		String url = parts[parts.length - 1].replace("\"", "");
 
-		if(!domainsAllowed.contains(getDomain(url))) {
-			System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
-			String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-			domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
-			System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+		try{
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+		} catch(Exception e) {
+			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
+			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
 	

@@ -220,7 +220,7 @@ public final class Tags extends TagsBase {
 	/*
 	private static Set<Tag<String>> generalStringVerdictTags;
 	static {
-		Set<Tag<String>> generalStringVerdictTags = new HashSet<Tag<String>>();
+		generalStringVerdictTags = new HashSet<Tag<String>>();
 		generalStringVerdictTags.add(Title);
 		generalStringVerdictTags.add(ValuePattern);
 	}*/

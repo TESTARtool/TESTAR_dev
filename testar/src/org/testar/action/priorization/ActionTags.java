@@ -44,7 +44,7 @@ public class ActionTags extends TagsBase  {
 
 	private static Set<Tag<Integer>> actionTags;
 	static {
-		Set<Tag<Integer>> actionTags = new HashSet<Tag<Integer>>();
+		actionTags = new HashSet<Tag<Integer>>();
 		actionTags.add(SimilarityValue);
 	}
 
