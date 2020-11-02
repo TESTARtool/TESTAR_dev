@@ -78,7 +78,7 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = null; //Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com");
+		domainsAllowed = Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)

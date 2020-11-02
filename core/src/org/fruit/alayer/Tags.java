@@ -216,13 +216,20 @@ public final class Tags extends TagsBase {
 	 * The original widget that can be attached to things like actions
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
-	
+
+	/*
 	private static Set<Tag<String>> generalStringVerdictTags;
 	static {
 		Set<Tag<String>> generalStringVerdictTags = new HashSet<Tag<String>>();
 		generalStringVerdictTags.add(Title);
 		generalStringVerdictTags.add(ValuePattern);
-	}
+	}*/
+	private static Set<Tag<String>> generalStringVerdictTags = new HashSet<Tag<String>>() {
+		{
+			add(Title);
+			add(ValuePattern);
+		}
+	};
 
 	public static Set<Tag<String>> getGeneralStringVerdictTags() {
 		return generalStringVerdictTags;
