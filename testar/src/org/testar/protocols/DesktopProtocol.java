@@ -39,6 +39,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
@@ -253,13 +254,34 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * DECODER 
      * This method checks the needed files (JS insert file, Test Result Schema, Test Result Artifact) 
      * and TESTAR setting (PKM ip, port, db, user, key) 
-     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * to prepare a CURL command that allows TESTAR to feed the PKM through PKM-API
      * 
-     * @return NodeJS query
+     * @return CURL command
      */
     protected String prepareTestResultNodeCommand() {
     	String commandTestResults = "";
+
+    	// Prepare the CURL command to insert the Test Results Artefact through PKM-API
+    	/* curl -k -X POST "https://10.101.0.224:8080/testar/test_results/myproject" 
+    	 * -H  "accept: application/json" 
+    	 * -H  "key: user.key.key" 
+    	 * -H  "Content-Type: application/json" 
+    	 * -d @ArtefactTestResults_MyThaiStar_2020.1_2020-06-15_12h14m24s.json*/
+
     	try {
+    		commandTestResults = String.format("curl -k -X POST \"%s\" -H \"%s\" -H \"%s\" -H \"%s\" -d %s", 
+    				"https://"+settings.get(ConfigTags.PKMaddress)+":"+settings.get(ConfigTags.PKMport)+"/testar/test_results/"+settings.get(ConfigTags.PKMdatabase),
+    				"accept: application/json",
+    				"key:"+settings.get(ConfigTags.PKMkey),
+    				"Content-Type: application/json",
+    				"@"+new File(testResultsArtefactDirectory).getCanonicalPath());
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing CURL command to insert ArtefactTestResults");
+    		e.printStackTrace();
+    	}
+
+    	/* First OLD Version that used node js to connect directly with mongodb
+    	 * try {
     		// Prepare the NodeJS command to insert the Test Results Artefact
     		String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
     		String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
@@ -275,22 +297,43 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	} catch (IOException e) {
     		System.out.println("ERROR! Preparing Node JS command to insert Test Results Artefact");
     		e.printStackTrace();
-    	}
-    	
+    	}*/
+
     	return commandTestResults;
     }
-    
+
     /**
      * DECODER 
      * This method checks the needed files (JS insert file, State Model Schema, State Model Artifact) 
      * and TESTAR setting (PKM ip, port, db, user, key) 
-     * to prepare a Node JS query that allows TESTAT to feed the PKM.
+     * to prepare a CURL command that allows TESTAR to feed the PKM through PKM-API
      * 
-     * @return NodeJS query
+     * @return CURL command
      */
     protected String prepareStateModelNodeCommand() {
     	String commandStateModel = "";
+
+    	// Prepare the CURL command to insert the State Model Artefact through PKM-API
+    	/* curl -k -X POST "https://10.101.0.224:8080/testar/state_model/myproject" 
+    	 * -H  "accept: application/json" 
+    	 * -H  "key: user.key.key" 
+    	 * -H  "Content-Type: application/json" 
+    	 * -d @ArtefactStateModel_MyThaiStar_2020.1_zpnffj5c3407972370_2020-06-15_12h14m24s.json*/
+
     	try {
+    		commandStateModel = String.format("curl -k -X POST \"%s\" -H \"%s\" -H \"%s\" -H \"%s\" -d %s", 
+    				"https://"+settings.get(ConfigTags.PKMaddress)+":"+settings.get(ConfigTags.PKMport)+"/testar/state_model/"+settings.get(ConfigTags.PKMdatabase),
+    				"accept: application/json",
+    				"key:"+settings.get(ConfigTags.PKMkey),
+    				"Content-Type: application/json",
+    				"@"+new File(stateModelArtefactDirectory).getCanonicalPath());
+    	} catch (IOException e) {
+    		System.out.println("ERROR! Preparing CURL command to insert ArtefactStateModel");
+    		e.printStackTrace();
+    	}
+
+    	/* First OLD Version that used node js to connect directly with mongodb
+    	 * try {
     		// Prepare the NodeJS command to insert the State Model Artefact
     		String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
     		String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
@@ -306,7 +349,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	} catch (IOException e) {
     		System.out.println("ERROR! Preparing Node JS command to insert State Model Artefact");
     		e.printStackTrace();
-    	}
+    	}*/
 
     	return commandStateModel;
     }

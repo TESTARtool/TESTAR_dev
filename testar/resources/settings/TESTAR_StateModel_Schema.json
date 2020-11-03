@@ -1,489 +1,559 @@
 {
-  "definitions": {},
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "title": "The Root Schema",
-  "required": [
-    "timestamp",
-    "url",
-    "sut",
-    "tool",
-    "stateModelIdentifier",
-    "stateModelAppName",
-    "stateModelAppVersion",
-    "abstractionId",
-    "deterministic",
-    "unvisitedAbstractActions",
-    "numberAbstractStates",
-    "numberAbstractActions",
-    "numberConcreteStates",
-    "numberConcreteActions",
-    "storeWidgets",
-    "numberWidgets",
-    "numberTestSequences",
-    "testSequences"
-  ],
-  "properties": {
-    "timestamp": {
-      "$id": "#/properties/timestamp",
-      "type": "string",
-      "title": "The Timestamp Schema",
-      "default": "",
-      "examples": [
-        "2020-02-17_17h33m24s"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "url": {
-      "$id": "#/properties/url",
-      "type": "string",
-      "title": "The Url Schema",
-      "default": "",
-      "examples": [
-        "https://testar.org/images/models/"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "sut": {
-      "$id": "#/properties/sut",
-      "type": "object",
-      "title": "The Sut Schema",
-      "required": [
-        "license",
-        "runtimeOS"
-      ],
-      "properties": {
-        "license": {
-          "$id": "#/properties/sut/properties/license",
-          "type": "object",
-          "title": "The License Schema",
-          "default": "",
-          "examples": [
-            "license"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "runtimeOS": {
-          "$id": "#/properties/sut/properties/runtimeOS",
-          "type": "string",
-          "title": "The Runtimeos Schema",
-          "default": "",
-          "examples": [
-            "Windows 10"
-          ],
-          "pattern": "^(.*)$"
-        }
-      }
-    },
-    "tool": {
-      "$id": "#/properties/tool",
-      "type": "object",
-      "title": "The Tool Schema",
-      "required": [
-        "title",
-        "name",
-        "isOpenSource",
-        "license",
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "timestamp",
         "url",
-        "version",
-        "runtimeOS"
-      ],
-      "properties": {
-        "title": {
-          "$id": "#/properties/tool/properties/title",
-          "type": "string",
-          "title": "The Title Schema",
-          "default": "",
-          "examples": [
-            "TESTAR"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "name": {
-          "$id": "#/properties/tool/properties/name",
-          "type": "string",
-          "title": "The Name Schema",
-          "default": "",
-          "examples": [
-            "TESTAR: Automated Robustness Testing at the GUI level"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "isOpenSource": {
-          "$id": "#/properties/tool/properties/isOpenSource",
-          "type": "boolean",
-          "title": "The Isopensource Schema",
-          "default": false,
-          "examples": [
-            true
-          ]
-        },
-        "license": {
-          "$id": "#/properties/tool/properties/license",
-          "type": "string",
-          "title": "The License Schema",
-          "default": "",
-          "examples": [
-            "BSD-3-Clause License"
-          ],
-          "pattern": "^(.*)$"
+        "sut",
+        "tool",
+        "stateModelDataStore",
+        "stateModelDataStoreType",
+        "stateModelDataStoreServer",
+        "stateModelDataStoreDirectory",
+        "stateModelDataStoreDB",
+        "stateModelDataStoreUser",
+        "stateModelDataStorePassword",
+        "stateModelIdentifier",
+        "stateModelAppName",
+        "stateModelAppVersion",
+        "stateModelDifference",
+        "abstractionId",
+        "deterministic",
+        "unvisitedAbstractActions",
+        "numberAbstractStates",
+        "numberAbstractActions",
+        "numberConcreteStates",
+        "numberConcreteActions",
+        "storeWidgets",
+        "numberWidgets",
+        "numberTestSequences",
+        "testSequences"
+    ],
+    "properties": {
+        "timestamp": {
+            "$id": "#/properties/timestamp",
+            "type": "string",
+            "title": "The Timestamp Schema",
+            "default": "",
+            "examples": [
+                "2020-02-17_17h33m24s"
+            ],
+            "pattern": "^(.*)$"
         },
         "url": {
-          "$id": "#/properties/tool/properties/url",
-          "type": "string",
-          "title": "The Url Schema",
-          "default": "",
-          "examples": [
-            "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
-          ],
-          "pattern": "^(.*)$"
+            "$id": "#/properties/url",
+            "type": "string",
+            "title": "The Url Schema",
+            "default": "",
+            "examples": [
+                "https://testar.org/images/models/"
+            ],
+            "pattern": "^(.*)$"
         },
-        "version": {
-          "$id": "#/properties/tool/properties/version",
-          "type": "string",
-          "title": "The Version Schema",
-          "default": "",
-          "examples": [
-            "2.2.3 (7-Nov-2019)"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "runtimeOS": {
-          "$id": "#/properties/tool/properties/runtimeOS",
-          "type": "string",
-          "title": "The Runtimeos Schema",
-          "default": "",
-          "examples": [
-            "Windows 10"
-          ],
-          "pattern": "^(.*)$"
-        }
-      }
-    },
-    "stateModelIdentifier": {
-      "$id": "#/properties/stateModelIdentifier",
-      "type": "string",
-      "title": "The Statemodelidentifier Schema",
-      "default": "",
-      "examples": [
-        "jhew4x18845942042"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "stateModelAppName": {
-      "$id": "#/properties/stateModelAppName",
-      "type": "string",
-      "title": "The Statemodelappname Schema",
-      "default": "",
-      "examples": [
-        "Notepad"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "stateModelAppVersion": {
-      "$id": "#/properties/stateModelAppVersion",
-      "type": "string",
-      "title": "The Statemodelappversion Schema",
-      "default": "",
-      "examples": [
-        "2.0.0"
-      ],
-      "pattern": "^(.*)$"
-    },
-	"stateModelDifference": {
-        "$id": "#/properties/stateModelDifference",
-        "type": "object",
-        "title": "The stateModelDifference schema",
-        "default": {},
-        "examples": [
-            {
-                "previousStateModelAppName": "demo",
-                "previousStateModelAppVersion": "1",
-                "existsPreviousStateModel": true,
-                "numberDisappearedAbstractStates": 3,
-                "numberNewAbstractStates": 3,
-                "stateModelDifferenceReport": "./output\\2020-09-25_10h54m43s_demo_2\\StateModelDifference_demo_1_vs_demo_2\\DifferenceReport.html"
-            }
-        ],
-        "required": [
-            "previousStateModelAppName",
-            "previousStateModelAppVersion",
-            "existsPreviousStateModel",
-            "numberDisappearedAbstractStates",
-            "numberNewAbstractStates",
-            "stateModelDifferenceReport"
-        ],
-        "properties": {
-            "previousStateModelAppName": {
-                "$id": "#/properties/stateModelDifference/properties/previousStateModelAppName",
-                "type": "string",
-                "title": "The previousStateModelAppName schema",
-                "default": "",
-                "examples": [
-                    "demo"
-                ]
-            },
-            "previousStateModelAppVersion": {
-                "$id": "#/properties/stateModelDifference/properties/previousStateModelAppVersion",
-                "type": "string",
-                "title": "The previousStateModelAppVersion schema",
-                "default": "",
-                "examples": [
-                    "1"
-                ]
-            },
-            "existsPreviousStateModel": {
-                "$id": "#/properties/stateModelDifference/properties/existsPreviousStateModel",
-                "type": "boolean",
-                "title": "Check if existsPreviousStateModel",
-                "default": false,
-                "examples": [
-                    true
-                ]
-            },
-            "numberDisappearedAbstractStates": {
-                "$id": "#/properties/stateModelDifference/properties/numberDisappearedAbstractStates",
-                "type": "integer",
-                "title": "The numberDisappearedAbstractStates schema",
-                "default": 0,
-                "examples": [
-                    3
-                ]
-            },
-            "numberNewAbstractStates": {
-                "$id": "#/properties/stateModelDifference/properties/numberNewAbstractStates",
-                "type": "integer",
-                "title": "The numberNewAbstractStates schema",
-                "default": 0,
-                "examples": [
-                    3
-                ]
-            },
-            "stateModelDifferenceReport": {
-                "$id": "#/properties/stateModelDifference/properties/stateModelDifferenceReport",
-                "type": "string",
-                "title": "The stateModelDifferenceReport schema",
-                "default": "",
-                "examples": [
-                    "./output\\2020-09-25_10h54m43s_demo_2\\StateModelDifference_demo_1_vs_demo_2\\DifferenceReport.html"
-                ]
-            }
-        }
-    },
-    "abstractionId": {
-      "$id": "#/properties/abstractionId",
-      "type": "string",
-      "title": "The Abstractionid Schema",
-      "default": "",
-      "examples": [
-        "Widget title"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "deterministic": {
-      "$id": "#/properties/deterministic",
-      "type": "boolean",
-      "title": "The Deterministic Schema",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
-    "unvisitedAbstractActions": {
-      "$id": "#/properties/unvisitedAbstractActions",
-      "type": "integer",
-      "title": "The Unvisitedabstractactions Schema",
-      "default": 0,
-      "examples": [
-        43
-      ]
-    },
-    "numberAbstractStates": {
-      "$id": "#/properties/numberAbstractStates",
-      "type": "integer",
-      "title": "The Numberabstractstates Schema",
-      "default": 0,
-      "examples": [
-        13
-      ]
-    },
-    "numberAbstractActions": {
-      "$id": "#/properties/numberAbstractActions",
-      "type": "integer",
-      "title": "The Numberabstractactions Schema",
-      "default": 0,
-      "examples": [
-        21
-      ]
-    },
-    "numberConcreteStates": {
-      "$id": "#/properties/numberConcreteStates",
-      "type": "integer",
-      "title": "The Numberconcretestates Schema",
-      "default": 0,
-      "examples": [
-        17
-      ]
-    },
-    "numberConcreteActions": {
-      "$id": "#/properties/numberConcreteActions",
-      "type": "integer",
-      "title": "The Numberconcreteactions Schema",
-      "default": 0,
-      "examples": [
-        22
-      ]
-    },
-    "storeWidgets": {
-      "$id": "#/properties/storeWidgets",
-      "type": "boolean",
-      "title": "The Storewidgets Schema",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
-    "numberWidgets": {
-      "$id": "#/properties/numberWidgets",
-      "type": "integer",
-      "title": "The Numberwidgets Schema",
-      "default": 0,
-      "examples": [
-        495
-      ]
-    },
-    "numberTestSequences": {
-      "$id": "#/properties/numberTestSequences",
-      "type": "integer",
-      "title": "The Numbertestsequences Schema",
-      "default": 0,
-      "examples": [
-        5
-      ]
-    },
-    "testSequences": {
-      "$id": "#/properties/testSequences",
-      "type": "array",
-      "title": "The Testsequences Schema",
-      "items": {
-        "$id": "#/properties/testSequences/items",
-        "type": "object",
-        "title": "The Items Schema",
-        "required": [
-          "sequenceId",
-          "numberSequenceNodes",
-          "startDateTime",
-          "verdict",
-          "foundErrors",
-          "numberErrors",
-          "sequenceDeterministic",
-          "sequenceActionSteps"
-        ],
-        "properties": {
-          "sequenceId": {
-            "$id": "#/properties/testSequences/items/properties/sequenceId",
-            "type": "string",
-            "title": "The Sequenceid Schema",
-            "default": "",
-            "examples": [
-              "078c0469-3e2a-4f26-b740-5dc1bbdaa03e"
+        "sut": {
+            "$id": "#/properties/sut",
+            "type": "object",
+            "title": "The Sut Schema",
+            "required": [
+                "license",
+                "runtimeOS"
             ],
-            "pattern": "^(.*)$"
-          },
-          "numberSequenceNodes": {
-            "$id": "#/properties/testSequences/items/properties/numberSequenceNodes",
-            "type": "integer",
-            "title": "The Numbersequencenodes Schema",
-            "default": 0,
-            "examples": [
-              5
-            ]
-          },
-          "startDateTime": {
-            "$id": "#/properties/testSequences/items/properties/startDateTime",
-            "type": "string",
-            "title": "The Startdatetime Schema",
-            "default": "",
-            "examples": [
-              "Mon Feb 17 17:33:48 CET 2020"
-            ],
-            "pattern": "^(.*)$"
-          },
-          "verdict": {
-            "$id": "#/properties/testSequences/items/properties/verdict",
-            "type": "string",
-            "title": "The Verdict Schema",
-            "default": "",
-            "examples": [
-              "COMPLETED_SUCCESFULLY"
-            ],
-            "pattern": "^(.*)$"
-          },
-          "foundErrors": {
-            "$id": "#/properties/testSequences/items/properties/foundErrors",
-            "type": "boolean",
-            "title": "The Founderrors Schema",
-            "default": false,
-            "examples": [
-              false
-            ]
-          },
-          "numberErrors": {
-            "$id": "#/properties/testSequences/items/properties/numberErrors",
-            "type": "integer",
-            "title": "The Numbererrors Schema",
-            "default": 0,
-            "examples": [
-              0
-            ]
-          },
-          "sequenceDeterministic": {
-            "$id": "#/properties/testSequences/items/properties/sequenceDeterministic",
-            "type": "boolean",
-            "title": "The Sequencedeterministic Schema",
-            "default": false,
-            "examples": [
-              true
-            ]
-          },
-          "sequenceActionSteps": {
-            "$id": "#/properties/testSequences/items/properties/sequenceActionSteps",
-            "type": "array",
-            "title": "The Sequenceactionsteps Schema",
-            "items": {
-              "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items",
-              "type": "object",
-              "title": "The Items Schema",
-              "required": [
-                "actionDescription",
-                "timestamp"
-              ],
-              "properties": {
-                "actionDescription": {
-                  "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/actionDescription",
-                  "type": "string",
-                  "title": "The Actiondescription Schema",
-                  "default": "",
-                  "examples": [
-                    "Left Click at 'View'"
-                  ],
-                  "pattern": "^(.*)$"
+            "properties": {
+                "license": {
+                    "$id": "#/properties/sut/properties/license",
+                    "type": "object",
+                    "title": "The License Schema",
+                    "default": "",
+                    "examples": [
+                        "license"
+                    ],
+                    "pattern": "^(.*)$"
                 },
-                "timestamp": {
-                  "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/timestamp",
-                  "type": "string",
-                  "title": "The Timestamp Schema",
-                  "default": "",
-                  "examples": [
-                    "Mon Feb 17 17:33:59 CET 2020"
-                  ],
-                  "pattern": "^(.*)$"
+                "runtimeOS": {
+                    "$id": "#/properties/sut/properties/runtimeOS",
+                    "type": "string",
+                    "title": "The Runtimeos Schema",
+                    "default": "",
+                    "examples": [
+                        "Windows 10"
+                    ],
+                    "pattern": "^(.*)$"
                 }
-              }
             }
-          }
+        },
+        "tool": {
+            "$id": "#/properties/tool",
+            "type": "object",
+            "title": "The Tool Schema",
+            "required": [
+                "title",
+                "name",
+                "isOpenSource",
+                "license",
+                "url",
+                "version",
+                "runtimeOS"
+            ],
+            "properties": {
+                "title": {
+                    "$id": "#/properties/tool/properties/title",
+                    "type": "string",
+                    "title": "The Title Schema",
+                    "default": "",
+                    "examples": [
+                        "TESTAR"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "name": {
+                    "$id": "#/properties/tool/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                        "TESTAR: Automated Robustness Testing at the GUI level"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "isOpenSource": {
+                    "$id": "#/properties/tool/properties/isOpenSource",
+                    "type": "boolean",
+                    "title": "The Isopensource Schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "license": {
+                    "$id": "#/properties/tool/properties/license",
+                    "type": "string",
+                    "title": "The License Schema",
+                    "default": "",
+                    "examples": [
+                        "BSD-3-Clause License"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "url": {
+                    "$id": "#/properties/tool/properties/url",
+                    "type": "string",
+                    "title": "The Url Schema",
+                    "default": "",
+                    "examples": [
+                        "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "version": {
+                    "$id": "#/properties/tool/properties/version",
+                    "type": "string",
+                    "title": "The Version Schema",
+                    "default": "",
+                    "examples": [
+                        "2.2.3 (7-Nov-2019)"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "runtimeOS": {
+                    "$id": "#/properties/tool/properties/runtimeOS",
+                    "type": "string",
+                    "title": "The Runtimeos Schema",
+                    "default": "",
+                    "examples": [
+                        "Windows 10"
+                    ],
+                    "pattern": "^(.*)$"
+                }
+            }
+        },
+        "stateModelDataStore": {
+            "$id": "#/properties/stateModelDataStore",
+            "type": "string",
+            "title": "The stateModelDataStore schema",
+            "default": "",
+            "examples": [
+                "OrientDB"
+            ]
+        },
+        "stateModelDataStoreType": {
+            "$id": "#/properties/stateModelDataStoreType",
+            "type": "string",
+            "title": "The stateModelDataStoreType schema",
+            "default": "",
+            "examples": [
+                "remote"
+            ]
+        },
+        "stateModelDataStoreServer": {
+            "$id": "#/properties/stateModelDataStoreServer",
+            "type": "string",
+            "title": "The stateModelDataStoreServer schema",
+            "default": "",
+            "examples": [
+                "10.102.0.244"
+            ]
+        },
+        "stateModelDataStoreDirectory": {
+            "$id": "#/properties/stateModelDataStoreDirectory",
+            "type": "string",
+            "title": "The stateModelDataStoreDirectory schema",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        },
+        "stateModelDataStoreDB": {
+            "$id": "#/properties/stateModelDataStoreDB",
+            "type": "string",
+            "title": "The stateModelDataStoreDB schema",
+            "default": "",
+            "examples": [
+                "testar"
+            ]
+        },
+        "stateModelDataStoreUser": {
+            "$id": "#/properties/stateModelDataStoreUser",
+            "type": "string",
+            "title": "The stateModelDataStoreUser schema",
+            "default": "",
+            "examples": [
+                "testar"
+            ]
+        },
+        "stateModelDataStorePassword": {
+            "$id": "#/properties/stateModelDataStorePassword",
+            "type": "string",
+            "title": "The stateModelDataStorePassword schema",
+            "default": "",
+            "examples": [
+                "testar"
+            ]
+        },
+        "stateModelIdentifier": {
+            "$id": "#/properties/stateModelIdentifier",
+            "type": "string",
+            "title": "The Statemodelidentifier Schema",
+            "default": "",
+            "examples": [
+                "jhew4x18845942042"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "stateModelAppName": {
+            "$id": "#/properties/stateModelAppName",
+            "type": "string",
+            "title": "The Statemodelappname Schema",
+            "default": "",
+            "examples": [
+                "Notepad"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "stateModelAppVersion": {
+            "$id": "#/properties/stateModelAppVersion",
+            "type": "string",
+            "title": "The Statemodelappversion Schema",
+            "default": "",
+            "examples": [
+                "2"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "stateModelDifference": {
+            "$id": "#/properties/stateModelDifference",
+            "type": "object",
+            "title": "The stateModelDifference schema",
+            "default": {},
+            "examples": [{
+                    "existsPreviousStateModel": true,
+                    "previousStateModelAppName": "Notepad",
+                    "previousStateModelAppVersion": "1",
+                    "numberDisappearedAbstractStates": 1,
+                    "numberNewAbstractStates": 1,
+                    "stateModelDifferenceReport": "./output/2020-11-03_11h47m50s_notepad_demo_2/StateModelDifference_notepad_demo_1_vs_notepad_demo_2"
+                }
+            ],
+            "required": [
+                "existsPreviousStateModel",
+                "previousStateModelAppName",
+                "previousStateModelAppVersion",
+                "numberDisappearedAbstractStates",
+                "numberNewAbstractStates",
+                "stateModelDifferenceReport"
+            ],
+            "properties": {
+                "existsPreviousStateModel": {
+                    "$id": "#/properties/stateModelDifference/properties/existsPreviousStateModel",
+                    "type": "boolean",
+                    "title": "The existsPreviousStateModel schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "previousStateModelAppName": {
+                    "$id": "#/properties/stateModelDifference/properties/previousStateModelAppName",
+                    "type": "string",
+                    "title": "The previousStateModelAppName schema",
+                    "default": "",
+                    "examples": [
+                        "Notepad"
+                    ]
+                },
+                "previousStateModelAppVersion": {
+                    "$id": "#/properties/stateModelDifference/properties/previousStateModelAppVersion",
+                    "type": "string",
+                    "title": "The previousStateModelAppVersion schema",
+                    "default": "",
+                    "examples": [
+                        "1"
+                    ]
+                },
+                "numberDisappearedAbstractStates": {
+                    "$id": "#/properties/stateModelDifference/properties/numberDisappearedAbstractStates",
+                    "type": "integer",
+                    "title": "The numberDisappearedAbstractStates schema",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "numberNewAbstractStates": {
+                    "$id": "#/properties/stateModelDifference/properties/numberNewAbstractStates",
+                    "type": "integer",
+                    "title": "The numberNewAbstractStates schema",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "stateModelDifferenceReport": {
+                    "$id": "#/properties/stateModelDifference/properties/stateModelDifferenceReport",
+                    "type": "string",
+                    "title": "The stateModelDifferenceReport schema",
+                    "default": "",
+                    "examples": [
+                        "./output/2020-11-03_11h47m50s_notepad_demo_2/StateModelDifference_notepad_demo_1_vs_notepad_demo_2"
+                    ]
+                }
+            }
+        },
+        "abstractionId": {
+            "$id": "#/properties/abstractionId",
+            "type": "string",
+            "title": "The Abstractionid Schema",
+            "default": "",
+            "examples": [
+                "Widget title"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "deterministic": {
+            "$id": "#/properties/deterministic",
+            "type": "boolean",
+            "title": "The Deterministic Schema",
+            "default": false,
+            "examples": [
+                true
+            ]
+        },
+        "unvisitedAbstractActions": {
+            "$id": "#/properties/unvisitedAbstractActions",
+            "type": "integer",
+            "title": "The Unvisitedabstractactions Schema",
+            "default": 0,
+            "examples": [
+                43
+            ]
+        },
+        "numberAbstractStates": {
+            "$id": "#/properties/numberAbstractStates",
+            "type": "integer",
+            "title": "The Numberabstractstates Schema",
+            "default": 0,
+            "examples": [
+                13
+            ]
+        },
+        "numberAbstractActions": {
+            "$id": "#/properties/numberAbstractActions",
+            "type": "integer",
+            "title": "The Numberabstractactions Schema",
+            "default": 0,
+            "examples": [
+                21
+            ]
+        },
+        "numberConcreteStates": {
+            "$id": "#/properties/numberConcreteStates",
+            "type": "integer",
+            "title": "The Numberconcretestates Schema",
+            "default": 0,
+            "examples": [
+                17
+            ]
+        },
+        "numberConcreteActions": {
+            "$id": "#/properties/numberConcreteActions",
+            "type": "integer",
+            "title": "The Numberconcreteactions Schema",
+            "default": 0,
+            "examples": [
+                22
+            ]
+        },
+        "storeWidgets": {
+            "$id": "#/properties/storeWidgets",
+            "type": "boolean",
+            "title": "The Storewidgets Schema",
+            "default": false,
+            "examples": [
+                true
+            ]
+        },
+        "numberWidgets": {
+            "$id": "#/properties/numberWidgets",
+            "type": "integer",
+            "title": "The Numberwidgets Schema",
+            "default": 0,
+            "examples": [
+                495
+            ]
+        },
+        "numberTestSequences": {
+            "$id": "#/properties/numberTestSequences",
+            "type": "integer",
+            "title": "The Numbertestsequences Schema",
+            "default": 0,
+            "examples": [
+                5
+            ]
+        },
+        "testSequences": {
+            "$id": "#/properties/testSequences",
+            "type": "array",
+            "title": "The Testsequences Schema",
+            "items": {
+                "$id": "#/properties/testSequences/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "sequenceId",
+                    "numberSequenceNodes",
+                    "startDateTime",
+                    "verdict",
+                    "foundErrors",
+                    "numberErrors",
+                    "sequenceDeterministic",
+                    "sequenceActionSteps"
+                ],
+                "properties": {
+                    "sequenceId": {
+                        "$id": "#/properties/testSequences/items/properties/sequenceId",
+                        "type": "string",
+                        "title": "The Sequenceid Schema",
+                        "default": "",
+                        "examples": [
+                            "078c0469-3e2a-4f26-b740-5dc1bbdaa03e"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "numberSequenceNodes": {
+                        "$id": "#/properties/testSequences/items/properties/numberSequenceNodes",
+                        "type": "integer",
+                        "title": "The Numbersequencenodes Schema",
+                        "default": 0,
+                        "examples": [
+                            5
+                        ]
+                    },
+                    "startDateTime": {
+                        "$id": "#/properties/testSequences/items/properties/startDateTime",
+                        "type": "string",
+                        "title": "The Startdatetime Schema",
+                        "default": "",
+                        "examples": [
+                            "Mon Feb 17 17:33:48 CET 2020"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "verdict": {
+                        "$id": "#/properties/testSequences/items/properties/verdict",
+                        "type": "string",
+                        "title": "The Verdict Schema",
+                        "default": "",
+                        "examples": [
+                            "COMPLETED_SUCCESFULLY"
+                        ],
+                        "pattern": "^(.*)$"
+                    },
+                    "foundErrors": {
+                        "$id": "#/properties/testSequences/items/properties/foundErrors",
+                        "type": "boolean",
+                        "title": "The Founderrors Schema",
+                        "default": false,
+                        "examples": [
+                            false
+                        ]
+                    },
+                    "numberErrors": {
+                        "$id": "#/properties/testSequences/items/properties/numberErrors",
+                        "type": "integer",
+                        "title": "The Numbererrors Schema",
+                        "default": 0,
+                        "examples": [
+                            0
+                        ]
+                    },
+                    "sequenceDeterministic": {
+                        "$id": "#/properties/testSequences/items/properties/sequenceDeterministic",
+                        "type": "boolean",
+                        "title": "The Sequencedeterministic Schema",
+                        "default": false,
+                        "examples": [
+                            true
+                        ]
+                    },
+                    "sequenceActionSteps": {
+                        "$id": "#/properties/testSequences/items/properties/sequenceActionSteps",
+                        "type": "array",
+                        "title": "The Sequenceactionsteps Schema",
+                        "items": {
+                            "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items",
+                            "type": "object",
+                            "title": "The Items Schema",
+                            "required": [
+                                "actionDescription",
+                                "timestamp"
+                            ],
+                            "properties": {
+                                "actionDescription": {
+                                    "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/actionDescription",
+                                    "type": "string",
+                                    "title": "The Actiondescription Schema",
+                                    "default": "",
+                                    "examples": [
+                                        "Left Click at 'View'"
+                                    ],
+                                    "pattern": "^(.*)$"
+                                },
+                                "timestamp": {
+                                    "$id": "#/properties/testSequences/items/properties/sequenceActionSteps/items/properties/timestamp",
+                                    "type": "string",
+                                    "title": "The Timestamp Schema",
+                                    "default": "",
+                                    "examples": [
+                                        "Mon Feb 17 17:33:59 CET 2020"
+                                    ],
+                                    "pattern": "^(.*)$"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }

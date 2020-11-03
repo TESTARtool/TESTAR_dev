@@ -299,26 +299,23 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 
-		// Install Node JS packages
-		installNodePackages(new HashSet<>(Arrays.asList("mongodb", "ajv")));
-
-		// Prepare NodeJS query based on created Test Results Artifact Files
+		// Prepare CURL command based on PKM-API Test Results Artifact
 		String commandTestResults = prepareTestResultNodeCommand();
 
-		// Execute the NodeJS query and obtain the TestResults ArtefactId
-		String artefactIdTestResults = executeNodeJSQueryPKM(commandTestResults);
+		// Execute the CURL command and obtain the TestResults ArtefactId
+		String artefactIdTestResults = executeCURLCommandPKM(commandTestResults);
 
 		// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
 		updateTestResultsJsonMap(artefactIdTestResults);
 
 		if(settings.get(ConfigTags.StateModelEnabled, false)) {
 
-			// Prepare NodeJS query based on created State Model Artifact Files
+			// Prepare CURL command based on PKM-API State Model Artifact
 			String commandStateModel = prepareStateModelNodeCommand();
 
-			// Execute the NodeJS query and obtain the StateModels ArtefactId
-			String artefactIdStateModel = executeNodeJSQueryPKM(commandStateModel);
-			
+			// Execute the CURL command and obtain the StateModels ArtefactId
+			String artefactIdStateModel = executeCURLCommandPKM(commandStateModel);
+
 			// Update the JSON Map that we will use to launch TESTAR HttpReportServer web service
 			updateStateModelDifferenceJsonMap(artefactIdStateModel);
 		}

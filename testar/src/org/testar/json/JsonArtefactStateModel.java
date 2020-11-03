@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.SortedSet;
 
+import org.fruit.monkey.Settings;
 import org.fruit.monkey.SettingsDialog;
 import org.testar.OutputStructure;
 import org.testar.json.object.*;
@@ -57,7 +58,7 @@ public class JsonArtefactStateModel {
 	}
 
 	@JsonCreator
-	public void automaticStateModelArtefact(String applicationName, String applicationVersion, String modelIdentifier,
+	public void automaticStateModelArtefact(Settings settings, String applicationName, String applicationVersion, String modelIdentifier,
 			Object license, String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
 			boolean storeWidgets, long widgets, long testSequences, SortedSet<StateModelTestSequenceJsonObject> testSequenceObject) {
@@ -69,7 +70,7 @@ public class JsonArtefactStateModel {
 				NativeLinker.getOsName());
 
 		modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
-				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
+				url, sutJson, toolJson, settings, applicationName, applicationVersion, modelIdentifier,
 				abstractionId, deterministic, unvisitedActions,
 				abstractStates, abstractActions, concreteStates, concreteActions,
 				storeWidgets, widgets, testSequences);
@@ -82,7 +83,7 @@ public class JsonArtefactStateModel {
 	}
 
 	@JsonCreator
-	public void specificStateModelArtefact(String pathArtefact, Object license,
+	public void specificStateModelArtefact(Settings settings, String pathArtefact, Object license,
 			String applicationName, String applicationVersion, String modelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedActions,
 			long abstractStates, long abstractActions, long concreteStates, long concreteActions,
@@ -95,7 +96,7 @@ public class JsonArtefactStateModel {
 				NativeLinker.getOsName());
 
 		modelJson = new StateModelJsonObject(OutputStructure.startOuterLoopDateString,
-				url, sutJson, toolJson, applicationName, applicationVersion, modelIdentifier,
+				url, sutJson, toolJson, settings, applicationName, applicationVersion, modelIdentifier,
 				abstractionId, deterministic, unvisitedActions,
 				abstractStates, abstractActions, concreteStates, concreteActions,
 				storeWidgets, widgets, testSequences);

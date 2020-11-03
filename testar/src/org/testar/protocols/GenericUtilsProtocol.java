@@ -422,9 +422,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
     
     /**
+     * First OLD Version that used node js to connect directly with mongodb
      * Install Node package dependencies needed to insert Artefacts inside PKM
      */
-    protected void installNodePackages(Set<String> packagesName) {
+    /*protected void installNodePackages(Set<String> packagesName) {
     	// TODO: Allow Record mode when Listening mode implemented
     	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
 
@@ -445,22 +446,19 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
     		System.out.println("ALL Node packages installed successfully!");
     	}
-    }
+    }*/
     
     /**
-     * Execute a query command to interact with PKM.
-     * Use Node with JavaScript files and options parameters.
-     * 
-     * Example: node validate_and_insert_testar_test_results.js TESTAR_TestResults_Schema.json Artefact_TESTAR_TestResults.json
+     * Execute a CURL command to interact with PKM.
      * 
      * @param command
      */
-    protected String executeNodeJSQueryPKM(String command) {
+    protected String executeCURLCommandPKM(String command) {
     	// TODO: Allow Record mode when Listening mode implemented
     	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
 
     		try {
-    			System.out.println("Executing PKM query: " + command);
+    			System.out.println("Executing PKM-API command: " + command);
 
     			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
     			Process p = builder.start();
@@ -487,27 +485,23 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				System.out.println(s);
     				errorContent.append(s);
     			}
-
-    			if(errorContent.length() < 1) {
-    				System.out.println(" *****************************************");
-    				System.out.println(" OK: PKM Query successfully executed ");
-    				System.out.println(" *****************************************");
-    			} else {
+        		
+    			if(command.contains("test_results")) {
+    				//{"TESTARTestResults artefactId":""}
+    				return substringArtefactId(outputContent.toString(), "TESTARTestResults artefactId\":\"");
+    			}
+    			else if (command.contains("state_model")) {
+    				//{"TESTARStateModels artefactId":""}
+    				return substringArtefactId(outputContent.toString(), "TESTARStateModels artefactId\":\"");
+    			}
+    			else {
     				System.out.println(" ------------------------------------------");
     				System.out.println(" !! ERROR trying to insert the Artefact !! ");
     				System.out.println(" ------------------------------------------");
     			}
-    			
-        		
-        		if(command.contains("validate_and_insert_testar_test_results.js")) {
-        			 return substringArtefactId(outputContent.toString(), "TestResultsArtefactId:");
-        		}
-        		else if (command.contains("validate_and_insert_testar_state_model.js")) {
-        			 return substringArtefactId(outputContent.toString(), "StateModelArtefactId:");
-        		}
 
     		} catch (IOException e) {
-    			System.out.println("ERROR! : Trying to execute NODE JavaScript command : " + command);
+    			System.out.println("ERROR! : Trying to execute CURL command : " + command);
     			e.printStackTrace();
     		}
     	}
@@ -528,7 +522,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		try {
 			String pkmOutputInfo = executionOutput.substring(executionOutput.indexOf(find) + find.length());
 			artefactId = StringUtils.split(pkmOutputInfo, " ")[0];
-			artefactId = artefactId.replace("\n", "").replace("\r", "");
+			artefactId = artefactId.replace("\"}","").replace("\n", "").replace("\r", "");
 			artefactId = artefactId.trim();
 		} catch(Exception e) {
 			System.out.println("ERROR! : Trying to obtain : " + find);

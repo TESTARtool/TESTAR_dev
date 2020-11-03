@@ -138,7 +138,7 @@ public class StateModelArtefactManager {
 			SortedSet<StateModelTestSequenceJsonObject> testSequenceObject = getStateModelTestSequencesObject(sessionDB, stateModelId);
 
             System.out.println("Creating JSON State Model artefact...");
-        	jsonArtefactStateModel.automaticStateModelArtefact(appName, appVersion, stateModelId,
+        	jsonArtefactStateModel.automaticStateModelArtefact(settings, appName, appVersion, stateModelId,
         			license, abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
         			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
         			storeWidgets, numberOfWidgets, numberOfTestSequences, testSequenceObject);
@@ -153,7 +153,7 @@ public class StateModelArtefactManager {
 		
 	}
 
-	public static void createSpecificArtefact(ODatabaseSession sessionDB, String pathArtefact, String appName, String appVersion, String database) {
+	public static void createSpecificArtefact(ODatabaseSession sessionDB, Settings settings, String pathArtefact, String appName, String appVersion, String database) {
 		
 		// Search and get the State Model identifier to start the queries
 		String stateModelId = getAbstractStateModelIdentifier(sessionDB, appName, appVersion);
@@ -177,7 +177,7 @@ public class StateModelArtefactManager {
 
         System.out.println("Creating JSON State Model artefact...");
 		JsonArtefactStateModel jsonArtefactStateModel = new JsonArtefactStateModel();
-		jsonArtefactStateModel.specificStateModelArtefact(pathArtefact, "", appName, appVersion, stateModelId,
+		jsonArtefactStateModel.specificStateModelArtefact(settings, pathArtefact, "", appName, appVersion, stateModelId,
     			abstractionLevelProperties, isDeterministic, numberOfUnvisitedAbstractActions,
     			numberOfAbstractStates, numberOfAbstractActions, numberOfConcreteStates, numberOfConcreteActions,
     			//TODO: storewidgets (next false) Obtain the option from State Model or settings 

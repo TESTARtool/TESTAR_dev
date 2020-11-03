@@ -1,347 +1,732 @@
 {
-  "definitions": {},
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "title": "The Root Schema",
-  "required": [
-    "timestamp",
-    "url",
-    "sequencesResult",
-    "htmlsResult",
-    "logsResult",
-    "sequencesVerdicts",
-    "sut",
-    "tool",
-    "settings"
-  ],
-  "properties": {
-    "timestamp": {
-      "$id": "#/properties/timestamp",
-      "type": "string",
-      "title": "The Timestamp Schema",
-      "default": "",
-      "examples": [
-        "2020-01-29_08h36m28s"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "url": {
-      "$id": "#/properties/url",
-      "type": "string",
-      "title": "The Url Schema",
-      "default": "",
-      "examples": [
-        "https://testar.org/images/models/"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "sequencesResult": {
-      "$id": "#/properties/sequencesResult",
-      "type": "array",
-      "title": "The Sequencesresult Schema",
-      "items": {
-        "$id": "#/properties/sequencesResult/items",
-        "type": "string",
-        "title": "The Items Schema",
-        "default": "",
-        "examples": [
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.testar",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.testar",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.testar"
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "htmlsResult": {
-      "$id": "#/properties/htmlsResult",
-      "type": "array",
-      "title": "The Htmlsresult Schema",
-      "items": {
-        "$id": "#/properties/htmlsResult/items",
-        "type": "string",
-        "title": "The Items Schema",
-        "default": "",
-        "examples": [
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.html",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.html",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.html"
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "logsResult": {
-      "$id": "#/properties/logsResult",
-      "type": "array",
-      "title": "The Logsresult Schema",
-      "items": {
-        "$id": "#/properties/logsResult/items",
-        "type": "string",
-        "title": "The Items Schema",
-        "default": "",
-        "examples": [
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.log",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.log",
-          "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.log"
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "sequencesVerdicts": {
-      "$id": "#/properties/sequencesVerdicts",
-      "type": "array",
-      "title": "The Sequencesverdicts Schema",
-      "items": {
-        "$id": "#/properties/sequencesVerdicts/items",
-        "type": "string",
-        "title": "The Items Schema",
-        "default": "",
-        "examples": [
-          "2020-01-29_08h37m10s OK No problem detected.",
-          "2020-01-29_08h37m45s OK No problem detected.",
-          "2020-01-29_08h38m01s OK No problem detected."
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "sut": {
-      "$id": "#/properties/sut",
-      "type": "object",
-      "title": "The Sut Schema",
-      "required": [
-        "license",
-        "runtimeOS"
-      ],
-      "properties": {
-        "license": {
-          "$id": "#/properties/sut/properties/license",
-          "type": "object",
-          "title": "The License Schema",
-          "default": "",
-          "examples": [
-            "license"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "runtimeOS": {
-          "$id": "#/properties/sut/properties/runtimeOS",
-          "type": "string",
-          "title": "The Runtimeos Schema",
-          "default": "",
-          "examples": [
-            "Windows 10"
-          ],
-          "pattern": "^(.*)$"
-        }
-      }
-    },
-    "tool": {
-      "$id": "#/properties/tool",
-      "type": "object",
-      "title": "The Tool Schema",
-      "required": [
-        "title",
-        "name",
-        "isOpenSource",
-        "license",
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "timestamp",
         "url",
-        "version",
-        "runtimeOS"
-      ],
-      "properties": {
-        "title": {
-          "$id": "#/properties/tool/properties/title",
-          "type": "string",
-          "title": "The Title Schema",
-          "default": "",
-          "examples": [
-            "TESTAR"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "name": {
-          "$id": "#/properties/tool/properties/name",
-          "type": "string",
-          "title": "The Name Schema",
-          "default": "",
-          "examples": [
-            "TESTAR: Automated Robustness Testing at the GUI level"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "isOpenSource": {
-          "$id": "#/properties/tool/properties/isOpenSource",
-          "type": "boolean",
-          "title": "The Isopensource Schema",
-          "default": false,
-          "examples": [
-            true
-          ]
-        },
-        "license": {
-          "$id": "#/properties/tool/properties/license",
-          "type": "string",
-          "title": "The License Schema",
-          "default": "",
-          "examples": [
-            "BSD-3-Clause License"
-          ],
-          "pattern": "^(.*)$"
+        "sequencesResult",
+        "htmlsResult",
+        "logsResult",
+        "sequencesVerdicts",
+        "sut",
+        "tool",
+        "settings"
+    ],
+    "properties": {
+        "timestamp": {
+            "$id": "#/properties/timestamp",
+            "type": "string",
+            "title": "The Timestamp Schema",
+            "default": "",
+            "examples": [
+                "2020-01-29_08h36m28s"
+            ],
+            "pattern": "^(.*)$"
         },
         "url": {
-          "$id": "#/properties/tool/properties/url",
-          "type": "string",
-          "title": "The Url Schema",
-          "default": "",
-          "examples": [
-            "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
-          ],
-          "pattern": "^(.*)$"
+            "$id": "#/properties/url",
+            "type": "string",
+            "title": "The Url Schema",
+            "default": "",
+            "examples": [
+                "https://testar.org/images/models/"
+            ],
+            "pattern": "^(.*)$"
         },
-        "version": {
-          "$id": "#/properties/tool/properties/version",
-          "type": "string",
-          "title": "The Version Schema",
-          "default": "",
-          "examples": [
-            "2.2.3 (7-Nov-2019)"
-          ],
-          "pattern": "^(.*)$"
+        "sequencesResult": {
+            "$id": "#/properties/sequencesResult",
+            "type": "array",
+            "title": "The Sequencesresult Schema",
+            "items": {
+                "$id": "#/properties/sequencesResult/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.testar",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.testar",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\sequences\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.testar"
+                ],
+                "pattern": "^(.*)$"
+            }
         },
-        "runtimeOS": {
-          "$id": "#/properties/tool/properties/runtimeOS",
-          "type": "string",
-          "title": "The Runtimeos Schema",
-          "default": "",
-          "examples": [
-            "Windows 10"
-          ],
-          "pattern": "^(.*)$"
+        "htmlsResult": {
+            "$id": "#/properties/htmlsResult",
+            "type": "array",
+            "title": "The Htmlsresult Schema",
+            "items": {
+                "$id": "#/properties/htmlsResult/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.html",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.html",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\HTMLreports\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.html"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "logsResult": {
+            "$id": "#/properties/logsResult",
+            "type": "array",
+            "title": "The Logsresult Schema",
+            "items": {
+                "$id": "#/properties/logsResult/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m45s_notepad_1.0.0_sequence_2.log",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h38m01s_notepad_1.0.0_sequence_3.log",
+                    "./output\\2020-01-29_08h36m28s_notepad_1.0.0\\logs\\2020-01-29_08h37m10s_notepad_1.0.0_sequence_1.log"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "sequencesVerdicts": {
+            "$id": "#/properties/sequencesVerdicts",
+            "type": "array",
+            "title": "The Sequencesverdicts Schema",
+            "items": {
+                "$id": "#/properties/sequencesVerdicts/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "2020-01-29_08h37m10s OK No problem detected.",
+                    "2020-01-29_08h37m45s OK No problem detected.",
+                    "2020-01-29_08h38m01s OK No problem detected."
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "sut": {
+            "$id": "#/properties/sut",
+            "type": "object",
+            "title": "The Sut Schema",
+            "required": [
+                "license",
+                "runtimeOS"
+            ],
+            "properties": {
+                "license": {
+                    "$id": "#/properties/sut/properties/license",
+                    "type": "object",
+                    "title": "The License Schema",
+                    "default": "",
+                    "examples": [
+                        "license"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "runtimeOS": {
+                    "$id": "#/properties/sut/properties/runtimeOS",
+                    "type": "string",
+                    "title": "The Runtimeos Schema",
+                    "default": "",
+                    "examples": [
+                        "Windows 10"
+                    ],
+                    "pattern": "^(.*)$"
+                }
+            }
+        },
+        "tool": {
+            "$id": "#/properties/tool",
+            "type": "object",
+            "title": "The Tool Schema",
+            "required": [
+                "title",
+                "name",
+                "isOpenSource",
+                "license",
+                "url",
+                "version",
+                "runtimeOS"
+            ],
+            "properties": {
+                "title": {
+                    "$id": "#/properties/tool/properties/title",
+                    "type": "string",
+                    "title": "The Title Schema",
+                    "default": "",
+                    "examples": [
+                        "TESTAR"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "name": {
+                    "$id": "#/properties/tool/properties/name",
+                    "type": "string",
+                    "title": "The Name Schema",
+                    "default": "",
+                    "examples": [
+                        "TESTAR: Automated Robustness Testing at the GUI level"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "isOpenSource": {
+                    "$id": "#/properties/tool/properties/isOpenSource",
+                    "type": "boolean",
+                    "title": "The Isopensource Schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "license": {
+                    "$id": "#/properties/tool/properties/license",
+                    "type": "string",
+                    "title": "The License Schema",
+                    "default": "",
+                    "examples": [
+                        "BSD-3-Clause License"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "url": {
+                    "$id": "#/properties/tool/properties/url",
+                    "type": "string",
+                    "title": "The Url Schema",
+                    "default": "",
+                    "examples": [
+                        "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "version": {
+                    "$id": "#/properties/tool/properties/version",
+                    "type": "string",
+                    "title": "The Version Schema",
+                    "default": "",
+                    "examples": [
+                        "2.2.3 (7-Nov-2019)"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "runtimeOS": {
+                    "$id": "#/properties/tool/properties/runtimeOS",
+                    "type": "string",
+                    "title": "The Runtimeos Schema",
+                    "default": "",
+                    "examples": [
+                        "Windows 10"
+                    ],
+                    "pattern": "^(.*)$"
+                }
+            }
+        },
+        "settings": {
+            "$id": "#/properties/settings",
+            "type": "object",
+            "title": "The Settings Schema",
+            "required": [
+                "sutConnector",
+                "sutConnectorValue",
+                "Mode",
+                "AccessBridgeEnabled",
+                "SequenceLength",
+                "Sequences",
+                "forceForeground",
+                "OverrideWebDriverDisplayScale",
+                "OnlySaveFaultySequences",
+                "StopGenerationOnFault",
+                "ProcessesToKillDuringTest",
+                "suspiciousTitles",
+                "timeToFreeze",
+                "ProcessListenerEnabled",
+                "SuspiciousProcessOutput",
+                "ProcessLogs",
+                "clickFilter",
+                "actionDuration",
+                "timeToWaitAfterAction",
+                "MaxTime",
+                "StartupTime",
+                "protocolClass",
+                "OutputDir",
+                "TempDir",
+                "MyClassPath",
+                "maxReward",
+                "discount",
+                "StateModelEnabled",
+                "DataStore",
+                "DataStoreType",
+                "DataStoreServer",
+                "DataStoreDB",
+                "DataStoreUser",
+                "DataStorePassword",
+                "DataStoreMode",
+                "DataStoreDirectory",
+                "ResetDataStore",
+                "ApplicationName",
+                "ApplicationVersion",
+                "ActionSelectionAlgorithm",
+                "StateModelStoreWidgets",
+                "AbstractStateAttributes",
+                "PreviousApplicationName",
+                "PreviousApplicationVersion",
+                "StateModelDifferenceAutomaticReport",
+                "PKMaddress",
+                "PKMport",
+                "PKMdatabase",
+                "PKMusername",
+                "PKMkey"
+            ],
+            "properties": {
+                "sutConnector": {
+                    "$id": "#/properties/settings/properties/sutConnector",
+                    "type": "string",
+                    "title": "The sutConnector schema",
+                    "default": "",
+                    "examples": [
+                        "COMMAND_LINE"
+                    ]
+                },
+                "sutConnectorValue": {
+                    "$id": "#/properties/settings/properties/sutConnectorValue",
+                    "type": "string",
+                    "title": "The sutConnectorValue schema",
+                    "default": "",
+                    "examples": [
+                        "c:\\windows\\system32\\notepad.exe"
+                    ]
+                },
+                "Mode": {
+                    "$id": "#/properties/settings/properties/Mode",
+                    "type": "string",
+                    "title": "The Mode schema",
+                    "default": "",
+                    "examples": [
+                        "Generate"
+                    ]
+                },
+                "AccessBridgeEnabled": {
+                    "$id": "#/properties/settings/properties/AccessBridgeEnabled",
+                    "type": "boolean",
+                    "title": "The AccessBridgeEnabled schema",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "SequenceLength": {
+                    "$id": "#/properties/settings/properties/SequenceLength",
+                    "type": "integer",
+                    "title": "The SequenceLength schema",
+                    "default": 0,
+                    "examples": [
+                        5
+                    ]
+                },
+                "Sequences": {
+                    "$id": "#/properties/settings/properties/Sequences",
+                    "type": "integer",
+                    "title": "The Sequences schema",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "forceForeground": {
+                    "$id": "#/properties/settings/properties/forceForeground",
+                    "type": "boolean",
+                    "title": "The forceForeground schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "OverrideWebDriverDisplayScale": {
+                    "$id": "#/properties/settings/properties/OverrideWebDriverDisplayScale",
+                    "type": "string",
+                    "title": "The OverrideWebDriverDisplayScale schema",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "OnlySaveFaultySequences": {
+                    "$id": "#/properties/settings/properties/OnlySaveFaultySequences",
+                    "type": "boolean",
+                    "title": "The OnlySaveFaultySequences schema",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "StopGenerationOnFault": {
+                    "$id": "#/properties/settings/properties/StopGenerationOnFault",
+                    "type": "boolean",
+                    "title": "The StopGenerationOnFault schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "ProcessesToKillDuringTest": {
+                    "$id": "#/properties/settings/properties/ProcessesToKillDuringTest",
+                    "type": "string",
+                    "title": "The ProcessesToKillDuringTest schema",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "suspiciousTitles": {
+                    "$id": "#/properties/settings/properties/suspiciousTitles",
+                    "type": "string",
+                    "title": "The suspiciousTitles schema",
+                    "default": "",
+                    "examples": [
+                        ".*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*"
+                    ]
+                },
+                "timeToFreeze": {
+                    "$id": "#/properties/settings/properties/timeToFreeze",
+                    "type": "number",
+                    "title": "The timeToFreeze schema",
+                    "default": 0.0,
+                    "examples": [
+                        30.0
+                    ]
+                },
+                "ProcessListenerEnabled": {
+                    "$id": "#/properties/settings/properties/ProcessListenerEnabled",
+                    "type": "boolean",
+                    "title": "The ProcessListenerEnabled schema",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "SuspiciousProcessOutput": {
+                    "$id": "#/properties/settings/properties/SuspiciousProcessOutput",
+                    "type": "string",
+                    "title": "The SuspiciousProcessOutput schema",
+                    "default": "",
+                    "examples": [
+                        ".*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*"
+                    ]
+                },
+                "ProcessLogs": {
+                    "$id": "#/properties/settings/properties/ProcessLogs",
+                    "type": "string",
+                    "title": "The ProcessLogs schema",
+                    "default": "",
+                    "examples": [
+                        ".*.*"
+                    ]
+                },
+                "clickFilter": {
+                    "$id": "#/properties/settings/properties/clickFilter",
+                    "type": "string",
+                    "title": "The clickFilter schema",
+                    "default": "",
+                    "examples": [
+                        ".*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*"
+                    ]
+                },
+                "actionDuration": {
+                    "$id": "#/properties/settings/properties/actionDuration",
+                    "type": "number",
+                    "title": "The actionDuration schema",
+                    "default": 0.0,
+                    "examples": [
+                        0.5
+                    ]
+                },
+                "timeToWaitAfterAction": {
+                    "$id": "#/properties/settings/properties/timeToWaitAfterAction",
+                    "type": "number",
+                    "title": "The timeToWaitAfterAction schema",
+                    "default": 0.0,
+                    "examples": [
+                        0.5
+                    ]
+                },
+                "MaxTime": {
+                    "$id": "#/properties/settings/properties/MaxTime",
+                    "type": "number",
+                    "title": "The MaxTime schema",
+                    "default": 0.0,
+                    "examples": [
+                        31536000.0
+                    ]
+                },
+                "StartupTime": {
+                    "$id": "#/properties/settings/properties/StartupTime",
+                    "type": "number",
+                    "title": "The StartupTime schema",
+                    "default": 0.0,
+                    "examples": [
+                        2.0
+                    ]
+                },
+                "protocolClass": {
+                    "$id": "#/properties/settings/properties/protocolClass",
+                    "type": "string",
+                    "title": "The protocolClass schema",
+                    "default": "",
+                    "examples": [
+                        "desktop_generic_statemodel/Protocol_desktop_generic_statemodel"
+                    ]
+                },
+                "OutputDir": {
+                    "$id": "#/properties/settings/properties/OutputDir",
+                    "type": "string",
+                    "title": "The OutputDir schema",
+                    "default": "",
+                    "examples": [
+                        "./output"
+                    ]
+                },
+                "TempDir": {
+                    "$id": "#/properties/settings/properties/TempDir",
+                    "type": "string",
+                    "title": "The TempDir schema",
+                    "default": "",
+                    "examples": [
+                        "./output/temp"
+                    ]
+                },
+                "MyClassPath": {
+                    "$id": "#/properties/settings/properties/MyClassPath",
+                    "type": "string",
+                    "title": "The MyClassPath schema",
+                    "default": "",
+                    "examples": [
+                        "./settings"
+                    ]
+                },
+                "maxReward": {
+                    "$id": "#/properties/settings/properties/maxReward",
+                    "type": "number",
+                    "title": "The maxReward schema",
+                    "default": 0.0,
+                    "examples": [
+                        9999999.0
+                    ]
+                },
+                "discount": {
+                    "$id": "#/properties/settings/properties/discount",
+                    "type": "number",
+                    "title": "The discount schema",
+                    "default": 0.0,
+                    "examples": [
+                        0.95
+                    ]
+                },
+                "StateModelEnabled": {
+                    "$id": "#/properties/settings/properties/StateModelEnabled",
+                    "type": "boolean",
+                    "title": "The StateModelEnabled schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "DataStore": {
+                    "$id": "#/properties/settings/properties/DataStore",
+                    "type": "string",
+                    "title": "The DataStore schema",
+                    "default": "",
+                    "examples": [
+                        "OrientDB"
+                    ]
+                },
+                "DataStoreType": {
+                    "$id": "#/properties/settings/properties/DataStoreType",
+                    "type": "string",
+                    "title": "The DataStoreType schema",
+                    "default": "",
+                    "examples": [
+                        "plocal"
+                    ]
+                },
+                "DataStoreServer": {
+                    "$id": "#/properties/settings/properties/DataStoreServer",
+                    "type": "string",
+                    "title": "The DataStoreServer schema",
+                    "default": "",
+                    "examples": [
+                        "localhost"
+                    ]
+                },
+                "DataStoreDB": {
+                    "$id": "#/properties/settings/properties/DataStoreDB",
+                    "type": "string",
+                    "title": "The DataStoreDB schema",
+                    "default": "",
+                    "examples": [
+                        "testardemo"
+                    ]
+                },
+                "DataStoreUser": {
+                    "$id": "#/properties/settings/properties/DataStoreUser",
+                    "type": "string",
+                    "title": "The DataStoreUser schema",
+                    "default": "",
+                    "examples": [
+                        "testar"
+                    ]
+                },
+                "DataStorePassword": {
+                    "$id": "#/properties/settings/properties/DataStorePassword",
+                    "type": "string",
+                    "title": "The DataStorePassword schema",
+                    "default": "",
+                    "examples": [
+                        "testar"
+                    ]
+                },
+                "DataStoreMode": {
+                    "$id": "#/properties/settings/properties/DataStoreMode",
+                    "type": "string",
+                    "title": "The DataStoreMode schema",
+                    "default": "",
+                    "examples": [
+                        "instant"
+                    ]
+                },
+                "DataStoreDirectory": {
+                    "$id": "#/properties/settings/properties/DataStoreDirectory",
+                    "type": "string",
+                    "title": "The DataStoreDirectory schema",
+                    "default": "",
+                    "examples": [
+                        "C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases"
+                    ]
+                },
+                "ResetDataStore": {
+                    "$id": "#/properties/settings/properties/ResetDataStore",
+                    "type": "boolean",
+                    "title": "The ResetDataStore schema",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "ApplicationName": {
+                    "$id": "#/properties/settings/properties/ApplicationName",
+                    "type": "string",
+                    "title": "The ApplicationName schema",
+                    "default": "",
+                    "examples": [
+                        "debug"
+                    ]
+                },
+                "ApplicationVersion": {
+                    "$id": "#/properties/settings/properties/ApplicationVersion",
+                    "type": "string",
+                    "title": "The ApplicationVersion schema",
+                    "default": "",
+                    "examples": [
+                        "1"
+                    ]
+                },
+                "ActionSelectionAlgorithm": {
+                    "$id": "#/properties/settings/properties/ActionSelectionAlgorithm",
+                    "type": "string",
+                    "title": "The ActionSelectionAlgorithm schema",
+                    "default": "",
+                    "examples": [
+                        "unvisited"
+                    ]
+                },
+                "StateModelStoreWidgets": {
+                    "$id": "#/properties/settings/properties/StateModelStoreWidgets",
+                    "type": "boolean",
+                    "title": "The StateModelStoreWidgets schema",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "AbstractStateAttributes": {
+                    "$id": "#/properties/settings/properties/AbstractStateAttributes",
+                    "type": "string",
+                    "title": "The AbstractStateAttributes schema",
+                    "default": "",
+                    "examples": [
+                        "WidgetControlType"
+                    ]
+                },
+                "PreviousApplicationName": {
+                    "$id": "#/properties/settings/properties/PreviousApplicationName",
+                    "type": "string",
+                    "title": "The PreviousApplicationName schema",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "PreviousApplicationVersion": {
+                    "$id": "#/properties/settings/properties/PreviousApplicationVersion",
+                    "type": "string",
+                    "title": "The PreviousApplicationVersion schema",
+                    "default": "",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "StateModelDifferenceAutomaticReport": {
+                    "$id": "#/properties/settings/properties/StateModelDifferenceAutomaticReport",
+                    "type": "boolean",
+                    "title": "The StateModelDifferenceAutomaticReport schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "PKMaddress": {
+                    "$id": "#/properties/settings/properties/PKMaddress",
+                    "type": "string",
+                    "title": "The PKMaddress schema",
+                    "default": "",
+                    "examples": [
+                        "127.0.0.1"
+                    ]
+                },
+                "PKMport": {
+                    "$id": "#/properties/settings/properties/PKMport",
+                    "type": "string",
+                    "title": "The PKMport schema",
+                    "default": "",
+                    "examples": [
+                        "27017"
+                    ]
+                },
+                "PKMdatabase": {
+                    "$id": "#/properties/settings/properties/PKMdatabase",
+                    "type": "string",
+                    "title": "The PKMdatabase schema",
+                    "default": "",
+                    "examples": [
+                        "mydb"
+                    ]
+                },
+                "PKMusername": {
+                    "$id": "#/properties/settings/properties/PKMusername",
+                    "type": "string",
+                    "title": "The PKMusername schema",
+                    "default": "",
+                    "examples": [
+                        "admin"
+                    ]
+                },
+                "PKMkey": {
+                    "$id": "#/properties/settings/properties/PKMkey",
+                    "type": "string",
+                    "title": "The PKMkey schema",
+                    "default": "",
+                    "examples": [
+                        "admin"
+                    ]
+                }
+            }
         }
-      }
-    },
-    "settings": {
-      "$id": "#/properties/settings",
-      "type": "object",
-      "title": "The Settings Schema",
-      "required": [
-        "sutConnector",
-        "sutConnectorValue",
-        "suspiciousTitles",
-        "clickFilter",
-        "protocolClass",
-        "forceForeground",
-        "actionDuration",
-        "timeToWaitAfterAction",
-        "timeToFreeze",
-        "maxReward",
-        "discount"
-      ],
-      "properties": {
-        "sutConnector": {
-          "$id": "#/properties/settings/properties/sutConnector",
-          "type": "string",
-          "title": "The Sutconnector Schema",
-          "default": "",
-          "examples": [
-            "COMMAND_LINE"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "sutConnectorValue": {
-          "$id": "#/properties/settings/properties/sutConnectorValue",
-          "type": "string",
-          "title": "The Sutconnectorvalue Schema",
-          "default": "",
-          "examples": [
-            "c:\\windows\\system32\\notepad.exe"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "suspiciousTitles": {
-          "$id": "#/properties/settings/properties/suspiciousTitles",
-          "type": "string",
-          "title": "The Suspicioustitles Schema",
-          "default": "",
-          "examples": [
-            ".*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "clickFilter": {
-          "$id": "#/properties/settings/properties/clickFilter",
-          "type": "string",
-          "title": "The Clickfilter Schema",
-          "default": "",
-          "examples": [
-            ".*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "protocolClass": {
-          "$id": "#/properties/settings/properties/protocolClass",
-          "type": "string",
-          "title": "The Protocolclass Schema",
-          "default": "",
-          "examples": [
-            "desktop_generic_statemodel/Protocol_desktop_generic_statemodel"
-          ],
-          "pattern": "^(.*)$"
-        },
-        "forceForeground": {
-          "$id": "#/properties/settings/properties/forceForeground",
-          "type": "boolean",
-          "title": "The Forceforeground Schema",
-          "default": false,
-          "examples": [
-            true
-          ]
-        },
-        "actionDuration": {
-          "$id": "#/properties/settings/properties/actionDuration",
-          "type": "number",
-          "title": "The Actionduration Schema",
-          "default": 0.0,
-          "examples": [
-            0.1
-          ]
-        },
-        "timeToWaitAfterAction": {
-          "$id": "#/properties/settings/properties/timeToWaitAfterAction",
-          "type": "number",
-          "title": "The Timetowaitafteraction Schema",
-          "default": 0.0,
-          "examples": [
-            0.1
-          ]
-        },
-        "timeToFreeze": {
-          "$id": "#/properties/settings/properties/timeToFreeze",
-          "type": "integer",
-          "title": "The Timetofreeze Schema",
-          "default": 0,
-          "examples": [
-            30
-          ]
-        },
-        "maxReward": {
-          "$id": "#/properties/settings/properties/maxReward",
-          "type": "integer",
-          "title": "The Maxreward Schema",
-          "default": 0,
-          "examples": [
-            9999999
-          ]
-        },
-        "discount": {
-          "$id": "#/properties/settings/properties/discount",
-          "type": "number",
-          "title": "The Discount Schema",
-          "default": 0.0,
-          "examples": [
-            0.95
-          ]
-        }
-      }
     }
-  }
 }

@@ -285,7 +285,7 @@ public class StateModelArtefactDialog extends JDialog {
 	}
 
 	private void createArtefact() {
-		dbConfig = new Config();
+		/* dbConfig = new Config();
 		dbConfig.setConnectionType(dataStoreTypeBox.getSelectedItem().toString());
 		dbConfig.setServer(textFieldStoreServer.getText());
 		dbConfig.setUser(textFieldRoot.getText());
@@ -314,7 +314,7 @@ public class StateModelArtefactDialog extends JDialog {
 			e.printStackTrace();
 		} finally {
 			orientDB.close();
-		}
+		}*/
 
 	}
 

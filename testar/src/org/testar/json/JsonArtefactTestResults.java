@@ -60,7 +60,7 @@ public class JsonArtefactTestResults {
 		SutJsonObject sutJson = new SutJsonObject(license, NativeLinker.getOsName());
 
 		ToolJsonObject toolJson = new ToolJsonObject("TESTAR", "TESTAR: Automated Robustness Testing at the GUI level",
-				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_pkm", SettingsDialog.TESTAR_VERSION,
+				true, "BSD-3-Clause License", "https://github.com/TESTARtool/TESTAR_dev/tree/decoder_master", SettingsDialog.TESTAR_VERSION,
 				NativeLinker.getOsName());
 
 		TestResultsJsonObject resultsJson = new TestResultsJsonObject(OutputStructure.startOuterLoopDateString,

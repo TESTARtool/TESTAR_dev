@@ -96,7 +96,7 @@ public class StateModelPanel extends JPanel {
     
     private JButton exportDBbutton = new JButton("Export DB");
     private JButton importDBbutton = new JButton("Import DB");
-    private JButton artefactStateModel = new JButton("Model Artefact");
+    //private JButton artefactStateModel = new JButton("Model Artefact"); //OLD
     private JButton modelDiffbutton = new JButton("Model Diff");
     
     private Tag<?>[] allStateManagementTags;
@@ -143,7 +143,7 @@ public class StateModelPanel extends JPanel {
         components.add(stateModelWidgetStoreChkBox);
         components.add(exportDBbutton);
         components.add(importDBbutton);
-        components.add(artefactStateModel);
+        //components.add(artefactStateModel);
         components.add(modelDiffbutton);
 
         // add the components to the panel
@@ -283,7 +283,8 @@ public class StateModelPanel extends JPanel {
         });
         add(importDBbutton);
 
-        artefactStateModel.setBounds(470, 285, 120, 27);
+        /* TODO: OLD feature to manually create the StateModelArtefact
+         * artefactStateModel.setBounds(470, 285, 120, 27);
         artefactStateModel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,7 +294,7 @@ public class StateModelPanel extends JPanel {
             	artefactDialog.setVisible(true);
             }
         });
-        add(artefactStateModel);
+        add(artefactStateModel);*/
         
         modelDiffbutton.setBounds(470, 320, 120, 27);
         modelDiffbutton.addActionListener(new ActionListener() {
