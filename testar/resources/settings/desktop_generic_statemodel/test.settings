@@ -109,7 +109,7 @@ GraphDBPassword = testar
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = localhost
+DataStoreServer = 10.102.0.244
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -126,10 +126,10 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # PKM address
 #################################################################
-PKMaddress = 127.0.0.1
-PKMport = 27017
-PKMdatabase = mydb
-PKMusername = admin
+PKMaddress = 10.101.0.224
+PKMport = 8080
+PKMdatabase = myproject
+PKMusername = demo
 PKMkey = admin
 
 #################################################################

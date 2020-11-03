@@ -410,7 +410,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     			stateModelDifferenceJsonObject.setExistsPreviousStateModel(modelDifferenceManager.existsPreviousStateModel());
     			stateModelDifferenceJsonObject.setNumberDisappearedAbstractStates(modelDifferenceManager.getNumberDisappearedAbstractStates());
     			stateModelDifferenceJsonObject.setNumberNewAbstractStates(modelDifferenceManager.getNumberNewAbstractStates());
-    			stateModelDifferenceJsonObject.setStateModelDifferenceReport(modelDifferenceManager.getStateModelDifferenceHTMLReport());
+    			stateModelDifferenceJsonObject.setStateModelDifferenceReport(dirName);
 
     		} catch (Exception e) {
     			System.out.println("ERROR: Trying to create an automatic State Model Difference");
