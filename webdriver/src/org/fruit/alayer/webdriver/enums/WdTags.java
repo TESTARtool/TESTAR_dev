@@ -244,4 +244,9 @@ public class WdTags extends TagsBase {
    * Access key of a widget.
    */
   public static final Tag<String> WebAccessKey = from("WebAccessKey", String.class);
+
+  /* Custom Element State (user defined) */
+  public static final Tag<Object> WebCustomElementState = from("WebCustomElementState", Object.class);
+  public static final Tag<String> WebCustomElementStateLambda = from("WebCustomElementStateLambda", String.class);
+
 }

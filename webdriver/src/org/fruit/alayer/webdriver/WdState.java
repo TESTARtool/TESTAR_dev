@@ -156,6 +156,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(Tags.ValuePattern)) {
 			ret = w.element.href;
 		}
+		else if (t.equals(WdTags.WebCustomElementState)) {
+			ret = w.element.customElementState;
+		}
 		/*else if (t.equals(Tags.ToolTipText)) {
 			ret = w.element.helpText;
 		}*/

@@ -13,3 +13,4 @@ build.bat
 *.sse
 *.class
 *.log
+.DS_Store

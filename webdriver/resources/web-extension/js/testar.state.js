@@ -8,7 +8,7 @@ var labelMap;
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
  * @return {(Object | Array)}
  */
-var getStateTreeTestar = function (ignoredTags) {
+var getStateTreeTestar = function (ignoredTags, customElementStateLambda) {
     var body = document.body;
     var bodyWrapped = wrapElementTestar(body, 0, 0);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
@@ -24,7 +24,7 @@ var getStateTreeTestar = function (ignoredTags) {
         return treeArray;
     }
     else {
-        traverseElementTestar(bodyWrapped, body, ignoredTags);
+        traverseElementTestar(bodyWrapped, body, ignoredTags, customElementStateLambda);
         return bodyWrapped;
     }
 };
@@ -35,7 +35,7 @@ var getStateTreeTestar = function (ignoredTags) {
  * @param {node} rootElement, the body element
  * @param {object} ignoredTags, list of tags to skip, <style>, <script> etc.
  */
-function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
+function traverseElementTestar(parentWrapped, rootElement, ignoredTags, customElementStateLambda) {
     var childNodes = getChildNodesTestar(parentWrapped);
     for (var i = 0; i < childNodes.length; i++) {
         var childElement = childNodes[i];
@@ -52,7 +52,7 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         }
 
         var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementTestar(childWrapped, rootElement, ignoredTags);
+        traverseElementTestar(childWrapped, rootElement, ignoredTags, customElementStateLambda);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
 	
@@ -74,10 +74,13 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 			}
 			
 			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags);
+			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags, customElementStateLambda);
 			parentWrapped.wrappedChildren.push(childShadowWrapped);
 		}
 	}
+
+	// Custom-element-state data
+    parentWrapped['custom-element-state'] = customElementStateLambda(parentWrapped['element']);
 
     // No need for it anymore, save serialization effort
     delete parentWrapped['element'];

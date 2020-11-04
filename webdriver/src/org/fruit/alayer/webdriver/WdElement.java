@@ -60,6 +60,8 @@ public class WdElement extends TaggableBase implements Serializable {
   
   boolean isModal = false;
 
+  public Object customElementState;
+
   public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
@@ -104,7 +106,8 @@ public class WdElement extends TaggableBase implements Serializable {
     	System.out.println("-------------------------------------------------------------------------------------");
     	throw e;
     }
-    
+
+    customElementState = packedElement.get("custom-element-state");
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
     genericTitle = (String) packedElement.get("name");

@@ -36,6 +36,8 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.webdriver.enums.WdTags;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +52,12 @@ public class WdStateFetcher implements Callable<WdState> {
 
   @SuppressWarnings("unchecked")
   public static WdRootElement buildRoot(SUT system) throws StateBuildException {
-    Object result = WdDriver.executeScript(
-        "return getStateTreeTestar(arguments[0])", Constants.ignoredTags);
+    String customElementStateLambda = system.get(WdTags.WebCustomElementStateLambda, "(element => null)");
+
+    // inject custom lambda. TODO Escape string
+    String script = "return getStateTreeTestar(arguments[0], " + customElementStateLambda + ")";
+
+    Object result = WdDriver.executeScript(script, Constants.ignoredTags);
 
     // TODO As Edge limits its recursion to 20, we need to flatten the tree in JS
     // And unflatten the list here into a nested Map (as produced by Chrome / FF)
