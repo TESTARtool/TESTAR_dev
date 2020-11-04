@@ -268,6 +268,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
+    
+	/**
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions) {
+		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+		if(actions == null || actions.isEmpty()) {
+			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
+		return super.selectAction(state, actions);
+	}
 
     /**
      * Overwriting to add HTML report writing into it

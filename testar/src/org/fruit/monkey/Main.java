@@ -98,6 +98,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
+		
+		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
 
@@ -157,6 +159,27 @@ public class Main {
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
 
 		return true;
+	}
+	
+	/**
+	 * Verify the initial directory of TESTAR
+	 * If this directory didn't contain testar.bat file inform the user
+	 */
+	private static void verifyTestarInitialDirectory() {
+		// Obtain Files name of current testarDir
+		Set<String> filesName = new HashSet<>();
+		File[] filesList = new File(testarDir).listFiles();
+        for(File file : filesList){
+        	filesName.add(file.getName());
+        }
+
+        // Verify if we are in the correct executable testar directory (contains testar.bat)
+		if(!filesName.contains("testar.bat")) {
+			System.out.println("WARNING: We cannot find testar.bat executable file.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			filesName.forEach(System.out::println);
+		}
 	}
 
 	/**
