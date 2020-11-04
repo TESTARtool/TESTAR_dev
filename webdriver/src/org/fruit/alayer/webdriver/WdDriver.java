@@ -76,6 +76,7 @@ public class WdDriver extends SUTBase {
   private static List<String> windowHandles = new ArrayList<>();
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
+  public static boolean forceActivateTab = true;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -406,8 +407,8 @@ public class WdDriver extends SUTBase {
   public static void activate() {
     updateHandlesList();
 
-    // Nothing to activate
-    if (windowHandles.size() < 1) {
+    // Nothing to activate, or user doesn't want to use this activate feature
+    if (windowHandles.size() < 1 || !forceActivateTab) {
       return;
     }
 

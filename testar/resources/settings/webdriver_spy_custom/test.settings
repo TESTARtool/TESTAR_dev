@@ -100,14 +100,6 @@ SUTProcesses =
 ProtocolClass = webdriver_spy_custom/Protocol_webdriver_spy_custom
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

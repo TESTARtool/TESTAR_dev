@@ -100,14 +100,6 @@ SUTProcesses =
 ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = false

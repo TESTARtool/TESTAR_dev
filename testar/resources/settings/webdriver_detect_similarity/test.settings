@@ -100,14 +100,6 @@ SUTProcesses =
 ProtocolClass = webdriver_detect_similarity/Protocol_webdriver_detect_similarity
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing

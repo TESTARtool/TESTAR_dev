@@ -59,9 +59,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = Arrays.asList(
@@ -99,10 +97,12 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			put("class", "iAgreeButton");
 		}};
 
+		//Force the browser to run in full screen mode
 		WdDriver.fullScreen = true;
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
+		
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = true;
 	}
 
 	/**

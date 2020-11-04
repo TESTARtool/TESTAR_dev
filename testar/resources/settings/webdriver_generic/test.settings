@@ -100,14 +100,6 @@ SUTProcesses =
 ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

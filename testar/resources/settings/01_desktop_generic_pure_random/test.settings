@@ -96,14 +96,6 @@ SUTProcesses =
 ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_random
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
