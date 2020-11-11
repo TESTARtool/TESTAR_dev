@@ -28,11 +28,10 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -41,18 +40,13 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
 public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
@@ -82,7 +76,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = null ; //Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+		domainsAllowed = null; //Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -145,7 +139,24 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 	}
-	
+
+	protected Object abstractINGFlowState(Object obj) {
+		if (obj instanceof Map) {
+			Map map = (Map)obj;
+			Map newmap = new HashMap();
+
+			for (Object key : map.keySet()) {
+				newmap.put(key, abstractINGFlowState(map.get(key)));
+			}
+			return newmap;
+		}
+		else if (obj == null) {
+			return null;
+		}
+		else {
+			return obj.getClass().getCanonicalName(); // abstract value to class
+		}
+	}
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -162,13 +173,23 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     	// Reset because modal element may disappear
     	highWebModalZIndex = 0;
     	widgetModal = state;
-    	
+
+    	Boolean modalMode = false;
+
     	for(Widget w : state) {
 			Object st = w.get(WdTags.WebCustomElementState, null);
 
 			if (st != null) {
-				// TODO: remove values, keep keys in map
+				Object filtered = abstractINGFlowState(st);
 				System.out.println("ing-flow state: " + st);
+				System.out.println("ing-flow abstract state: " + abstractINGFlowState(st));
+				state.set(WdTags.WebCustomElementState, filtered);
+			}
+
+			String cl = (((WdWidget)w).element).attributeMap.getOrDefault("class", "");
+			// if the ING global-overlays element contains children, there is a modal displayed
+			if ("global-overlays".equals(cl) && w.childCount() > 0) {
+				modalMode = true;
 			}
 
 			// Set highWebModalZIndex value. And the widget that represents that block modal.
@@ -178,10 +199,20 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     			widgetModal = w;
     		}
     	}
-		
-		return state;
+
+    	state.set(WdTags.WebIsWindowModal, modalMode);
+		setAbstractIdCustom(state);
+
+		return state;                                                                        
 	}
 
+	protected void setAbstractIdCustom(State state) {
+		Object cstate = state.get(WdTags.WebCustomElementState, null);
+		if (cstate != null) {
+			String id = CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(cstate.toString());
+			state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + id);
+		}
+	}
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
@@ -190,8 +221,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-
+		setAbstractIdCustom(state);
 		Verdict verdict = super.getVerdict(state);
+		setAbstractIdCustom(state);
+
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
 		//-----------------------------------------------------------------------------
@@ -217,8 +250,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state)
 			throws ActionBuildException {
+
+		setAbstractIdCustom(state);
+		System.out.println("abstract custom state id: " + state.get(Tags.AbstractIDCustom));
+		
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
+		setAbstractIdCustom(state);
 
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
@@ -230,15 +268,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			return forcedActions;
 		}
 
+		boolean modalMode = state.get(WdTags.WebIsWindowModal, false);
+
 		// iterate through all widgets
 		for (Widget widget : state) {
+			// slides can happen, even though the widget might be blocked
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+
+			// ignore aria-hidden = true
+			if (isAriaHidden(widget)) {
+				continue;
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 
-			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			/* We only care about Widgets that are contained by an ing-flow when we are not in modal mode */
+			if (!isINGFlowStep(widget) && !modalMode) {
+				continue;
+			}
 
 			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -259,6 +309,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
+					WdElement element = ((WdWidget) widget).element;
+					Role role = widget.get(Tags.Role, Roles.Widget);
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
@@ -268,7 +320,86 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}
 
 	@Override
+	protected String getRandomText(Widget w) {
+		String sText = super.getRandomText(w);
+
+		String name = w.get(WdTags.WebName, "").toLowerCase();
+
+		int multiplier = 100;
+
+		if (name.contains("monthly")) {
+			multiplier = 9;
+		}
+		if (name.contains("age")) {
+			return "" + ((multiplier * (((new Random()).nextInt(90) + 15))) / 100);
+		}
+		if (name.contains("income")) {
+			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
+		}
+		if (name.contains("profit")) {
+			return "" + ((multiplier * (((new Random()).nextInt(10000) + 10))) / 100);
+		}
+		if (name.contains("years")) {
+			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
+		}
+		if (name.contains("studyloan")) {
+			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
+		}
+		if (name.contains("liabilities")) {
+			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
+		}
+		if (name.contains("alimony")) {
+			return "" + (((new Random()).nextInt(300)));
+		}
+		return sText;
+	}  
+	
+	/* Check whether the Widget is contained by the ing-step container and is not hidden */
+	protected boolean isINGFlowStep(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		String id = element.attributeMap.getOrDefault("id","");
+
+		if ("flow-step".equals(id)) {
+			return true;
+		}
+		else {
+			Widget parent = widget.parent();
+			if (parent != null) {
+				return isINGFlowStep(widget.parent());
+			}
+			return false;
+		}
+	}
+
+	protected boolean isAriaHidden(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+
+		if ("true".equals(element.attributeMap.getOrDefault("aria-hidden","false"))) {
+			return true;
+		}
+		Widget parent = widget.parent();
+		if (parent != null) {
+			return isAriaHidden(parent);
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
 	protected boolean isClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+
+		if (element.attributeMap.getOrDefault("href", "").contains("bel-me-nu")) {
+			return false;
+		}
+		if (element.attributeMap.getOrDefault("href", "").endsWith("hypotheek-berekenen/")) {
+			return false;
+		}
+		if("_blank".equals(element.attributeMap.getOrDefault("target", ""))) {
+			return false;
+		}
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...
@@ -278,8 +409,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 			return true;
 		}
-
-		WdElement element = ((WdWidget) widget).element;
+		
 		if (element.isClickable) {
 			return true;
 		}
@@ -327,12 +457,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		setAbstractIdCustom(state);
+
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			//using the action selector of the state model:
+			setAbstractIdCustom(state);
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
@@ -386,45 +519,5 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
-	}
-
-
-	/*
-	 * Force closing of Policies Popup - in this case the ING cookie selection popup
-	 */
-	@Override
-	protected Set<Action> detectForcedPopupClick(State state,
-												 StdActionCompiler ac) {
-		super.detectForcedPopupClick(state, ac);
-
-		String basicCookieConcreteId = "WCam8lud34592136641";
-		String submitConcreteId = "WCzzefyf273025495128";
-
-		WdWidget submitButton = null;
-		WdWidget basicCookie = null;
-
-		for (Widget widget : state) {
-			WdWidget wdWidget = (WdWidget) widget;
-
-			if (basicCookieConcreteId.equals(wdWidget.get(Tags.ConcreteID, ""))) {
-				basicCookie = wdWidget;
-			}
-
-			if (submitConcreteId.equals(wdWidget.get(Tags.ConcreteID, ""))) {
-				submitButton = wdWidget;
-			}
-		}
-
-		// Submit, but only if default cookie  and submit button have been found
-		if (basicCookie != null && submitButton != null) {
-			CompoundAction.Builder builder = new CompoundAction.Builder();
-
-			builder.add(ac.leftClickAt(basicCookie), 1);
-			builder.add(ac.leftClickAt(submitButton), 1);
-
-			return new HashSet<>(Collections.singletonList(builder.build()));
-		}
-
-		return null;
 	}
 }

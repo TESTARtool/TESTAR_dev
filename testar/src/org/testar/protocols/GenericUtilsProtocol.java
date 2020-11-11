@@ -217,6 +217,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
             //For each possible drag, create an action and add it to the derived actions
             for (Drag drag : drags){
+                System.out.println("drag: "  + drag);
                 //Create a slide action with the Action Compiler, and add it to the set of derived actions
                 actions.add(ac.slideFromTo(
                         new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),

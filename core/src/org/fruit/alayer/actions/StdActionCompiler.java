@@ -278,7 +278,8 @@ public class StdActionCompiler {
 		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing Cntr + A keys to select all text:
-		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
+		builder.add(leftClickAt(position), 1);
+		builder.add(new KeyDown(KBKeys.VK_META), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_META), 0.1);
 		/*
 		// old text replacements by pressing delete multiple times:
 		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes

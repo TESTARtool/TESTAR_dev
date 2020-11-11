@@ -78,4 +78,9 @@ public class Drag {
 		this.toY = toY;
 	}
 
+	@Override
+	public String toString() {
+		return "Drag(from=("+fromX+","+fromY+"), to=("+toX+","+toY+"))";
+	}
+
 }

@@ -89,7 +89,8 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	 */
     @Override
     public void keyDown(KBKeys key) {    	
-        super.keyDown(key);        
+        super.keyDown(key);
+        //System.out.println("key down: " + key);
         if (mode() == Modes.Spy){ 
         	if (key == KBKeys.VK_CAPS_LOCK)
         		displayWhiteTabu = !displayWhiteTabu;
@@ -111,7 +112,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     @Override
     public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
-        if (mode() == Modes.Spy){
+		//System.out.println("key up: " + key);
+
+		if (mode() == Modes.Spy){
         	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
         	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){

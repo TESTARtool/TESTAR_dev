@@ -269,15 +269,34 @@ public class CodingManager {
 	 */
 	private static String getAbstractActionIdentifier(Action action, Map<Role, Integer> roleCounter) {
 		Role role;
+		String pathId = "";
+
+		// Capture some Action context
 		try {
-			role = action.get(Tags.OriginWidget).get(Tags.Role);
+			Widget origin = action.get(Tags.OriginWidget);
+			pathId = getPathId(origin);
+			role = origin.get(Tags.Role);
 		}
 		catch (NoSuchTagException e) {
 			role = action.get(Tags.Role, Roles.Invalid);
 		}
-		return role.toString() + roleCounter.getOrDefault(role, 999);
+		String abstractActionId = pathId + "." + roleCounter.getOrDefault(role, 999);
+		System.out.println("abstractActionId: " + abstractActionId);
+		return abstractActionId;
 	}
-	
+
+	private static String getPathId(Widget w) {
+		String name = w.get(Tags.Title);
+		String result = name;
+
+		Widget parent = w.parent();
+		if (parent == null) {
+			return result;
+		}
+		else {
+			return getPathId(parent) + "." + result;
+		}
+	}
 	// ###############
 	//  STATES CODING
 	// ###############
@@ -311,7 +330,7 @@ public class CodingManager {
 	//  IDS CODING
 	// ############
 
-	private static String lowCollisionID(String text){ // reduce ID collision probability
+	public static String lowCollisionID(String text){ // reduce ID collision probability
 		CRC32 crc32 = new CRC32();
 		crc32.update(text.getBytes());
 		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
