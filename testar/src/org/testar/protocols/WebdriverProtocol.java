@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
 import org.fruit.alayer.Action;
@@ -64,11 +65,13 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -94,7 +97,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	// Define a whitelist of allowed domains for links and pages
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
-	protected List<String> domainsAllowed = null;
+	protected List<String> domainsAllowed = new ArrayList<>();
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)
@@ -108,11 +111,30 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
-	protected Map<String, String> policyAttributes =
-			new HashMap<String, String>() {{
-				put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
-			}};
+	@SuppressWarnings("serial")
+	protected Map<String, String> policyAttributes = new HashMap<String, String>()
+	{
+		{ 
+			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+		}
+	};
 
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+		// Indicate to TESTAR we want to use webdriver package implementation
+		NativeLinker.addWdDriverOS();
+		
+		super.initialize(settings);
+	    
+		// Override ProtocolUtil to allow WebDriver screenshots
+	    protocolUtil = new WdProtocolUtil();
+	}
+	
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
      */
@@ -136,12 +158,15 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
+    	// Add the domain from the SUTConnectorValue to domainsAllowed List
+    	ensureDomainsAllowed();
+    	
     	SUT sut = super.startSystem();
 
     	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
     	// webdriver in the constructor of WdDriver.
     	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows")
+    	if(System.getProperty("os.name").contains("Windows 10")
     			&& sut.get(Tags.HWND, null) == null) {
     		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
     		// window handle. The running browser needs to be in the foreground when we reach this part.
@@ -210,18 +235,30 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
     	
-    	WdDriver.waitDocumentReady();
+    	try {
+    		WdDriver.waitDocumentReady();
+    	} catch(org.openqa.selenium.WebDriverException wde) {
+    		LogSerialiser.log("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!\n", LogSerialiser.LogLevel.Critical);
+    		System.out.println("******************************************************************");
+    		System.out.println("** WEBDRIVER ERROR: Selenium Chromedriver seems not to respond! **");
+    		System.out.println("******************************************************************");
+    		System.out.println(wde.getMessage());
+    		system.set(Tags.IsRunning, false);
+    	}
 
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
-    			&& System.getProperty("os.name").contains("Windows")
+    			&& System.getProperty("os.name").contains("Windows 10")
+    			&& system.get(Tags.IsRunning, false) && !system.get(Tags.NotResponding, false)
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
+    		
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
     		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
+    		
     	}
 
     	latestState = state;
@@ -243,6 +280,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
+    
+	/**
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions) {
+		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+		if(actions == null || actions.isEmpty()) {
+			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
+		return super.selectAction(state, actions);
+	}
 
     /**
      * Overwriting to add HTML report writing into it
@@ -307,7 +364,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     		try {
     			
-    			File folder = new File(settings.getSettingsPath());
+    			File folder = new File(Settings.getSettingsPath());
     			File file = new File(folder, "existingCssClasses.txt");
     			if(!file.exists())
     				file.createNewFile();
@@ -541,17 +598,23 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/*
-	 * If domainsAllowed not set, allow the domain from the SUT Connector
+	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		// Not required or already defined
-		if (domainsAllowed == null || domainsAllowed.size() > 0) {
-			return;
-		}
-
 		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
 		String url = parts[parts.length - 1].replace("\"", "");
-		domainsAllowed = Arrays.asList(getDomain(url));
+
+		try{
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+		} catch(Exception e) {
+			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
+			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
+		}
 	}
 	
 	/*

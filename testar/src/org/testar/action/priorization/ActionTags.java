@@ -42,11 +42,11 @@ public class ActionTags extends TagsBase  {
 
 	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
 
-	private static Set<Tag<Integer>> actionTags = new HashSet<Tag<Integer>>() {
-		{
-			add(SimilarityValue);
-		}
-	};
+	private static Set<Tag<Integer>> actionTags;
+	static {
+		actionTags = new HashSet<Tag<Integer>>();
+		actionTags.add(SimilarityValue);
+	}
 
 	public static Set<Tag<Integer>> getActionTags() {
 		return actionTags;
