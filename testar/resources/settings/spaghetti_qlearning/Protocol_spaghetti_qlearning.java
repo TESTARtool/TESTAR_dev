@@ -117,7 +117,7 @@ public class Protocol_spaghetti_qlearning extends DesktopProtocol {
 		Util.pause(30);*/
 		
 		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
-		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
+		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 		

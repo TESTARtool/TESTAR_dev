@@ -106,14 +106,6 @@ SUTProcesses =
 
 ProtocolClass = swingset2_statemodel/Protocol_swingset2_statemodel
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"

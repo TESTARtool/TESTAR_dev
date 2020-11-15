@@ -95,14 +95,6 @@ SUTProcesses =
 
 ProtocolClass = desktop_swing_statemodel/Protocol_desktop_swing_statemodel
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"

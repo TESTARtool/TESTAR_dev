@@ -106,14 +106,6 @@ SUTProcesses =
 
 ProtocolClass = spaghetti_statemodel/Protocol_spaghetti_statemodel
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"

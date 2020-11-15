@@ -96,14 +96,6 @@ SUTProcesses =
 ProtocolClass = bluej_purerandom/Protocol_bluej_purerandom
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing

@@ -107,14 +107,6 @@ SUTProcesses =
 ProtocolClass = swingset2_jacoco_action_statemodel_remote/Protocol_swingset2_jacoco_action_statemodel_remote
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = true

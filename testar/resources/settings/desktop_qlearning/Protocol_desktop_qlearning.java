@@ -63,7 +63,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		// initializing simple GUI state graph for Q-learning:
-		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
+		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 	}

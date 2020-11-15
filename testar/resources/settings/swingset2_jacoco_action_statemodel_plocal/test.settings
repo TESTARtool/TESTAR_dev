@@ -107,14 +107,6 @@ SUTProcesses =
 ProtocolClass = swingset2_jacoco_action_statemodel_plocal/Protocol_swingset2_jacoco_action_statemodel_plocal
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = true

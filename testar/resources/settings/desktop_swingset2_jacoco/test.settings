@@ -107,14 +107,6 @@ SUTProcesses =
 ProtocolClass = desktop_swingset2_jacoco/Protocol_desktop_swingset2_jacoco
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
