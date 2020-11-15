@@ -563,7 +563,7 @@ public class AccessBridgeControlTypes {
 		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, new Long(Windows.UIA_ToolTipControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_TREE, new Long(Windows.UIA_TreeControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, new Long(Windows.UIA_ScrollBarControlTypeId)); // maybe UIA_PaneControlTypeId
+		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, new Long(Windows.UIA_PaneControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, new Long(Windows.UIA_WindowControlTypeId));
 	}};
 	
