@@ -518,7 +518,7 @@ public class AccessBridgeControlTypes {
 		put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, new Long(Windows.UIA_PaneControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, new Long(Windows.UIA_ToolBarControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, new Long(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, new Long(Windows.UIA_CheckBoxControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, new Long(Windows.UIA_SeparatorControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, new Long(Windows.UIA_CustomControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, new Long(Windows.UIA_CustomControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, new Long(Windows.UIA_WindowControlTypeId));
@@ -563,7 +563,7 @@ public class AccessBridgeControlTypes {
 		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, new Long(Windows.UIA_ToolTipControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_TREE, new Long(Windows.UIA_TreeControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, new Long(Windows.UIA_ScrollBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, new Long(Windows.UIA_PaneControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, new Long(Windows.UIA_WindowControlTypeId));
 	}};
 	
@@ -574,7 +574,7 @@ public class AccessBridgeControlTypes {
 	 */
 	public static long toUIA(String accessibleRole){
 		if (accessibleRole == null || accessibleRole.isEmpty()){
-			System.out.println("WARNING - null/empty accessible role <" + accessibleRole + ">");
+			//System.out.println("WARNING - null/empty accessible role <" + accessibleRole + ">");
 			return MISSING_UIA;
 		}
 		
@@ -582,7 +582,7 @@ public class AccessBridgeControlTypes {
 		if (uia != null)
 			return uia.longValue();
 
-		System.out.println("WARNING - missed accessible role <" + accessibleRole + ">");
+		//System.out.println("WARNING - missed accessible role <" + accessibleRole + ">");
 		return MISSING_UIA;		
 	}
 
