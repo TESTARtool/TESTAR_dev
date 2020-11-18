@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_fsecure/Protocol_webdriver_fsecure
+ProtocolClass = webdriver_fsecure_RDR/Protocol_webdriver_fsecure_RDR
 
 #################################################################
 # State model inference settings
@@ -118,7 +118,7 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = business
+ApplicationName = RDR
 ApplicationVersion = 1.0
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false

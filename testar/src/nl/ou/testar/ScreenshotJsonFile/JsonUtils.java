@@ -36,10 +36,7 @@ import nl.ou.testar.ScreenshotJsonFile.BoundingPoly;
 import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
 import nl.ou.testar.ScreenshotJsonFile.Vertice;
 import nl.ou.testar.ScreenshotJsonFile.WidgetJsonObject;
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.windows.UIATags;
 
 import java.io.FileWriter;
@@ -59,7 +56,6 @@ public class JsonUtils {
     	}
 //        System.out.println("DEBUG: SUT rect x="+sutRect.x()+", y="+sutRect.y()+", width="+sutRect.width()+", height="+sutRect.height());
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
         for(Widget widget:state){
             boolean enabled = widget.get(Tags.Enabled, null);
@@ -80,17 +76,15 @@ public class JsonUtils {
             String valuePattern= widget.get(Tags.ValuePattern, "");
             WidgetJsonObject widgetJsonObject = new WidgetJsonObject(enabled, role, blocked, boundingPoly, className, title, desc, name, toolTipText, valuePattern);
             widgetJsonObjects.add(widgetJsonObject);
-//			for(Tag tag:widget.tags()){
-//				System.out.println("Tag:"+tag.toString()+"="+widget.get(tag));
-//			}
         }
-//        System.out.println("Widget size="+widgetJsonObjects.size());
+        //        System.out.println("Widget size="+widgetJsonObjects.size());
         String screenshotPath = state.get(Tags.ScreenshotPath);
 //        System.out.println("ScreenshotPath="+screenshotPath);
         ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath);
 //        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
 //        System.out.println("FilePath="+filePath);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try{
             FileWriter fileWriter = new FileWriter(filePath);
             gson.toJson(screenshotWidgetJsonObject, fileWriter);
@@ -100,4 +94,39 @@ public class JsonUtils {
             System.out.println("ERROR: Writing JSON into file failed!");
         }
     }
+
+    public static void createAllWidgetPropertiesJsonFile(State state){
+        Set<AllWidgetPropertiesJsonObject> allWidgetPropertiesJsonObjects = new HashSet<AllWidgetPropertiesJsonObject>();
+        System.out.println("======== New state ==========");
+        for(Widget widget:state){
+            System.out.println("*** New widget ***");
+            Set<WidgetPropertyValueJsonObject> widgetPropertyValueJsonObjects = new HashSet<WidgetPropertyValueJsonObject>();
+			for(Tag tag:widget.tags()){
+			    System.out.println(tag.toString()+"="+widget.get(tag));
+                widgetPropertyValueJsonObjects.add(new WidgetPropertyValueJsonObject(tag.toString(),widget.get(tag)));
+			}
+            allWidgetPropertiesJsonObjects.add(new AllWidgetPropertiesJsonObject(widgetPropertyValueJsonObjects));
+        }
+        StateWidgetsJson stateWidgetsJson = new StateWidgetsJson(allWidgetPropertiesJsonObjects);
+/*
+        String screenshotPath = state.get(Tags.ScreenshotPath, "/output/");
+        String filePath = "";
+        if(screenshotPath.equals("/output/")){
+            filePath = screenshotPath+state.get(Tags.AbstractIDCustom, "noAbstractIDCustomAvailable")+".json";
+        }else{
+            filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
+        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try{
+            FileWriter fileWriter = new FileWriter(filePath);
+            gson.toJson(stateWidgetsJson, fileWriter);
+            fileWriter.flush(); //flush data to file   <---
+            fileWriter.close(); //close write          <---
+        }catch(Exception e){
+            System.out.println("ERROR: Writing JSON into file failed!");
+        }
+
+ */
+    }
+
 }

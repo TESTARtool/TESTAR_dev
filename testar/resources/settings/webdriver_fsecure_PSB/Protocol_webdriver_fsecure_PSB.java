@@ -31,7 +31,6 @@
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
-import nl.ou.testar.ScreenshotJsonFile.WidgetPropertyValueJsonObject;
 import nl.ou.testar.SutVisualization;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -55,7 +54,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_fsecure extends WebdriverProtocol {
+public class Protocol_webdriver_fsecure_PSB extends WebdriverProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -137,7 +136,10 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebType,"email", "pekka.aho@ou.nl", state, system, 5,1.0);
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebType,"password", "Testar12345", state, system, 5,1.0);
 		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebType,"submit", state, system, 5,1.0);
-		Util.pause(5);
+		Util.pause(2);
+		state = getState(system);
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebHref,"emea.psb.f-secure.com", state, system, 5,1.0);
+		Util.pause(2);
 		// SUT state is automatically updated after beginSequence()
 	}
 
@@ -210,7 +212,6 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 	}
 
 	private Set<Action> getActions(SUT system, State state){
-		System.out.println("======= Actions of a new state ========");
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 		Set<Action> filteredActions = new HashSet<Action>();
@@ -227,11 +228,6 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
-			if(widget.get(WdTags.WebHref).contains("portal.rdr.f-secure.com")){
-				filteredActions.add(ac.leftClickAt(widget));
-			}else if(widget.get(WdTags.WebHref).contains("emea.psb.f-secure.com")){
-				filteredActions.add(ac.leftClickAt(widget));
-			}
 
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true) ) {
@@ -253,14 +249,12 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				printActionWidget(widget);
 				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
-					printActionWidget(widget);
 					actions.add(ac.leftClickAt(widget));
 				}else{
 					filteredActions.add(ac.leftClickAt(widget));
@@ -272,13 +266,6 @@ public class Protocol_webdriver_fsecure extends WebdriverProtocol {
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
-	}
-
-	private void printActionWidget(Widget widget){
-		System.out.println("*** Properties of an actionable widget ***");
-		for(Tag tag:widget.tags()){
-			System.out.println(tag.toString()+"="+widget.get(tag));
-		}
 	}
 
 	@Override
