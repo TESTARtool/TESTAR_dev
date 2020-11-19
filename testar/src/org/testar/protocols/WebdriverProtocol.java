@@ -131,8 +131,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		
 		super.initialize(settings);
 	    
-		// Override ProtocolUtil to allow WebDriver screenshots
-	    protocolUtil = new WdProtocolUtil();
 	}
 	
     /**

@@ -43,11 +43,8 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
 public class WdProtocolUtil extends ProtocolUtil {
-  public WdProtocolUtil() {
-  }
 
-  @Override
-  public String getStateshot(State state) {
+  public static String getStateshot(State state) {
     double width = CanvasDimensions.getCanvasWidth() + (
         state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
     double height = CanvasDimensions.getCanvasHeight() + (
@@ -57,8 +54,7 @@ public class WdProtocolUtil extends ProtocolUtil {
     return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
   }
 
-  @Override
-  public String getActionshot(State state, Action action) {
+  public static String getActionshot(State state, Action action) {
     List<Finder> targets = action.get(Tags.Targets, null);
     if (targets == null) {
       return null;
@@ -89,8 +85,7 @@ public class WdProtocolUtil extends ProtocolUtil {
     return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
   }
   
-  @Override
-  public AWTCanvas getStateshotBinary(State state) {
+  public static AWTCanvas getStateshotBinary(State state) {
 	  //If these State Tags are not obtained, the State has an error, use full monitor screen
 	  if(state.get(WdTags.WebVerticallyScrollable, null) == null 
 			  && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
