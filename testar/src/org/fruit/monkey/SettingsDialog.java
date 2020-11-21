@@ -36,6 +36,7 @@ import nl.ou.testar.StateModel.Settings.StateModelPanel;
 
 import org.fruit.Pair;
 import org.fruit.Util;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
 import org.testar.settings.ExtendedSettingsFactory;
 
@@ -71,6 +72,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
   static final String TESTAR_VERSION = "2.3.4 (1-Jul-2021)";
+  static final String SETTINGS_FILENAME = "test.settings";
 
   private String settingsFile;
   private Settings settings;
@@ -183,6 +185,12 @@ public class SettingsDialog extends JFrame implements Observer {
     }
     if (!new File(settings.get(ConfigTags.TempDir)).exists()) {
       throw new IllegalStateException("Temp Directory does not exist!");
+    }
+
+    try{
+      settings.get(ConfigTags.ExtendedSettingsFile);
+    } catch (NoSuchTagException e){
+      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettings.FileName));
     }
 
     settingPanels.forEach((k,v) -> v.right().checkSettings());

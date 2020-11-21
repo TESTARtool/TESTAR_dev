@@ -34,6 +34,7 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public final class ConfigTags {

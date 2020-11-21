@@ -443,6 +443,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ExtendedSettingsFile =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Extended settings file\n"
+					+"#\n"
+					+"# Relative path to extended settings file.\n"
+					+"#################################################################\n"
+					+"ExtendedSettingsFile =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Other more advanced settings\n"
 					+"#################################################################\n");
 
