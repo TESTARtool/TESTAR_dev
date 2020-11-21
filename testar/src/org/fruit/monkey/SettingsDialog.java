@@ -37,7 +37,9 @@ package org.fruit.monkey;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
+import org.testar.settings.ExtendedSettings;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -69,7 +71,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
   static final String TESTAR_VERSION = "2.2.11 (27-Oct-2020)";
-
+  static final String SETTINGS_FILENAME = "test.settings";
 
   private String settingsFile;
   private Settings settings;
@@ -188,6 +190,12 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Temp Directory does not exist!");
     }
 
+    try{
+      settings.get(ConfigTags.ExtendedSettingsFile);
+    } catch (NoSuchTagException e){
+      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettings.FileName));
+    }
+
     miscPanel.checkSettings();
   }
 
@@ -195,7 +203,7 @@ public class SettingsDialog extends JFrame implements Observer {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(SETTINGS_FILENAME)-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
