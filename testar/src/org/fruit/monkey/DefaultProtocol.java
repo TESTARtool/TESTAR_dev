@@ -1321,6 +1321,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue),Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
 			return sutConnector.startOrConnectSut();
+		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_DAEMON)) {
+			//TODO make a generic solution, this is F-Secure specific:
+			String commandToBringDaemonGuiForeground = "";
+			// first bring the GUI of the daemon process visible:
+			try {
+				Runtime.getRuntime().exec(commandToBringDaemonGuiForeground);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+
+			// then connect to the GUI window:
+			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
