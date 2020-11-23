@@ -1,10 +1,8 @@
 package nl.ou.testar.ReinforcementLearning.Policies;
 
 import nl.ou.testar.RandomActionSelector;
-import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
 import nl.ou.testar.StateModel.AbstractAction;
 
-import java.util.Collections;
 import java.util.Set;
 
 public class EpsilonGreedyPolicy implements Policy {
@@ -27,8 +25,7 @@ public class EpsilonGreedyPolicy implements Policy {
             return greedyPolicy.applyPolicy(actions);
         }
 
-        final Set<AbstractAction> actionsSelected = Collections.singleton(RandomActionSelector.selectAbstractAction(actions));
-        return ReinforcementLearningUtils.selectAction(actionsSelected);
+        return RandomActionSelector.selectAbstractAction(actions);
     }
 
     float getRandomValue() {

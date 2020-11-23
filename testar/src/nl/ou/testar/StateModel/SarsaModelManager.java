@@ -8,6 +8,7 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.apache.commons.lang.Validate;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
@@ -23,13 +24,17 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     /** The previously executed {@link AbstractAction} */
     private AbstractAction previousAbstractActionToExecute = null;
 
-    /*  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
+    /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
-    * */
+    */
     private final RewardFunction rewardFunction;
 
-    /** {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction} */
+    /**
+     * The {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction}
+     */
     private final QFunction qFunction;
+
+    private State state = null;
 
     /**
      * Constructor
@@ -46,6 +51,13 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
+    }
+
+    @Override
+    public void notifyNewStateReached(final State newState, final Set<Action> actions) {
+        super.notifyNewStateReached(newState, actions);
+        state = newState;
+
     }
 
     /**
@@ -72,7 +84,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
             final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
 
             // get reward and Q-value
-            float reward = rewardFunction.getReward(getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
             final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward);
 
             // set attribute for saving in the graph database

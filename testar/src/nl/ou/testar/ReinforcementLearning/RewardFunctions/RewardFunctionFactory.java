@@ -11,7 +11,7 @@ public class RewardFunctionFactory {
 
         switch(rewardFunction) {
             case "WidgetTreeBasedRewardFunction":
-                selectedRewardFunction = new WidgetTreeBasedRewardFunction();
+                selectedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(new LRKeyrootsHelper());
                 break;
             case "ImageRecognitionBasedRewardFunction":
                 final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);

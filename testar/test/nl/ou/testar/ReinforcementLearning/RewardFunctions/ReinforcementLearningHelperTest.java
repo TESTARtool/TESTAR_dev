@@ -1,5 +1,6 @@
-package nl.ou.testar.ReinforcementLearning.Utils;
+package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import nl.ou.testar.StateModel.AbstractAction;
 import org.junit.Test;
 
@@ -8,7 +9,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class ReinforcementLearningUtilsTest {
+public class ReinforcementLearningHelperTest {
 
     @Test
     public void selectAction_returnsARandomAction_whenMoreThanOneActionIsProvided () {
@@ -21,7 +22,7 @@ public class ReinforcementLearningUtilsTest {
         actionsSelected.add(abstractActionTwo);
 
         // when
-        final AbstractAction actionSelected = ReinforcementLearningUtils.selectAction(actionsSelected);
+        final AbstractAction actionSelected = ReinforcementLearningUtil.selectAction(actionsSelected);
 
         // then
         assertNotNull(actionSelected);
@@ -35,7 +36,7 @@ public class ReinforcementLearningUtilsTest {
         actionsSelected.add(abstractAction);
 
         // when
-        final AbstractAction actionSelected = ReinforcementLearningUtils.selectAction(actionsSelected);
+        final AbstractAction actionSelected = ReinforcementLearningUtil.selectAction(actionsSelected);
 
         // then
         assertEquals(abstractAction, actionSelected);
@@ -46,7 +47,7 @@ public class ReinforcementLearningUtilsTest {
         final Collection<AbstractAction> actionsSelected = new HashSet<>();
 
         // when
-        final AbstractAction actionSelected = ReinforcementLearningUtils.selectAction(actionsSelected);
+        final AbstractAction actionSelected = ReinforcementLearningUtil.selectAction(actionsSelected);
 
         // then
         assertNull(actionSelected);

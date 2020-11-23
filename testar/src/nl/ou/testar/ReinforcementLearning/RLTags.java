@@ -58,5 +58,4 @@ public class RLTags extends TagsBase  {
 	public static Set<Tag<?>> getReinforcementLearningTags() {
 		return reinforcementLearningTags;
 	}
-
 }

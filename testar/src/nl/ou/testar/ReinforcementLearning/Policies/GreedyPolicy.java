@@ -3,7 +3,7 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import nl.ou.testar.ReinforcementLearning.RLTags;
-import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import nl.ou.testar.StateModel.AbstractAction;
 
 import java.util.Collection;
@@ -37,6 +37,6 @@ public class GreedyPolicy implements Policy {
 
         final float maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
-        return ReinforcementLearningUtils.selectAction(actionsSelected);
+        return ReinforcementLearningUtil.selectAction(actionsSelected);
     }
 }

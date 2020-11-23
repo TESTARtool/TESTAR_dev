@@ -43,7 +43,7 @@ public class CounterBasedRewardFunctionTest {
         doNothing().when(taggableBase).set(eq(RLTags.Counter), anyInt());
 
         // when
-        float reward = rewardFunction.getReward(null, currentAbstractState, executedAction);
+        float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
 
         // then
         assertEquals(1f, reward , 0f);
