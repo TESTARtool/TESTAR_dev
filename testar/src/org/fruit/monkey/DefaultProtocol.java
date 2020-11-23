@@ -54,7 +54,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -66,6 +65,8 @@ import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -91,7 +92,6 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
-import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
@@ -146,7 +146,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
@@ -162,7 +162,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false;
-	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 	
@@ -322,6 +321,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void initialize(Settings settings) {
 
+		visualizationOn = settings.get(ConfigTags.VisualizeActions);
+
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
@@ -349,7 +350,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
 
@@ -679,6 +680,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
+				
+				//update state after begin sequence SUT modification
+				state = getState(system);
 
 				//initializing fragment for recording replayable test sequence:
 				initFragmentForReplayableSequence(state);
@@ -792,20 +796,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
-			if(actions.isEmpty()){
-				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				}
-				//----------------------------------
-				// THERE MUST ALMOST BE ONE ACTION!
-				//----------------------------------
-				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildEnvironmentActionIDs(state, escAction);
-				actions.add(escAction);
-				escAttempts++;
-			} else
-				escAttempts = 0;
 			//Showing the green dots if visualization is on:
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
@@ -957,25 +947,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			State state = getState(system);
 
-			cv.begin(); Util.clear(cv);
-
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
+			cv.begin(); Util.clear(cv);
+			
+			//in Spy-mode, always visualize the widget info under the mouse cursor:
+			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv, state);
+
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
+			
 			cv.end();
 
-			//TODO: Prepare Spy Mode refresh time on settings file
-			//Wait 500ms to show the actions
+			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
+			
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(msRefresh);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -991,7 +981,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		cv.end();
 		
 		//finishSequence() content, but SPY mode is not a sequence
-		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		}
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
@@ -1654,42 +1646,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Action preSelectAction(State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
 
-		//If deriveActions indicated that there are processes that need to be killed
-		//because they are in the process filters
-		//Then here we will select the action to do that killing
+		// If deriveActions indicated that there are processes that need to be killed
+		// because they are in the process filters
+		// Then here we will select the action to do that killing
 
 		if (this.forceKillProcess != null){
 			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
+			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildEnvironmentActionIDs(state, killProcessAction);
 			this.forceKillProcess = null;
-			return a;
+			return killProcessAction;
 		}
-		//If deriveActions indicated that the SUT should be put back in the foreground
-		//Then here we will select the action to do that
+
+		// If deriveActions indicated that the SUT should be put back in the foreground
+		// Then here we will select the action to do that
 
 		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action foregroundAction = new ActivateSystem();
+			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
 			this.forceToForeground = false;
-			return a;
+			return foregroundAction;
 		}
 
-		//TODO: This seems not to be used yet...
+		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (this.forceNextActionESC){
-			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
+		else if (actions.isEmpty()){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildEnvironmentActionIDs(state, a);
-			this.forceNextActionESC = false;
-			return a;
-		} else
-			return null;
+			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildEnvironmentActionIDs(state, escAction);
+			return escAction;
+		}
+
+		return null;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)

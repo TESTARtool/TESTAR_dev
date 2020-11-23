@@ -14,3 +14,4 @@ build.bat
 *.class
 /windows/native_src/compile_w10.bat
 /windows/native_src/clean_w10.bat
+*.log
