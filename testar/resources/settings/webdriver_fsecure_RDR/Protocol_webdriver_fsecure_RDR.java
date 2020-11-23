@@ -103,7 +103,7 @@ public class Protocol_webdriver_fsecure_RDR extends WebdriverProtocol {
 		WdDriver.fullScreen = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
+		//protocolUtil = new WdProtocolUtil();
 
 	}
 
