@@ -31,6 +31,8 @@
 
 import java.io.File;
 import java.util.Set;
+
+import es.upv.staq.testar.ProtocolUtil;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import org.fruit.Util;
@@ -156,7 +158,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			//System.out.println("DEBUG: action: "+action.toString());
 			//System.out.println("DEBUG: action short: "+action.toShortString());
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
 				try {
 					//System.out.println("DEBUG: sikuli clicking ");
@@ -173,7 +175,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			}else if(action.toShortString().contains("ClickTypeInto(")){
 				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
 				//System.out.println("parsed text:"+textToType);
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
 				Util.pause(halfWait);
 				Screen sikuliScreen = new Screen();
 				try {
