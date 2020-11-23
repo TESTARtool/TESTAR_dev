@@ -131,8 +131,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		
 		super.initialize(settings);
 	    
-		// Override ProtocolUtil to allow WebDriver screenshots
-	    protocolUtil = new WdProtocolUtil();
 	}
 	
     /**
@@ -166,7 +164,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
     	// webdriver in the constructor of WdDriver.
     	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows")
+    	if(System.getProperty("os.name").contains("Windows 10")
     			&& sut.get(Tags.HWND, null) == null) {
     		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
     		// window handle. The running browser needs to be in the foreground when we reach this part.
@@ -235,18 +233,30 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
     	
-    	WdDriver.waitDocumentReady();
+    	try {
+    		WdDriver.waitDocumentReady();
+    	} catch(org.openqa.selenium.WebDriverException wde) {
+    		LogSerialiser.log("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!\n", LogSerialiser.LogLevel.Critical);
+    		System.out.println("******************************************************************");
+    		System.out.println("** WEBDRIVER ERROR: Selenium Chromedriver seems not to respond! **");
+    		System.out.println("******************************************************************");
+    		System.out.println(wde.getMessage());
+    		system.set(Tags.IsRunning, false);
+    	}
 
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
-    			&& System.getProperty("os.name").contains("Windows")
+    			&& System.getProperty("os.name").contains("Windows 10")
+    			&& system.get(Tags.IsRunning, false) && !system.get(Tags.NotResponding, false)
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
+    		
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
     		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
+    		
     	}
 
     	latestState = state;
@@ -268,6 +278,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
+    
+	/**
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions) {
+		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+		if(actions == null || actions.isEmpty()) {
+			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		
+		return super.selectAction(state, actions);
+	}
 
     /**
      * Overwriting to add HTML report writing into it
