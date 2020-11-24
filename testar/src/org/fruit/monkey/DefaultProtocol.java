@@ -1389,10 +1389,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				System.out.println("DEBUG: Using WebDriver specific state shot.");
+				//System.out.println("DEBUG: Using WebDriver specific state shot.");
 				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
 			}else{
-				System.out.println("DEBUG: normal state shot");
+				//System.out.println("DEBUG: normal state shot");
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
 			}
 		}
@@ -1569,10 +1569,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			System.out.println("DEBUG: Using WebDriver specific action shot.");
+			//System.out.println("DEBUG: Using WebDriver specific action shot.");
 			WdProtocolUtil.getActionshot(state,action);
 		}else{
-			System.out.println("DEBUG: normal action shot");
+			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
 		
