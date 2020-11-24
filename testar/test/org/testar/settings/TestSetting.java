@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TestSetting implements Serializable, Comparable<TestSetting> {
+public class TestSetting extends ExtendedSettingBase<TestSetting> {
 
     static final String DEFAULT_VALUE = "Default";
     public String value;

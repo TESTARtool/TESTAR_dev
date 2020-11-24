@@ -13,12 +13,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.junit.Assert.*;
 
-public class ExtendedSettingsTest {
+public class ExtendedSettingFileTest {
     final private String _rootDir = System.getProperty("user.dir") + File.separator;
     final private String _relativePath = "extended_settings_test" + File.separatorChar;
     final private String _workingDir = _rootDir + _relativePath;
 
-    ExtendedSettings sut;
+    ExtendedSettingFile sut;
     ReentrantReadWriteLock fileAccessLock;
 
     @After
@@ -80,7 +80,7 @@ public class ExtendedSettingsTest {
         assertFalse(testFile.exists());
 
         // WHEN Trying to load an extended setting without default values.
-        sut = new ExtendedSettings(_relativePath + unknownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + unknownFile, fileAccessLock);
         TestSetting element = sut.load(TestSetting.class);
 
         // THEN The file is created.
@@ -96,7 +96,7 @@ public class ExtendedSettingsTest {
         assertFalse(testFile.exists());
 
         // WHEN Trying to load an extended setting without default values.
-        sut = new ExtendedSettings(_relativePath + unknownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + unknownFile, fileAccessLock);
         TestSetting element = sut.load(TestSetting.class, TestSetting::CreateDefault);
 
         // THEN The file is created containing default values.
@@ -113,7 +113,7 @@ public class ExtendedSettingsTest {
         assertFalse(testFile.exists());
 
         // WHEN Trying to save an extended setting before loading.
-        sut = new ExtendedSettings(_relativePath + unknownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + unknownFile, fileAccessLock);
         TestSetting element = new TestSetting();
         sut.save(element);
 
@@ -128,7 +128,7 @@ public class ExtendedSettingsTest {
         XmlFile.CreateUnknownFile(_workingDir + unknownFile);
 
         // WHEN Trying to load an extended setting without default values.
-        sut = new ExtendedSettings(_relativePath + unknownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + unknownFile, fileAccessLock);
         TestSetting element = sut.load(TestSetting.class);
 
         // THEN The element remains empty.
@@ -142,7 +142,7 @@ public class ExtendedSettingsTest {
         XmlFile.CreateUnknownFile(_workingDir + unknownFile);
 
         // WHEN Trying to save an extended setting.
-        sut = new ExtendedSettings(_relativePath + unknownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + unknownFile, fileAccessLock);
         TestSetting data = TestSetting.CreateDefault();
         sut.save(data);
 
@@ -159,7 +159,7 @@ public class ExtendedSettingsTest {
         XmlFile.CreateSingleTestSetting(_workingDir + knownFile);
 
         // WHEN Trying to update a known element.
-        sut = new ExtendedSettings(_relativePath + knownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting data = sut.load(TestSetting.class);
         data.value = "updated";
         sut.save(data);
@@ -177,7 +177,7 @@ public class ExtendedSettingsTest {
         XmlFile.CreateMultipleTestSetting(_workingDir + knownFile);
 
         // WHEN Trying to update a known element.
-        sut = new ExtendedSettings(_relativePath + knownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting data = sut.load(TestSetting.class);
         data.value = "version3";
         sut.save(data);
@@ -193,8 +193,8 @@ public class ExtendedSettingsTest {
         final String knownFile = "update_multiple_elements.xml";
         File testFile = new File(_workingDir + knownFile);
         assertFalse(testFile.exists());
-        sut = new ExtendedSettings(_relativePath + knownFile, fileAccessLock);
-        ExtendedSettings sutTwo = new ExtendedSettings(_relativePath + knownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
+        ExtendedSettingFile sutTwo = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting elementOne = sut.load(TestSetting.class, TestSetting::CreateDefault);
         OtherSetting elementTwo = sutTwo.load(OtherSetting.class, OtherSetting::CreateDefault);
         assertTrue(testFile.exists());
@@ -223,7 +223,7 @@ public class ExtendedSettingsTest {
         final String knownFile = "update_wrong_element.xml";
         File testFile = new File(_workingDir + knownFile);
         assertFalse(testFile.exists());
-        sut = new ExtendedSettings(_relativePath + knownFile, fileAccessLock);
+        sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting elementOne = sut.load(TestSetting.class, TestSetting::CreateDefault);
         OtherSetting elementTwo = sut.load(OtherSetting.class, OtherSetting::CreateDefault);
         assertTrue(testFile.exists());

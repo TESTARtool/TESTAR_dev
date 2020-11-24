@@ -40,7 +40,8 @@ import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
-import org.testar.settings.ExtendedSettings;
+import org.testar.settings.ExtendedSettingFile;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -189,17 +190,12 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Temp Directory does not exist!");
     }
 
-    try{
-      settings.get(ConfigTags.ExtendedSettingsFile);
-    } catch (NoSuchTagException e){
-      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettings.FileName));
-    }
-
     settingPanels.forEach((k,v) -> v.getValue().checkSettings());
   }
 
   private void saveCurrentSettings() {
     extractInformation(settings);
+    ExtendedSettingsFactory.SaveAll();
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
       Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(SETTINGS_FILENAME)-1));
@@ -235,6 +231,13 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void populateInformation(Settings settings) {
+    try{
+      settings.get(ConfigTags.ExtendedSettingsFile);
+    } catch (NoSuchTagException e){
+      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettingFile.FileName));
+    }
+    ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
+
     settingPanels.forEach((k,v) -> v.getValue().populateFrom(settings));
   }
 

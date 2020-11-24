@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class OtherSetting implements Serializable, Comparable<OtherSetting> {
+public class OtherSetting extends ExtendedSettingBase<OtherSetting> {
     static final int DEFAULT_VALUE = 5;
     public int speed;
 

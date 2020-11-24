@@ -31,14 +31,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @XmlRootElement(name = "root")
 @XmlAccessorType(XmlAccessType.FIELD)
-class ExtendedSettingsXml implements Serializable {
+class RootSetting implements Serializable {
     // Holds all the XML elements found in the file.
     @XmlAnyElement(lax = true)
     public List<Object> any;
 
     public Integer version;
 
-    public ExtendedSettingsXml() {
+    public RootSetting() {
         any = new ArrayList<>();
         version = 1;
     }
@@ -49,17 +49,17 @@ class ExtendedSettingsXml implements Serializable {
  */
 class ExtractionResult {
     final JAXBContext Context;
-    final ExtendedSettingsXml Data;
+    final RootSetting Data;
     final Boolean FileNotFound;
 
-    public ExtractionResult(JAXBContext context, ExtendedSettingsXml data, Boolean fileNotFound) {
+    public ExtractionResult(JAXBContext context, RootSetting data, Boolean fileNotFound) {
         Context = context;
         Data = data;
         FileNotFound = fileNotFound;
     }
 }
 
-public class ExtendedSettings implements Serializable {
+public class ExtendedSettingFile implements Serializable {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final String FileName = "ExtendedSettings.xml";
     private final String _absolutePath;
@@ -78,7 +78,7 @@ public class ExtendedSettings implements Serializable {
      * @param fileLocation    The absolute path the the XML file.
      * @param fileAccessMutex Mutex for thread-safe access.
      */
-    protected ExtendedSettings(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
+    protected ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
         _fileAccessMutex = fileAccessMutex;
         _absolutePath = System.getProperty("user.dir") +
                 (fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)
@@ -89,11 +89,10 @@ public class ExtendedSettings implements Serializable {
      * Try to load the requested data element from the XML file.
      *
      * @param clazz The class type of the element we want to load.
-     * @param <T>   The class type of the element we want to load.
      * @return When found in the XML the requested element, otherwise null.
      */
     @SuppressWarnings("unchecked")
-    public <T> T load(@SuppressWarnings("rawtypes") @NonNull Class clazz) {
+    public <T> T load(@NonNull Class<T> clazz) {
         T result = null;
 
         // Check if file exits
@@ -130,7 +129,7 @@ public class ExtendedSettings implements Serializable {
      * @param <T>            The class type of the element we want to load.
      * @return Either the element found in the file otherwise the default configuration.
      */
-    public <T> T load(@SuppressWarnings("rawtypes") @NonNull Class clazz, @NonNull IExtendedSettingDefaultValue<T> defaultFunctor) {
+    public <T> T load(@NonNull Class<T> clazz, @NonNull IExtendedSettingDefaultValue<T> defaultFunctor) {
         T result = load(clazz);
 
         if (result == null) {
@@ -158,22 +157,21 @@ public class ExtendedSettings implements Serializable {
         updateFile(data, result.Context, result.Data);
     }
 
-    @SuppressWarnings("rawtypes")
-    private ExtractionResult extractContent(@NonNull Class clazz) {
+    private <T> ExtractionResult extractContent(@NonNull Class<T> clazz) {
         JAXBContext context = null;
-        ExtendedSettingsXml data = null;
+        RootSetting data = null;
         boolean fileNotFound = false;
 
         try {
             FileInputStream xmlFile = null;
-            context = JAXBContext.newInstance(ExtendedSettingsXml.class, clazz);
+            context = JAXBContext.newInstance(RootSetting.class, clazz);
             Unmarshaller um = context.createUnmarshaller();
 
             try {
                 _fileAccessMutex.readLock().lock();
                 // Load latest version of XML, other settings may have been updated in the mean time.
                 xmlFile = new FileInputStream(_absolutePath);
-                data = (ExtendedSettingsXml) um.unmarshal(xmlFile);
+                data = (RootSetting) um.unmarshal(xmlFile);
             } catch (FileNotFoundException e) {
                 fileNotFound = true;
             } finally {
@@ -189,8 +187,7 @@ public class ExtendedSettings implements Serializable {
         return new ExtractionResult(context, data, fileNotFound);
     }
 
-    @SuppressWarnings("rawtypes")
-    private ExtractionResult readFile(@NonNull Class clazz) {
+    private <T> ExtractionResult readFile(@NonNull Class<T> clazz) {
 
         ExtractionResult result = extractContent(clazz);
         if (result.FileNotFound) {
@@ -202,7 +199,7 @@ public class ExtendedSettings implements Serializable {
     }
 
     @SuppressWarnings("rawtypes")
-    private void updateFile(@NonNull Object data, JAXBContext context, ExtendedSettingsXml xmlData) {
+    private void updateFile(@NonNull Object data, JAXBContext context, RootSetting xmlData) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(xmlData);
 
@@ -250,10 +247,10 @@ public class ExtendedSettings implements Serializable {
             OutputStream os = null;
             try {
                 os = new FileOutputStream(_absolutePath);
-                JAXBContext context = JAXBContext.newInstance(ExtendedSettingsXml.class);
+                JAXBContext context = JAXBContext.newInstance(RootSetting.class);
                 Marshaller marshaller = context.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-                marshaller.marshal(new ExtendedSettingsXml(), os);
+                marshaller.marshal(new RootSetting(), os);
                 LOGGER.info("Created extended settings file: {}", _absolutePath);
             } catch (JAXBException e) {
                 e.printStackTrace();

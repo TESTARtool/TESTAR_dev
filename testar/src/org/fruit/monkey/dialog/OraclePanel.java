@@ -30,9 +30,11 @@
 
 package org.fruit.monkey.dialog;
 
+import nl.ou.testar.visualvalidation.VisualValidationSettings;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.SettingsPanel;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.swing.*;
 
@@ -79,7 +81,7 @@ public class OraclePanel extends SettingsPanel {
 		JLabel secondsLabel = new JLabel("seconds");
 
 		enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
-		enableVisualValidationCheckBox.setBounds(10, 280, 150, 20);
+		enableVisualValidationCheckBox.setBounds(10, 280, 180, 20);
 		enableVisualValidationCheckBox.setToolTipText(enableVisualValidationTTT);
 
 		GroupLayout gl_jPanelOracles = new GroupLayout(this);
@@ -92,7 +94,7 @@ public class OraclePanel extends SettingsPanel {
 								.addGroup(gl_jPanelOracles.createSequentialGroup()
 										.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING)
 												.addGroup(GroupLayout.Alignment.LEADING, gl_jPanelOracles.createSequentialGroup()
-														.addComponent(enableVisualValidationCheckBox, PREFERRED_SIZE, 150, PREFERRED_SIZE)
+														.addComponent(enableVisualValidationCheckBox, PREFERRED_SIZE, 180, PREFERRED_SIZE)
 														.addGap(121))
 												.addGroup(gl_jPanelOracles.createSequentialGroup()
 														.addComponent(freezeTimeLabel, PREFERRED_SIZE, 92, PREFERRED_SIZE)
@@ -152,7 +154,8 @@ public class OraclePanel extends SettingsPanel {
 		processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
 		txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
 		spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
-		//enableVisualValidationCheckBox.setSelected(settings.get(ConfigTags.UseOCR));
+		VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
+		enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
 	}
 
 	/**
@@ -165,6 +168,7 @@ public class OraclePanel extends SettingsPanel {
 		settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
 		settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
 		settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
-		//settings.set(ConfigTags.UseOCR, enableVisualValidationCheckBox.isSelected());
+		VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
+		visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
 	}
 }
