@@ -40,7 +40,7 @@ SequenceLength = 20
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -53,7 +53,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -76,7 +76,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = 
 
 #################################################################
 # Processfilter
@@ -93,15 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_pure_random/Protocol_desktop_generic_pure_random
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_random
 
 #################################################################
 # State identifier attributes
