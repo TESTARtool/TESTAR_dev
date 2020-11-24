@@ -1293,33 +1293,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 
-	// TODO mustContain is never used, maybe it was meant for something but not implemented?
-//	protected SUT startSystem() throws SystemStartException{
-//		return startSystem(null);
-//	}
-
-	protected SUT startSystem() throws SystemStartException{
-		//String mustContain = null; //TODO mustContain was never used?
+	protected SUT startSystem() throws SystemStartException {
 		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
-		try{// refactored from "protected SUT startSystem() throws SystemStartException"
+		try{
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
 			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo))
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 		}catch(IOException ioe){
 			throw new SystemStartException(ioe);
-		} // end refactoring
+		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
-		//if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-		//	return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
-		//else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-		//	return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
-		//else
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue),Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
@@ -1348,7 +1337,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @throws StateBuildException
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		Assert.notNull(system);
 		State state = builder.apply(system);
 
