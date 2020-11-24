@@ -40,6 +40,10 @@ public final class Windows10 implements IEnvironment {
     @Override
     public double getDisplayScale(long windowHandle) {
         double result = 1.0;
+        if(windowHandle==0){
+            // no need to check anything if Window Handle == 0:
+            return result;
+        }
         long monitorHandle = Windows.MonitorFromWindow(windowHandle, MONITOR_DEFAULTTONULL);
         if (monitorHandle == 0){
             System.out.printf("WARNING: Could not find monitor handle for window handle:%d\n",windowHandle);

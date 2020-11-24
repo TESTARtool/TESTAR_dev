@@ -1323,7 +1323,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_DAEMON)) {
 			//TODO make a generic solution, this is F-Secure specific:
-			String commandToBringDaemonGuiForeground = "";
+			String commandToBringDaemonGuiForeground = "C:\\Program Files (x86)\\F-Secure\\PSB\\fs_ui_32.exe";
 			// first bring the GUI of the daemon process visible:
 			try {
 				Runtime.getRuntime().exec(commandToBringDaemonGuiForeground);
