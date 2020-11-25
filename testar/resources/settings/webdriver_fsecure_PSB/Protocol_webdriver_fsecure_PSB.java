@@ -234,7 +234,7 @@ public class Protocol_webdriver_fsecure_PSB extends WebdriverProtocol {
 				continue;
 			}
 
-			if (blackListed(widget)) {
+			if (blackListed(widget) || !isUnfiltered(widget)) {
 				filteredActions.add(ac.leftClickAt(widget));
 				continue;
 			}

@@ -22,8 +22,8 @@ Mode = Generate
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = DAEMON_PROCESS
-SUTConnectorValue = F-Secure
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = C:\\Program Files (x86)\\F-Secure\\PSB\\ui\\fssettings.exe
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 20
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,7 +51,7 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles =
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]can.*|About|Help|Turn off.*|Quarantine.*|Submit.*|Recent.*|More.*
+ClickFilter = .*[mM]inimi[sz]e.*|.*[mM]aximi[sz]e.*|.*[eE]xit.*|.*[cC]lose.*|View.*|Help
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses = .*[fF]-[sS]ecure.*|.*[sS]ettings.*|.*[sS]can.*
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_fsecure/Protocol_desktop_fsecure
+ProtocolClass = desktop_fsecure_settings/Protocol_desktop_fsecure_settings
 
 #################################################################
 # State model inference settings
@@ -118,7 +118,7 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = F-Secure_Desktop
+ApplicationName = F-Secure_Desktop_Settings
 ApplicationVersion = 1.0
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false

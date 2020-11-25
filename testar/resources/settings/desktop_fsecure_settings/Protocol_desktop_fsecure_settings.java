@@ -49,7 +49,7 @@ import static org.fruit.alayer.Tags.Enabled;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_fsecure extends DesktopProtocol {
+public class Protocol_desktop_fsecure_settings extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -165,13 +165,17 @@ public class Protocol_desktop_fsecure extends DesktopProtocol {
 			//optional: iterate through top level widgets based on Z-index:
 			//for(Widget w : getTopWidgets(state)){
 
-			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")||
+					w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIACustomControl")){
 				// filtering out actions on menu-containers (that would add an action in the middle of the menu)
 				continue; // skip this iteration of the for-loop
+			}else if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenuItem")){
+				// filtering out actions on menu-containers (that would add an action in the middle of the menu)
+				filteredActions.add(ac.leftClickAt(w));
+				continue; // skip this iteration of the for-loop
 			}
-
 			//System.out.println("DEBUG: tooltiptext="+w.get(Tags.ToolTipText, "No tool tip text"));
-			if(w.get(Tags.ToolTipText, "No tool tip text").equalsIgnoreCase("Settings")
+			else if(w.get(Tags.ToolTipText, "No tool tip text").equalsIgnoreCase("Settings")
 					|| w.get(Tags.ToolTipText, "No tool tip text").equalsIgnoreCase("Software Updater")){
 				//TODO put settings dialog and software updater into a separate TESTAR protocol:
 				filteredActions.add(ac.leftClickAt(w));
@@ -194,6 +198,7 @@ public class Protocol_desktop_fsecure extends DesktopProtocol {
 					// We want to create actions that consist of left clicking on them
 					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a left click action with the Action Compiler, and add it to the set of derived actions
+						//System.out.println("DEBUG: click action found, role="+w.get(Tags.Role, Roles.Widget).toString()+", desc="+w.get(Tags.Desc, "No desc"));
 						actions.add(ac.leftClickAt(w));
 					}
 
@@ -205,6 +210,7 @@ public class Protocol_desktop_fsecure extends DesktopProtocol {
 					// We want to create actions that consist of typing into them
 					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
+						//System.out.println("DEBUG: type action found, role="+w.get(Tags.Role, Roles.Widget).toString()+", desc="+w.get(Tags.Desc, "No desc"));
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 
