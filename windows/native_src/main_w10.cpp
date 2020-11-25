@@ -2666,6 +2666,110 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 	
 }
 
+/** Java Swing Table Cells Properties **/
+
+/** GetAccessibleTable */
+JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleTable)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	jlongArray ret = 0;
+
+	AccessibleTableInfo tableInfo;
+	
+	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
+		
+		jlong accessibleId[2];
+		
+		accessibleId[0] = (long)tableInfo.accessibleContext;
+		accessibleId[1] = (long)tableInfo.accessibleTable;
+	
+		ret = env->NewLongArray(2);
+		env->SetLongArrayRegion(ret, (jsize)0, (jsize)2, (jlong*)&accessibleId[0]);
+		
+	}
+	
+    return ret;
+	
+}
+
+/** GetNumberOfTableRowColumn  */
+JNI_SIG(jintArray, WINAPI_NS(GetNumberOfTableRowColumn)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	jintArray ret = 0;
+
+	AccessibleTableInfo tableInfo;
+	
+	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
+		
+		jint tableRowColumn[2];
+		
+		tableRowColumn[0] = tableInfo.rowCount;
+		tableRowColumn[1] = tableInfo.columnCount;
+		
+		ret = env->NewIntArray(2);
+		env->SetIntArrayRegion(ret, (jsize)0, (jsize)2, (jint*)&tableRowColumn[0]);
+		
+	}
+	
+    return ret;
+}
+
+/** SelectTableRow */
+JNI_SIG(void, WINAPI_NS(SelectTableRow)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row){
+
+		int index = getAccessibleTableIndex((long)vmid, ac, row, 0);
+		
+		ClearAccessibleSelectionFromContext((long)vmid, ac);
+		
+		AddAccessibleSelectionFromContext((long)vmid, ac, index);
+}
+
+/** SelectTableCell */
+JNI_SIG(void, WINAPI_NS(SelectTableCell)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
+
+		int index = getAccessibleTableIndex((long)vmid, ac, row, column);
+		
+		ClearAccessibleSelectionFromContext((long)vmid, ac);
+		
+		AddAccessibleSelectionFromContext((long)vmid, ac, index);
+}
+
+/** GetTableCellProperties */
+JNI_SIG(jobjectArray, WINAPI_NS(GetTableCellProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
+	
+	jobjectArray ret = 0;
+	
+	AccessibleContext cellContext = GetAccessibleSelectionFromContext((long)vmid, ac, column);
+	
+	AccessibleContextInfo info;
+	
+	if (GetAccessibleContextInfo((long)vmid, cellContext, &info)){
+		
+		const int ACCESSIBLE_PROPERTIES = 15;
+		
+		ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
+		
+		env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.name)));
+		env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.description)));
+		env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.role)));
+		env->SetObjectArrayElement(ret, 3, env->NewStringUTF(wchart2String(env, info.states)));
+		env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.indexInParent)));
+		env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.childrenCount)));
+		env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.x)));
+		env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.y)));
+		env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.width)));
+		env->SetObjectArrayElement(ret, 9, env->NewStringUTF(jint2String(env, info.height)));
+		env->SetObjectArrayElement(ret, 10, env->NewStringUTF(jint2String(env, info.accessibleComponent)));
+		env->SetObjectArrayElement(ret, 11, env->NewStringUTF(jint2String(env, info.accessibleAction)));
+		env->SetObjectArrayElement(ret, 12, env->NewStringUTF(jint2String(env, info.accessibleSelection)));
+		env->SetObjectArrayElement(ret, 13, env->NewStringUTF(jint2String(env, info.accessibleText)));
+		env->SetObjectArrayElement(ret, 14, env->NewStringUTF(jint2String(env, info.accessibleInterfaces)));
+	}
+		
+	
+	return ret;
+	
+}
+
 /* GetProcessNameFromHWND (copy from Windows 7) */
 JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
 

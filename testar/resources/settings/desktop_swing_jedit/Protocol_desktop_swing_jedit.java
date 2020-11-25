@@ -34,9 +34,6 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.windows.AccessBridgeFetcher;
-import org.fruit.alayer.windows.UIATags;
-import org.fruit.monkey.Settings;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
@@ -56,22 +53,10 @@ import static org.fruit.alayer.Tags.Enabled;
  * - forceListElemetsClickAction
  * - forceComboBoxClickAction
  * 
- * Specific SwingSet2 behavior:
- * - isSourceCodeEditWidget
+ * Specific jEdit behavior:
+ * - isToolTipTextEditWidget
  */
-public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
-	
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 * @param   settings  the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings){
-		super.initialize(settings);
-		// Enable the inspection of internal cells on Java Swing Tables
-		AccessBridgeFetcher.swingJavaTableDescend = true;
-	}
+public class Protocol_desktop_swing_jedit extends JavaSwingProtocol {
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -131,13 +116,8 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 						actions.add(ac.leftClickAt(w));
 					}
 
-					// left click in Table Cells
-					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
-						actions.add(ac.leftClickAt(w));
-					}
-
 					// type into text boxes
-					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
+					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isToolTipTextEditWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 
@@ -186,13 +166,8 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 						actions.add(ac.leftClickAt(w));
 					}
 
-					// left click in Table Cells
-					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
-						actions.add(ac.leftClickAt(w));
-					}
-
 					// type into text boxes
-					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
+					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isToolTipTextEditWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 
@@ -218,17 +193,12 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	}
 
 	/**
-	 * SwingSet2 application contains a TabElement called "SourceCode"
-	 * that internally contains UIAEdit widgets that are not modifiable.
+	 * jEdit application contains UIAEdit widgets that are not modifiable.
 	 * Because these widgets have the property ToolTipText with the value "text/html",
 	 * use this Tag to recognize and ignore.
 	 */
-	private boolean isSourceCodeEditWidget(Widget w) {
+	private boolean isToolTipTextEditWidget(Widget w) {
 		return w.get(Tags.ToolTipText, "").contains("text/html");
-	}
-
-	private boolean isTableCell(Widget w) {
-		return w.get(UIATags.UIAAutomationId, "").contains("TableCell");
 	}
 
 	/**

@@ -735,21 +735,25 @@ public final class Windows{
 	public static native long Gdiplus_FontFamily_Create(String name) throws GDIException;
 	public static native void Gdiplus_FontFamily_Destroy(long pFontFamily) throws GDIException;
 
-	// begin by urueda
 	public static native long   GetProcessMemoryInfo(long processID);
 	public static native long[] GetProcessTimes(long processID);
 	public static native String	GetProcessNameFromHWND(long hwnd);
-	// end by urueda
 
-	public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
-	// begin by urueda
+	// Java Swing
+	public static native boolean InitializeAccessBridge();
 	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
 	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
 	//public static native int	  GetVisibleChildrenCount(long vmid, long ac);
 	//public static native long[]   GetVisibleChildren(long vmid, long ac);
 	public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);
 	public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
-	// end by urueda
+
+	// Java Swing Table Cell Properties
+	public static native long[] GetAccessibleTable(long vmid, long ac); // accessibleContext x accessibleTable
+	public static native int[] GetNumberOfTableRowColumn(long vmid, long ac); // row x column
+	public static native void SelectTableRow(long vmid, long ac, int row);
+	public static native void SelectTableCell(long vmid, long ac, int row, int column);
+	public static native Object[] GetTableCellProperties(long vmid, long ac, int row, int column);
 
 	public static String Gdiplus_Status2String(int statusCode){
 		switch(statusCode){
