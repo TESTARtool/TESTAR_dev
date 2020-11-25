@@ -31,7 +31,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     /** {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction} */
     private final QFunction qFunction;
 
-    private final String tagName;
+    private final Tag tag;
 
     /**
      * Constructor
@@ -45,11 +45,11 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
                              final boolean storeWidgets,
                              final RewardFunction rewardFunction,
                              final QFunction qFunction,
-                             final String tagName) {
+                             final Tag tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
-        this.tagName = tagName;
+        this.tag = tag;
     }
 
     /**
@@ -80,7 +80,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
             final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
 
             // set attribute for saving in the graph database
-            selectedAbstractAction.addAttribute((Tag) RLTags.class.getField(tagName).get(null), (float) qValue);
+            selectedAbstractAction.addAttribute(tag, (float) qValue);
 
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
             previousAbstractActionToExecute = selectedAbstractAction;

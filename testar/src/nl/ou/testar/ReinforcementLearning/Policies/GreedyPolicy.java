@@ -2,12 +2,10 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
 import nl.ou.testar.StateModel.AbstractAction;
 import org.fruit.alayer.Tag;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -15,12 +13,14 @@ import java.util.Set;
 /**
  * Implementation of a greedy policy
  */
-public class GreedyPolicy implements Policy {
+public class GreedyPolicy<T extends Object & Comparable<? super T>>  implements Policy {
 
-    private final float defaultQValue;
+    private final Number defaultQValue;
+    private final Tag<Number> tag;
 
-    public GreedyPolicy(final float defaultQValue){
+    public GreedyPolicy(final Number defaultQValue, final Tag<Number> tag){
         this.defaultQValue = defaultQValue;
+        this.tag = tag;
     }
 
     /**
@@ -29,15 +29,15 @@ public class GreedyPolicy implements Policy {
      */
     @Override
     public AbstractAction applyPolicy(final Set<AbstractAction> actions) {
-        final Multimap<Float, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
-        actions.forEach(action -> qValuesActionsMultimap.put(action.getAttributes().get(RLTags.QLearningValue, defaultQValue), action));
+        final Multimap<Number, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
+        actions.forEach(action -> qValuesActionsMultimap.put(action.getAttributes().get(tag, defaultQValue), action));
 
-        final Set<Float> qValues = qValuesActionsMultimap.keySet();
+        final Set<Number> qValues = qValuesActionsMultimap.keySet();
         if (qValues.isEmpty()) {
             return null;
         }
 
-        final float maxValue = Collections.max(qValues);
+        final Number maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
         return ReinforcementLearningUtils.selectAction(actionsSelected);
     }
