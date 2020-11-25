@@ -175,6 +175,13 @@ public class Protocol_desktop_fsecure extends DesktopProtocol {
 		return(super.selectAction(state, actions));
 	}
 
+
+	@Override
+	protected Action getBringToForeGroundAction(State state){
+		startSystem();
+		return null;
+	}
+
 	/**
 	 * Execute the selected action.
 	 *

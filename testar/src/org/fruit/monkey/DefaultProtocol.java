@@ -1555,12 +1555,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// Then here we will select the action to do that
 
 		else if (this.forceToForeground){
-			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action foregroundAction = new ActivateSystem();
-			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
 			this.forceToForeground = false;
-			return foregroundAction;
+			return getBringToForeGroundAction(state);
 		}
 
 		// TESTAR didn't find any actions in the State of the SUT
@@ -1574,6 +1570,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		return null;
+	}
+
+	protected Action getBringToForeGroundAction(State state){
+		LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
+		Action foregroundAction = new ActivateSystem();
+		foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+		CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
+		return foregroundAction;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
