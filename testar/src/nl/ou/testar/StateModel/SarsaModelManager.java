@@ -31,6 +31,8 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     /** {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction} */
     private final QFunction qFunction;
 
+    private final String tagName;
+
     /**
      * Constructor
      *
@@ -42,10 +44,12 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
                              final SequenceManager sequenceManager,
                              final boolean storeWidgets,
                              final RewardFunction rewardFunction,
-                             final QFunction qFunction) {
+                             final QFunction qFunction,
+                             final String tagName) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
+        this.tagName = tagName;
     }
 
     /**
@@ -54,7 +58,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     @Override
     public Action getAbstractActionToExecute(final Set<Action> actions) {
         final Action selectedAction = super.getAbstractActionToExecute(actions);
-        updateQValue(selectedAction);
+        updateQValue(selectedAction, actions);
         return selectedAction;
     }
 
@@ -63,7 +67,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      *
      * @param selectedAction, can be null
      */
-    private void updateQValue(final Action selectedAction) {
+    private void updateQValue(final Action selectedAction, final Set<Action> actions) {
         try {
             // validate input
             Validate.notNull(selectedAction, "No action was found to execute");
@@ -73,10 +77,10 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
 
             // get reward and Q-value
             float reward = rewardFunction.getReward(getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
-            final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward);
+            final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
 
             // set attribute for saving in the graph database
-            selectedAbstractAction.addAttribute(RLTags.SarsaValue, (float) qValue);
+            selectedAbstractAction.addAttribute((Tag) RLTags.class.getField(tagName).get(null), (float) qValue);
 
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
             previousAbstractActionToExecute = selectedAbstractAction;

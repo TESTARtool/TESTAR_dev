@@ -65,7 +65,7 @@ public class ABTBasedRewardFunction implements RewardFunction {
 //                .sum();
         System.out.println("New: " + noOfNewElements);
 //        System.out.println("Lost: " + noOfLostElements);
-        System.out.println("Diff: " + (float) (noOfNewElements) / (newTags.size() );
+        System.out.println("Diff: " + (float) (noOfNewElements) / (newTags.size() ));
         System.out.println(newTags.size());
         System.out.println(oldTags.size());
         return (float) (noOfNewElements) / (newTags.size());

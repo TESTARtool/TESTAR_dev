@@ -139,6 +139,7 @@ DecayRate = 0.0001
 Temperature = 1.0
 RewardFunction = ABTBasedRewardFunction
 Policy = EpsilonGreedyPolicy
+TagName = QLearningValue
 
 #################################################################
 # Other more advanced settings

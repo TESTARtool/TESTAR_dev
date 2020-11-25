@@ -34,17 +34,20 @@ public class PolicyFactory {
     private static Policy getEpsilonGreedyPolicy(final Settings settings) {
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        final String tag = settings.get(ConfigTags.TagName, "qvalue");
         return new EpsilonGreedyPolicy(new GreedyPolicy(defaultQValue), epsilon);
     }
 
     private static Policy getGreedyPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        final String tag = settings.get(ConfigTags.TagName, "qvalue");
         return new GreedyPolicy(defaultQValue);
     }
 
     private static Policy getOptimisticQValuesInitializationPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         final float maxQValue = settings.get(ConfigTags.MaxQValue, 0f);
+        final String tag = settings.get(ConfigTags.TagName, "qvalue");
         return new OptimisticQValuesInitializationPolicy(new GreedyPolicy(defaultQValue), maxQValue);
     }
 
@@ -53,6 +56,7 @@ public class PolicyFactory {
         final float decayRate = settings.get(ConfigTags.DecayRate, 0.0001f);
         final float temperature = settings.get(ConfigTags.Temperature, 1.0f);
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
+        final String tag = settings.get(ConfigTags.TagName, "qvalue");
         return new EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(new GreedyPolicy(defaultQValue), new BoltzmannDistributedExplorationPolicy(decayRate, temperature), epsilon);
     }
 

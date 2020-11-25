@@ -77,6 +77,7 @@ public class StateModelManagerFactory {
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+            String tagName = settings.get(ConfigTags.TagName);
             return new SarsaModelManager(abstractStateModel,
                     actionSelector,
                     persistenceManager,
@@ -84,7 +85,8 @@ public class StateModelManagerFactory {
                     sequenceManager,
                     storeWidgets,
                     rewardFunction,
-                    qFunction);
+                    qFunction,
+                    tagName);
         }
         
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);

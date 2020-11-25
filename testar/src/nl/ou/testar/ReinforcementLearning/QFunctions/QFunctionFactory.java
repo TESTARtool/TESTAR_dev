@@ -15,6 +15,18 @@ public class QFunctionFactory {
 
         System.out.println(String.format("QFunction loaded with alpha='%s' gammaDiscount='%s' and defaultQValue='%s'", alphaDiscount, gammaDiscount, defaultQValue));
 
-        return new SarsaQFunction(alphaDiscount, gammaDiscount, defaultQValue);
+        final String qfunction = settings.get(ConfigTags.QFunction, "");
+        final QFunction selectedQFunction;
+
+        switch(qfunction) {
+            case "QlearningFunction":
+                selectedQFunction = new QlearningFunction(alphaDiscount, gammaDiscount, defaultQValue);
+                break;
+            default:
+                selectedQFunction = new SarsaQFunction(alphaDiscount, gammaDiscount, defaultQValue);
+        }
+
+
+        return selectedQFunction;
     }
 }

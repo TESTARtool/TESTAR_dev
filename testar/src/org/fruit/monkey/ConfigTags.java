@@ -122,6 +122,8 @@ public final class ConfigTags {
   public static final Tag<Float> DecayRate = Tag.from("DecayRate", Float.class);
   public static final Tag<Float> Temperature = Tag.from("Temperature", Float.class);
   public static final Tag<Float> MaxQValue = Tag.from("MaxQValue", Float.class);
+  public static final Tag<String> TagName = Tag.from("TagName", String.class);
+  public static final Tag<String> QFunction = Tag.from("QFunction", String.class);
 
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
