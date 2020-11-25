@@ -17,6 +17,9 @@ public class RewardFunctionFactory {
                 final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
                 selectedRewardFunction = new ImageRecognitionBasedRewardFunction(defaultReward);
                 break;
+            case "ABTBasedRewardFunction":
+                selectedRewardFunction = new ABTBasedRewardFunction();
+                break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();
         }
