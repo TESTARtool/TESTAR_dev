@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "C:/Program Files/jEdit/jedit.jar"
+SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\lib\\jacocoagent.jar=jmx=true "suts\\rachota.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -43,7 +43,7 @@ AccessBridgeEnabled = true
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,7 +51,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
+ClickFilter = .*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_swing_jedit/Protocol_desktop_swing_jedit
+ProtocolClass = rachota_qlearning/Protocol_rachota_qlearning
 
 #################################################################
 # State identifier attributes
@@ -112,7 +112,7 @@ ProtocolClass = desktop_swing_jedit/Protocol_desktop_swing_jedit
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
 # Other more advanced settings
@@ -137,7 +137,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.3
-StartupTime = 20.0
+StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

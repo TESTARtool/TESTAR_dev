@@ -1,59 +1,47 @@
 /***************************************************************************************************
- *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
+*
+* Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2020 Open Universiteit - www.ou.nl
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
 
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.Settings;
-import org.testar.protocols.JavaSwingProtocol;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.fruit.alayer.windows.AccessBridgeFetcher;
-import org.fruit.alayer.windows.UIATags;
-import org.fruit.alayer.windows.WinProcess;
-import org.testar.jacoco.JacocoReportReader;
-import org.testar.jacoco.MBeanClient;
-import org.testar.OutputStructure;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import com.google.common.io.Files;
-
 import org.apache.commons.io.FileUtils;
 import org.fruit.Util;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
@@ -62,13 +50,26 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
+import org.testar.OutputStructure;
+import org.testar.protocols.JavaSwingProtocol;
+import org.fruit.alayer.windows.AccessBridgeFetcher;
+import org.fruit.alayer.windows.UIATags;
+import org.fruit.alayer.windows.WinProcess;
+import org.testar.jacoco.JacocoReportReader;
+import org.testar.jacoco.MBeanClient;
+
+import com.google.common.io.Files;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-import java.io.FileWriter;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
+import org.fruit.alayer.exceptions.StateBuildException;
 
 import org.fruit.alayer.*;
+
+import java.io.FileWriter;
 
 import org.fruit.monkey.Main;
 
@@ -76,21 +77,24 @@ import org.fruit.monkey.Main;
  * This protocol together with the settings provides a specific behavior to test rachota
  * We will use Java Access Bridge settings (AccessBridgeEnabled = true) for widget tree extraction
  *
- * It uses Random Selection algorithm.
+ * It uses QLearningActionSelector algorithm.
  */
-public class Protocol_rachota_purerandom extends JavaSwingProtocol {
-
+public class Protocol_rachota_qlearning extends JavaSwingProtocol {
+	
 	private long startSequenceTime;
-	private String reportTimeDir;
-
-	/**
+	private String reportTimeDir;	
+	
+	// QLearningActionSelector: Instead of random, we will use QLearning action selector
+	private QLearningActionSelector actionSelector;
+	
+	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
-
+		
 		// For experimental purposes we need to disconnect from Windows Remote Desktop
 		// without close the GUI session.
 		/*try {
@@ -112,20 +116,23 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 		// Wait because disconnect from system modifies internal Screen resolution
 		Util.pause(30);*/
-
+		
+		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
+		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
+		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
-
+		
 		// rachota: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-
+		
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
-		
+
 		// Enable the inspection of internal cells on Java Swing Tables
 		AccessBridgeFetcher.swingJavaTableDescend = true;
 	}
-
+	
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -156,7 +163,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		Util.pause(10);
 		state = super.getState(system);
 	}
-
+	
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -197,17 +204,17 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 					if((isClickable(w)) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// rachota: left clicks on specific widgets
 					if((isEditToClickWidget(w) || isCalendarTextWidget(w)) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// left click in Table Cells
 					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// rachota: use spinboxes
 					if(isSpinBoxWidget(w) && (isUnfiltered(w) || whiteListed(w))) {
 						addIncreaseDecreaseActions(w, actions, ac);
@@ -239,6 +246,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 
 		return actions;
+
 	}
 
 	/**
@@ -251,7 +259,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Rachota:
 	 * Seems that interactive Edit elements have tool type text with instructions
@@ -261,7 +269,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		String toolTipText = w.get(Tags.ToolTipText,"");
 		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") && !toolTipText.contains("Mouse click");
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * Check if it is a Table Cell widget
@@ -269,7 +277,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private boolean isTableCell(Widget w) {
 		return w.get(UIATags.UIAAutomationId, "").contains("TableCell");
 	}
-	
+
 	/**
 	 * Rachota:
 	 * Tricky way to check if current text widgets is a potential calendar number
@@ -283,18 +291,18 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 		return false;
 	}
-	
+
 	private int getNumericInt(String strNum) {
-	    if (strNum == null) {
-	        return -1;
-	    }
-	    try {
-	        return Integer.parseInt(strNum);
-	    } catch (NumberFormatException nfe) {
-	        return -1;
-	    }
+		if (strNum == null) {
+			return -1;
+		}
+		try {
+			return Integer.parseInt(strNum);
+		} catch (NumberFormatException nfe) {
+			return -1;
+		}
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * Check if it is a Spinner widget
@@ -302,7 +310,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private boolean isSpinBoxWidget(Widget w) {
 		return w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner");
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * SpinBox widgets buttons seems that do not exist as unique element,
@@ -310,23 +318,23 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 */
 	private void addIncreaseDecreaseActions(Widget w, Set<Action> actions, StdActionCompiler ac) {
 		Action increase = new CompoundAction.Builder()   
-		.add(ac.leftClickAt(w), 0.5) // Click for focus 
-		.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
-		.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
-		
+				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+				.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
+
 		increase.set(Tags.Role, Roles.Button);
 		increase.set(Tags.OriginWidget, w);
 		increase.set(Tags.Desc, "Increase Spinner");
-		
+
 		Action decrease = new CompoundAction.Builder()   
-		.add(ac.leftClickAt(w), 0.5) // Click for focus 
-		.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
-		.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
-		
+				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+				.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
+
 		decrease.set(Tags.Role, Roles.Button);
 		decrease.set(Tags.OriginWidget, w);
 		decrease.set(Tags.Desc, "Decrease Spinner");
-		
+
 		actions.add(increase);
 		actions.add(decrease);
 	}
@@ -376,22 +384,29 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		} catch(Exception e) {}
 	}
 
-
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-		// RandomSelector: Desktop protocol will return a random action
-		return(super.selectAction(state, actions));
-	}
-
+	  * Select one of the available actions using an action selection algorithm (for example random action selection)
+	  *
+	  * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	  * overwrite it, not always running it, we have take care of the HTML report here
+	  *
+	  * @param state the SUT's current state
+	  * @param actions the set of derived actions
+	  * @return  the selected action (non-null!)
+	  */
+	 @Override
+	 protected Action selectAction(State state, Set<Action> actions){
+		 //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+		 //unwanted processes are killed and SUT is put into foreground.
+		 Action retAction = preSelectAction(state, actions);
+		 if (retAction== null) {
+			 // QLearningActionSelector: we select randomly one of the prioritize actions
+			 // Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
+			 retAction = actionSelector.selectAction(state,actions);
+		 }
+		 return retAction;
+	 }
+	
 	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
@@ -407,12 +422,12 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			// Dump the jacoco report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-
+					
 				// Write sequence duration to CLI and to file
 				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
 				System.out.println();
 				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-
+	
 				long minutes = (sequenceDurationSoFar / 1000)  / 60;
 				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
 				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
@@ -428,7 +443,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 					System.out.println("An error occurred.");
 					e.printStackTrace();
 				}
-
+				
 				String jacocoFile = MBeanClient.dumpJaCoCoActionStepReport(Integer.toString(actionCount));
 				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
 
@@ -451,7 +466,19 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
 				System.out.println(coverageInfo);
-
+				/*
+				// Code for ending a sequence after reaching a certain amount of coverage
+				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+				System.out.println();
+				System.out.println(coverageInfo);
+				int index = coverageInfo.indexOf( '%' );
+				String instructionCoverage = coverageInfo.substring(index-2, index);
+				System.out.println(instructionCoverage);
+				String s = instructionCoverage;
+				int intCoverage = Integer.parseInt(s);  
+				if (intCoverage > 72) finishSequence();
+				System.out.println();
+				*/
 			} catch (Exception e) {
 				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
 			}
@@ -477,7 +504,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
-
+			
 			//TODO: Disabled by default, we also need to delete original folder after compression
 			//Compress JaCoCo files
 			compressOutputFile();
@@ -485,7 +512,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 
 		super.finishSequence();
-
+		
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -560,7 +587,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Compress desired folder
 	 * https://www.baeldung.com/java-compress-and-uncompress
