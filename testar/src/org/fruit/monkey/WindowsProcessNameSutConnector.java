@@ -50,7 +50,7 @@ public class WindowsProcessNameSutConnector implements SutConnector {
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
-        Assert.hasText(processName);
+        Assert.hasTextSetting(processName, "SUTConnectorValue");
         List<SUT> suts = null;
         long now = System.currentTimeMillis();
         do{

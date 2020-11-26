@@ -1312,7 +1312,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
-			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
+			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
 
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
