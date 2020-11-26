@@ -188,6 +188,12 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 		// iterate through top level widgets
 		for(Widget w : getTopWidgets(state)){
+			
+			// rachota: add filename report
+			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+					&& w.get(Tags.Title,"").contains("Filename:")) {
+				addFilenameReportAction(w, actions, ac);
+			}
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -239,6 +245,23 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 
 		return actions;
+	}
+
+	/**
+	 * Rachota:
+	 * This SUT have the functionality of create invoices and reports
+	 * Create an action that prepares a filename to create this report
+	 */
+	private void addFilenameReportAction(Widget w, Set<Action> actions, StdActionCompiler ac) {
+		Action addFilename = new CompoundAction.Builder()   
+				.add(ac.clickTypeInto(w, Util.dateString(OutputStructure.DATE_FORMAT), true), 0.5) // Click and type
+				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
+				.add(new KeyUp(KBKeys.VK_TAB),0.5).build(); // Release Keyboard
+
+		addFilename.set(Tags.Role, Roles.Button);
+		addFilename.set(Tags.OriginWidget, w);
+		addFilename.set(Tags.Desc, "Add Filename Report");
+		actions.add(addFilename);
 	}
 
 	/**
