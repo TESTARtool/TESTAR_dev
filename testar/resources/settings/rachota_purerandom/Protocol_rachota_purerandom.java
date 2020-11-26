@@ -399,6 +399,18 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		} catch(Exception e) {}
 	}
 
+	@Override
+	protected boolean isUnfiltered(Widget w) {
+		// Rachota: Filter Cancel button widgets if we are in the report generation window
+		if(w.get(Tags.Title,"").equals("Cancel")) {
+			for(Widget widget : w.root()) {
+				if(widget.get(Tags.Title,"").contains("Report generation wizard")) {
+					return false;
+				}
+			}
+		}
+		return super.isUnfiltered(w);
+	}
 
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
