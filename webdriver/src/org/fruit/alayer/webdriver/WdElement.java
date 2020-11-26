@@ -168,7 +168,8 @@ public class WdElement extends TaggableBase implements Serializable {
 
     setName();
     fillScrollValues();
-    
+
+
     // Empty string ?
     //textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     //helpText = attributeMap.get("title");

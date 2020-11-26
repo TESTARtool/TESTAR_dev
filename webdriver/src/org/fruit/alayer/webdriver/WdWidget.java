@@ -56,11 +56,29 @@ public class WdWidget implements Widget, Serializable {
     this.element = element;
     this.root = root;
 
+    tags.put(Tag.from("state", WdWidget.class), root);
+    tags.put(Tag.from("parent", WdWidget.class), parent);
+    tags.put(Tag.from("element", WdElement.class), element);
+    tags.put(Tag.from("children", List.class), children);
+    tags.put(Tag.from("parents", List.class), parents());
+    tags.put(Tag.from("attributes", Map.class), element.attributeMap);
+    
     if (parent != null) {
       root.connect(parent, this);
     }
   }
 
+  public List<WdWidget> parents() {
+    if (parent == null) {
+      return new ArrayList();
+    }
+    else {
+      List<WdWidget> tail = parent.parents();
+      tail.add(parent);
+      return tail;
+    }
+  }
+  
   public String getAttribute(String key) {
     return element.attributeMap.get(key);
   }
