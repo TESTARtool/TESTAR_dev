@@ -92,7 +92,8 @@ public final class Tag<T> implements Serializable{
 	public int hashCode(){
 		int ret = hashcode;
 		if(ret == 0){
-			ret = name.hashCode() + 31 * Util.hashCode(clazz.getCanonicalName());   //Class<T>.hashCode() is not stable across serializations!!
+			// RvD: DO WE REALLY WANT names to collide if they differ in Type?
+			ret = name.hashCode(); // 31 * Util.hashCode(clazz.getCanonicalName());   //Class<T>.hashCode() is not stable across serializations!!
 			hashcode = ret;
 		}
 		return hashcode;
@@ -103,7 +104,8 @@ public final class Tag<T> implements Serializable{
 			return true;
 		if(other instanceof Tag){
 			Tag<?> ot = (Tag<?>) other;
-			return name.equals(ot.name) && clazz.equals(ot.clazz);
+			// RvD: DO WE REALLY WANT names to collide if they differ in Type?
+			return name.equals(ot.name); // && clazz.equals(ot.clazz);
 		}
 		return false;
 	}

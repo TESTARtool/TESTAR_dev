@@ -176,7 +176,7 @@ public class CodingManager {
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.lowCollisionID(abstractRoleTitlePathId.toString()));
 			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_STATE + ID_PREFIX_CONCRETE_CUSTOM + CodingManager.lowCollisionID(concreteIdCustom.toString()));
 			widget.set(Tags.AbstractIDCustom, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(abstractIdCustom.toString()));
-		}	
+		}
 	}
 	
 	/**
@@ -208,8 +208,8 @@ public class CodingManager {
 				forEach(
 					action -> {
 						updateRoleCounter(action, roleCounter);
-						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
+						String abstractActionId = ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM + state.get(Tags.AbstractIDCustom) + "_" + getAbstractActionIdentifier(action, roleCounter);
+						action.set(Tags.AbstractIDCustom, abstractActionId);
 				}
 		);
 	}
@@ -281,7 +281,6 @@ public class CodingManager {
 			role = action.get(Tags.Role, Roles.Invalid);
 		}
 		String abstractActionId = pathId + "." + roleCounter.getOrDefault(role, 999);
-		System.out.println("abstractActionId: " + abstractActionId);
 		return abstractActionId;
 	}
 
