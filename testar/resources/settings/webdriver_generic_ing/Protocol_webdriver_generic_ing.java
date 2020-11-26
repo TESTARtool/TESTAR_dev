@@ -349,10 +349,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	List<GenRule> inputGenerators() {
 		return inputGenerators(
-			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),
-			formInputRule("mySituationForm", "Age", "[1-8][0-9]", 5),
-			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
-			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5)
+			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
+			formInputRule("mySituationForm", "Age", "[1-8][0-9]", 5),          // Specific age input
+			formInputRule("income", "income", "[1-9][0-9]{4}", 5),             // Specific income input
+			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5)// Specific monthly income
 		);
 	}
 
@@ -367,7 +367,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				new FilterRule("parents[attributes[contains(@slot, 'progress')]]", true),  // ignore progress actions
 				new FilterRule("parents[attributes[contains(@class, 'progress')]]", true),  // ignore progress actions
 
-				new FilterRule("attributes[contains(@href, 'bel-me-nu')]", true),
+				new FilterRule("attributes[contains(@href, 'bel-me-nu')]", true),   // ignore outside links
 				new FilterRule("attributes[drv:ends(@href, 'hypotheek-berekenen')]", true),
 				new FilterRule("attributes[@target = '_blank']", true)
 		);
@@ -460,38 +460,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 		public boolean isValid() { return isValid; }
-	}
-	
-	/* Check whether the Widget is contained by the ing-step container and is not hidden */
-	protected boolean isINGFlowStep(Widget widget) {
-		WdElement element = ((WdWidget) widget).element;
-		String id = element.attributeMap.getOrDefault("id","");
-
-		if ("flow-step".equals(id)) {
-			return true;
-		}
-		else {
-			Widget parent = widget.parent();
-			if (parent != null) {
-				return isINGFlowStep(widget.parent());
-			}
-			return false;
-		}
-	}
-
-	protected boolean isAriaHidden(Widget widget) {
-		WdElement element = ((WdWidget) widget).element;
-
-		if ("true".equals(element.attributeMap.getOrDefault("aria-hidden","false"))) {
-			return true;
-		}
-		Widget parent = widget.parent();
-		if (parent != null) {
-			return isAriaHidden(parent);
-		}
-		else {
-			return false;
-		}
 	}
 
 	@Override
