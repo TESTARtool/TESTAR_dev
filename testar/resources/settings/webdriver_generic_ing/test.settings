@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Record
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = 
 
 #################################################################
 # Processfilter
@@ -107,14 +107,6 @@ SUTProcesses =
 ProtocolClass = webdriver_generic_ing/Protocol_webdriver_generic_ing
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl = 
-GraphDBUser = 
-GraphDBPassword = 
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = true
@@ -128,7 +120,7 @@ DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = 
 ApplicationVersion = 
-ActionSelectionAlgorithm = random
+ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################
@@ -157,46 +149,50 @@ OverrideWebDriverDisplayScale =
 #################################################################
 # Other more advanced settings
 #################################################################
-TypingTextsForExecutedAction = 10
-RefreshSpyCanvas = 1.0
-Discount = 0.95
-TempDir = ./output/temp
-MaxTime = 3.1536E7
-StopGenerationOnFault = true
-ExecuteActions = true
-DrawWidgetTree = false
-UseRecordedActionDurationAndWaitTimeDuringReplay = false
-ForceForeground = true
-AlgorithmFormsFilling = false
-FaultThreshold = 1.0E-9
-DrawWidgetInfo = false
-MaxReward = 9999999.0
-LogLevel = 1
-VisualizeSelectedAction = true
 Delete = 
+TimeToFreeze = 30.0
+NonReactingUIThreshold = 100
+GraphDBPassword = 
+AlgorithmFormsFilling = false
 MyClassPath = ./settings
+LogLevel = 1
+CopyFromTo = 
+MaxReward = 9999999.0
+ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
+FaultThreshold = 1.0E-9
+GraphDBUrl = 
+StartupTime = 2.0
+GraphResuming = true
+StateScreenshotSimilarityThreshold = 1.4E-45
+ActionDuration = 0.30000000000000004
+PathToReplaySequence = ./output/temp
+VisualizeActions = true
+TypingTextsForExecutedAction = 10
+OutputDir = ./output
+OfflineGraphConversion = true
+DrawWidgetUnderCursor = false
 ProcessesToKillDuringTest = 
+RefreshSpyCanvas = 1.0
+OnlySaveFaultySequences = false
+MaxTime = 3.1536E7
+AlwaysCompile = true
+ExplorationSampleInterval = 1
+Discount = 0.95
+UnattendedTests = false
+ResetDataStore = false
+DrawWidgetInfo = false
+GraphsActivated = true
+VisualizeSelectedAction = true
+TimeToWaitAfterAction = 0.1
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
-OutputDir = ./output
-UnattendedTests = false
+TempDir = ./output/temp
+ForceForeground = true
 TestGenerator = random
-StartupTime = 2.0
-ActionDuration = 0.1
-NonReactingUIThreshold = 100
-GraphsActivated = true
-GraphResuming = true
-CopyFromTo = 
-TimeToFreeze = 30.0
-StateScreenshotSimilarityThreshold = 1.4E-45
-ShowVisualSettingsDialogOnStartup = true
-ResetDataStore = false
-TimeToWaitAfterAction = 0.1
-DrawWidgetUnderCursor = true
-AlwaysCompile = true
-PathToReplaySequence = ./output/temp
-VisualizeActions = false
-ExplorationSampleInterval = 1
-OnlySaveFaultySequences = false
-OfflineGraphConversion = true
+DrawWidgetTree = false
+GraphDBEnabled = false
+ExecuteActions = true
+StopGenerationOnFault = true
+GraphDBUser = 
+UseRecordedActionDurationAndWaitTimeDuringReplay = false

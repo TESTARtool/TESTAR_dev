@@ -28,9 +28,14 @@
  *
  */
 
+import com.github.curiousoddman.rgxgen.RgxGen;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.RandomActionSelector;
+import org.apache.commons.jxpath.ClassFunctions;
+import org.apache.commons.jxpath.CompiledExpression;
+import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.JXPathIntrospector;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -44,6 +49,7 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -53,7 +59,16 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
     protected int highWebModalZIndex = 0;
     protected Widget widgetModal;
-	
+	protected List<GenRule> rules = inputGenerators();
+	protected List<FilterRule> filters = filterRules();
+
+	public static String lowercase(String str) {
+		return str.toLowerCase();
+	}
+	public static Boolean ends(String str1, String str2) {
+		return str1.endsWith(str2);
+	}
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -62,6 +77,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
+		JXPathIntrospector.registerDynamicClass(org.fruit.alayer.Taggable.class, org.fruit.alayer.webdriver.TaggableDynamicPropertyHandler.class);
+				
 		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
 		ensureDomainsAllowed();
@@ -170,7 +187,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
-    	// Reset because modal element may disappear
+		// Reset because modal element may disappear
     	highWebModalZIndex = 0;
     	widgetModal = state;
 
@@ -201,18 +218,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     	}
 
     	state.set(WdTags.WebIsWindowModal, modalMode);
-		setAbstractIdCustom(state);
+
+		CodingManager.buildIDs(state);
 
 		return state;                                                                        
 	}
 
-	protected void setAbstractIdCustom(State state) {
-		Object cstate = state.get(WdTags.WebCustomElementState, null);
-		if (cstate != null) {
-			String id = CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(cstate.toString());
-			state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + id);
-		}
-	}
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
@@ -221,9 +232,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-		setAbstractIdCustom(state);
 		Verdict verdict = super.getVerdict(state);
-		setAbstractIdCustom(state);
 
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
@@ -251,12 +260,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected Set<Action> deriveActions(SUT system, State state)
 			throws ActionBuildException {
 
-		setAbstractIdCustom(state);
-		System.out.println("abstract custom state id: " + state.get(Tags.AbstractIDCustom));
-		
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
-		setAbstractIdCustom(state);
 
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
@@ -275,18 +280,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// slides can happen, even though the widget might be blocked
 			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			// ignore aria-hidden = true
-			if (isAriaHidden(widget)) {
+			if (blackListedWithFilter(widget)) {
 				continue;
 			}
 
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
-				continue;
-			}
-
-			/* We only care about Widgets that are contained by an ing-flow when we are not in modal mode */
-			if (!isINGFlowStep(widget) && !modalMode) {
 				continue;
 			}
 
@@ -309,6 +308,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
+					System.out.println("widget: " + widget.getRepresentation("\t"));
+					
 					WdElement element = ((WdWidget) widget).element;
 					Role role = widget.get(Tags.Role, Roles.Widget);
 					actions.add(ac.leftClickAt(widget));
@@ -319,40 +320,147 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return actions;
 	}
 
+	JXPathContext createContext(Object w) {
+		JXPathContext c = JXPathContext.newContext(w);
+		// register extra (static) functions
+		c.setFunctions(new ClassFunctions(Protocol_webdriver_generic_ing.class, "drv"));
+		return c;
+	}
+
+	Boolean blackListedWithFilter(Widget w) {
+		boolean isWhite = false;
+		boolean isBlack = false;
+		
+		JXPathContext context = createContext(w);
+
+		for (FilterRule f : filters) {
+			Iterator<?> r = f.expr.iterate(context);
+
+			if (r != null && r.hasNext()) {
+				isBlack = isBlack || f.isBlack;
+				isWhite = isWhite || !f.isBlack;
+			}
+		}
+
+		// TODO: turn this into a boolean expression
+		if (isWhite) { return false; }
+		else { return isBlack; }  
+	}
+
+	List<GenRule> inputGenerators() {
+		return inputGenerators(
+			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),
+			formInputRule("mySituationForm", "Age", "[1-8][0-9]", 5),
+			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
+			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5)
+		);
+	}
+
+	List<FilterRule> filterRules() {
+		return filterRules(
+				new FilterRule("attributes[@aria-hidden = 'true'] | parents/attributes[@aria-hidden = 'true']", true),  // ignore aria-hidden
+				new FilterRule(".[@WebTagName = 'a']/attributes[string-length(@href) = 0]", true), // ignore weird link without refs
+
+				new FilterRule("parents[@WebTagName = 'header']", true), // ignore elements that are part of the header
+				new FilterRule("attributes[@id = 'action-stop']", true), // ignore 'stop'
+				new FilterRule("attributes[@id = 'action-back']", true), // ignore 'terug'
+				new FilterRule("parents[attributes[contains(@slot, 'progress')]]", true),  // ignore progress actions
+				new FilterRule("parents[attributes[contains(@class, 'progress')]]", true),  // ignore progress actions
+
+				new FilterRule("attributes[contains(@href, 'bel-me-nu')]", true),
+				new FilterRule("attributes[drv:ends(@href, 'hypotheek-berekenen')]", true),
+				new FilterRule("attributes[@target = '_blank']", true)
+		);
+	}
+
+	List <FilterRule> filterRules(FilterRule ... rules) {
+		return Arrays.asList(rules);
+	}
+
+	List<GenRule> inputGenerators(GenRule ... rules) {
+		return Arrays.asList(rules);
+	}
+
+	GenRule formInputRule(String f, String n, String g, int p) {
+		String xpath = String.format(".[contains(@WebName, '%s')]/parents[contains(@WebName, '%s')]", n, f);
+		return new GenRule(xpath, g, p);
+	}
+
+	// Choose Rule based on priorities
+	protected <R extends PrioRule> R prioritizedPick(List<R> rules) {
+		int sum = rules.stream().map(r -> r.priority).reduce(0, Integer::sum);
+		int x = (new Random()).nextInt(sum);
+		int s = 0;
+
+		for (R rule : rules) {
+			s = s + rule.priority();
+			if (x < s) { return rule; }
+		}
+
+		throw new RuntimeException("there are no rules to pick");
+	}
+
 	@Override
 	protected String getRandomText(Widget w) {
+		// Default behaviour
 		String sText = super.getRandomText(w);
 
-		String name = w.get(WdTags.WebName, "").toLowerCase();
+		JXPathContext context = createContext(w);
 
-		int multiplier = 100;
+		// Collect all matches rules
+		List <GenRule> matches = rules.stream().
+				filter(GenRule::isValid).       				// only consider valid rules
+				filter(r -> r.expression.iterate(context).hasNext()). // only those that match
+				collect(Collectors.toList());
 
-		if (name.contains("monthly")) {
-			multiplier = 9;
+		// Pick rule based on priority
+		if (matches.size() > 0) {
+			return prioritizedPick(matches).generator.generate();
 		}
-		if (name.contains("age")) {
-			return "" + ((multiplier * (((new Random()).nextInt(90) + 15))) / 100);
-		}
-		if (name.contains("income")) {
-			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
-		}
-		if (name.contains("profit")) {
-			return "" + ((multiplier * (((new Random()).nextInt(10000) + 10))) / 100);
-		}
-		if (name.contains("years")) {
-			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
-		}
-		if (name.contains("studyloan")) {
-			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
-		}
-		if (name.contains("liabilities")) {
-			return "" + ((multiplier * (((new Random()).nextInt(100000) + 10))) / 100);
-		}
-		if (name.contains("alimony")) {
-			return "" + (((new Random()).nextInt(300)));
-		}
+
+		// else, return default behaviour
 		return sText;
 	}  
+
+	abstract class PrioRule {
+		protected int priority = 0;
+		protected boolean isValid = false;
+
+		public int priority() { return priority; }
+		public boolean isValid() { return isValid; }
+	}
+
+	class GenRule extends PrioRule {
+		protected CompiledExpression expression;
+		protected RgxGen generator;
+
+		public GenRule(String e, String g, int p) {
+			try {
+				expression = JXPathContext.compile(e); generator = new RgxGen(g);
+				isValid = true; priority = p;
+			}
+			catch (Exception exception) {
+				System.out.println("WARNING: invalid generator rule: " + exception.getMessage());
+			}
+		}
+	}
+
+	class FilterRule  {
+		protected CompiledExpression expr;
+		protected boolean isBlack;
+		protected boolean isValid;
+
+		public FilterRule(String e, boolean b) {
+			try {
+				expr = JXPathContext.compile(e); isBlack = b;
+				isValid = true;
+			}
+			catch (Exception exception) {
+				System.out.println("WARNING: invalid filter rule: " + exception.getMessage());
+			}
+		}
+		public boolean isValid() { return isValid; }
+	}
 	
 	/* Check whether the Widget is contained by the ing-step container and is not hidden */
 	protected boolean isINGFlowStep(Widget widget) {
@@ -389,16 +497,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected boolean isClickable(Widget widget) {
 		WdElement element = ((WdWidget) widget).element;
-
-		if (element.attributeMap.getOrDefault("href", "").contains("bel-me-nu")) {
-			return false;
-		}
-		if (element.attributeMap.getOrDefault("href", "").endsWith("hypotheek-berekenen/")) {
-			return false;
-		}
-		if("_blank".equals(element.attributeMap.getOrDefault("target", ""))) {
-			return false;
-		}
 
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -457,15 +555,14 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		setAbstractIdCustom(state);
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
+		
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			//using the action selector of the state model:
-			setAbstractIdCustom(state);
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
