@@ -82,6 +82,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 	private long startSequenceTime;
 	private String reportTimeDir;
+	private int countEmptyStateTimes = 0;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -150,11 +151,65 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			if(w.get(Tags.Title,"").contains("Rachota is already running or it was not")) {
 				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Yes", state, system, 5, 1);
 			}
+			// Dutch
+			if(w.get(Tags.Title,"").contains("was de vorige keer niet normaal afgesloten")) {
+				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Ja", state, system, 5, 1);
+			}
 		}
 
 		// Wait and update the state
 		Util.pause(10);
 		state = super.getState(system);
+	}
+	
+	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		State state = super.getState(system);
+		// rachota: User inactivity popup window
+		for(Widget w : state) {
+			if(w.get(Tags.Title,"").contains("User inactivity detected")) {
+				System.out.println("User inactivity detected! Closing this window...");
+				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
+				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
+				return super.getState(system);
+			}
+		}
+		return state;
+	}
+	
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
+		
+		if(countEmptyStateTimes > 20) {
+			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "Seems that rachota SUT is not responding");
+		}
+
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+		//--------------------------------------------------------
+
+		return verdict;
 	}
 
 	/**
@@ -224,6 +279,12 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && isEditableWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
+					
+					// rachota: custom number for this generate reporting field
+					if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+							&& w.get(Tags.Title,"").contains("Price per hour")) {
+						forcePricePerHourAndFinish(w, actions, ac);
+					}
 
 					// GENERIC: All swing apps
 					/** Force actions on some widgets with a wrong accessibility **/
@@ -243,6 +304,16 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 				}
 			}
 		}
+		
+		// rachota: sometimes rachota freezes, TESTAR detects the SUT
+		// but cannot extract anything at JavaAccessBridge level
+		// Use this count for Verdict
+		if(actions.isEmpty()) {
+			countEmptyStateTimes = countEmptyStateTimes + 1;
+			System.out.println("Empty Actions on State! count : " + countEmptyStateTimes);
+		} else {
+			countEmptyStateTimes = 0;
+		}
 
 		return actions;
 	}
@@ -252,16 +323,53 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 * This SUT have the functionality of create invoices and reports
 	 * Create an action that prepares a filename to create this report
 	 */
-	private void addFilenameReportAction(Widget w, Set<Action> actions, StdActionCompiler ac) {
+	private void addFilenameReportAction(Widget filenameWidget, Set<Action> actions, StdActionCompiler ac) {
+
+		// Get Next widget
+		Widget nextButton = filenameWidget;
+		for(Widget checkWidget: filenameWidget.root()) { 
+			if(checkWidget.get(Tags.Title,"").contains("Next")) {
+				nextButton = checkWidget;
+			}
+		}
+
+		// type filename, use tab to complete the path, and click next
 		Action addFilename = new CompoundAction.Builder()   
-				.add(ac.clickTypeInto(w, Util.dateString(OutputStructure.DATE_FORMAT), true), 0.5) // Click and type
+				.add(ac.clickTypeInto(filenameWidget, Util.dateString(OutputStructure.DATE_FORMAT), true), 0.5) // Click and type
 				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
-				.add(new KeyUp(KBKeys.VK_TAB),0.5).build(); // Release Keyboard
+				.add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
+				.add(ac.leftClickAt(nextButton), 0.5).build(); //Click next
 
 		addFilename.set(Tags.Role, Roles.Button);
-		addFilename.set(Tags.OriginWidget, w);
+		addFilename.set(Tags.OriginWidget, filenameWidget);
 		addFilename.set(Tags.Desc, "Add Filename Report");
 		actions.add(addFilename);
+	}
+	
+	/**
+	 * Rachota:
+	 * Force the input of a correct price and click finish to create the invoice report
+	 */
+	private void forcePricePerHourAndFinish(Widget priceWidget, Set<Action> actions, StdActionCompiler ac) {
+		// Get Finish widget
+		Widget finishButton = priceWidget;
+		for(Widget checkWidget: priceWidget.root()) { 
+			if(checkWidget.get(Tags.Title,"").contains("Finish")) {
+				finishButton = checkWidget;
+			}
+		}
+		
+		// type price, use tab to complete the path, and click finish
+		Action forcePriceFinish = new CompoundAction.Builder()   
+				.add(ac.clickTypeInto(priceWidget, "3", true), 0.5) // Click and type
+				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
+				.add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
+				.add(ac.leftClickAt(finishButton), 0.5).build(); //Click next
+		
+		forcePriceFinish.set(Tags.Role, Roles.Button);
+		forcePriceFinish.set(Tags.OriginWidget, priceWidget);
+		forcePriceFinish.set(Tags.Desc, "forcePriceAndFinish");
+		actions.add(forcePriceFinish);
 	}
 
 	/**
@@ -279,10 +387,12 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 * Rachota:
 	 * Seems that interactive Edit elements have tool type text with instructions
 	 * Then if ToolTipText exists, the widget is interactive
+	 * Disable price per hour random text, customize number
 	 */
 	private boolean isEditableWidget(Widget w) {
 		String toolTipText = w.get(Tags.ToolTipText,"");
-		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") && !toolTipText.contains("Mouse click");
+		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") 
+				&& !toolTipText.contains("Mouse click") && !w.get(Tags.Title,"").contains("Price per hour");
 	}
 	
 	/**
