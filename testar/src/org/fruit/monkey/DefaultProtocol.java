@@ -42,6 +42,7 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 
 import java.awt.Desktop;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -64,6 +65,8 @@ import javax.swing.JOptionPane;
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.HtmlReporting.Reporting;
+import nl.ou.testar.visualvalidation.VisualValidationFactory;
+import nl.ou.testar.visualvalidation.VisualValidationManager;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.apache.logging.log4j.LogManager;
@@ -190,6 +193,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
+	protected VisualValidationManager visualValidationManager;
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -357,6 +361,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+
+			visualValidationManager = VisualValidationFactory.createVisualValidator();
 		}
 
 		try {
@@ -1499,6 +1505,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//System.out.println("DEBUG: normal state shot");
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
 			}
+			AWTCanvas screenShot = protocolUtil.getStateshotBinary(state);
+			visualValidationManager.AnalyzeImage(screenShot.image());
+			String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom,
+					"NoConcreteIdAvailable"), screenShot);
+			state.set(Tags.ScreenshotPath, screenshotPath);
 		}
 	}
 
@@ -1837,6 +1848,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					GlobalScreen.unregisterNativeHook();
 				}
 			}
+			visualValidationManager.Close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

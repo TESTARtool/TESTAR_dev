@@ -31,6 +31,7 @@
 package org.testar.settings;
 
 import nl.ou.testar.visualvalidation.VisualValidationSettings;
+import nl.ou.testar.visualvalidation.ocr.tesseract.TesseractSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,5 +84,9 @@ public class ExtendedSettingsFactory {
 
     public static ExampleSetting createTestSetting() {
         return createSettings(ExampleSetting.class, ExampleSetting::CreateDefault);
+    }
+
+    public static TesseractSettings createTesseractSetting() {
+        return createSettings(TesseractSettings.class, TesseractSettings::CreateDefault);
     }
 }
