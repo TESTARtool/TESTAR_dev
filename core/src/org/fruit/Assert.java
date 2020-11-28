@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -69,5 +70,14 @@ public final class Assert {
 	public static void hasText(String string){
 		if(string == null || string.length() == 0)
 			throw new IllegalArgumentException("You passed a null or empty string!");
+	}
+
+	public static void hasTextSetting(String string, String settingName){
+		if(string == null || string.length() == 0) {
+			String message = "Non valid setting value!\n"
+					+ String.format("It seems that setting %s as null or empty string!\n", settingName)
+					+ "Please provide a correct string value using TESTAR GUI or test.setting file";
+			throw new IllegalArgumentException(message);
+		}
 	}
 }
