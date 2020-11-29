@@ -96,17 +96,6 @@ SUTProcesses =
 ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
 
 #################################################################
-<<<<<<< HEAD:testar/resources/settings/desktop_reinforcement_learning/test.settings
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################
-# State model inference settings
-#################################################################
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
@@ -120,8 +109,6 @@ ApplicationName = Notepad
 ApplicationVersion = 1.0.0
 
 #################################################################
-=======
->>>>>>> 924c346e0df3b96eabafd60116afc955d5b51d73:testar/resources/settings/desktop_qlearning/test.settings
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
