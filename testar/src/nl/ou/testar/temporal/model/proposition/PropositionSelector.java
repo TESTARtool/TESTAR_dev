@@ -46,7 +46,6 @@ public class PropositionSelector {
         tmptagset.addAll(useMinimalAttributes());
         return  tmptagset;
     }
-    @SuppressWarnings("unused")
     private static Set<TagBean<?>> getAllAttributeTags(){
         // WORKAROUND CSS 20190629
         // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
@@ -110,6 +109,8 @@ public class PropositionSelector {
         tmptagset.addAll(useMinimalAttributes());
         return tmptagset;
     }
+
+
 
     /**
      * used for writing a default proposition manager
@@ -291,13 +292,19 @@ public class PropositionSelector {
 
     private String getTagFromAttribute(String attrib){
         String ret=null;
-        for (String tag : selectedAttributes  // consider to pass if selected atributes = empty?
-        ) {
-            if ( tag.equals(attrib)){
-                ret=tag;
-                break;
-            }
+        Set <String> attributeSet;
+        if (selectedAttributes.contains("*")){
+           attributeSet=getAllAttributeNames();
+        }else{
+           attributeSet=selectedAttributes;
         }
+            for (String tag :attributeSet
+            ) {
+                if (tag.equals(attrib)) {
+                    ret = tag;
+                    break;
+                }
+            }
         return  ret;
     }
 
