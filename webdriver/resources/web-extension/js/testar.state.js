@@ -172,6 +172,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         tagName: element.tagName.toLowerCase(),
         textContent: "",
         value: element.value,
+        checked: element.checked,
         display: computedStyle.getPropertyValue('display'),
 
         zIndex: getZIndexTestar(element), // TESTAR z-index value not real value given by web page developers
