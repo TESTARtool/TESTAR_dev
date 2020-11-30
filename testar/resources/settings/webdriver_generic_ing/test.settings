@@ -129,7 +129,7 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebCustomElementState
+#AbstractStateAttributes = WebCustomElementState
 
 #################################################################
 # Override display scale

@@ -30,14 +30,15 @@
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.DefaultIDGenerator;
 import es.upv.staq.testar.NativeLinker;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.s9api.*;
+import net.sf.saxon.value.BooleanValue;
 import nl.ou.testar.RandomActionSelector;
-import org.apache.commons.jxpath.ClassFunctions;
-import org.apache.commons.jxpath.CompiledExpression;
-import org.apache.commons.jxpath.JXPathContext;
-import org.apache.commons.jxpath.JXPathIntrospector;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -47,7 +48,20 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,17 +70,27 @@ import static org.fruit.alayer.Tags.Enabled;
 
 
 public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
-
     protected int highWebModalZIndex = 0;
     protected Widget widgetModal;
-	protected List<GenRule> rules = inputGenerators();
-	protected List<FilterRule> filters = filterRules();
+
+	protected List<ActionRule> actionRules = actionRules();
+	protected List<GenRule> generatorRules = inputGenerators();
+	protected List<FilterRule> filterRules = filterRules();
 
 	public static String lowercase(String str) {
 		return str.toLowerCase();
 	}
 	public static Boolean ends(String str1, String str2) {
 		return str1.endsWith(str2);
+	}
+
+	private static Processor saxonProcessor;
+	private static XPathCompiler xpathCompiler;
+
+	static {
+		saxonProcessor = new Processor(false);
+		xpathCompiler = saxonProcessor.newXPathCompiler();
+		xpathCompiler.setCaching(true);
 	}
 
 	/**
@@ -77,8 +101,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		JXPathIntrospector.registerDynamicClass(org.fruit.alayer.Taggable.class, org.fruit.alayer.webdriver.TaggableDynamicPropertyHandler.class);
-				
+
+		CodingManager.setIdGenerator(new MyIdGenerator());
+		
 		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
 		ensureDomainsAllowed();
@@ -120,6 +145,33 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	}
 
+	public class MyIdGenerator extends DefaultIDGenerator {
+		@Override
+		public void buildIDs(Widget widget) {
+			super.buildIDs(widget);
+		}
+
+		@Override
+		public void buildIDs(State state, Set<Action> actions) {
+			super.buildIDs(state, actions);
+		}
+
+		@Override
+		public void buildIDs(State state, Action action) {
+			super.buildIDs(state, action);
+		}
+
+		@Override
+		public void buildEnvironmentActionIDs(State state, Action action) {
+			super.buildEnvironmentActionIDs(state, action);
+		}
+
+		@Override
+		public String getAbstractStateModelHash(String applicationName, String applicationVersion) {
+			return super.getAbstractStateModelHash(applicationName, applicationVersion);
+		}
+	} ;
+
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of
@@ -143,6 +195,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		sut.set(WdTags.WebCustomElementStateLambda, customElementStateLambda);
 
+		xpathCompiler.setCaching(true);
+		
 		return sut;
 	}
 
@@ -174,6 +228,26 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			return obj.getClass().getCanonicalName(); // abstract value to class
 		}
 	}
+
+	private boolean match(String expr, XdmItem item) {
+		try {
+			XdmItem i = xpathCompiler.evaluateSingle(expr, item);
+			if (i != null) {
+				Item k = i.getUnderlyingValue();
+				if (k instanceof BooleanValue) {
+					BooleanValue vv = (BooleanValue)k;
+					return vv.isIdentical(BooleanValue.TRUE);
+				}
+				else {
+					return true;
+				}
+			}
+			return false;
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Cannot evaluate " + e);
+		}
+	}
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -187,6 +261,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
+		Document d = toDom(state);
+		//printDocument(d);
+		
 		// Reset because modal element may disappear
     	highWebModalZIndex = 0;
     	widgetModal = state;
@@ -222,6 +299,77 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		CodingManager.buildIDs(state);
 
 		return state;                                                                        
+	}
+
+	protected Document toDom(State state) {
+		WdState s = (WdState)state;
+
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = factory.newDocumentBuilder();
+
+			Document d = dBuilder.newDocument();
+			Node n = toNode(d, s);
+			d.appendChild(n);
+
+			s.set(WdTags.DOM, d);
+			//d.setUserData("widget", s, null);
+			
+			return d;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot create DOM representation");
+		}
+	}
+
+	public static void printDocument(Document doc) {
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+			transformer.transform(new DOMSource(doc),
+					new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Cannot print doc: " + e);
+		}
+	}
+
+	protected Node toNode(Document d, WdWidget w) {
+		WdElement el = w.element;
+		
+		Element e = d.createElement(el.tagName);
+
+		e.setTextContent(e.getTextContent());
+		
+		Map <String, String> map = el.attributeMap;
+
+		for (String key: map.keySet()) {
+			e.setAttribute(key, map.get(key));
+		}
+
+		if (el.value != null) {
+			e.setAttribute("value", el.value.toString());
+		}
+		if (el.checked != null) {
+			e.setAttribute("checked", el.checked.toString());
+		}
+		
+		for (int i = 0; i < w.childCount() ; i++) {
+			e.appendChild(toNode(d, w.child(i)));
+		}
+
+		// Associate bi-directional
+		w.set(WdTags.DOM, e);
+		//e.setUserData("widget", w, null);
+		
+		return e;
 	}
 
 	/**
@@ -308,8 +456,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
-					System.out.println("widget: " + widget.getRepresentation("\t"));
-					
 					WdElement element = ((WdWidget) widget).element;
 					Role role = widget.get(Tags.Role, Roles.Widget);
 					actions.add(ac.leftClickAt(widget));
@@ -317,28 +463,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 
-		return actions;
-	}
+		selectRuleAction(state, actions);
 
-	JXPathContext createContext(Object w) {
-		JXPathContext c = JXPathContext.newContext(w);
-		// register extra (static) functions
-		c.setFunctions(new ClassFunctions(Protocol_webdriver_generic_ing.class, "drv"));
-		return c;
+		return actions;
 	}
 
 	Boolean blackListedWithFilter(Widget w) {
 		boolean isWhite = false;
 		boolean isBlack = false;
-		
-		JXPathContext context = createContext(w);
 
-		for (FilterRule f : filters) {
-			Iterator<?> r = f.expr.iterate(context);
+		Node n = w.get(WdTags.DOM);
+		XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
 
-			if (r != null && r.hasNext()) {
-				isBlack = isBlack || f.isBlack;
-				isWhite = isWhite || !f.isBlack;
+		for (FilterRule f : filterRules) {
+			try {
+				if (match(f.sexpr, item)) {
+					isBlack = isBlack || f.isBlack;
+					isWhite = isWhite || !f.isBlack;
+				}
+			}
+			catch (Exception e){
+				throw new RuntimeException("Cannot evaluate " + e);
 			}
 		}
 
@@ -347,30 +492,46 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		else { return isBlack; }  
 	}
 
+	List<ActionRule> actionRules() {
+		return actionsRules(
+			new ActionRule("'true'", 10),                  // Default priority
+			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 20), // Empty text fields
+			new ActionRule(".[@type = 'radio'] and (count(ancestor::*[@role = 'radiogroup']//ing-radio[not(@checked = 'true')]) = count(ancestor::*[@role = 'radiogroup']//ing-radio))", 20) // radio-groups
+		);
+	}
+	
 	List<GenRule> inputGenerators() {
 		return inputGenerators(
-			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
-			formInputRule("mySituationForm", "Age", "[1-8][0-9]", 5),          // Specific age input
-			formInputRule("income", "income", "[1-9][0-9]{4}", 5),             // Specific income input
-			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5)// Specific monthly income
+			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 10),                        // Generic input
+
+			formInputRule("mySituationForm", "age", "[1-8][0-9]", 50),
+			formInputRule("income", "income", "[1-9][0-9]{4}", 50),
+			formInputRule("income", "years[]", "[1-9][0-9]{4}", 50),
+			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 100),
+			formInputRule("expensesForm", "studyLoan", "[1-3][0-9]{4}", 50),
+			formInputRule("expensesForm", "liabilities", "[1-3][0-9]{4}", 50),
+			formInputRule("expensesForm", "alimony", "[0-9]{3}", 50) ,
+			formInputRule("entrepreneurIncomeForm", "companyProfit", "[1-9][0-9]{2}", 50)
 		);
 	}
 
 	List<FilterRule> filterRules() {
 		return filterRules(
-				new FilterRule("attributes[@aria-hidden = 'true'] | parents/attributes[@aria-hidden = 'true']", true),  // ignore aria-hidden
-				new FilterRule(".[@WebTagName = 'a']/attributes[string-length(@href) = 0]", true), // ignore weird link without refs
-
-				new FilterRule("parents[@WebTagName = 'header']", true), // ignore elements that are part of the header
-				new FilterRule("attributes[@id = 'action-stop']", true), // ignore 'stop'
-				new FilterRule("attributes[@id = 'action-back']", true), // ignore 'terug'
-				new FilterRule("parents[attributes[contains(@slot, 'progress')]]", true),  // ignore progress actions
-				new FilterRule("parents[attributes[contains(@class, 'progress')]]", true),  // ignore progress actions
-
-				new FilterRule("attributes[contains(@href, 'bel-me-nu')]", true),   // ignore outside links
-				new FilterRule("attributes[drv:ends(@href, 'hypotheek-berekenen')]", true),
-				new FilterRule("attributes[@target = '_blank']", true)
+				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
+				new FilterRule("a[@href]", true),
+				new FilterRule("ancestor::header", true),
+				new FilterRule(".[@id = 'action-top']", true),
+				new FilterRule(".[@id = 'action-back']", true),
+				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true),
+		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true),
+				new FilterRule(".[contains(@href, 'bel-me-nu')]", true),
+				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen')]", true),
+				new FilterRule(".[@target = '_blank']", true)
 		);
+	}
+
+	List <ActionRule> actionsRules(ActionRule ... rules) {
+		return Arrays.asList(rules);
 	}
 
 	List <FilterRule> filterRules(FilterRule ... rules) {
@@ -382,7 +543,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}
 
 	GenRule formInputRule(String f, String n, String g, int p) {
-		String xpath = String.format(".[contains(@WebName, '%s')]/parents[contains(@WebName, '%s')]", n, f);
+		String lf = f.toLowerCase();
+		String ln = n.toLowerCase();
+		String xpath = String.format(".[contains(lower-case(@name), '%s')]/ancestor::*[contains(lower-case(@name), '%s')]", ln, lf);
 		return new GenRule(xpath, g, p);
 	}
 
@@ -405,12 +568,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// Default behaviour
 		String sText = super.getRandomText(w);
 
-		JXPathContext context = createContext(w);
-
+		Node n = w.get(WdTags.DOM);
+		XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
+		
 		// Collect all matches rules
-		List <GenRule> matches = rules.stream().
+		List <GenRule> matches = generatorRules.stream().
 				filter(GenRule::isValid).       				// only consider valid rules
-				filter(r -> r.expression.iterate(context).hasNext()). // only those that match
+				filter(r -> match(r.sexpr, item)). // only those that match
 				collect(Collectors.toList());
 
 		// Pick rule based on priority
@@ -430,29 +594,73 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public boolean isValid() { return isValid; }
 	}
 
+	class ActionRule extends PrioRule {
+		protected String sexpr;
+		protected XPathExecutable expression;
+
+		public ActionRule(String e, int p) {
+			try {
+				sexpr = e;
+				expression = xpathCompiler.compile(e);
+				isValid = true; priority = p;
+			}
+			catch (Exception exception) {
+				System.out.println("WARNING: invalid action rule: " + exception.getMessage());
+			}
+		}
+		public String toString() {
+			return "ActionRule(" + sexpr + "," + priority + ")";
+		}
+	}
+
+	class ActionPrio extends PrioRule {
+		public final Action action;
+
+		public ActionPrio(Action a, int prio) {
+			action = a;
+			priority = prio;
+			isValid = true;
+		}
+
+		public String toString() {
+			return "ActionPrio(" + action + "," + priority + ")";
+		}
+	}
+	
 	class GenRule extends PrioRule {
-		protected CompiledExpression expression;
+		protected String sexpr;
+		protected String gexpr;
+		protected XPathExecutable expression;
 		protected RgxGen generator;
 
 		public GenRule(String e, String g, int p) {
 			try {
-				expression = JXPathContext.compile(e); generator = new RgxGen(g);
+				sexpr = e;
+				gexpr = g;
+				expression = xpathCompiler.compile(e); generator = new RgxGen(g);
 				isValid = true; priority = p;
 			}
 			catch (Exception exception) {
 				System.out.println("WARNING: invalid generator rule: " + exception.getMessage());
 			}
 		}
+
+		public String toString() { return "GenRule(" +  sexpr + ", " + gexpr + "," + priority + ");"; }
 	}
 
 	class FilterRule  {
-		protected CompiledExpression expr;
+
+		protected String sexpr;
+		protected XPathExecutable expr;
+
 		protected boolean isBlack;
 		protected boolean isValid;
 
 		public FilterRule(String e, boolean b) {
+			sexpr = e;
 			try {
-				expr = JXPathContext.compile(e); isBlack = b;
+				expr = xpathCompiler.compile(e);
+				isBlack = b;
 				isValid = true;
 			}
 			catch (Exception exception) {
@@ -460,6 +668,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 		public boolean isValid() { return isValid; }
+		public String toString() { return "FilterRule(" +  sexpr + ", " + isBlack + ");"; }
 	}
 
 	@Override
@@ -536,9 +745,40 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		if(retAction==null) {
 			System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, using random:
-			retAction = RandomActionSelector.selectAction(actions);
+			retAction = selectRuleAction(state, actions);
+			if (retAction == null) {
+				retAction = RandomActionSelector.selectAction(actions);
+			}
 		}
 		return retAction;
+	}
+
+	protected Action selectRuleAction(State state, Set<Action> actions) {
+		List<ActionPrio> rules = new LinkedList();
+
+		for (Action action : actions) {
+			for (ActionRule r: actionRules) {
+				Widget w = action.get(Tags.OriginWidget);
+
+				Node n = w.get(WdTags.DOM);
+				XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
+
+				try {
+					if (match(r.sexpr, item)) {
+						if (r.priority > 10) {
+							System.out.println("PRIO > 10: " + item);
+						}
+						rules.add(new ActionPrio(action, r.priority));
+					}
+
+				}
+				catch (Exception e) {
+					throw new RuntimeException("Cannot evaluate xpath: " + e);
+				}
+			}
+		}
+
+		return prioritizedPick(rules).action;
 	}
 
 	/**
