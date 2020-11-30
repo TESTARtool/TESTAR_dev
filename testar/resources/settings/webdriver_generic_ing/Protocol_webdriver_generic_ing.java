@@ -463,7 +463,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 
-		selectRuleAction(state, actions);
+		for (Action a: actions) {
+			Widget w = a.get(Tags.OriginWidget);
+			Node e = w.get(WdTags.DOM);
+			System.out.println("ACTION: " + saxonProcessor.newDocumentBuilder().wrap(e));
+		}
 
 		return actions;
 	}
@@ -495,8 +499,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	List<ActionRule> actionRules() {
 		return actionsRules(
 			new ActionRule("'true'", 10),                  // Default priority
-			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 20), // Empty text fields
-			new ActionRule(".[@type = 'radio'] and (count(ancestor::*[@role = 'radiogroup']//ing-radio[not(@checked = 'true')]) = count(ancestor::*[@role = 'radiogroup']//ing-radio))", 20) // radio-groups
+			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 50), // Empty text fields
+			new ActionRule(".[@type = 'submit']", 50), // submit
+			new ActionRule(".[@type = 'radio'] and (count(ancestor::*[@role = 'radiogroup']//ing-radio[not(@checked = 'true')]) = count(ancestor::*[@role = 'radiogroup']//ing-radio))", 50) // radio-groups
 		);
 	}
 	
@@ -518,9 +523,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	List<FilterRule> filterRules() {
 		return filterRules(
 				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
-				new FilterRule("a[@href]", true),
+				new FilterRule(".[(name() = 'a') and (not(@href))]", true),
 				new FilterRule("ancestor::header", true),
-				new FilterRule(".[@id = 'action-top']", true),
+				new FilterRule(".[@id = 'action-stop']", true),
 				new FilterRule(".[@id = 'action-back']", true),
 				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true),
 		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true),
