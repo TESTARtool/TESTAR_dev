@@ -33,6 +33,7 @@ package org.fruit.alayer.webdriver.enums;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
+import org.w3c.dom.Node;
 
 /**
  * Creates and holds tags specific to WEB info.
@@ -248,5 +249,7 @@ public class WdTags extends TagsBase {
   /* Custom Element State (user defined) */
   public static final Tag<Object> WebCustomElementState = from("WebCustomElementState", Object.class);
   public static final Tag<String> WebCustomElementStateLambda = from("WebCustomElementStateLambda", String.class);
+
+  public static final Tag<Node> DOM = from("DOM", Node.class);
 
 }
