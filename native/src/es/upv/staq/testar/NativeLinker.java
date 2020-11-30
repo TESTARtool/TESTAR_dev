@@ -431,6 +431,8 @@ public class NativeLinker {
 	public static boolean isNativeTypeable(Widget w){
 		if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles())) {
 			return false;
+		} else if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)){
+			return w.get(WdTags.WebIsKeyboardFocusable);
 		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return w.get(UIATags.UIAIsKeyboardFocusable);
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
