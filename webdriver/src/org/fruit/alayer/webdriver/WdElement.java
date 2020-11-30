@@ -72,8 +72,10 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt, src;
-
+  String valuePattern, href, style, target, alt, src;
+  public Object value;
+  public Boolean checked;
+  
   double zindex;
   int webZIndex = 0;
   Rect rect;
@@ -115,7 +117,8 @@ public class WdElement extends TaggableBase implements Serializable {
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
-    value = attributeMap.getOrDefault("value", "");
+    value = (Object)packedElement.get("value");
+    checked = (Boolean)packedElement.getOrDefault("checked", false);
     style = attributeMap.getOrDefault("style", "");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
@@ -202,8 +205,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(id != null && !id.isEmpty()) {
 		  return id;
 	  }
-	  else if(value != null && !value.isEmpty()) {
-		  return value;
+	  else if(value != null) {
+		  return value.toString();
 	  }
 	  else if(tagName != null && !tagName.isEmpty()) {
 		  return tagName;
