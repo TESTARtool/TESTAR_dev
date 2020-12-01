@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Widget;
 import org.apache.commons.math3.analysis.function.Divide;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
@@ -24,7 +25,7 @@ public class WidgetTreeBasedRewardFunction implements RewardFunction {
      * @return The calculated reward
      */
     @Override
-    public float getReward(final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
         final Map<Tag<?>, Object>  tags = currentConcreteState.getAttributes().getTagValues();
         System.out.println("\n+++++------------------------------");
         System.out.println(currentConcreteState.getAttributes().getTagValues());

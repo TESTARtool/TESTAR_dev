@@ -8,7 +8,7 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunctionFactory;
 import nl.ou.testar.ReinforcementLearning.QFunctions.SarsaQFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
-import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -74,7 +74,7 @@ public class StateModelManagerFactory {
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
 
         if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
-            Tag<?> tag = ReinforcementLearningUtils.getTag(settings);
+            Tag<?> tag = ReinforcementLearningUtil.getTag(settings);
             final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);

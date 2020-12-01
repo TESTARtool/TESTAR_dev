@@ -2,7 +2,7 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import nl.ou.testar.StateModel.AbstractAction;
 import org.fruit.alayer.Tag;
 
@@ -39,6 +39,6 @@ public class GreedyPolicy<T extends Object & Comparable<? super T>>  implements 
 
         final T maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
-        return ReinforcementLearningUtils.selectAction(actionsSelected);
+        return ReinforcementLearningUtil.selectAction(actionsSelected);
     }
 }

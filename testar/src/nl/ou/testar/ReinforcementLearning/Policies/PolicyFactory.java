@@ -1,6 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.Policies;
 
-import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtils;
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -36,20 +36,20 @@ public class PolicyFactory {
     private static Policy getEpsilonGreedyPolicy(final Settings settings) {
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
-        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new EpsilonGreedyPolicy(new GreedyPolicy<Float>(defaultQValue, tag), epsilon);
     }
 
     private static Policy getGreedyPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
-        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new GreedyPolicy<Float>(defaultQValue, tag);
     }
 
     private static Policy getOptimisticQValuesInitializationPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         final float maxQValue = settings.get(ConfigTags.MaxQValue, 0f);
-        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new OptimisticQValuesInitializationPolicy(new GreedyPolicy<Float>(defaultQValue, tag), maxQValue);
     }
 
@@ -58,7 +58,7 @@ public class PolicyFactory {
         final float decayRate = settings.get(ConfigTags.DecayRate, 0.0001f);
         final float temperature = settings.get(ConfigTags.Temperature, 1.0f);
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
-        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(new GreedyPolicy<Float>(defaultQValue, tag), new BoltzmannDistributedExplorationPolicy(decayRate, temperature), epsilon);
     }
 

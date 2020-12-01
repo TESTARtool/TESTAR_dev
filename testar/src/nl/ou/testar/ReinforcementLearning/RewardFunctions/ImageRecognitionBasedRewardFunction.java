@@ -4,12 +4,17 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.lang.Validate;
+import org.fruit.alayer.State;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 
 public class ImageRecognitionBasedRewardFunction implements RewardFunction {
+
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final float defaultReward;
 
@@ -23,7 +28,7 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
     *{@inheritDoc}
      */
     @Override
-    public float getReward(final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
         try {
             Settings.MinSimilarity = 0.01; //override default of 0.3
             Validate.notNull(screenImagePreviouslyExecutedAction, "ScreenImagePreviouslyExecutedAction has the value null");
@@ -36,12 +41,12 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
             finder.find(patternOfPreviousSceenshot);
             Validate.isTrue(finder.hasNext(), "Screenshots could not be compared");
             final Match match = finder.next();
-            System.out.println("Match found between screenshots with " + (1 - match.getScore()));
+            logger.debug("Match found between screenshots with " + (1 - match.getScore()));
             screenImagePreviouslyExecutedAction = screenshot;
             finder.destroy();
             return (float) (1d - match.getScore());
         } catch (final IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            logger.debug(e.getMessage());
             screenImagePreviouslyExecutedAction = takeScreenshot();
             return defaultReward;
         }

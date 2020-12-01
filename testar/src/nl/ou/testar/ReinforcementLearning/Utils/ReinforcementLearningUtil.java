@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ReinforcementLearningUtils {
+public class ReinforcementLearningUtil {
 
     /**
      * Util function for action selection in case a policy returns multiple actions.

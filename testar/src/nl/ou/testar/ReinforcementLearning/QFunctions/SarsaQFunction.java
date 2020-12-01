@@ -1,7 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.QFunctions;
 
 import nl.ou.testar.ReinforcementLearning.RLTags;
-import nl.ou.testar.ReinforcementLearning.RewardFunctions.WidgetTreeBasedRewardFunction;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.alayer.Action;
@@ -28,7 +27,8 @@ public class SarsaQFunction implements QFunction {
         this.gammaDiscount = gammaDiscount;
         this.defaultQValue = defaultQValue;
     }
-/**
+
+    /**
      * {@inheritDoc}
      */
     @Override
