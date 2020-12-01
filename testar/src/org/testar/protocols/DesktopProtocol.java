@@ -31,8 +31,10 @@
 
 package org.testar.protocols;
 
+import nl.ou.testar.DerivedActions;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
+import org.fruit.Drag;
 import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -42,6 +44,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -192,61 +195,105 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * Adding derived actions into the given set of actions and returning the modified set of actions.
      *
      * @param actions
-     * @param system
      * @param state
      * @return
      */
-    protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
-        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-        StdActionCompiler ac = new AnnotatingActionCompiler();
+    protected DerivedActions deriveClickTypeScrollActionsFromAllWidgets(Set<Action> actions, State state){
+
+        Set<Action> filteredActions = new HashSet<>();
+        DerivedActions derived = new DerivedActions(actions, filteredActions);
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
         for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
+            derived = getActionFromWidget(w,derived);
+        }
+        return derived;
+    }
 
-            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
+    protected DerivedActions deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, State state){
 
-            // Only consider enabled and non-blocked widgets
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+        Set<Action> filteredActions = new HashSet<>();
+        DerivedActions derived = new DerivedActions(actions, filteredActions);
 
-                // Do not build actions for widgets on the blacklist
-                // The blackListed widgets are those that have been filtered during the SPY mode with the
-                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-                if (!blackListed(w)){
+        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+        for(Widget w : getTopWidgets(state)){
+            derived = getActionFromWidget(w,derived);
+        }
+        return derived;
+    }
 
-                    //For widgets that are:
-                    // - clickable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of left clicking on them
-                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.leftClickAt(w));
-                    }
+    private DerivedActions getActionFromWidget(Widget w, DerivedActions derived){
+        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
 
-                    //For widgets that are:
-                    // - typeable
-                    // and
-                    // - unFiltered by any of the regular expressions in the Filter-tab, or
-                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-                    // We want to create actions that consist of typing into them
-                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+        if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+            // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+            return derived; // skip this widget
+        }
+
+        // Only consider enabled and non-blocked widgets
+        if(!w.get(Enabled, true) || w.get(Blocked, false)) {
+            // widget not enabled or is blocked:
+            return derived; // skip this widget
+        }else{
+
+            // Do not build actions for widgets on the blacklist
+            // The blackListed widgets are those that have been filtered during the SPY mode with the
+            //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+            if (blackListed(w)) {
+                derived.addFilteredAction(ac.leftClickAt(w));
+                return derived;
+            }else{
+
+                //For widgets that are:
+                // - typeable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of typing into them
+                if(isTypeable(w)){
+                    if(isUnfiltered(w) || whiteListed(w)) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addAvailableAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        return derived;
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.leftClickAt(w));
+                        return derived;
                     }
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                }
+
+                //For widgets that are:
+                // - clickable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of left clicking on them
+                if(isClickable(w)) {
+                    if((isUnfiltered(w) || whiteListed(w))){
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        derived.addAvailableAction(ac.leftClickAt(w));
+                        return derived;
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.leftClickAt(w));
+                        return derived;
+                    }
+                }
+
+                //Add sliding actions (like scroll, drag and drop) to the derived actions
+                //method defined below.
+                Drag[] drags = null;
+                //If there are scroll (drags/drops) actions possible
+                if((drags = w.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICK)) != null) {
+                    derived = addSlidingActions(derived, ac, drags, w);
+                    return derived;
                 }
             }
         }
-        return actions;
+        return derived;
     }
+
 
 
     /**
@@ -257,14 +304,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @param state
      * @return
      */
-    protected Set<Action> deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, SUT system, State state){
+    @Deprecated
+    protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
         // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for(Widget w : getTopWidgets(state)){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
+        for(Widget w : state){
 
             if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
                 // filtering out actions on menu-containers (that would add an action in the middle of the menu)
@@ -302,7 +348,66 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
+                }
+            }
+        }
+        return actions;
+    }
+
+    /**
+     * Adding derived actions into the given set of actions and returning the modified set of actions.
+     *
+     * @param actions
+     * @param system
+     * @param state
+     * @return
+     */
+    @Deprecated
+    protected Set<Action> deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, SUT system, State state){
+        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+
+        // iterate through top level widgets based on Z-index:
+        for(Widget w : getTopWidgets(state)){
+
+            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+                continue; // skip this iteration of the for-loop
+            }
+
+            // Only consider enabled and non-blocked widgets
+            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+                // Do not build actions for widgets on the blacklist
+                // The blackListed widgets are those that have been filtered during the SPY mode with the
+                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+                if (!blackListed(w)){
+
+                    //For widgets that are:
+                    // - clickable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of left clicking on them
+                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.leftClickAt(w));
+                    }
+
+                    //For widgets that are:
+                    // - typeable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of typing into them
+                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a type action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                    }
+                    //Add sliding actions (like scroll, drag and drop) to the derived actions
+                    //method defined below.
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
                 }
             }
         }
