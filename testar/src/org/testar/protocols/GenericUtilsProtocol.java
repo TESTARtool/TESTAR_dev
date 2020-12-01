@@ -45,6 +45,7 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.TimeOutException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 import org.testar.json.object.StateModelDifferenceJsonObject;
@@ -56,6 +57,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -344,7 +346,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     	
     	if(settings.get(ConfigTags.Mode) == Modes.Generate 
     			&& settings.get(ConfigTags.StateModelEnabled, false)
-    			&& settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
+    			&& settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)
+    			&& !decoderExceptionThrown) {
     		
     		try {
     			// Define current State Model version
@@ -413,7 +416,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     			stateModelDifferenceJsonObject.setStateModelDifferenceReport(dirName);
 
     		} catch (Exception e) {
-    			System.out.println("ERROR: Trying to create an automatic State Model Difference");
+    			System.err.println("ERROR: Trying to create an automatic State Model Difference");
     			e.printStackTrace();
     		}
     	}
@@ -422,40 +425,13 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
     
     /**
-     * First OLD Version that used node js to connect directly with mongodb
-     * Install Node package dependencies needed to insert Artefacts inside PKM
-     */
-    /*protected void installNodePackages(Set<String> packagesName) {
-    	// TODO: Allow Record mode when Listening mode implemented
-    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
-
-    		for(String name : packagesName) {
-    			System.out.println("Installing Node package " + name + "...");
-    			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", "npm install " + name);
-    			Process process = null;
-    			try {
-    				process = builder.start();
-    				process.waitFor();
-    			} catch(IOException | InterruptedException e) {
-    				System.out.println("ERROR! Installing " + name + " Node package");
-    				process.destroy();
-    				return;
-    			}
-    			System.out.println("Package " + name + " installed!");
-    		}
-
-    		System.out.println("ALL Node packages installed successfully!");
-    	}
-    }*/
-    
-    /**
      * Execute a CURL command to interact with PKM.
      * 
      * @param command
      */
     protected String executeCURLCommandPKM(String command) {
     	// TODO: Allow Record mode when Listening mode implemented
-    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
 
     		try {
     			System.out.println("Executing PKM-API command: " + command);
@@ -486,23 +462,29 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				errorContent.append(s);
     			}
         		
-    			if(command.contains("test_results")) {
-    				//{"TESTARTestResults artefactId":""}
+    			// ErrorBuffer contains errors after execute curl command
+    			if(!errorContent.toString().isEmpty()) {
+    				String msg = curlInsertArtefactError(command);
+    				msg = msg.concat(errorContent.toString());
+    				throw new TimeOutException(msg);
+    			}
+    			// curl command has no errors check if we are executing test_results or state_model 
+    			else if(command.contains("test_results")) {
     				return substringArtefactId(outputContent.toString(), "TESTARTestResults artefactId\":\"");
     			}
     			else if (command.contains("state_model")) {
-    				//{"TESTARStateModels artefactId":""}
     				return substringArtefactId(outputContent.toString(), "TESTARStateModels artefactId\":\"");
     			}
+    			// Something strange happen, this command seems not correct
     			else {
-    				System.out.println(" ------------------------------------------");
-    				System.out.println(" !! ERROR trying to insert the Artefact !! ");
-    				System.out.println(" ------------------------------------------");
+    				throw new TimeOutException(curlInsertArtefactError(command));
     			}
 
     		} catch (IOException e) {
-    			System.out.println("ERROR! : Trying to execute CURL command : " + command);
+    			System.err.println("ERROR! : Trying to execute CURL command : " + command);
     			e.printStackTrace();
+    		} catch (TimeOutException toe) {
+    			System.err.println(toe.getMessage());
     		}
     	}
     	
@@ -525,9 +507,22 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			artefactId = artefactId.replace("\"}","").replace("\n", "").replace("\r", "");
 			artefactId = artefactId.trim();
 		} catch(Exception e) {
-			System.out.println("ERROR! : Trying to obtain : " + find);
+			System.err.println("ERROR! : Trying to obtain : " + find);
 		}
 		
 		return artefactId;
+	}
+	
+	/**
+	 * Custom error message if curl failed trying to insert some Artefact.
+	 */
+	private String curlInsertArtefactError(String command) {
+		if(command.contains("test_results")) {
+			return "ERROR! Trying to Insert TestResults Artefact using curl. ";
+		}
+		if (command.contains("state_model")) {
+			return "ERROR! Trying to Insert StateModel Artefact using curl. ";
+		}
+		return "Unknown ERROR! Trying to Insert Artefact using curl. ";
 	}
 }

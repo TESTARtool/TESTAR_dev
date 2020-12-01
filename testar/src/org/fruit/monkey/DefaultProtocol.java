@@ -186,6 +186,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected static final int MAX_ESC_ATTEMPTS = 99;
 
 	protected boolean exceptionThrown = false;
+	protected boolean decoderExceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -230,12 +231,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.settings = settings;
 
 		SUT system = null;
+		
+		decoderExceptionThrown = false;
 
 		try {
 			//initialize TESTAR with the given settings:
 			initialize(settings);
 		} catch (OStorageException | ODatabaseException ode) {
-			String msg = "Error trying to connect with OrientDB database\n"
+			String msg = "Error trying to connect with OrientDB database. \n"
 					+ String.format("Check settings connection and OrientDB database name:\n %s %s %s %s", 
 							settings.get(ConfigTags.DataStoreType), settings.get(ConfigTags.DataStoreServer), 
 							settings.get(ConfigTags.DataStoreDirectory), settings.get(ConfigTags.DataStoreDB));
@@ -245,10 +248,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(ode.getMessage());
 
 			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
 			return;
 			
 		} catch (OSecurityAccessException osae) {
-			String msg = "Error trying to connect with OrientDB database\n"
+			String msg = "Error trying to connect with OrientDB database. \n"
 					+ String.format("Credentials error:\n %s %s", 
 							settings.get(ConfigTags.DataStoreUser), "NotCorrectPassword");
 
@@ -257,6 +261,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(osae.getMessage());
 
 			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
 			return;
 			
 		} catch (IllegalArgumentException iae) {
@@ -267,6 +272,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(iae.getMessage());
 
 			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
 			return;
 		}
 
@@ -277,7 +283,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 						Desktop.getDesktop().browse(file.toURI());
-					}catch (Exception e) {
+					} catch (Exception e) {
 						popupMessage("Exception: Check the path of the file, something is wrong");
 						System.out.println("Exception: Check the path of the file, something is wrong");
 					}
@@ -285,7 +291,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
-					}catch (Exception e) {
+					} catch (Exception e) {
 						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
 					}
@@ -312,18 +318,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runModelDifferenceMode();
 			}
 
-		}catch(WinApiException we) {
+		} catch(SystemStartException | WinApiException e) {
 
 			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
 			+" is a correct definition";
 
 			popupMessage(msg);
 
-			System.out.println(msg);
+			System.err.println(msg);
+			System.err.println(e.getMessage());
 
+			decoderExceptionThrown = true;
 			this.mode = Modes.Quit;
 			
-		}catch(SessionNotCreatedException e) {
+		} catch(SessionNotCreatedException e) {
 			
     		if(e.getMessage().contains("Chrome version")) {
     			
@@ -336,15 +344,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			
     			popupMessage(msg);
     			
-    			System.out.println(msg);
-    			System.out.println(e.getMessage());
+    			System.err.println(msg);
+    			System.err.println(e.getMessage());
     			
-    		}else {
-    			System.out.println("********** ERROR starting Selenium WebDriver ********");
-    			System.out.println(e.getMessage());
+    		} else {
+    			System.err.println("********** ERROR starting Selenium WebDriver ********");
+    			System.err.println(e.getMessage());
     		}
     		
-		}catch (IllegalStateException e) {
+    		decoderExceptionThrown = true;
+    		
+		} catch (IllegalStateException e) {
 			if (e.getMessage().contains("driver executable does not exist")) {
 				
 				String msg = "Exception: Check if chromedriver.exe path: \n"
@@ -353,18 +363,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				popupMessage(msg);
 
-				System.out.println(msg);
+				System.err.println(msg);
 			
 			}else {
 				e.printStackTrace();
 			}
+			
+			decoderExceptionThrown = true;
 		
-		}catch(SystemStartException SystemStartException) {
-			SystemStartException.printStackTrace();
-			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
 		}
 
 		//allowing close-up in the end of test session:

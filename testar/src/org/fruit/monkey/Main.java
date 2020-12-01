@@ -546,7 +546,7 @@ public class Main {
 
 		//Command line protocol doesn't exist
 		if(!existSSE) {
-			System.out.println("Protocol: "+sseName+" doesn't exist");
+			System.err.println("Protocol: "+sseName+" doesn't exist");
 			throw new IllegalArgumentException("ERROR: Command line SSE protocol doesn't exist");
 		}
 

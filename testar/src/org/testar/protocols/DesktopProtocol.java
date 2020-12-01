@@ -58,6 +58,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -230,7 +231,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	super.closeTestSession();
 
     	// TODO: Allow Record mode when Listening mode implemented
-    	if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
     		testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
     				sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
 
@@ -276,28 +277,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     				"Content-Type: application/json",
     				"@"+new File(testResultsArtefactDirectory).getCanonicalPath());
     	} catch (IOException e) {
-    		System.out.println("ERROR! Preparing CURL command to insert ArtefactTestResults");
+    		System.err.println("ERROR! Preparing CURL command to insert ArtefactTestResults");
     		e.printStackTrace();
     	}
-
-    	/* First OLD Version that used node js to connect directly with mongodb
-    	 * try {
-    		// Prepare the NodeJS command to insert the Test Results Artefact
-    		String insertTestResultsJS = Main.settingsDir + "validate_and_insert_testar_test_results.js";
-    		String insertTestResultsSchema = Main.settingsDir + "TESTAR_TestResults_Schema.json";
-    		commandTestResults = "node" +
-    				" " + new File(insertTestResultsJS).getCanonicalPath() +
-    				" " + new File(insertTestResultsSchema).getCanonicalPath() +
-    				" " + new File(testResultsArtefactDirectory).getCanonicalPath() +
-    				" " + settings.get(ConfigTags.PKMaddress) +
-    				" " + settings.get(ConfigTags.PKMport) +
-    				" " + settings.get(ConfigTags.PKMdatabase) +
-    				" " + settings.get(ConfigTags.PKMusername) +
-    				" " + settings.get(ConfigTags.PKMkey);
-    	} catch (IOException e) {
-    		System.out.println("ERROR! Preparing Node JS command to insert Test Results Artefact");
-    		e.printStackTrace();
-    	}*/
 
     	return commandTestResults;
     }
@@ -328,28 +310,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     				"Content-Type: application/json",
     				"@"+new File(stateModelArtefactDirectory).getCanonicalPath());
     	} catch (IOException e) {
-    		System.out.println("ERROR! Preparing CURL command to insert ArtefactStateModel");
+    		System.err.println("ERROR! Preparing CURL command to insert ArtefactStateModel");
     		e.printStackTrace();
     	}
-
-    	/* First OLD Version that used node js to connect directly with mongodb
-    	 * try {
-    		// Prepare the NodeJS command to insert the State Model Artefact
-    		String insertStateModelJS = Main.settingsDir + "validate_and_insert_testar_state_model.js";
-    		String insertStateModelSchema = Main.settingsDir + "TESTAR_StateModel_Schema.json";
-    		commandStateModel = "node" +
-    				" " + new File(insertStateModelJS).getCanonicalPath() +
-    				" " + new File(insertStateModelSchema).getCanonicalPath() +
-    				" " + new File(stateModelArtefactDirectory).getCanonicalPath() +
-    				" " + settings.get(ConfigTags.PKMaddress) +
-    				" " + settings.get(ConfigTags.PKMport) +
-    				" " + settings.get(ConfigTags.PKMdatabase) +
-    				" " + settings.get(ConfigTags.PKMusername) +
-    				" " + settings.get(ConfigTags.PKMkey);
-    	} catch (IOException e) {
-    		System.out.println("ERROR! Preparing Node JS command to insert State Model Artefact");
-    		e.printStackTrace();
-    	}*/
 
     	return commandStateModel;
     }
@@ -364,7 +327,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected void updateTestResultsJsonMap(String artefactIdTestResults) {
 
     	// If we are not in Generate Mode we do not want to update this JSON map
-    	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
     		return;
     	}
 
@@ -407,7 +370,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     			writer.close();
     		}
     	} catch (IOException e) {
-    		System.out.println("ERROR updateTestResultsJsonMap");
+    		System.err.println("ERROR reading the internal file for updateTestResultsJsonMap");
+    	} catch (NoSuchElementException | NullPointerException ne) {
+    		System.err.println("ERROR finding the internal element for updateTestResultsJsonMap");
     	}
     }
     
@@ -421,7 +386,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected void updateStateModelDifferenceJsonMap(String artefactIdStateModel) {
 
     	// If we are not in Generate Mode we do not want to update this JSON map
-    	if(settings.get(ConfigTags.Mode) != Modes.Generate) {
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
     		return;
     	}
 
@@ -458,7 +423,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     			writer.close();
     		}
     	} catch (IOException e) {
-    		System.out.println("ERROR updateStateModelDifferenceJsonMap");
+    		System.err.println("ERROR reading the internal file for updateTestResultsJsonMap");
+    	} catch (IllegalStateException | NoSuchElementException | NullPointerException ne) {
+    		System.err.println("ERROR finding the internal element for updateTestResultsJsonMap");
     	}
     }
 
