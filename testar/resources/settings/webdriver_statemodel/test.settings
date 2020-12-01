@@ -99,14 +99,6 @@ SUTProcesses =
 
 ProtocolClass = webdriver_statemodel/Protocol_webdriver_statemodel
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"

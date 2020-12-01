@@ -54,13 +54,11 @@ public class SutVisualization {
      * @param showExtendedWidgetInfo
      * @param markParentWidget
      * @param mouse
-     * @param protocolUtil
      * @param lastPrintParentsOf
      * @param canvas
      * @param state
      */
-    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, boolean markParentWidget, Mouse mouse,
-                                                   ProtocolUtil protocolUtil, String lastPrintParentsOf, Canvas canvas, State state) {
+    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, boolean markParentWidget, Mouse mouse, String lastPrintParentsOf, Canvas canvas, State state){
         Point cursor = mouse.cursor();
         Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
 
@@ -85,8 +83,8 @@ public class SutVisualization {
                     Shape minicwShape = Rect.from(cwShape.x() + cwShape.width() / 2 + 32,
                             cwShape.y() + cwShape.height() / 2 + 32,
                             miniwidgetInfoW, miniwidgetInfoH);
-                    Shape repositionShape = protocolUtil.calculateWidgetInfoShape(canvas, minicwShape, miniwidgetInfoW, miniwidgetInfoH);
-                    if (repositionShape != minicwShape) {
+                    Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas, minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+                    if (repositionShape != minicwShape){
                         double x = repositionShape.x() - repositionShape.width() - 32,
                                 y = repositionShape.y() - repositionShape.height() - 32;
                         if (x < 0) x = 0;
@@ -109,30 +107,30 @@ public class SutVisualization {
                         lastPrintParentsOf = cursorWidgetID;
                         System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
                     }
-                    int lvls = protocolUtil.markParents(canvas, cursorWidget, protocolUtil.ancestorsMarkingColors.keySet().iterator(), 0, print);
-                    if (lvls > 0) {
-                        Shape legendShape = protocolUtil.repositionShape(canvas, Rect.from(cursor.x(), cursor.y(), 110, lvls * 25));
+                    int lvls = ProtocolUtil.markParents(canvas, cursorWidget, ProtocolUtil.ancestorsMarkingColors.keySet().iterator(), 0, print);
+                    if (lvls > 0){
+                        Shape legendShape = ProtocolUtil.repositionShape(canvas, Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
                         canvas.rect(Pen.PEN_WHITE_ALPHA, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
                         canvas.rect(Pen.PEN_BLACK, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
                         int shadow = 2;
                         String l;
-                        Iterator<String> it = protocolUtil.ancestorsMarkingColors.keySet().iterator();
-                        for (int i = 0; i < lvls; i++) {
+                        Iterator<String> it = ProtocolUtil.ancestorsMarkingColors.keySet().iterator();
+                        for (int i=0; i<lvls; i++){
                             l = it.next();
-                            Pen lpen = Pen.newPen().setColor(protocolUtil.ancestorsMarkingColors.get(l)).build();
-                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i * 25, 0, l);
-                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i * 25, 0, l);
-                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i * 25, 0, l);
-                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i * 25, 0, l);
-                            canvas.text(Pen.PEN_BLACK, legendShape.x(), legendShape.y() + i * 25, 0, l);
+                            Pen lpen = Pen.newPen().setColor(ProtocolUtil.ancestorsMarkingColors.get(l)).build();
+                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i*25, 0, l);
+                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
+                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
+                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i*25, 0, l);
+                            canvas.text(Pen.PEN_BLACK, legendShape.x(), legendShape.y() + i*25, 0, l);
                         }
                     }
                 }
 
                 int MAX_ANCESTORS_PERLINE = 6;
-                double widgetInfoW = canvas.width() / 2; //550;
+                double widgetInfoW = canvas.width() / 2;
                 double widgetInfoH = (1 + calculateNumberOfTagsToShow(cursorWidget) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
-                cwShape = protocolUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
+                cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
 
                 if (showExtendedWidgetInfo) {
                     canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);

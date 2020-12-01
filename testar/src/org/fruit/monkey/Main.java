@@ -63,6 +63,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -113,6 +114,8 @@ public class Main {
 
         isValidJavaEnvironment();
 
+        verifyTestarInitialDirectory();
+
         initTagVisualization();
 
         initTestarSSE(args);
@@ -132,8 +135,8 @@ public class Main {
 
             initOperatingSystem();
 
-            startTestar(settings, testSettingsFileName);
-        }
+			startTestar(settings);
+		}
 
         //TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
         else {
@@ -148,9 +151,9 @@ public class Main {
 
                 initOperatingSystem();
 
-                startTestar(settings, testSettingsFileName);
-            }
-        }
+				startTestar(settings);
+			}
+		}
 
         TestSerialiser.exit();
         ScreenshotSerialiser.exit();
@@ -174,8 +177,29 @@ public class Main {
                     + "GO TO: https://testar.org/faq/ to obtain more details \n \n");
         }
 
-        return true;
-    }
+		return true;
+	}
+	
+	/**
+	 * Verify the initial directory of TESTAR
+	 * If this directory didn't contain testar.bat file inform the user
+	 */
+	private static void verifyTestarInitialDirectory() {
+		// Obtain Files name of current testarDir
+		Set<String> filesName = new HashSet<>();
+		File[] filesList = new File(testarDir).listFiles();
+        for(File file : filesList){
+        	filesName.add(file.getName());
+        }
+
+        // Verify if we are in the correct executable testar directory (contains testar.bat)
+		if(!filesName.contains("testar.bat")) {
+			System.out.println("WARNING: We cannot find testar.bat executable file.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			filesName.forEach(System.out::println);
+		}
+	}
 
     /**
      * Set the current directory of TESTAR, settings and output folders
@@ -301,7 +325,7 @@ public class Main {
             LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
         }
 
-        //TODO: Understand what this exactly does?
+        //Override settings values using Java Parameters (Example: -Dtest="true")
         overrideWithUserProperties(settings);
         Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
         if (SST != null) {
@@ -325,7 +349,6 @@ public class Main {
                 return false;
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return true;
@@ -336,187 +359,187 @@ public class Main {
 	 * 
 	 * This method get the specific protocol class of the selected settings to run TESTAR
 	 * 
-     * @param settings
-     * @param testSettings
-     */
-    private static void startTestar(Settings settings, String testSettings) {
+	 * @param settings
+	 * @param testSettings
+	 */
+	private static void startTestar(Settings settings) {
 
-        URLClassLoader loader = null;
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+		}
 
-        try {
-            List<String> cp = settings.get(MyClassPath);
-            URL[] classPath = new URL[cp.size()];
-            for (int i = 0; i < cp.size(); i++) {
+		URLClassLoader loader = null;
 
-                classPath[i] = new File(cp.get(i)).toURI().toURL();
-            }
+		try {
+			List<String> cp = settings.get(MyClassPath);
+			URL[] classPath = new URL[cp.size()];
+			for (int i = 0; i < cp.size(); i++) {
 
-            loader = new URLClassLoader(classPath);
+				classPath[i] = new File(cp.get(i)).toURI().toURL();
+			}
 
-            String pc = settings.get(ProtocolClass);
-            String protocolClass = pc.substring(pc.lastIndexOf('/') + 1, pc.length());
+			loader = new URLClassLoader(classPath);
 
-            LogSerialiser.log("Trying to load TESTAR protocol in class '" + protocolClass +
-                    "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
+			String pc = settings.get(ProtocolClass);
+			String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
 
-            @SuppressWarnings("unchecked")
-            UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
-            LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
+			LogSerialiser.log("Trying to load TESTAR protocol in class '" + protocolClass +
+					"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
 
-            LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
+			@SuppressWarnings("unchecked")
+			UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
+			LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
-            //Run TESTAR protocol with the selected settings
-            protocol.run(settings);
+			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
 
-        } catch (Throwable t) {
-            LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
-            System.out.println("Main: Exception caught");
-            t.printStackTrace();
-            t.printStackTrace(LogSerialiser.getLogStream());
-        } finally {
-            if (loader != null) {
-                try {
-                    loader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+			//Run TESTAR protocol with the selected settings
+			protocol.run(settings);
 
-            TestSerialiser.exit();
-            ScreenshotSerialiser.exit();
-            LogSerialiser.exit();
-        }
-    }
+		}catch (Throwable t) {
+			LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
+			System.out.println("Main: Exception caught");
+			t.printStackTrace();
+			t.printStackTrace(LogSerialiser.getLogStream());
+		}
+		finally {
+			if (loader != null) {
+				try {
+					loader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 
-    // TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
+			TestSerialiser.exit();
+			ScreenshotSerialiser.exit();
+			LogSerialiser.exit();
+		}
+	}
 
-    /**
-     * Load the default settings for all the configurable settings and add/overwrite with those from the file
-     * This is needed because the user might not have set all the possible settings in the test.settings file.
-     *
-     * @param argv
-     * @param file
-     * @return An instance of Settings
-     * @throws ConfigException
-     */
-    public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-        Assert.notNull(file);
-        try {
-            List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
-            defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
-            defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
-            defaults.add(Pair.from(FaultThreshold, 0.1));
-            defaults.add(Pair.from(LogLevel, 1));
-            defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
-            defaults.add(Pair.from(OutputDir, outputDir));
-            defaults.add(Pair.from(TempDir, tempDir));
-            defaults.add(Pair.from(OnlySaveFaultySequences, false));
-            defaults.add(Pair.from(PathToReplaySequence, tempDir));
-            defaults.add(Pair.from(ActionDuration, 0.1));
-            defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-            defaults.add(Pair.from(ExecuteActions, true));
-            defaults.add(Pair.from(DrawWidgetUnderCursor, false));
-            defaults.add(Pair.from(DrawWidgetInfo, true));
-            defaults.add(Pair.from(VisualizeActions, false));
-            defaults.add(Pair.from(VisualizeSelectedAction, false));
-            defaults.add(Pair.from(SequenceLength, 10));
-            defaults.add(Pair.from(ReplayRetryTime, 30.0));
-            defaults.add(Pair.from(Sequences, 1));
-            defaults.add(Pair.from(MaxTime, 31536000.0));
-            defaults.add(Pair.from(StartupTime, 8.0));
-            defaults.add(Pair.from(SUTConnectorValue, ""));
-            defaults.add(Pair.from(Delete, new ArrayList<String>()));
-            defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-            defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
-            defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-            defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
-            defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
-            defaults.add(Pair.from(ForceForeground, true));
-            defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
-            defaults.add(Pair.from(StopGenerationOnFault, true));
-            defaults.add(Pair.from(TimeToFreeze, 10.0));
-            defaults.add(Pair.from(ShowSettingsAfterTest, true));
-            defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
-            defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-            defaults.add(Pair.from(TestGenerator, "random"));
-            defaults.add(Pair.from(MaxReward, 9999999.0));
-            defaults.add(Pair.from(Discount, .95));
-            defaults.add(Pair.from(AlgorithmFormsFilling, false));
-            defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
-            defaults.add(Pair.from(DrawWidgetTree, false));
-            defaults.add(Pair.from(ExplorationSampleInterval, 1));
-            defaults.add(Pair.from(GraphsActivated, true));
-            defaults.add(Pair.from(PrologActivated, false));
-            defaults.add(Pair.from(GraphResuming, true));
-            defaults.add(Pair.from(ForceToSequenceLength, true));
-            defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
-            defaults.add(Pair.from(OfflineGraphConversion, true));
-            defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
-            defaults.add(Pair.from(UnattendedTests, false)); // disabled
-            defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
-            defaults.add(Pair.from(SUTProcesses, ""));
-            defaults.add(Pair.from(GraphDBEnabled, false));
-            defaults.add(Pair.from(GraphDBUrl, ""));
-            defaults.add(Pair.from(GraphDBUser, ""));
-            defaults.add(Pair.from(GraphDBPassword, ""));
-            defaults.add(Pair.from(StateModelEnabled, false));
-            defaults.add(Pair.from(DataStore, ""));
-            defaults.add(Pair.from(DataStoreType, ""));
-            defaults.add(Pair.from(DataStoreServer, ""));
-            defaults.add(Pair.from(DataStoreDirectory, ""));
-            defaults.add(Pair.from(DataStoreDB, ""));
-            defaults.add(Pair.from(DataStoreUser, ""));
-            defaults.add(Pair.from(DataStorePassword, ""));
-            defaults.add(Pair.from(DataStoreMode, ""));
-            defaults.add(Pair.from(ResetDataStore, false));
-            defaults.add(Pair.from(ApplicationName, ""));
-            defaults.add(Pair.from(ApplicationVersion, ""));
-            defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
-            defaults.add(Pair.from(StateModelStoreWidgets, true));
-            defaults.add(Pair.from(AlwaysCompile, true));
-            defaults.add(Pair.from(ProcessListenerEnabled, false));
-            defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
-            defaults.add(Pair.from(ProcessLogs, ".*.*"));
-            defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
+	/**
+	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
+	 * This is needed because the user might not have set all the possible settings in the test.settings file.
+	 * @param argv
+	 * @param file
+	 * @return An instance of Settings
+	 * @throws ConfigException
+	 */
+	public static Settings loadSettings(String[] argv, String file) throws ConfigException {
+		Assert.notNull(file);
+		try {
+			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
+			defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
+			defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
+			defaults.add(Pair.from(FaultThreshold, 0.1));
+			defaults.add(Pair.from(LogLevel, 1));
+			defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
+			defaults.add(Pair.from(OutputDir, outputDir));
+			defaults.add(Pair.from(TempDir, tempDir));
+			defaults.add(Pair.from(OnlySaveFaultySequences, false));
+			defaults.add(Pair.from(PathToReplaySequence, tempDir));
+			defaults.add(Pair.from(ActionDuration, 0.1));
+			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
+			defaults.add(Pair.from(ExecuteActions, true));
+			defaults.add(Pair.from(DrawWidgetUnderCursor, false));
+			defaults.add(Pair.from(DrawWidgetInfo, true));
+			defaults.add(Pair.from(VisualizeActions, false));
+			defaults.add(Pair.from(VisualizeSelectedAction, false));
+			defaults.add(Pair.from(SequenceLength, 10));
+			defaults.add(Pair.from(ReplayRetryTime, 30.0));
+			defaults.add(Pair.from(Sequences, 1));
+			defaults.add(Pair.from(MaxTime, 31536000.0));
+			defaults.add(Pair.from(StartupTime, 8.0));
+			defaults.add(Pair.from(SUTConnectorValue, ""));
+			defaults.add(Pair.from(Delete, new ArrayList<String>()));
+			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
+			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
+			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
+			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
+			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
+			defaults.add(Pair.from(ForceForeground, true));
+			defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
+			defaults.add(Pair.from(StopGenerationOnFault, true));
+			defaults.add(Pair.from(TimeToFreeze, 10.0));
+			defaults.add(Pair.from(ShowSettingsAfterTest, true));
+			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
+			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
+			defaults.add(Pair.from(TestGenerator, "random"));
+			defaults.add(Pair.from(MaxReward, 9999999.0));
+			defaults.add(Pair.from(Discount, .95));
+			defaults.add(Pair.from(AlgorithmFormsFilling, false));
+			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
+			defaults.add(Pair.from(DrawWidgetTree, false));
+			defaults.add(Pair.from(ExplorationSampleInterval, 1));
+			defaults.add(Pair.from(GraphsActivated, true));
+			defaults.add(Pair.from(PrologActivated, false));
+			defaults.add(Pair.from(GraphResuming, true));
+			defaults.add(Pair.from(ForceToSequenceLength, true));
+			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
+			defaults.add(Pair.from(OfflineGraphConversion, true));
+			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
+			defaults.add(Pair.from(UnattendedTests, false)); // disabled
+			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(SUTProcesses, ""));
+			defaults.add(Pair.from(StateModelEnabled, false));
+			defaults.add(Pair.from(DataStore, ""));
+			defaults.add(Pair.from(DataStoreType, ""));
+			defaults.add(Pair.from(DataStoreServer, ""));
+			defaults.add(Pair.from(DataStoreDirectory, ""));
+			defaults.add(Pair.from(DataStoreDB, ""));
+			defaults.add(Pair.from(DataStoreUser, ""));
+			defaults.add(Pair.from(DataStorePassword, ""));
+			defaults.add(Pair.from(DataStoreMode, ""));
+			defaults.add(Pair.from(ResetDataStore, false));
+			defaults.add(Pair.from(ApplicationName, ""));
+			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(StateModelStoreWidgets, true));
+			defaults.add(Pair.from(AlwaysCompile, true));
+			defaults.add(Pair.from(ProcessListenerEnabled, false));
+			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
+			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 
-            defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
-                {
-                    add("WidgetControlType");
-                }
-            }));
+			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+				{
+					add("WidgetControlType");
+				}
+			}));
 
-            //Overwrite the default settings with those from the file
-            Settings settings = Settings.fromFile(defaults, file);
+			//Overwrite the default settings with those from the file
+			Settings settings = Settings.fromFile(defaults, file);
 
-            //If user use command line to input properties, mix file settings with cmd properties
-            if (argv.length > 0) {
-                try {
-                    settings = Settings.fromFileCmd(defaults, file, argv);
-                } catch (Exception e) {
-                    System.out.println("Error with command line properties. Examples:");
-                    System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
-                    System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
-                }
-                //SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
-                //SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
-            }
+			//If user use command line to input properties, mix file settings with cmd properties
+			if(argv.length>0) {
+				try {
+					settings = Settings.fromFileCmd(defaults, file, argv);
+				}catch(Exception e) {
+					System.out.println("Error with command line properties. Examples:");
+					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
+					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
+				}
+				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
+				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
+			}
 
-            //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
-            //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
-            //PrologActivated is ALWAYS false.
-            //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
-            settings.set(ConfigTags.PrologActivated, false);
+			//Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
+			//Need this during refactoring process of getting Prolog code out. Refactoring will assume that
+			//PrologActivated is ALWAYS false.
+			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
+			settings.set(ConfigTags.PrologActivated, false);
 
-            // check that the abstract state properties and the abstract action properties have at least 1 value
-            if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-                throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
-            }
+			// check that the abstract state properties and the abstract action properties have at least 1 value
+			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+			}
 
-            return settings;
-        } catch (IOException ioe) {
-            throw new ConfigException("Unable to load configuration file!", ioe);
-        }
-    }
+			return settings;
+		} catch (IOException ioe) {
+			throw new ConfigException("Unable to load configuration file!", ioe);
+		}
+	}
 
     /**
      * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
@@ -559,10 +582,8 @@ public class Main {
         }
     }
 
-    //TODO: Understand what this exactly does?
-
     /**
-     * Override something. Not sure what
+     * Override settings values using Java Parameters (Example: -Dtest="true")
      *
      * @param settings
      */
