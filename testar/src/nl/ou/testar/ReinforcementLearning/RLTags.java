@@ -58,6 +58,17 @@ public class RLTags extends TagsBase  {
 		}
 	};
 
+	public static Tag<?> getTag(String tagName){
+		for(Tag<?> tag: reinforcementLearningTags){
+			if(tag.name().equals(tagName)){
+				System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*");
+				System.out.println(tag);
+				return tag;
+			}
+		}
+		return SarsaValue;
+	}
+
 	public static Set<Tag<?>> getReinforcementLearningTags() {
 		return reinforcementLearningTags;
 	}

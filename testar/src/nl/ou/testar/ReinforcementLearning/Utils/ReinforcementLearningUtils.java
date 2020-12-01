@@ -18,6 +18,7 @@ public class ReinforcementLearningUtils {
      * If the provided collection is emtpy a null value is provided.
      * If one action is provided than this action is returned
      * If multiple actions are provided a random action is returns
+     *
      * @param actionsSelected A collection of actions selected by a {@link nl.ou.testar.ReinforcementLearning.Policies.Policy}, is never {@code null}
      * @return An {@link AbstractAction}
      */
@@ -32,10 +33,9 @@ public class ReinforcementLearningUtils {
         }
     }
 
-    public static Tag getTag(final Settings settings){
+    public static <T> Tag<T> getTag(final Settings settings) {
+
         String tagName = settings.get(ConfigTags.TagName);
-        return RLTags.class.getField(tagName).get(null);
+        return (Tag<T>) RLTags.getTag(tagName);
     }
-
-
 }

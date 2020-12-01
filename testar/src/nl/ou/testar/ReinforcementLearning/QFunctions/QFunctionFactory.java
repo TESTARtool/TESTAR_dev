@@ -20,6 +20,7 @@ public class QFunctionFactory {
 
         switch(qfunction) {
             case "QlearningFunction":
+                System.out.println("//*/*/*/*/*/*/*/*/* qlearningfunction");
                 selectedQFunction = new QlearningFunction(alphaDiscount, gammaDiscount, defaultQValue);
                 break;
             default:

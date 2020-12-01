@@ -5,11 +5,11 @@ import java.util.Set;
 
 public class EpsilonGreedyAndBoltzmannDistributedExplorationPolicy implements Policy {
 
-    private final GreedyPolicy greedyPolicy;
+    private final GreedyPolicy<?> greedyPolicy;
     private final BoltzmannDistributedExplorationPolicy boltzmannDistributedExplorationPolicy;
     private final float epsilon; //The epsilon parameter should be between 0 and 1
 
-    public EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(final GreedyPolicy greedyPolicy, final BoltzmannDistributedExplorationPolicy boltzmannDistributedExplorationPolicy, final float epsilon) {
+    public EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(final GreedyPolicy<?> greedyPolicy, final BoltzmannDistributedExplorationPolicy boltzmannDistributedExplorationPolicy, final float epsilon) {
         this.greedyPolicy = greedyPolicy;
         this.boltzmannDistributedExplorationPolicy = boltzmannDistributedExplorationPolicy;
         this.epsilon = epsilon;

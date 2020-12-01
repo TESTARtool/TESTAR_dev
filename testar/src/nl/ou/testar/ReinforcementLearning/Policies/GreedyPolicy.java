@@ -15,10 +15,10 @@ import java.util.Set;
  */
 public class GreedyPolicy<T extends Object & Comparable<? super T>>  implements Policy {
 
-    private final Number defaultQValue;
-    private final Tag<Number> tag;
+    private final T defaultQValue;
+    private final Tag<T> tag;
 
-    public GreedyPolicy(final Number defaultQValue, final Tag<Number> tag){
+    public GreedyPolicy(final T defaultQValue, final Tag<T> tag){
         this.defaultQValue = defaultQValue;
         this.tag = tag;
     }
@@ -29,15 +29,15 @@ public class GreedyPolicy<T extends Object & Comparable<? super T>>  implements 
      */
     @Override
     public AbstractAction applyPolicy(final Set<AbstractAction> actions) {
-        final Multimap<Number, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
+        final Multimap<T, AbstractAction> qValuesActionsMultimap = ArrayListMultimap.create();
         actions.forEach(action -> qValuesActionsMultimap.put(action.getAttributes().get(tag, defaultQValue), action));
 
-        final Set<Number> qValues = qValuesActionsMultimap.keySet();
+        final Set<T> qValues = qValuesActionsMultimap.keySet();
         if (qValues.isEmpty()) {
             return null;
         }
 
-        final Number maxValue = Collections.max(qValues);
+        final T maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
         return ReinforcementLearningUtils.selectAction(actionsSelected);
     }

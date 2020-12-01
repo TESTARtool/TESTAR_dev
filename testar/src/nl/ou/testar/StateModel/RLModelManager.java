@@ -18,7 +18,7 @@ import java.util.Set;
  * Sarsa is a reinforcement learning (Artificial Intelligence) algorithm
  * for (sequential) action selection.
  */
-public class SarsaModelManager extends ModelManager implements StateModelManager {
+public class RLModelManager extends ModelManager implements StateModelManager {
 
     /** The previously executed {@link AbstractAction} */
     private AbstractAction previousAbstractActionToExecute = null;
@@ -31,13 +31,13 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     /** {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction} */
     private final QFunction qFunction;
 
-    private final Tag tag;
+    private final Tag<?> tag;
 
     /**
      * Constructor
      *
      */
-    public SarsaModelManager(final AbstractStateModel abstractStateModel,
+    public RLModelManager(final AbstractStateModel abstractStateModel,
                              final ActionSelector actionSelector,
                              final PersistenceManager persistenceManager,
                              final Set<Tag<?>> concreteStateTags,
@@ -45,7 +45,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
                              final boolean storeWidgets,
                              final RewardFunction rewardFunction,
                              final QFunction qFunction,
-                             final Tag tag) {
+                             final Tag<?> tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;

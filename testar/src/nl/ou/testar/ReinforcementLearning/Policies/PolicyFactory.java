@@ -36,21 +36,21 @@ public class PolicyFactory {
     private static Policy getEpsilonGreedyPolicy(final Settings settings) {
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
-        Tag tag = ReinforcementLearningUtils.getTag(settings);
-        return new EpsilonGreedyPolicy(new GreedyPolicy(defaultQValue, tag), epsilon);
+        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        return new EpsilonGreedyPolicy(new GreedyPolicy<Float>(defaultQValue, tag), epsilon);
     }
 
     private static Policy getGreedyPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
-        Tag tag = ReinforcementLearningUtils.getTag(settings);
-        return new GreedyPolicy(defaultQValue, tag);
+        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        return new GreedyPolicy<Float>(defaultQValue, tag);
     }
 
     private static Policy getOptimisticQValuesInitializationPolicy(final Settings settings) {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         final float maxQValue = settings.get(ConfigTags.MaxQValue, 0f);
-        Tag tag = ReinforcementLearningUtils.getTag(settings);
-        return new OptimisticQValuesInitializationPolicy(new GreedyPolicy(defaultQValue, tag), maxQValue);
+        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        return new OptimisticQValuesInitializationPolicy(new GreedyPolicy<Float>(defaultQValue, tag), maxQValue);
     }
 
     private static Policy getEpsilonGreedyAndBoltzmannDistributedExplorationPolicy(final Settings settings) {
@@ -58,8 +58,8 @@ public class PolicyFactory {
         final float decayRate = settings.get(ConfigTags.DecayRate, 0.0001f);
         final float temperature = settings.get(ConfigTags.Temperature, 1.0f);
         final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
-        Tag tag = ReinforcementLearningUtils.getTag(settings);
-        return new EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(new GreedyPolicy(defaultQValue, tag), new BoltzmannDistributedExplorationPolicy(decayRate, temperature), epsilon);
+        Tag<Float> tag = ReinforcementLearningUtils.getTag(settings);
+        return new EpsilonGreedyAndBoltzmannDistributedExplorationPolicy(new GreedyPolicy<Float>(defaultQValue, tag), new BoltzmannDistributedExplorationPolicy(decayRate, temperature), epsilon);
     }
 
     private static BoltzmannDistributedExplorationPolicy getBoltzmannDistributedExplorationPolicy(final Settings settings) {

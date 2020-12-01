@@ -74,12 +74,12 @@ public class StateModelManagerFactory {
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
 
         if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
-            Tag tag = ReinforcementLearningUtils.getTag(settings);
+            Tag<?> tag = ReinforcementLearningUtils.getTag(settings);
             final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
-            return new SarsaModelManager(abstractStateModel,
+            return new RLModelManager(abstractStateModel,
                     actionSelector,
                     persistenceManager,
                     concreteStateTags,
