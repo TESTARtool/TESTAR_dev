@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_one_drive/Protocol_web_one_drive
+ProtocolClass = winapi_web_one_drive/Protocol_web_one_drive
 
 #################################################################
 # State identifier attributes
