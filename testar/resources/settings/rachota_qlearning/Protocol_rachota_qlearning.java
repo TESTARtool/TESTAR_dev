@@ -186,14 +186,44 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 		// rachota: User inactivity popup window
 		for(Widget w : state) {
 			if(w.get(Tags.Title,"").contains("User inactivity detected")) {
-				System.out.println("User inactivity detected! Closing this window...");
-				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
-				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
-				return super.getState(system);
+				// rachota: Try to close this inactivity window
+				closeInactivityWindow(system, state, false);
+				state = super.getState(system);
+				for(Widget secondCheckWidget : state) {
+					if(secondCheckWidget.get(Tags.Title,"").contains("User inactivity detected")) {
+						// rachota: sometimes this windows was into the background
+						// send a tabbing action and try to close again
+						closeInactivityWindow(system, state, true);
+						return super.getState(system);
+					}
+				}
+				return state;
 			}
 		}
 		return state;
 	}
+
+	/**
+	 * Rachota:
+	 * This Inactivity naughty window can get into the background
+	 */
+	private void closeInactivityWindow(SUT system, State state, boolean tab) {
+		if(tab) {
+			System.out.println("User inactivity detected! TABBING and Closing this window...");
+			Keyboard kb = AWTKeyboard.build();
+			kb.press(KBKeys.VK_ALT);
+			kb.press(KBKeys.VK_TAB);
+			kb.release(KBKeys.VK_TAB);
+			kb.release(KBKeys.VK_ALT);
+			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
+			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
+		}
+		else {
+			System.out.println("User inactivity detected! Closing this window...");
+			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
+			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
+		}
+	}	
 
 	/**
 	 * The getVerdict methods implements the online state oracles that
@@ -291,6 +321,10 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 					if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
 							&& w.get(Tags.Title,"").contains("Price per hour")) {
 						forcePricePerHourAndFinish(w, actions, ac);
+					}
+					if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+							&& w.get(Tags.Title,"").contains("Tax:")) {
+						actions.add(ac.clickTypeInto(w, "3", true));
 					}
 
 					// GENERIC: All swing apps
@@ -396,11 +430,13 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 	 * Seems that interactive Edit elements have tool type text with instructions
 	 * Then if ToolTipText exists, the widget is interactive
 	 * Disable price per hour random text, customize number
+	 * Disable taxes prize, customize number
 	 */
 	private boolean isEditableWidget(Widget w) {
 		String toolTipText = w.get(Tags.ToolTipText,"");
 		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") 
-				&& !toolTipText.contains("Mouse click") && !w.get(Tags.Title,"").contains("Price per hour");
+				&& !toolTipText.contains("Mouse click") &&
+				!w.get(Tags.Title,"").contains("Price per hour") && !w.get(Tags.Title,"").contains("Tax:");
 	}
 
 	/**
