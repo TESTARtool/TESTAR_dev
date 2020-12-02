@@ -100,6 +100,14 @@ SUTProcesses =
 ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 
 #################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WebWidgetId
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
