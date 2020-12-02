@@ -27,23 +27,6 @@ public class WidgetTreeBasedRewardFunction implements RewardFunction {
     @Override
     public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
         final Map<Tag<?>, Object>  tags = currentConcreteState.getAttributes().getTagValues();
-        System.out.println("\n+++++------------------------------");
-        System.out.println(currentConcreteState.getAttributes().getTagValues());
-        System.out.println("-----------------");
-        System.out.println(currentConcreteState.getChildren().size());
-        System.out.println(currentConcreteState.getId());
-        for (Widget childWidget : currentConcreteState.getChildren()) {
-
-            System.out.println(childWidget);
-            System.out.println(childWidget.getId());
-            System.out.println(childWidget.getAttributes().get(Tags.Title, "default"));
-            System.out.println(childWidget.getChildren().size());
-            for (Widget childWidget2 : childWidget.getChildren()) {
-                System.out.println(childWidget2.getAttributes().get(Tags.Title, "default"));
-            }
-        }
-        System.out.println("*****------------------------------\n");
-
         final int noOfEqualElements = tags.keySet().stream()
                 .mapToInt(key -> isAttributeEqualToAttributeInPreviousState(key, tags, attributesInPreviousState))
                 .sum();
