@@ -466,8 +466,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		for (Action a: actions) {
 			Widget w = a.get(Tags.OriginWidget);
 			Node e = w.get(WdTags.DOM);
-			System.out.println("ACTION: " + saxonProcessor.newDocumentBuilder().wrap(e));
+			//System.out.println("ACTION: " + saxonProcessor.newDocumentBuilder().wrap(e));
 		}
+
+		selectRuleAction(state, actions);
 
 		return actions;
 	}
@@ -501,7 +503,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			new ActionRule("'true'", 10),                  // Default priority
 			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 50), // Empty text fields
 			new ActionRule(".[@type = 'submit']", 50), // submit
-			new ActionRule(".[@type = 'radio'] and (count(ancestor::*[@role = 'radiogroup']//ing-radio[not(@checked = 'true')]) = count(ancestor::*[@role = 'radiogroup']//ing-radio))", 50) // radio-groups
+			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 50) // unselected radiogroup
 		);
 	}
 	
@@ -523,14 +525,16 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	List<FilterRule> filterRules() {
 		return filterRules(
 				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
-				new FilterRule(".[(name() = 'a') and (not(@href))]", true),
-				new FilterRule("ancestor::header", true),
-				new FilterRule(".[@id = 'action-stop']", true),
-				new FilterRule(".[@id = 'action-back']", true),
-				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true),
-		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true),
-				new FilterRule(".[contains(@href, 'bel-me-nu')]", true),
-				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen')]", true),
+				new FilterRule(".[(name() = 'a') and (not(@href))]", true), // ignore links without href
+				new FilterRule("ancestor::header", true), // ignore header
+				new FilterRule("ancestor::ing-feat-sc-house-next-step-based-on-house-card", true), // ignore next step
+				new FilterRule("ancestor-or-self::ing-button[contains(@id, 'moreInfoButton')]", true), // ignore more info
+				new FilterRule(".[@id = 'action-stop']", true), // ignore stop button
+				new FilterRule(".[@id = 'action-back']", true), // ignore back button
+				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true), // ignore progress section
+		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true), // ignore progress section
+				new FilterRule(".[contains(@href, 'bel-me-nu')]", true), // ignore outside links
+				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]", true),
 				new FilterRule(".[@target = '_blank']", true)
 		);
 	}
@@ -783,7 +787,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 
-		return prioritizedPick(rules).action;
+		if (rules.size() > 0) {
+			return prioritizedPick(rules).action;
+		}
+		return null;
 	}
 
 	/**
