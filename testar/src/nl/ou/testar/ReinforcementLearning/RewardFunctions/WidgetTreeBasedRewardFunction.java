@@ -42,11 +42,13 @@ public class WidgetTreeBasedRewardFunction implements RewardFunction {
         System.out.println(key);
          final Object newAttributeObject = newTagValues.getOrDefault(key, null);
          final Object oldAttributeObject = attributesInPreviousState.getOrDefault(key, null);
-
+        System.out.println(newAttributeObject);
+        System.out.println(oldAttributeObject);
          if (newAttributeObject.equals(oldAttributeObject)) {
+             System.out.println("EQUAL");
              return 0;
          }
-
+        System.out.println("NOT EQUAL");
         return 1;
     }
 }

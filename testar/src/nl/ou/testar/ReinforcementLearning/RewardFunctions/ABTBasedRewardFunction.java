@@ -118,8 +118,12 @@ public class ABTBasedRewardFunction implements RewardFunction {
     private int isAttributeEqualToAttributeInPreviousState(final Object key, final Map<Tag<?>, Object> newTagValues, final Map<Tag<?>, Object> OldTagValues) {
         final Object newAttributeObject = newTagValues.getOrDefault(key, null);
         final Object oldAttributeObject = OldTagValues.getOrDefault(key, null);
-
+        System.out.println("------Comparing--------");
+        System.out.println(key);
+        System.out.println(newAttributeObject);
+        System.out.println(oldAttributeObject);
         if (newAttributeObject.equals(oldAttributeObject)) {
+            System.out.println("EQUAL");
             return 0;
         }
         else{
