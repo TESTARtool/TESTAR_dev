@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -109,7 +109,7 @@ ProtocolClass = webdriver_generic_ing/Protocol_webdriver_generic_ing
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer = localhost
@@ -129,7 +129,7 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-#AbstractStateAttributes = WebCustomElementState
+AbstractStateAttributes = WidgetControlType
 
 #################################################################
 # Override display scale

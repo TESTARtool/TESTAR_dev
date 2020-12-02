@@ -54,17 +54,8 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -248,6 +239,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			throw new RuntimeException("Cannot evaluate " + e);
 		}
 	}
+
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -313,31 +305,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			d.appendChild(n);
 
 			s.set(WdTags.DOM, d);
-			//d.setUserData("widget", s, null);
-			
+
 			return d;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot create DOM representation");
-		}
-	}
-
-	public static void printDocument(Document doc) {
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-			transformer.transform(new DOMSource(doc),
-					new StreamResult(new OutputStreamWriter(System.out, "UTF-8")));
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Cannot print doc: " + e);
+			throw new RuntimeException("Cannot create DOM representation " + e);
 		}
 	}
 
@@ -365,10 +337,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			e.appendChild(toNode(d, w.child(i)));
 		}
 
+		
 		// Associate bi-directional
 		w.set(WdTags.DOM, e);
-		//e.setUserData("widget", w, null);
-		
+		e.setUserData("widget", w, null);
+
 		return e;
 	}
 
@@ -463,12 +436,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 
-		for (Action a: actions) {
-			Widget w = a.get(Tags.OriginWidget);
-			Node e = w.get(WdTags.DOM);
-			//System.out.println("ACTION: " + saxonProcessor.newDocumentBuilder().wrap(e));
-		}
-
 		selectRuleAction(state, actions);
 
 		return actions;
@@ -502,8 +469,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return actionsRules(
 			new ActionRule("'true'", 10),                  // Default priority
 			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 50), // Empty text fields
+			new ActionRule(".[@aria-invalid = 'true']", 50), // self is invalid
 			new ActionRule(".[@type = 'submit']", 50), // submit
-			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 50) // unselected radiogroup
+			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 50), // unselected radiogroup
+			new ActionRule("ancestor::*[(@role = 'radiogroup') and (@aria-invalid = 'true')]", 50) // radiogroup is invalid
 		);
 	}
 	
