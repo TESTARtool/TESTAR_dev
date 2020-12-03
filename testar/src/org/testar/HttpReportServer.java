@@ -31,8 +31,6 @@
 package org.testar;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -47,12 +45,12 @@ import nl.ou.testar.StateModel.Analysis.ShutdownServlet;
 public class HttpReportServer { 
 
 	private int portNumber = 8091;
-	private File htmlReport;
+	private File outputDirectory;
 
 	private ShutdownServlet shutdownServlet;
 
-	public HttpReportServer(File htmlReport) {
-		this.htmlReport = htmlReport;
+	public HttpReportServer(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
 	}	
 
 	/**
@@ -72,19 +70,14 @@ public class HttpReportServer {
 			ResourceHandler resourceHandler = new ResourceHandler();
 			resourceHandler.setDirectoriesListed(true);
 
-			// Specific HTML report directory
-			// bin\\output\\2020-07-24_09h22m12s_notepad_1\\HTMLreports\\2020-07-24_09h22m12s_notepad_1_sequence_1.html
-			String htmlPath = htmlReport.getCanonicalPath();
-
 			// Run output that contains all resources
-			String runPath = getDynamicOutputDirectory(htmlPath);
-			resourceHandler.setResourceBase(runPath);
-			System.out.println("HttpReportServer aiming to: " + runPath);
+			resourceHandler.setResourceBase(outputDirectory.getCanonicalPath());
+			System.out.println("HttpReportServer aiming to: " + outputDirectory);
 
 			// the webapp context handler will handle requests for our controllers
 			WebAppContext webAppContext = new WebAppContext();
 			webAppContext.setContextPath("/");
-			webAppContext.setResourceBase(runPath);
+			webAppContext.setResourceBase(outputDirectory.getCanonicalPath());
 			// Shutdown this server
 			shutdownServlet = new ShutdownServlet(server);
 			webAppContext.addServlet(new ServletHolder(shutdownServlet), "/shutdown");
@@ -106,29 +99,6 @@ public class HttpReportServer {
 
 	public boolean isJettyServerRunning() {
 		return shutdownServlet.isServerRunning();
-	}
-
-	/**
-	 * Get dynamic output content : output\\2020-07-24_09h22m12s_notepad_1
-	 * Using default structure : \\output\\2020-07-24_09h22m12s_notepad_1\\HTMLreports\\
-	 * 
-	 * @return
-	 */
-	private String getDynamicOutputDirectory(String htmlPath) {
-		String runDirectory = "";
-		try {
-			String output = File.separator + "output" + File.separator;
-			int startIndex = htmlPath.lastIndexOf(output);
-			int endIndex = htmlPath.indexOf(File.separator, startIndex + 8);
-			runDirectory = htmlPath.substring(startIndex + 1, endIndex);
-
-			return new File(runDirectory).getCanonicalPath();
-		} catch (IOException e) {
-			System.out.println("ERROR: getDynamicOutputDirectory: from : " + htmlPath);
-			e.printStackTrace();
-		}
-
-		return runDirectory;
 	}
 
 } 

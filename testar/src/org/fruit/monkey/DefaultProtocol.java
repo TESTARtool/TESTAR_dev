@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -100,8 +99,6 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.HttpReportServer;
 import org.testar.OutputStructure;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.orientechnologies.orient.core.exception.ODatabaseException;
 import com.orientechnologies.orient.core.exception.OSecurityAccessException;
 import com.orientechnologies.orient.core.exception.OStorageException;
@@ -480,13 +477,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
-	
-	private boolean isHtmlFile(String filePath) {
-		if(filePath.contains(".html"))
-			return true;
-
-		return false;
-	}
 
 	/**
 	 * Check if the selected file to View is a log file
@@ -570,19 +560,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void runReportMode() {
 		try {
 			File file = new File(settings.get(ConfigTags.HTMLreportServerFile)).getCanonicalFile();
-			
+
 			File extractedArtefactHtml = null;
-			if(!isHtmlFile() && (extractedArtefactHtml = extractArtefactTestResults()) != null) {
+			if(!isHtmlFile() && (extractedArtefactHtml = getArtefactIdOutputFolder()) != null) {
 				file = extractedArtefactHtml;
 			}
-			
-			if(isHtmlFile(file.getCanonicalPath())) {
-				HttpReportServer httpReportServer = new HttpReportServer(file);
-				httpReportServer.runHtmlReport();
-				while(httpReportServer.isJettyServerRunning()) {
-					// HttpReportServer is running...
-					// This will stop when user send a GET localhost:8091/shutdown request
-				}
+			HttpReportServer httpReportServer = new HttpReportServer(file);
+			httpReportServer.runHtmlReport();
+			while(httpReportServer.isJettyServerRunning()) {
+				// HttpReportServer is running...
+				// This will stop when user send a GET localhost:8091/shutdown request
 			}
 		}catch (Exception e) {
 			System.out.println("Exception: Check the path of the file, something is wrong");
@@ -591,6 +578,35 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 	
 	/**
+	 * If we want to launch TESTAR with the HTML report web service
+	 * using DECODER ArtefactId. Find the artefactId output directory.
+	 * 
+	 * @return
+	 */
+	private File getArtefactIdOutputFolder() {
+		try {
+			
+			String artefactId = settings.get(ConfigTags.HTMLreportServerFile);
+			File testarDirectory = new File(Main.testarDir);
+			// Find Directory with ArtefactId name
+			for(String foldersName : testarDirectory.list()) {
+				if(foldersName.contains(artefactId)) {
+					return new File(foldersName + File.separator + "output" + File.separator).getCanonicalFile();
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("ERROR DefaultProtocol: getArtefactIdOutputFolder");
+			e.printStackTrace();
+			return null;
+		}
+
+		return null;
+	}
+	
+	/**
+	 * TODO: I don't remember why I created this ModelDiff mode here.
+	 * Lord leads us in strange ways
+	 * 
 	 * Model Difference Mode compares two State Model creating a model difference report
 	 */
 	private void runModelDifferenceMode() {
@@ -624,41 +640,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("ERROR runModelDifferenceMode: Trying to create an automatic State Model Difference");
 			e.printStackTrace();
 		}
-	}
-	
-	/**
-	 * If we want to launch TESTAR with the HTML report web service
-	 * using the ArtefactId mapped from ArtefactIdMap.json file. 
-	 * Get the mapped HTML output directory from this JSON file.
-	 * 
-	 * @return
-	 */
-	private File extractArtefactTestResults() {
-		File file = new File("ArtefactIdMap.json");
-
-		if(!file.exists())
-			return null;
-
-		try {
-			// Read ArtefactIdMap.json content
-			FileReader reader = new FileReader(file.getCanonicalPath());
-			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
-			
-			// If ArtefactIdMap.json contains a HTML report mapped for the Artefact Id
-			if(!jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).isJsonNull()) {
-				String mappedHtml = jsonObject.get(settings.get(ConfigTags.HTMLreportServerFile)).getAsString();
-				reader.close();
-				return new File(mappedHtml).getCanonicalFile();
-			}
-			
-			reader.close();
-		} catch (IOException e) {
-			System.out.println("ERROR DefaultProtocol: extractArtefactTestResults");
-			e.printStackTrace();
-			return null;
-		}
-
-		return null;
 	}
 
 	/**

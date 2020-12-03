@@ -34,31 +34,21 @@ package org.testar.protocols;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.StateModel.Artefact.StateModelArtefactManager;
 import nl.ou.testar.RandomActionSelector;
+
 import org.fruit.Environment;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.json.JsonArtefactStateModel;
 import org.testar.json.JsonArtefactTestResults;
 import org.testar.json.object.StateModelDifferenceJsonObject;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -224,6 +214,8 @@ public class DesktopProtocol extends GenericUtilsProtocol {
 		logsOutputDir.add(getGeneratedLogName());
 		htmlOutputDir.add(htmlReport.getGeneratedHTMLName());
 		sequencesVerdicts.add(verdictInfo);
+
+		htmlReport.close();
     }
     
     @Override
@@ -315,118 +307,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	}
 
     	return commandStateModel;
-    }
-
-    /**
-     * DECODER needs a Map to have a relation between the TESTAR TestResults output results 
-     * and the TESTAR TestResults ArtefactId. 
-     * This method uses a TESTAR TestResults ArtefactId to update a JSON Map.
-     * 
-     * @param artefactIdTestResults
-     */
-    protected void updateTestResultsJsonMap(String artefactIdTestResults) {
-
-    	// If we are not in Generate Mode we do not want to update this JSON map
-    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
-    		return;
-    	}
-
-    	File file = new File("ArtefactIdMap.json");
-    	
-    	// If something wrong append and file was created empty, we need to delete or always will be failing
-    	if(file.exists() && file.length() == 0) {
-    		file.delete();
-    	}
-    	
-    	try {
-    		if(!file.exists()) {
-    			// First TESTAR execution will create this file map
-    			file.createNewFile();
-
-    			// Create the simple JSON object map "{ artefactId : htmlOutput }"
-    			JsonObject jsonObject = new JsonObject();
-    			jsonObject.addProperty(artefactIdTestResults, htmlOutputDir.first());
-
-    			// Write the JSON object in the new created file
-    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    			FileWriter writer = new FileWriter(file.getCanonicalPath());
-    			gson.toJson(jsonObject, writer);
-    			writer.close();
-    		}
-    		else {
-    			// File JSON map exists, read the content and load the existing JSON objects
-    			FileReader reader = new FileReader(file.getCanonicalPath());
-    			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
-
-    			// Add the new JSON object map "{ NEWartefactId : NEWhtmlOutput }"
-    			jsonObject.addProperty(artefactIdTestResults, htmlOutputDir.first());
-
-    			// Write all the JSON objects
-    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    			FileWriter writer = new FileWriter(file.getCanonicalPath());
-    			gson.toJson(jsonObject, writer);
-
-    			reader.close();
-    			writer.close();
-    		}
-    	} catch (IOException e) {
-    		System.err.println("ERROR reading the internal file for updateTestResultsJsonMap");
-    	} catch (NoSuchElementException | NullPointerException ne) {
-    		System.err.println("ERROR finding the internal element for updateTestResultsJsonMap");
-    	}
-    }
-    
-    /**
-     * DECODER needs a Map to have a relation between the TESTAR StateModelDifference Report output results 
-     * and the TESTAR StateModel ArtefactId. 
-     * This method uses a TESTAR StateModel ArtefactId to update a JSON Map.
-     * 
-     * @param artefactIdStateModel
-     */
-    protected void updateStateModelDifferenceJsonMap(String artefactIdStateModel) {
-
-    	// If we are not in Generate Mode we do not want to update this JSON map
-    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
-    		return;
-    	}
-
-    	File file = new File("ArtefactIdMap.json");
-    	try {
-    		if(!file.exists()) {
-    			// First TESTAR execution will create this file map
-    			file.createNewFile();
-
-    			// Create the simple JSON object map "{ artefactId : reportHTMLStateModelDifference }"
-    			JsonObject jsonObject = new JsonObject();
-    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
-
-    			// Write the JSON object in the new created file
-    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    			FileWriter writer = new FileWriter(file.getCanonicalPath());
-    			gson.toJson(jsonObject, writer);
-    			writer.close();
-    		}
-    		else {
-    			// File JSON map exists, read the content and load the existing JSON objects
-    			FileReader reader = new FileReader(file.getCanonicalPath());
-    			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
-
-    			// Add the new JSON object map "{ NEWartefactId : NEWreportHTMLStateModelDifference }"
-    			jsonObject.addProperty(artefactIdStateModel, reportHTMLStateModelDifference);
-
-    			// Write all the JSON objects
-    			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    			FileWriter writer = new FileWriter(file.getCanonicalPath());
-    			gson.toJson(jsonObject, writer);
-
-    			reader.close();
-    			writer.close();
-    		}
-    	} catch (IOException e) {
-    		System.err.println("ERROR reading the internal file for updateTestResultsJsonMap");
-    	} catch (IllegalStateException | NoSuchElementException | NullPointerException ne) {
-    		System.err.println("ERROR finding the internal element for updateTestResultsJsonMap");
-    	}
     }
 
     /**

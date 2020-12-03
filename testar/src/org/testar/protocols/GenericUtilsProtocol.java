@@ -36,6 +36,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -47,6 +48,7 @@ import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.TimeOutException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.json.object.StateModelDifferenceJsonObject;
 
@@ -57,7 +59,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -461,22 +462,24 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     				System.out.println(s);
     				errorContent.append(s);
     			}
-        		
-    			// ErrorBuffer contains errors after execute curl command
-    			if(!errorContent.toString().isEmpty()) {
-    				String msg = curlInsertArtefactError(command);
-    				msg = msg.concat(errorContent.toString());
-    				throw new TimeOutException(msg);
-    			}
+    			
     			// curl command has no errors check if we are executing test_results or state_model 
-    			else if(command.contains("test_results")) {
+    			if(command.contains("test_results")) {
     				return substringArtefactId(outputContent.toString(), "TESTARTestResults artefactId\":\"");
     			}
     			else if (command.contains("state_model")) {
     				return substringArtefactId(outputContent.toString(), "TESTARStateModels artefactId\":\"");
     			}
+    			// ErrorBuffer contains errors after execute curl command
+    			else if(errorContent.toString().contains("curl")) {
+    				decoderExceptionThrown = true;
+    				String msg = curlInsertArtefactError(command);
+    				msg = msg.concat(errorContent.toString());
+    				throw new TimeOutException(msg);
+    			}
     			// Something strange happen, this command seems not correct
     			else {
+    				decoderExceptionThrown = true;
     				throw new TimeOutException(curlInsertArtefactError(command));
     			}
 
@@ -525,4 +528,27 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		}
 		return "Unknown ERROR! Trying to Insert Artefact using curl. ";
 	}
+	
+    /**
+     * DECODER needs a Map to have a relation between the TESTAR TestResults output results 
+     * and the TESTAR TestResults ArtefactId. 
+     * This method renames TESTAR TestResults OutputRunFolder with ArtefactId name.
+     * 
+     * @param artefactIdTestResults
+     */
+    protected void updateOutputRunFolder(String artefactIdTestResults) {
+
+    	// If we are not in Generate Mode we do not want to move the output folder
+    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
+    		return;
+    	}
+    	try {
+    		File artefactOutputFolder = new File(Main.testarDir + artefactIdTestResults + File.separator + "output" + File.separator);
+    		File outputRunFile = new File(OutputStructure.outerLoopOutputDir);
+    		FileUtils.moveDirectory(outputRunFile, artefactOutputFolder);
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		System.err.println("ERROR moving OutputRunFolder with ArtefactId");
+    	}
+    }
 }
