@@ -34,6 +34,8 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.JavaSwingProtocol;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -44,6 +46,7 @@ import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
 import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
+import org.testar.jacoco.MergeJacocoFiles;
 import org.testar.OutputStructure;
 import java.io.File;
 import java.io.FileInputStream;
@@ -83,6 +86,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private long startSequenceTime;
 	private String reportTimeDir;
 	private int countEmptyStateTimes = 0;
+	private Set<String> jacocoFiles = new HashSet<>();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -656,6 +660,9 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			// Dump the jacoco report from the remote JVM and Get the name/path of this file
 			String jacocoFile = dumpAndGetJacocoSequenceFileName();
 
+			// Add jacoco sequence file to this set list, for merging at the end of the TESTAR run
+			jacocoFiles.add(jacocoFile);
+			
 			// Create the output Jacoco report
 			createJacocoSequenceReport(jacocoFile);
 
@@ -825,6 +832,40 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			try {
 				FileUtils.deleteDirectory(new File(rachotaPath));
 			} catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
+		}
+	}
+	
+	/**
+	 * This method is called after the last sequence, to allow for example handling the reporting of the session
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		try {
+			MergeJacocoFiles mergeJacocoFiles = new MergeJacocoFiles();
+			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
+			mergeJacocoFiles.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+			
+			// Create JaCoCo report inside output\SUTexecuted folder
+			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
+					+ File.separator + "JaCoCo_reports"
+					+ File.separator + "TOTAL_MERGED";
+
+			// Launch JaCoCo report (build.xml) and overwrite desired parameters
+			String antCommand = "cd jacoco && ant report"
+					+ " -DjacocoFile=" + mergedJacocoFile.getCanonicalPath()
+					+ " -DreportCoverageDir=" + reportDir;
+
+			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+			Process p = builder.start();
+			p.waitFor();
+
+			System.out.println("MERGED JaCoCo report created : " + reportDir);
+
+			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+			System.out.println(coverageInfo);
+		} catch (Exception e) {
+			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");
 		}
 	}
 }
