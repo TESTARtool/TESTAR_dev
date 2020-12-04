@@ -34,7 +34,9 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -42,8 +44,10 @@ import java.util.zip.ZipOutputStream;
 
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
+import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
+import org.testar.jacoco.MergeJacocoFiles;
 import org.testar.OutputStructure;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,6 +82,13 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;
+	
+	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
+	// we use this variable to store after each action the last correct coverage
+	private String lastCorrectJacocoCoverageFile = "";
+
+	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
+	private Set<String> jacocoFiles = new HashSet<>();
 	
 	// BlueJ: Some parts/windows of the SUT may not be interesting to explore
 	// Use the name of the window UIATitleBar to force a close action - "BlueJ:  Debugger" need double space
@@ -350,7 +361,7 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 		// Modify if desired
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 
-			// Dump the jacoco report from the remote JVM and Get the name/path of this file
+			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
 				
@@ -375,28 +386,16 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 					e.printStackTrace();
 				}
 				
-				String jacocoFile = MBeanClient.dumpJaCoCoActionStepReport(Integer.toString(actionCount));
-				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+				// Dump the JaCoCo Action report from the remote JVM
+				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
-				// Create JaCoCo report inside output\SUTexecuted folder
-				String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-						+ File.separator + "JaCoCo_reports"
-						+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
-						+ "_action_" + actionCount;
+				// If not empty save as last correct file in case the SUT crashes
+				if(!jacocoFile.isEmpty()) {
+					lastCorrectJacocoCoverageFile = jacocoFile;
+				}
 
-				// Launch JaCoCo report (build.xml) and overwrite desired parameters
-				String antCommand = "cd jacoco && ant report"
-						+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-						+ " -DreportCoverageDir=" + reportDir;
-
-				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-				Process p = builder.start();
-				p.waitFor();
-
-				System.out.println("JaCoCo report created : " + reportDir);
-
-				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-				System.out.println(coverageInfo);
+				// Create the output JaCoCo Action report
+				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
 
 			} catch (Exception e) {
 				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
@@ -418,16 +417,18 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 		// Modify if desired
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 
-			// Dump the jacoco report from the remote JVM and Get the name/path of this file
-			String jacocoFile = dumpAndGetJacocoSequenceFileName();
+			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
+			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
+			if(!jacocoFile.isEmpty()) {
+				lastCorrectJacocoCoverageFile = jacocoFile;
+			}
 
-			// Create the output Jacoco report
-			createJacocoSequenceReport(jacocoFile);
-			
-			//TODO: Disabled by default, we also need to delete original folder after compression
-			//Compress JaCoCo files
-			//compressOutputFile();
+			// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
+			// If everything works correctly will be the sequence report, if not last correct action report
+			jacocoFiles.add(lastCorrectJacocoCoverageFile);
 
+			// Create the output JaCoCo report
+			JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
 		}
  
 		super.finishSequence();
@@ -453,122 +454,6 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 	}
 
 	/**
-	 * TESTAR has finished executing the actions
-	 * Call MBeanClient to dump a jacoco.exec file
-	 * 
-	 * @return
-	 */
-	private String dumpAndGetJacocoSequenceFileName() {
-		// Default name (generated by default by JaCoCo)
-		String jacocoFile = "jacoco.exec";
-
-		try {
-			System.out.println("Extract JaCoCO report with MBeanClient...");
-			jacocoFile = MBeanClient.dumpJaCoCoSequenceReport();
-			System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
-		} catch (Exception e) {
-			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
-		}
-
-		return jacocoFile;
-	}
-
-	/**
-	 * With the dumped jacocoFile (typical jacoco.exec) 
-	 * and the build.xml file (that includes a reference to the .class SUT files).
-	 * 
-	 * Create the JaCoCo report files.
-	 * 
-	 * @param jacocoFile
-	 */
-	private void createJacocoSequenceReport(String jacocoFile) {
-		try {
-			// JaCoCo report inside output\SUTexecuted folder
-			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
-
-			// Launch JaCoCo report (build.xml) and overwrite desired parameters
-			String antCommand = "cd jacoco && ant report"
-					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
-
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
-
-			System.out.println("JaCoCo report created : " + reportDir);
-
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			System.out.println(coverageInfo);
-
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Compress desired folder
-	 * https://www.baeldung.com/java-compress-and-uncompress
-	 * 
-	 * @return
-	 */
-	private boolean compressOutputFile() {
-		String originalFolder = "";
-		try {
-			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
-			System.out.println("Compressing folder... " + originalFolder);
-
-			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
-
-			FileOutputStream fos = new FileOutputStream(compressedFile);
-			ZipOutputStream zipOut = new ZipOutputStream(fos);
-			File fileToZip = new File(originalFolder);
-
-			zipFile(fileToZip, fileToZip.getName(), zipOut);
-			zipOut.close();
-			fos.close();
-
-			System.out.println("OK! Compressed successfully : " + compressedFile);
-
-			return true;
-		} catch (Exception e) {
-			System.out.println("ERROR Compressing folder: " + originalFolder);
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
-		if (fileToZip.isHidden()) {
-			return;
-		}
-		if (fileToZip.isDirectory()) {
-			if (fileName.endsWith("/")) {
-				zipOut.putNextEntry(new ZipEntry(fileName));
-				zipOut.closeEntry();
-			} else {
-				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
-				zipOut.closeEntry();
-			}
-			File[] children = fileToZip.listFiles();
-			for (File childFile : children) {
-				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
-			}
-			return;
-		}
-		FileInputStream fis = new FileInputStream(fileToZip);
-		ZipEntry zipEntry = new ZipEntry(fileName);
-		zipOut.putNextEntry(zipEntry);
-		byte[] bytes = new byte[1024];
-		int length;
-		while ((length = fis.read(bytes)) >= 0) {
-			zipOut.write(bytes, 0, length);
-		}
-		fis.close();
-	}
-
-	/**
 	 * This methods stops the SUT
 	 *
 	 * @param system
@@ -581,6 +466,31 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 		// In this protocol this one is residual, so just delete
 		if(new File("jacoco.exec").exists()) {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
+		}
+	}
+	
+	/**
+	 * This method is called after the last sequence, to allow for example handling the reporting of the session
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		try {
+			// Merge all jacoco.exec sequence files
+			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
+			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
+			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+			// And create the report that contains the coverage of all executed sequences
+			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+
+			//TODO: We also need to delete original folder after compression
+			//Compress all JaCoCo report files
+			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");
 		}
 	}
 }
