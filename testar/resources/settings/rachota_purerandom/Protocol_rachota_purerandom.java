@@ -44,6 +44,7 @@ import java.util.zip.ZipOutputStream;
 import org.fruit.alayer.windows.AccessBridgeFetcher;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
+import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.JacocoReportReader;
 import org.testar.jacoco.MBeanClient;
 import org.testar.jacoco.MergeJacocoFiles;
@@ -85,8 +86,16 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 	private long startSequenceTime;
 	private String reportTimeDir;
-	private int countEmptyStateTimes = 0;
+
+	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
+	// we use this variable to store after each action the last correct coverage
+	private String lastCorrectJacocoCoverageFile = "";
+	
+	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
+
+	// rachota: sometimes SUT stop responding, we need this empty actions countdown
+	private int countEmptyStateTimes = 0;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -458,14 +467,14 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	}
 	
 	private int getNumericInt(String strNum) {
-	    if (strNum == null) {
-	        return -1;
-	    }
-	    try {
-	        return Integer.parseInt(strNum);
-	    } catch (NumberFormatException nfe) {
-	        return -1;
-	    }
+		if (strNum == null) {
+			return -1;
+		}
+		try {
+			return Integer.parseInt(strNum);
+		} catch (NumberFormatException nfe) {
+			return -1;
+		}
 	}
 	
 	/**
@@ -483,18 +492,18 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 */
 	private void addIncreaseDecreaseActions(Widget w, Set<Action> actions, StdActionCompiler ac) {
 		Action increase = new CompoundAction.Builder()   
-		.add(ac.leftClickAt(w), 0.5) // Click for focus 
-		.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
-		.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
+				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+				.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
 		
 		increase.set(Tags.Role, Roles.Button);
 		increase.set(Tags.OriginWidget, w);
 		increase.set(Tags.Desc, "Increase Spinner");
 		
 		Action decrease = new CompoundAction.Builder()   
-		.add(ac.leftClickAt(w), 0.5) // Click for focus 
-		.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
-		.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
+				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+				.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
 		
 		decrease.set(Tags.Role, Roles.Button);
 		decrease.set(Tags.OriginWidget, w);
@@ -589,7 +598,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		// Modify if desired
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 
-			// Dump the jacoco report from the remote JVM and Get the name/path of this file
+			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
 
@@ -614,33 +623,20 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 					e.printStackTrace();
 				}
 
-				String jacocoFile = MBeanClient.dumpJaCoCoActionStepReport(Integer.toString(actionCount));
-				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
-
-				// Create JaCoCo report inside output\SUTexecuted folder
-				String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-						+ File.separator + "JaCoCo_reports"
-						+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
-						+ "_action_" + actionCount;
-
-				// Launch JaCoCo report (build.xml) and overwrite desired parameters
-				String antCommand = "cd jacoco && ant report"
-						+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-						+ " -DreportCoverageDir=" + reportDir;
-
-				ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-				Process p = builder.start();
-				p.waitFor();
-
-				System.out.println("JaCoCo report created : " + reportDir);
-
-				String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-				System.out.println(coverageInfo);
+				// Dump the JaCoCo Action report from the remote JVM
+				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
+				
+				// If not empty save as last correct file in case the SUT crashes
+				if(!jacocoFile.isEmpty()) {
+					lastCorrectJacocoCoverageFile = jacocoFile;
+				}
+				
+				// Create the output JaCoCo Action report
+				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
 
 			} catch (Exception e) {
-				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
+				System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
 			}
-
 		}
 
 		return actionExecuted;
@@ -652,24 +648,22 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 */
 	@Override
 	protected void finishSequence() {
-
 		// Only create JaCoCo report for Generate Mode
 		// Modify if desired
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 
-			// Dump the jacoco report from the remote JVM and Get the name/path of this file
-			String jacocoFile = dumpAndGetJacocoSequenceFileName();
+			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
+			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
+			if(!jacocoFile.isEmpty()) {
+				lastCorrectJacocoCoverageFile = jacocoFile;
+			}
 
-			// Add jacoco sequence file to this set list, for merging at the end of the TESTAR run
-			jacocoFiles.add(jacocoFile);
-			
-			// Create the output Jacoco report
-			createJacocoSequenceReport(jacocoFile);
+			// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
+			// If everything works correctly will be the sequence report, if not last correct action report
+			jacocoFiles.add(lastCorrectJacocoCoverageFile);
 
-			//TODO: Disabled by default, we also need to delete original folder after compression
-			//Compress JaCoCo files
-			compressOutputFile();
-
+			// Create the output JaCoCo report
+			JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
 		}
 
 		super.finishSequence();
@@ -692,122 +686,6 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * TESTAR has finished executing the actions
-	 * Call MBeanClient to dump a jacoco.exec file
-	 * 
-	 * @return
-	 */
-	private String dumpAndGetJacocoSequenceFileName() {
-		// Default name (generated by default by JaCoCo)
-		String jacocoFile = "jacoco.exec";
-
-		try {
-			System.out.println("Extract JaCoCO report with MBeanClient...");
-			jacocoFile = MBeanClient.dumpJaCoCoSequenceReport();
-			System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
-		} catch (Exception e) {
-			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
-		}
-
-		return jacocoFile;
-	}
-
-	/**
-	 * With the dumped jacocoFile (typical jacoco.exec) 
-	 * and the build.xml file (that includes a reference to the .class SUT files).
-	 * 
-	 * Create the JaCoCo report files.
-	 * 
-	 * @param jacocoFile
-	 */
-	private void createJacocoSequenceReport(String jacocoFile) {
-		try {
-			// JaCoCo report inside output\SUTexecuted folder
-			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
-
-			// Launch JaCoCo report (build.xml) and overwrite desired parameters
-			String antCommand = "cd jacoco && ant report"
-					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
-
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
-
-			System.out.println("JaCoCo report created : " + reportDir);
-
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			System.out.println(coverageInfo);
-
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Compress desired folder
-	 * https://www.baeldung.com/java-compress-and-uncompress
-	 * 
-	 * @return
-	 */
-	private boolean compressOutputFile() {
-		String originalFolder = "";
-		try {
-			originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
-			System.out.println("Compressing folder... " + originalFolder);
-
-			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
-
-			FileOutputStream fos = new FileOutputStream(compressedFile);
-			ZipOutputStream zipOut = new ZipOutputStream(fos);
-			File fileToZip = new File(originalFolder);
-
-			zipFile(fileToZip, fileToZip.getName(), zipOut);
-			zipOut.close();
-			fos.close();
-
-			System.out.println("OK! Compressed successfully : " + compressedFile);
-
-			return true;
-		} catch (Exception e) {
-			System.out.println("ERROR Compressing folder: " + originalFolder);
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
-		if (fileToZip.isHidden()) {
-			return;
-		}
-		if (fileToZip.isDirectory()) {
-			if (fileName.endsWith("/")) {
-				zipOut.putNextEntry(new ZipEntry(fileName));
-				zipOut.closeEntry();
-			} else {
-				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
-				zipOut.closeEntry();
-			}
-			File[] children = fileToZip.listFiles();
-			for (File childFile : children) {
-				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
-			}
-			return;
-		}
-		FileInputStream fis = new FileInputStream(fileToZip);
-		ZipEntry zipEntry = new ZipEntry(fileName);
-		zipOut.putNextEntry(zipEntry);
-		byte[] bytes = new byte[1024];
-		int length;
-		while ((length = fis.read(bytes)) >= 0) {
-			zipOut.write(bytes, 0, length);
-		}
-		fis.close();
 	}
 
 	/**
@@ -842,29 +720,20 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 		try {
-			MergeJacocoFiles mergeJacocoFiles = new MergeJacocoFiles();
+			// Merge all jacoco.exec sequence files
+			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
 			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
-			mergeJacocoFiles.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+			// And create the report that contains the coverage of all executed sequences
+			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+
+			//TODO: We also need to delete original folder after compression
+			//Compress all JaCoCo report files
+			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
+			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
 			
-			// Create JaCoCo report inside output\SUTexecuted folder
-			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + "TOTAL_MERGED";
-
-			// Launch JaCoCo report (build.xml) and overwrite desired parameters
-			String antCommand = "cd jacoco && ant report"
-					+ " -DjacocoFile=" + mergedJacocoFile.getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
-
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
-
-			System.out.println("MERGED JaCoCo report created : " + reportDir);
-
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			System.out.println(coverageInfo);
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");
 		}
 	}

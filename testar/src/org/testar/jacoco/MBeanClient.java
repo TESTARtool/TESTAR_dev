@@ -57,9 +57,7 @@ public final class MBeanClient {
 		void reset();
 	}
 
-
 	public static String dumpJaCoCoSequenceReport() {
-
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
 				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
@@ -69,7 +67,6 @@ public final class MBeanClient {
 	}
 	
 	public static String dumpJaCoCoActionStepReport(String actionCount) {
-
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
 				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
@@ -87,7 +84,6 @@ public final class MBeanClient {
 	 */
 	private static String dumpJaCoCoReport(String destFile) {
 		try {
-
 			// Open connection to the coverage agent:
 			final JMXServiceURL url = new JMXServiceURL(SERVICE_URL);
 			final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
