@@ -81,11 +81,14 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         }
                         String[] prefixLines = cleanprefix.split("\\n");
                         if (prefixLines.length>=2){  // only when there is  content in the prefix section
-                        for (int j = 0; j < prefixLines.length; j = j + 2) {
+                         // SPOT adds the artificial state and silently increases the state count.
+                         //skip first artificial state and artificial transition
+                            int cutoff= (tmodel.getInitialStates().size()>1)?2:0;
+                            for (int j = cutoff; j < prefixLines.length; j = j + 2) {
                             int stateindex= Integer.parseInt(prefixLines[j].trim()); // was self-assignment
-                            if (tmodel.getInitialStates().size()>1){ // SPOT adds the artificial state and silently increases the state count.
-                                stateindex=stateindex-1;
-                            }
+                            //if (tmodel.getInitialStates().size()>1){ // SPOT adds the artificial state and silently increases the state count.
+                            //    stateindex=stateindex-1;
+                            //}
                             StateEncoding sEnc = stateEncodings.get(stateindex);
                             prefixStateList.add(sEnc.getState());
 
@@ -107,9 +110,9 @@ public class SPOT_LTL_ModelChecker extends ModelChecker {
                         if (cycleLines.length>=2){  // only when there is  content in the cycle section
                         for (int j = 0; j < cycleLines.length; j = j + 2) {
                             int stateindex= Integer.parseInt(cycleLines[j].trim()); // was self-assignment
-                            if (tmodel.getInitialStates().size()>1){// SPOT adds the artificial state and silently increases the state count.
-                                stateindex=stateindex-1;
-                            }
+                            //if (tmodel.getInitialStates().size()>1){// SPOT adds the artificial state and silently increases the state count.
+                            //    stateindex=stateindex-1;
+                            //}  // in case of artificial state state, then is ALWAYS a prefix!: no need to check during cycle processing
                             StateEncoding sEnc = stateEncodings.get(stateindex);
                             cycleStateList.add(sEnc.getState());
 
