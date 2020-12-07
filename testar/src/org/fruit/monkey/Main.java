@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,34 +30,26 @@
 
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.UnProc;
-import org.fruit.Util;
-import org.fruit.alayer.State;
+import org.fruit.*;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
-import java.util.stream.Collectors;
+import org.fruit.alayer.windows.Windows10;
 
-import org.fruit.alayer.windows.UIATags;
-
-import static java.lang.System.exit;
+import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -106,6 +98,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
+		
+		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
 
@@ -122,7 +116,9 @@ public class Main {
 
 			initCodingManager(settings);
 
-			startTestar(settings, testSettingsFileName);
+			initOperatingSystem();
+
+			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
@@ -136,7 +132,9 @@ public class Main {
 
 				initCodingManager(settings);
 
-				startTestar(settings, testSettingsFileName);
+				initOperatingSystem();
+
+				startTestar(settings);
 			}
 		}
 
@@ -161,6 +159,27 @@ public class Main {
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
 
 		return true;
+	}
+	
+	/**
+	 * Verify the initial directory of TESTAR
+	 * If this directory didn't contain testar.bat file inform the user
+	 */
+	private static void verifyTestarInitialDirectory() {
+		// Obtain Files name of current testarDir
+		Set<String> filesName = new HashSet<>();
+		File[] filesList = new File(testarDir).listFiles();
+        for(File file : filesList){
+        	filesName.add(file.getName());
+        }
+
+        // Verify if we are in the correct executable testar directory (contains testar.bat)
+		if(!filesName.contains("testar.bat")) {
+			System.out.println("WARNING: We cannot find testar.bat executable file.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			filesName.forEach(System.out::println);
+		}
 	}
 
 	/**
@@ -325,7 +344,12 @@ public class Main {
 	 * @param settings
 	 * @param testSettings
 	 */
-	private static void startTestar(Settings settings, String testSettings) {
+	private static void startTestar(Settings settings) {
+
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+		}
 
 		URLClassLoader loader = null;
 
@@ -421,6 +445,7 @@ public class Main {
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
 			defaults.add(Pair.from(ShowSettingsAfterTest, true));
+			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -439,10 +464,6 @@ public class Main {
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
 			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));
@@ -462,6 +483,7 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(ListeningMode, false));
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
@@ -668,4 +690,15 @@ public class Main {
         }
     }
 
+	/**
+	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 */
+	private static void initOperatingSystem() {
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
+			Environment.setInstance(new Windows10());
+		} else {
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			Environment.setInstance(new UnknownEnvironment());
+		}
+	}
 }

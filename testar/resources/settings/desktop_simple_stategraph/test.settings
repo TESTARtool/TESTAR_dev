@@ -96,14 +96,6 @@ SUTProcesses =
 ProtocolClass = desktop_simple_stategraph/Protocol_desktop_simple_stategraph
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
-
-#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.ou.testar.ActionSelectionUtils;
+import nl.ou.testar.PrioritizeNewActionsSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
@@ -46,9 +47,46 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 
 
-	private Set<Action> executedActions = new HashSet<Action> ();
-	private Set<Action> previousActions;
+	private PrioritizeNewActionsSelector selector = new PrioritizeNewActionsSelector();
 
+	/**
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @return  a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		Set<Action> actions = super.deriveActions(system,state);
+
+
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		}
+		
+		// Generate mode visualization purposes (Shift + Up)
+		actions = selector.getPrioritizedActions(actions);
+
+		//return the set of derived actions
+		return actions;
+	}
+	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
@@ -60,39 +98,8 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		System.out.println("*** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
-		Set<Action> prioritizedActions = new HashSet<Action> ();
-		//checking if it is the first round of actions:
-		if(previousActions==null) {
-			//all actions are new actions:
-			//System.out.println("DEBUG: the first round of actions");
-			prioritizedActions = actions;
-		}else{
-			//if not the first round, get the new actions compared to previous state:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, previousActions);
-		}
-		if(prioritizedActions.size()>0){
-			//there are new actions to choose from, checking if they have been already executed:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(prioritizedActions, executedActions);
-		}
-		if(prioritizedActions.size()>0){
-			// found new actions that have not been executed before - choose randomly
-			//System.out.println("DEBUG: found NEW actions that have not been executed before");
-		}else{
-			// no new unexecuted actions, checking if any unexecuted actions:
-			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions);
-		}
-		if(prioritizedActions.size()>0){
-			// found actions that have not been executed before - choose randomly
-			//System.out.println("DEBUG: found actions that have not been executed before");
-		}else{
-			// no unexecuted actions, choose randomly on any of the available actions:
-			//System.out.println("DEBUG: NO actions that have not been executed before");
-			prioritizedActions = actions;
-		}
-		//saving the current actions for the next round:
-		previousActions = actions;
-		return(super.selectAction(state, prioritizedActions));
+		Action action = super.selectAction(state, actions);
+		return(action);
 	}
 
 	/**
@@ -107,8 +114,9 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		executedActions.add(action);
-		System.out.println("executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
+		selector.addExecutedAction(action);
+		/*System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
+		+ " -- Times executed: " + selector.timesExecuted(action));*/
 		return super.executeAction(system, state, action);
 	}
 }

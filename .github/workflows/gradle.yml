@@ -1,0 +1,56 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: TESTAR CI - build with Gradle
+
+on:
+  push:
+    branches: [ master, master_gradle_workflow ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
+      run: ./gradlew runTestDesktopGenericCommandLineOk
+    - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericCommandLineOk-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_ok
+    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
+    - name: Save runTestDesktopGenericCommandLineSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericCommandLineSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
+    - name: Save runTestDesktopGenericProcessNameSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericProcessNameSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_process_and_suspicious
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
+    - name: Save runTestDesktopGenericTitleNameSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious

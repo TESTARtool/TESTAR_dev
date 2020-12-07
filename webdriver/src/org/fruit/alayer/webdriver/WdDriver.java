@@ -75,6 +75,9 @@ public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
   private static List<String> windowHandles = new ArrayList<>();
   public static boolean followLinks = true;
+  public static boolean fullScreen = false;
+  public static boolean forceActivateTab = true;
+  public static boolean disableSecurity = false;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -96,7 +99,7 @@ public class WdDriver extends SUTBase {
     String url = parts[parts.length - 1].replace("\"", "");
     Dimension screenDimensions = null;
     Point screenPosition = null;
-    if (parts.length == 3) {
+    if (parts.length == 3 && !fullScreen) {
       String tmp = parts[1].replace("\"", "").toLowerCase();
       String[] dims = tmp.split("\\+")[0].split("x");
       screenDimensions =
@@ -159,6 +162,13 @@ public class WdDriver extends SUTBase {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
+    if(fullScreen) {
+    	options.addArguments("--start-maximized");
+    }
+    if(disableSecurity) {
+    	options.addArguments("--disable-web-security");
+    	options.addArguments("--allow-running-insecure-content");
+    }
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);
@@ -403,8 +413,8 @@ public class WdDriver extends SUTBase {
   public static void activate() {
     updateHandlesList();
 
-    // Nothing to activate
-    if (windowHandles.size() < 1) {
+    // Nothing to activate, or user doesn't want to use this activate feature
+    if (windowHandles.size() < 1 || !forceActivateTab) {
       return;
     }
 

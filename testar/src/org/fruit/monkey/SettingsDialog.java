@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,6 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDBPanel;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
@@ -59,7 +58,6 @@ import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.UIManager.*;
-import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 
@@ -70,7 +68,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.2.3 (7-Nov-2019)";
+  static final String TESTAR_VERSION = "2.2.12 (26-Nov-2020)";
 
 
   private String settingsFile;
@@ -155,9 +153,6 @@ public class SettingsDialog extends JFrame implements Observer {
       settings.set(ConfigTags.Mode, mode);
       saveCurrentSettings();
       ret = settings;
-      if (settings.get(ConfigTags.AlwaysCompile)) {
-        compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
-      }
       this.dispose();
     } catch (IllegalStateException ise) {
       JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
