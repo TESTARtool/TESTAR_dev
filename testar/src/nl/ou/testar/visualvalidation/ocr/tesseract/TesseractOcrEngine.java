@@ -1,10 +1,13 @@
 package nl.ou.testar.visualvalidation.ocr.tesseract;
 
 import nl.ou.testar.visualvalidation.ocr.OcrEngineInterface;
+import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.tesseract.ETEXT_DESC;
+import org.bytedeco.tesseract.ResultIterator;
 import org.bytedeco.tesseract.TessBaseAPI;
+import org.bytedeco.tesseract.global.tesseract;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import java.awt.image.BufferedImage;
@@ -16,6 +19,8 @@ import java.awt.image.DataBufferUShort;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TesseractOcrEngine implements OcrEngineInterface {
     private final TessBaseAPI engine;
@@ -35,6 +40,27 @@ public class TesseractOcrEngine implements OcrEngineInterface {
     @Override
     public void ScanImage(BufferedImage image) {
         // TODO TM: Image analysis should be done on separate thread.
+        loadImage(image);
+
+        if (engine.Recognize(new ETEXT_DESC()) != 0) {
+            // TODO TM: Should we throw or just log and proceed with the application and set the matcher result to unknown-ish
+            throw new IllegalArgumentException("could not recognize text");
+        }
+
+        List<RecognizedElement> recognizedWords = new ArrayList<>();
+        try (ResultIterator recognizedElement = engine.GetIterator()) {
+            int level = tesseract.RIL_WORD;
+            do {
+                recognizedWords.add(TesseractResult.Extract(recognizedElement, level));
+            } while (recognizedElement.Next(level));
+
+            recognizedWords.forEach(ocrWord -> LOGGER.info("Found {}", ocrWord));
+        }
+
+        engine.Clear();
+    }
+
+    private void loadImage(BufferedImage image) {
         DataBuffer dataBuffer = image.getData().getDataBuffer();
 
         ByteBuffer byteBuffer;
@@ -62,14 +88,8 @@ public class TesseractOcrEngine implements OcrEngineInterface {
         int bytes_per_line = bytes_per_pixel * image.getWidth();
 
         engine.SetImage(byteBuffer, image.getWidth(), image.getHeight(), bytes_per_pixel, bytes_per_line);
-        BytePointer result = engine.GetUTF8Text();
-        if (result != null) {
-            LOGGER.info("Tesseract has found: {}", result.getString());
-            result.deallocate();
-        } else {
-            LOGGER.warn("Failed to analyze image");
-        }
-
+        // TODO TM: Figure out which value we should use.
+        engine.SetSourceResolution(160);
     }
 
     @Override
