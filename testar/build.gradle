@@ -85,6 +85,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.7'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')
@@ -186,3 +187,109 @@ task buildWindows(type: Exec) {
 buildWindows.dependsOn classes
 
 mainClassName='org.fruit.monkey.Main'
+
+
+/**
+ * Tasks to test TESTAR using gradle
+ */
+
+// Default COMMAND_LINE execution to run Notepad, execute 2 actions and verdict should be OK
+task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericCommandLineOk'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Default COMMAND_LINE execution to run Notepad
+// Force TESTAR to find a Suspicious Title Error (Format widget)
+// And verify it reading output command line
+task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericCommandLineSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_command_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Format (for English and Spanish)
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
+            println "\n${output} \nTESTAR has successfully detected Format Suspicious Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect Format Suspicious Title")
+        }
+    }
+}
+
+// Help task to run Notepad before start TESTAR (to connect with process or title)
+task runNotepad {
+    group = 'test_testar_workflow'
+    description ='runNotepad'
+    doFirst{
+        ext.process = new ProcessBuilder().command('cmd', '/c', 'C:\\Windows\\System32\\notepad.exe').start()
+    }
+}
+
+// Verify that TESTAR correctly connects using process name
+// To be sure, connect to process and detect Format suspicious title
+task runTestDesktopGenericProcessNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericProcessNameSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Format (for English and Spanish)
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
+            println "\n${output} \nTESTAR has successfully connect with SUT_PROCESS_NAME and detected Format Suspicious Title! "
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+        } else {
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_PROCESS_NAME")
+        }
+    }
+}
+
+// Verify that TESTAR correctly connects using windows title
+// To be sure, connect with windows title and detect Format suspicious title
+task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericTitleNameSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Format (for English and Spanish)
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
+            println "\n${output} \nTESTAR has successfully connect with SUT_WINDOW_TITLE and detected Format Suspicious Title! "
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+        } else {
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_WINDOW_TITLE")
+        }
+    }
+}
