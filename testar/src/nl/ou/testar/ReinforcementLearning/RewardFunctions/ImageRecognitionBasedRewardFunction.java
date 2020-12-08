@@ -4,17 +4,19 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.lang.Validate;
+import org.apache.logging.log4j.LogManager;
 import org.fruit.alayer.State;
 import org.sikuli.basics.Settings;
-import org.sikuli.script.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sikuli.script.Finder;
+import org.sikuli.script.Match;
+import org.sikuli.script.Pattern;
+import org.sikuli.script.Screen;
 
 import java.awt.image.BufferedImage;
 
 public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ImageRecognitionBasedRewardFunction.class);
 
     private final float defaultReward;
 
@@ -54,6 +56,12 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
     protected BufferedImage takeScreenshot() {
         return new Screen().capture().getImage();
+    }
+
+    @Override
+    public void reset() {
+        screenImagePreviouslyExecutedAction = null;
+        logger.info("ImageRecognitionBasedRewardFunction was reset");
     }
 
 }

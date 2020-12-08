@@ -15,5 +15,4 @@ public interface QFunction {
      * @param reward
      */
     float getQValue(final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward);
-
 }

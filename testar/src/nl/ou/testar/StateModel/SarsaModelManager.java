@@ -11,6 +11,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -20,6 +22,8 @@ import java.util.Set;
  * for (sequential) action selection.
  */
 public class SarsaModelManager extends ModelManager implements StateModelManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(SarsaModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
     private AbstractAction previousAbstractActionToExecute = null;
@@ -65,7 +69,9 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      */
     @Override
     public Action getAbstractActionToExecute(final Set<Action> actions) {
+        logger.info("Number of actions available:{}", actions.size());
         final Action selectedAction = super.getAbstractActionToExecute(actions);
+        logger.info("Action selected:{}", selectedAction == null ? null :selectedAction.toShortString());
         updateQValue(selectedAction);
         return selectedAction;
     }
@@ -93,7 +99,13 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
             previousAbstractActionToExecute = selectedAbstractAction;
         } catch (final Exception e) {
-            System.out.println(String.format("Update of Q-value failed because: '%s'", e.getMessage()));
+            logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
         }
+    }
+
+    @Override
+    public void notifyTestSequenceStopped() {
+        super.notifyTestSequenceStopped();
+        rewardFunction.reset();
     }
 }
