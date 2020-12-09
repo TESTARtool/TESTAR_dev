@@ -65,7 +65,6 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
@@ -131,8 +130,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		
 		super.initialize(settings);
 	    
-		// Override ProtocolUtil to allow WebDriver screenshots
-	    protocolUtil = new WdProtocolUtil();
 	}
 	
     /**
@@ -351,6 +348,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			+ " " + settings.get(ConfigTags.Mode, mode())
     			+ " " + sequencesPath
     			+ " " + status + " \"" + statusInfo + "\"" );
+    	
+    	htmlReport.close();
     }
     
     @Override
