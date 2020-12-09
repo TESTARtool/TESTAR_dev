@@ -57,8 +57,8 @@ public class StateModelDifferenceImages {
 	public static String getDifferenceImage(String img1Disk, String idImg1, String img2Disk, String idImg2, String modelDifferenceReportDirectory) {
 		try {
 
-			BufferedImage img1 = ImageIO.read(new File(img1Disk));
-			BufferedImage img2 = ImageIO.read(new File(img2Disk));
+			BufferedImage img1 = ImageIO.read(new File(modelDifferenceReportDirectory + File.separator + img1Disk));
+			BufferedImage img2 = ImageIO.read(new File(modelDifferenceReportDirectory + File.separator + img2Disk));
 
 			int width1 = img1.getWidth(); // Change - getWidth() and getHeight() for BufferedImage
 			int width2 = img2.getWidth(); // take no arguments
@@ -102,14 +102,10 @@ public class StateModelDifferenceImages {
 			File screenshotDir = new File(modelDifferenceReportDirectory + File.separator);
 
 			// save the file to disk
-			File screenshotFile = new File(screenshotDir, "diff_"+ idImg1 + "_" + idImg2 + ".png");
+			String imageName = "diff_"+ idImg1 + "_" + idImg2 + ".png";
+			File screenshotFile = new File(screenshotDir, imageName);
 			if (screenshotFile.exists()) {
-				try {
-					return screenshotFile.getCanonicalPath();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				return imageName;
 			}
 			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
 
@@ -121,7 +117,7 @@ public class StateModelDifferenceImages {
 			outputStream.flush();
 			outputStream.close();
 
-			return screenshotFile.getCanonicalPath();
+			return imageName;
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
