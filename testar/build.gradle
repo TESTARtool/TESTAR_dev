@@ -85,6 +85,10 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'org.apache.maven', name: 'maven-core', version: '3.6.3'
+    compile group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.6'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')
@@ -102,6 +106,11 @@ task prepareSUTs(type: Copy) {
 task prepareOracles(type: Copy) {
     from 'target/classes/java/oracle'
     into 'target/scripts/settings'
+}
+
+task prepareJacoco(type: Copy) {
+    from 'jacoco'
+    into 'target/scripts/jacoco'
 }
 
 task prepareOutputFolder(type: Copy) {

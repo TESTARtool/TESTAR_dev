@@ -738,6 +738,9 @@ public final class Windows{
 	public static native long   GetProcessMemoryInfo(long processID);
 	public static native long[] GetProcessTimes(long processID);
 	public static native String	GetProcessNameFromHWND(long hwnd);
+	
+	// Determines whether the system considers that a specified application is not responding
+	public static native boolean IsHungAppWindow(long hwnd);
 
 	// Java Swing
 	public static native boolean InitializeAccessBridge();

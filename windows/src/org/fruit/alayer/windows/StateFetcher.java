@@ -167,6 +167,8 @@ public class StateFetcher implements Callable<UIAState>{
 					//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
 					modalElement = this.accessBridgeEnabled ? AccessBridgeFetcher.accessBridgeDescend(windowHandle, uiaRoot, 0, 0) :
 															  uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
+					// If owned window, set as main system window handle
+					system.set(Tags.HWND, windowHandle);
 				} else
 					ownedWindows.add(windowHandle);
 			}

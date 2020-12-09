@@ -1,0 +1,40 @@
+<?xml version= "1.0"?>
+<project name="jacoco ant" default="create-report">
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="lib/jacocoant.jar" />
+	</taskdef>
+	
+	<!-- Use the jacoco.exec and the rachota.jar classes to create the coverage report -->
+	<target name="report" description="Create a coverage report">
+		<property name="jacocoFile" value="../jacoco.exec" />
+		<property name="reportCoverageDir" value="reports" />
+		<jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
+			<executiondata>
+				<file file="${jacocoFile}" />
+			</executiondata>
+			<structure name="${ant.project.name}">
+				
+					<!-- Folder directory of rachota.jar classes -->
+					<classfiles>
+						<fileset dir="..\suts\rachota_files">
+							<include name="**/*.class" />
+						</fileset>
+					</classfiles>
+					<sourcefiles encoding="UTF-8">
+						<fileset file="..\suts\rachota_files/*.jar"/>
+					</sourcefiles>
+					<!-- all filetests here -->
+				
+			</structure>
+			<html destdir="${reportCoverageDir}" />
+			<csv destfile="${reportCoverageDir}/report_jacoco.csv" />
+			<xml destfile="${reportCoverageDir}/reportjacoco.xml" />
+		</jacoco:report>
+	</target>
+	
+	<!-- Clean and delete the report to create a new one from the begining -->
+	<target name="clean">
+		<delete file="jacoco.exec" />
+		<delete file="jacoco-client.exec" />
+	</target>
+</project>
