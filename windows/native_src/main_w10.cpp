@@ -2800,3 +2800,9 @@ JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong
 	return ret;
 
 }
+
+/** IsHungAppWindow(HWND) **/
+JNI_SIG(jboolean, WINAPI_NS(IsHungAppWindow)) (JNIEnv * env, jclass, jlong hwnd){
+	HWND window = (HWND) hwnd;
+	return IsHungAppWindow(window);
+}

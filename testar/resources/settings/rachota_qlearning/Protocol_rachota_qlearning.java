@@ -148,6 +148,29 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 	}
 	
 	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		try {
+			// Create rachota settings configuration file, and disable detectInactivity feature
+			File rachotaFile = new File("C:\\Users\\testar\\.rachota");
+			if(!rachotaFile.exists()) {
+				rachotaFile.mkdirs();
+			}
+			File rachotaSettings = new File("C:\\Users\\testar\\.rachota\\settings.cfg");
+			if(rachotaSettings.createNewFile() || rachotaFile.exists()) {
+				FileWriter settingsWriter = new FileWriter("C:\\Users\\testar\\.rachota\\settings.cfg");
+				settingsWriter.write("detectInactivity = false");
+				settingsWriter.close();
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR trying to disable detectInactivity configuration feature");
+		}
+	}
+	
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -163,6 +186,14 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 			System.out.println("sequenceTimeUntilActions.txt can not be created " );
 			e.printStackTrace();
 		}
+		
+		// wait 10 seconds, give time to rachota to start
+		Util.pause(10);
+
+		// reset values
+		countEmptyStateTimes = 0;
+		lastCorrectJacocoCoverageFile = "";
+		
 		super.beginSequence(system, state);
 
 		// rachota: predefined action to deal with initial pop-up question
@@ -170,16 +201,18 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 		for(Widget w : state) {
 			if(w.get(Tags.Title,"").contains("Rachota is already running or it was not")) {
 				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Yes", state, system, 5, 1);
+				// Wait and update the state
+				Util.pause(10);
+				state = super.getState(system);
 			}
 			// Dutch
 			if(w.get(Tags.Title,"").contains("was de vorige keer niet normaal afgesloten")) {
 				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Ja", state, system, 5, 1);
+				// Wait and update the state
+				Util.pause(10);
+				state = super.getState(system);
 			}
 		}
-
-		// Wait and update the state
-		Util.pause(10);
-		state = super.getState(system);
 	}
 
 	/**
@@ -196,47 +229,17 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
-		// rachota: User inactivity popup window
-		for(Widget w : state) {
-			if(w.get(Tags.Title,"").contains("User inactivity detected")) {
-				// rachota: Try to close this inactivity window
-				closeInactivityWindow(system, state, false);
-				state = super.getState(system);
-				for(Widget secondCheckWidget : state) {
-					if(secondCheckWidget.get(Tags.Title,"").contains("User inactivity detected")) {
-						// rachota: sometimes this windows was into the background
-						// send a tabbing action and try to close again
-						closeInactivityWindow(system, state, true);
-						return super.getState(system);
-					}
-				}
-				return state;
+		// rachota: check at windows level if SUT stops responding
+		try {
+			if(WinProcess.isHungWindow(system.get(Tags.HWND, (long)0))) {
+				Verdict freezeVerdict = new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "WinProcess.isHungWindow(system) Rachota stops responding");
+				state.set(Tags.OracleVerdict, freezeVerdict);
 			}
+		} catch(Exception e) {
+			System.out.println("Error trying to apply not responding verdict to system.get(Tags.HWND)");
 		}
 		return state;
 	}
-
-	/**
-	 * Rachota:
-	 * This Inactivity naughty window can get into the background
-	 */
-	private void closeInactivityWindow(SUT system, State state, boolean tab) {
-		if(tab) {
-			System.out.println("User inactivity detected! TABBING and Closing this window...");
-			Keyboard kb = AWTKeyboard.build();
-			kb.press(KBKeys.VK_ALT);
-			kb.press(KBKeys.VK_TAB);
-			kb.release(KBKeys.VK_TAB);
-			kb.release(KBKeys.VK_ALT);
-			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
-			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
-		}
-		else {
-			System.out.println("User inactivity detected! Closing this window...");
-			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "bother me with this reminder", state, system, 5, 1);
-			waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
-		}
-	}	
 
 	/**
 	 * The getVerdict methods implements the online state oracles that
@@ -251,7 +254,7 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 		// suspicious titles
 		Verdict verdict = super.getVerdict(state);
 
-		if(countEmptyStateTimes > 20) {
+		if(countEmptyStateTimes > 2) {
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "Seems that rachota SUT is not responding");
 		}
 
@@ -363,8 +366,20 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 		// but cannot extract anything at JavaAccessBridge level
 		// Use this count for Verdict
 		if(actions.isEmpty()) {
-			countEmptyStateTimes = countEmptyStateTimes + 1;
-			System.out.println("Empty Actions on State! count : " + countEmptyStateTimes);
+			System.out.println("Empty Actions on State!");
+			try {
+				// Windows level call to check if application is not responding.
+				if(WinProcess.isHungWindow(state.child(0).get(Tags.HWND, (long)0))) {
+					countEmptyStateTimes = countEmptyStateTimes + 5;
+				}
+			} catch (IndexOutOfBoundsException iobe) {
+				System.out.println("TESTAR State has no childs!");
+				countEmptyStateTimes = countEmptyStateTimes + 1;
+				// Wait a bit in case SUT is updating something internally
+				Util.pause(5);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			countEmptyStateTimes = 0;
 		}
