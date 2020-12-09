@@ -33,6 +33,7 @@ import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -64,9 +65,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
@@ -93,10 +92,12 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			put("id", "sncmp-banner-btn-agree");
 		}};
 
+		//Force the browser to run in full screen mode
 		WdDriver.fullScreen = true;
 		
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = true;
 	}
 
 	/**
@@ -212,9 +213,9 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			// if state model fails, using random:
+			retAction = RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
 	}

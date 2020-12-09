@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.action.priorization;
+package org.fruit.monkey;
 
-import java.util.HashSet;
-import java.util.Set;
+import es.upv.staq.testar.NativeLinker;
+import org.fruit.Assert;
+import org.fruit.Util;
+import org.fruit.alayer.*;
+import org.fruit.alayer.exceptions.SystemStartException;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+import java.util.List;
 
-public class ActionTags extends TagsBase  {
+public class WindowsProcessNameSutConnector implements SutConnector {
 
-	private ActionTags() {}
+    private String processName;
+    private double maxEngageTime;
 
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
+    public WindowsProcessNameSutConnector(String processName, double maxEngageTime) {
+        this.processName = processName;
+        this.maxEngageTime = maxEngageTime;
+    }
 
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
-
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
-	}
+    @Override
+    public SUT startOrConnectSut() throws SystemStartException {
+        Assert.hasTextSetting(processName, "SUTConnectorValue");
+        List<SUT> suts = null;
+        long now = System.currentTimeMillis();
+        do{
+            Util.pauseMs(100);
+            suts = NativeLinker.getNativeProcesses();
+            if (suts != null){
+                String desc;
+                for (SUT theSUT : suts){
+                    desc = theSUT.get(Tags.Desc, null);
+                    if (desc != null && desc.contains(processName)){
+                        System.out.println("SUT with Process Name -" + processName + "- DETECTED!");
+                        return theSUT;
+                    }
+                }
+            }
+        } while (System.currentTimeMillis() - now < maxEngageTime);
+        throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
+    }
 
 }

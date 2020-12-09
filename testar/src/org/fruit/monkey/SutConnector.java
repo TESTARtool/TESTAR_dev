@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.action.priorization;
+package org.fruit.monkey;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.fruit.alayer.SUT;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+public interface SutConnector {
 
-public class ActionTags extends TagsBase  {
-
-	private ActionTags() {}
-
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
-
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
-
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
-	}
-
+    abstract SUT startOrConnectSut();
 }
