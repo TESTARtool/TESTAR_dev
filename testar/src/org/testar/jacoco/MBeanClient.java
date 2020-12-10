@@ -39,6 +39,8 @@ import org.testar.OutputStructure;
  */
 public final class MBeanClient {
 
+	// TODO: Allow jmx port customization
+	// Port is coded to 5000, we need to use same number to launch SUT with jacoco + jmx
 	private static final String SERVICE_URL = "service:jmx:rmi:///jndi/rmi://localhost:5000/jmxrmi";
 
 	private MBeanClient() {}
@@ -57,6 +59,11 @@ public final class MBeanClient {
 		void reset();
 	}
 
+	/**
+	 * Uses the current sequence number to extract a jacoco.exec report file.
+	 * 
+	 * @return string that contains extracted jacoco.exec file
+	 */
 	public static String dumpJaCoCoSequenceReport() {
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
@@ -66,6 +73,13 @@ public final class MBeanClient {
 		return dumpJaCoCoReport(destFile);
 	}
 	
+	/**
+	 * Uses the current sequence number and the indicated action number 
+	 * to extract a jacoco.exec report file.
+	 * 
+	 * @param actionCount
+	 * @return string that contains extracted jacoco.exec file
+	 */
 	public static String dumpJaCoCoActionStepReport(String actionCount) {
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
@@ -77,10 +91,13 @@ public final class MBeanClient {
 	}
 
 	/**
-	 * Execute the example.
+	 * Use JMX service to connect with the JVM and extract one JaCoCo report file.
+	 * IF success return the string that represents the path of this jacoco.exec file,
+	 * ELSE return empty string.
 	 *
-	 * @param args
+	 * @param destFile
 	 * @throws Exception
+	 * @return string that contains extracted jacoco.exec file
 	 */
 	private static String dumpJaCoCoReport(String destFile) {
 		try {
@@ -108,7 +125,13 @@ public final class MBeanClient {
 			// Close connection:
 			jmxc.close();
 
-		} catch(Exception e) {e.printStackTrace();}
+		} catch(Exception e) {
+			System.out.println("MBeanClient ERROR: Trying to connect with the JVM using JMX to extract the jacoco report");
+			System.out.println("MBeanClient ERROR: Probably the SUT stops responding or closed unexpectedly");
+			System.out.println(e.getMessage());
+			// return an empty string to indicate we didn't create any jacoco.exec report
+			return "";
+		}
 
 		return destFile;
 	}
