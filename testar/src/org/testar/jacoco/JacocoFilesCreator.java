@@ -53,9 +53,13 @@ public class JacocoFilesCreator {
 
 		try {
 			jacocoFile = MBeanClient.dumpJaCoCoActionStepReport(actionCount);
-			System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+			if(!jacocoFile.isEmpty()) {
+				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+			} else {
+				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo Action " + actionCount + "exec report");
+			}
 		} catch (Exception e) {
-			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo Action " + actionCount + "exec report");
+			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
@@ -69,11 +73,15 @@ public class JacocoFilesCreator {
 		String jacocoFile = "";
 
 		try {
-			System.out.println("Extract JaCoCO report with MBeanClient...");
+			System.out.println("Extract JaCoCo report with MBeanClient...");
 			jacocoFile = MBeanClient.dumpJaCoCoSequenceReport();
-			System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+			if(!jacocoFile.isEmpty()) {
+				System.out.println("Extracted: " + new File(jacocoFile).getCanonicalPath());
+			} else {
+				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
+			}
 		} catch (Exception e) {
-			System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
+			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
