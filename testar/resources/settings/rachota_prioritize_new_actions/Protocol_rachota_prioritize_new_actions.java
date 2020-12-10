@@ -28,14 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import nl.ou.testar.ActionSelectionUtils;
 import nl.ou.testar.PrioritizeNewActionsSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -43,8 +37,6 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.JavaSwingProtocol;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
@@ -58,23 +50,12 @@ import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.KeyUp;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Keyboard;
 import org.testar.OutputStructure;
-import org.testar.jacoco.JacocoFilesCreator;
-import org.testar.jacoco.JacocoReportReader;
-import org.testar.jacoco.MBeanClient;
-import org.testar.jacoco.MergeJacocoFiles;
-
-import com.google.common.io.Files;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 import java.io.FileWriter;
-
-import org.fruit.monkey.Main;
 
 /**
  * This protocol together with the settings provides a specific behavior to test rachota
@@ -86,13 +67,6 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
-	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
-	// we use this variable to store after each action the last correct coverage
-	private String lastCorrectJacocoCoverageFile = "";
-	
-	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
-	private Set<String> jacocoFiles = new HashSet<>();
 
 	// rachota: sometimes SUT stop responding, we need this empty actions countdown
 	private int countEmptyStateTimes = 0;
@@ -107,29 +81,6 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		
-		// For experimental purposes we need to disconnect from Windows Remote Desktop
-		// without close the GUI session.
-		/*try {
-			// bat file that uses tscon.exe to disconnect without stop GUI session
-			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
-
-			// Launch and disconnect from RDP session
-			// This will prompt the UAC permission window if enabled in the System
-			if(disconnectBatFile.exists()) {
-				System.out.println("Running: " + disconnectBatFile);
-				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
-			} else {
-				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
-		
 		super.initialize(settings);
 		
 		// rachota: Requires Java Access Bridge
@@ -141,6 +92,9 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 		
 		// Enable the inspection of internal cells on Java Swing Tables
 		AccessBridgeFetcher.swingJavaTableDescend = true;
+		
+		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+		copyJacocoBuildFile();
 	}
 	
 	/**
@@ -177,7 +131,6 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 		startSequenceTime = System.currentTimeMillis();
 		try{
 			reportTimeDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();
-			//myWriter = new FileWriter(reportTimeDir + "/_sequenceTimeUntilActions.txt");
 		} catch (Exception e) {
 				System.out.println("sequenceTimeUntilActions.txt can not be created " );
 				e.printStackTrace();
@@ -188,7 +141,6 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 
 		// reset values
 		countEmptyStateTimes = 0;
-		lastCorrectJacocoCoverageFile = "";
 		
 		super.beginSequence(system, state);
 
@@ -617,49 +569,29 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
 
-		// Only create JaCoCo report for Generate Mode
-		// Modify if desired
+		// Write sequence duration to CLI and to file
+		long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
+		System.out.println();
+		System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
+
+		long minutes = (sequenceDurationSoFar / 1000)  / 60;
+		int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
+		System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
+		System.out.println();
+		// Write sequence duration to file
+		try {
+			FileWriter myWriter = new FileWriter(reportTimeDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_actionTimeStamps.txt", true);
+			myWriter.write(sequenceDurationSoFar + "\r\n");
+			myWriter.close();
+			System.out.println("Wrote time so far to file." + reportTimeDir + "/_sequenceTimeUntilAction.txt");
+		} catch (IOException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
+		}
+
+		// Extract and create JaCoCo action coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-
-			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
-			try {
-				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-				
-				// Write sequence duration to CLI and to file
-				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
-				System.out.println();
-				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-	
-				long minutes = (sequenceDurationSoFar / 1000)  / 60;
-				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
-				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
-				System.out.println();
-				// Write sequence duration to file
-				try {
-					FileWriter myWriter = new FileWriter(reportTimeDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_actionTimeStamps.txt", true);
-					//myWriter.write("Elapsed time until action " + actionCount + " : " + minutes + " minutes, " + seconds + " seconds   (" + sequenceDurationSoFar + " mili). \r\n");
-					myWriter.write(sequenceDurationSoFar + "\r\n");
-					myWriter.close();
-					System.out.println("Wrote time so far to file." + reportTimeDir + "/_sequenceTimeUntilAction.txt");
-				} catch (IOException e) {
-					System.out.println("An error occurred.");
-					e.printStackTrace();
-				}
-
-				// Dump the JaCoCo Action report from the remote JVM
-				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
-
-				// If not empty save as last correct file in case the SUT crashes
-				if(!jacocoFile.isEmpty()) {
-					lastCorrectJacocoCoverageFile = jacocoFile;
-				}
-
-				// Create the output JaCoCo Action report
-				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
-
-			} catch (Exception e) {
-				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
-			}
+			extractJacocoActionReport();
 		}
 
 		return actionExecuted;
@@ -672,22 +604,9 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 	@Override
 	protected void finishSequence() {
 
-		// Only create JaCoCo report for Generate Mode
-		// Modify if desired
+		// Extract and create JaCoCo sequence coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-
-			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
-			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
-			if(!jacocoFile.isEmpty()) {
-				lastCorrectJacocoCoverageFile = jacocoFile;
-			}
-
-			// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
-			// If everything works correctly will be the sequence report, if not last correct action report
-			jacocoFiles.add(lastCorrectJacocoCoverageFile);
-
-			// Create the output JaCoCo report
-			JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+			extractJacocoSequenceReport();
 		}
  
 		super.finishSequence();
@@ -736,26 +655,17 @@ public class Protocol_rachota_prioritize_new_actions extends JavaSwingProtocol {
 			} catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
 		}
 	}
-
+	
+	/**
+	 * This method is called after the last sequence, to allow for example handling the reporting of the session
+	 */
 	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
-		try {
-			// Merge all jacoco.exec sequence files
-			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
-			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
-			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
-			// And create the report that contains the coverage of all executed sequences
-			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
-
-			//TODO: We also need to delete original folder after compression
-			//Compress all JaCoCo report files
-			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
-			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");
+		// Extract and create JaCoCo run coverage report for Generate Mode
+		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+			extractJacocoRunReport();
+			compressJacocoReportFolder();
 		}
 	}
 }

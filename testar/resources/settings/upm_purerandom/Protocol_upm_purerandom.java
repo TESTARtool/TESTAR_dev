@@ -1,83 +1,77 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2020 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Set;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.protocols.JavaSwingProtocol;
+
+import java.util.Set;
 import org.fruit.alayer.windows.WinProcess;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.fruit.monkey.ConfigTags;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.*;
 
-import java.io.FileWriter;
-
 /**
- * This protocol together with the settings provides a specific behavior to test jEdit
+ * This protocol together with the settings provides a specific behavior to test UPM
  * We will use Java Access Bridge settings (AccessBridgeEnabled = true) for widget tree extraction
  *
- * It uses QLearningActionSelector algorithm.
+ * It uses Random Selection algorithm.
  */
-public class Protocol_jedit_qlearning extends JavaSwingProtocol {
+public class Protocol_upm_purerandom extends JavaSwingProtocol {
 	
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
-	// QLearningActionSelector: Instead of random, we will use QLearning action selector
-	private QLearningActionSelector actionSelector;
-	
-	/** 
+
+	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){
-		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
-		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
-		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
+	protected void initialize(Settings settings){		
 		super.initialize(settings);
-		
-		// jEdit: Requires Java Access Bridge
+
+		// Swing Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-		
-		// TESTAR will execute the SUT with Java
+
+		// TESTAR will execute the SUT with Java instead of Windows API
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
 		
@@ -102,7 +96,7 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 		}
 		super.beginSequence(system, state);
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -113,7 +107,6 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
@@ -124,16 +117,8 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		/**
-		 * Specific Action Derivation for jEdit SUT
-		 * To avoid deriving actions on non-desired widgets
-		 * 
-		 * Optional : for(Widget w : state)
-		 * If selected also change it for all jEdit protocols
-		 */
-
-		// iterate through top level widgets
-		for(Widget w : getTopWidgets(state)){
+		// iterate through all widgets
+		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -145,104 +130,33 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 					}
 
 					// type into text boxes
-					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w)))) {
+					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
-
-					// GENERIC: All swing apps
-					/** Force actions on some widgets with a wrong accessibility **/
-					// Optional feature, comment out this changes if your Swing applications doesn't need it
-
-					// Tree List elements have plain "text" items have child nodes
-					// We need to derive a click action on them
-					if(w.get(Tags.Role).toString().contains("Tree")) {
-						forceWidgetTreeClickAction(w, actions);
-					}
-					// Combo Box elements also have List Elements
-					// Lists elements needs a special derivation to check widgets visibility
-					if(w.get(Tags.Role).toString().contains("List")) {
-						forceListElemetsClickAction(w, actions);
-					}
-					/** End of Force action **/
 				}
 			}
 		}
 
 		return actions;
-
 	}
 
 	/**
-	 * Iterate through the child of the specified widget to derive a click Action
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action (non-null!)
 	 */
-	private void forceWidgetTreeClickAction(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
-		for(int i = 0; i<w.childCount(); i++) {
-			forceWidgetTreeClickAction(w.child(i), actions);
-		}
+	@Override
+	protected Action selectAction(State state, Set<Action> actions){
+		// RandomSelector: Desktop protocol will return a random action
+		return(super.selectAction(state, actions));
 	}
 
-	/**
-	 * Derive a click Action on visible List dropdown elements
-	 */
-	public void forceListElemetsClickAction(Widget w, Set<Action> actions) {
-		if(!Objects.isNull(w.parent())) {
-			Widget parentContainer = w.parent();
-			Rect visibleContainer = Rect.from(parentContainer.get(Tags.Shape).x(), parentContainer.get(Tags.Shape).y(),
-					parentContainer.get(Tags.Shape).width(), parentContainer.get(Tags.Shape).height());
-
-			forceComboBoxClickAction(w, visibleContainer, actions);
-		}
-	}
-
-	/**
-	 * Derive a click Action if widget rect bounds are inside the visible container
-	 */
-	public void forceComboBoxClickAction(Widget w, Rect visibleContainer, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		try {
-			Rect widgetContainer = Rect.from(w.get(Tags.Shape).x(), w.get(Tags.Shape).y(),
-					w.get(Tags.Shape).width(), w.get(Tags.Shape).height());
-
-			if(Rect.contains(visibleContainer, widgetContainer)) {
-				actions.add(ac.leftClickAt(w));
-				w.set(Tags.ActionSet, actions);
-			}
-
-			for(int i = 0; i<w.childCount(); i++) {
-				forceComboBoxClickAction(w.child(i), visibleContainer, actions);
-			}
-		} catch(Exception e) {}
-	}
-
-	/**
-	  * Select one of the available actions using an action selection algorithm (for example random action selection)
-	  *
-	  * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
-	  * overwrite it, not always running it, we have take care of the HTML report here
-	  *
-	  * @param state the SUT's current state
-	  * @param actions the set of derived actions
-	  * @return  the selected action (non-null!)
-	  */
-	 @Override
-	 protected Action selectAction(State state, Set<Action> actions){
-		 //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-		 //unwanted processes are killed and SUT is put into foreground.
-		 Action retAction = preSelectAction(state, actions);
-		 if (retAction== null) {
-			 // QLearningActionSelector: we select randomly one of the prioritize actions
-			 // Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			 retAction = actionSelector.selectAction(state,actions);
-		 }
-		 return retAction;
-	 }
-	
 	/**
 	 * Execute the selected action.
-	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
@@ -282,14 +196,13 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 	 */
 	@Override
 	protected void finishSequence() {
-
 		// Extract and create JaCoCo sequence coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoSequenceReport();
 		}
 
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -319,13 +232,12 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 	protected void stopSystem(SUT system) {
 		super.stopSystem(system);
 
-		// This is the default JaCoCo generated file, we dumped our desired file with MBeanClient (finishSequence)
-		// In this protocol this one is residual, so just delete
+		// Delete default JaCoCo generated file, because we dumped our desired file with MBeanClient (finishSequence)
 		if(new File("jacoco.exec").exists()) {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
-	
+
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
@@ -335,7 +247,7 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			//compressJacocoReportFolder();
 		}
 	}
 }

@@ -28,51 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.ou.testar.ActionSelectionUtils;
 import nl.ou.testar.PrioritizeNewActionsSelector;
 import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 import org.fruit.alayer.windows.UIATags;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.AWTKeyboard;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.Tags;
 import org.testar.OutputStructure;
-import org.testar.jacoco.JacocoFilesCreator;
-import org.testar.jacoco.JacocoReportReader;
-import org.testar.jacoco.MBeanClient;
-import org.testar.jacoco.MergeJacocoFiles;
-
-import com.google.common.io.Files;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -89,13 +68,6 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	private long startSequenceTime;
 	private String reportTimeDir;
 	
-	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
-	// we use this variable to store after each action the last correct coverage
-	private String lastCorrectJacocoCoverageFile = "";
-
-	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
-	private Set<String> jacocoFiles = new HashSet<>();
-	
 	// BlueJ: Some parts/windows of the SUT may not be interesting to explore
 	// Use the name of the window UIATitleBar to force a close action - "BlueJ:  Debugger" need double space
 	protected List<String> unwantedWindows = Arrays.asList("BlueJ:  Debugger", "BlueJ Quick Introduction - tutorial");
@@ -110,34 +82,14 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		
-		// For experimental purposes we need to disconnect from Windows Remote Desktop
-		// without close the GUI session.
-		/*try {
-			// bat file that uses tscon.exe to disconnect without stop GUI session
-			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
-
-			// Launch and disconnect from RDP session
-			// This will prompt the UAC permission window if enabled in the System
-			if(disconnectBatFile.exists()) {
-				System.out.println("Running: " + disconnectBatFile);
-				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
-			} else {
-				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
-		
 		super.initialize(settings);
 
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
+		
+		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+		copyJacocoBuildFile();
 	}
 	
 	/**
@@ -151,7 +103,6 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 		startSequenceTime = System.currentTimeMillis();
 		try{
 			reportTimeDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();
-			//myWriter = new FileWriter(reportTimeDir + "/_sequenceTimeUntilActions.txt");
 		} catch (Exception e) {
 				System.out.println("sequenceTimeUntilActions.txt can not be created " );
 				e.printStackTrace();
@@ -188,7 +139,6 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 		waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "OK", state, system, 5, 1);
 		
 		Util.pause(10);
-	
 		
 	 	super.beginSequence(system, state);
 	}
@@ -372,53 +322,32 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 		// PrioritizeNewActionsSelector: add executed action, next iteration we will prioritize least executed actions
 		selector.addExecutedAction(action);
-		
+
 		boolean actionExecuted = super.executeAction(system, state, action);
 
-		// Only create JaCoCo report for Generate Mode
-		// Modify if desired
+		// Write sequence duration to CLI and to file
+		long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
+		System.out.println();
+		System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
+
+		long minutes = (sequenceDurationSoFar / 1000)  / 60;
+		int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
+		System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
+		System.out.println();
+		// Write sequence duration to file
+		try {
+			FileWriter myWriter = new FileWriter(reportTimeDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_actionTimeStamps.txt", true);
+			myWriter.write(sequenceDurationSoFar + "\r\n");
+			myWriter.close();
+			System.out.println("Wrote time so far to file." + reportTimeDir + "/_sequenceTimeUntilAction.txt");
+		} catch (IOException e) {
+			System.out.println("An error occurred.");
+			e.printStackTrace();
+		}
+
+		// Extract and create JaCoCo action coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-
-			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
-			try {
-				System.out.println("Extract JaCoCo report for Action number: " + actionCount);
-				
-				// Write sequence duration to CLI and to file
-				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
-				System.out.println();
-				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-	
-				long minutes = (sequenceDurationSoFar / 1000)  / 60;
-				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
-				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
-				System.out.println();
-				// Write sequence duration to file
-				try {
-					FileWriter myWriter = new FileWriter(reportTimeDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_actionTimeStamps.txt", true);
-					//myWriter.write("Elapsed time until action " + actionCount + " : " + minutes + " minutes, " + seconds + " seconds   (" + sequenceDurationSoFar + " mili). \r\n");
-					myWriter.write(sequenceDurationSoFar + "\r\n");
-					myWriter.close();
-					System.out.println("Wrote time so far to file." + reportTimeDir + "/_sequenceTimeUntilAction.txt");
-				} catch (IOException e) {
-					System.out.println("An error occurred.");
-					e.printStackTrace();
-				}
-				
-				// Dump the JaCoCo Action report from the remote JVM
-				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
-
-				// If not empty save as last correct file in case the SUT crashes
-				if(!jacocoFile.isEmpty()) {
-					lastCorrectJacocoCoverageFile = jacocoFile;
-				}
-
-				// Create the output JaCoCo Action report
-				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
-
-			} catch (Exception e) {
-				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
-			}
-
+			extractJacocoActionReport();
 		}
 
 		return actionExecuted;
@@ -431,26 +360,13 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	@Override
 	protected void finishSequence() {
 
-		// Only create JaCoCo report for Generate Mode
-		// Modify if desired
+		// Extract and create JaCoCo sequence coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-
-			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
-			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
-			if(!jacocoFile.isEmpty()) {
-				lastCorrectJacocoCoverageFile = jacocoFile;
-			}
-
-			// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
-			// If everything works correctly will be the sequence report, if not last correct action report
-			jacocoFiles.add(lastCorrectJacocoCoverageFile);
-
-			// Create the output JaCoCo report
-			JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+			extractJacocoSequenceReport();
 		}
- 
+
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -493,22 +409,10 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
-		try {
-			// Merge all jacoco.exec sequence files
-			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
-			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
-			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
-			// And create the report that contains the coverage of all executed sequences
-			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
-
-			//TODO: We also need to delete original folder after compression
-			//Compress all JaCoCo report files
-			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
-			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");
+		// Extract and create JaCoCo run coverage report for Generate Mode
+		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+			extractJacocoRunReport();
+			compressJacocoReportFolder();
 		}
 	}
 }

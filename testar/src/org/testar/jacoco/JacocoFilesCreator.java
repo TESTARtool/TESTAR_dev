@@ -97,8 +97,10 @@ public class JacocoFilesCreator {
 		try {
 			// JaCoCo Action report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+					+ File.separator + "jacoco_reports"
+					+ File.separator + OutputStructure.startInnerLoopDateString 
+					+ "_" + OutputStructure.executedSUTname
+					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount
 					+ "_action_" + actionCount;
 
 			createJacocoReport(jacocoFile, reportDir);
@@ -116,8 +118,10 @@ public class JacocoFilesCreator {
 		try {
 			// JaCoCo Sequence report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname;
+					+ File.separator + "jacoco_reports"
+					+ File.separator + OutputStructure.startInnerLoopDateString 
+					+ "_" + OutputStructure.executedSUTname
+					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
 			createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
@@ -134,8 +138,10 @@ public class JacocoFilesCreator {
 		try {
 			// JaCoCo Merged report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
-					+ File.separator + "JaCoCo_reports"
-					+ File.separator + "TOTAL_MERGED";
+					+ File.separator + "jacoco_reports"
+					+ File.separator + OutputStructure.startInnerLoopDateString 
+					+ "_" + OutputStructure.executedSUTname
+					+ "_TOTAL_MERGED";
 
 			createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
