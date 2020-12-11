@@ -32,9 +32,9 @@ package org.testar.settings;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.SerializationUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.testar.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -90,7 +90,7 @@ class ExtractionResult {
 }
 
 public class ExtendedSettingFile implements Serializable {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final String TAG = "ExtendedSettings";
     public static final String FileName = "ExtendedSettings.xml";
     private final String _absolutePath;
     private final ReentrantReadWriteLock _fileAccessMutex;
@@ -137,14 +137,14 @@ public class ExtendedSettingFile implements Serializable {
 
             // We only support loading a single element for now.
             if (rd.Data.any.stream().filter(element -> element.getClass() == clazz).count() > 1) {
-                LOGGER.error("Duplicate elements found for {}, returning first element ", clazz);
+                Logger.log(Level.ERROR, TAG, "Duplicate elements found for {}, returning first element ", clazz);
             }
 
             // Store the current content, so we can replace it when needed.
             _loadedValue = SerializationUtils.clone((Serializable) result);
         }
         if (result == null) {
-            LOGGER.info("Did not found XML element for class: {}", clazz);
+            Logger.log(Level.INFO, TAG,"Did not found XML element for class: {}", clazz);
         }
 
         return result;
@@ -163,7 +163,7 @@ public class ExtendedSettingFile implements Serializable {
         T result = load(clazz);
 
         if (result == null) {
-            LOGGER.info("Writing default values for {}", clazz);
+            Logger.log(Level.TRACE, TAG,"Writing default values for {}", clazz);
             save(defaultFunctor.CreateDefault());
             return load(clazz);
         }
@@ -179,7 +179,7 @@ public class ExtendedSettingFile implements Serializable {
      */
     public void save(@NonNull Object data) {
         if (!(data instanceof Comparable)) {
-            LOGGER.error("Object {} is not extending Comparable", data);
+            Logger.log(Level.ERROR, TAG,"Object {} is not extending Comparable", data);
             return;
         }
 
@@ -281,7 +281,7 @@ public class ExtendedSettingFile implements Serializable {
                 Marshaller marshaller = context.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
                 marshaller.marshal(new RootSetting(), os);
-                LOGGER.info("Created extended settings file: {}", _absolutePath);
+                Logger.log(Level.INFO, TAG,"Created extended settings file: {}", _absolutePath);
             } catch (JAXBException e) {
                 e.printStackTrace();
             } finally {

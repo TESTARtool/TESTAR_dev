@@ -162,7 +162,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
