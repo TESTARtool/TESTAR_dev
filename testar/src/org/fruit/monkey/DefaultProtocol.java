@@ -41,8 +41,7 @@ import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 
-import java.awt.Desktop;
-import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -53,14 +52,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
@@ -69,12 +72,14 @@ import nl.ou.testar.visualvalidation.VisualValidationFactory;
 import nl.ou.testar.visualvalidation.VisualValidationManager;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Canvas;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.Shape;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
@@ -178,7 +183,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean forceToForeground = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
-	
+
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
 
@@ -278,31 +283,29 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
-			
+
 		}catch(SessionNotCreatedException e) {
 			
     		if(e.getMessage().contains("Chrome version")) {
-    			
-    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
-    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
-    					+ "\n"
-    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
-    					+ "You can use Task Manager to finish it.";
-    			
-    			popupMessage(msg);
-    			
+    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions ***"
+    					+ "<br>Please verify your Chrome browser version: chrome://settings/help"
+    					+ "<br>And <a href=\"https://chromedriver.chromium.org/downloads\">download</a> the appropriate ChromeDriver version."
+    					+ "<br>"
+    					+ "<br>Surely exists a residual process \"chromedriver.exe\" running."
+    					+ "<br>You can use Task Manager to finish it.";
+
+				chromeDriverMissing(msg);
+
     			System.out.println(msg);
-    			System.out.println(e.getMessage());
-    			
-    		}else {
+
+			}else {
     			System.out.println("********** ERROR starting Selenium WebDriver ********");
-    			System.out.println(e.getMessage());
-    		}
-    		
+			}
+			System.out.println(e.getMessage());
+
 		}catch (IllegalStateException e) {
 			if (e.getMessage().contains("driver executable does not exist")) {
-				
+
 				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists or if is a correct definition";
@@ -310,11 +313,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				popupMessage(msg);
 
 				System.out.println(msg);
-			
+
 			}else {
 				e.printStackTrace();
 			}
-		
+
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
@@ -468,6 +471,47 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);
+
+		}
+	}
+
+	/**
+	 * Show a popup containing a html message with click interaction.
+	 * Only if GUI option is enabled (disabled for CI)
+	 */
+	private void chromeDriverMissing(String htmlMessage) {
+		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			JFrame frame = new JFrame();
+			// for copying style
+			JLabel label = new JLabel();
+			Font font = label.getFont();
+
+			// create some css from the label's font
+			String style = "font-family:" + font.getFamily() + ";"
+					+ "font-weight:" + (font.isBold() ? "bold" : "normal") + ";"
+					+ "font-size:" + font.getSize() + "pt;";
+			// html content
+			JEditorPane ep = new JEditorPane("text/html", "<html><body style=\"" + style + "\">"
+					+ htmlMessage
+					+ "</body></html>");
+
+			// handle link events
+			ep.addHyperlinkListener(e -> {
+				if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+					Desktop desktop = Desktop.getDesktop();
+					try {
+						desktop.browse(e.getURL().toURI());
+					} catch (URISyntaxException | IOException exception) {
+						exception.printStackTrace();
+					}
+				}
+			});
+			ep.setEditable(false);
+			ep.setBackground(label.getBackground());
+
+			// show
+			JOptionPane.showMessageDialog(frame, ep);
+
 		}
 	}
 
@@ -700,7 +744,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
-				
+
 				//update state after begin sequence SUT modification
 				state = getState(system);
 
@@ -943,17 +987,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
-			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
 
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
-			
+
 			cv.end();
 
 			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
-			
+
 			synchronized (this) {
 				try {
 					this.wait(msRefresh);
@@ -971,7 +1014,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
-		
+
 		//finishSequence() content, but SPY mode is not a sequence
 		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
 			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
@@ -1487,7 +1530,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		return state;
 	}
 
@@ -1551,7 +1594,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// if everything was OK ...
 		return Verdict.OK;
 	}
-	
+
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
 
@@ -1692,10 +1735,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
 			WdProtocolUtil.getActionshot(state,action);
 		}else{
-			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
 		
