@@ -1509,13 +1509,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		setStateForClickFilterLayerProtocol(state);
 
-		if(settings.get(ConfigTags.Mode) == Modes.Spy)
+		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 			return state;
-		
-		Verdict verdict = getVerdict(state);
-		state.set(Tags.OracleVerdict, verdict);
+		}
 
 		setStateScreenshot(state);
+
+		Verdict verdict = getVerdict(state);
+		state.set(Tags.OracleVerdict, verdict);
 
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
@@ -1535,10 +1536,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Take a Screenshot of the State and associate the path into state tag
+	 * Take a Screenshot of the State and associate the path into state tag.
+	 * If enabled run the visual validation on the capture screenshot.
 	 */
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
+		AWTCanvas screenShot = null;
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
 				//System.out.println("DEBUG: Using WebDriver specific state shot.");
@@ -1553,6 +1556,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					"NoConcreteIdAvailable"), screenShot);
 			state.set(Tags.ScreenshotPath, screenshotPath);
 		}
+		visualValidationManager.AnalyzeImage(state, screenShot);
 	}
 
 	@Override
@@ -1888,7 +1892,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					GlobalScreen.unregisterNativeHook();
 				}
 			}
-			visualValidationManager.Close();
+			visualValidationManager.Destroy();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

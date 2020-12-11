@@ -1,9 +1,19 @@
 package nl.ou.testar.visualvalidation;
 
-import java.awt.image.BufferedImage;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.fruit.alayer.AWTCanvas;
+import org.fruit.alayer.State;
 
 public interface VisualValidationManager {
-    void AnalyzeImage(BufferedImage image);
+    /**
+     * Analyze the captured image and update the verdict.
+     * @param state The state of the application.
+     * @param screenshot The captured screenshot of the current state.
+     */
+    void AnalyzeImage(State state, @Nullable AWTCanvas screenshot);
 
-    void Close();
+    /**
+     * Destroy the visual validation manager.
+     */
+    void Destroy();
 }

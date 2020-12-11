@@ -11,11 +11,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TesseractSettings extends ExtendedSettingBase<TesseractSettings> {
     public String dataPath;
     public String language;
+    public int imageResolution;
 
     public static TesseractSettings CreateDefault() {
         TesseractSettings instance = new TesseractSettings();
         instance.dataPath = System.getenv("LOCALAPPDATA") + "\\Tesseract-OCR\\tessdata";
         instance.language = "eng";
+        instance.imageResolution = 160;
         return instance;
     }
 
