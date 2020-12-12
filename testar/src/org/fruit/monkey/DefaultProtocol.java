@@ -1541,22 +1541,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
-		AWTCanvas screenShot = null;
+		AWTCanvas screenshot = null;
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				//System.out.println("DEBUG: Using WebDriver specific state shot.");
-				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+				screenshot = WdProtocolUtil.getStateshotBinary(state);
 			}else{
-				//System.out.println("DEBUG: normal state shot");
-				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+				screenshot = ProtocolUtil.getStateshotBinary(state);
 			}
-			AWTCanvas screenShot = protocolUtil.getStateshotBinary(state);
-			visualValidationManager.AnalyzeImage(screenShot.image());
 			String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom,
-					"NoConcreteIdAvailable"), screenShot);
+					"NoConcreteIdAvailable"), screenshot);
 			state.set(Tags.ScreenshotPath, screenshotPath);
 		}
-		visualValidationManager.AnalyzeImage(state, screenShot);
+		visualValidationManager.AnalyzeImage(state, screenshot);
 	}
 
 	@Override
