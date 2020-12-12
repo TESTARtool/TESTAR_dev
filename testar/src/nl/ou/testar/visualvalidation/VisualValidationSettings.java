@@ -41,7 +41,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class VisualValidationSettings extends ExtendedSettingBase<VisualValidationSettings> {
     public Boolean enabled;
-
     public OcrConfiguration ocrConfiguration;
 
     @Override
@@ -63,7 +62,7 @@ public class VisualValidationSettings extends ExtendedSettingBase<VisualValidati
 
     public static VisualValidationSettings CreateDefault() {
         VisualValidationSettings DefaultInstance = new VisualValidationSettings();
-        DefaultInstance.enabled = false;
+        DefaultInstance.enabled = true;
         DefaultInstance.ocrConfiguration = OcrConfiguration.CreateDefault();
         return DefaultInstance;
     }

@@ -101,11 +101,11 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     }
 
     @Override
-    public void reportResult(List<RecognizedElement> items) {
+    public void reportResult(List<RecognizedElement> detectedText) {
         synchronized (_ocrResultReceived) {
-            _ocrItems = items;
+            _ocrItems = detectedText;
             _ocrResultReceived.notify();
-            Logger.log(Level.INFO, TAG, "Received {} result", items.size());
+            Logger.log(Level.INFO, TAG, "Received {} result", detectedText.size());
         }
     }
 }
