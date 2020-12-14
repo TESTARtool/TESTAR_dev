@@ -48,11 +48,15 @@ public class WdProtocolUtil extends ProtocolUtil {
 
   @Override
   public String getStateshot(State state) {
-    double width = CanvasDimensions.getCanvasWidth() + (
-        state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
-    double height = CanvasDimensions.getCanvasHeight() + (
-        state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+    double width = CanvasDimensions.getCanvasWidth() + (state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+    double height = CanvasDimensions.getCanvasHeight() + (state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
     Rect rect = Rect.from(0, 0, width, height);
+	  
+    if(isOverrideWebdriver()) {
+    	AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, getOverrideScreenshotDisplayScale());
+    	return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
+    }
+	  
     AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
     return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
   }
@@ -64,8 +68,7 @@ public class WdProtocolUtil extends ProtocolUtil {
       return null;
     }
 
-    Rectangle actionArea = new Rectangle(
-        Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    Rectangle actionArea = new Rectangle(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
     for (Finder f : targets) {
       Widget widget = f.apply(state);
       Shape shape = widget.get(Tags.Shape);
@@ -83,8 +86,14 @@ public class WdProtocolUtil extends ProtocolUtil {
       return null;
     }
 
-    Rect rect = Rect.from(
-        actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
+    Rect rect = Rect.from(actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
+    
+    if(isOverrideWebdriver()) {
+    	AWTCanvas actionScrshot = WdScreenshot.fromScreenshot(rect, getOverrideScreenshotDisplayScale());
+    	return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), 
+    			action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), actionScrshot);
+    }
+    
     AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
     return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
   }
@@ -101,11 +110,14 @@ public class WdProtocolUtil extends ProtocolUtil {
 		  return scrshot;
 	  }
 	  
-	  double width = CanvasDimensions.getCanvasWidth() + (
-			  state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
-	  double height = CanvasDimensions.getCanvasHeight() + (
-			  state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+	  double width = CanvasDimensions.getCanvasWidth() + (state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+	  double height = CanvasDimensions.getCanvasHeight() + (state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
 	  Rect rect = Rect.from(0, 0, width, height);
+
+	  if(isOverrideWebdriver()) {
+		  return WdScreenshot.fromScreenshot(rect, getOverrideScreenshotDisplayScale());
+	  }
+
 	  AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
 	  return screenshot;
   }

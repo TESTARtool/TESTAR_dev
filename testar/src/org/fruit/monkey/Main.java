@@ -480,6 +480,7 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(OverrideWebDriverScreenshotDisplay, ""));
 			
 			defaults.add(Pair.from(HTMLreportServerFile, outputDir));
 			defaults.add(Pair.from(PKMaddress, "127.0.0.1"));

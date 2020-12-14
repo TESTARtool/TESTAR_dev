@@ -138,5 +138,6 @@ public final class ConfigTags {
 
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
+  public static final Tag<String> OverrideWebDriverScreenshotDisplay = Tag.from("OverrideWebDriverScreenshotDisplay", String.class);
 
 }

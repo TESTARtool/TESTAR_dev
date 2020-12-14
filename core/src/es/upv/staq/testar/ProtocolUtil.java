@@ -234,6 +234,22 @@ public class ProtocolUtil {
 	//  Screenshots helpers
 	// #####################
 	
+	// Screenshots sometimes will need to specify different display scales
+	private double overrideScreenshotDisplayScale = 1.0;
+	public double getOverrideScreenshotDisplayScale() {
+		return overrideScreenshotDisplayScale;
+	}
+	public void setOverrideScreenshotDisplay(double overrideScreenshotDisplayScale) {
+		this.overrideScreenshotDisplayScale = overrideScreenshotDisplayScale;
+	}
+	private boolean overrideScreenshot = false;
+	public boolean isOverrideWebdriver() {
+		return overrideScreenshot;
+	}
+	public void setOverrideScreenshot(boolean overrideScreenshot) {
+		this.overrideScreenshot = overrideScreenshot;
+	}
+
 	public String getStateshot(State state){
 		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state));
 	}

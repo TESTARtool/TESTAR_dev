@@ -439,6 +439,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
+					+"OverrideWebDriverScreenshotDisplay =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

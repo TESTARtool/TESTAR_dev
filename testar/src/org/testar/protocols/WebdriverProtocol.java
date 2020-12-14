@@ -180,6 +180,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// See remarks in WdMouse
         mouse = sut.get(Tags.StandardMouse);
         mouse.setCursorDisplayScale(displayScale);
+        
+        // Use OverrideWebDriverScreenshotDisplay settings value to override webdriver screenshots display scale
+        try {
+        	String overrideScreenshotDisplayAsString = settings().get(ConfigTags.OverrideWebDriverScreenshotDisplay, "");
+        	if(!overrideScreenshotDisplayAsString.isEmpty()) {
+        		double webDriverScreenshotDisplay = Double.parseDouble(overrideScreenshotDisplayAsString);
+        		if(webDriverScreenshotDisplay > 0.0) {
+        			System.out.println("Changing OverrideWebDriverScreenshotDisplay to: " + webDriverScreenshotDisplay);
+        			protocolUtil.setOverrideScreenshot(true);
+        			protocolUtil.setOverrideScreenshotDisplay(webDriverScreenshotDisplay);
+        		}
+        	}
+        } catch (NumberFormatException e) {
+        	System.out.println("WARNING Unable to convert OverrideWebDriverScreenshotDisplay to double");
+        }
 
     	return sut;
     }
