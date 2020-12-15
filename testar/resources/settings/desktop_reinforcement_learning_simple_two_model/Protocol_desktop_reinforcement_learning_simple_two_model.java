@@ -96,14 +96,7 @@ public class Protocol_desktop_reinforcement_learning_simple_two_model extends De
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for (Widget w : state) {
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
-
-            if (w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")) {
-                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
-                continue; // skip this iteration of the for-loop
-            }
+        for(Widget w : getTopWidgets(state)){
 
             // Only consider enabled and non-blocked widgets
             if (w.get(Enabled, true) && !w.get(Blocked, false)) {
@@ -136,12 +129,6 @@ public class Protocol_desktop_reinforcement_learning_simple_two_model extends De
                         // For Reinforcement Learning purposes, we will use temporally this text for type actions
                         actions.add(ac.clickTypeInto(w, "SameTypeStringText", true));
                     }
-
-                    //Add sliding actions (like scroll, drag and drop) to the derived actions
-                    //method defined below.
-
-                    // For Reinforcement Learning purposes, we will disable temporally scroll actions
-                    //addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
                 }
             }
         }

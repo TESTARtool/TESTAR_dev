@@ -82,6 +82,13 @@ public class WidgetStub implements Widget {
                 this.get(Tags.Abstract_R_T_P_ID) + "\n");
         return repr.toString();
     }
+    
+	@Override
+	public String getAbstractRepresentation() {
+		StringBuilder repr = new StringBuilder();
+		repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+		return repr.toString();
+	}
 
     @Override
     public String toString(Tag<?>... tags){

@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "C:\\Users\\mark_\\IdeaProjects\T\ESTAR_dev\\testar\\distributionSUTs\\SimpleModelTwo.jar"
+SUTConnectorValue = java -jar "suts\\SimpleModelTwo.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = true
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 2
-SequenceLength = 2
+Sequences = 1
+SequenceLength = 5
 
 #################################################################
 # Oracles based on suspicious titles

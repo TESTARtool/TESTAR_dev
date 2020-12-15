@@ -290,6 +290,11 @@ public class AtSpiWidget implements Widget, Serializable {
                 getPropertiesRepresentation(tab);
 
     }
+    
+	@Override
+	public String getAbstractRepresentation() {
+		return "Complete Linux AtSpiWidget.getAbstractRepresentation() abstract tag ???";
+	}
 
 
     /**

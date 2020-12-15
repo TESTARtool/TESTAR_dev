@@ -43,7 +43,7 @@ public class LRKeyrootsHelper {
         }
 
         return childList.stream()
-                .sorted(Comparator.comparing(childWidget -> childWidget.getRepresentation("")))
+                .sorted(Comparator.comparing(childWidget -> childWidget.getAbstractRepresentation()))
                 .collect(Collectors.toList());
     }
 
@@ -54,15 +54,20 @@ public class LRKeyrootsHelper {
             return;
         }
 
-        logger.info("Sorted list is '{}'", sortedChildList);
+        // TODO: Widget object identifier is not informative for logs debugging
+        //logger.info("Sorted list is '{}'", sortedChildList);
 
+        // TODO: Why? Only One left Widget
+        // Then all other to right Widget
         processLeftChild(sortedChildList.get(0), result);
 
-        IntStream.range(1, sortedChildList.size())
-                .forEach(i -> processRightChild(sortedChildList.get(i), result));
+        IntStream.range(1, sortedChildList.size()).forEach(i -> processRightChild(sortedChildList.get(i), result));
     }
 
     private void processLeftChild(final Widget leftChildWidget, final Deque<Widget> result) {
+    	// FIXME: Why not?
+    	//result.add(leftChildWidget);
+    	
         processChilds(leftChildWidget, result);
     }
 

@@ -49,6 +49,8 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
+import es.upv.staq.testar.CodingManager;
+
 import static org.fruit.alayer.windows.UIATags.*;
 
 class UIAWidget implements Widget, Serializable {
@@ -178,11 +180,30 @@ class UIAWidget implements Widget, Serializable {
 		return Util.join(hDrags,vDrags);
 	}
 	
+	@Override
+	public String getAbstractRepresentation() {
+		StringBuilder repr = new StringBuilder();
+		repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+		repr.append(getAbstractProperties());
+		return repr.toString();
+	}
+	
+	private String getAbstractProperties() {
+		StringBuilder absP = new StringBuilder();
+		for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
+			if(this.get(tag, null) != null) {
+				absP.append("," + tag.name() + "=" + this.get(tag));
+			}
+		}
+		return absP.toString();
+	}
+	
 	/**
 	 * @param tab A tabulator for indentation.
 	 * @return Computes a string representation of the widget properties.
 	 * @author urueda
 	 */
+	// OLD IMPLEMENTATION
 	private String getPropertiesRepresentation(String tab){
 		StringBuffer pr = new StringBuffer();
 		Role role = this.get(Tags.Role, null);
@@ -207,6 +228,7 @@ class UIAWidget implements Widget, Serializable {
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
+	//OLD IMPLEMENTATION
 	public String getRepresentation(String tab){
 		StringBuffer repr = new StringBuffer();
 		repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
@@ -222,5 +244,17 @@ class UIAWidget implements Widget, Serializable {
 	public String toString(Tag<?>... tags){
 		return Util.treeDesc(this, 2, tags);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == this) {
+			return true;
+		}
 		
+		if(!(o instanceof UIAWidget)) {
+			return false;
+		}
+		
+		return this.get(Tags.AbstractIDCustom, "one").equals(((UIAWidget) o).get(Tags.AbstractIDCustom, "two"));
+	}
 }

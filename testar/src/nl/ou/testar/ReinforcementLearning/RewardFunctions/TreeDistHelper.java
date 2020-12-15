@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
 import java.util.ArrayDeque;
@@ -36,8 +37,28 @@ public class TreeDistHelper {
 
         for (final Widget nodeTree1 : keyRootPathTree1) {
             for (final Widget nodeTree2: keyRootPathTree2) {
-                if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
-                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {
+            	
+                System.out.println("**** Node Tree1 Widget Title : " + nodeTree1.get(Tags.Title, "NOtitleOne"));
+                System.out.println("**** Node Tree2 Widget Title : " + nodeTree2.get(Tags.Title, "NOtitleTwo"));
+                
+                System.out.println("--------------------------------------------------------------------------------------------------");
+                System.out.println("getLeftMostArray(nodeTree1).getFirst() TITLE: " + getLeftMostArray(nodeTree1).getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("getLeftMostArray(nodeTree1).getFirst() AbstractIDCustom: " + getLeftMostArray(nodeTree1).getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
+                System.out.println("keyRootPathTree1.getFirst() TITLE: " + keyRootPathTree1.getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("keyRootPathTree1.getFirst() AbstractIDCustom: " + keyRootPathTree1.getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
+                
+                System.out.println("--------------------------------------------------------------------------------------------------");
+                
+                System.out.println("getLeftMostArray(nodeTree2).getFirst() TITLE: " + getLeftMostArray(nodeTree2).getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("getLeftMostArray(nodeTree2).getFirst() AbstractIDCustom: " + getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));	
+                System.out.println("keyRootPathTree2.getFirst() TITLE: " + keyRootPathTree2.getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("keyRootPathTree2.getFirst() AbstractIDCustom: " + keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
+                
+                
+                /*if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
+                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {*/
+            	if (getLeftMostArray(nodeTree1).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree1.getFirst().get(Tags.AbstractIDCustom,"two"))
+                        && getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom,"two"))) {
 
                     final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
                     final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree1);
@@ -69,14 +90,17 @@ public class TreeDistHelper {
         if (node1 == null || node2 == null) {
             return false;
         }
-        logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
-
-        return StringUtils.equals(node1.getRepresentation(""), node2.getRepresentation(""));
+        
+        //logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
+        
+        logger.debug("Comparing AbstractIDCustom properties of nodes: '{}' and '{}'", node1.toString(), node2.toString());
+        
+        return StringUtils.equals(node1.getAbstractRepresentation(), node2.getAbstractRepresentation());
     }
 
     private Widget getEarlierNode(final Widget node, final Deque<Widget> deque) {
         final List<Widget> dequeList = new ArrayList<>(deque);
-        final int position = dequeList.indexOf(node); // test if this works
+        final int position = dequeList.indexOf(node); // TODO: test if this works
 
         if (position - 1 < 0) {
             return null;

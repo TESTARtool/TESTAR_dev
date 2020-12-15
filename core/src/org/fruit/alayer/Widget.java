@@ -69,7 +69,10 @@ public interface Widget extends Taggable, Serializable {
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
+	// OLD IMPLEMENTATION
 	public String getRepresentation(String tab);
+	
+	public String getAbstractRepresentation();
 	
 	public abstract String toString(Tag<?>... tags);
 	
