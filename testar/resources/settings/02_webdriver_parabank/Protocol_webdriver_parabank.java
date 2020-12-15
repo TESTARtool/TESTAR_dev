@@ -163,7 +163,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   @Override
   protected Verdict getVerdict(State state) {
 
-    Verdict verdict = super.getVerdict(state); // by urueda
+    Verdict verdict = super.getVerdict(state);
     // system crashes, non-responsiveness and suspicious titles automatically detected!
 
     //-----------------------------------------------------------------------------
@@ -194,8 +194,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    * @return a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state)
-      throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
     Set<Action> filteredActions = new HashSet<>();
@@ -206,9 +205,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // Check if forced actions are needed to stay within allowed domains
     Set<Action> forcedActions = detectForcedActions(state, ac);
-    if (forcedActions != null && forcedActions.size() > 0) {
-      return forcedActions;
-    }
 
     // iterate through all widgets
     for (Widget widget : state) {
@@ -223,9 +219,16 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
       if (!widget.get(Enabled, true)) {
         continue;
       }
+
+      // The blackListed widgets are those that have been filtered during the SPY mode with the
+      //CAPS_LOCK + SHIFT + Click clickfilter functionality.
       if(blackListed(widget)){
-    	    filteredActions.add(ac.leftClickAt(widget));
-          continue;
+    	  if(isTypeable(widget)){
+    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  } else {
+    		  filteredActions.add(ac.leftClickAt(widget));
+    	  }
+    	  continue;
       }
 
       // slides can happen, even though the widget might be blocked
@@ -238,12 +241,12 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
       // type into text boxes
       if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-          if(whiteListed(widget) || isUnfiltered(widget)){
-    	        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-          }else{
-              // filtered and not white listed:
-              filteredActions.add(ac.leftClickAt(widget));
-          }
+    	  if(whiteListed(widget) || isUnfiltered(widget)){
+    		  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  }else{
+    		  // filtered and not white listed:
+    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  }
       }
 
       // left clicks, but ignore links outside domain
@@ -264,6 +267,12 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
 	if(actions.isEmpty()) {
 		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+	}
+	
+	// If we have forced actions, prioritize and filter the other ones
+	if (forcedActions != null && forcedActions.size() > 0) {
+		filteredActions = actions;
+		actions = forcedActions;
 	}
 
 	//Showing the grey dots for filtered actions if visualization is on:

@@ -38,7 +38,6 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
@@ -47,8 +46,6 @@ import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
