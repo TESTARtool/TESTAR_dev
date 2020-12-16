@@ -57,8 +57,6 @@ import static org.fruit.alayer.Tags.Enabled;
 import org.testar.protocols.DesktopProtocol;
 
 public class Protocol_desktop_listening_reward extends DesktopProtocol {
-
-	private double userInterestReward = 2.5;
 	
 	/**
 	 * Initialize TESTAR with the given settings:

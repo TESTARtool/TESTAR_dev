@@ -1707,7 +1707,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//	 */
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
 		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
+			
+			executeScriptEvent(system, state);
+			
+			if (userEvent != null && !typeReady){
 				Action mapAction = mapUserEvent(system, state);
 				//Only set the Action if was found on widget tree map
 				if(mapAction != null) {
@@ -1799,8 +1802,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				return null;
 			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
+		} else if(!typedText.isEmpty() && typedText.length() > 1) {
+			// By default the widget is the state
+			Widget w = state;
+
+			// If this event was created listening the scripts get the widget
+			if(userEvent[0] != null && userEvent[0].equals("script")) {
+				w = Util.widgetFromPoint(state, (double)userEvent[1], (double)userEvent[2]);
+			}
+
+			Action typeIntoState = (new AnnotatingActionCompiler()).clickTypeInto(state, typedText, false);
+			typedText = "";
+			return typeIntoState;
+		} else if (userEvent[0] instanceof KBKeys) { // key events
 			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+		}
 		else if (userEvent[0] instanceof String){ // type events
 			if (lastExecutedAction == null)
 				return null;
@@ -1815,5 +1831,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 		return null;
+	}
+	
+	protected void executeScriptEvent(SUT system, State state) {
+		//Future implementation for listening mode + script events
 	}
 }
