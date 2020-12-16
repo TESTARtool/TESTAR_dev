@@ -61,16 +61,28 @@ public class TreeDistHelper {
                 System.out.println("keyRootPathTree2.getFirst() ROLE: " + keyRootPathTree2.getFirst().get(Tags.Role, Roles.Widget));
                 System.out.println("keyRootPathTree2.getFirst() AbstractIDCustom: " + keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
                 
-                
-                /*if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
-                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {*/
-            	
-                
-                if (getLeftMostArray(nodeTree1).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree1.getFirst().get(Tags.AbstractIDCustom,"two"))
-                        && getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom,"two"))) {
-
+                // This equals is comparing AbstractIDCustom widget property
+                // See windows -> org.fruit.alayer.windows -> UIAWidget.java -> equals
+                if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
+                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {
                 	
                     System.out.println(" INSIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE :D");
+                    
+                    /**
+                     * Debug: windows -> org.fruit.alayer.windows -> UIAWidget.java -> getAbstractRepresentation()
+                     * This is just a debugging to check that this method works
+                     * FINAL implementation should be done with getEarlierNodes
+                     */
+                    
+                    if(nodeTree1 != null) {
+                    	System.out.println("nodeTree1 getAbstractRepresentation()");
+                    	System.out.println(nodeTree1.getAbstractRepresentation());
+                    }
+                    
+                    if(nodeTree2 != null) {
+                    	System.out.println("nodeTree2 getAbstractRepresentation()");
+                    	System.out.println(nodeTree2.getAbstractRepresentation());
+                    }
                 	
                 	
                     final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
@@ -104,6 +116,9 @@ public class TreeDistHelper {
             return false;
         }
         
+        // FIXME: At the moment this seems not to work
+        System.out.println("!!!! areNodesEqual NOT NULL !!!! We are IN");
+        
         //logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
         
         logger.debug("Comparing AbstractIDCustom properties of nodes: '{}' and '{}'", node1.toString(), node2.toString());
@@ -113,7 +128,9 @@ public class TreeDistHelper {
 
     private Widget getEarlierNode(final Widget node, final Deque<Widget> deque) {
         final List<Widget> dequeList = new ArrayList<>(deque);
-        final int position = dequeList.indexOf(node); // TODO: test if this works
+        
+        // TODO: test if this works
+        final int position = dequeList.indexOf(node);
         
         
         System.out.println("getEarlierNode -> " + node.get(Tags.Role, Roles.Widget));

@@ -111,13 +111,13 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb-3.0.28\\databases
-DataStoreDB = testarDB
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = delayed
-ApplicationName = SimpleModelTwo
-ApplicationVersion = 1.0.0
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = debug
+ApplicationVersion = 1
 
 #################################################################
 # State identifier attributes
@@ -125,7 +125,7 @@ ApplicationVersion = 1.0.0
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetTitle,WidgetControlType
 
 #################################################################
 # Reinforcement learning settings
@@ -157,13 +157,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.5
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
