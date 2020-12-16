@@ -1888,7 +1888,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					GlobalScreen.unregisterNativeHook();
 				}
 			}
-			visualValidationManager.Destroy();
+			if (visualValidationManager != null) {
+				visualValidationManager.Destroy();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

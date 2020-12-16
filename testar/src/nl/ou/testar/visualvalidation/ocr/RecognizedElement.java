@@ -1,15 +1,12 @@
 package nl.ou.testar.visualvalidation.ocr;
 
+import nl.ou.testar.visualvalidation.TextElement;
+
 /**
  * A discovered text element by an OCR engine.
  */
-public class RecognizedElement {
-    final int _x1;
-    final int _y1;
-    final int _x2;
-    final int _y2;
-    final float _confidence;
-    final String _text;
+public class RecognizedElement extends TextElement {
+    public final float _confidence;
 
     /**
      * Constructor.
@@ -22,12 +19,8 @@ public class RecognizedElement {
      * @param text       The discovered text.
      */
     public RecognizedElement(int x1, int y1, int x2, int y2, float confidence, String text) {
-        _x1 = x1;
-        _y1 = y1;
-        _x2 = x2;
-        _y2 = y2;
+        super(x1, y1, x2, y2, text);
         _confidence = confidence;
-        _text = text;
     }
 
     @Override

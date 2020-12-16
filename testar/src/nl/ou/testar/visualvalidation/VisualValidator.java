@@ -1,5 +1,9 @@
 package nl.ou.testar.visualvalidation;
 
+import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
+import nl.ou.testar.visualvalidation.extractor.ExpectedTextCallback;
+import nl.ou.testar.visualvalidation.extractor.ExtractorFactory;
+import nl.ou.testar.visualvalidation.extractor.TextExtractorInterface;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcher;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcherFactory;
 import nl.ou.testar.visualvalidation.ocr.OcrConfiguration;
@@ -8,29 +12,40 @@ import nl.ou.testar.visualvalidation.ocr.OcrEngineInterface;
 import nl.ou.testar.visualvalidation.ocr.OcrResultCallback;
 import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.apache.logging.log4j.Level;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.State;
 import org.testar.Logger;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class VisualValidator implements VisualValidationManager, OcrResultCallback {
-    private final OcrEngineInterface ocrEngine;
-    private final VisualMatcher matcher;
+public class VisualValidator implements VisualValidationManager, OcrResultCallback, ExpectedTextCallback {
     private final String TAG = "VisualValidator";
     private int analysisId = 0;
-    private final Boolean _ocrResultReceived = false;
-    private final Boolean _expectedTextReceived = false;
+
+    private final VisualMatcher matcher;
+
+    private final OcrEngineInterface _ocrEngine;
+    private final Object _ocrResultSync = new Object();
+    private final AtomicBoolean _ocrResultReceived = new AtomicBoolean();
     private List<RecognizedElement> _ocrItems = null;
 
-    public VisualValidator(VisualValidationSettings settings) {
+    private final TextExtractorInterface _extractor;
+    private final Object _expectedTextSync = new Object();
+    private final AtomicBoolean _expectedTextReceived = new AtomicBoolean();
+    private List<ExpectedElement> _expectedText = null;
+
+    public VisualValidator(@NonNull VisualValidationSettings settings) {
         OcrConfiguration ocrConfig = settings.ocrConfiguration;
         if (ocrConfig.enabled) {
-            ocrEngine = OcrEngineFactory.createOcrEngine(ocrConfig);
+            _ocrEngine = OcrEngineFactory.createOcrEngine(ocrConfig);
         } else {
-            ocrEngine = null;
+            _ocrEngine = null;
         }
+
+        _extractor = ExtractorFactory.CreateTextExtractor();
 
         matcher = VisualMatcherFactory.createDummyMatcher();
     }
@@ -46,7 +61,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         // Start extracting text, provide callback once finished.
         extractExpectedText(state);
 
-        // Wait for both results.
+        // Match the expected text with the detected text.
         matchText();
 
         updateVerdict(state);
@@ -56,12 +71,18 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
 
     private void startNewAnalysis() {
         analysisId++;
+        synchronized (_ocrResultSync) {
+            _ocrResultReceived.set(false);
+        }
+        synchronized (_expectedTextSync) {
+            _expectedTextReceived.set(false);
+        }
         Logger.log(Level.INFO, TAG, "Starting new analysis {}", analysisId);
     }
 
     private void parseScreenshot(@Nullable AWTCanvas screenshot) {
         if (screenshot != null) {
-            ocrEngine.AnalyzeImage(screenshot.image(), this);
+            _ocrEngine.AnalyzeImage(screenshot.image(), this);
 
         } else {
             Logger.log(Level.ERROR, TAG, "No screenshot for current state");
@@ -69,19 +90,31 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     }
 
     private void extractExpectedText(State state) {
-        Logger.log(Level.INFO, TAG, "Extracting text");
+        _extractor.ExtractExpectedText(state, this);
     }
 
     private void matchText() {
-        synchronized (_ocrResultReceived) {
-            try {
-                _ocrResultReceived.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        waitForResults();
+
+        Logger.log(Level.INFO, TAG, "Matching {} with {}", _ocrItems, _expectedText);
+    }
+
+    private void waitForResult(@NonNull AtomicBoolean receivedFlag, Object syncObject) {
+        if (!receivedFlag.get()) {
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (syncObject) {
+                try {
+                    syncObject.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
 
-        Logger.log(Level.INFO, TAG, "Matching {} with {}", _ocrItems, "api");
+    private void waitForResults() {
+        waitForResult(_ocrResultReceived, _ocrResultSync);
+        waitForResult(_expectedTextReceived, _expectedTextSync);
     }
 
     private void updateVerdict(State state) {
@@ -95,17 +128,29 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     @Override
     public void Destroy() {
         matcher.destroy();
-        if (ocrEngine != null) {
-            ocrEngine.Destroy();
+        _extractor.Destroy();
+        if (_ocrEngine != null) {
+            _ocrEngine.Destroy();
         }
     }
 
     @Override
-    public void reportResult(List<RecognizedElement> detectedText) {
-        synchronized (_ocrResultReceived) {
+    public void reportResult(@NonNull List<RecognizedElement> detectedText) {
+        synchronized (_ocrResultSync) {
             _ocrItems = detectedText;
-            _ocrResultReceived.notify();
-            Logger.log(Level.INFO, TAG, "Received {} result", detectedText.size());
+            _ocrResultReceived.set(true);
+            _ocrResultSync.notifyAll();
+            Logger.log(Level.INFO, TAG, "Received {} OCR result", detectedText.size());
+        }
+    }
+
+    @Override
+    public void ReportExtractedText(@NonNull List<ExpectedElement> expectedText) {
+        synchronized (_expectedTextSync) {
+            _expectedText = expectedText;
+            _expectedTextReceived.set(true);
+            _expectedTextSync.notifyAll();
+            Logger.log(Level.INFO, TAG, "Received {} expected result", expectedText.size());
         }
     }
 }
