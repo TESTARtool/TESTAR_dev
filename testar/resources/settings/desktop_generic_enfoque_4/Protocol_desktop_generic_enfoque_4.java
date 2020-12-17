@@ -65,26 +65,18 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
+public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 	
 	String lastWidgetID = "";
 	
-	private HTMLDifferenceGeneric htmlDifference;			// ENFOQUE 4
+	private HTMLDifference htmlDifference;
 	String differenceScreenshot;
-	
-	// ENFOQUE 3
-	int numWidgetsBefore = 0;
-	int numWidgetsNow = 0;
 
 	List<String> idCustomsGlobalList = new ArrayList<String>();
 	List<String> widgetNamesGlobalList = new ArrayList<String>();
 	List<String> actionGroupsGlobalList = new ArrayList<String>();
 	List<Double> zIndexesGlobalList = new ArrayList<Double>();
 	List<Double> qLearningsGlobalList = new ArrayList<Double>();
-
-	// ENFOQUE 3
-	List<String> lastStateWIDList = new ArrayList<String>();
-	boolean enfoque3o4 = false;
 	
 	
 	/**
@@ -95,7 +87,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-		htmlDifference = new HTMLDifferenceGeneric();		// ENFOQUE 4
+		htmlDifference = new HTMLDifference();
 		System.out.println("*** NEW EXECUTION ***");
 	}
 
@@ -227,123 +219,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		}
 		
 		
-		// ENFOQUE 2: Decrecimiento iterativo de los QValues
-		
-		for(Widget w : state) {
-			System.out.println("NEW WIDGET DETECTED:");
-			
-			updateListsBefore(w);
-			
-			// Asignacion de ActionGroup
-			ActionTags.ActionGroupType actionGroup = w.get(ActionTags.ActionGroup, null);
-			if(actionGroup == null) {
-				Role actionRole = w.get(Tags.Role);
-				String actionRoleStr = actionRole.toString();
-				setActionGroup(actionRoleStr, w);
-			}
-
-			// Asignacion de ZIndex
-			if(w.get(ActionTags.ZIndex, 0) == 0) {
-				double wZIndex = w.get(Tags.ZIndex, 0.0);
-				if(wZIndex != 0.0) {
-					int ZIndexInt = (int) wZIndex;
-					w.set(ActionTags.ZIndex, ZIndexInt);
-				}
-			}
-			
-			// Asignacion de QLearning
-			double actionQLearning = w.get(ActionTags.QLearning, 0.0);
-			if(actionGroup == null && actionQLearning == 0.0) {
-				w.set(ActionTags.QLearning, 1.0);
-			}
-			
-			// 1) Si el widget no tiene ActionGroup y tampoco un valor en su tag QLearning, asignar el valor mas alto (1) a su Tag QLearning.
-			// 2) Si el widget tiene un ActionGroup pero no un valor en su tag QLearning, comprobar si existen widgets en las listas con su mismo Action Group y ZIndex.
-			// 3)		Si existen, comprobar si alguno de los widgets de las listas tienen un valor en su tag QLearning.
-			// 4)			Si alg�n widget de las listas tiene un valor, asignar al widget inicial el valor de QLearning del widget de las listas.
-			// 5)			Si ning�n widget de las listas tiene un valor, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
-			// 6)		Si no existen, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
-			if(actionGroup != null && actionQLearning == 0.0) {										// 2)
-				double auxQValue = 0.0;
-				for (int i = 0; i < actionGroupsGlobalList.size(); i ++) {
-					String aActionGroup = w.get(ActionTags.ActionGroup, null).toString();
-					String a2ActionGroup = actionGroupsGlobalList.get(i);
-					if(a2ActionGroup != null && aActionGroup != null) {
-						double aZIndex = w.get(ActionTags.ZIndex, null);
-						double a2ZIndex = zIndexesGlobalList.get(i);
-						if(a2ActionGroup.equals(aActionGroup) && aZIndex == a2ZIndex) {
-							double a2QLearning = qLearningsGlobalList.get(i);
-							if ((a2QLearning > 0.0) && (a2QLearning < auxQValue)) {									// 3)
-								auxQValue = a2QLearning;													// 4)
-							}
-						}
-					}
-				}
-							
-				if(auxQValue != 0.0) {
-					w.set(ActionTags.QLearning, auxQValue);
-				} else {																			// 5) 6)
-					w.set(ActionTags.QLearning, 1.0);
-				}
-			}
-			System.out.println("Name: " + w.get(Tags.Desc, "NULL") + ".\t\t QLearning = " + w.get(ActionTags.QLearning, 0.0) + ".\t\tID: " + w.get(Tags.ConcreteIDCustom));
-		}
-		
-		
-		
-		
-		// ENFOQUE 3: Dar una mayor recompensa a los widgets cuyas acciones produzcan un mayor cambio en el programa
-		// Numero de widgets en el estado previo y en el actual
-		/*
-		enfoque3o4 = true;
-		
-		numWidgetsNow = state.childCount();
-				
-		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
-		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
-		
-		for (Widget w : state) {			
-			updateListsBefore(w);
-			
-			// Inicializacion del valor de recompensa a 1.0
-			if(w.get(ActionTags.QLearning, 0.0) == 0.0) w.set(ActionTags.QLearning, 1.0);
-			
-			System.out.println("Name: " + w.get(Tags.Desc, "NULL") + ".\t\t QLearning = " + w.get(ActionTags.QLearning, 0.0) + ".\t\tID: " + w.get(Tags.ConcreteIDCustom));
-		}
-		
-
-		// Si no existe widget tree anterior, no hacer nada
-		if(numWidgetsBefore > 0) {
-			double persistentDecrement = getPersistentDecrement(state);
-			int index = idCustomsGlobalList.indexOf(lastWidgetID);
-			if(index != -1) {
-				double numWidgetsBeforeDouble = numWidgetsBefore;
-				double numWidgetsNowDouble = numWidgetsNow;
-				double newQLearningValue = qLearningsGlobalList.get(index);
-				
-				if(numWidgetsBefore < numWidgetsNow) {
-					newQLearningValue = newQLearningValue - persistentDecrement +
-							((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble);
-				} else if(numWidgetsBefore > numWidgetsNow) {
-					newQLearningValue = greaterThanZero(newQLearningValue - persistentDecrement -
-							(numWidgetsNowDouble / numWidgetsBeforeDouble));
-				} else {
-					newQLearningValue = greaterThanZero(newQLearningValue - persistentDecrement);
-				}
-				
-				qLearningsGlobalList.set(index, newQLearningValue);
-			}
-		}
-		*/
-		
-		
 		// ENFOQUE 4
 		// [state 1] --(a)--> [state 2]
 		// Comparar la imagen de los estados [state 1] y [state 2], y ver cuántos píxeles han cambiado.
 		// La recompensa de (a) será mayor cuantos más píxeles cambien entre [state 1] y [state 2].
 		// Usar la información de "htmlDifference"
-		/*
-		enfoque3o4 = true;
 		
 		for (Widget w : state) {
 			updateListsBefore(w);
@@ -379,7 +259,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 				e.printStackTrace();
 			}
 		}
-		*/
+		
 
 	
 
@@ -399,55 +279,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 
-		// ENFOQUE 2: Decrecimiento iterativo de los QValues
-		
-		//Seleccionar el widget con el mayor valor en su tag QLearning.
-		double maxQLearning = 0.0;
-		double wQLearning = 0.0;
-		int index = 0;
-		int wIndex = 0;
-		
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				wQLearning = w.get(ActionTags.QLearning, 0.0);
-				if(wQLearning > maxQLearning) {
-					maxQLearning = wQLearning;
-					wIndex = index;
-				}
-				
-			}
-			index ++;
-		}
-		
-		// Actualizar los valores de QLearning de los widgets. El valor en widgets de un ActionGroup sera menor
-		// a medida que se ejecuten acciones de dicho ActionGroup.
-		
-		index = 0;
-		for(Widget w : state) {
-			if(index == wIndex) {
-				double newQL = greaterThanZero(w.get(ActionTags.QLearning, 0.0) - 0.05);
-				w.set(ActionTags.QLearning, newQL);
-		
-				System.out.println("Widget to be selected: " + w.get(Tags.Desc) + "\t\t New QLearning = " + w.get(ActionTags.QLearning, 0.0));
-						
-				updateListsAfter(w);
-						
-				System.out.println(" ... END ...");
-				System.out.println(" ... widgetNamesGlobalList: " + widgetNamesGlobalList);
-				System.out.println(" ... actionGroupsGlobalList: " + actionGroupsGlobalList);
-				System.out.println(" ... qLearningsGlobalList: " + qLearningsGlobalList);
-				System.out.println(" ... zIndexesGlobalList: " + zIndexesGlobalList);
-						
-				Action maxAction = getAction(w, actions);
-				return maxAction;
-			}
-			index ++;
-		}
-		
-		
 		
 		// ENFOQUE 3 y 4: Dar una mayor recompensa a los widgets que, de ser seleccionados, produzcan un mayor cambio en el programa
-		/*
+		
 		//Seleccionar el widgetcon el mayor valor en su tag QLearning.
 		Widget maxWidget = null;
 		double maxQLearning = 0.0;
@@ -483,7 +317,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 			Action maxAction = getAction(maxWidget, actions);
 			return maxAction;
 		}
-		*/
+		
 		
 		
 		return(super.selectAction(state, actions));
@@ -759,7 +593,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 			if(idCustomsGlobalList.contains(idCustom)) {
 				int index = idCustomsGlobalList.indexOf(idCustom);
 				actionGroupsGlobalList.set(index, maxActionGroup);
-				if(enfoque3o4) maxActionQL -= 0.01 * maxActionZIndex;
+				maxActionQL -= 0.01 * maxActionZIndex;
 				qLearningsGlobalList.set(index, maxActionQL);
 				zIndexesGlobalList.set(index, maxActionZIndex);
 			} else {
@@ -775,32 +609,13 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	private Action getAction(Widget w, Set<Action> actions) {
 		Action theActions[] = new Action[actions.size()];
 		actions.toArray(theActions);
-		//Action theAction = null;
-		//if(actions.size() > 0) {
-			Action theAction = theActions[0];
-			for(Action a : actions) {
-				if(w.get(Tags.ConcreteIDCustom) == a.get(Tags.OriginWidget).get(Tags.ConcreteIDCustom)) {
-					theAction = a;
-				}
-			}
-			
-		//}	
-		return theAction;
-	}
-	
-	private double getPersistentDecrement(State state) {
-		int persistentWidgetNum = 0;
-		
-		for(Widget w : state) {
-			String wID = w.get(Tags.ConcreteIDCustom);
-			if(lastStateWIDList.contains(wID)) {
-				persistentWidgetNum ++;
+		Action theAction = theActions[theActions.length - 1];
+		for(Action a : actions) {
+			if(w.get(Tags.ConcreteIDCustom) == a.get(Tags.ConcreteIDCustom)) {
+				theAction = a;
 			}
 		}
-		lastStateWIDList.clear();
-
-		double persistentDecrement = persistentWidgetNum * 0.01;
-		return persistentDecrement;
+		return theAction;
 	}
 
 	
@@ -915,11 +730,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 /**
  * Helper Class to prepare HTML State report Difference
  */
-class HTMLDifferenceGeneric {
+class HTMLDifference {
 	
 	PrintWriter out = null;
 
-	public HTMLDifferenceGeneric () { 
+	public HTMLDifference () { 
 		String[] HEADER = new String[] {
 				"<!DOCTYPE html>",
 				"<html>",
