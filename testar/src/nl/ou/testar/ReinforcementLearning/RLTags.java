@@ -49,12 +49,15 @@ public class RLTags extends TagsBase  {
 	public static final Tag<Integer> Counter = from("counter", Integer.class);
 
 	public static final Tag<Float> QLearningValue = from("qvalue", Float.class);
+
+	public static final Tag<Float> QBorja = from("qborja", Float.class);
 	
 	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
 		{
 			add(SarsaValue);
 			add(Counter);
 			add(QLearningValue);
+			add(QBorja);
 		}
 	};
 

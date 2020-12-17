@@ -20,6 +20,9 @@ public class RewardFunctionFactory {
             case "ABTBasedRewardFunction":
                 selectedRewardFunction = new ABTBasedRewardFunction();
                 break;
+            case "BorjaReward4":
+                selectedRewardFunction = new BorjaReward4();
+                break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();
         }
