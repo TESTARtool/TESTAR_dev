@@ -1069,15 +1069,32 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (actionStatus.isUserEventAction()) {
 
 				Action recordedAction = actionStatus.getAction();
-				
-				// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
-				for(Action a : actions)
-					if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None")))
-						recordedAction = a;
+
+				// Map Recorded Type Actions with existing action
+				if(recordedAction.get(Tags.Desc, "Nothing").contains("Type")) {
+					for(Action a : actions) {
+						if(a.get(Tags.OriginWidget).get(Tags.Path)
+								.equals(actionStatus.getAction().get(Tags.OriginWidget).get(Tags.Path))) {
+							recordedAction = a;
+							break;
+						}
+					}
+				} else {
+					// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
+					for(Action a : actions) {
+						if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None"))) {
+							recordedAction = a;
+							break;
+						}
+					}
+				}
 				
 				// If something went wrong trying to find the action, we need to create the AbstractIDCustom
-				if(recordedAction.get(Tags.AbstractIDCustom, null) == null)
+				if(recordedAction.get(Tags.AbstractIDCustom, null) == null) {
+					System.out.println("Recorded Action has not AbstractIDCustom, creating...");
 					CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
+					System.out.println(recordedAction.get(Tags.AbstractIDCustom));
+				}
 				
 				//notify the state model manager of the Recorded action
 				stateModelManager.notifyRecordedAction(recordedAction);
@@ -1807,11 +1824,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Widget w = state;
 
 			// If this event was created listening the scripts get the widget
-			if(userEvent[0] != null && userEvent[0].equals("script")) {
-				w = Util.widgetFromPoint(state, (double)userEvent[1], (double)userEvent[2]);
+			if(userEvent[0] != null && userEvent[0].toString().contains("script")) {
+				double x = ((Double)userEvent[1]).doubleValue();
+				double y = ((Double)userEvent[2]).doubleValue();
+				w = Util.widgetFromPoint(state, x, y);
 			}
 
-			Action typeIntoState = (new AnnotatingActionCompiler()).clickTypeInto(state, typedText, false);
+			Action typeIntoState = (new AnnotatingActionCompiler()).clickTypeInto(w, typedText, false);
 			typedText = "";
 			return typeIntoState;
 		} else if (userEvent[0] instanceof KBKeys) { // key events

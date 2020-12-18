@@ -41,20 +41,13 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.AbstractWebDriverEventListener;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testar.protocols.WebdriverProtocol;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-
 import java.util.*;
-import java.util.function.Consumer;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -223,12 +216,14 @@ public class Protocol_script_listening_webdriver extends WebdriverProtocol {
 	
 	@Override
 	protected void executeScriptEvent(SUT system, State state) {
-		scriptClass.executeScriptedAction();
+		if(!scriptClass.executeScriptedAction()) {
+			this.mode = Modes.Quit;
+		}
 	}
 	
 	private class Script extends AbstractWebDriverEventListener {
 		EventFiringWebDriver eventDriver;
-		LinkedList<String> scriptedSequence = new LinkedList<>();
+		int stepCounter; 
 		
 		public Script(WebDriver driver) {
 			//initalize event-firing driver using Firefox webdriver instance.
@@ -236,33 +231,35 @@ public class Protocol_script_listening_webdriver extends WebdriverProtocol {
 			//register event listener to even-firing webdriver instance
 			eventDriver.register(this);
 			this.eventDriver = eventDriver;
-			defineScriptedSequence();
+			this.stepCounter = 0;
 		}
 		
-		private void defineScriptedSequence() {
-			scriptedSequence.add("eventDriver.findElement(By.name( \"username\" )).sendKeys( \"john\" );");
-			scriptedSequence.add("eventDriver.findElement(By.name( \"password\" )).sendKeys( \"demo\" );");
-			scriptedSequence.add("eventDriver.findElement(By.xpath(\"//input[@value='Log In']\")).click();");
-		}
-		
+		/**
+		 * I want to synch Script Actions with TESTAR. 
+		 * To send a request like: Go ahead execute one step
+		 * Then listen what's going on in the GUI.
+		 * 
+		 * @return if script action executed
+		 */
 		public boolean executeScriptedAction() {
-			//eventDriver.findElement(By.className("home")).click();
-			eventDriver.findElement(By.name("username")).sendKeys("john");
-			//eventDriver.findElement(By.name("password")).sendKeys("demo");
-			//eventDriver.findElement(By.xpath("//input[@value='Log In']")).click();
-			
-			/*Interpreter interpreter = new Interpreter();
-			// This eval should take first driver string command and execute it as java code
-			try {
-				interpreter.set("eventDriver", this.eventDriver);
-				interpreter.set("By.name", "org.openqa.selenium.By.name");
-				Object res = interpreter.eval(scriptedSequence.getFirst());
-				System.out.println("Bean Interpreter : " + res);
-				scriptedSequence.removeFirst();
-			} catch (EvalError e) {
-				e.printStackTrace();
+			// step Counter is a bad way to do this, need to think a better approach
+			if(stepCounter == 0) {
+				eventDriver.findElement(By.className("home")).click();
+			}
+			else if(stepCounter == 1) {
+				eventDriver.findElement(By.name("username")).sendKeys("john");
+			}
+			else if(stepCounter == 2) {
+				eventDriver.findElement(By.name("password")).sendKeys("demo");
+			}
+			else if(stepCounter == 3) {
+				eventDriver.findElement(By.xpath("//input[@value='Log In']")).click();
+			}
+			else {
 				return false;
-			}*/
+			}
+			
+			stepCounter = stepCounter + 1;
 			return true;
 		}
 		
@@ -271,8 +268,10 @@ public class Protocol_script_listening_webdriver extends WebdriverProtocol {
 		 */
 		@Override
 		public void beforeClickOn(WebElement element, WebDriver driver) {
+			// Aim to the middle of the element
 			double x = element.getRect().getX() + (element.getRect().getWidth() /2.0);
 			double y = element.getRect().getY() + (element.getRect().getHeight() /2.0);
+			// Create a TESTAR userEvent to be recorded
 			userEvent = new Object[]{MouseButtons.BUTTON1, x, y};
 		}
 		
@@ -281,9 +280,11 @@ public class Protocol_script_listening_webdriver extends WebdriverProtocol {
 		 */
 		@Override
 		public void beforeChangeValueOf(WebElement element, WebDriver driver, CharSequence[] keysToSend) {
+			// Aim to the middle of the element
 			double x = element.getRect().getX() + (element.getRect().getWidth() /2.0);
 			double y = element.getRect().getY() + (element.getRect().getHeight() /2.0);
 			typedText = Arrays.toString(keysToSend).replace("[", "").replace("]", "");
+			// Create a TESTAR userEvent to be recorded
 			userEvent = new Object[]{"script", x, y};
 		}
 	}
