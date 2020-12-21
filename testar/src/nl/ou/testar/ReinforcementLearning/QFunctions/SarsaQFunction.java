@@ -4,6 +4,7 @@ import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Tag;
 
 import java.util.Set;
 
@@ -32,12 +33,14 @@ public class SarsaQFunction implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
         float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
-            oldQValue = previouslyExecutedAction.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+            oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
         }
-        float newQValue = actionUnderExecution.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+        System.out.println("OLD QVALUE of " + previouslyExecutedAction.getActionId() + " : " + Float.toString(oldQValue));
+        float newQValue = actionUnderExecution.getAttributes().get(rl_tag, defaultQValue);
+        System.out.println("NEW QVALUE of " + actionUnderExecution.getActionId() + " : " + Float.toString(newQValue));
 
         return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
     }
