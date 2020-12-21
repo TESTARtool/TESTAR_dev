@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.Collections;
@@ -36,15 +37,16 @@ public class QlearningFunction implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
         float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
-            oldQValue = previouslyExecutedAction.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+            oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
         }
+        System.out.println("OLD QVALUE of: " + Float.toString(oldQValue));
         final Multimap<Float, Action> abstractActions = ArrayListMultimap.create();
         actions.forEach(action -> {
             try {
-                abstractActions.put(currentAbstractState.getAction(action.get(Tags.AbstractIDCustom, "")).getAttributes().get(RLTags.SarsaValue, defaultQValue),
+                abstractActions.put(currentAbstractState.getAction(action.get(Tags.AbstractIDCustom, "")).getAttributes().get(rl_tag, defaultQValue),
                         action);
             } catch (ActionNotFoundException e) {
                 e.printStackTrace();

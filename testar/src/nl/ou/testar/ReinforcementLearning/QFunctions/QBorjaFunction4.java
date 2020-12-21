@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.Collections;
@@ -30,10 +31,13 @@ public class QBorjaFunction4 implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
         float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
-            oldQValue = previouslyExecutedAction.getAttributes().get(RLTags.QBorja, defaultQValue);
+            System.out.println("previouslyExecutedAction != null ---> True");
+            System.out.println("rl_tag ---> " + rl_tag.toString());
+            oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
+            System.out.println("oldQValue ---> " + Float.toString(oldQValue));
         }
         return oldQValue + reward;
     }
