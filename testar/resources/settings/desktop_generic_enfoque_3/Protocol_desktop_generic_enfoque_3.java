@@ -216,10 +216,9 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		
 		
 		
-		// ENFOQUE 3: Dar una mayor recompensa a los widgets cuyas acciones produzcan un mayor cambio en el programa
 		// Numero de widgets en el estado previo y en el actual
 		
-		numWidgetsNow = state.childCount();
+		numWidgetsNow = getWidNum(actions);
 				
 		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
 		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
@@ -252,7 +251,6 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 				} else {
 					newQLearningValue = greaterThanZero(newQLearningValue - persistentDecrement);
 				}
-				
 				qLearningsGlobalList.set(index, newQLearningValue);
 			}
 		}
@@ -272,41 +270,48 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-
-		// ENFOQUE 3 y 4: Dar una mayor recompensa a los widgets que, de ser seleccionados, produzcan un mayor cambio en el programa
-		
 		//Seleccionar el widgetcon el mayor valor en su tag QLearning.
-		Widget maxWidget = null;
+		String maxID = "";
 		double maxQLearning = 0.0;
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				double widgetQLearning = w.get(ActionTags.QLearning, 0.0);
-				if(widgetQLearning > maxQLearning) {
-					maxWidget = w;
-					maxQLearning = widgetQLearning;
+		double wQLearning = 0.0;
+		
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			for(Widget w : state) {
+				String wID = w.get(Tags.AbstractIDCustom);
+				if(aID == wID) {
+					wQLearning = w.get(ActionTags.QLearning, 0.0);
+					if(wQLearning > maxQLearning) {
+						maxQLearning = wQLearning;
+						maxID = wID;
+					}
+					
+					lastStateWIDList.add(wID);
 				}
-				
-				lastStateWIDList.add(w.get(Tags.ConcreteIDCustom));
 			}
 		}
 
 		numWidgetsBefore = numWidgetsNow;
 		
-		if (maxWidget != null) {
-			updateListsAfter(maxWidget);
-			
-			lastWidgetID = maxWidget.get(Tags.ConcreteIDCustom);
-			
-			System.out.println("... widgetToBeSelectedID: " + lastWidgetID);
-			System.out.println("... widgetToBeSelectedQL: " + maxQLearning);
-			System.out.println(" ...... widgetNamesGlobalList: " + widgetNamesGlobalList);
-			System.out.println(" ...... actionGroupsGlobalList: " + actionGroupsGlobalList);
-			System.out.println(" ...... qLearningsGlobalList: " + qLearningsGlobalList);
-			System.out.println(" ...... zIndexesGlobalList: " + zIndexesGlobalList);
-			
-			
-			Action maxAction = getAction(maxWidget, actions);
-			return maxAction;
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			if(aID == maxID) {
+				for(Widget w : state) {
+					String wID = w.get(Tags.AbstractIDCustom);
+					if(aID == wID) {
+						updateListsAfter(w);
+						
+						System.out.println("... widgetToBeSelected: " + w.get(Tags.Desc));
+						System.out.println("... widgetToBeSelectedQL: " + maxQLearning);
+						System.out.println(" ...... widgetNamesGlobalList: " + widgetNamesGlobalList);
+						System.out.println(" ...... actionGroupsGlobalList: " + actionGroupsGlobalList);
+						System.out.println(" ...... qLearningsGlobalList: " + qLearningsGlobalList);
+						System.out.println(" ...... zIndexesGlobalList: " + zIndexesGlobalList);
+						
+						return a;
+					}
+				}
+			}
 		}
 		
 		
@@ -555,7 +560,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 	}
 	
 	private void updateListsBefore(Widget w) {
-		String idCustom = w.get(Tags.ConcreteIDCustom);
+		String idCustom = w.get(Tags.AbstractIDCustom);
 		if(idCustomsGlobalList.contains(idCustom)) {
 			int index = idCustomsGlobalList.indexOf(idCustom);
 			w.set(ActionTags.QLearning, qLearningsGlobalList.get(index));
@@ -567,7 +572,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 	}
 	
 	private void updateListsAfter(Widget w) {
-		String idCustom = w.get(Tags.ConcreteIDCustom);
+		String idCustom = w.get(Tags.AbstractIDCustom);
 		String maxActionGroup = w.get(ActionTags.ActionGroup, ActionGroupType.UIAWidget).toString();
 		double maxActionQL = w.get(ActionTags.QLearning);
 		String maxActionDesc = w.get(Tags.Desc, "NULL");
@@ -602,7 +607,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		actions.toArray(theActions);
 		Action theAction = theActions[theActions.length - 1];
 		for(Action a : actions) {
-			if(w.get(Tags.ConcreteIDCustom) == a.get(Tags.ConcreteIDCustom)) {
+			if(w.get(Tags.AbstractIDCustom) == a.get(Tags.AbstractIDCustom)) {
 				theAction = a;
 			}
 		}
@@ -613,7 +618,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		int persistentWidgetNum = 0;
 		
 		for(Widget w : state) {
-			String wID = w.get(Tags.ConcreteIDCustom);
+			String wID = w.get(Tags.AbstractIDCustom);
 			if(lastStateWIDList.contains(wID)) {
 				persistentWidgetNum ++;
 			}
@@ -622,6 +627,14 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 
 		double persistentDecrement = persistentWidgetNum * 0.01;
 		return persistentDecrement;
+	}
+	
+	private int getWidNum(Set<Action> actions) {
+		int res = 0;
+		for(Action a : actions) {
+			res ++;
+		}
+		return res;
 	}
 
 }

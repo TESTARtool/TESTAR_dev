@@ -66,9 +66,6 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
  * It uses random action selection algorithm.
  */
 public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
-	
-	String lastWidgetID = "";
-
 	List<String> idCustomsGlobalList = new ArrayList<String>();
 	List<String> widgetNamesGlobalList = new ArrayList<String>();
 	List<String> actionGroupsGlobalList = new ArrayList<String>();
@@ -136,18 +133,8 @@ public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		// ENFOQUE 4
-		// Save previous state object
-		State previousState = latestState;
-				
 		// Update state information
 		State state = super.getState(system);
-				
-		if(previousState != null && previousState.get(Tags.ScreenshotPath, null) != null && state.get(Tags.ScreenshotPath, null) != null) {
-				
-			// Update: output\timestamp_app_version\HTMLreports\StateDifferenceReport.html
-			//htmlDifference.addStateDifferenceStep(actionCount, previousState.get(Tags.ScreenshotPath), state.get(Tags.ScreenshotPath), differenceScreenshot);
-		}
 				
 		return state;
 	}
@@ -185,11 +172,6 @@ public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//System.out.println(" ··· START ···");
-		//System.out.println(" ··· actionNamesGlobalList: " + actionNamesGlobalList);
-		//System.out.println(" ··· actionGroupsGlobalList: " + actionGroupsGlobalList);
-		//System.out.println(" ··· qLearningsGlobalList: " + qLearningsGlobalList);
-		
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
@@ -287,58 +269,48 @@ public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-
-		// ENFOQUE 2: Decrecimiento iterativo de los QValues
-		
 		//Seleccionar el widget con el mayor valor en su tag QLearning.
-		String maxWID = "";
+		String maxID = "";
 		double maxQLearning = 0.0;
 		double wQLearning = 0.0;
-		//int index = 0;
-		// wIndex = 0;
 				
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				wQLearning = w.get(ActionTags.QLearning, 0.0);
-				if(wQLearning > maxQLearning) {
-					maxQLearning = wQLearning;
-					//wIndex = index;
-					maxWID = w.get(Tags.AbstractIDCustom);
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			for(Widget w : state) {
+				String wID = w.get(Tags.AbstractIDCustom);
+				if(aID == wID) {
+					wQLearning = w.get(ActionTags.QLearning, 0.0);
+					if(wQLearning > maxQLearning) {
+						maxQLearning = wQLearning;
+						maxID = wID;
+					}
 				}
-				
 			}
-			//index ++;
 		}
 				
 		// Actualizar los valores de QLearning de los widgets. El valor en widgets de un ActionGroup sera menor
 		// a medida que se ejecuten acciones de dicho ActionGroup.
 				
-		// = 0;
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				String wID = w.get(Tags.AbstractIDCustom);
-				if(wID == maxWID) {
-					double newQL = greaterThanZero(w.get(ActionTags.QLearning, 0.0) - 0.05);
-					w.set(ActionTags.QLearning, newQL);
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			if(aID == maxID) {
+				double newQL = greaterThanZero(a.get(Tags.OriginWidget).get(ActionTags.QLearning, 0.0) - 0.05);
+				a.get(Tags.OriginWidget).set(ActionTags.QLearning, newQL);
 			
-					System.out.println("Widget to be selected: " + w.get(Tags.Desc) + "\t\t New QLearning = " + w.get(ActionTags.QLearning, 0.0));
+				System.out.println("Widget to be selected: " + a.get(Tags.OriginWidget).get(Tags.Desc) + "\t\t New QLearning = " + a.get(Tags.OriginWidget).get(ActionTags.QLearning, 0.0));
+								
+				updateListsAfter(a.get(Tags.OriginWidget));
 									
-					updateListsAfter(w);
+				System.out.println(" ... END ...");
+				System.out.println(" ... widgetNamesGlobalList: " + widgetNamesGlobalList);
+				System.out.println(" ... actionGroupsGlobalList: " + actionGroupsGlobalList);
+				System.out.println(" ... qLearningsGlobalList: " + qLearningsGlobalList);
+				System.out.println(" ... zIndexesGlobalList: " + zIndexesGlobalList);
 									
-					System.out.println(" ... END ...");
-					System.out.println(" ... widgetNamesGlobalList: " + widgetNamesGlobalList);
-					System.out.println(" ... actionGroupsGlobalList: " + actionGroupsGlobalList);
-					System.out.println(" ... qLearningsGlobalList: " + qLearningsGlobalList);
-					System.out.println(" ... zIndexesGlobalList: " + zIndexesGlobalList);
-									
-					Action maxAction = getAction(w, actions);
-					return maxAction;
-				}
-				//index ++;
+				//Action maxAction = getAction(a.get(Tags.OriginWidget), actions);
+				return a;
 			}
 		}
-		
-		System.out.println(" ... NO ENCONTRADO");
 						
 		return(super.selectAction(state, actions));
 	}
@@ -600,7 +572,6 @@ public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 		double maxActionQL = w.get(ActionTags.QLearning);
 		String maxActionDesc = w.get(Tags.Desc, "NULL");
 		double maxActionZIndex = w.get(Tags.ZIndex);
-		lastWidgetID = idCustom;
 				
 		if(idCustomsGlobalList.isEmpty()) {
 			idCustomsGlobalList.add(idCustom);
