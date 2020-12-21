@@ -65,26 +65,12 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
-	
-	String lastWidgetID = "";
-	
-	private HTMLDifferenceGeneric htmlDifference;			// ENFOQUE 4
-	String differenceScreenshot;
-	
-	// ENFOQUE 3
-	int numWidgetsBefore = 0;
-	int numWidgetsNow = 0;
-
+public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 	List<String> idCustomsGlobalList = new ArrayList<String>();
 	List<String> widgetNamesGlobalList = new ArrayList<String>();
 	List<String> actionGroupsGlobalList = new ArrayList<String>();
 	List<Double> zIndexesGlobalList = new ArrayList<Double>();
 	List<Double> qLearningsGlobalList = new ArrayList<Double>();
-
-	// ENFOQUE 3
-	List<String> lastStateWIDList = new ArrayList<String>();
-	boolean enfoque3o4 = false;
 	
 	
 	/**
@@ -95,7 +81,6 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-		htmlDifference = new HTMLDifferenceGeneric();		// ENFOQUE 4
 		System.out.println("*** NEW EXECUTION ***");
 	}
 
@@ -148,24 +133,8 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		// ENFOQUE 4
-		// Save previous state object
-		State previousState = latestState;
-				
 		// Update state information
 		State state = super.getState(system);
-				
-		if(previousState != null && previousState.get(Tags.ScreenshotPath, null) != null && state.get(Tags.ScreenshotPath, null) != null) {
-					
-			// Create and obtain the image-diff path
-			differenceScreenshot = getDifferenceImage(
-				previousState.get(Tags.ScreenshotPath), previousState.get(Tags.ConcreteIDCustom, ""),
-				state.get(Tags.ScreenshotPath), state.get(Tags.ConcreteIDCustom, "")
-				);
-						
-			// Update: output\timestamp_app_version\HTMLreports\StateDifferenceReport.html
-			//htmlDifference.addStateDifferenceStep(actionCount, previousState.get(Tags.ScreenshotPath), state.get(Tags.ScreenshotPath), differenceScreenshot);
-		}
 				
 		return state;
 	}
@@ -203,15 +172,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		//System.out.println(" ··· START ···");
-		//System.out.println(" ··· actionNamesGlobalList: " + actionNamesGlobalList);
-		//System.out.println(" ··· actionGroupsGlobalList: " + actionGroupsGlobalList);
-		//System.out.println(" ··· qLearningsGlobalList: " + qLearningsGlobalList);
-		
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
+
 
 		// Derive left-click actions, click and type actions, and scroll actions from
 		// top level (highest Z-index) widgets of the GUI:
@@ -219,6 +184,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 
 		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
+//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
@@ -258,8 +224,8 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 			// 1) Si el widget no tiene ActionGroup y tampoco un valor en su tag QLearning, asignar el valor mas alto (1) a su Tag QLearning.
 			// 2) Si el widget tiene un ActionGroup pero no un valor en su tag QLearning, comprobar si existen widgets en las listas con su mismo Action Group y ZIndex.
 			// 3)		Si existen, comprobar si alguno de los widgets de las listas tienen un valor en su tag QLearning.
-			// 4)			Si alg�n widget de las listas tiene un valor, asignar al widget inicial el valor de QLearning del widget de las listas.
-			// 5)			Si ning�n widget de las listas tiene un valor, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
+			// 4)			Si alg�n widget de las listas tiene un valor, asignar al widget inicial el valor de QLearning del widget de las listas.
+			// 5)			Si ning�n widget de las listas tiene un valor, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
 			// 6)		Si no existen, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
 			if(actionGroup != null && actionQLearning == 0.0) {										// 2)
 				double auxQValue = 0.0;
@@ -284,102 +250,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 					w.set(ActionTags.QLearning, 1.0);
 				}
 			}
-			System.out.println("Name: " + w.get(Tags.Desc, "NULL") + ".\t\t QLearning = " + w.get(ActionTags.QLearning, 0.0) + ".\t\tID: " + w.get(Tags.ConcreteIDCustom));
+			System.out.println("Name: " + w.get(Tags.Desc, "NULL") + ".\t\t QLearning = " + w.get(ActionTags.QLearning, 0.0) + ".\t\tID: " + w.get(Tags.AbstractIDCustom));
 		}
 		
-		
-		
-		
-		// ENFOQUE 3: Dar una mayor recompensa a los widgets cuyas acciones produzcan un mayor cambio en el programa
-		// Numero de widgets en el estado previo y en el actual
-		/*
-		enfoque3o4 = true;
-		
-		numWidgetsNow = state.childCount();
-				
-		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
-		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
-		
-		for (Widget w : state) {			
-			updateListsBefore(w);
-			
-			// Inicializacion del valor de recompensa a 1.0
-			if(w.get(ActionTags.QLearning, 0.0) == 0.0) w.set(ActionTags.QLearning, 1.0);
-			
-			System.out.println("Name: " + w.get(Tags.Desc, "NULL") + ".\t\t QLearning = " + w.get(ActionTags.QLearning, 0.0) + ".\t\tID: " + w.get(Tags.ConcreteIDCustom));
-		}
-		
-
-		// Si no existe widget tree anterior, no hacer nada
-		if(numWidgetsBefore > 0) {
-			double persistentDecrement = getPersistentDecrement(state);
-			int index = idCustomsGlobalList.indexOf(lastWidgetID);
-			if(index != -1) {
-				double numWidgetsBeforeDouble = numWidgetsBefore;
-				double numWidgetsNowDouble = numWidgetsNow;
-				double newQLearningValue = qLearningsGlobalList.get(index);
-				
-				if(numWidgetsBefore < numWidgetsNow) {
-					newQLearningValue = newQLearningValue - persistentDecrement +
-							((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble);
-				} else if(numWidgetsBefore > numWidgetsNow) {
-					newQLearningValue = greaterThanZero(newQLearningValue - persistentDecrement -
-							(numWidgetsNowDouble / numWidgetsBeforeDouble));
-				} else {
-					newQLearningValue = greaterThanZero(newQLearningValue - persistentDecrement);
-				}
-				
-				qLearningsGlobalList.set(index, newQLearningValue);
-			}
-		}
-		*/
-		
-		
-		// ENFOQUE 4
-		// [state 1] --(a)--> [state 2]
-		// Comparar la imagen de los estados [state 1] y [state 2], y ver cuántos píxeles han cambiado.
-		// La recompensa de (a) será mayor cuantos más píxeles cambien entre [state 1] y [state 2].
-		// Usar la información de "htmlDifference"
-		/*
-		enfoque3o4 = true;
-		
-		for (Widget w : state) {
-			updateListsBefore(w);
-			if(w.get(ActionTags.QLearning, 0.0) == 0.0) w.set(ActionTags.QLearning, 1.0);
-		}
-		
-		if(lastWidgetID != "") {
-			int index = idCustomsGlobalList.indexOf(lastWidgetID);
-			double qLearningValue = qLearningsGlobalList.get(index);
-			try {
-				BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));		
-					
-				double totalPixels = diffScreanshot.getWidth() * diffScreanshot.getHeight();
-				double differentPixels = 0;
-				int[] pixelsArray = diffScreanshot.getRGB(0, 0, diffScreanshot.getWidth(), diffScreanshot.getHeight(), null, 0, diffScreanshot.getWidth());
-				for (int i = 0; i < totalPixels; i++) {
-				    if (pixelsArray[i] != Color.Black.argb32()) {
-				    	differentPixels ++;
-				    }
-				}
-				double diffPxPercentage = differentPixels / totalPixels;
-					
-				System.out.println("*********");
-				System.out.println("Totales actuales: " + totalPixels);
-				System.out.println("Diferentes: " + differentPixels);
-				System.out.println("Proporcion (0..1): " + diffPxPercentage);
-				System.out.println("*********");
-					
-				qLearningValue += diffPxPercentage;
-				qLearningsGlobalList.set(index, qLearningValue);
-					
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		*/
-
-	
 
 		//return the set of derived actions
 		return actions;
@@ -396,96 +269,50 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-
-		// ENFOQUE 2: Decrecimiento iterativo de los QValues
-		
 		//Seleccionar el widget con el mayor valor en su tag QLearning.
+		String maxID = "";
 		double maxQLearning = 0.0;
 		double wQLearning = 0.0;
-		int index = 0;
-		int wIndex = 0;
-		
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				wQLearning = w.get(ActionTags.QLearning, 0.0);
-				if(wQLearning > maxQLearning) {
-					maxQLearning = wQLearning;
-					wIndex = index;
-				}
 				
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			for(Widget w : state) {
+				String wID = w.get(Tags.AbstractIDCustom);
+				if(aID == wID) {
+					wQLearning = w.get(ActionTags.QLearning, 0.0);
+					if(wQLearning > maxQLearning) {
+						maxQLearning = wQLearning;
+						maxID = wID;
+					}
+				}
 			}
-			index ++;
 		}
-		
+				
 		// Actualizar los valores de QLearning de los widgets. El valor en widgets de un ActionGroup sera menor
 		// a medida que se ejecuten acciones de dicho ActionGroup.
-		
-		index = 0;
-		for(Widget w : state) {
-			if(index == wIndex) {
-				double newQL = greaterThanZero(w.get(ActionTags.QLearning, 0.0) - 0.05);
-				w.set(ActionTags.QLearning, newQL);
-		
-				System.out.println("Widget to be selected: " + w.get(Tags.Desc) + "\t\t New QLearning = " + w.get(ActionTags.QLearning, 0.0));
-						
-				updateListsAfter(w);
-						
+				
+		for(Action a : actions) {
+			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+			if(aID == maxID) {
+				double newQL = greaterThanZero(a.get(Tags.OriginWidget).get(ActionTags.QLearning, 0.0) - 0.05);
+				a.get(Tags.OriginWidget).set(ActionTags.QLearning, newQL);
+			
+				System.out.println("Widget to be selected: " + a.get(Tags.OriginWidget).get(Tags.Desc) + "\t\t New QLearning = " + a.get(Tags.OriginWidget).get(ActionTags.QLearning, 0.0));
+								
+				updateListsAfter(a.get(Tags.OriginWidget));
+									
 				System.out.println(" ... END ...");
 				System.out.println(" ... widgetNamesGlobalList: " + widgetNamesGlobalList);
 				System.out.println(" ... actionGroupsGlobalList: " + actionGroupsGlobalList);
 				System.out.println(" ... qLearningsGlobalList: " + qLearningsGlobalList);
 				System.out.println(" ... zIndexesGlobalList: " + zIndexesGlobalList);
+									
+				//Action maxAction = getAction(a.get(Tags.OriginWidget), actions);
+				return a;
+			}
+		}
 						
-				Action maxAction = getAction(w, actions);
-				return maxAction;
-			}
-			index ++;
-		}
-		
-		
-		
-		// ENFOQUE 3 y 4: Dar una mayor recompensa a los widgets que, de ser seleccionados, produzcan un mayor cambio en el programa
-		/*
-		//Seleccionar el widgetcon el mayor valor en su tag QLearning.
-		Widget maxWidget = null;
-		double maxQLearning = 0.0;
-		for(Widget w : state) {
-			if((w.get(Tags.Role).toString() == "UIAButton") || (w.get(Tags.Role).toString() == "UIAMenuItem")) {
-				double widgetQLearning = w.get(ActionTags.QLearning, 0.0);
-				if(widgetQLearning > maxQLearning) {
-					maxWidget = w;
-					maxQLearning = widgetQLearning;
-				}
-				
-				// ENFOQUE 3
-				//lastStateWIDList.add(w.get(Tags.ConcreteIDCustom));
-			}
-		}
-
-		// ENFOQUE 3
-		//numWidgetsBefore = numWidgetsNow;
-		
-		if (maxWidget != null) {
-			updateListsAfter(maxWidget);
-			
-			lastWidgetID = maxWidget.get(Tags.ConcreteIDCustom);
-			
-			System.out.println("... widgetToBeSelectedID: " + lastWidgetID);
-			System.out.println("... widgetToBeSelectedQL: " + maxQLearning);
-			System.out.println(" ...... widgetNamesGlobalList: " + widgetNamesGlobalList);
-			System.out.println(" ...... actionGroupsGlobalList: " + actionGroupsGlobalList);
-			System.out.println(" ...... qLearningsGlobalList: " + qLearningsGlobalList);
-			System.out.println(" ...... zIndexesGlobalList: " + zIndexesGlobalList);
-			
-			
-			Action maxAction = getAction(maxWidget, actions);
-			return maxAction;
-		}
-		*/
-		
-		
 		return(super.selectAction(state, actions));
-		
 	}
 	
 
@@ -728,7 +555,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 	
 	private void updateListsBefore(Widget w) {
-		String idCustom = w.get(Tags.ConcreteIDCustom);
+		String idCustom = w.get(Tags.AbstractIDCustom);
 		if(idCustomsGlobalList.contains(idCustom)) {
 			int index = idCustomsGlobalList.indexOf(idCustom);
 			w.set(ActionTags.QLearning, qLearningsGlobalList.get(index));
@@ -740,12 +567,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 	
 	private void updateListsAfter(Widget w) {
-		String idCustom = w.get(Tags.ConcreteIDCustom);
+		String idCustom = w.get(Tags.AbstractIDCustom);
 		String maxActionGroup = w.get(ActionTags.ActionGroup, ActionGroupType.UIAWidget).toString();
 		double maxActionQL = w.get(ActionTags.QLearning);
 		String maxActionDesc = w.get(Tags.Desc, "NULL");
 		double maxActionZIndex = w.get(Tags.ZIndex);
-		lastWidgetID = idCustom;
 				
 		if(idCustomsGlobalList.isEmpty()) {
 			idCustomsGlobalList.add(idCustom);
@@ -757,7 +583,6 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 			if(idCustomsGlobalList.contains(idCustom)) {
 				int index = idCustomsGlobalList.indexOf(idCustom);
 				actionGroupsGlobalList.set(index, maxActionGroup);
-				if(enfoque3o4) maxActionQL -= 0.01 * maxActionZIndex;
 				qLearningsGlobalList.set(index, maxActionQL);
 				zIndexesGlobalList.set(index, maxActionZIndex);
 			} else {
@@ -773,185 +598,12 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	private Action getAction(Widget w, Set<Action> actions) {
 		Action theActions[] = new Action[actions.size()];
 		actions.toArray(theActions);
-		//Action theAction = null;
-		//if(actions.size() > 0) {
-			Action theAction = theActions[0];
-			for(Action a : actions) {
-				if(w.get(Tags.ConcreteIDCustom) == a.get(Tags.OriginWidget).get(Tags.ConcreteIDCustom)) {
-					theAction = a;
-				}
+		Action theAction = theActions[theActions.length - 1];
+		for(Action a : actions) {
+			if(w.get(Tags.AbstractIDCustom) == a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom)) {
+				theAction = a;
 			}
-			
-		//}	
+		}
 		return theAction;
-	}
-	
-	private double getPersistentDecrement(State state) {
-		int persistentWidgetNum = 0;
-		
-		for(Widget w : state) {
-			String wID = w.get(Tags.ConcreteIDCustom);
-			if(lastStateWIDList.contains(wID)) {
-				persistentWidgetNum ++;
-			}
-		}
-		lastStateWIDList.clear();
-
-		double persistentDecrement = persistentWidgetNum * 0.01;
-		return persistentDecrement;
-	}
-
-	
-	// ENFOQUE 4
-	/**
-	 * State image difference 
-	 * 
-	 * https://stackoverflow.com/questions/25022578/highlight-differences-between-images
-	 * 
-	 * @param previousStateDisk
-	 * @param namePreviousState
-	 * @param stateDisk
-	 * @param nameState
-	 * @return
-	 */
-	private String getDifferenceImage(String previousStateDisk, String namePreviousState, String stateDisk, String nameState) {
-		try {
-
-			// State Images paths
-			String previousStatePath = new File(previousStateDisk).getCanonicalFile().toString();
-			String statePath = new File(stateDisk).getCanonicalFile().toString();
-			
-			System.out.println("Action: " + actionCount);
-			System.out.println("PreviousState: " + previousStatePath);
-			System.out.println("CurrentState: " + statePath);
-			
-			// TESTAR launches the process to create the image and move forward without wait if exists
-			// thats why we need to check and wait to obtain the image-diff
-			while(!new File(previousStatePath).exists() || !new File(statePath).exists()){
-				System.out.println("Waiting for Screenshot creation");
-				System.out.println("Waiting... PreviousState: " + previousStatePath);
-				System.out.println("Waiting... CurrentState: " + statePath);
-				Util.pause(2);
-			}
-			
-			BufferedImage img1 = ImageIO.read(new File(previousStatePath));
-			BufferedImage img2 = ImageIO.read(new File(statePath));
-
-			int width1 = img1.getWidth(); // Change - getWidth() and getHeight() for BufferedImage
-			int width2 = img2.getWidth(); // take no arguments
-			int height1 = img1.getHeight();
-			int height2 = img2.getHeight();
-			if ((width1 != width2) || (height1 != height2)) {
-				System.out.println("Error: Images dimensions mismatch");
-				return "";
-			}
-
-			// NEW - Create output Buffered image of type RGB
-			BufferedImage outImg = new BufferedImage(width1, height1, BufferedImage.TYPE_INT_RGB);
-
-			// Modified - Changed to int as pixels are ints
-			int diff;
-			int result; // Stores output pixel
-			for (int i = 0; i < height1; i++) {
-				for (int j = 0; j < width1; j++) {
-					int rgb1 = img1.getRGB(j, i);
-					int rgb2 = img2.getRGB(j, i);
-					int r1 = (rgb1 >> 16) & 0xff;
-					int g1 = (rgb1 >> 8) & 0xff;
-					int b1 = (rgb1) & 0xff;
-					int r2 = (rgb2 >> 16) & 0xff;
-					int g2 = (rgb2 >> 8) & 0xff;
-					int b2 = (rgb2) & 0xff;
-					diff = Math.abs(r1 - r2); // Change
-					diff += Math.abs(g1 - g2);
-					diff += Math.abs(b1 - b2);
-					diff /= 3; // Change - Ensure result is between 0 - 255
-					// Make the difference image gray scale
-					// The RGB components are all the same
-					result = (diff << 16) | (diff << 8) | diff;
-					outImg.setRGB(j, i, result); // Set result
-				}
-			}
-
-			// Now save the image on disk
-			// check if we have a directory for the screenshots yet
-			File screenshotDir = new File(OutputStructure.htmlOutputDir + File.separator);
-
-			// save the file to disk
-			File screenshotFile = new File(screenshotDir, "diff_"+ namePreviousState + "_" + nameState + ".png");
-			if (screenshotFile.exists()) {
-				try {
-					return screenshotFile.getCanonicalPath();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(outImg, "png", baos);
-			byte[] bytes = baos.toByteArray();
-
-			outputStream.write(bytes);
-			outputStream.flush();
-			outputStream.close();
-
-			return screenshotFile.getCanonicalPath();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return "";
-	}
-}
-
-/**
- * Helper Class to prepare HTML State report Difference
- */
-class HTMLDifferenceGeneric {
-	
-	PrintWriter out = null;
-
-	public HTMLDifferenceGeneric () { 
-		String[] HEADER = new String[] {
-				"<!DOCTYPE html>",
-				"<html>",
-				"<style>",
-				".container {display: flex;}",
-				".float {display:inline-block;}",
-				"</style>",
-				"<head>",
-				"<title>TESTAR State Model difference report</title>",
-				"</head>",
-				"<body>"
-		};
-		
-		String htmlReportName =  OutputStructure.htmlOutputDir + File.separator + "StateDifferenceReport.html";
-
-		try {
-			out = new PrintWriter(new File(htmlReportName).getCanonicalPath(), HTMLReporter.CHARSET);
-		} catch (IOException e) { e.printStackTrace(); }
-
-		for(String s:HEADER){
-			out.println(s);
-			out.flush();
-		}
-	}
-	
-	public void addStateDifferenceStep(int actionCount, String previousState, String state, String difference) {
-		out.println("<h2> Specific State changes for action " + actionCount + " </h2>");
-		try {
-			out.println("<p><img src=\"" + new File(previousState).getCanonicalFile().toString() + "\">");
-			out.println("<img src=\"" + new File(state).getCanonicalFile().toString() + "\">");
-			out.println("<img src=\"" + new File(difference).getCanonicalFile().toString() + "\"></p>");
-		} catch (IOException e) {
-			out.println("<p> ERROR ADDING IMAGES </p>");;
-		}
-		out.flush();
 	}
 }
