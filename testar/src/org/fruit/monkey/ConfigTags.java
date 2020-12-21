@@ -94,12 +94,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
-  // graph db config tags
-  public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
-  public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
-  public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
-  public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
-
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
   public static final Tag<String> DataStore = Tag.from("DataStore", String.class);
@@ -118,6 +112,11 @@ public final class ConfigTags {
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 
+  // state model difference
+  public static final Tag<String> PreviousApplicationName = Tag.from("PreviousApplicationName", String.class);
+  public static final Tag<String> PreviousApplicationVersion = Tag.from("PreviousApplicationVersion", String.class);
+  public static final Tag<Boolean> StateModelDifferenceAutomaticReport = Tag.from("StateModelDifferenceAutomaticReport", Boolean.class);
+  
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
 
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);

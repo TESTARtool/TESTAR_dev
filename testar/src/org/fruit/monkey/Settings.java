@@ -377,14 +377,6 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProtocolClass = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
-					+"# Graphdatabase settings (experimental)\n"
-					+"#################################################################\n"
-					+"GraphDBEnabled = false" + Util.lineSep()
-					+"GraphDBUrl =" + Util.lineSep()
-					+"GraphDBUser =" + Util.lineSep()
-					+"GraphDBPassword =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
 					+"# State model inference settings\n"
 					+"#################################################################\n"
 					+"StateModelEnabled = false" + Util.lineSep()
@@ -408,6 +400,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# the widget and state hash strings. Use a comma separated list.\n"
 					+"#################################################################\n"
 					+"AbstractStateAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Previous State model difference settings\n"
+					+"#################################################################\n"
+					+"PreviousApplicationName =" + Util.lineSep()
+					+"PreviousApplicationVersion =" + Util.lineSep()
+					+"StateModelDifferenceAutomaticReport =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Override display scale\n"

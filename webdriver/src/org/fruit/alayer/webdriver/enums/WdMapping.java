@@ -80,6 +80,7 @@ public class WdMapping {
 	 * @param mappedTag
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> Tag<T> getMappedStateTag(Tag<T> mappedTag) {
 		return (Tag<T>) stateTagMappingWebdriver.getOrDefault(mappedTag, null);
 	}

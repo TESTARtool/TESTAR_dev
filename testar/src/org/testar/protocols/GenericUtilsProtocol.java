@@ -33,6 +33,8 @@ package org.testar.protocols;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+
+import org.apache.commons.io.FileUtils;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -41,8 +43,15 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
+import org.testar.OutputStructure;
+import org.testar.jacoco.JacocoFilesCreator;
+import org.testar.jacoco.MergeJacocoFiles;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -314,4 +323,116 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         }
         return false;
     }
+    
+	// Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
+	// we use this variable to store after each action the last correct coverage
+	private String lastCorrectJacocoCoverageFile = "";
+
+	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
+	private Set<String> jacocoFiles = new HashSet<>();
+	
+	/**
+	 * Copy settings protocolName build.xml file to jacoco directory
+	 * Example: "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+	 */
+	protected void copyJacocoBuildFile() {
+		// JaCoCo: Move settings protocolName build.xml file to jacoco directory
+		try {
+			// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+			String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
+			File originalBuildFile = new File(Main.settingsDir + File.separator + protocolName + File.separator + "build.xml").getCanonicalFile();
+			System.out.println("originalBuildFile: " + originalBuildFile);
+			if(originalBuildFile.exists()) {
+				File destbuildFile = new File(Main.testarDir + File.separator + "jacoco" + File.separator + "build.xml").getCanonicalFile();
+				System.out.println("destbuildFile: " + destbuildFile);
+				if(destbuildFile.exists()) {
+					destbuildFile.delete();
+				}
+				FileUtils.copyFile(originalBuildFile, destbuildFile);
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
+		}
+	}
+	
+	/**
+	 * Extract and create JaCoCo action coverage report.
+	 */
+	protected void extractJacocoActionReport() {
+		try {
+			System.out.println("Extracting JaCoCo report for Action number: " + actionCount);
+
+			// Dump the JaCoCo Action report from the remote JVM
+			// Example: jacoco-upm_sequence_1_action_3.exec
+			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
+
+			// If is not empty, save as last correct file in case the SUT crashes executing next actions
+			if(!jacocoFile.isEmpty()) {
+				lastCorrectJacocoCoverageFile = jacocoFile;
+			}
+
+			// Create the output JaCoCo Action report
+			// Example: "jacoco_reports/upm_sequence_1_action_3/index.html"
+			JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
+
+		} catch (Exception e) {
+			System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+		}
+	}
+	
+	/**
+	 * Extract and create JaCoCo sequence coverage report.
+	 */
+	protected void extractJacocoSequenceReport() {
+		// Dump the sequence JaCoCo report from the remote JVM
+		// Example: jacoco-upm_sequence_1.exec
+		String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
+		if(!jacocoFile.isEmpty()) {
+			lastCorrectJacocoCoverageFile = jacocoFile;
+		}
+
+		// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
+		// If everything works correctly will be the sequence report, if not, last correct action jacoco.exec file
+		jacocoFiles.add(lastCorrectJacocoCoverageFile);
+
+		// Create the output JaCoCo report
+		// Example: "jacoco_reports/upm_sequence_1/index.html"
+		JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		
+		// reset value
+		lastCorrectJacocoCoverageFile = "";
+	}
+	
+	/**
+	 * Merge all JaCoCo sequences files and create a run coverage merged report
+	 */
+	protected void extractJacocoRunReport() {
+		try {
+			// Merge all jacoco.exec sequence files
+			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
+			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
+			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+			
+			// Then create the report that contains the coverage of all executed sequences
+			// Example: jacoco_reports//TOTAL_MERGED//index.html
+			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.out.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
+		}
+	}
+	
+	/**
+	 * Compress JaCoCo report folder
+	 */
+	protected void compressJacocoReportFolder() {
+		//TODO: We also need to delete original folder after compression
+		try {
+			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "jacoco_reports";
+			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			System.out.println("ERROR: Trying to compress JaCoCo report folder");
+		}
+	}
 }

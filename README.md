@@ -118,41 +118,64 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 		SuspiciousTitles -> The errors that TESTAR will search in the execution
 
 Example: 
-testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"
 
-
-## Known issues
-https://github.com/TESTARtool/TESTAR_dev/issues
+``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
 ## State Model / Graph database support
-TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR State Model.
+TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.
 Detected Widget's, Actions, States and their respective relations are recorded to this graph database.
 
 ### Use of the State Mode and the graph database
-The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Management.
+The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Sequence.
 
 The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
 
-More information about how to configure TESTAR State Model is available starting on the slide 28:
-https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
+### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
+https://www.orientdb.org/download
+https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip
 
-### Using OrientDB graphdb on the local filesystem
-OrientDB graph database can be used remotely or locally.
-Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server.
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
+``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
 
 ### Install and configure OrientDB Server
-In order to use the graphdb feature it's advised to install a graph database on your machine.
-The current implementation  of TESTAR has a backend for Orientdb.
-You can download the community edition from [orientdb](orientdb.com).
-Follow the installation instructions to install the database on your machine. 
+In order to use the graphdb feature it's advised to install a graph database on your machine or in a remote server.
+
+Follow the installation instructions about how to configure TESTAR State Model on slide 28:
+https://testar.org/images/development/TESTAR_webdriver_state_model.pdf 
+
+Also TESTAR HandsOn (Section 6) contains more information about State Model settings: https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_October_14.pdf
 
 When orientdb is started the first time. The root password needs to be configured. Make sure you remember this password.
 
-In order to use the graphdb feature. A database must be created in Orientdb. To do this follow the following procedure;
+In order to use the graphdb feature. A database must be created in OrientDB. To do this follow the following procedure:
 - Start the database server (ORIENTDB_HOME/bin/server.bat)
 - Start orientdb studio in a webbrowser [http://localhost:2480](http://localhost:2480)
 - Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/admin  user/password).
+- Go to Security tab and create a new user (testar/testar) with an active status and the admin role
+
+### Using OrientDB graphdb on the local filesystem
+OrientDB graph database can be used remotely or locally.
+Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server:
+
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = remote
+		DataStoreServer = localhost
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
+
+Also is possible to connect at file level without deploy the OrientDB locally:
+
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = plocal
+		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
+		
+## Known issues
+https://github.com/TESTARtool/TESTAR_dev/issues
+
+## Release notes
+https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes

@@ -29,17 +29,13 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.SimilarityDetection;
@@ -53,7 +49,18 @@ import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
-
+/**
+ * Sample protocol that tries to detect similar Actions between previous and current State,
+ * to decrease the possibilities to select a static widget and previous executed Action.
+ * 
+ * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
+ * that allows TESTAR to identify web elements based on Abstract Properties.
+ * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
+ * 
+ * If some Action.OriginWidget still existing between previous and current State
+ * or if some Action.OriginWidget was executed previously,
+ * increase a numeric similarity weight that will reduce the % to be selected
+ */
 public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	
 	private SimilarityDetection similarActions;
@@ -66,9 +73,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
@@ -100,11 +105,12 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 			put("class", "lfr-btn-label");
 		}};
 
+		//Force the browser to run in full screen mode
 		WdDriver.fullScreen = true;
 
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
-
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = true;
 	}
 
 	/**
@@ -116,6 +122,8 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		// 5 is the default maximum numeric weight
+		// the more it is increased, the more the probability % of selecting "similar" actions is reduced
 		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
 	}
 
@@ -223,6 +231,12 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
+		
+		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
+		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
+		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
+		
 		actions = similarActions.modifySimilarActions(actions);
 
 		System.out.println("---------------------- DEBUG SIMILARITY VALUES ----------------------------------------");
@@ -271,6 +285,8 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		// Increase the similarity (weight value) of an executed action
+		// to reduce the % to be selected next iteration
 		similarActions.increaseSpecificExecutedAction(action);
 		return super.executeAction(system, state, action);
 	}
