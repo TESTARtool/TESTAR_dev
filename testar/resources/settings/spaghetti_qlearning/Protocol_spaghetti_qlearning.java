@@ -1,32 +1,32 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2020 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 import java.io.File;
 import java.io.IOException;
@@ -37,16 +37,9 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.Tags;
 import org.testar.OutputStructure;
-import org.testar.protocols.JavaSwingProtocol;
+import org.testar.protocols.experiments.SpaghettiProtocol;
 import org.fruit.alayer.windows.WinProcess;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import java.io.FileWriter;
 
@@ -56,14 +49,14 @@ import java.io.FileWriter;
  *
  * It uses QLearningActionSelector algorithm.
  */
-public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
-	
+public class Protocol_spaghetti_qlearning extends SpaghettiProtocol {
+
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
+
 	// QLearningActionSelector: Instead of random, we will use QLearning action selector
 	private QLearningActionSelector actionSelector;
-	
+
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -75,108 +68,69 @@ public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
 		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
-		
-		// SwingSet2: Requires Java Access Bridge
+
+		// Spaghetti: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-		
+
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
-		
+
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
 		startSequenceTime = System.currentTimeMillis();
 		try{
 			reportTimeDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();
 		} catch (Exception e) {
-				System.out.println("sequenceTimeUntilActions.txt can not be created " );
-				e.printStackTrace();
+			System.out.println("sequenceTimeUntilActions.txt can not be created " );
+			e.printStackTrace();
 		}
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
-	
-	 /**
-	  * This method is used by TESTAR to determine the set of currently available actions.
-	  * You can use the SUT's current state, analyze the widgets and their properties to create
-	  * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	  * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	  * will stop generation of the current action and continue with the next one.
-	  * @param system the SUT
-	  * @param state the SUT's current state
-	  * @return  a set of actions
-	  */
-	 protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		 //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		 //the foreground. You should add all other actions here yourself.
-		 // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
-		 Set<Action> actions = super.deriveActions(system,state);
+	/**
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 * @param system the SUT
+	 * @param state the SUT's current state
+	 * @return  a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		 StdActionCompiler ac = new AnnotatingActionCompiler();
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+		Set<Action> actions = super.deriveActions(system,state);
 
-		 /**
-		  * Specific Action Derivation for Spaghetti SUT
-		  * To avoid deriving actions on non-desired widgets
-		  * 
-		  * Optional : iterate through top level widgets based on Z-index
-		  * for(Widget w : getTopWidgets(state))
-		  * If selected also change it for all Spaghetti protocols
-		  */
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
-		 // iterate through all widgets
-		 for(Widget w : state){
+		if(actions.isEmpty()){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, state);
+		}
 
-			 if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+		//return the set of derived actions
+		return actions;
+	}
 
-				 if (!blackListed(w)){  // do not build actions for tabu widgets  
-
-					 // left clicks
-					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						 actions.add(ac.leftClickAt(w));
-					 }
-
-					 // type into text boxes
-					 if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						 actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					 }
-
-					 // GENERIC: All swing apps
-					 //Force actions on some widgets with a wrong accessibility
-					 //Optional, comment this changes if your Swing applications doesn't need it
-					 if(w.get(Tags.Role).toString().contains("Tree") ||
-							 w.get(Tags.Role).toString().contains("ComboBox") ||
-							 w.get(Tags.Role).toString().contains("List")) {
-						 widgetTree(w, actions);
-					 }
-					 //End of Force action
-				 }
-			 }
-		 }
-
-		 return actions;
-	 }
-
-	 //Force actions on Tree widgets with a wrong accessibility
-	 public void widgetTree(Widget w, Set<Action> actions) {
-		 StdActionCompiler ac = new AnnotatingActionCompiler();
-		 actions.add(ac.leftClickAt(w));
-		 w.set(Tags.ActionSet, actions);
-		 for(int i = 0; i<w.childCount(); i++) {
-			 widgetTree(w.child(i), actions);
-		 }
-	 }
-	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
@@ -199,7 +153,7 @@ public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
 		}
 		return retAction;
 	}
-	
+
 	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
@@ -235,7 +189,7 @@ public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
 
 		return actionExecuted;
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
@@ -249,7 +203,7 @@ public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
 		}
 
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -285,7 +239,7 @@ public class Protocol_spaghetti_qlearning extends JavaSwingProtocol {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
-	
+
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
