@@ -20,10 +20,10 @@ public class ModelManager implements StateModelManager {
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
-    private AbstractAction actionUnderExecution;
+    protected AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
@@ -240,7 +240,7 @@ public class ModelManager implements StateModelManager {
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
             errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
                     "unable to find the action in its executable actions");
-        } catch (ActionNotFoundException e) {
+        } catch (final ActionNotFoundException e) {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
         }
         return null;
@@ -270,4 +270,7 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
 }

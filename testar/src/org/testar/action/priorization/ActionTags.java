@@ -39,7 +39,7 @@ import org.fruit.alayer.TagsBase;
 import org.fruit.alayer.windows.Windows;
 
 public class ActionTags extends TagsBase  {
-	
+
 	public enum ActionGroupType {
 		UIAWidget, UIAAppBar, UIAButton, UIACalendar, UIACheckBox, UIAComboBox,
 		UIACustomControl, UIADataGrid, UIADataItem, UIADocument, UIAEdit,
@@ -54,11 +54,11 @@ public class ActionTags extends TagsBase  {
 	private ActionTags() {}
 
 	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
-	
+
 	public static final Tag<Double> QLearning = from("QLearning", Double.class);
-	
+
 	public static final Tag<Integer> ZIndex = from("ZIndex", Integer.class);
-	
+
 	public static final Tag<ActionGroupType> ActionGroup = from("ActionGroup", ActionGroupType.class);
 	// <-- **
 
@@ -68,14 +68,14 @@ public class ActionTags extends TagsBase  {
 			add(ZIndex);
 		}
 	};
-	
+
 	// ** -->
 	private static Set<Tag<Double>> doubleActionTags = new HashSet<Tag<Double>>() {
 		{
 			add(QLearning);
 		}
 	};
-	
+
 	private static Set<Tag<ActionGroupType>> StringActionTags = new HashSet<Tag<ActionGroupType>>() {
 		{
 			add(ActionGroup);
