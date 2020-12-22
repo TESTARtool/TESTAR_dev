@@ -45,6 +45,7 @@ public class TreeDistHelper {
         for (final Widget nodeTree1 : keyRootPathTree1) {
             for (final Widget nodeTree2: keyRootPathTree2) {
             	
+            	// TODO: You can remove or comment out this :D
                 System.out.println("**** Node Tree1 Widget Title : " + nodeTree1.get(Tags.Title, "NOtitleOne"));
                 System.out.println("**** Node Tree1 Widget Role : " + nodeTree1.get(Tags.Role, Roles.Widget));
                 System.out.println("**** Node Tree2 Widget Title : " + nodeTree2.get(Tags.Title, "NOtitleTwo"));
@@ -71,20 +72,15 @@ public class TreeDistHelper {
                 // See windows -> org.fruit.alayer.windows -> UIAWidget.java -> equals
                 if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
                         && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {
-                	
-                    System.out.println(" INSIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE :D");
                     
                     /**
-                     * Debug: windows -> org.fruit.alayer.windows -> UIAWidget.java -> getAbstractRepresentation()
+                     * Debug: Widget getAbstractRepresentation()
                      * This is just a debugging to check that this method works
-                     * FINAL implementation should be done with getEarlierNodes
                      */
-                    
                     if(nodeTree1 != null) {
                     	System.out.println("nodeTree1 getAbstractRepresentation()");
                     	System.out.println(nodeTree1.getAbstractRepresentation());
                     }
-                    
                     if(nodeTree2 != null) {
                     	System.out.println("nodeTree2 getAbstractRepresentation()");
                     	System.out.println(nodeTree2.getAbstractRepresentation());
@@ -141,23 +137,21 @@ public class TreeDistHelper {
             return false;
         }
         
-        // FIXME: At the moment this seems not to work
-        System.out.println("!!!! areNodesEqual NOT NULL !!!! We are IN");
+        System.out.println("!!!! Cheking areNodesEqual (Not Null) !!!!");
         
-        //logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
-        
-        logger.debug("Comparing AbstractIDCustom properties of nodes: '{}' and '{}'", node1.toString(), node2.toString());
+        //TODO: Check what is returning toString()
+        logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
 
         // TODO: Note that getAbstractRepresentation of two "different" menu items will be the same if Widget Title is not included in the abstraction level
+        // TODO: Basically users will need to define a GOOD SUT Abstraction before running this
         return StringUtils.equals(node1.getAbstractRepresentation(), node2.getAbstractRepresentation());
     }
 
     private Widget getEarlierNode(final Widget node, final Deque<Widget> deque) {
         final List<Widget> dequeList = new ArrayList<>(deque);
         
-        // TODO: test if this works
+        // TODO from Mark: test if this works
         final int position = dequeList.indexOf(node);
-        
         
         System.out.println("getEarlierNode -> " + node.get(Tags.Role, Roles.Widget));
         System.out.println("getEarlierNode left position -> " + String.valueOf(position - 1));
@@ -195,12 +189,12 @@ public class TreeDistHelper {
 
     private Integer getForestDist(final MultiKeyMap forestDist, final Widget node1, final Widget node2) {
         if (node1 == null && node2 == null) {
-            // Why? I thought getForestDist(null, null) = 1
+            // TODO: Why? I thought getForestDist(null, null) = 1
             return 0;
         }
 
         if (!forestDist.containsKey(node1, node2)) {
-            // When is this possible?
+            // TODO: When is this possible?
             return 0;
         }
 
@@ -213,7 +207,7 @@ public class TreeDistHelper {
         }
 
         if (!treeDist.containsKey(node1, node2)) {
-            // When is this possible?
+            // TODO: When is this possible?
             return 0;
         }
 

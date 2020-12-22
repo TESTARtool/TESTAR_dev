@@ -55,10 +55,10 @@ public class LRKeyrootsHelper {
             return;
         }
 
-        // TODO: Widget object identifier is not informative for logs debugging
+        // TODO: This is printing Java Widget object identifier, not informative for logs debugging
         //logger.info("Sorted list is '{}'", sortedChildList);
 
-        // TODO: Why? Only One left Widget
+        // TODO Fernando: Why? Only One left Widget
         // ANSWER FROM Olivia: I think this is actually accurate, left child nodes are not LRKeyroots,
             // and each right child should be analyzed because they are indeed LRKeyroots
             // Although the recursive call to processChild could be done here directly
@@ -69,8 +69,8 @@ public class LRKeyrootsHelper {
     }
 
     private void processLeftChild(final Widget leftChildWidget, final Deque<Widget> result) {
-    	// FIXME: Why not?
-    	//result.add(leftChildWidget);
+    	// TODO Fernando: Why not? result.add(leftChildWidget);
+    	// ANSWER FROM Fernando: Probably something related with this LRKeyroots
     	
         processChilds(leftChildWidget, result);
     }

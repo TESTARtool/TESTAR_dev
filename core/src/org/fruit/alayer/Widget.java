@@ -37,6 +37,8 @@ import java.io.Serializable;
 
 import org.fruit.Drag;
 
+import es.upv.staq.testar.CodingManager;
+
 /**
  * A Widget is usually a control element of an <code>SUT</code>.
  * Widgets have exactly one parent and can have several children.
@@ -72,7 +74,22 @@ public interface Widget extends Taggable, Serializable {
 	// OLD IMPLEMENTATION
 	public String getRepresentation(String tab);
 	
-	public String getAbstractRepresentation();
+	/**
+	 * Get the Abstract Tags from a Widget (defined by users) 
+	 * to prepare a string that represents it at an abstract level. 
+	 * 
+	 * @return String that represents the widget at an abstract level.
+	 */
+	default String getAbstractRepresentation() {
+		StringBuilder repr = new StringBuilder();
+		repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+		for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
+			if(this.get(tag, null) != null) {
+				repr.append("," + tag.name() + "=" + this.get(tag));
+			}
+		}
+		return repr.toString();
+	}
 	
 	public abstract String toString(Tag<?>... tags);
 	

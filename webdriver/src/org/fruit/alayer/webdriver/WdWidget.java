@@ -246,24 +246,6 @@ public class WdWidget implements Widget, Serializable {
   }
 
   @Override
-  public String getAbstractRepresentation() {
-	  StringBuilder repr = new StringBuilder();
-	  repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
-	  repr.append(getAbstractProperties());
-	  return repr.toString();
-  }
-
-  private String getAbstractProperties() {
-	  StringBuilder absP = new StringBuilder();
-	  for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
-		  if(this.get(tag, null) != null) {
-			  absP.append("," + tag.name() + "=" + this.get(tag));
-		  }
-	  }
-	  return absP.toString();
-  }
-
-  @Override
   public String toString(Tag<?>... tags) {
     return Util.treeDesc(this, 2, tags);
   }

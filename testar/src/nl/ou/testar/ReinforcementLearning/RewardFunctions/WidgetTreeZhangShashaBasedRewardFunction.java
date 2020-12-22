@@ -58,32 +58,27 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         int reward = treeDist.values().stream()
                 .mapToInt(object -> (Integer) object)
                 .sum();
-
-        /**
-         * This is only logger debugging.
-         * 
-         * IF implementation is like this, the implementation is not correct
-         * 
-         * ELSE solve only debugging information
-         */
         
-        // FIXME: Why this? State (process Widget) has normally only 1 child =  windows container
+        /**
+         * Minor fixes for debugging purposes
+         */
+        // TODO: State (process Widget) has normally only 1 child =  windows container
+        // Then I think size of all State Widgets
         //logger.info("Childcount previous state='{}'", previousState.childCount());
         //logger.info("Childcount current state='{}'", state.childCount());
-        //logger.info("State", state.getRepresentation(""));
-        //logger.info("State", state.getRepresentation(""));
-        
         logger.info("Number widgets Previous State='{}'", previousState.childCount() > 0 ? Iterables.size(previousState) : 0);
-        logger.info("Previous State", previousState);
         logger.info("Number widgets Current State='{}'", state.childCount() > 0 ? Iterables.size(state) : 0);
-        logger.info("Current State", state);
+        
+        // TODO: State is basically the process Widget, think that getAbstractRepresentation is not informative
+        //logger.info("State", state.getAbstractRepresentation());
+        //logger.info("State", state.getAbstractRepresentation());
 
-        // FIXME: Why are we checking this? first child of the state is normally the windows container
+        // TODO: First child of the state is normally the windows container, not really informative
         //logger.info("First child of previous state='{}'", previousState.child(0).getAbstractRepresentation());
 
-        // FIXME: This is returning the representation of the State = Widget process
+        // TODO: This is returning the representation of the State = Widget process, not really informative
         //logger.info("Reward for previous state:{} and current state {} is {}", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
-        logger.info("Reward for, Action Transition? from Previous State to Current State is {}", reward);
+        logger.info("Reward for Action Transition from Previous State to Current State is {}", reward);
         
         previousState = state;
         forestDist.clear();
