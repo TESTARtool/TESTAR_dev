@@ -21,6 +21,7 @@ public class LRKeyrootsHelper {
     public Deque<Widget> getLRKeyroots(final Widget widget) {
         final Deque<Widget> result = new ArrayDeque<>();
         // add root element
+        //TODO: should the root node be stored at the left side of the deque or should it be the last item?
         result.add(widget);
 
         processChilds(widget, result);
@@ -58,6 +59,9 @@ public class LRKeyrootsHelper {
         //logger.info("Sorted list is '{}'", sortedChildList);
 
         // TODO: Why? Only One left Widget
+        // ANSWER FROM Olivia: I think this is actually accurate, left child nodes are not LRKeyroots,
+            // and each right child should be analyzed because they are indeed LRKeyroots
+            // Although the recursive call to processChild could be done here directly
         // Then all other to right Widget
         processLeftChild(sortedChildList.get(0), result);
 
@@ -72,6 +76,7 @@ public class LRKeyrootsHelper {
     }
 
     private void processRightChild(final Widget rightChildWidget, final Deque<Widget> result) {
+        // TODO: Maybe call processChilds before adding the widget?
         result.add(rightChildWidget);
 
         processChilds(rightChildWidget, result);

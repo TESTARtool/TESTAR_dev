@@ -52,6 +52,9 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
             }
         }
 
+        // TODO: Maybe the reward is the distance calculated with the last keyroots, i.e. assuming it is the one stored in the treeDist for the roots of both trees
+        // Unless the reward is the sum of all distances of every subtree? Not sure
+        // int reward = (int)treeDist.get(previousState, state);
         int reward = treeDist.values().stream()
                 .mapToInt(object -> (Integer) object)
                 .sum();

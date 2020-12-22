@@ -28,10 +28,16 @@ public class TreeDistHelper {
         final Deque<Widget> keyRootPathTree2 = getLeftMostArray(keyRoot2);
 
         for (final Widget node : keyRootPathTree1) {
+            // TODO: Should be used earlierNode of node instead of node?
+            //   final Widget earlierNode = getEarlierNode(node, keyRootPathTree1);
+            //   forestDist.put(node, null, getForestDist(forestDist, earlierNode, null) + DELETE);
             forestDist.put(node, null, getForestDist(forestDist, node, null) + DELETE);
         }
 
         for (final Widget node : keyRootPathTree2) {
+            // TODO: Should be used earlierNode of node instead of node?
+            //   final Widget earlierNode = getEarlierNode(node, keyRootPathTree1);
+            //   forestDist.put(node, null, getForestDist(forestDist, earlierNode, null) + DELETE);
             forestDist.put(null, node, getForestDist(forestDist, null, node) + INSERT);
         }
 
@@ -61,8 +67,14 @@ public class TreeDistHelper {
                         && getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom,"two"))) {
 
                     final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
+                    // TODO: Change to keyRootPathTree2, not keyRootPathTree1
                     final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree1);
 
+                    // TODO: is it always nodeTree1 and nodeTree2?. Maybe it is:
+                    // first:  int i = getForestDist(forestDist, earlierNode1, nodeTree2) + DELETE
+                    // second: int j = getForestDist(forestDist, nodeTree1, earlierNode2) + INSERT;
+                    // and not sure if the difference with with early nodes or with the nodes, like:
+                    // final boolean nodesAreEqual = areNodesEqual(nodeTree1, nodeTree2);
                     final int i = getForestDist(forestDist, nodeTree1, nodeTree2) + DELETE;
                     final int j = getForestDist(forestDist, nodeTree1, nodeTree2) + INSERT;
                     final boolean nodesAreEqual = areNodesEqual(earlierNode1, earlierNode2);
@@ -75,8 +87,20 @@ public class TreeDistHelper {
                     final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
                     final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree1);
 
+                    // TODO: same as before... is it always nodeTree1 and nodeTree2?. Maybe it is:
+                    // first getForestDist(forestDist, earlierNode1, nodeTree2) + DELETE
+                    // second getForestDist(forestDist, nodeTree1, earlierNode2) + INSERT;
                     final int i = getForestDist(forestDist, nodeTree1, nodeTree2) + DELETE;
                     final int j = getForestDist(forestDist, nodeTree1, nodeTree2) + INSERT;
+
+                    // And then we might need the early nodes of the left most child... does this make sense?
+                    // As in the formula from the algoritsm: forestdist(T_1[l(i)..l(i_1) - 1 ], T_2[l(j)..l(j_1) - 1]) + treedist(i_1,j_1)
+                    // T_1[l(i)..l(i_1) - 1 ] the forest from the left most descendant of i to the node "l(i_1) - 1"
+                    // l(i_1) - 1 : I understand from this that l(i_1) is the left most descendant of nodeTree1 and -1 implies the early node
+                    // I would assume is something like this, but I have doubts:
+                    // final Widget earlyLeftMost1 = getEarlierNode(getLeftMostArray(nodeTree1).getFirst(), keyRootPathTree1);
+                    // final Widget earlyLeftMost2 = getEarlierNode(getLeftMostArray(nodeTree2).getFirst(), keyRootPathTree2);
+                    // final int k = getForestDist(forestDist, earlyLeftMost1, earlyLeftMost2) + getTreeDist(treeDist,nodeTree1, nodeTree2);
                     final int k = getForestDist(forestDist, earlierNode1, earlierNode2) + getTreeDist(treeDist,nodeTree1, nodeTree2);
 
                     forestDist.put(nodeTree1, nodeTree2, NumberUtils.min(i,j,k));
@@ -87,6 +111,7 @@ public class TreeDistHelper {
     }
 
     private boolean areNodesEqual(final Widget node1, final Widget node2) {
+        // TODO: What should happen if both are null?
         if (node1 == null || node2 == null) {
             return false;
         }
@@ -94,7 +119,8 @@ public class TreeDistHelper {
         //logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
         
         logger.debug("Comparing AbstractIDCustom properties of nodes: '{}' and '{}'", node1.toString(), node2.toString());
-        
+
+        // TODO: Note that getAbstractRepresentation of two "different" menu items will be the same if Widget Title is not included in the abstraction level
         return StringUtils.equals(node1.getAbstractRepresentation(), node2.getAbstractRepresentation());
     }
 
@@ -113,6 +139,7 @@ public class TreeDistHelper {
      * The first element is the most left
      */
     private Deque<Widget> getLeftMostArray(final Widget widget) {
+        // TODO: I am not sure at this point, but I think this path should be a post order traversal, not just all left descendants
         final Deque<Widget> result = new ArrayDeque<>();
         result.add(widget);
 
@@ -134,10 +161,12 @@ public class TreeDistHelper {
 
     private Integer getForestDist(final MultiKeyMap forestDist, final Widget node1, final Widget node2) {
         if (node1 == null && node2 == null) {
+            // Why? I thought getForestDist(null, null) = 1
             return 0;
         }
 
         if (!forestDist.containsKey(node1, node2)) {
+            // When is this possible?
             return 0;
         }
 
@@ -150,6 +179,7 @@ public class TreeDistHelper {
         }
 
         if (!treeDist.containsKey(node1, node2)) {
+            // When is this possible?
             return 0;
         }
 
