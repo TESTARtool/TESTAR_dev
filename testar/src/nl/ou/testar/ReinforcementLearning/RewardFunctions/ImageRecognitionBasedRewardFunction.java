@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.lang.Validate;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.*;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.util.Set;
 
 public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
@@ -28,7 +30,7 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
     *{@inheritDoc}
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
         try {
             Settings.MinSimilarity = 0.01; //override default of 0.3
             Validate.notNull(screenImagePreviouslyExecutedAction, "ScreenImagePreviouslyExecutedAction has the value null");

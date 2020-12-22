@@ -4,13 +4,14 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Widget;
-import org.apache.commons.math3.analysis.function.Divide;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ABTBasedRewardFunction implements RewardFunction {
 
@@ -23,10 +24,11 @@ public class ABTBasedRewardFunction implements RewardFunction {
      * @param currentConcreteState The {@link ConcreteState} the SUT is in
      * @param currentAbstractState The {@link AbstractState} the SUT is in
      * @param executedAction The {@link AbstractAction} that was executed
+     * @param actions
      * @return The calculated reward
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
         final Map<Tag<?>, Object>  tags = currentConcreteState.getAttributes().getTagValues();
 //        System.out.println("\n+++++------------------------------");
 //        System.out.println(currentConcreteState.getAttributes().getTagValues());

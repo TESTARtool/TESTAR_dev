@@ -88,7 +88,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
             final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
 
             // get reward and Q-value
-            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
             System.out.println("REWARD: " + Float.toString(reward));
             final double qValue = qFunction.getQValue((Tag<Float>)this.tag, previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
 

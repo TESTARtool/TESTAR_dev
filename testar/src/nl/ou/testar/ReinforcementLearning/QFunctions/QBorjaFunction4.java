@@ -31,12 +31,12 @@ public class QBorjaFunction4 implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
         float oldQValue = 0f;
-        if (previouslyExecutedAction != null) {
+        if (previousActionUnderExecution != null) {
             System.out.println("previouslyExecutedAction != null ---> True");
             System.out.println("rl_tag ---> " + rl_tag.toString());
-            oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
+            oldQValue = previousActionUnderExecution.getAttributes().get(rl_tag, defaultQValue);
             System.out.println("oldQValue ---> " + Float.toString(oldQValue));
         }
         return oldQValue + reward;

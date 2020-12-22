@@ -3,20 +3,17 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
-import org.apache.commons.lang.Validate;
 import org.fruit.Util;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
-import org.sikuli.basics.Settings;
-import org.sikuli.script.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Set;
 
 public class BorjaReward4 implements RewardFunction {
 
@@ -35,7 +32,7 @@ public class BorjaReward4 implements RewardFunction {
      *{@inheritDoc}
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
 
         State previousState = latestState;
         latestState = state;
@@ -43,6 +40,7 @@ public class BorjaReward4 implements RewardFunction {
         if(previousState != null && previousState.get(Tags.ScreenshotPath, null) != null && state.get(Tags.ScreenshotPath, null) != null) {
 
             // Create and obtain the image-diff path
+            // TODO: to handle when getDifferenceImage returns "" (empty string). Error: EOFException
             String differenceScreenshot = getDifferenceImage(
                     previousState.get(Tags.ScreenshotPath), previousState.get(Tags.ConcreteIDCustom, ""),
                     state.get(Tags.ScreenshotPath), state.get(Tags.ConcreteIDCustom, "")
@@ -52,7 +50,7 @@ public class BorjaReward4 implements RewardFunction {
                 BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));
 
                 double totalPixels = diffScreanshot.getWidth() * diffScreanshot.getHeight();
-                float differentPixels = 0;
+                double differentPixels = 0;
                 int[] pixelsArray = diffScreanshot.getRGB(0, 0, diffScreanshot.getWidth(), diffScreanshot.getHeight(), null, 0, diffScreanshot.getWidth());
                 for (int i = 0; i < totalPixels; i++) {
                     if (pixelsArray[i] != Color.Black.argb32()) {
@@ -67,8 +65,6 @@ public class BorjaReward4 implements RewardFunction {
                 System.out.println("Proporcion (0..1): " + diffPxPercentage);
                 System.out.println("*********");
 
-                return differentPixels;
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,10 +73,6 @@ public class BorjaReward4 implements RewardFunction {
             //htmlDifference.addStateDifferenceStep(actionCount, previousState.get(Tags.ScreenshotPath), state.get(Tags.ScreenshotPath), differenceScreenshot);
         }
         return 0;
-    }
-
-    protected BufferedImage takeScreenshot() {
-        return new Screen().capture().getImage();
     }
 
     private String getDifferenceImage(String previousStateDisk, String namePreviousState, String stateDisk, String nameState) {

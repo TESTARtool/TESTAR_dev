@@ -236,6 +236,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		// Si no existe widget tree anterior, no hacer nada
 		if(numWidgetsBefore > 0) {
 			double persistentDecrement = getPersistentDecrement(state);
+			// TODO: lastWidgetID stores the id of last widget or last state???
 			int index = idCustomsGlobalList.indexOf(lastWidgetID);
 			if(index != -1) {
 				double numWidgetsBeforeDouble = numWidgetsBefore;
@@ -274,8 +275,9 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		String maxID = "";
 		double maxQLearning = 0.0;
 		double wQLearning = 0.0;
-		
+
 		for(Action a : actions) {
+			//TODO: Preguntar a Fernando
 			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
 			for(Widget w : state) {
 				String wID = w.get(Tags.AbstractIDCustom);
@@ -616,7 +618,7 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 	
 	private double getPersistentDecrement(State state) {
 		int persistentWidgetNum = 0;
-		
+
 		for(Widget w : state) {
 			String wID = w.get(Tags.AbstractIDCustom);
 			if(lastStateWIDList.contains(wID)) {

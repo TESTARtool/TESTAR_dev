@@ -6,15 +6,13 @@ import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 
 public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction {
@@ -37,7 +35,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
     }
 
     @Override
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
         if (state == null) {
             return 0f;
         }

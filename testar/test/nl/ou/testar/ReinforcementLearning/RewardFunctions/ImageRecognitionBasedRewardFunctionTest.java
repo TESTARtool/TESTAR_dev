@@ -53,7 +53,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshotPreviouslyExecutedAction);
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
 
         // then
         assertEquals(0f, reward, 0);
@@ -72,7 +72,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
 
         // then
         assertEquals(0.25f, reward, 0.05f);
@@ -91,7 +91,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
 
         // then
         assertEquals(0.50f, reward, 0.05f);
@@ -110,7 +110,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
 
         // then
         assertEquals(0.75f, reward, 0.05f);
@@ -129,7 +129,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
 
         // then
         assertEquals(1.00f, reward, 0.05f);

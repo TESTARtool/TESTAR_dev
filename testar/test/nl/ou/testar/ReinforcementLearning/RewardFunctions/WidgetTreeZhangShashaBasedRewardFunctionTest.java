@@ -43,7 +43,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
 
         // then
         assertEquals(reward, 1f, 0.00001);
@@ -65,7 +65,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
 
         // then
         assertEquals(reward, 0f, 0.00001);
@@ -91,7 +91,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
 
         // then
         assertEquals(reward, 1f, 0.00001);
@@ -118,7 +118,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
 
         // then
         assertEquals(reward, 1f, 0.00001);

@@ -23,8 +23,11 @@ public class QFunctionFactory {
                 System.out.println("//*/*/*/*/*/*/*/*/* qlearningfunction");
                 selectedQFunction = new QlearningFunction(alphaDiscount, gammaDiscount, defaultQValue);
                 break;
-            case "QBorjaFunction":
+            case "QBorjaFunction4":
                 selectedQFunction = new QBorjaFunction4(defaultQValue);
+                break;
+            case "QBorjaFunction3":
+                selectedQFunction = new QBorjaFunction3();
                 break;
             default:
                 selectedQFunction = new SarsaQFunction(alphaDiscount, gammaDiscount, defaultQValue);

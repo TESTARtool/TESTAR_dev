@@ -227,6 +227,8 @@ public class Protocol_desktop_generic_enfoque_2 extends DesktopProtocol {
 			// 4)			Si alg�n widget de las listas tiene un valor, asignar al widget inicial el valor de QLearning del widget de las listas.
 			// 5)			Si ning�n widget de las listas tiene un valor, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
 			// 6)		Si no existen, asignar al widget inicial el valor mas alto (1) a su Tag QLearning.
+			// TODO: This approach requires either to traverse the entire widget tree or dynamically store all widgets of previous visited states.
+			// Not sure what to do
 			if(actionGroup != null && actionQLearning == 0.0) {										// 2)
 				double auxQValue = 0.0;
 				for (int i = 0; i < actionGroupsGlobalList.size(); i ++) {
