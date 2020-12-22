@@ -33,6 +33,7 @@ package org.testar.protocols;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.DerivedActions;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -211,7 +212,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param scrollThick
      * @param widget
      */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+    @Deprecated
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget){
         Drag[] drags = null;
         //If there are scroll (drags/drops) actions possible
         if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
@@ -226,6 +228,37 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             }
         }
+    }
+
+    @Deprecated
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+    }
+
+    /**
+     * Adds sliding actions into available actions of the DerivedActions for the given widget
+     * and returns DerivedActions after that
+     *
+     * @param derived
+     * @param ac
+     * @param drags
+     * @param widget
+     * @return DerivedActions with added sliding actions in the available actions
+     */
+    protected DerivedActions addSlidingActions(DerivedActions derived, StdActionCompiler ac, Drag[] drags, Widget widget){
+
+            //TODO creates multiple drag actions for one widget?
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                derived.addAvailableAction(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
+                ));
+
+            }
+        return derived;
     }
 
     /**
