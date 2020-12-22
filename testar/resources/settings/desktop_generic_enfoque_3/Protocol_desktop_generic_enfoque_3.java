@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterators;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -218,8 +219,9 @@ public class Protocol_desktop_generic_enfoque_3 extends DesktopProtocol {
 		
 		// Numero de widgets en el estado previo y en el actual
 		
-		numWidgetsNow = getWidNum(actions);
-				
+//		numWidgetsNow = getWidNum(actions);
+		numWidgetsNow = Iterators.size(state.iterator());
+
 		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
 		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
 		

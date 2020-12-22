@@ -16,7 +16,7 @@ public class QBorjaFunction3 implements QFunction {
             System.out.println("rl_tag ---> " + rl_tag.toString());
 
             // TODO: Right now Q is per abstract action, not per widget, but in the original protocol Q seems to be attached to Widgets
-            // TODO: What to do is no previous Q
+            // TODO: What to do if no previous Q
             oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, 0f);
 
             System.out.println("oldQValue ---> " + Float.toString(oldQValue));

@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import com.google.common.collect.Iterators;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
@@ -18,7 +19,7 @@ public class BorjaReward3 implements RewardFunction{
     @Override
     public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction executedAction, Set<Action> actions) {
         System.out.println("Calculating reward");
-        float numWidgetsNow = getWidNum(actions);
+        float numWidgetsNow = Iterators.size(state.iterator());
         System.out.println("numWidgetsNow ---> " + Float.toString(numWidgetsNow));
         float rewards = 0f;
         float persistentDecrement = getPersistentDecrement(state);
