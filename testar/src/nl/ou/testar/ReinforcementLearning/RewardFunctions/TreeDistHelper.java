@@ -29,15 +29,15 @@ public class TreeDistHelper {
         final Deque<Widget> keyRootPathTree2 = getLeftMostArray(keyRoot2);
 
         for (final Widget node : keyRootPathTree1) {
-            // TODO: Should be used earlierNode of node instead of node?
+            // TODO: Should earlierNode of node be used instead of node?
             //   final Widget earlierNode = getEarlierNode(node, keyRootPathTree1);
             //   forestDist.put(node, null, getForestDist(forestDist, earlierNode, null) + DELETE);
             forestDist.put(node, null, getForestDist(forestDist, node, null) + DELETE);
         }
 
         for (final Widget node : keyRootPathTree2) {
-            // TODO: Should be used earlierNode of node instead of node?
-            //   final Widget earlierNode = getEarlierNode(node, keyRootPathTree1);
+            // TODO: Should earlierNode of node be used instead of node?
+            //   final Widget earlierNode = getEarlierNode(node, keyRootPathTree2);
             //   forestDist.put(node, null, getForestDist(forestDist, earlierNode, null) + DELETE);
             forestDist.put(null, node, getForestDist(forestDist, null, node) + INSERT);
         }
@@ -118,8 +118,8 @@ public class TreeDistHelper {
                     final int i = getForestDist(forestDist, nodeTree1, nodeTree2) + DELETE;
                     final int j = getForestDist(forestDist, nodeTree1, nodeTree2) + INSERT;
 
-                    // And then we might need the early nodes of the left most child... does this make sense?
-                    // As in the formula from the algoritsm: forestdist(T_1[l(i)..l(i_1) - 1 ], T_2[l(j)..l(j_1) - 1]) + treedist(i_1,j_1)
+                    // And then we might need the early node of the left most child... does this make sense?
+                    // As in the formula from the algorithm: forestdist(T_1[l(i)..l(i_1) - 1 ], T_2[l(j)..l(j_1) - 1]) + treedist(i_1,j_1)
                     // T_1[l(i)..l(i_1) - 1 ] the forest from the left most descendant of i to the node "l(i_1) - 1"
                     // l(i_1) - 1 : I understand from this that l(i_1) is the left most descendant of nodeTree1 and -1 implies the early node
                     // I would assume is something like this, but I have doubts:
