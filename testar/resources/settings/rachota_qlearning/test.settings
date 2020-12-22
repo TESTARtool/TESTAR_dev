@@ -51,7 +51,7 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTitles =
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -73,8 +73,8 @@ SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 # (Only available for desktop applications through COMMAND_LINE)
 #
 # Allow TESTAR to store execution logs coming from the processes.
-# You can use the regular expression ProcessLogs below to filter 
-# the logs. Use .*.* if you want to store all the outputs of the 
+# You can use the regular expression ProcessLogs below to filter
+# the logs. Use .*.* if you want to store all the outputs of the
 # process.
 #################################################################
 
@@ -112,7 +112,7 @@ ProtocolClass = rachota_qlearning/Protocol_rachota_qlearning
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+AbstractStateAttributes = WidgetPath,WidgetControlType
 
 #################################################################
 # Other more advanced settings

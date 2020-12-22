@@ -90,7 +90,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
-	
+
 	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
 
@@ -107,7 +107,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 		// For experimental purposes we need to disconnect from Windows Remote Desktop
 		// without close the GUI session.
-		/*try {
+		try {
 			// bat file that uses tscon.exe to disconnect without stop GUI session
 			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
 
@@ -125,7 +125,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 
 		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
+		Util.pause(60);
 
 		super.initialize(settings);
 
@@ -135,11 +135,11 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
-		
+
 		// Enable the inspection of internal cells on Java Swing Tables
 		AccessBridgeFetcher.swingJavaTableDescend = true;
 	}
-	
+
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
@@ -179,14 +179,14 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			System.out.println("sequenceTimeUntilActions.txt can not be created " );
 			e.printStackTrace();
 		}
-		
+
 		// wait 10 seconds, give time to rachota to start
 		Util.pause(10);
 
 		// reset values
 		countEmptyStateTimes = 0;
 		lastCorrectJacocoCoverageFile = "";
-		
+
 		super.beginSequence(system, state);
 
 		// rachota: predefined action to deal with initial pop-up question
@@ -207,7 +207,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			}
 		}
 	}
-	
+
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -233,7 +233,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 		return state;
 	}
-	
+
 	/**
 	 * The getVerdict methods implements the online state oracles that
 	 * examine the SUT's current state and returns an oracle verdict.
@@ -246,7 +246,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		// non-responsiveness
 		// suspicious titles
 		Verdict verdict = super.getVerdict(state);
-		
+
 		if(countEmptyStateTimes > 2) {
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "Seems that rachota SUT is not responding");
 		}
@@ -282,14 +282,14 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		/**
 		 * Specific Action Derivation for rachota SUT
 		 * To avoid deriving actions on non-desired widgets
-		 * 
+		 *
 		 * Optional : for(Widget w : state)
 		 * If selected also change it for all rachota protocols
 		 */
 
 		// iterate through top level widgets
 		for(Widget w : getTopWidgets(state)){
-			
+
 			// rachota: add filename report
 			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
 					&& w.get(Tags.Title,"").contains("Filename:")) {
@@ -298,23 +298,23 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					// left clicks
 					if((isClickable(w)) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// rachota: left clicks on specific widgets
 					if((isEditToClickWidget(w) || isCalendarTextWidget(w)) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// left click in Table Cells
 					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
-					
+
 					// rachota: use spinboxes
 					if(isSpinBoxWidget(w) && (isUnfiltered(w) || whiteListed(w))) {
 						addIncreaseDecreaseActions(w, actions, ac);
@@ -325,7 +325,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && isEditableWidget(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
-					
+
 					// rachota: custom number for this generate reporting field
 					if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
 							&& w.get(Tags.Title,"").contains("Price per hour")) {
@@ -354,7 +354,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 				}
 			}
 		}
-		
+
 		// rachota: sometimes rachota freezes, TESTAR detects the SUT
 		// but cannot extract anything at JavaAccessBridge level
 		// Use this count for Verdict
@@ -389,14 +389,14 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 		// Get Next widget
 		Widget nextButton = filenameWidget;
-		for(Widget checkWidget: filenameWidget.root()) { 
+		for(Widget checkWidget: filenameWidget.root()) {
 			if(checkWidget.get(Tags.Title,"").contains("Next")) {
 				nextButton = checkWidget;
 			}
 		}
 
 		// type filename, use tab to complete the path, and click next
-		Action addFilename = new CompoundAction.Builder()   
+		Action addFilename = new CompoundAction.Builder()
 				.add(ac.clickTypeInto(filenameWidget, Util.dateString(OutputStructure.DATE_FORMAT), true), 0.5) // Click and type
 				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
 				.add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
@@ -407,7 +407,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		addFilename.set(Tags.Desc, "Add Filename Report");
 		actions.add(addFilename);
 	}
-	
+
 	/**
 	 * Rachota:
 	 * Force the input of a correct price and click finish to create the invoice report
@@ -415,19 +415,19 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private void forcePricePerHourAndFinish(Widget priceWidget, Set<Action> actions, StdActionCompiler ac) {
 		// Get Finish widget
 		Widget finishButton = priceWidget;
-		for(Widget checkWidget: priceWidget.root()) { 
+		for(Widget checkWidget: priceWidget.root()) {
 			if(checkWidget.get(Tags.Title,"").contains("Finish")) {
 				finishButton = checkWidget;
 			}
 		}
-		
+
 		// type price, use tab to complete the path, and click finish
-		Action forcePriceFinish = new CompoundAction.Builder()   
+		Action forcePriceFinish = new CompoundAction.Builder()
 				.add(ac.clickTypeInto(priceWidget, "3", true), 0.5) // Click and type
 				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
 				.add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
 				.add(ac.leftClickAt(finishButton), 0.5).build(); //Click next
-		
+
 		forcePriceFinish.set(Tags.Role, Roles.Button);
 		forcePriceFinish.set(Tags.OriginWidget, priceWidget);
 		forcePriceFinish.set(Tags.Desc, "forcePriceAndFinish");
@@ -444,7 +444,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Rachota:
 	 * Seems that interactive Edit elements have tool type text with instructions
@@ -454,11 +454,11 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	 */
 	private boolean isEditableWidget(Widget w) {
 		String toolTipText = w.get(Tags.ToolTipText,"");
-		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") 
+		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain")
 				&& !toolTipText.contains("Mouse click") &&
 				!w.get(Tags.Title,"").contains("Price per hour") && !w.get(Tags.Title,"").contains("Tax:");
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * Check if it is a Table Cell widget
@@ -466,7 +466,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private boolean isTableCell(Widget w) {
 		return w.get(UIATags.UIAAutomationId, "").contains("TableCell");
 	}
-	
+
 	/**
 	 * Rachota:
 	 * Tricky way to check if current text widgets is a potential calendar number
@@ -480,7 +480,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 		}
 		return false;
 	}
-	
+
 	private int getNumericInt(String strNum) {
 		if (strNum == null) {
 			return -1;
@@ -491,7 +491,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			return -1;
 		}
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * Check if it is a Spinner widget
@@ -499,31 +499,31 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 	private boolean isSpinBoxWidget(Widget w) {
 		return w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner");
 	}
-	
+
 	/**
 	 * Rachota + Swing:
 	 * SpinBox widgets buttons seems that do not exist as unique element,
 	 * derive click + keyboard action to increase or decrease
 	 */
 	private void addIncreaseDecreaseActions(Widget w, Set<Action> actions, StdActionCompiler ac) {
-		Action increase = new CompoundAction.Builder()   
-				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+		Action increase = new CompoundAction.Builder()
+				.add(ac.leftClickAt(w), 0.5) // Click for focus
 				.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
 				.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
-		
+
 		increase.set(Tags.Role, Roles.Button);
 		increase.set(Tags.OriginWidget, w);
 		increase.set(Tags.Desc, "Increase Spinner");
-		
-		Action decrease = new CompoundAction.Builder()   
-				.add(ac.leftClickAt(w), 0.5) // Click for focus 
+
+		Action decrease = new CompoundAction.Builder()
+				.add(ac.leftClickAt(w), 0.5) // Click for focus
 				.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
 				.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
-		
+
 		decrease.set(Tags.Role, Roles.Button);
 		decrease.set(Tags.OriginWidget, w);
 		decrease.set(Tags.Desc, "Decrease Spinner");
-		
+
 		actions.add(increase);
 		actions.add(decrease);
 	}
@@ -640,12 +640,12 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 
 				// Dump the JaCoCo Action report from the remote JVM
 				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
-				
+
 				// If not empty save as last correct file in case the SUT crashes
 				if(!jacocoFile.isEmpty()) {
 					lastCorrectJacocoCoverageFile = jacocoFile;
 				}
-				
+
 				// Create the output JaCoCo Action report
 				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
 
@@ -727,7 +727,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			} catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
 		}
 	}
-	
+
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
@@ -746,7 +746,7 @@ public class Protocol_rachota_purerandom extends JavaSwingProtocol {
 			//Compress all JaCoCo report files
 			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JaCoCo_reports";
 			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
-			
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("ERROR: Trying to MergeMojo Jacoco Files");

@@ -83,14 +83,14 @@ import org.fruit.monkey.Main;
  * It uses StateModel Unvisited Actions algorithm.
  */
 public class Protocol_rachota_statemodel extends JavaSwingProtocol {
-	
+
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
+
 	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
-	
+
 	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
 
@@ -104,10 +104,10 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		
+
 		// For experimental purposes we need to disconnect from Windows Remote Desktop
 		// without close the GUI session.
-		/*try {
+		try {
 			// bat file that uses tscon.exe to disconnect without stop GUI session
 			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
 
@@ -125,18 +125,18 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 		}
 
 		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
-		
+		Util.pause(60);
+
 		super.initialize(settings);
 
 		// rachota: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-		
+
 		// StateModel Unvisited Action: This should be "unvisited", if not execution is not valid
 		System.out.println("StateModel Algorithm: " + settings.get(ConfigTags.ActionSelectionAlgorithm, "nothing"));
 		// This should be false for fastest executions
 		System.out.println("StateModel StateModelStoreWidgets: " + settings.get(ConfigTags.StateModelStoreWidgets, true));
-		
+
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
@@ -144,7 +144,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 		// Enable the inspection of internal cells on Java Swing Tables
 		AccessBridgeFetcher.swingJavaTableDescend = true;
 	}
-	
+
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
@@ -167,7 +167,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 			System.out.println("ERROR trying to disable detectInactivity configuration feature");
 		}
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -184,14 +184,14 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 				System.out.println("sequenceTimeUntilActions.txt can not be created " );
 				e.printStackTrace();
 		}
-		
+
 		// wait 10 seconds, give time to rachota to start
 		Util.pause(10);
 
 		// reset values
 		countEmptyStateTimes = 0;
 		lastCorrectJacocoCoverageFile = "";
-		
+
 	 	super.beginSequence(system, state);
 
 	 	// rachota: predefined action to deal with initial pop-up question
@@ -287,7 +287,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 		 /**
 		  * Specific Action Derivation for rachota SUT
 		  * To avoid deriving actions on non-desired widgets
-		  * 
+		  *
 		  * Optional : for(Widget w : state)
 		  * If selected also change it for all rachota protocols
 		  */
@@ -303,7 +303,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 
 			 if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				 if (!blackListed(w)){  // do not build actions for tabu widgets  
+				 if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					 // left clicks
 					 if((isClickable(w)) && (isUnfiltered(w) || whiteListed(w))) {
@@ -394,14 +394,14 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 
 		 // Get Next widget
 		 Widget nextButton = filenameWidget;
-		 for(Widget checkWidget: filenameWidget.root()) { 
+		 for(Widget checkWidget: filenameWidget.root()) {
 			 if(checkWidget.get(Tags.Title,"").contains("Next")) {
 				 nextButton = checkWidget;
 			 }
 		 }
 
 		 // type filename, use tab to complete the path, and click next
-		 Action addFilename = new CompoundAction.Builder()   
+		 Action addFilename = new CompoundAction.Builder()
 				 .add(ac.clickTypeInto(filenameWidget, Util.dateString(OutputStructure.DATE_FORMAT), true), 0.5) // Click and type
 				 .add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
 				 .add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
@@ -420,14 +420,14 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 	 private void forcePricePerHourAndFinish(Widget priceWidget, Set<Action> actions, StdActionCompiler ac) {
 		 // Get Finish widget
 		 Widget finishButton = priceWidget;
-		 for(Widget checkWidget: priceWidget.root()) { 
+		 for(Widget checkWidget: priceWidget.root()) {
 			 if(checkWidget.get(Tags.Title,"").contains("Finish")) {
 				 finishButton = checkWidget;
 			 }
 		 }
 
 		 // type price, use tab to complete the path, and click finish
-		 Action forcePriceFinish = new CompoundAction.Builder()   
+		 Action forcePriceFinish = new CompoundAction.Builder()
 				 .add(ac.clickTypeInto(priceWidget, "3", true), 0.5) // Click and type
 				 .add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
 				 .add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
@@ -459,7 +459,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 	  */
 	 private boolean isEditableWidget(Widget w) {
 		 String toolTipText = w.get(Tags.ToolTipText,"");
-		 return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") 
+		 return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain")
 				 && !toolTipText.contains("Mouse click") &&
 				 !w.get(Tags.Title,"").contains("Price per hour") && !w.get(Tags.Title,"").contains("Tax:");
 	 }
@@ -511,8 +511,8 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 	  * derive click + keyboard action to increase or decrease
 	  */
 	 private void addIncreaseDecreaseActions(Widget w, Set<Action> actions, StdActionCompiler ac) {
-		 Action increase = new CompoundAction.Builder()   
-				 .add(ac.leftClickAt(w), 0.5) // Click for focus 
+		 Action increase = new CompoundAction.Builder()
+				 .add(ac.leftClickAt(w), 0.5) // Click for focus
 				 .add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
 				 .add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
 
@@ -520,8 +520,8 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 		 increase.set(Tags.OriginWidget, w);
 		 increase.set(Tags.Desc, "Increase Spinner");
 
-		 Action decrease = new CompoundAction.Builder()   
-				 .add(ac.leftClickAt(w), 0.5) // Click for focus 
+		 Action decrease = new CompoundAction.Builder()
+				 .add(ac.leftClickAt(w), 0.5) // Click for focus
 				 .add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
 				 .add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
 
@@ -632,12 +632,12 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-				
+
 				// Write sequence duration to CLI and to file
 				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
 				System.out.println();
 				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-	
+
 				long minutes = (sequenceDurationSoFar / 1000)  / 60;
 				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
 				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
@@ -697,9 +697,9 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 			// Create the output JaCoCo report
 			JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
 		}
- 
+
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -734,7 +734,7 @@ public class Protocol_rachota_statemodel extends JavaSwingProtocol {
 		if(new File("jacoco.exec").exists()) {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
-		
+
 		String rachotaPath = "C:\\Users\\testar\\.rachota";
 
 		// Delete rachota files then next sequence will have same initial state without tasks

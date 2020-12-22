@@ -82,31 +82,31 @@ import org.fruit.monkey.Main;
  * It uses QLearningActionSelector algorithm.
  */
 public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
-	
+
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
+
 	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
 
 	// Java Coverage: Save all JaCoCO sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
-	
+
 	// QLearningActionSelector: Instead of random, we will use QLearning action selector
 	private QLearningActionSelector actionSelector;
-	
-	/** 
+
+	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		
+
 		// For experimental purposes we need to disconnect from Windows Remote Desktop
 		// without close the GUI session.
-		/*try {
+		try {
 			// bat file that uses tscon.exe to disconnect without stop GUI session
 			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
 
@@ -124,21 +124,21 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		}
 
 		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
-		
+		Util.pause(60);
+
 		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
 		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
-		
+
 		// SwingSet2: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-		
+
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -157,7 +157,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		}
 		super.beginSequence(system, state);
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -181,7 +181,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		/**
 		 * Specific Action Derivation for SwingSet2 SUT
 		 * To avoid deriving actions on non-desired widgets
-		 * 
+		 *
 		 * Optional : iterate through top level widgets based on Z-index
 		 * for(Widget w : getTopWidgets(state))
 		 * If selected also change it for all SwingSet2 protocols
@@ -192,7 +192,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					// left clicks
 					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
@@ -221,7 +221,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		return actions;
 
 	}
-	
+
 	 /**
 	  * SwingSet2 application contains a TabElement called "SourceCode"
 	  * that internally contains UIAEdit widgets that are not modifiable.
@@ -241,7 +241,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 			 widgetTree(w.child(i), actions);
 		 }
 	 }
-	
+
 	 /**
 	  * Select one of the available actions using an action selection algorithm (for example random action selection)
 	  *
@@ -264,7 +264,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		 }
 		 return retAction;
 	 }
-	
+
 	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
@@ -280,12 +280,12 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-					
+
 				// Write sequence duration to CLI and to file
 				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
 				System.out.println();
 				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-	
+
 				long minutes = (sequenceDurationSoFar / 1000)  / 60;
 				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
 				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
@@ -301,7 +301,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 					System.out.println("An error occurred.");
 					e.printStackTrace();
 				}
-				
+
 				// Dump the JaCoCo Action report from the remote JVM
 				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
@@ -312,7 +312,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 
 				// Create the output JaCoCo Action report
 				JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
-				
+
 			} catch (Exception e) {
 				System.out.println("ERROR Creating JaCoCo covergae for specific action: " + actionCount);
 			}
@@ -347,7 +347,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 		}
 
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -383,7 +383,7 @@ public class Protocol_swingset2_qlearning extends JavaSwingProtocol {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
-	
+
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */

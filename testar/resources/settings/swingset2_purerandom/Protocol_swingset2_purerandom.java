@@ -82,10 +82,10 @@ import org.fruit.monkey.Main;
  * It uses Random Selection algorithm.
  */
 public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
-	
+
 	private long startSequenceTime;
 	private String reportTimeDir;
-	
+
 	//Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
@@ -100,10 +100,10 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		
+
 		// For experimental purposes we need to disconnect from Windows Remote Desktop
 		// without close the GUI session.
-		/*try {
+		try {
 			// bat file that uses tscon.exe to disconnect without stop GUI session
 			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
 
@@ -121,13 +121,13 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 		}
 
 		// Wait because disconnect from system modifies internal Screen resolution
-		Util.pause(30);*/
-		
+		Util.pause(60);
+
 		super.initialize(settings);
-		
+
 		// SwingSet2: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
-		
+
 		// TESTAR will execute the SUT with Java
 		// We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
 		WinProcess.java_execution = true;
@@ -171,11 +171,11 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 
 		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		 StdActionCompiler ac = new AnnotatingActionCompiler();
-		 
+
 		 /**
 		  * Specific Action Derivation for SwingSet2 SUT
 		  * To avoid deriving actions on non-desired widgets
-		  * 
+		  *
 		  * Optional : iterate through top level widgets based on Z-index
 		  * for(Widget w : getTopWidgets(state))
 		  * If selected also change it for all SwingSet2 protocols
@@ -186,7 +186,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 
 			 if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				 if (!blackListed(w)){  // do not build actions for tabu widgets  
+				 if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					 // left clicks
 					 if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
@@ -214,7 +214,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 
 		 return actions;
 	 }
-	
+
 	 /**
 	  * SwingSet2 application contains a TabElement called "SourceCode"
 	  * that internally contains UIAEdit widgets that are not modifiable.
@@ -265,12 +265,12 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 			// Dump the JaCoCo report from the remote JVM and Get the name/path of this file
 			try {
 				System.out.println("Extract JaCoCO report for Action number: " + actionCount);
-				
+
 				// Write sequence duration to CLI and to file
 				long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
 				System.out.println();
 				System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-	
+
 				long minutes = (sequenceDurationSoFar / 1000)  / 60;
 				int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
 				System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
@@ -286,7 +286,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 					System.out.println("An error occurred.");
 					e.printStackTrace();
 				}
-				
+
 				// Dump the JaCoCo Action report from the remote JVM
 				String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
@@ -305,7 +305,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 
 		return actionExecuted;
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
@@ -332,7 +332,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 		}
 
 		super.finishSequence();
-		
+
 		// Write sequence duration to CLI and to file
 		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
 		System.out.println();
@@ -368,7 +368,7 @@ public class Protocol_swingset2_purerandom extends JavaSwingProtocol {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 	}
-	
+
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
