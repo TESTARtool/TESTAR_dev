@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
@@ -45,27 +46,51 @@ public class TreeDistHelper {
             for (final Widget nodeTree2: keyRootPathTree2) {
             	
                 System.out.println("**** Node Tree1 Widget Title : " + nodeTree1.get(Tags.Title, "NOtitleOne"));
+                System.out.println("**** Node Tree1 Widget Role : " + nodeTree1.get(Tags.Role, Roles.Widget));
                 System.out.println("**** Node Tree2 Widget Title : " + nodeTree2.get(Tags.Title, "NOtitleTwo"));
+                System.out.println("**** Node Tree2 Widget Role : " + nodeTree2.get(Tags.Role, Roles.Widget));
                 
                 System.out.println("--------------------------------------------------------------------------------------------------");
                 System.out.println("getLeftMostArray(nodeTree1).getFirst() TITLE: " + getLeftMostArray(nodeTree1).getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("getLeftMostArray(nodeTree1).getFirst() ROLE: " + getLeftMostArray(nodeTree1).getFirst().get(Tags.Role, Roles.Widget));
                 System.out.println("getLeftMostArray(nodeTree1).getFirst() AbstractIDCustom: " + getLeftMostArray(nodeTree1).getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
                 System.out.println("keyRootPathTree1.getFirst() TITLE: " + keyRootPathTree1.getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("keyRootPathTree1.getFirst() ROLE: " + keyRootPathTree1.getFirst().get(Tags.Role, Roles.Widget));
                 System.out.println("keyRootPathTree1.getFirst() AbstractIDCustom: " + keyRootPathTree1.getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
                 
                 System.out.println("--------------------------------------------------------------------------------------------------");
                 
                 System.out.println("getLeftMostArray(nodeTree2).getFirst() TITLE: " + getLeftMostArray(nodeTree2).getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("getLeftMostArray(nodeTree2).getFirst() ROLE: " + getLeftMostArray(nodeTree2).getFirst().get(Tags.Role, Roles.Widget));
                 System.out.println("getLeftMostArray(nodeTree2).getFirst() AbstractIDCustom: " + getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));	
                 System.out.println("keyRootPathTree2.getFirst() TITLE: " + keyRootPathTree2.getFirst().get(Tags.Title, "NO TITLE"));
+                System.out.println("keyRootPathTree2.getFirst() ROLE: " + keyRootPathTree2.getFirst().get(Tags.Role, Roles.Widget));
                 System.out.println("keyRootPathTree2.getFirst() AbstractIDCustom: " + keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom, "NO AbstractIDCustom"));
                 
-                
-                /*if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
-                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {*/
-            	if (getLeftMostArray(nodeTree1).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree1.getFirst().get(Tags.AbstractIDCustom,"two"))
-                        && getLeftMostArray(nodeTree2).getFirst().get(Tags.AbstractIDCustom, "one").equals(keyRootPathTree2.getFirst().get(Tags.AbstractIDCustom,"two"))) {
-
+                // This equals is comparing AbstractIDCustom widget property
+                // See windows -> org.fruit.alayer.windows -> UIAWidget.java -> equals
+                if (getLeftMostArray(nodeTree1).getFirst().equals(keyRootPathTree1.getFirst())
+                        && getLeftMostArray(nodeTree2).getFirst().equals(keyRootPathTree2.getFirst())) {
+                	
+                    System.out.println(" INSIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE :D");
+                    
+                    /**
+                     * Debug: windows -> org.fruit.alayer.windows -> UIAWidget.java -> getAbstractRepresentation()
+                     * This is just a debugging to check that this method works
+                     * FINAL implementation should be done with getEarlierNodes
+                     */
+                    
+                    if(nodeTree1 != null) {
+                    	System.out.println("nodeTree1 getAbstractRepresentation()");
+                    	System.out.println(nodeTree1.getAbstractRepresentation());
+                    }
+                    
+                    if(nodeTree2 != null) {
+                    	System.out.println("nodeTree2 getAbstractRepresentation()");
+                    	System.out.println(nodeTree2.getAbstractRepresentation());
+                    }
+                	
+                	
                     final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
                     // TODO: Change to keyRootPathTree2, not keyRootPathTree1
                     final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree1);
@@ -116,6 +141,9 @@ public class TreeDistHelper {
             return false;
         }
         
+        // FIXME: At the moment this seems not to work
+        System.out.println("!!!! areNodesEqual NOT NULL !!!! We are IN");
+        
         //logger.debug("Comparing nodes: '{}' and '{}'", node1.toString(), node2.toString());
         
         logger.debug("Comparing AbstractIDCustom properties of nodes: '{}' and '{}'", node1.toString(), node2.toString());
@@ -126,7 +154,13 @@ public class TreeDistHelper {
 
     private Widget getEarlierNode(final Widget node, final Deque<Widget> deque) {
         final List<Widget> dequeList = new ArrayList<>(deque);
-        final int position = dequeList.indexOf(node); // TODO: test if this works
+        
+        // TODO: test if this works
+        final int position = dequeList.indexOf(node);
+        
+        
+        System.out.println("getEarlierNode -> " + node.get(Tags.Role, Roles.Widget));
+        System.out.println("getEarlierNode left position -> " + String.valueOf(position - 1));
 
         if (position - 1 < 0) {
             return null;
