@@ -62,6 +62,8 @@ public class PrioritizeNewActionsSelector {
     private Map<Action, Integer> executedActions = new HashMap<>();
 
     public Set<Action> getPrioritizedActions(Set<Action> actions) {
+    	if(actions.isEmpty()) {return actions;}
+    	
         Set<Action> prioritizedActions = new HashSet<Action>();
         //checking if it is the first round of actions:
         if(previousActions==null) {
