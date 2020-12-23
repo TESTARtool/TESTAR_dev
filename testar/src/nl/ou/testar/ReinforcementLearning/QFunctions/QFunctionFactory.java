@@ -29,6 +29,9 @@ public class QFunctionFactory {
             case "QBorjaFunction3":
                 selectedQFunction = new QBorjaFunction3();
                 break;
+            case "QBorjaFunction2":
+                selectedQFunction = new QBorjaFunction2();
+                break;
             default:
                 selectedQFunction = new SarsaQFunction(alphaDiscount, gammaDiscount, defaultQValue);
         }

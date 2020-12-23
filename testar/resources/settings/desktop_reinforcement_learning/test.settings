@@ -96,14 +96,6 @@ SUTProcesses =
 ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = true

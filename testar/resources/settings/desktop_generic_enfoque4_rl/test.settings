@@ -96,14 +96,6 @@ SUTProcesses =
 ProtocolClass = desktop_generic_enfoque4_rl/Protocol_desktop_enfoque4_rl
 
 #################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = true

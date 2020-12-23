@@ -42,15 +42,7 @@ public class BorjaReward3 implements RewardFunction{
         previousState = state;
         return rewards;
     }
-
-    // TODO: Is the reward based on the number of widgets or on the number of actions?
-    private int getWidNum(Set<Action> actions) {
-        int res = 0;
-        for(Action a : actions) {
-            res ++;
-        }
-        return res;
-    }
+    
     private float getPersistentDecrement(State state) {
         int persistentWidgetNum = 0;
 
