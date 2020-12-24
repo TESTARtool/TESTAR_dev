@@ -66,11 +66,14 @@ public class NativeLinker {
 	 */
 	private static EnumSet<OperatingSystems> determinePlatform() {
 		osName = System.getProperty("os.name");
+
 		switch (osName) {
 		case "Windows 10":
 			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
 		case "Windows 7":
 			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_7);
+		case "Mac OS X":
+			return EnumSet.of(OperatingSystems.MAC);
 		default:
 			if (osName.contains("Windows"))
 				return EnumSet.of(OperatingSystems.WINDOWS);
