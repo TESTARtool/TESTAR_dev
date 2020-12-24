@@ -66,7 +66,7 @@ public final class Type extends TaggableBase implements Action {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
 		
-		double d = duration / text.length();
+		double d = duration / ((double)text.length());
 		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
 		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
 
@@ -87,11 +87,11 @@ public final class Type extends TaggableBase implements Action {
 				KBKeys key = getKey(c);
 
 				if(shift)
-					shiftDown.run(system, state, .0);
-				new KeyDown(key).run(system, state, .0);
-				new KeyUp(key).run(system, state, .0);
+					shiftDown.run(system, state, .05);
+				new KeyDown(key).run(system, state, .05);
+				new KeyUp(key).run(system, state, .05);
 				if(shift)
-					shiftUp.run(system, state, .0);
+					shiftUp.run(system, state, .05);
 				Util.pause(d);
 
 			} catch(IllegalArgumentException e) {

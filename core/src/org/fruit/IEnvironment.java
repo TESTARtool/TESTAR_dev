@@ -29,6 +29,7 @@
  *******************************************************************************************************/
 
 package org.fruit;
+import org.fruit.alayer.devices.KBKeys;
 
 public interface IEnvironment {
     /**
@@ -37,4 +38,6 @@ public interface IEnvironment {
      * @return The scale of the display which shows the window, when the display could not be resolved 1.0 is returned.
      */
     double getDisplayScale(long windowHandle);
+
+    KBKeys controlKey();
 }

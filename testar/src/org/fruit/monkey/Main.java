@@ -47,6 +47,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.windows.Windows10;
 
 import static org.fruit.Util.compileProtocol;
@@ -693,11 +695,26 @@ public class Main {
 	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
 	 */
 	private static void initOperatingSystem() {
-		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
+		Set<OperatingSystems> oss = NativeLinker.getPLATFORM_OS();
+		
+		if (oss.contains(OperatingSystems.WINDOWS_10)) {
 			Environment.setInstance(new Windows10());
-		} else {
+		}
+		else if (oss.contains(OperatingSystems.MAC)) {
+			Environment.setInstance(new MAC());
+		}
+		else {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
+	}
+
+	static class MAC implements IEnvironment {
+		@Override
+		public double getDisplayScale(long windowHandle) {
+			return 1.0;
+		}
+		@Override
+		public KBKeys controlKey() { return KBKeys.VK_META; }
 	}
 }

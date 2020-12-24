@@ -31,6 +31,8 @@
 package org.fruit.alayer.windows;
 
 import org.fruit.IEnvironment;
+import org.fruit.alayer.devices.KBKeys;
+
 import static org.fruit.alayer.windows.Windows.MONITOR_DEFAULTTONULL;
 
 /**
@@ -53,4 +55,7 @@ public final class Windows10 implements IEnvironment {
         System.out.printf("WARNING Failed to requested scale factor for display:%d res:%d \n",monitorHandle,res[0]);
         return result;
     }
+
+    @Override
+    public KBKeys controlKey() { return KBKeys.VK_CONTROL; }
 }

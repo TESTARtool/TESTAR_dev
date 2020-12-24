@@ -30,6 +30,8 @@
 
 package org.fruit;
 
+import org.fruit.alayer.devices.KBKeys;
+
 /**
  * A default environment implementation. Can be used as fallback option when a OS specific environment implementation
  * is missing.
@@ -41,4 +43,7 @@ public class UnknownEnvironment implements IEnvironment {
         System.out.println("WARNING getDisplayScale not implemented for current OS, returning default value");
         return 1.0;
     }
+
+    @Override
+    public KBKeys controlKey() { return KBKeys.VK_CONTROL; }
 }
