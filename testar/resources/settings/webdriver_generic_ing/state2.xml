@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<body class="redesign redesign-responsive">
+    <header>
+        <ing-open-nav-topbar mode="ing-flow">
+            <nav aria-labelledby="mainNavHeading" class="open-nav" role="navigation">
+                <h2 class="sr-only" id="mainNavHeading"/>
+                <div class="">
+                    <ing-open-nav-topbar-mobile>
+                        <div class="navbar-mobile">
+                            <div class="navbar-header">
+                                <ing-open-nav-topbar-brand>
+                                    <a class="navbar-brand" href="/particulier/index.html">
+                                        <span class="sr-only"/>
+                                        <span>
+                                            <img alt="Naar home"
+                                                 role="presentation"
+                                                 src="https://www.ing.nl/ing-app-open/bower_components/ing-open-navigation/packages/ing-open-nav-topbar/src/additives/../../assets/img/ing-logo.svg"/>
+                                        </span>
+                                    </a>
+                                </ing-open-nav-topbar-brand>
+                                <div class="buttons">
+                                    <span class="login">
+                                        <a class="btn btn-primary" href="https://mijn.ing.nl/login">
+                                            <span/>
+                                        </a>
+                                    </span>
+                                    <a class="btn-search" href="/particulier/zoeken.html">
+                                        <ing-open-icon icon="ing:solid.navigation.search">
+                                            <span class="icon-content"/>
+                                        </ing-open-icon>
+                                    </a>
+                                    <button class="btn-menu" type="button" value="">
+                                        <ing-open-icon icon="ing:solid.navigation.menu">
+                                            <span class="icon-content"/>
+                                        </ing-open-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <ing-open-nav-topbar-mobile-menu>
+                                <div class="navbar-mobile-collapse ">
+                                    <div class="navbar-mobile-collapse-header">
+                                        <h2/>
+                                        <button value="">
+                                            <ing-open-icon icon="ing:navigation-menu-close">
+                                                <span class="icon-content"/>
+                                            </ing-open-icon>
+                                        </button>
+                                    </div>
+                                    <div class="navbar-mobile-collapse-container">
+                                        <div class="menu-content l0">
+                                            <ul>
+                                                <li value="0">
+                                                    <a>
+                                                        <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                       icon="ing:solid.arrows.chevron-open-right">
+                                                            <span class="icon-content"/>
+                                                        </ing-open-icon>
+                                                    </a>
+                                                    <div class="navbar-mobile-collapse ">
+                                                        <div class="navbar-mobile-collapse-header">
+                                                            <h2/>
+                                                            <button value="">
+                                                                <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                    <span class="icon-content"/>
+                                                                </ing-open-icon>
+                                                            </button>
+                                                            <button value="">
+                                                                <ing-open-icon icon="ing:navigation-menu-close">
+                                                                    <span class="icon-content"/>
+                                                                </ing-open-icon>
+                                                            </button>
+                                                        </div>
+                                                        <div class="navbar-mobile-collapse-container">
+                                                            <div class="menu-content">
+                                                                <ul>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                    <li value="0">
+                                                                        <a class="clickable">
+                                                                            <ing-open-icon class="icon h-float-right nav-arrow"
+                                                                                           icon="ing:solid.arrows.chevron-open-right">
+                                                                                <span class="icon-content"/>
+                                                                            </ing-open-icon>
+                                                                        </a>
+                                                                        <div class="navbar-mobile-collapse ">
+                                                                            <div class="navbar-mobile-collapse-header">
+                                                                                <h2/>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:solid.arrows.chevron-open-left">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                                <button value="">
+                                                                                    <ing-open-icon icon="ing:navigation-menu-close">
+                                                                                        <span class="icon-content"/>
+                                                                                    </ing-open-icon>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="navbar-mobile-collapse-container">
+                                                                                <div class="menu-content">
+                                                                                    <ing-open-nav-topbar-mobile-menu-content/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li value="0">
+                                                    <a href="/de-ing/afspraakmaken/afspraak-maken.html"/>
+                                                </li>
+                                                <li value="0">
+                                                    <a href="https://www.ing.nl/punten/overview"/>
+                                                </li>
+                                                <li value="0">
+                                                    <a href="/particulier/klantenservice/index.html"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <ul>
+                                            <li value="0">
+                                                <a class="segments" href="/particulier/index.html">
+                                                    <ing-open-icon class="icon h-float-right check" icon="ing:solid.symbol.check">
+                                                        <span class="icon-content"/>
+                                                    </ing-open-icon>
+                                                </a>
+                                            </li>
+                                            <li value="0">
+                                                <a class="segments" href="/personalbanking/index.html"/>
+                                            </li>
+                                            <li value="0">
+                                                <a class="segments" href="/privatebanking/index.html"/>
+                                            </li>
+                                            <li value="0">
+                                                <a class="segments" href="/zakelijk/index.html"/>
+                                            </li>
+                                            <li value="0">
+                                                <a class="segments" href="/particulier/english/index.html"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </ing-open-nav-topbar-mobile-menu>
+                        </div>
+                    </ing-open-nav-topbar-mobile>
+                </div>
+            </nav>
+        </ing-open-nav-topbar>
+    </header>
+    <div>
+        <a name="0"/>
+        <ing-app-open-page page="smart-calculators" subpage="house-mortgage-based-on-income">
+            <div class="ing-app-open-page">
+                <ing-feat-sc-house-based-on-income>
+                    <div>
+                        <ing-flow>
+                            <customState xmlns="https://testar.org/state">
+                                <node key="applicantEmployeeIncomeForm">
+                                    <node key="income">
+                                        <node key="hasHolidayPay"/>
+                                        <node key="hasThirteenth"/>
+                                        <node key="monthlyIncome"/>
+                                        <node key="yearlyIncome">30000</node>
+                                    </node>
+                                </node>
+                                <node key="applicantIncomeTypeForm">
+                                    <node key="employeeIncomePermanent">true</node>
+                                    <node key="incomeType">EMPLOYEE</node>
+                                    <node key="incomeType[]">
+                                        <node index="0">
+                                            <node key="checked">true</node>
+                                            <node key="value">EMPLOYEE</node>
+                                        </node>
+                                        <node index="1">
+                                            <node key="checked">false</node>
+                                            <node key="value">ENTREPRENEUR</node>
+                                        </node>
+                                        <node index="2">
+                                            <node key="checked">false</node>
+                                            <node key="value">UNEMPLOYMENT</node>
+                                        </node>
+                                    </node>
+                                </node>
+                                <node key="buyIntentionForm">
+                                    <node key="buyIntention">3To6Months</node>
+                                </node>
+                                <node key="mySituationForm">
+                                    <node key="applicantAge">30</node>
+                                    <node key="hasPartner">true</node>
+                                    <node key="partnerAge">40</node>
+                                </node>
+                            </customState>
+                            <ing-flow-shell>
+                                <ing-flow-progress slot="progress">
+                                    <ol class="list">
+                                        <li value="0">
+                                            <div class="progress-item visited completed">
+                                                <div class="progress-counter"/>
+                                                <span>
+                                                    <a class="click-area"
+                                                       href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=1-my-situation-step">
+                                                        <span/>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li value="0">
+                                            <div class="progress-item visited completed">
+                                                <div class="progress-counter"/>
+                                                <span>
+                                                    <a class="click-area"
+                                                       href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=2-buy-intention-step">
+                                                        <span/>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li value="0">
+                                            <ing-ow-expandable>
+                                                <div class="progress-item visited completed" slot="toggle">
+                                                    <div class="progress-counter"/>
+                                                    <span>
+                                                        <span class="click-area"/>
+                                                    </span>
+                                                    <ing-icon aria-hidden="true" role="img">
+                                                        <slot/>
+                                                    </ing-icon>
+                                                </div>
+                                                <ol slot="details">
+                                                    <li class="progress-sub-item visited completed" value="0">
+                                                        <a class="click-area"
+                                                           href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=3-income-applicant-type-step">
+                                                            <span/>
+                                                        </a>
+                                                    </li>
+                                                    <li class="progress-sub-item visited completed" value="0">
+                                                        <a class="click-area"
+                                                           href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=income-applicant-employee-amount-step">
+                                                            <span/>
+                                                        </a>
+                                                    </li>
+                                                </ol>
+                                                <slot name="toggle-prefix"/>
+                                                <button aria-controls="expandable"
+                                                        aria-expanded="false"
+                                                        class="toggle"
+                                                        value="">
+                                                    <slot name="toggle"/>
+                                                </button>
+                                                <slot name="toggle-suffix"/>
+                                            </ing-ow-expandable>
+                                        </li>
+                                        <li value="0">
+                                            <ing-ow-expandable>
+                                                <div class="progress-item visited active latest" slot="toggle">
+                                                    <div class="progress-counter"/>
+                                                    <span>
+                                                        <span class="click-area"/>
+                                                    </span>
+                                                    <ing-icon aria-hidden="true" role="img">
+                                                        <slot/>
+                                                    </ing-icon>
+                                                </div>
+                                                <ol slot="details">
+                                                    <li class="progress-sub-item visited active latest" value="0">
+                                                        <a aria-current="step"
+                                                           class="click-area"
+                                                           href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=income-partner-type-step">
+                                                            <span/>
+                                                        </a>
+                                                    </li>
+                                                    <li class="progress-sub-item  " value="0">
+                                                        <span class="click-area"/>
+                                                    </li>
+                                                </ol>
+                                                <slot name="toggle-prefix"/>
+                                                <button aria-controls="expandable"
+                                                        aria-expanded="false"
+                                                        class="toggle"
+                                                        value="">
+                                                    <slot name="toggle"/>
+                                                </button>
+                                                <slot name="toggle-suffix"/>
+                                            </ing-ow-expandable>
+                                        </li>
+                                        <li value="0">
+                                            <div class="progress-item  ">
+                                                <div class="progress-counter"/>
+                                                <span>
+                                                    <span class="click-area"/>
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li value="0">
+                                            <div class="progress-item  ">
+                                                <div class="progress-counter"/>
+                                                <span>
+                                                    <span class="click-area"/>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </ing-flow-progress>
+                                <div id="flow-step">
+                                    <ing-feat-sc-house-income-type>
+                                        <ing-flow-form aria-describedby=" help-text-ing-flow-form-gk1jyjegu6 feedback-ing-flow-form-gk1jyjegu6"
+                                                       aria-invalid="false"
+                                                       aria-labelledby=""
+                                                       class="form-control state-error"
+                                                       error-state=""
+                                                       id="ing-flow-form-gk1jyjegu6"
+                                                       layout="default"
+                                                       name="partnerIncomeTypeForm">
+                                            <form>
+                                                <ing-flow-radio-group aria-describedby=" help-text-ing-flow-radio-group-fi847hnuzz feedback-ing-flow-radio-group-fi847hnuzz feedback-ing-flow-form-gk1jyjegu6 help-text-ing-flow-form-gk1jyjegu6"
+                                                                      aria-invalid="false"
+                                                                      aria-labelledby=" label-ing-flow-radio-group-fi847hnuzz"
+                                                                      class="flow-radio-group form-control state-error"
+                                                                      error-state=""
+                                                                      id="ing-flow-radio-group-fi847hnuzz"
+                                                                      layout="default"
+                                                                      name="incomeType"
+                                                                      role="radiogroup">
+                                                    <h3 class="radio-group-label"
+                                                        for="ing-flow-radio-group-fi847hnuzz"
+                                                        id="label-ing-flow-radio-group-fi847hnuzz"
+                                                        slot="label"/>
+                                                    <ing-radio checked="false"
+                                                               class="state-filled form-field"
+                                                               label="In loondienst"
+                                                               name="incomeType[]"
+                                                               type="radio"
+                                                               value="EMPLOYEE">
+                                                        <div aria-live="polite"
+                                                             id="feedback-ing-radio-a64muglh2p"
+                                                             slot="feedback"/>
+                                                        <label for="ing-radio-a64muglh2p"
+                                                               id="label-ing-radio-a64muglh2p"
+                                                               slot="label"/>
+                                                        <div id="help-text-ing-radio-a64muglh2p" slot="help-text"/>
+                                                        <input aria-describedby=" help-text-ing-radio-a64muglh2p feedback-ing-radio-a64muglh2p feedback-ing-flow-radio-group-fi847hnuzz help-text-ing-flow-radio-group-fi847hnuzz feedback-ing-flow-form-gk1jyjegu6 help-text-ing-flow-form-gk1jyjegu6"
+                                                               aria-invalid="false"
+                                                               aria-labelledby=" label-ing-radio-a64muglh2p"
+                                                               checked="false"
+                                                               class="form-control"
+                                                               id="ing-radio-a64muglh2p"
+                                                               name="incomeType[]"
+                                                               slot="input"
+                                                               type="radio"
+                                                               value="EMPLOYEE"/>
+                                                        <slot name="input"/>
+                                                        <div class="choice-field__graphic-container"/>
+                                                        <div class="choice-field__label">
+                                                            <slot name="label"/>
+                                                        </div>
+                                                    </ing-radio>
+                                                    <ing-radio checked="false"
+                                                               class="state-filled form-field"
+                                                               label="Als ondernemer"
+                                                               name="incomeType[]"
+                                                               type="radio"
+                                                               value="ENTREPRENEUR">
+                                                        <div aria-live="polite"
+                                                             id="feedback-ing-radio-w10pctdnqv"
+                                                             slot="feedback"/>
+                                                        <label for="ing-radio-w10pctdnqv"
+                                                               id="label-ing-radio-w10pctdnqv"
+                                                               slot="label"/>
+                                                        <div id="help-text-ing-radio-w10pctdnqv" slot="help-text"/>
+                                                        <input aria-describedby=" help-text-ing-radio-w10pctdnqv feedback-ing-radio-w10pctdnqv feedback-ing-flow-radio-group-fi847hnuzz help-text-ing-flow-radio-group-fi847hnuzz feedback-ing-flow-form-gk1jyjegu6 help-text-ing-flow-form-gk1jyjegu6"
+                                                               aria-invalid="false"
+                                                               aria-labelledby=" label-ing-radio-w10pctdnqv"
+                                                               checked="false"
+                                                               class="form-control"
+                                                               id="ing-radio-w10pctdnqv"
+                                                               name="incomeType[]"
+                                                               slot="input"
+                                                               type="radio"
+                                                               value="ENTREPRENEUR"/>
+                                                        <slot name="input"/>
+                                                        <div class="choice-field__graphic-container"/>
+                                                        <div class="choice-field__label">
+                                                            <slot name="label"/>
+                                                        </div>
+                                                    </ing-radio>
+                                                    <ing-radio checked="false"
+                                                               class="state-filled form-field"
+                                                               label="Via een uitkering"
+                                                               name="incomeType[]"
+                                                               type="radio"
+                                                               value="UNEMPLOYMENT">
+                                                        <div aria-live="polite"
+                                                             id="feedback-ing-radio-8llwhbkag2"
+                                                             slot="feedback"/>
+                                                        <label for="ing-radio-8llwhbkag2"
+                                                               id="label-ing-radio-8llwhbkag2"
+                                                               slot="label"/>
+                                                        <div id="help-text-ing-radio-8llwhbkag2" slot="help-text"/>
+                                                        <input aria-describedby=" help-text-ing-radio-8llwhbkag2 feedback-ing-radio-8llwhbkag2 feedback-ing-flow-radio-group-fi847hnuzz help-text-ing-flow-radio-group-fi847hnuzz feedback-ing-flow-form-gk1jyjegu6 help-text-ing-flow-form-gk1jyjegu6"
+                                                               aria-invalid="false"
+                                                               aria-labelledby=" label-ing-radio-8llwhbkag2"
+                                                               checked="false"
+                                                               class="form-control"
+                                                               id="ing-radio-8llwhbkag2"
+                                                               name="incomeType[]"
+                                                               slot="input"
+                                                               type="radio"
+                                                               value="UNEMPLOYMENT"/>
+                                                        <slot name="input"/>
+                                                        <div class="choice-field__graphic-container"/>
+                                                        <div class="choice-field__label">
+                                                            <slot name="label"/>
+                                                        </div>
+                                                    </ing-radio>
+                                                    <ing-validation-feedback aria-live="polite"
+                                                                             id="feedback-ing-flow-radio-group-fi847hnuzz"
+                                                                             slot="feedback">
+                                                        <div class="container visually-hidden" id="container">
+                                                            <ing-icon aria-hidden="true" class="icon" id="icon" role="img">
+                                                                <slot/>
+                                                            </ing-icon>
+                                                            <span class="text" id="text"/>
+                                                        </div>
+                                                    </ing-validation-feedback>
+                                                    <div id="help-text-ing-flow-radio-group-fi847hnuzz" slot="help-text"/>
+                                                    <div class="form-field__group-one">
+                                                        <div class="form-field__label">
+                                                            <slot name="label"/>
+                                                            <slot name="_label-optional"/>
+                                                        </div>
+                                                        <small class="form-field__help-text">
+                                                            <slot name="help-text"/>
+                                                        </small>
+                                                    </div>
+                                                    <div class="form-field__group-two">
+                                                        <div class="input-group">
+                                                            <slot/>
+                                                        </div>
+                                                        <div class="form-field__feedback">
+                                                            <slot name="feedback"/>
+                                                        </div>
+                                                    </div>
+                                                </ing-flow-radio-group>
+                                                <ing-button class="flow-action" role="button" tabindex="0" type="submit">
+                                                    <button aria-hidden="true"
+                                                            slot="_button"
+                                                            tabindex="-1"
+                                                            type="submit"
+                                                            value=""/>
+                                                    <div class="btn">
+                                                        <div class="click-area"/>
+                                                        <slot name="icon-before"/>
+                                                        <slot/>
+                                                        <slot name="icon-after"/>
+                                                        <slot name="_button"/>
+                                                    </div>
+                                                </ing-button>
+                                            </form>
+                                            <div aria-live="polite"
+                                                 id="feedback-ing-flow-form-gk1jyjegu6"
+                                                 slot="feedback"/>
+                                            <div id="help-text-ing-flow-form-gk1jyjegu6" slot="help-text"/>
+                                            <div class="form-field__group-one">
+                                                <div class="form-field__label">
+                                                    <slot name="label"/>
+                                                    <slot name="_label-optional"/>
+                                                </div>
+                                                <small class="form-field__help-text">
+                                                    <slot name="help-text"/>
+                                                </small>
+                                            </div>
+                                            <div class="form-field__group-two">
+                                                <div class="input-group">
+                                                    <slot/>
+                                                </div>
+                                                <div class="form-field__feedback">
+                                                    <slot name="feedback"/>
+                                                </div>
+                                            </div>
+                                        </ing-flow-form>
+                                    </ing-feat-sc-house-income-type>
+                                </div>
+                                <div class="shell">
+                                    <div class="progress">
+                                        <div class="heading">
+                                            <h1 tabindex="-1">
+                                                <span class="sr-only"/>
+                                            </h1>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div style="width:50%"/>
+                                        </div>
+                                        <nav>
+                                            <slot name="progress"/>
+                                        </nav>
+                                    </div>
+                                    <div class="step">
+                                        <div class="actions">
+                                            <div class="navigation-back">
+                                                <a href="/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=income-applicant-employee-amount-step"
+                                                   id="action-back">
+                                                    <ing-icon aria-hidden="true" role="img">
+                                                        <slot/>
+                                                    </ing-icon>
+                                                    <span/>
+                                                </a>
+                                            </div>
+                                            <div class="stop">
+                                                <ing-button font14=""
+                                                            id="action-stop"
+                                                            role="button"
+                                                            tabindex="0"
+                                                            text=""
+                                                            type="submit">
+                                                    <ing-icon aria-hidden="true" role="img" slot="icon-before">
+                                                        <slot/>
+                                                    </ing-icon>
+                                                    <button aria-hidden="true"
+                                                            slot="_button"
+                                                            tabindex="-1"
+                                                            type="submit"
+                                                            value=""/>
+                                                    <div class="btn">
+                                                        <div class="click-area"/>
+                                                        <slot name="icon-before"/>
+                                                        <slot/>
+                                                        <slot name="icon-after"/>
+                                                        <slot name="_button"/>
+                                                    </div>
+                                                </ing-button>
+                                            </div>
+                                        </div>
+                                        <strong class="group-label"/>
+                                        <h2/>
+                                        <slot/>
+                                    </div>
+                                </div>
+                            </ing-flow-shell>
+                        </ing-flow>
+                    </div>
+                </ing-feat-sc-house-based-on-income>
+            </div>
+            <ing-app-open-util>
+                <ing-open-webtrekk category="opp"
+                                   cid=""
+                                   domain="REGEXP:.*\.ing\.nl"
+                                   enable-marketing-campaign="true"
+                                   marketingpref=""
+                                   track-domain="mon.ingbank.nl"
+                                   track-id="722906798759289"/>
+            </ing-app-open-util>
+        </ing-app-open-page>
+    </div>
+    <footer>
+        <ing-open-nav-footer/>
+    </footer>
+    <div class="global-overlays"/>
+</body>

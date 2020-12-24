@@ -36,6 +36,7 @@ import net.sf.saxon.om.Item;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.value.BooleanValue;
 import nl.ou.testar.RandomActionSelector;
+import org.apache.commons.codec.binary.Base64;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.Action;
@@ -54,6 +55,16 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.File;
+import java.security.MessageDigest;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import static org.fruit.alayer.Tags.Blocked;
@@ -64,24 +75,44 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     protected int highWebModalZIndex = 0;
     protected Widget widgetModal;
 
+    protected VisitedActionsData visitedActionsData = new VisitedActionsData();
 	protected List<ActionRule> actionRules = actionRules();
 	protected List<GenRule> generatorRules = inputGenerators();
 	protected List<FilterRule> filterRules = filterRules();
 
-	public static String lowercase(String str) {
-		return str.toLowerCase();
-	}
-	public static Boolean ends(String str1, String str2) {
-		return str1.endsWith(str2);
-	}
-
+	private static DocumentBuilder documentBuilder;
 	private static Processor saxonProcessor;
-	private static XPathCompiler xpathCompiler;
+	private static XQueryCompiler xqueryCompiler;
+
+	private static Xslt30Transformer abstractDocumentTemplate;
+	private static Xslt30Transformer abstractWidgetTemplate;
+
+	private static String testarNamespace = "http://testar.org/state";
 
 	static {
 		saxonProcessor = new Processor(false);
-		xpathCompiler = saxonProcessor.newXPathCompiler();
-		xpathCompiler.setCaching(true);
+		xqueryCompiler = saxonProcessor.newXQueryCompiler();
+
+		xqueryCompiler.setFastCompilation(true);
+		xqueryCompiler.declareNamespace("tst", testarNamespace);
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		try {
+			documentBuilder = factory.newDocumentBuilder();
+		}
+		catch (Exception e)  {
+			throw new RuntimeException("Cannot create documentBuilder: ", e);
+		}
+	}
+
+	static void printXML(Node d) {
+		try {
+			Transformer tform = TransformerFactory.newInstance().newTransformer();
+			tform.setOutputProperty(OutputKeys.INDENT, "yes");
+			tform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			tform.transform(new DOMSource(d), new StreamResult(System.out));
+		}
+		catch (Exception e) { }
 	}
 
 	/**
@@ -134,22 +165,176 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 
+		try {
+			File xsl1 = new File(Settings.getSettingsPath(), "abstract-state.xsl");
+			File xsl2 = new File(Settings.getSettingsPath(), "abstract-widget.xsl");
+
+			XsltCompiler compiler = saxonProcessor.newXsltCompiler();
+			XsltExecutable s1 = compiler.compile(new StreamSource(xsl1));
+			XsltExecutable s2 = compiler.compile(new StreamSource(xsl2));
+			abstractDocumentTemplate = s1.load30();
+			abstractWidgetTemplate = s2.load30();
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Could not compile: ",  e);
+		}
 	}
 
 	public class MyIdGenerator extends DefaultIDGenerator {
+		protected Node toDom(Widget widget) {
+			WdState s = (WdState)widget.root();
+
+			// check if WDState has top level DOM attribute
+			if (s.get(WdTags.DOM, null) == null) {
+				try {
+					Document d = documentBuilder.newDocument();
+					// recursive through all widgets
+					Node n = toNode(d, s);
+					d.appendChild(n);
+					s.set(WdTags.DOM, d);
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("Cannot create DOM representation ", e);
+				}
+			}
+
+			// this widget should have a DOM attribute
+			return widget.get(WdTags.DOM);
+		}
+
+		protected void asNode(Document d, String namespace, Element e, Object o) {
+			if (o instanceof Map) {
+				Map<?, ?> m = (Map<?, ?>)o;
+				for (Object key : m.keySet()) {
+					Element cn = d.createElementNS(namespace, "node");
+					cn.setAttributeNS(namespace, "key", key.toString());
+					asNode(d, namespace, cn, m.get(key));
+					e.appendChild(cn);
+				}
+			}
+			else if (o instanceof List) {
+				List<?> l = (List<?>)o;
+				int i = 0;
+				for (Object el: l) {
+					Element cn = d.createElementNS(namespace, "node");
+					cn.setAttributeNS(namespace, "index", "" + i);
+					asNode(d, namespace, cn, el);
+					e.appendChild(cn);
+					i++;
+				}
+			}
+			else if (o == null) {
+				// do nothing
+			}
+			else {
+				e.setTextContent(o.toString());
+			}
+		}
+
+		protected Node toNode(Document d, WdWidget w) {
+			WdElement el = w.element;
+
+			Element e = d.createElement(el.tagName);
+
+			e.setTextContent(e.getTextContent());
+
+			Map <String, String> map = el.attributeMap;
+
+			for (String key: map.keySet()) {
+				e.setAttribute(key, map.get(key));
+			}
+
+			if (el.customElementState != null) {
+				Element ce = d.createElementNS(testarNamespace, "customState");
+				asNode(d, testarNamespace, ce, el.customElementState);
+				e.appendChild(ce);
+			}
+			if (el.value != null) {
+				e.setAttribute("value", el.value.toString());
+			}
+			if (el.checked != null) {
+				e.setAttribute("checked", el.checked.toString());
+			}
+
+			for (int i = 0; i < w.childCount() ; i++) {
+				e.appendChild(toNode(d, w.child(i)));
+			}
+
+			// Associate bi-directional
+			w.set(WdTags.DOM, e);
+			e.setUserData("widget", w, null);
+
+			return e;
+		}
+
+
+		private String hashString(String message, String algorithm) {
+			try {
+				MessageDigest digest = MessageDigest.getInstance(algorithm);
+				return Base64.encodeBase64String(digest.digest(message.getBytes("UTF-8")));
+			} catch (Exception e) {
+				throw new RuntimeException("Could not generate hash from String", e);
+			}
+		}
+
 		@Override
 		public void buildIDs(Widget widget) {
+			Node d = toDom(widget);
+			XdmValue source = saxonProcessor.newDocumentBuilder().wrap(d);
 			super.buildIDs(widget);
+			
+			try {
+				if (widget.parent() == null) {
+					XdmValue result = abstractDocumentTemplate.applyTemplates(source);
+
+					widget.set(Tags.ConcreteIDCustom, hashString(source.toString(), "MD5"));
+					widget.set(Tags.AbstractIDCustom, hashString(result.toString(), "MD5"));
+					
+					System.out.println("ABSTRACT DATA: " + result);
+					System.out.println("ABSTRACT ID CUSTOM: " + widget.get(Tags.AbstractIDCustom));
+
+					for (Widget w : widget.root()) {
+						if (w != widget) {
+							buildIDs(w);
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("abstract mapping failed", e);
+			}
 		}
 
 		@Override
 		public void buildIDs(State state, Set<Action> actions) {
 			super.buildIDs(state, actions);
+			for (Action a: actions) {
+				buildIDs(state, a);
+			}
+			// Annotate DOM with previously visited Actions
+			Node d = state.get(WdTags.DOM);
+			visitedActionsData.annotateVisits((Document)d, (WdState)state);
 		}
 
 		@Override
 		public void buildIDs(State state, Action action) {
 			super.buildIDs(state, action);
+			Widget widget = action.get(Tags.OriginWidget, null);
+			if (widget != null) {
+				Node d = toDom(widget);
+				XdmValue source = saxonProcessor.newDocumentBuilder().wrap(d);
+
+				try {
+					XdmValue result = abstractWidgetTemplate.applyTemplates(source);
+					//System.out.println("CONCRETE ID " + source);
+					widget.set(WdTags.ActionAbstractState, hashString(result.toString(), "MD5"));
+				}
+				catch (Exception e) {
+					throw new RuntimeException("Cannot apply template: ", e);
+				}
+			}
+			else throw new RuntimeException("Action: " + action + " has no origin!");
 		}
 
 		@Override
@@ -186,8 +371,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		sut.set(WdTags.WebCustomElementStateLambda, customElementStateLambda);
 
-		xpathCompiler.setCaching(true);
-		
 		return sut;
 	}
 
@@ -202,27 +385,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		super.beginSequence(system, state);
 	}
 
-	protected Object abstractINGFlowState(Object obj) {
-		if (obj instanceof Map) {
-			Map map = (Map)obj;
-			Map newmap = new HashMap();
-
-			for (Object key : map.keySet()) {
-				newmap.put(key, abstractINGFlowState(map.get(key)));
-			}
-			return newmap;
-		}
-		else if (obj == null) {
-			return null;
-		}
-		else {
-			return obj.getClass().getCanonicalName(); // abstract value to class
-		}
-	}
-
-	private boolean match(String expr, XdmItem item) {
+	private boolean match(XQueryEvaluator comp, XdmItem item) {
 		try {
-			XdmItem i = xpathCompiler.evaluateSingle(expr, item);
+			comp.setContextItem(item);
+			XdmItem i = comp.evaluateSingle();
+			
 			if (i != null) {
 				Item k = i.getUnderlyingValue();
 				if (k instanceof BooleanValue) {
@@ -236,7 +403,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			return false;
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Cannot evaluate " + e);
+			throw new RuntimeException("Cannot evaluate ", e);
 		}
 	}
 
@@ -252,31 +419,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
-
-		Document d = toDom(state);
-		//printDocument(d);
 		
 		// Reset because modal element may disappear
     	highWebModalZIndex = 0;
     	widgetModal = state;
 
-    	Boolean modalMode = false;
-
     	for(Widget w : state) {
 			Object st = w.get(WdTags.WebCustomElementState, null);
-
-			if (st != null) {
-				Object filtered = abstractINGFlowState(st);
-				System.out.println("ing-flow state: " + st);
-				System.out.println("ing-flow abstract state: " + abstractINGFlowState(st));
-				state.set(WdTags.WebCustomElementState, filtered);
-			}
-
-			String cl = (((WdWidget)w).element).attributeMap.getOrDefault("class", "");
-			// if the ING global-overlays element contains children, there is a modal displayed
-			if ("global-overlays".equals(cl) && w.childCount() > 0) {
-				modalMode = true;
-			}
 
 			// Set highWebModalZIndex value. And the widget that represents that block modal.
     		// It can be useful for users in their specific protocols.
@@ -286,63 +435,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     		}
     	}
 
-    	state.set(WdTags.WebIsWindowModal, modalMode);
-
-		CodingManager.buildIDs(state);
-
 		return state;                                                                        
-	}
-
-	protected Document toDom(State state) {
-		WdState s = (WdState)state;
-
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = factory.newDocumentBuilder();
-
-			Document d = dBuilder.newDocument();
-			Node n = toNode(d, s);
-			d.appendChild(n);
-
-			s.set(WdTags.DOM, d);
-
-			return d;
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Cannot create DOM representation " + e);
-		}
-	}
-
-	protected Node toNode(Document d, WdWidget w) {
-		WdElement el = w.element;
-		
-		Element e = d.createElement(el.tagName);
-
-		e.setTextContent(e.getTextContent());
-		
-		Map <String, String> map = el.attributeMap;
-
-		for (String key: map.keySet()) {
-			e.setAttribute(key, map.get(key));
-		}
-
-		if (el.value != null) {
-			e.setAttribute("value", el.value.toString());
-		}
-		if (el.checked != null) {
-			e.setAttribute("checked", el.checked.toString());
-		}
-		
-		for (int i = 0; i < w.childCount() ; i++) {
-			e.appendChild(toNode(d, w.child(i)));
-		}
-
-		
-		// Associate bi-directional
-		w.set(WdTags.DOM, e);
-		e.setUserData("widget", w, null);
-
-		return e;
 	}
 
 	/**
@@ -401,12 +494,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// slides can happen, even though the widget might be blocked
 			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			if (blackListedWithFilter(widget)) {
-				continue;
-			}
-
 			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
+			if (!widget.get(Enabled, true)) {
 				continue;
 			}
 
@@ -415,6 +504,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				continue;
 			}
 
+			if (blackListedWithFilter(widget)) {
+				continue;
+			}
+			
 			// NOTE: this doesn't work for this specific ING use case - the z-index blocking algo is too naive
 			// Check if the element is blocked by web modal element with high z-index
 			/*if (isBlockedByModal(widget)) {
@@ -422,12 +515,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			} */
 
 			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (isUnfiltered(widget))) {
 				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+			if (isAtBrowserCanvas(widget) && isClickable(widget) && (isUnfiltered(widget))) {
 				if (!isLinkDenied(widget)) {
 					WdElement element = ((WdWidget) widget).element;
 					Role role = widget.get(Tags.Role, Roles.Widget);
@@ -450,13 +543,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		for (FilterRule f : filterRules) {
 			try {
-				if (match(f.sexpr, item)) {
+				if (match(f.expr, item)) {
 					isBlack = isBlack || f.isBlack;
 					isWhite = isWhite || !f.isBlack;
 				}
 			}
 			catch (Exception e){
-				throw new RuntimeException("Cannot evaluate " + e);
+				throw new RuntimeException("Cannot evaluate ", e);
 			}
 		}
 
@@ -467,27 +560,28 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	List<ActionRule> actionRules() {
 		return actionsRules(
-			new ActionRule("'true'", 10),                  // Default priority
-			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 50), // Empty text fields
-			new ActionRule(".[@aria-invalid = 'true']", 50), // self is invalid
-			new ActionRule(".[@type = 'submit']", 50), // submit
-			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 50), // unselected radiogroup
-			new ActionRule("ancestor::*[(@role = 'radiogroup') and (@aria-invalid = 'true')]", 50) // radiogroup is invalid
+			new ActionRule("'true'", 1),                  // Default priority
+			new ActionRule(".[not(@type = 'submit') and not(@aria-invalid = 'true')] and tst:visits[@count > 0]", 0.2),  // if action already visited, except submit!
+			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 5), // Empty text fields
+			new ActionRule(".[@aria-invalid = 'true']", 5), // self is invalid
+			new ActionRule(".[@type = 'submit']", 3), // submit
+			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 5), // unselected radiogroup
+			new ActionRule("ancestor::*[(@role = 'radiogroup') and (@aria-invalid = 'true')]", 5) // radiogroup is invalid
 		);
 	}
 	
 	List<GenRule> inputGenerators() {
 		return inputGenerators(
-			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 10),                        // Generic input
+			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
 
-			formInputRule("mySituationForm", "age", "[1-8][0-9]", 50),
-			formInputRule("income", "income", "[1-9][0-9]{4}", 50),
-			formInputRule("income", "years[]", "[1-9][0-9]{4}", 50),
-			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 100),
-			formInputRule("expensesForm", "studyLoan", "[1-3][0-9]{4}", 50),
-			formInputRule("expensesForm", "liabilities", "[1-3][0-9]{4}", 50),
-			formInputRule("expensesForm", "alimony", "[0-9]{3}", 50) ,
-			formInputRule("entrepreneurIncomeForm", "companyProfit", "[1-9][0-9]{2}", 50)
+			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5),
+			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
+			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
+			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 10),
+			formInputRule("expensesForm", "studyLoan", "[1-3][0-9]{4}", 5),
+			formInputRule("expensesForm", "liabilities", "[1-3][0-9]{4}", 5),
+			formInputRule("expensesForm", "alimony", "[0-9]{3}", 5),
+			formInputRule("entrepreneurIncomeForm", "companyProfit", "[1-9][0-9]{2}", 5)
 		);
 	}
 
@@ -495,13 +589,17 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return filterRules(
 				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
 				new FilterRule(".[(name() = 'a') and (not(@href))]", true), // ignore links without href
+
 				new FilterRule("ancestor::header", true), // ignore header
 				new FilterRule("ancestor::ing-feat-sc-house-next-step-based-on-house-card", true), // ignore next step
 				new FilterRule("ancestor-or-self::ing-button[contains(@id, 'moreInfoButton')]", true), // ignore more info
+
 				new FilterRule(".[@id = 'action-stop']", true), // ignore stop button
 				new FilterRule(".[@id = 'action-back']", true), // ignore back button
+
 				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true), // ignore progress section
 		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true), // ignore progress section
+
 				new FilterRule(".[contains(@href, 'bel-me-nu')]", true), // ignore outside links
 				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]", true),
 				new FilterRule(".[@target = '_blank']", true)
@@ -523,15 +621,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	GenRule formInputRule(String f, String n, String g, int p) {
 		String lf = f.toLowerCase();
 		String ln = n.toLowerCase();
-		String xpath = String.format(".[contains(lower-case(@name), '%s')]/ancestor::*[contains(lower-case(@name), '%s')]", ln, lf);
-		return new GenRule(xpath, g, p);
+		String xquery = String.format(".[contains(lower-case(@name), '%s')]/ancestor::*[contains(lower-case(@name), '%s')]", ln, lf);
+		return new GenRule(xquery, g, p);
 	}
 
 	// Choose Rule based on priorities
-	protected <R extends PrioRule> R prioritizedPick(List<R> rules) {
-		int sum = rules.stream().map(r -> r.priority).reduce(0, Integer::sum);
-		int x = (new Random()).nextInt(sum);
-		int s = 0;
+	protected <R extends PrioRule> R prioritizedAbsolutePick(List<R> rules) {
+		double sum = rules.stream().map(r -> r.priority).reduce(0.0, Double::sum);
+		double x = (new Random()).nextDouble() * sum;
+		double s = 0;
 
 		for (R rule : rules) {
 			s = s + rule.priority();
@@ -539,6 +637,22 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 
 		throw new RuntimeException("there are no rules to pick");
+	}
+
+	protected ActionPrio prioritizedRelativePick(List<ActionPrio> rules) {
+		Map<Action, List<ActionPrio>> groups = rules.stream().collect(Collectors.groupingBy(x -> x.action));
+		List<ActionPrio> absPicks =
+				groups.
+						keySet().
+						stream().
+						map(k -> new ActionPrio(k,
+								groups.get(k).
+										stream().
+										map(m -> m.priority).
+										reduce(1.0, (r1, r2) -> r1 * r2))).
+						collect(Collectors.toList());
+
+		return prioritizedAbsolutePick(absPicks);
 	}
 
 	@Override
@@ -552,12 +666,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// Collect all matches rules
 		List <GenRule> matches = generatorRules.stream().
 				filter(GenRule::isValid).       				// only consider valid rules
-				filter(r -> match(r.sexpr, item)). // only those that match
+				filter(r -> match(r.expression, item)). // only those that match
 				collect(Collectors.toList());
 
 		// Pick rule based on priority
 		if (matches.size() > 0) {
-			return prioritizedPick(matches).generator.generate();
+			return prioritizedAbsolutePick(matches).generator.generate();
 		}
 
 		// else, return default behaviour
@@ -565,21 +679,21 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}  
 
 	abstract class PrioRule {
-		protected int priority = 0;
+		protected double priority = 0;
 		protected boolean isValid = false;
 
-		public int priority() { return priority; }
+		public double priority() { return priority; }
 		public boolean isValid() { return isValid; }
 	}
 
 	class ActionRule extends PrioRule {
 		protected String sexpr;
-		protected XPathExecutable expression;
+		protected XQueryEvaluator expression;
 
-		public ActionRule(String e, int p) {
+		public ActionRule(String e, double p) {
 			try {
 				sexpr = e;
-				expression = xpathCompiler.compile(e);
+				expression = xqueryCompiler.compile(e).load();
 				isValid = true; priority = p;
 			}
 			catch (Exception exception) {
@@ -594,28 +708,28 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	class ActionPrio extends PrioRule {
 		public final Action action;
 
-		public ActionPrio(Action a, int prio) {
+		public ActionPrio(Action a, double prio) {
 			action = a;
 			priority = prio;
 			isValid = true;
 		}
 
 		public String toString() {
-			return "ActionPrio(" + action + "," + priority + ")";
+			return "ActionPrio(" + action.get(Tags.OriginWidget) + "," + priority + ")";
 		}
 	}
 	
 	class GenRule extends PrioRule {
 		protected String sexpr;
 		protected String gexpr;
-		protected XPathExecutable expression;
+		protected XQueryEvaluator expression;
 		protected RgxGen generator;
 
-		public GenRule(String e, String g, int p) {
+		public GenRule(String e, String g, double p) {
 			try {
 				sexpr = e;
 				gexpr = g;
-				expression = xpathCompiler.compile(e); generator = new RgxGen(g);
+				expression = xqueryCompiler.compile(e).load(); generator = new RgxGen(g);
 				isValid = true; priority = p;
 			}
 			catch (Exception exception) {
@@ -629,7 +743,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	class FilterRule  {
 
 		protected String sexpr;
-		protected XPathExecutable expr;
+		protected XQueryEvaluator expr;
 
 		protected boolean isBlack;
 		protected boolean isValid;
@@ -637,7 +751,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public FilterRule(String e, boolean b) {
 			sexpr = e;
 			try {
-				expr = xpathCompiler.compile(e);
+				expr = xqueryCompiler.compile(e).load();
 				isBlack = b;
 				isValid = true;
 			}
@@ -728,7 +842,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				retAction = RandomActionSelector.selectAction(actions);
 			}
 		}
-		return retAction;
+
+		return retAction;                 
+	}
+	                                                                              
+	@Override
+	protected boolean executeAction(SUT system, State state, Action action) {
+		boolean success = super.executeAction(system, state, action);
+		visitedActionsData.addAction((WdState)state, action);
+		return success;
 	}
 
 	protected Action selectRuleAction(State state, Set<Action> actions) {
@@ -742,37 +864,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
 
 				try {
-					if (match(r.sexpr, item)) {
-						if (r.priority > 10) {
-							System.out.println("PRIO > 10: " + item);
+					if (match(r.expression, item)) {
+						if (r.priority < 1.0) {
+							System.out.println("RULE: " + r.sexpr);
+							System.out.println("PRIO: " + r.priority);
+							printXML(n);
+							
 						}
 						rules.add(new ActionPrio(action, r.priority));
 					}
 
 				}
 				catch (Exception e) {
-					throw new RuntimeException("Cannot evaluate xpath: " + e);
+					throw new RuntimeException("Cannot evaluate xquery: ", e);
 				}
 			}
 		}
 
 		if (rules.size() > 0) {
-			return prioritizedPick(rules).action;
+			return prioritizedRelativePick(rules).action;
 		}
 		return null;
-	}
-
-	/**
-	 * Execute the selected action
-	 *
-	 * @param system the SUT
-	 * @param state  the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action) {
-		return super.executeAction(system, state, action);
 	}
 
 	/**
@@ -805,5 +917,33 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
+	}
+
+	class VisitedActionsData {
+		Map<String, Integer> visitedAbstractActions = new HashMap();
+
+		public void addAction(WdState s, Action a) {
+			if (a.get(Tags.OriginWidget, null) != null) {
+				String abstractActionId = a.get(Tags.OriginWidget).get(WdTags.ActionAbstractState);
+				visit(visitedAbstractActions, abstractActionId);
+			}
+		}
+
+		public void annotateVisits(Document d, WdState s) {
+			for (Widget w: s) {
+				Node n = w.get(WdTags.DOM);
+				String abstractId = w.get(WdTags.ActionAbstractState, null);
+				
+				if (visitedAbstractActions.containsKey(abstractId)) {
+					Element e = d.createElementNS(testarNamespace, "visits");
+					e.setAttribute("count", visitedAbstractActions.get(abstractId).toString());
+					n.appendChild(e);
+				}
+			}
+		}
+
+		private void visit(Map<String, Integer> m, String id) {
+			m.put(id, m.getOrDefault(id, 0) + 1);
+		}
 	}
 }

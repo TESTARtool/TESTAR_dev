@@ -251,5 +251,6 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebCustomElementStateLambda = from("WebCustomElementStateLambda", String.class);
 
   public static final Tag<Node> DOM = from("DOM", Node.class);
+  public static final Tag<String> ActionAbstractState = from("ActionAbstractState", String.class);
 
 }
