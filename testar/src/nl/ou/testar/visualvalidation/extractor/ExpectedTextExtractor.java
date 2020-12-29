@@ -150,7 +150,9 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
     private Tag<String> getVisualTextTag(String widgetRole) {
         // Check if we have specified a custom tag for this widget, if so convert the string identifier into the actual
         // Tag.
-        return _tag.getOrDefault(_lookupTable.getOrDefault(widgetRole, ""), Title);
+        // TODO TM: Should inject this based on the selected protocol?
+        Tag<String> defaultTag = widgetRole.contains("Wd") ? WebTextContent : Title;
+        return _tag.getOrDefault(_lookupTable.getOrDefault(widgetRole, ""), defaultTag);
     }
 
     @Override
