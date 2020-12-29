@@ -94,9 +94,10 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
     }
 
     private void recognizeText() {
-        Objects.requireNonNull(_image);
-        Objects.requireNonNull(_callback);
-
+        if (_image == null || _callback == null) {
+            Logger.log(Level.ERROR, TAG, "Should not try to detect text on empty image/callback");
+            return;
+        }
         List<RecognizedElement> recognizedWords = new ArrayList<>();
 
         loadImageIntoEngine(_image);

@@ -1,6 +1,5 @@
 package nl.ou.testar.visualvalidation.extractor;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.testar.settings.ExtendedSettingBase;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,7 +35,7 @@ public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfi
         if (widget.size() == other.widget.size()) {
             for (int i = 0; i < widget.size(); i++) {
                 int index = i;
-                if (other.widget.stream().noneMatch(it -> it.compareTo(widget.get(index)) == 0)){
+                if (other.widget.stream().noneMatch(it -> it.compareTo(widget.get(index)) == 0)) {
                     return result;
                 }
             }

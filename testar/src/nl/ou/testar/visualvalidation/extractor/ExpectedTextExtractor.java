@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static org.fruit.alayer.Tags.*;
+import static org.fruit.alayer.webdriver.enums.WdTags.WebTextContent;
 
 public class ExpectedTextExtractor extends Thread implements TextExtractorInterface {
     private static final String TAG = "ExpectedTextExtractor";
@@ -98,8 +98,10 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
     }
 
     private void extractText() {
-        Objects.requireNonNull(_state);
-        Objects.requireNonNull(_callback);
+        if (_state == null || _callback == null) {
+            Logger.log(Level.ERROR, TAG, "Should not try to extract text on empty state/callback");
+            return;
+        }
 
         List<ExpectedElement> expectedElements = new ArrayList<>();
 
