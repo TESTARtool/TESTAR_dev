@@ -31,15 +31,35 @@ package nl.ou.testar;
 
 import org.fruit.alayer.Action;
 
+import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractState;
+import nl.ou.testar.StateModel.AbstractStateModel;
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomActionSelector {
+public class RandomActionSelector implements ActionSelector {
 
+    
+    @Deprecated
     public static Action selectAction(Set<Action> actions) {
+        System.out.println("Dit zou niet meer gebruikt mogen worden");
         long graphTime = System.currentTimeMillis();
         Random rnd = new Random(graphTime);
         return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+    }
+
+    @Override
+    public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel)
+    {
+        System.out.println("Ik ben de juiste call (selectAction van RandomActionSelection)");
+        Set<AbstractAction> actions = currentState.getActions();
+        long graphTime = System.currentTimeMillis();
+        Random rnd = new Random(graphTime);        
+        return new ArrayList<AbstractAction>(actions).get(rnd.nextInt(actions.size()));
+            
     }
 }
