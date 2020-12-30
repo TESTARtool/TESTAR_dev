@@ -20,16 +20,10 @@ import java.util.stream.Collectors;
 public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(Settings settings) {
-        // first check if the state model module is enabled
+        // first check if the state model module is enabled; do not check anymore and return full fledged statemodelmanager
         /*if(!settings.get(ConfigTags.StateModelEnabled)) {
-            
-            ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
-            StateModelManager manager = new DummyModelManager(settings, actionSelector);
-            manager.getAbstractActionToExecute(actions);
-            return new DummyModelManager(settings);
-
-            //return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
-            
+            return new DummyModelManager();
+        }
         }*/
 
         Set<Tag<?>> abstractTags = Arrays.stream(CodingManager.getCustomTagsForAbstractId()).collect(Collectors.toSet());
