@@ -21,9 +21,16 @@ public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(Settings settings) {
         // first check if the state model module is enabled
-        if(!settings.get(ConfigTags.StateModelEnabled)) {
-            return new DummyModelManager();
-        }
+        /*if(!settings.get(ConfigTags.StateModelEnabled)) {
+            
+            ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+            StateModelManager manager = new DummyModelManager(settings, actionSelector);
+            manager.getAbstractActionToExecute(actions);
+            return new DummyModelManager(settings);
+
+            //return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+            
+        }*/
 
         Set<Tag<?>> abstractTags = Arrays.stream(CodingManager.getCustomTagsForAbstractId()).collect(Collectors.toSet());
         if (abstractTags.isEmpty()) {
@@ -35,9 +42,10 @@ public class StateModelManagerFactory {
             throw new RuntimeException("No concrete State Attributes were provided in the settings file");
         }
 
-        // get a persistence manager
+        
+        // get a persistence manager, set persistence manager to dummy if state model is not enabled
         PersistenceManagerFactoryBuilder.ManagerType managerType;
-        if (settings.get(ConfigTags.DataStoreMode).equals(PersistenceManager.DATA_STORE_MODE_NONE)) {
+        if (settings.get(ConfigTags.DataStoreMode).equals(PersistenceManager.DATA_STORE_MODE_NONE) || (!settings.get(ConfigTags.StateModelEnabled))) {
             managerType = PersistenceManagerFactoryBuilder.ManagerType.DUMMY;
         }
         else {

@@ -51,6 +51,7 @@ public class GeneralPanel extends JPanel implements Observer {
 
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
+  private JComboBox<String> actionSelectionBox;
   private JTextArea txtSutPath;
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
@@ -114,6 +115,11 @@ public class GeneralPanel extends JPanel implements Observer {
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
     
+
+    actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first","Unvisited actions from db"});
+    actionSelectionBox.setBounds(10,235,280,30);
+    add(actionSelectionBox);
+
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
@@ -257,6 +263,18 @@ public class GeneralPanel extends JPanel implements Observer {
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
+
+    String currentAlgorithm = settings.get(ConfigTags.ActionSelectionAlgorithm);
+    for (int i =0; i < actionSelectionBox.getItemCount(); i++) {
+        if (actionSelectionBox.getItemAt(i).equals("Random selection") && currentAlgorithm.equals("random")) {
+            actionSelectionBox.setSelectedIndex(i);
+            break;
+        }
+        if (actionSelectionBox.getItemAt(i).equals("Unvisited actions first") && currentAlgorithm.equals("unvisited")) {
+            actionSelectionBox.setSelectedIndex(i);
+            break;
+        }
+    }
   }
 
   /**
@@ -275,6 +293,21 @@ public class GeneralPanel extends JPanel implements Observer {
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
+    switch ((String) actionSelectionBox.getSelectedItem()) {
+      case "Unvisited actions first":
+          settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");
+          System.out.println("ActionSelectionAlgorithm gezet op unvisited");
+          break;
+      case "Unvisited actions from db":
+          settings.set(ConfigTags.ActionSelectionAlgorithm, "db");
+          System.out.println("ActionSelectionAlgorithm gezet op db");
+          break;
+
+      default:
+          settings.set(ConfigTags.ActionSelectionAlgorithm, "random");
+          System.out.println("ActionSelectionAlgorithm gezet op random");
+  }
+  
   }
 
   public class MyItemListener extends Observable implements ItemListener {

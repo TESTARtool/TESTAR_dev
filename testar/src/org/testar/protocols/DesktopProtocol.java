@@ -143,7 +143,8 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         Action retAction = preSelectAction(state, actions);
         if (retAction == null)
             //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
+            //retAction =  RandomActionSelector.selectAction(actions);
+            retAction = stateModelManager.getAbstractActionToExecute(actions);
         return retAction;
     }
 
