@@ -1,0 +1,72 @@
+@startuml
+hide footbox
+actor TESTAR
+
+TESTAR -> TemporalController
+activate TemporalController
+
+
+TemporalController -> TemporalController :load
+
+note right   : Oracles.CSV
+TemporalController -> TemporalController :load
+
+note right   : PropositionMananager.JSON
+
+TemporalController -> TemporalDBmanager :computeTemporalModel
+activate TemporalDBmanager
+TemporalDBmanager -> TemporalDBmanager : getConcreteStates\nFromOrientDB
+  loop each: State
+   TemporalDBmanager -> TemporalModel : addStateEncoding
+   activate TemporalModel
+   TemporalModel -> TemporalModel :
+   activate TemporalModel
+   deactivate TemporalModel
+end
+TemporalDBmanager -> PropositionManager :setPassingFilters
+activate PropositionManager
+deactivate PropositionManager
+
+note right : for widgets
+TemporalDBmanager -> TemporalDBmanager : getWidgetpropositions
+note left : from orientDB
+TemporalDBmanager -> PropositionManager :setPassingFilters
+activate PropositionManager
+deactivate PropositionManager
+note right : for actions
+TemporalDBmanager -> TemporalModel : finalizeTransitions
+
+TemporalModel -> TemporalModel :
+activate TemporalModel
+deactivate TemporalModel
+deactivate TemporalModel
+'TemporalDBmanager -> TemporalDBmanager : fetchTraces
+TemporalController -> TemporalDBmanager :saveToGraphMLFile
+
+TemporalDBmanager-> TemporalDBmanager :save
+activate TemporalDBmanager
+note right   : GraphML.XML files
+
+deactivate TemporalDBmanager
+
+
+'TemporalController ->CheckerFactory :getModelChecker
+'activate CheckerFactory
+'deactivate CheckerFactory
+
+TemporalController -> ModelChecker : setupModel
+activate ModelChecker
+
+  loop each: ModelChecker
+    TemporalController -> ModelChecker : setExecutable
+    TemporalController -> ModelChecker : modelCheck
+
+end
+deactivate ModelChecker
+TemporalController -> TemporalController :save
+
+note right   : Checked Oracles
+TemporalController --> TESTAR
+deactivate TemporalController
+
+@enduml

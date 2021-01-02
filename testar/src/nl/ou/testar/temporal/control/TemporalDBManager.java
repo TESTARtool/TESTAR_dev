@@ -823,6 +823,7 @@ public  class TemporalDBManager {
 
         if(logDetailsInModelFile){
             simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions");
+            //this logs outgoing transitions with the same valuation of APs but towards different target states
             for (StateEncoding stenc : tModel.getStateEncodings()) {
                 Map<String,TransitionEncoding> encodedConjuncts = new HashMap<>();
                 for (TransitionEncoding tren : stenc.getTransitionColl()) {
@@ -834,6 +835,7 @@ public  class TemporalDBManager {
                     } else encodedConjuncts.put(enc, tren);
                 }
             }
+            //future: log 'non determinism' multiple outgoing transitions (~diff. AP valuation) towards the SAME state
         }
         else{
             simpleLog.append(prettyCurrentTime() + " | " + "Logging non-deterministic transitions is disabled");
