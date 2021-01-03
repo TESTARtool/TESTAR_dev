@@ -52,13 +52,8 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
             }
         }
 
-        // TODO: Maybe the reward is the distance calculated with the last keyroots, i.e. assuming it is the one stored in the treeDist for the roots of both trees
-        // Unless the reward is the sum of all distances of every subtree? Not sure
-        // int reward = (int)treeDist.get(previousState, state);
-        int reward = treeDist.values().stream()
-                .mapToInt(object -> (Integer) object)
-                .sum();
-        
+        int reward = (Integer) treeDist.get(lrKeyroots1.getLast(), lrKeyroots2.getLast());
+
         /**
          * Minor fixes for debugging purposes
          */
@@ -70,14 +65,14 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         logger.info("Number widgets Current State='{}'", state.childCount() > 0 ? Iterables.size(state) : 0);
         
         // TODO: State is basically the process Widget, think that getAbstractRepresentation is not informative
-        //logger.info("State", state.getAbstractRepresentation());
+        logger.info("State", state.getAbstractRepresentation());
         //logger.info("State", state.getAbstractRepresentation());
 
         // TODO: First child of the state is normally the windows container, not really informative
-        //logger.info("First child of previous state='{}'", previousState.child(0).getAbstractRepresentation());
+        logger.info("First child of previous state='{}'", previousState.child(0).getAbstractRepresentation());
 
         // TODO: This is returning the representation of the State = Widget process, not really informative
-        //logger.info("Reward for previous state:{} and current state {} is {}", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
+        logger.info("Reward for previous state:{} and current state {} is {}", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
         logger.info("Reward for Action Transition from Previous State to Current State is {}", reward);
         
         previousState = state;

@@ -68,6 +68,11 @@ public class WidgetStub implements Widget {
         throw new NotImplementedException();
     }
 
+    public Widget addChild(Widget widget) {
+        widgets.add(widget);
+        return this;
+    }
+
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
         throw new NotImplementedException();

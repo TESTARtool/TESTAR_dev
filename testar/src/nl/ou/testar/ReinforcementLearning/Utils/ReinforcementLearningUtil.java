@@ -27,6 +27,4 @@ public class ReinforcementLearningUtil {
             return RandomActionSelector.selectAbstractAction(actionSetMaxValues);
         }
     }
-
-
 }

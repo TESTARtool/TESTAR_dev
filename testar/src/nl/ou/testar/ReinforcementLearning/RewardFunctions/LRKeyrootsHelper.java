@@ -20,11 +20,8 @@ public class LRKeyrootsHelper {
      */
     public Deque<Widget> getLRKeyroots(final Widget widget) {
         final Deque<Widget> result = new ArrayDeque<>();
-        // add root element
-        //TODO: should the root node be stored at the left side of the deque or should it be the last item?
-        result.add(widget);
-
         processChilds(widget, result);
+        result.add(widget);
 
         logger.info("Returned deque of widgets is '{}'", result);
         logger.info("Returned deque of widgets is with size '{}'", result.size());
@@ -44,7 +41,7 @@ public class LRKeyrootsHelper {
         }
 
         return childList.stream()
-                .sorted(Comparator.comparing(childWidget -> childWidget.getAbstractRepresentation()))
+                .sorted(Comparator.comparing(Widget::getAbstractRepresentation))
                 .collect(Collectors.toList());
     }
 
