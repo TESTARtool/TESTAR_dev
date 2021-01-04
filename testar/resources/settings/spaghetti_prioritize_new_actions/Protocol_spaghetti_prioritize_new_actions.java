@@ -66,6 +66,11 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// Spaghetti: Requires Java Access Bridge

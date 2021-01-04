@@ -66,6 +66,11 @@ public class Protocol_rachota_qlearning extends RachotaProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
 		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));

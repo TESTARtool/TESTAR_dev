@@ -65,6 +65,11 @@ public class Protocol_rachota_statemodel extends RachotaProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// rachota: Requires Java Access Bridge

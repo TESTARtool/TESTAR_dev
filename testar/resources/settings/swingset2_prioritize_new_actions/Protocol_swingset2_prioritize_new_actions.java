@@ -67,6 +67,11 @@ public class Protocol_swingset2_prioritize_new_actions extends SwingSet2Protocol
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// SwingSet2: Requires Java Access Bridge
