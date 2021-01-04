@@ -31,13 +31,8 @@ SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun
 # Number of sequences and the length of these sequences
 #################################################################
 
-<<<<<<< HEAD:testar/resources/settings/desktop_reinforcement_learning/test.settings
-Sequences = 3
-SequenceLength = 5
-=======
 Sequences = 1
 SequenceLength = 10
->>>>>>> master_experiments:testar/resources/settings/bluej_prioritize_new_actions/test.settings
 
 #################################################################
 # Oracles based on suspicious titles
@@ -98,24 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-<<<<<<< HEAD:testar/resources/settings/desktop_reinforcement_learning/test.settings
-ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
-
-#################################################################
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = plocal
-DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb-3.0.28\\databases
-DataStoreDB = testarDB
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = delayed
-ApplicationName = Notepad
-ApplicationVersion = 1.0.0
-=======
 ProtocolClass = bluej_prioritize_new_actions/Protocol_bluej_prioritize_new_actions
->>>>>>> master_experiments:testar/resources/settings/bluej_prioritize_new_actions/test.settings
 
 #################################################################
 # State identifier attributes
@@ -124,20 +102,6 @@ ProtocolClass = bluej_prioritize_new_actions/Protocol_bluej_prioritize_new_actio
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
-
-#################################################################
-# Reinforcement learning settings
-#################################################################
-Alpha = 1.0
-Gamma = 0.99
-DefaultValue = 0.0
-DefaultReward = 0.0
-Epsilon = 0.7
-MaxQValue = 1.0
-DecayRate = 0.0001
-Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
-Policy = EpsilonGreedyPolicy
 
 #################################################################
 # Other more advanced settings

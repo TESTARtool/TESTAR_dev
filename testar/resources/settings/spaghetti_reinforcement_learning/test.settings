@@ -23,7 +23,18 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\lib\\jacocoagent.jar=jmx=true "suts\\TestGUI.jar"
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = true
 
 #################################################################
 # Sequences
@@ -31,8 +42,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 5
+Sequences = 1
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -53,7 +64,7 @@ SuspiciousTitles =
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -76,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[qQ]uit.*|.*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[oO]pen.*|.*[pP]roject.*|.*[cC]hoose.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -93,20 +104,21 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
+ProtocolClass = spaghetti_reinforcement_learning/Protocol_spaghetti_reinforcement_learning
 
+#################################################################
+# State model inference settings
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = plocal
+DataStoreType = remote
 DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb-3.0.28\\databases
-DataStoreDB = testarDB
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = delayed
-ApplicationName = Notepad
-ApplicationVersion = 1.0.0
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = Spaghetti_RL
+ApplicationVersion = 1
 
 #################################################################
 # State identifier attributes
@@ -153,7 +165,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.3
-StartupTime = 10.0
+StartupTime = 20.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
