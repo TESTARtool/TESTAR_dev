@@ -65,7 +65,12 @@ public class Protocol_upm_purerandom extends JavaSwingProtocol {
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){		
+	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// Swing Requires Java Access Bridge

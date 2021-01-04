@@ -324,6 +324,30 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return false;
     }
     
+    /**
+     * Disconnect from Windows Remote Desktop without close the GUI session.
+     */
+    protected void disconnectRDP() {
+		try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(60);
+    }
+    
 	// Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";

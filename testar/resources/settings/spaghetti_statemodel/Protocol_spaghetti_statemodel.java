@@ -63,6 +63,11 @@ public class Protocol_spaghetti_statemodel extends SpaghettiProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// StateModel Unvisited Action: This should be "unvisited", if not execution is not valid

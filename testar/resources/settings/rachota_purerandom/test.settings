@@ -112,7 +112,7 @@ ProtocolClass = rachota_purerandom/Protocol_rachota_purerandom
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+AbstractStateAttributes = WidgetPath,WidgetControlType
 
 #################################################################
 # Other more advanced settings
@@ -137,7 +137,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.3
-StartupTime = 10.0
+StartupTime = 20.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
