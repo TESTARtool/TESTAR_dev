@@ -1350,8 +1350,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				countTimeFlash += 2000;
 			}
 
-			final long now = System.currentTimeMillis(),
-					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
+			final long now = System.currentTimeMillis();
+			final long ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 					State state;
 					do{
 						if (sut.isRunning()){
@@ -1360,30 +1360,39 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
-							if (state != null && state.childCount() > 0){
+							if (state != null && state.childCount() > 0) {
 								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 								return sut;
+							} else {
+								// SUT process is running but GUI needs time to load
+								printSutInfo = "Waiting for the GUI to be accessible ...";
+								FlashFeedback.flash(printSutInfo, 2000);
 							}
-						}else {
+						} else {
 							//Print info to the user to know that TESTAR is NOT READY for its use :-(
 							printSutInfo = "Waiting for the SUT to be accessible ...";
-							FlashFeedback.flash(printSutInfo, 500);
+							FlashFeedback.flash(printSutInfo, 1000);
 						}
 						Util.pauseMs(500);
-					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-					if (sut.isRunning())
+					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < maxEngageTime);
+					
+					if (sut.isRunning()) {
 						sut.stop();
-
-					if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
+					}
+					// If SUT didn't run and it is a java app, probably path exception
+					else if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar")) {
+						System.out.println("Unable to start the SUT of the java application: " + settings.get(ConfigTags.SUTConnectorValue));
 						throw new WinApiException("JAVA SUT PATH EXCEPTION");
+					}
 
 					// issue starting the SUT
 					if (tryToKillIfRunning){
-						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
-						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-					} else
+						System.out.println("Unable to start the SUT after <" + maxEngageTime + "> ms");
+						return tryKillAndStartSystem(mustContain, sut, maxEngageTime);
+					} else {
 						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
+					}
 		}
 	}
 
