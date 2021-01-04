@@ -32,6 +32,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -318,7 +321,8 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 					}
 
 					// left click in Table Cells
-					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
+					// but filtering duration table cell widgets
+					if(isTableCell(w) && !isDurationTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
 						actions.add(ac.leftClickAt(w));
 					}
 
@@ -506,6 +510,27 @@ public class Protocol_rachota_qlearning extends JavaSwingProtocol {
 	 */
 	private boolean isSpinBoxWidget(Widget w) {
 		return w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner");
+	}
+	
+	/**
+	 * Rachota + Swing
+	 * We need to filter dynamic Task Duration Table Cell widget, 
+	 * because prioritize actions is using Action Description to compare actions
+	 */
+	private boolean isDurationTableCell(Widget w) {
+		if(isTableCell(w)) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+			String duration = w.get(Tags.Title, "noTitle");
+			try {
+				LocalTime time = LocalTime.parse(duration, formatter);
+				// If parsed correctly, this is the duration widget we need to filter
+				return true;
+			} catch(DateTimeParseException | NullPointerException e) {
+				// If error parsing, this is not the duration widget
+				return false;
+			}
+		}
+		return false;
 	}
 
 	/**
