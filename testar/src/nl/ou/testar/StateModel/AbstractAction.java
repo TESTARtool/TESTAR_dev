@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Persistence.Persistable;
+import org.fruit.alayer.TaggableBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +18,16 @@ public class AbstractAction extends AbstractEntity implements Persistable {
     public AbstractAction(String actionId) {
         super(actionId);
         concreteActionIds = new HashSet<>();
+    }
+
+    /**
+     * This method returns the `attributes` that have been added to this abstract state
+     *
+     * @return
+     */
+    @Override
+    public TaggableBase getAttributes() {
+        return super.getAttributes();
     }
 
     /**

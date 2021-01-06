@@ -1,6 +1,12 @@
 package nl.ou.testar.StateModel;
 
 import es.upv.staq.testar.CodingManager;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
+import nl.ou.testar.ReinforcementLearning.QFunctions.QFunctionFactory;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -8,6 +14,8 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactory;
 import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactoryBuilder;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -18,6 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StateModelManagerFactory {
+
+    private static final Logger logger = LogManager.getLogger(StateModelManagerFactory.class);
 
     public static StateModelManager getStateModelManager(Settings settings) {
         // first check if the state model module is enabled
@@ -55,18 +65,40 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
-        // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
-                settings.get(ConfigTags.ApplicationName),
-                settings.get(ConfigTags.ApplicationVersion),
-                abstractTags,
-                persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
-        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
-
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
-    }
+        // create the abstract state model and then the state model manager
+        AbstractStateModelReinforcementLearning abstractStateModel = new AbstractStateModelReinforcementLearning(modelIdentifier,
+                settings.get(ConfigTags.ApplicationName),
+                settings.get(ConfigTags.ApplicationVersion),
+                abstractTags,
+                persistenceManager != null ? (StateModelEventListener) persistenceManager : null);
 
+        if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
+            final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
+
+            final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
+            final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+            logger.info("State model with sarsaModelManager selected");
+            return new SarsaModelManager(abstractStateModel,
+                    actionSelector,
+                    persistenceManager,
+                    concreteStateTags,
+                    sequenceManager,
+                    storeWidgets,
+                    rewardFunction,
+                    qFunction);
+        }
+        
+        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+
+        logger.info("State model with modelManager selected");
+        return new ModelManager(abstractStateModel,
+                actionSelector,
+                persistenceManager,
+                concreteStateTags,
+                sequenceManager,
+                storeWidgets);
+    }
 }

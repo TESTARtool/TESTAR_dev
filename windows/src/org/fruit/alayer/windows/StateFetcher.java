@@ -165,8 +165,10 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
 				if(!isOwnedWindow){
 					//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+					modalElement = this.accessBridgeEnabled ? AccessBridgeFetcher.accessBridgeDescend(windowHandle, uiaRoot, 0, 0) :
 															  uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
+					// If owned window, set as main system window handle
+					system.set(Tags.HWND, windowHandle);
 				} else
 					ownedWindows.add(windowHandle);
 			}
@@ -178,7 +180,7 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+				if ((modalE = this.accessBridgeEnabled ? AccessBridgeFetcher.accessBridgeDescend(windowHandle, uiaRoot, 0, 0) :
 														 uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
 					modalElement = modalE;
 
@@ -507,87 +509,6 @@ public class StateFetcher implements Callable<UIAState>{
 //		mappedValues.add(extractTagsForCsv(uiaElement));
 		
 		return modalElement;
-	}
-	
-	// (through AccessBridge)
-	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
-		UIAElement modalElement = null;
-
-		parent.set(Tags.HWND, hwnd);
-		
-		long[] vmidAC;
-		if (vmid == 0)
-			vmidAC = Windows.GetAccessibleContext(hwnd);
-		else
-			vmidAC = new long[]{ vmid,ac };
-		if (vmidAC != null){			
-			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
-			if (props != null){
-				String role 		 = (String) props[0],
-					   name 		 = (String) props[1],
-					   description 	 = (String) props[2],
-					   x 			 = (String) props[3],
-					   y 			 = (String) props[4],
-					   width 		 = (String) props[5],
-					   height 		 = (String) props[6],
-					   indexInParent = (String) props[7],
-					   childrenCount = (String) props[8];
-
-				Rect rect = null;
-				try {
-					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									 new Double(width).doubleValue(), new Double(height).doubleValue());
-					//if (parent.parent == null)
-					//	parent.rect = el.rect; // fix UI actions at root widget
-				} catch (Exception e){
-					return null;
-				}
-
-				UIAElement el = new UIAElement(parent);
-				parent.children.add(el);
-				el.rect = rect;
-
-				el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
-				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
-					el.isTopLevelContainer = true;
-					modalElement = el;
-				}
-				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
-				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
-					el.isTopLevelContainer = true;
-				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
-					el.isKeyboardFocusable = true;
-				el.name = name;				
-				el.helpText = description;
-				// el.enabled = true;
-				parent.root.windowHandleMap.put(el.windowHandle, el);
-				
-				
-				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
-				if(!role.equals("menu") && !role.equals("combo box")
-					&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
-					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
-					if (cc > 0){
-						el.children = new ArrayList<UIAElement>(cc);
-						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
-						for (int i=0; i<children.length; i++)
-							abDescend(windowHandle,el,vmidAC[0],children[i]);
-					}*/
-					
-						long childAC;
-						int c = new Integer(childrenCount).intValue();
-						el.children = new ArrayList<UIAElement>(c);
-						for (int i=0; i<c; i++){
-							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,el,vmidAC[0],childAC);
-						}
-				}
-
-			}
-		}
-				
-		return modalElement;
-		
 	}
 
 	// (mark a proper widget as modal)

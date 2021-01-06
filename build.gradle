@@ -20,6 +20,7 @@ subprojects {
     }
     dependencies {
         testCompile group:'junit', name:'junit', version:'4.12'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.0'
     }
 
     buildDir = new File('./target')

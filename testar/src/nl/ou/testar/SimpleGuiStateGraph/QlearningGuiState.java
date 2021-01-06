@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package nl.ou.testar.SimpleGuiStateGraph;
 
 import org.fruit.alayer.Action;
@@ -7,21 +37,21 @@ import org.fruit.alayer.Tags;
 import java.util.*;
 
 public class QlearningGuiState {
-    protected String concreteStateId;
+    protected String abstractStateId;
     //TODO use QlearningValues instead and only 1 hash map
-    protected HashMap<String, Double> concreteActionIdsAndRewards;
-    protected HashMap<String, Double> concreteActionIdsAndQValues;
-    protected HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
+    protected HashMap<String, Double> abstractActionIdsAndRewards;
+    protected HashMap<String, Double> abstractActionIdsAndQValues;
+    protected HashMap<String, Integer> abstractActionIdsAndExecutionCounters;
     protected Set<GuiStateTransition> stateTransitions;
 
-    public QlearningGuiState(String concreteStateId, HashMap<String, Double> concreteActionIdsAndRewards) {
-        this.concreteStateId = concreteStateId;
-        this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
-        this.concreteActionIdsAndQValues = concreteActionIdsAndRewards; // all Q values are the same as R Max in the beginning
+    public QlearningGuiState(String abstractStateId, HashMap<String, Double> abstractActionIdsAndRewards) {
+        this.abstractStateId = abstractStateId;
+        this.abstractActionIdsAndRewards = abstractActionIdsAndRewards;
+        this.abstractActionIdsAndQValues = abstractActionIdsAndRewards; // all Q values are the same as R Max in the beginning
         //creating execution counters for each action:
-        concreteActionIdsAndExecutionCounters = new HashMap<String, Integer>();
-        for(String id:concreteActionIdsAndRewards.keySet()){
-            concreteActionIdsAndExecutionCounters.put(id,0);
+        abstractActionIdsAndExecutionCounters = new HashMap<String, Integer>();
+        for(String id:abstractActionIdsAndRewards.keySet()){
+            abstractActionIdsAndExecutionCounters.put(id,0);
         }
         stateTransitions = new HashSet<GuiStateTransition>();
     }
@@ -33,10 +63,10 @@ public class QlearningGuiState {
      */
     public double getMaxQValueOfTheState(Set<Action> actions){
         double qValue = 0;
-        for(Map.Entry<String, Double> entry:concreteActionIdsAndQValues.entrySet()){
+        for(Map.Entry<String, Double> entry:abstractActionIdsAndQValues.entrySet()){
             if(entry.getValue()>qValue){
                 for(Action action:actions){
-                    if(action.get(Tags.ConcreteID).equals(entry.getKey())){
+                    if(action.get(Tags.AbstractIDCustom).equals(entry.getKey())){
                         qValue = entry.getValue();
                     }
                 }
@@ -48,11 +78,11 @@ public class QlearningGuiState {
     public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions){
         ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
         double maxQValue = getMaxQValueOfTheState(actions);
-        for(String actionId:concreteActionIdsAndQValues.keySet()){
-            if(concreteActionIdsAndQValues.get(actionId).equals(maxQValue)){
+        for(String actionId:abstractActionIdsAndQValues.keySet()){
+            if(abstractActionIdsAndQValues.get(actionId).equals(maxQValue)){
                 //checking that the actionID from the model is also in the list of available actions of the state:
                 for(Action action:actions){
-                    if(action.get(Tags.ConcreteID).equals(actionId)){
+                    if(action.get(Tags.AbstractIDCustom).equals(actionId)){
                         actionIdsWithMaxQvalue.add(actionId);
                     }
                 }
@@ -63,33 +93,33 @@ public class QlearningGuiState {
     }
 
     /**
-     * For some reason, the actionIDs are changing even if the ConcreteStateID is the same
+     * For some reason, the actionIDs are changing even if the AbstractStateID is the same
      * So updating the actionIDs
      *
      */
     public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX){
         for(Action action:actions){
-            if(concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID))){
+            if(abstractActionIdsAndQValues.containsKey(action.get(Tags.AbstractIDCustom))){
                 // model contains the action ID
             }else{
-                concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID),R_MAX);
-                concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID),R_MAX);
-                concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID),0);
+                abstractActionIdsAndQValues.put(action.get(Tags.AbstractIDCustom),R_MAX);
+                abstractActionIdsAndRewards.put(action.get(Tags.AbstractIDCustom),R_MAX);
+                abstractActionIdsAndExecutionCounters.put(action.get(Tags.AbstractIDCustom),0);
             }
         }
     }
 
     public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState){
         //updating reward and Q value for the executed action:
-        updateRMaxAndQValues(newTransition.getActionConcreteId(), gammaDiscount, maxRMaxOfTheNewState);
+        updateRMaxAndQValues(newTransition.getActionAbstractId(), gammaDiscount, maxRMaxOfTheNewState);
         if(stateTransitions.size()>0){
             //if existing transitions, checking for identical ones:
             for(GuiStateTransition guiStateTransition:stateTransitions){
-                if(guiStateTransition.getSourceStateConcreteId().equals(newTransition.getSourceStateConcreteId())){
+                if(guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())){
                     // the same source state, as it should be:
-                    if(guiStateTransition.getActionConcreteId().equals(newTransition.getActionConcreteId())){
+                    if(guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())){
                         // also the action is the same:
-                        if(guiStateTransition.getTargetStateConcreteId().equals(newTransition.getTargetStateConcreteId())){
+                        if(guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())){
                             // also the target state is the same -> identical transition
                             System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
                             return;
@@ -108,17 +138,17 @@ public class QlearningGuiState {
         stateTransitions.add(newTransition);
     }
 
-    private void updateRMaxAndQValues(String actionConcreteId, double gammaDiscount, double maxQValueOfTheNewState){
-        int executionCounter = concreteActionIdsAndExecutionCounters.get(actionConcreteId);
+    private void updateRMaxAndQValues(String actionAbstractId, double gammaDiscount, double maxQValueOfTheNewState){
+        int executionCounter = abstractActionIdsAndExecutionCounters.get(actionAbstractId);
         executionCounter++;
-        System.out.println("DEBUG: execution counter for action "+actionConcreteId+" is now "+executionCounter);
-        concreteActionIdsAndExecutionCounters.put(actionConcreteId,executionCounter);
+        System.out.println("DEBUG: execution counter for action "+actionAbstractId+" is now "+executionCounter);
+        abstractActionIdsAndExecutionCounters.put(actionAbstractId,executionCounter);
         double reward = calculateReward(executionCounter);
-        System.out.println("DEBUG: new reward for action "+actionConcreteId+" is "+reward);
-        concreteActionIdsAndRewards.put(actionConcreteId,reward);
+        System.out.println("DEBUG: new reward for action "+actionAbstractId+" is "+reward);
+        abstractActionIdsAndRewards.put(actionAbstractId,reward);
         double qValue = calculateQValue(reward,gammaDiscount,maxQValueOfTheNewState);
-        System.out.println("DEBUG: new Q value for action "+actionConcreteId+" is "+qValue);
-        concreteActionIdsAndQValues.put(actionConcreteId,qValue);
+        System.out.println("DEBUG: new Q value for action "+actionAbstractId+" is "+qValue);
+        abstractActionIdsAndQValues.put(actionAbstractId,qValue);
     }
 
     private double calculateReward(int executionCounter){
@@ -142,19 +172,19 @@ public class QlearningGuiState {
         return stateTransitions;
     }
 
-    public String getConcreteStateId() {
-        return concreteStateId;
+    public String getAbstractStateId() {
+        return abstractStateId;
     }
 
-    public void setConcreteStateId(String concreteStateId) {
-        this.concreteStateId = concreteStateId;
+    public void setAbstractStateId(String abstractStateId) {
+        this.abstractStateId = abstractStateId;
     }
 
-    public HashMap<String, Double>  getConcreteActionIdsAndRewards() {
-        return concreteActionIdsAndRewards;
+    public HashMap<String, Double>  getAbstractActionIdsAndRewards() {
+        return abstractActionIdsAndRewards;
     }
 
-    public void setConcreteActionIdsAndRewards(HashMap<String, Double>  concreteActionIdsAndRewards) {
-        this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
+    public void setAbstractActionIdsAndRewards(HashMap<String, Double>  abstractActionIdsAndRewards) {
+        this.abstractActionIdsAndRewards = abstractActionIdsAndRewards;
     }
 }

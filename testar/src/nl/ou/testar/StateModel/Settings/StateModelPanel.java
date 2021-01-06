@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017, 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2017, 2018, 2019, 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -34,6 +35,7 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.HttpServer.JettyServer;
+import nl.ou.testar.StateModel.Difference.StateModelDifferenceDialog;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
@@ -94,6 +96,8 @@ public class StateModelPanel extends SettingsPanel {
     private Tag<?>[] allStateManagementTags;
     private Tag<?>[] selectedStateManagementTags;
 
+    private JButton modelDiffbutton = new JButton("Model Diff");
+
     private String outputDir;
 
     private StateModelPanel(){
@@ -133,6 +137,7 @@ public class StateModelPanel extends SettingsPanel {
         components.add(stateTagsButton);
         components.add(actionSelectionBox);
         components.add(stateModelWidgetStoreChkBox);
+        components.add(modelDiffbutton);
 
         // add the components to the panel
         setLayout(null);
@@ -246,6 +251,19 @@ public class StateModelPanel extends SettingsPanel {
 
         label14.setBounds(330, 280, 300, 27);
         add(label14);
+        
+        modelDiffbutton.setBounds(330, 318, 150, 27);
+        modelDiffbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	StateModelDifferenceDialog importDBdialog = new StateModelDifferenceDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(),
+            			dataStoreServerTextfield.getText(), dataStoreDirectoryField.getText());
+            	importDBdialog.setVisible(true);
+            	importDBdialog.setAlwaysOnTop(true);
+            }
+        });
+        add(modelDiffbutton);
 
     }
 

@@ -348,6 +348,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			+ " " + settings.get(ConfigTags.Mode, mode())
     			+ " " + sequencesPath
     			+ " " + status + " \"" + statusInfo + "\"" );
+    	
+    	htmlReport.close();
     }
     
     @Override
