@@ -1,5 +1,6 @@
 package org.testar.settings;
 
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.visualvalidation.VisualValidationSettings;
 
 import java.util.ArrayList;
@@ -49,6 +50,10 @@ public class ExtendedSettingsFactory {
 
     public static VisualValidationSettings createVisualValidationSettings() {
         return createSettings(VisualValidationSettings.class, VisualValidationSettings::CreateDefault);
+    }
+    
+    public static ReinforcementLearningSettings createReinforcementLearningSettings() {
+        return createSettings(ReinforcementLearningSettings.class, ReinforcementLearningSettings::CreateDefault);
     }
 
     public static ExampleSetting createTestSetting() {

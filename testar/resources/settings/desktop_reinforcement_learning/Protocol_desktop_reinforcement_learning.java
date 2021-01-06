@@ -28,6 +28,7 @@
  */
 
 
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.GreedyPolicy;
 import nl.ou.testar.ReinforcementLearning.Policies.Policy;
@@ -45,10 +46,11 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
-
+import org.testar.settings.ExtendedSettingsFactory;
 
 import static org.fruit.alayer.Tags.*;
 
+import java.io.File;
 import java.util.Set;
 
 /**
@@ -70,8 +72,43 @@ public class Protocol_desktop_reinforcement_learning extends DesktopProtocol {
         //Create Abstract Model with Reinforcement Learning Implementation
         settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
 
+        // Extended settings framework, set ConfigTags before get policy
+        // Here we set XML framework values with ConfigTags settings
+        // 1.- Probably delete ConfigTags settings and use XML values internally
+        // 2.- Or move this map code (XML - ConfigTags) to internal class
+        ReinforcementLearningSettings rlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+        System.out.println("Reinforcement Learning Debugging ExtendedSettingsFile: " + settings.get(ConfigTags.ExtendedSettingsFile, ""));
+        settings.set(ConfigTags.Alpha, rlSetting.alpha);
+        System.out.println("Alpha value : " + settings.get(ConfigTags.Alpha));
+        settings.set(ConfigTags.Gamma, rlSetting.gamma);
+        System.out.println("Gamma value : " + settings.get(ConfigTags.Gamma));
+        settings.set(ConfigTags.DefaultValue, rlSetting.defaultValue);
+        System.out.println("DefaultValue value : " + settings.get(ConfigTags.DefaultValue));
+        settings.set(ConfigTags.Epsilon, rlSetting.epsilon);
+        System.out.println("Epsilon value : " + settings.get(ConfigTags.Epsilon));
+        settings.set(ConfigTags.DefaultReward, rlSetting.defaultReward);
+        System.out.println("DefaultReward value : " + settings.get(ConfigTags.DefaultReward));
+        settings.set(ConfigTags.RewardFunction, rlSetting.rewardFunction);
+        System.out.println("RewardFunction value : " + settings.get(ConfigTags.RewardFunction));
+        settings.set(ConfigTags.Policy, rlSetting.policy);
+        System.out.println("Policy value : " + settings.get(ConfigTags.Policy));
+        settings.set(ConfigTags.DecayRate, rlSetting.decayRate);
+        System.out.println("DecayRate value : " + settings.get(ConfigTags.DecayRate));
+        settings.set(ConfigTags.Temperature, rlSetting.temperature);
+        System.out.println("Temperature value : " + settings.get(ConfigTags.Temperature));
+        settings.set(ConfigTags.MaxQValue, rlSetting.maxQValue);
+        System.out.println("MaxQValue value : " + settings.get(ConfigTags.MaxQValue));
+        
+        // Force new Application Name adding the RL Extended Settings
+        // This is being done to differentiate experiments results
+        String extendedSettingFileName = new File(settings.get(ConfigTags.ExtendedSettingsFile)).getName().replace(".xml", "");
+        String forceRLName = settings.get(ConfigTags.ApplicationName, "") + "_" + extendedSettingFileName;
+        settings.set(ConfigTags.ApplicationName, forceRLName);
+        System.out.println("ApplicationName : " + settings.get(ConfigTags.ApplicationName));
+        
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);
+        
         super.initialize(settings);
     }
 
