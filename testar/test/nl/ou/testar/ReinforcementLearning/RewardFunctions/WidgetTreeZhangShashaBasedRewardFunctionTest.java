@@ -31,7 +31,6 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
     @After
     public void cleanUp() {
         WidgetTreeZhangShashaBasedRewardFunction.treeDist.clear();
-        WidgetTreeZhangShashaBasedRewardFunction.forestDist.clear();
         WidgetTreeZhangShashaBasedRewardFunction.previousState = null;
     }
 
@@ -57,8 +56,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         // then
         assertEquals(1f, reward, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
         assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.treeDist.get(widget2, widget1), 1f, 0.00001);
     }
 
@@ -79,7 +78,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         // then
         assertEquals(0f, reward, 0.00001);
-        assertTrue(widgetTreeZhangShashaBasedRewardFunction.forestDist.isEmpty());
+//        assertTrue(widgetTreeZhangShashaBasedRewardFunction.forestDist.isEmpty());
         assertTrue(widgetTreeZhangShashaBasedRewardFunction.treeDist.isEmpty());
     }
 
@@ -90,7 +89,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         widgetTreeZhangShashaBasedRewardFunction.previousState = previousState;
 
         final Widget widget2 = new WidgetStub();
-        final Widget widget1 = new WidgetStub(widget2);
+        final WidgetStub widget1 = new WidgetStub();
+        widget1.addChild(widget2);
 
         final Deque<Widget> widgets1 = new ArrayDeque<>();
         widgets1.add(widget1);
@@ -105,8 +105,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         // then
         assertEquals(1f, reward, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
         assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.treeDist.get(widget2, widget1), 1f, 0.00001);
     }
 
@@ -117,7 +117,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         widgetTreeZhangShashaBasedRewardFunction.previousState = previousState;
 
         final Widget widget1 = new WidgetStub();
-        final Widget widget2 = new WidgetStub(widget1);
+        final WidgetStub widget2 = new WidgetStub();
+        widget2.addChild(widget1);
 
         final Deque<Widget> widgets1 = new ArrayDeque<>();
         widgets1.add(widget1);
@@ -132,8 +133,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         // then
         assertEquals(1f, reward, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
-        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(null, null), 0f, 0.00001);
+//        assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.forestDist.get(widget2, widget1), 1f, 0.00001);
         assertEquals((Integer)widgetTreeZhangShashaBasedRewardFunction.treeDist.get(widget2, widget1), 1f, 0.00001);
     }
 

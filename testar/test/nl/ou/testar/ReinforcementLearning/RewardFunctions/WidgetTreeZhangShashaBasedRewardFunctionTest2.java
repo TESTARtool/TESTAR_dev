@@ -1,21 +1,17 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
-import nl.ou.testar.ReinforcementLearning.Utils.WidgetUtil;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Deque;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
 
-    private StateStub state = new StateStub();
+    final StateStub previousState = new StateStub();
 
-    private StateStub previousState = new StateStub();
+    final StateStub state = new StateStub();
 
     private final LRKeyrootsHelper lrKeyrootsHelper = new LRKeyrootsHelper();
 
@@ -27,6 +23,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
     final WidgetStub widgetT1C = new WidgetStub();
     final WidgetStub widgetT1D = new WidgetStub();
     final WidgetStub widgetT1E = new WidgetStub();
+    final WidgetStub widgetT1F = new WidgetStub();
 
     // tree 2
     final WidgetStub widgetT2A = new WidgetStub();
@@ -34,11 +31,11 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
     final WidgetStub widgetT2C = new WidgetStub();
     final WidgetStub widgetT2D = new WidgetStub();
     final WidgetStub widgetT2E = new WidgetStub();
+    final WidgetStub widgetT2F = new WidgetStub();
 
     @After
     public void cleanUp() {
         WidgetTreeZhangShashaBasedRewardFunction.treeDist.clear();
-        WidgetTreeZhangShashaBasedRewardFunction.forestDist.clear();
         WidgetTreeZhangShashaBasedRewardFunction.previousState = null;
     }
 
@@ -50,6 +47,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
         widgetT1C.set(Tags.Title, "c");
         widgetT1D.set(Tags.Title, "d");
         widgetT1E.set(Tags.Title, "e");
+        widgetT1F.set(Tags.Title, "f");
+        previousState.set(Tags.Title, "f");
 
         // tree 2
         widgetT2A.set(Tags.Title, "a");
@@ -57,52 +56,40 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
         widgetT2C.set(Tags.Title, "c");
         widgetT2D.set(Tags.Title, "d");
         widgetT2E.set(Tags.Title, "e");
+        widgetT2F.set(Tags.Title, "f");
+        state.set(Tags.Title, "f");
 
         // tree 1
-        previousState.set(Tags.Title, "f");
         previousState.addChild(widgetT1D);
+        widgetT1D.setParent(previousState);
         previousState.addChild(widgetT1E);
+        widgetT1E.setParent(previousState);
+        widgetT1F.addChild(widgetT1D);
+        widgetT1D.setParent(widgetT1F);
+        widgetT1F.addChild(widgetT1E);
+        widgetT1E.setParent(widgetT1F);
         widgetT1D.addChild(widgetT1A);
+        widgetT1A.setParent(widgetT1D);
         widgetT1D.addChild(widgetT1C);
+        widgetT1C.setParent(widgetT1D);
         widgetT1C.addChild(widgetT1B);
+        widgetT1B.setParent(widgetT1C);
 
         // tree 2
-        state.set(Tags.Title, "f");
         state.addChild(widgetT2C);
+        widgetT2C.setParent(state);
         state.addChild(widgetT2E);
+        widgetT2E.setParent(state);
+        widgetT2F.addChild(widgetT2C);
+        widgetT2C.setParent(widgetT2F);
+        widgetT2F.addChild(widgetT2E);
+        widgetT2E.setParent(widgetT2F);
         widgetT2C.addChild(widgetT2D);
+        widgetT2D.setParent(widgetT2C);
         widgetT2D.addChild(widgetT2A);
+        widgetT2A.setParent(widgetT2D);
         widgetT2D.addChild(widgetT2B);
-    }
-
-    @Test
-    public void lrKeyrootsHelperTestTree1() {
-        final Deque<Widget> lrKeyRoots = lrKeyrootsHelper.getLRKeyroots(previousState);
-        assertEquals(3, lrKeyRoots.size());
-        assertEquals(widgetT1C, lrKeyRoots.pop());
-        assertEquals(widgetT1E, lrKeyRoots.pop());
-        assertEquals(previousState, lrKeyRoots.pop());
-    }
-
-    @Test
-    public void lrKeyrootsHelperTestTree2() {
-        final Deque<Widget> lrKeyRoots = lrKeyrootsHelper.getLRKeyroots(state);
-        assertEquals(3, lrKeyRoots.size());
-        assertEquals(widgetT2B, lrKeyRoots.pop());
-        assertEquals(widgetT2E, lrKeyRoots.pop());
-        assertEquals(state, lrKeyRoots.pop());
-    }
-
-    @Test
-    public void testWidgetUtil_widgetsAreEqual(){
-        assertTrue(WidgetUtil.equals(widgetT1A, widgetT2A));
-        assertTrue(WidgetUtil.equals(widgetT1B, widgetT2B));
-        assertTrue(WidgetUtil.equals(widgetT1C, widgetT2C));
-    }
-
-    @Test
-    public void testWidgetUtil_widgetsAreUnEquals(){
-        assertFalse(WidgetUtil.equals(widgetT1B, widgetT2A));
+        widgetT2B.setParent(widgetT2D);
     }
 
     @Test

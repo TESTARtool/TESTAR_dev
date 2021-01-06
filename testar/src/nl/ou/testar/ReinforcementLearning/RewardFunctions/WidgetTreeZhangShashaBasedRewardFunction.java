@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import com.google.common.collect.Iterables;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
@@ -8,8 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-
-import com.google.common.collect.Iterables;
 
 import java.util.Deque;
 
@@ -23,8 +22,8 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
 
     static State previousState = null;
 
-    final static MultiKeyMap forestDist = new MultiKeyMap();
     final static MultiKeyMap treeDist = new MultiKeyMap();
+    final static MultiKeyMap forestDist = new MultiKeyMap();
 
     public WidgetTreeZhangShashaBasedRewardFunction(final LRKeyrootsHelper lrKeyrootsHelper, final TreeDistHelper treeDistHelper) {
         this.lrKeyrootsHelper = lrKeyrootsHelper;
@@ -49,10 +48,13 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         for (final Widget keyRoot1 : lrKeyroots1) {
             for (final Widget keyRoot2 : lrKeyroots2) {
                 treeDistHelper.treeDist(keyRoot1, keyRoot2, forestDist, treeDist);
+                forestDist.clear();
             }
         }
 
-        int reward = (Integer) treeDist.get(lrKeyroots1.getLast(), lrKeyroots2.getLast());
+        int reward = (int) treeDist.get(previousState, state);
+
+//        int reward = (int) treeDist.get(previousState, state);
 
         /**
          * Minor fixes for debugging purposes
@@ -76,7 +78,6 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         logger.info("Reward for Action Transition from Previous State to Current State is {}", reward);
         
         previousState = state;
-        forestDist.clear();
         treeDist.clear();
 
         return reward;
@@ -85,7 +86,6 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
     @Override
     public void reset() {
         previousState = null;
-        forestDist.clear();
         treeDist.clear();
         logger.info("WidgetTreeZhangShashaBasedRewardFunction was reset");
     }

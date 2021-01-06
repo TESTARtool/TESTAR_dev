@@ -11,8 +11,8 @@ import org.junit.Test;
 import javax.swing.text.html.HTML;
 import java.util.Deque;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LRKeyrootsUtilTest {
 
@@ -29,22 +29,23 @@ public class LRKeyrootsUtilTest {
     }
 
     @Test
-    public void getLRKeyroots_widgetHasNoChildNode () {
+    public void getLRKeyroots_widgetHasNoChildNode() {
         // given
         final Widget widget = new WidgetStub();
 
         // when
-       final Deque<Widget> lrKeyroots = lrKeyrootsHelper.getLRKeyroots(widget);
+        final Deque<Widget> lrKeyroots = lrKeyrootsHelper.getLRKeyroots(widget);
 
         // then
         assertTrue(lrKeyroots.contains(widget));
     }
 
     @Test
-    public void getLRKeyroots_widgetHasOneChildNode () {
+    public void getLRKeyroots_widgetHasOneChildNode() {
         // given
         final Widget widget1 = new WidgetStub();
-        final Widget widget0 = new WidgetStub(widget1);
+        final WidgetStub widget0 = new WidgetStub();
+        widget0.addChild(widget1);
 
         // when
         final Deque<Widget> lrKeyroots = lrKeyrootsHelper.getLRKeyroots(widget0);
@@ -55,20 +56,22 @@ public class LRKeyrootsUtilTest {
     }
 
     @Test
-    public void getLRKeyroots_widgetHasTwoChildNodes () {
+    public void getLRKeyroots_widgetHasTwoChildNodes() {
         // given
         final Widget widget1 = new WidgetStub();
         widget1.set(Tags.ConcreteID, "AConcreteID");
         final Widget widget2 = new WidgetStub();
         widget2.set(Tags.ConcreteID, "concreteID");
-        final Widget widget0 = new WidgetStub(widget1, widget2);
+        final WidgetStub widget0 = new WidgetStub();
+        widget0.addChild(widget1);
+        widget0.addChild(widget2);
 
         // when
         final Deque<Widget> lrKeyroots = lrKeyrootsHelper.getLRKeyroots(widget0);
 
         // then
         assertTrue(lrKeyroots.contains(widget0));
-        assertFalse(lrKeyroots.toString(),lrKeyroots.contains(widget1));
+        assertFalse(lrKeyroots.toString(), lrKeyroots.contains(widget1));
         assertTrue(lrKeyroots.contains(widget2));
     }
 }
