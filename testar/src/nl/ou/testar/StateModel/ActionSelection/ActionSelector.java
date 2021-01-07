@@ -13,6 +13,6 @@ public interface ActionSelector {
      * @param abstractStateModel
      * @return
      */
-    public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException;
+    public AbstractAction selectAction(final AbstractState currentState, final AbstractStateModel abstractStateModel) throws ActionNotFoundException;
 
 }

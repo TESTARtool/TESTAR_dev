@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.TreeDistHelper;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
@@ -7,6 +8,8 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
@@ -16,14 +19,16 @@ import java.util.*;
 
 public class ModelManager implements StateModelManager {
 
+    private static final Logger logger = LogManager.getLogger(ModelManager.class);
+
     // the abstract state model that this class is managing
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
-    private AbstractAction actionUnderExecution;
+    protected AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
@@ -189,9 +194,9 @@ public class ModelManager implements StateModelManager {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
+            logger.info("NotifyActionExecution action:'{}'", action.toShortString());
             actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
-        }
-        catch (ActionNotFoundException ex) {
+        } catch (final ActionNotFoundException ex) {
             System.out.println("Action not found in state model");
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
@@ -270,4 +275,7 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
 }

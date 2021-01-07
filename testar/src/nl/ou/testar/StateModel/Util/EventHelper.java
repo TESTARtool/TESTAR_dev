@@ -40,6 +40,12 @@ public class EventHelper {
                 }
                 break;
 
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+            	if (!(event.getPayload() instanceof AbstractStateTransition)) {
+            		throw new InvalidEventException();
+            	}
+            	break;
+                
             case SEQUENCE_STARTED:
             case SEQUENCE_ENDED:
                 if (!(event.getPayload() instanceof Sequence)) {

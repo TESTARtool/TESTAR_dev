@@ -3,6 +3,8 @@ package nl.ou.testar.StateModel.Persistence.OrientDB;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -26,6 +28,8 @@ import nl.ou.testar.StateModel.Util.HydrationHelper;
 import nl.ou.testar.StateModel.Widget;
 
 import java.util.*;
+
+import org.fruit.alayer.Tag;
 
 import static java.lang.System.exit;
 
@@ -354,6 +358,49 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
         entityManager.saveEntity(actionEntity);
     }
+    
+    @Override
+    public void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition) {
+    	if (abstractStateTransition.getSourceState() == null || abstractStateTransition.getTargetState() == null || abstractStateTransition.getAction() == null) {
+    		System.out.println("persist ActionAttributeUpdated Objects missing in abstract state transition");
+    		return;
+    	}
+
+    	/**
+    	 * Obtain the Abstract Action of this Transition to update the attributes
+    	 */
+
+    	EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+    	VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
+    	VertexEntity targetVertexEntity = new VertexEntity(entityClass);
+
+    	// hydrate the entities to a format the orient database can store
+    	try {
+    		EntityHydrator stateHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+    		stateHydrator.hydrate(sourceVertexEntity, abstractStateTransition.getSourceState());
+    		stateHydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
+    	} catch (HydrationException e) {
+    		//@todo add some meaningful logging here
+    		return;
+    	}
+
+    	// no need to update the abstract states anymore
+    	sourceVertexEntity.enableUpdate(false);
+    	targetVertexEntity.enableUpdate(false);
+
+    	entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+    	EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
+
+    	try {
+    		EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+    		actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
+    	}
+    	catch (HydrationException ex) {
+    		//@todo add some meaningful logging here as well
+    	}
+
+    	entityManager.saveEntity(actionEntity);
+    }		
 
     @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
@@ -655,6 +702,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 //@todo the abstract action changed event needs to just update the action attributes
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
+                
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+            	persistAbstractActionAttributeUpdated((AbstractStateTransition) (event.getPayload()));
+            	break; 
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));
