@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://onedrive.live.com/about/gb-en/signin/"
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.google.com/"
 
 #################################################################
 # Sequences
@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_one_drive/Protocol_web_one_drive
+ProtocolClass = winapi_web_generic/Protocol_winapi_web_generic
 
 #################################################################
 # State identifier attributes
