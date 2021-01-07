@@ -143,6 +143,13 @@ RewardFunction = WidgetTreeBasedRewardFunction
 Policy = EpsilonGreedyPolicy
 
 #################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\desktop_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

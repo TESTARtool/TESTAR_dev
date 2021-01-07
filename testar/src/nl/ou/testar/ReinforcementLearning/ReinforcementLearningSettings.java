@@ -1,9 +1,13 @@
 package nl.ou.testar.ReinforcementLearning;
 
+import java.io.File;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.settings.ExtendedSettingBase;
 
 @XmlRootElement
@@ -66,6 +70,46 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         DefaultInstance.rewardFunction = "WidgetTreeBasedRewardFunction";
         DefaultInstance.policy = "EpsilonGreedyPolicy";
         return DefaultInstance;
+    }
+    
+    /**
+     * Update ReinforcementLearning ConfigTags settings with XML framework values, 
+     * and change the Application Name adding the RL Extended Settings
+     * 
+     * @param settings
+     * @return updated settings
+     */
+    public Settings updateXMLSettings(Settings settings) {
+        System.out.println("Reinforcement Learning Debugging ExtendedSettingsFile: " + settings.get(ConfigTags.ExtendedSettingsFile, ""));
+        settings.set(ConfigTags.Alpha, this.alpha);
+        System.out.println("Alpha value : " + settings.get(ConfigTags.Alpha));
+        settings.set(ConfigTags.Gamma, this.gamma);
+        System.out.println("Gamma value : " + settings.get(ConfigTags.Gamma));
+        settings.set(ConfigTags.DefaultValue, this.defaultValue);
+        System.out.println("DefaultValue value : " + settings.get(ConfigTags.DefaultValue));
+        settings.set(ConfigTags.Epsilon, this.epsilon);
+        System.out.println("Epsilon value : " + settings.get(ConfigTags.Epsilon));
+        settings.set(ConfigTags.DefaultReward, this.defaultReward);
+        System.out.println("DefaultReward value : " + settings.get(ConfigTags.DefaultReward));
+        settings.set(ConfigTags.RewardFunction, this.rewardFunction);
+        System.out.println("RewardFunction value : " + settings.get(ConfigTags.RewardFunction));
+        settings.set(ConfigTags.Policy, this.policy);
+        System.out.println("Policy value : " + settings.get(ConfigTags.Policy));
+        settings.set(ConfigTags.DecayRate, this.decayRate);
+        System.out.println("DecayRate value : " + settings.get(ConfigTags.DecayRate));
+        settings.set(ConfigTags.Temperature, this.temperature);
+        System.out.println("Temperature value : " + settings.get(ConfigTags.Temperature));
+        settings.set(ConfigTags.MaxQValue, this.maxQValue);
+        System.out.println("MaxQValue value : " + settings.get(ConfigTags.MaxQValue));
+        
+        // Force new Application Name adding the RL Extended Settings
+        // This is being done to differentiate experiments results
+        String extendedSettingFileName = new File(settings.get(ConfigTags.ExtendedSettingsFile)).getName().replace(".xml", "");
+        String forceRLName = settings.get(ConfigTags.ApplicationName, "") + "_" + extendedSettingFileName;
+        settings.set(ConfigTags.ApplicationName, forceRLName);
+        System.out.println("ApplicationName : " + settings.get(ConfigTags.ApplicationName));
+        
+        return settings;
     }
 
 }

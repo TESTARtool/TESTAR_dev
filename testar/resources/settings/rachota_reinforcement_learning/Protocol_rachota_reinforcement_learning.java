@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.GreedyPolicy;
 import nl.ou.testar.ReinforcementLearning.Policies.Policy;
@@ -37,6 +38,7 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.experiments.RachotaProtocol;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import java.util.Set;
 import org.fruit.alayer.windows.AccessBridgeFetcher;
@@ -80,6 +82,11 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 	    
         //Create Abstract Model with Reinforcement Learning Implementation
         settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        
+        // Extended settings framework, set ConfigTags settings with XML framework values 
+        // test.setting -> ExtendedSettingsFile
+        ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+        settings = rlXmlSetting.updateXMLSettings(settings);
 
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);

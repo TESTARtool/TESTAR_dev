@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.GreedyPolicy;
 import nl.ou.testar.ReinforcementLearning.Policies.Policy;
@@ -40,6 +41,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.experiments.SpaghettiProtocol;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import java.util.Set;
 import org.fruit.alayer.windows.WinProcess;
@@ -78,6 +80,11 @@ public class Protocol_spaghetti_reinforcement_learning extends SpaghettiProtocol
 	    
         //Create Abstract Model with Reinforcement Learning Implementation
         settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        
+        // Extended settings framework, set ConfigTags settings with XML framework values 
+        // test.setting -> ExtendedSettingsFile
+        ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+        settings = rlXmlSetting.updateXMLSettings(settings);
 
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);
