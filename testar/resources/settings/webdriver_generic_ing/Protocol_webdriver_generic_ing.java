@@ -56,6 +56,7 @@ import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -67,9 +68,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-
+import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
+import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     protected int highWebModalZIndex = 0;
@@ -86,9 +89,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	private static Xslt30Transformer abstractDocumentTemplate;
 	private static Xslt30Transformer abstractWidgetTemplate;
+	private static Xslt30Transformer compileModelTemplate;
 
 	private static String testarNamespace = "http://testar.org/state";
 
+	private static List<GenRule> modelGenRules;
+	
 	static {
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
@@ -97,11 +103,66 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		xqueryCompiler.declareNamespace("tst", testarNamespace);
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
 		try {
 			documentBuilder = factory.newDocumentBuilder();
 		}
 		catch (Exception e)  {
 			throw new RuntimeException("Cannot create documentBuilder: ", e);
+		}
+
+		try {
+			File xsl1 = new File(Settings.getSettingsPath(), "abstract-state.xsl");
+			File xsl2 = new File(Settings.getSettingsPath(), "abstract-widget.xsl");
+			File xsl3 = new File(Settings.getSettingsPath(), "compile-model.xsl");
+
+
+			XsltCompiler compiler = saxonProcessor.newXsltCompiler();
+			XsltExecutable s1 = compiler.compile(new StreamSource(xsl1));
+			XsltExecutable s2 = compiler.compile(new StreamSource(xsl2));
+			XsltExecutable s3 = compiler.compile(new StreamSource(xsl3));
+
+			abstractDocumentTemplate = s1.load30();
+			abstractWidgetTemplate = s2.load30();
+			compileModelTemplate = s3.load30();
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Could not compile: ",  e);
+		}
+
+		String modelFileName = (new File(Settings.getSettingsPath(), "model.json")).getAbsolutePath();
+		Map<QName, XdmValue> parameters = new HashMap();
+		parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
+
+		try {
+			compileModelTemplate.setStylesheetParameters(parameters);
+			
+			Document d = documentBuilder.newDocument();
+			Node n = d.createElement("root");
+			d.adoptNode(n);
+
+			Document r = documentBuilder.newDocument();
+			compileModelTemplate.transform(new DOMSource(d), new DOMDestination(r));
+			
+			printXML(r);
+
+			// fetch all input-rules
+			XQueryEvaluator e = xqueryCompiler.compile("//input-rule ").load();
+			e.setContextItem(saxonProcessor.newDocumentBuilder().wrap(r));
+			
+			XdmValue result = e.evaluate();
+			List<GenRule> gr = new LinkedList<>();
+			
+			for (XdmItem rule: result) {
+				XdmNode node = (XdmNode)rule;
+				gr.add(new GenRule(node.attribute("xquery"), node.attribute("regexp"), 3));
+			}
+
+			modelGenRules = gr;
+		}
+		
+		catch (Exception e) {
+			throw new RuntimeException("Could not compile: " + e);
 		}
 	}
 
@@ -112,7 +173,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			tform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			tform.transform(new DOMSource(d), new StreamResult(System.out));
 		}
-		catch (Exception e) { }
+		catch (Exception e) {
+			throw new RuntimeException("Could not print XML", e);
+		}
 	}
 
 	/**
@@ -164,20 +227,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
-
-		try {
-			File xsl1 = new File(Settings.getSettingsPath(), "abstract-state.xsl");
-			File xsl2 = new File(Settings.getSettingsPath(), "abstract-widget.xsl");
-
-			XsltCompiler compiler = saxonProcessor.newXsltCompiler();
-			XsltExecutable s1 = compiler.compile(new StreamSource(xsl1));
-			XsltExecutable s2 = compiler.compile(new StreamSource(xsl2));
-			abstractDocumentTemplate = s1.load30();
-			abstractWidgetTemplate = s2.load30();
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Could not compile: ",  e);
-		}
 	}
 
 	public class MyIdGenerator extends DefaultIDGenerator {
@@ -290,8 +339,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 					widget.set(Tags.ConcreteIDCustom, hashString(source.toString(), "MD5"));
 					widget.set(Tags.AbstractIDCustom, hashString(result.toString(), "MD5"));
 					
-					System.out.println("ABSTRACT DATA: " + result);
-					System.out.println("ABSTRACT ID CUSTOM: " + widget.get(Tags.AbstractIDCustom));
+					//System.out.println("ABSTRACT DATA: " + result);
+					//System.out.println("ABSTRACT ID CUSTOM: " + widget.get(Tags.AbstractIDCustom));
 
 					for (Widget w : widget.root()) {
 						if (w != widget) {
@@ -571,10 +620,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}
 	
 	List<GenRule> inputGenerators() {
-		return inputGenerators(
+		List<GenRule> l = inputGenerators(
 			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
 
-			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5),
+			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5000),
 			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
 			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
 			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 10),
@@ -583,6 +632,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			formInputRule("expensesForm", "alimony", "[0-9]{3}", 5),
 			formInputRule("entrepreneurIncomeForm", "companyProfit", "[1-9][0-9]{2}", 5)
 		);
+		l.addAll(modelGenRules);
+		return l;
 	}
 
 	List<FilterRule> filterRules() {
@@ -607,15 +658,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}
 
 	List <ActionRule> actionsRules(ActionRule ... rules) {
-		return Arrays.asList(rules);
+		return new LinkedList<>(Arrays.asList(rules));
 	}
 
 	List <FilterRule> filterRules(FilterRule ... rules) {
-		return Arrays.asList(rules);
+		return new LinkedList<>(Arrays.asList(rules));
 	}
 
 	List<GenRule> inputGenerators(GenRule ... rules) {
-		return Arrays.asList(rules);
+		return new LinkedList<>(Arrays.asList(rules));
 	}
 
 	GenRule formInputRule(String f, String n, String g, int p) {
@@ -678,7 +729,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return sText;
 	}  
 
-	abstract class PrioRule {
+	static abstract class PrioRule {
 		protected double priority = 0;
 		protected boolean isValid = false;
 
@@ -686,7 +737,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public boolean isValid() { return isValid; }
 	}
 
-	class ActionRule extends PrioRule {
+	static class ActionRule extends PrioRule {
 		protected String sexpr;
 		protected XQueryEvaluator expression;
 
@@ -705,7 +756,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 	}
 
-	class ActionPrio extends PrioRule {
+	static class ActionPrio extends PrioRule {
 		public final Action action;
 
 		public ActionPrio(Action a, double prio) {
@@ -719,7 +770,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 	}
 	
-	class GenRule extends PrioRule {
+	static class GenRule extends PrioRule {
 		protected String sexpr;
 		protected String gexpr;
 		protected XQueryEvaluator expression;
@@ -740,7 +791,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public String toString() { return "GenRule(" +  sexpr + ", " + gexpr + "," + priority + ");"; }
 	}
 
-	class FilterRule  {
+	static class FilterRule  {
 
 		protected String sexpr;
 		protected XQueryEvaluator expr;
@@ -835,7 +886,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			//System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, using random:
 			retAction = selectRuleAction(state, actions);
 			if (retAction == null) {
@@ -866,9 +917,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				try {
 					if (match(r.expression, item)) {
 						if (r.priority < 1.0) {
-							System.out.println("RULE: " + r.sexpr);
-							System.out.println("PRIO: " + r.priority);
-							printXML(n);
+							/*System.out.println("RULE: " + r.sexpr);
+							System.out.println("PRIO: " + r.priority);*/
+							//printXML(n);
 							
 						}
 						rules.add(new ActionPrio(action, r.priority));
