@@ -158,6 +158,12 @@ public class JacocoFilesCreator {
 	 */
 	private static void createJacocoReport(String jacocoFile, String reportDir) {
 	    try {
+	        // Using "HTML destdir" inside build.xml -> Creates the directory automatically
+	        // But using only "CSV destfile" needs to create this directory first
+	        if(!new File(reportDir).exists()) {
+	            new File(reportDir).mkdirs();
+	        }
+
 	        // Launch JaCoCo report (build.xml) and overwrite desired parameters
 	        String antCommand = "cd jacoco && ant report"
 	                + " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
@@ -167,7 +173,7 @@ public class JacocoFilesCreator {
 	        Process p = builder.start();
 	        p.waitFor();
 
-	        if(!new File(reportDir).exists()) {
+	        if(!new File(reportDir + File.separator + "report_jacoco.csv").exists()) {
 	            System.out.println("************************************************");
 	            System.out.println("ERROR creating JaCoCo report");
 	            System.out.println("Check: If ant library is installed in the system");
@@ -177,8 +183,14 @@ public class JacocoFilesCreator {
 	            System.out.println("JaCoCo report created : " + reportDir);
 	        }
 
-	        String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-	        System.out.println(coverageInfo);
+	        // HTML output report creates lot of files because we are creating Action Coverage
+	        /*
+	        String coverageInfoHTML = new JacocoReportReader(reportDir).obtainHTMLSummary();
+	        System.out.println(coverageInfoHTML);
+	        */
+	        
+	        String coverageInfoCSV = new JacocoReportReader(reportDir).obtainCSVSummary();
+	        System.out.println(coverageInfoCSV);
 	        
 	    } catch (IOException | InterruptedException e) {
 	        e.printStackTrace();
