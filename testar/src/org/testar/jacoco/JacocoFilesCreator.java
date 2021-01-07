@@ -157,23 +157,32 @@ public class JacocoFilesCreator {
 	 * @param reportDir
 	 */
 	private static void createJacocoReport(String jacocoFile, String reportDir) {
-		try {
-			// Launch JaCoCo report (build.xml) and overwrite desired parameters
-			String antCommand = "cd jacoco && ant report"
-					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
+	    try {
+	        // Launch JaCoCo report (build.xml) and overwrite desired parameters
+	        String antCommand = "cd jacoco && ant report"
+	                + " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
+	                + " -DreportCoverageDir=" + reportDir;
 
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
+	        ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+	        Process p = builder.start();
+	        p.waitFor();
 
-			System.out.println("JaCoCo report created : " + reportDir);
+	        if(!new File(reportDir).exists()) {
+	            System.out.println("************************************************");
+	            System.out.println("ERROR creating JaCoCo report");
+	            System.out.println("Check: If ant library is installed in the system");
+	            System.out.println("Command Line: ant -version");
+	            System.out.println("************************************************");
+	        } else {
+	            System.out.println("JaCoCo report created : " + reportDir);
+	        }
 
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			System.out.println(coverageInfo);
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
+	        String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
+	        System.out.println(coverageInfo);
+	        
+	    } catch (IOException | InterruptedException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	/**
