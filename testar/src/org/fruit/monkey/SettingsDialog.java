@@ -29,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- * @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -73,10 +70,10 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
-  static final String TESTAR_VERSION = "2.2.13 (01-Dec-2020)";
+  
+  static final String TESTAR_VERSION = "2.2.14 (7-Jan-2021)";
+  
   static final String SETTINGS_FILENAME = "test.settings";
-
-
 
   private String settingsFile;
   private Settings settings;
