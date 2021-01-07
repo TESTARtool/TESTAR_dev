@@ -47,7 +47,6 @@ import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.ActionTags.ActionGroupType;
 import org.testar.protocols.DesktopProtocol;
 
-// ENFOQUE 4
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -74,7 +73,6 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 
 	List<String> idCustomsGlobalList = new ArrayList<String>();
 	List<String> widgetNamesGlobalList = new ArrayList<String>();
-	List<String> actionGroupsGlobalList = new ArrayList<String>();
 	List<Double> zIndexesGlobalList = new ArrayList<Double>();
 	List<Double> qLearningsGlobalList = new ArrayList<Double>();
 	
@@ -89,42 +87,6 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 		super.initialize(settings);
 		htmlDifference = new HTMLDifference();
 		System.out.println("*** NEW EXECUTION ***");
-	}
-
-	/**
-	 * This methods is called before each test sequence, before startSystem(),
-	 * allowing for example using external profiling software on the SUT
-	 *
-	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
-	 */
-	@Override
-	protected void preSequencePreparations() {
-		super.preSequencePreparations();
-	}
-
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-	 * @return  a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException{
-		return super.startSystem();
-	}
-
-	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
-	 */
-	 @Override
-	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
 	}
 
 	/**
@@ -153,32 +115,9 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 				previousState.get(Tags.ScreenshotPath), previousState.get(Tags.AbstractIDCustom, ""),
 				state.get(Tags.ScreenshotPath), state.get(Tags.AbstractIDCustom, "")
 				);
-						
-			// Update: output\timestamp_app_version\HTMLreports\StateDifferenceReport.html
-			//htmlDifference.addStateDifferenceStep(actionCount, previousState.get(Tags.ScreenshotPath), state.get(Tags.ScreenshotPath), differenceScreenshot);
 		}
 				
 		return state;
-	}
-
-	/**
-	 * The getVerdict methods implements the online state oracles that
-	 * examine the SUT's current state and returns an oracle verdict.
-	 * @return oracle verdict, which determines whether the state is erroneous and why.
-	 */
-	@Override
-	protected Verdict getVerdict(State state){
-		// The super methods implements the implicit online state oracles for:
-		// system crashes
-		// non-responsiveness
-		// suspicious titles
-		Verdict verdict = super.getVerdict(state);
-
-		//--------------------------------------------------------
-		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
-		//--------------------------------------------------------
-
-		return verdict;
 	}
 
 	/**
@@ -193,12 +132,6 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-
-		//System.out.println(" ··· START ···");
-		//System.out.println(" ··· actionNamesGlobalList: " + actionNamesGlobalList);
-		//System.out.println(" ··· actionGroupsGlobalList: " + actionGroupsGlobalList);
-		//System.out.println(" ··· qLearningsGlobalList: " + qLearningsGlobalList);
-		
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
@@ -211,7 +144,7 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 
 		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			//System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
@@ -224,33 +157,22 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 		// Usar la información de "htmlDifference"
 		
 		for (Widget w : state) {
-			updateListsBefore(w);
-			if(w.get(ActionTags.QLearning, 0.0) == 0.0) w.set(ActionTags.QLearning, 1.0);
+			Action a = getAction(w, actions);
+			updateListsBefore(a);
+				
+			// Inicializacion del valor de recompensa a 1.0
+			if(a.get(ActionTags.QLearning, 0.0) == 0.0) a.set(ActionTags.QLearning, 1.0);
 		}
 		
 		if(lastWidgetID != "") {
 			int index = idCustomsGlobalList.indexOf(lastWidgetID);
-			double qLearningValue = qLearningsGlobalList.get(index);
 			if(index != -1) {
 				try {
-					BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));		
-						
-					double totalPixels = diffScreanshot.getWidth() * diffScreanshot.getHeight();
-					double differentPixels = 0;
-					int[] pixelsArray = diffScreanshot.getRGB(0, 0, diffScreanshot.getWidth(), diffScreanshot.getHeight(), null, 0, diffScreanshot.getWidth());
-					for (int i = 0; i < totalPixels; i++) {
-					    if (pixelsArray[i] != Color.Black.argb32()) {
-					    	differentPixels ++;
-					    }
-					}
-					double diffPxPercentage = differentPixels / totalPixels;
-						
-					System.out.println("*********");
-					System.out.println("Totales actuales: " + totalPixels);
-					System.out.println("Diferentes: " + differentPixels);
-					System.out.println("Proporcion (0..1): " + diffPxPercentage);
-					System.out.println("*********");
-						
+					double qLearningValue = qLearningsGlobalList.get(index);
+					
+					BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));
+					double diffPxPercentage = getDiffPxPercentage(diffScreanshot);
+					
 					qLearningValue += diffPxPercentage;
 					qLearningsGlobalList.set(index, qLearningValue);
 						
@@ -259,9 +181,6 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 				}
 			}
 		}
-		
-
-	
 
 		//return the set of derived actions
 		return actions;
@@ -281,344 +200,119 @@ public class Protocol_desktop_generic_enfoque_4 extends DesktopProtocol {
 		//Seleccionar el widgetcon el mayor valor en su tag QLearning.
 		String maxID = "";
 		double maxQLearning = 0.0;
-		double wQLearning = 0.0;
+		double aQLearning = 0.0;
 				
 		for(Action a : actions) {
 			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
-			for(Widget w : state) {
-				String wID = w.get(Tags.AbstractIDCustom);
-				if(aID == wID) {
-					wQLearning = w.get(ActionTags.QLearning, 0.0);
-					if(wQLearning > maxQLearning) {
-						maxQLearning = wQLearning;
-						maxID = wID;
-					}
-				}
+			aQLearning = a.get(ActionTags.QLearning, 0.0);
+			if(aQLearning > maxQLearning) {
+				maxQLearning = aQLearning;
+				maxID = aID;
 			}
 		}
+		
+		lastWidgetID = maxID;
 
 		for(Action a : actions) {
 			String aID = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
 			if(aID == maxID) {
-				for(Widget w : state) {
-					String wID = w.get(Tags.AbstractIDCustom);
-					if(aID == wID) {
-						updateListsAfter(w);
+				updateListsAfter(a);
 								
-						System.out.println("... widgetToBeSelected: " + w.get(Tags.Desc));
-						System.out.println("... widgetToBeSelectedQL: " + maxQLearning);
-						System.out.println(" ...... widgetNamesGlobalList: " + widgetNamesGlobalList);
-						System.out.println(" ...... actionGroupsGlobalList: " + actionGroupsGlobalList);
-						System.out.println(" ...... qLearningsGlobalList: " + qLearningsGlobalList);
-						System.out.println(" ...... zIndexesGlobalList: " + zIndexesGlobalList);
+				System.out.println("... widgetToBeSelected: " + a.get(Tags.OriginWidget).get(Tags.Desc));
+				System.out.println("... widgetToBeSelectedQL: " + maxQLearning);
+				System.out.println(" ...... widgetNamesGlobalList: " + widgetNamesGlobalList);
+				System.out.println(" ...... qLearningsGlobalList: " + qLearningsGlobalList);
+				System.out.println(" ...... zIndexesGlobalList: " + zIndexesGlobalList);
 								
-						return a;
-					}
-				}
+				return a;
 			}
 		}
-		
 		
 		return(super.selectAction(state, actions));
 		
 	}
-	
-
-	/**
-	 * Execute the selected action.
-	 *
-	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
-	 *
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-		return super.executeAction(system, state, action);
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You can stop deriving more actions after:
-	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-		return super.moreActions(state);
-	}
-
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test sequence
-	 * You could stop the test after:
-	 * - a specified amount of sequences, which is specified through the Sequences setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue test, else stop
-	 */
-	@Override
-	protected boolean moreSequences() {
-		return super.moreSequences();
-	}
-
-	/**
-	 * Here you can put graceful shutdown sequence for your SUT
-	 * @param system
-	 */
-	@Override
-	protected void stopSystem(SUT system) {
-		super.stopSystem(system);
-	}
-
-	/**
-	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-	 *
-	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
-	 */
-	@Override
-	protected void postSequenceProcessing() {
-		super.postSequenceProcessing();
-	}
-	
+		
 	private double greaterThanZero (double d) {
 		if(d >= 0.0) return d;
 		else return 0.1;
 	}
 	
-	private void setActionGroup(String actionRoleStr, Widget w) {
-		ActionTags.ActionGroupType actionGroup = null;
-		switch(actionRoleStr) {
-			case "UIAWidget":
-				actionGroup = ActionGroupType.UIAWidget;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAAppBar":
-				actionGroup = ActionGroupType.UIAAppBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAButton":
-				actionGroup = ActionGroupType.UIAButton;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIACalendar":
-				actionGroup = ActionGroupType.UIACalendar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIACheckBox":
-				actionGroup = ActionGroupType.UIACheckBox;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAComboBox":
-				actionGroup = ActionGroupType.UIAComboBox;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIACustomControl":
-				actionGroup = ActionGroupType.UIACustomControl;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIADataGrid":
-				actionGroup = ActionGroupType.UIADataGrid;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIADataItem":
-				actionGroup = ActionGroupType.UIADataItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIADocument":
-				actionGroup = ActionGroupType.UIADocument;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAEdit":
-				actionGroup = ActionGroupType.UIAEdit;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAGroup":
-				actionGroup = ActionGroupType.UIAGroup;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAHeader":
-				actionGroup = ActionGroupType.UIAHeader;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAHeaderItem":
-				actionGroup = ActionGroupType.UIAHeaderItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAHyperlink":
-				actionGroup = ActionGroupType.UIAHyperlink;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAImage":
-				actionGroup = ActionGroupType.UIAImage;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAList":
-				actionGroup = ActionGroupType.UIAList;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAListItem":
-				actionGroup = ActionGroupType.UIAListItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAMenuBar":
-				actionGroup = ActionGroupType.UIAMenuBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAMenu":
-				actionGroup = ActionGroupType.UIAMenu;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAMenuItem":
-				actionGroup = ActionGroupType.UIAMenuItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAPane":
-				actionGroup = ActionGroupType.UIAPane;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAProgressBar":
-				actionGroup = ActionGroupType.UIAProgressBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIARadioButton":
-				actionGroup = ActionGroupType.UIARadioButton;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAScrollBar":
-				actionGroup = ActionGroupType.UIAScrollBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIASemanticZoom":
-				actionGroup = ActionGroupType.UIASemanticZoom;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIASeparator":
-				actionGroup = ActionGroupType.UIASeparator;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIASlider":
-				actionGroup = ActionGroupType.UIASlider;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIASpinner":
-				actionGroup = ActionGroupType.UIASpinner;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIASplitButton":
-				actionGroup = ActionGroupType.UIASplitButton;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAStatusBar":
-				actionGroup = ActionGroupType.UIAStatusBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATabControl":
-				actionGroup = ActionGroupType.UIATabControl;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATabItem":
-				actionGroup = ActionGroupType.UIATabItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATable":
-				actionGroup = ActionGroupType.UIATable;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAText":
-				actionGroup = ActionGroupType.UIAText;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAThumb":
-				actionGroup = ActionGroupType.UIAThumb;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATitleBar":
-				actionGroup = ActionGroupType.UIATitleBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAToolBar":
-				actionGroup = ActionGroupType.UIAToolBar;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAToolTip":
-				actionGroup = ActionGroupType.UIAToolTip;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATree":
-				actionGroup = ActionGroupType.UIATree;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIATreeItem":
-				actionGroup = ActionGroupType.UIATreeItem;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-			case "UIAWindow":
-				actionGroup = ActionGroupType.UIAWindow;
-				w.set(ActionTags.ActionGroup, actionGroup);
-				break;
-		}
-	}
-	
-	private void updateListsBefore(Widget w) {
-		String idCustom = w.get(Tags.AbstractIDCustom);
+	private void updateListsBefore(Action a) {
+		String idCustom = a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
 		if(idCustomsGlobalList.contains(idCustom)) {
 			int index = idCustomsGlobalList.indexOf(idCustom);
-			w.set(ActionTags.QLearning, qLearningsGlobalList.get(index));
+			a.set(ActionTags.QLearning, qLearningsGlobalList.get(index));
 			int zIndexInt = (int) Math.round(zIndexesGlobalList.get(index));
-			w.set(ActionTags.ZIndex, zIndexInt);
-			setActionGroup(actionGroupsGlobalList.get(index), w);
-			
+			a.set(ActionTags.ZIndex, zIndexInt);
 		}
 	}
 	
-	private void updateListsAfter(Widget w) {
-		String idCustom = w.get(Tags.AbstractIDCustom);
-		String maxActionGroup = w.get(ActionTags.ActionGroup, ActionGroupType.UIAWidget).toString();
-		double maxActionQL = w.get(ActionTags.QLearning);
-		String maxActionDesc = w.get(Tags.Desc, "NULL");
-		double maxActionZIndex = w.get(Tags.ZIndex);
-		lastWidgetID = idCustom;
+	private void updateListsAfter(Action a) {
+		Widget originWidget = a.get(Tags.OriginWidget);
+		
+		String idCustom = originWidget.get(Tags.AbstractIDCustom);
+		String maxActionGroup = a.get(ActionTags.ActionGroup, ActionGroupType.UIAWidget).toString();
+		double maxQL = a.get(ActionTags.QLearning);
+		String maxDesc = originWidget.get(Tags.Desc, "NULL");
+		double maxZIndex = originWidget.get(Tags.ZIndex);
 				
 		if(idCustomsGlobalList.isEmpty()) {
 			idCustomsGlobalList.add(idCustom);
-			widgetNamesGlobalList.add(maxActionDesc);
-			actionGroupsGlobalList.add(maxActionGroup);
-			qLearningsGlobalList.add(maxActionQL);
-			zIndexesGlobalList.add(maxActionZIndex);
+			widgetNamesGlobalList.add(maxDesc);
+			qLearningsGlobalList.add(maxQL);
+			zIndexesGlobalList.add(maxZIndex);
 		} else {
 			if(idCustomsGlobalList.contains(idCustom)) {
 				int index = idCustomsGlobalList.indexOf(idCustom);
-				actionGroupsGlobalList.set(index, maxActionGroup);
-				maxActionQL -= 0.01 * maxActionZIndex;
-				qLearningsGlobalList.set(index, maxActionQL);
-				zIndexesGlobalList.set(index, maxActionZIndex);
+				double adjustedQL = maxQL - (0.01 * maxZIndex);
+				qLearningsGlobalList.set(index, adjustedQL);
+				zIndexesGlobalList.set(index, maxZIndex);
+				widgetNamesGlobalList.set(index, maxDesc);
 			} else {
 				idCustomsGlobalList.add(idCustom);
-				widgetNamesGlobalList.add(maxActionDesc);
-				actionGroupsGlobalList.add(maxActionGroup);
-				qLearningsGlobalList.add(maxActionQL);
-				zIndexesGlobalList.add(maxActionZIndex);
+				widgetNamesGlobalList.add(maxDesc);
+				qLearningsGlobalList.add(maxQL);
+				zIndexesGlobalList.add(maxZIndex);
 			}
 		}
 	}
-	
+
 	private Action getAction(Widget w, Set<Action> actions) {
 		Action theActions[] = new Action[actions.size()];
 		actions.toArray(theActions);
 		Action theAction = theActions[theActions.length - 1];
 		for(Action a : actions) {
-			if(w.get(Tags.AbstractIDCustom) == a.get(Tags.AbstractIDCustom)) {
+			if(w.get(Tags.AbstractIDCustom) == a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom)) {
 				theAction = a;
 			}
 		}
 		return theAction;
 	}
-
 	
-	// ENFOQUE 4
+	private double getDiffPxPercentage(BufferedImage diffScreanshot) {
+		double diffPxPercentage = 0;
+		double totalPixels = diffScreanshot.getWidth() * diffScreanshot.getHeight();
+		double differentPixels = 0;
+		int[] pixelsArray = diffScreanshot.getRGB(0, 0, diffScreanshot.getWidth(), diffScreanshot.getHeight(), null, 0, diffScreanshot.getWidth());
+		
+		for (int i = 0; i < totalPixels; i++) {
+		    if (pixelsArray[i] != Color.Black.argb32()) {
+		    	differentPixels ++;
+		    }
+		}
+		
+		diffPxPercentage = differentPixels / totalPixels;
+		
+		System.out.println("*********");
+		System.out.println("Totales actuales: " + totalPixels);
+		System.out.println("Diferentes: " + differentPixels);
+		System.out.println("Proporcion (0..1): " + diffPxPercentage);
+		System.out.println("*********");
+		
+		return diffPxPercentage;
+	}
+	
+	
 	/**
 	 * State image difference 
 	 * 
