@@ -32,6 +32,7 @@ package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsPanel;
 
 import javax.swing.*;
 
@@ -39,7 +40,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 import static org.fruit.monkey.dialog.ToolTipTexts.maxTestTimeTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.useRecordedTTT;
 
-public class TimingPanel extends JPanel {
+public class TimingPanel extends SettingsPanel {
 
   private static final long serialVersionUID = -5878966626046293031L;
 
@@ -143,6 +144,7 @@ public class TimingPanel extends JPanel {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     checkUseRecordedTimes.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay));
     spnActionWaitTime.setValue(settings.get(ConfigTags.TimeToWaitAfterAction));
@@ -156,6 +158,7 @@ public class TimingPanel extends JPanel {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, checkUseRecordedTimes.isSelected());
     settings.set(ConfigTags.ActionDuration, (Double) spnActionDuration.getValue());
