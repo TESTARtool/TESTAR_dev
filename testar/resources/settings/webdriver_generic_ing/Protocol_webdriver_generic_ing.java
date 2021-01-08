@@ -130,7 +130,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			throw new RuntimeException("Could not compile: ",  e);
 		}
 
-		String modelFileName = (new File(Settings.getSettingsPath(), "model.json")).getAbsolutePath();
+		String modelFileName = (new File(Settings.getSettingsPath(), "model.json")).toURI().toString();
 		Map<QName, XdmValue> parameters = new HashMap();
 		parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
 
@@ -155,7 +155,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			
 			for (XdmItem rule: result) {
 				XdmNode node = (XdmNode)rule;
-				gr.add(new GenRule(node.attribute("xquery"), node.attribute("regexp"), 3));
+				gr.add(new GenRule(node.attribute("xquery"), node.attribute("regexp"), 5));
 			}
 
 			modelGenRules = gr;

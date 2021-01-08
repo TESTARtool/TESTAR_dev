@@ -41,11 +41,30 @@
         </xsl:call-template>
     </xsl:template>
 
+
     <!-- stage 2: alphabetical rule -->
     <xsl:template match="validator[@type = 'alphabetical']">
         <xsl:call-template name="form-rule-1">
             <xsl:with-param name="regex">
-                [a-zA-Z ]+
+                [a-zA-Z ]{5,15}
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- stage 2: numeric rule -->
+    <xsl:template match="validator[@type = 'numeric']">
+        <xsl:call-template name="form-rule-1">
+            <xsl:with-param name="regex">
+                [0-9]{5,15}
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- stage 2: telephone rule -->
+    <xsl:template match="validator[@type = 'telephone']">
+        <xsl:call-template name="form-rule-1">
+            <xsl:with-param name="regex">
+                [+]?[a-zA-Z ]{10}
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>
@@ -64,7 +83,7 @@
     <xsl:template match="validator[@type = 'email']">
         <xsl:call-template name="form-rule-1">
             <xsl:with-param name="regex">
-                ([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\.[a-z]{2,4})|(bla@company.com)|(sut@bla.nl)
+                ([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\.[a-z]{2,4})|(bla@company\.com)|(sut@bla\.nl)
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>
@@ -73,7 +92,7 @@
     <xsl:template match="validator[@type = 'enterprise']">
         <xsl:call-template name="form-rule-1">
             <xsl:with-param name="regex">
-                (0415580365)|(0[0-9]{9})
+                E(0415580365)|(0[0-9]{9})
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>
@@ -98,8 +117,8 @@
         <xsl:variable name="name" select="ancestor-or-self::field/@name"/>
 
         <xsl:variable name="xquery">
-            .[contains(lower-case(@name), '<xsl:value-of select="$form"/>')]/ancestor::*[contains(lower-case(@name),
-            '<xsl:value-of select="$name"/>')]
+            .[contains(lower-case(@name), '<xsl:value-of select="$name"/>')]/ancestor::*[contains(lower-case(@name),
+            '<xsl:value-of select="$form"/>')]
         </xsl:variable>
 
         <input-rule xquery="{normalize-space($xquery)}" regexp="{normalize-space($regex)}"/>

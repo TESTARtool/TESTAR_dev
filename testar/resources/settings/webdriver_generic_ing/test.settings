@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/rapido/chromedriver" "1920x900+0+0" "https://www.ing.nl/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=1-my-situation-step"
+SUTConnectorValue = ""C:\\tmp\\chromedriver.exe "1920x900+0+0" "http://localhost:9001/iframe.html?id=flow-modeltest--ing-feat-modeltest-flow&viewMode=story&flow-step=save-and-resume"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
