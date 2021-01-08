@@ -32,6 +32,7 @@ package org.fruit.alayer.webdriver;
 
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.TaggableBase;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class WdElement extends TaggableBase implements Serializable {
   WdElement parent;
   WdRootElement root;
   WdWidget backRef;
+
+  public RemoteWebElement remoteWebElement;
 
   public boolean blocked;
   //long culture = 0L;
@@ -78,7 +81,7 @@ public class WdElement extends TaggableBase implements Serializable {
   
   double zindex;
   int webZIndex = 0;
-  Rect rect;
+  public Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
@@ -109,6 +112,7 @@ public class WdElement extends TaggableBase implements Serializable {
     	throw e;
     }
 
+    remoteWebElement = (RemoteWebElement)packedElement.get("element");
     customElementState = packedElement.get("custom-element-state");
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
