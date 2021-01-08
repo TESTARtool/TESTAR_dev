@@ -94,8 +94,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private static String testarNamespace = "http://testar.org/state";
 
 	private static List<GenRule> modelGenRules;
-	
+
+	private int nr_no_actions = 0;
+
 	static {
+		WdDriver.forceActivateTab = false;
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
 
@@ -432,6 +435,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		nr_no_actions = 0;
 	}
 
 	private boolean match(XQueryEvaluator comp, XdmItem item) {
@@ -540,6 +544,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+			WdWidget wdw = (WdWidget)widget;
+			
 			// slides can happen, even though the widget might be blocked
 			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
@@ -564,22 +570,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			} */
 
 			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+			if (isTypeable(widget)) {
+
+				Action action = new WdRemoteTypeAction(wdw, this.getRandomText(widget));
+
+				action.set(Tags.OriginWidget, widget);
+
+				actions.add(action);
 			}
 
 			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && (isUnfiltered(widget))) {
+			if (isClickable(widget)) {
 				if (!isLinkDenied(widget)) {
-					WdElement element = ((WdWidget) widget).element;
-					Role role = widget.get(Tags.Role, Roles.Widget);
-					actions.add(ac.leftClickAt(widget));
+					Action action = new WdRemoteClickAction(wdw);
+
+					action.set(Tags.OriginWidget, widget);
+
+					actions.add(action);
 				}
 			}
 		}
-
-		selectRuleAction(state, actions);
-
+		
 		return actions;
 	}
 
@@ -623,14 +634,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		List<GenRule> l = inputGenerators(
 			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
 
-			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5000),
+			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5),
 			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
+			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
+			formInputRule("income", "profit", "[1-9][0-9]{4}", 5),
 			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
-			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 10),
+			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5),
 			formInputRule("expensesForm", "studyLoan", "[1-3][0-9]{4}", 5),
 			formInputRule("expensesForm", "liabilities", "[1-3][0-9]{4}", 5),
-			formInputRule("expensesForm", "alimony", "[0-9]{3}", 5),
-			formInputRule("entrepreneurIncomeForm", "companyProfit", "[1-9][0-9]{2}", 5)
+			formInputRule("expensesForm", "alimony", "[0-9]{3}", 5)
 		);
 		l.addAll(modelGenRules);
 		return l;
@@ -876,6 +888,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 
+		if (actions.size() == 0) {
+			nr_no_actions += 1;
+		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
@@ -947,7 +962,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-		return super.moreActions(state);
+		return super.moreActions(state) && (nr_no_actions < 3);
 	}
 
 	/**

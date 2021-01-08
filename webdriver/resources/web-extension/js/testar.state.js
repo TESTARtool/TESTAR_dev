@@ -8,6 +8,7 @@ var labelMap;
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
  * @return {(Object | Array)}
  */
+
 var getStateTreeTestar = function (ignoredTags, customElementStateLambda) {
     var body = document.body;
     var bodyWrapped = wrapElementTestar(body, 0, 0);
@@ -83,7 +84,7 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags, customEl
     parentWrapped['custom-element-state'] = customElementStateLambda(parentWrapped['element']);
 
     // No need for it anymore, save serialization effort
-    delete parentWrapped['element'];
+    //delete parentWrapped['element'];
 }
 
 /*
