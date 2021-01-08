@@ -16,8 +16,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
     protected CharSequence keys;
 
     private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
-            //.setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();
-            .setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font siz
+            .setFillPattern(FillPattern.None).setStrokeWidth(3).build();
     
     public static class TypeVisualizer implements Visualizer {
 
@@ -42,7 +41,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
                 double mx = rect.x() + (rect.width() / 2.0);
                 double my = rect.y() + (rect.height() / 2.0);
                 
-                cv.text(pen, rect.x(), my - m.right() / 2, 0, text);
+                cv.text(pen, mx - (m.left() / 2.0), my - (m.right() / 2.0), 0, text);
             } catch (PositionException pe) {}
         }
     }

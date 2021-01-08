@@ -51,6 +51,15 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- stage 2: alphanumeric rule -->
+    <xsl:template match="validator[@type = 'alphanumeric']">
+        <xsl:call-template name="form-rule-1">
+            <xsl:with-param name="regex">
+                [0-9a-zA-Z ]{5,15}
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- stage 2: numeric rule -->
     <xsl:template match="validator[@type = 'numeric']">
         <xsl:call-template name="form-rule-1">
@@ -64,7 +73,7 @@
     <xsl:template match="validator[@type = 'telephone']">
         <xsl:call-template name="form-rule-1">
             <xsl:with-param name="regex">
-                [+]?[a-zA-Z ]{10}
+                [+]?[0-9]{10}
             </xsl:with-param>
         </xsl:call-template>
     </xsl:template>

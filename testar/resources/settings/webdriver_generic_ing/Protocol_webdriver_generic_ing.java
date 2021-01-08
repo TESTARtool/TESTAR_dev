@@ -226,8 +226,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			put("class", "lfr-btn-label");
 		}};*/
 
-		WdDriver.fullScreen = true;
-
 		// Override ProtocolUtil to allow WebDriver screenshots
 		protocolUtil = new WdProtocolUtil();
 	}

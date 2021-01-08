@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = ""C:\\tmp\\chromedriver.exe "1920x900+0+0" "http://localhost:9001/iframe.html?id=flow-modeltest--ing-feat-modeltest-flow&viewMode=story&flow-step=save-and-resume"
+SUTConnectorValue = "C:\\tmp\\chromedriver.exe" "http://localhost:9001/iframe.html?id=flow-modeltest--ing-feat-modeltest-flow&viewMode=story&flow-step=save-and-resume"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 10
 SequenceLength = 100
 
 #################################################################
@@ -165,7 +165,7 @@ GraphDBUrl =
 StartupTime = 2.0
 GraphResuming = true
 StateScreenshotSimilarityThreshold = 1.4E-45
-ActionDuration = 0.1
+ActionDuration = 0.2
 PathToReplaySequence = ./output/temp
 VisualizeActions = true
 TypingTextsForExecutedAction = 10
@@ -184,7 +184,7 @@ ResetDataStore = false
 DrawWidgetInfo = false
 GraphsActivated = true
 VisualizeSelectedAction = true
-TimeToWaitAfterAction = 0.4
+TimeToWaitAfterAction = 0.2
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
 TempDir = ./output/temp

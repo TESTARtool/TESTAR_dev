@@ -33,7 +33,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
         public void run(State state, Canvas canvas, Pen pen) {
             Assert.notNull(state, canvas, pen);
             pen = Pen.merge(pen, this.pen);
-            try { // by urueda
+            try {
                 double mx = rec.x() + (rec.width() / 2.0);
                 double my = rec.y() + (rec.height() / 2.0);
                 canvas.ellipse(pen, mx - width * .5, my - height * .5, width, height);
