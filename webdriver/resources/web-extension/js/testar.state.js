@@ -2,19 +2,7 @@
  * Keep a map with all labels client-side
  */
 var labelMap;
-var $elementCache = {
-    id: 1,
-    cache: { }
-};
 
-function registerElement(element) {
-    if ($elementCache.has(element)) { return $elementCache[element]; }
-    else {
-        $elementCache = $elementCache + 1;
-        $elementCache[element] = element;
-        return registerElement(element);
-    }
-};
 /*
  * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
