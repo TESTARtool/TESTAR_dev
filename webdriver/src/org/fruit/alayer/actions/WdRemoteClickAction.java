@@ -5,6 +5,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.PositionException;
 import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -43,7 +44,10 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 
     public WdRemoteClickAction(WdWidget widget) {
         this.widget = widget;
-        this.set(Tags.Visualizer, new ClickVisualizer(widget.element.rect, LClickPen, 10, 10));
+        Role role = widget.get(Tags.Role, Roles.Widget);
+        if (!role.equals(WdRoles.WdOPTION)) {
+            this.set(Tags.Visualizer, new ClickVisualizer(widget.element.rect, LClickPen, 10, 10));
+        }
     }
 
     @Override
@@ -56,7 +60,6 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
             remoteElement.click();
         }
         catch (Exception e) {
-            e.printStackTrace();
             System.out.println("ELEMENT " + widget.element.remoteWebElement.getId() + " IS STALE");
         }
     }
