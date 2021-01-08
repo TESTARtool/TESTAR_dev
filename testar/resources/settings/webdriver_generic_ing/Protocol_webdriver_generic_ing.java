@@ -648,6 +648,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	List<FilterRule> filterRules() {
 		return filterRules(
+				new FilterRule(".[name() = 'label']", true),
 				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
 				new FilterRule(".[(name() = 'a') and (not(@href))]", true), // ignore links without href
 
@@ -906,7 +907,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				retAction = RandomActionSelector.selectAction(actions);
 			}
 		}
-
+		
 		return retAction;                 
 	}
 	                                                                              
@@ -931,8 +932,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 					if (match(r.expression, item)) {
 						if (r.priority < 1.0) {
 							/*System.out.println("RULE: " + r.sexpr);
-							System.out.println("PRIO: " + r.priority);*/
-							//printXML(n);
+							System.out.println("PRIO: " + r.priority);
+							printXML(n);  */
 							
 						}
 						rules.add(new ActionPrio(action, r.priority));
