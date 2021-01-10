@@ -1,15 +1,19 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
-import nl.ou.testar.ReinforcementLearning.Utils.WidgetUtil;
+import nl.ou.testar.ReinforcementLearning.Utils.TreedistUtil;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang.math.NumberUtils;
-import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 
-import static nl.ou.testar.ReinforcementLearning.Utils.WidgetUtil.*;
+import static nl.ou.testar.ReinforcementLearning.Utils.TreedistUtil.*;
+import static nl.ou.testar.ReinforcementLearning.Utils.TreedistUtil.getEarlierNode;
 
+/**
+ * Helper class for the {@link WidgetTreeZhangShashaBasedRewardFunction}
+ */
 public class TreeDistHelper {
 
     private final static int DELETE = 1;
@@ -20,8 +24,8 @@ public class TreeDistHelper {
     public void treeDist(final Widget keyRoot1, final Widget keyRoot2, final MultiKeyMap forestDist, final MultiKeyMap treeDist) {
         forestDist.put(null, null, 0);
 
-        final Deque<Widget> keyRootPathTree1 = getLeftMostArray(keyRoot1);
-        final Deque<Widget> keyRootPathTree2 = getLeftMostArray(keyRoot2);
+        final Deque<Widget> keyRootPathTree1 = getPostOrder(keyRoot1, new ArrayDeque<>());
+        final Deque<Widget> keyRootPathTree2 = getPostOrder(keyRoot2, new ArrayDeque<>());
 
         for (final Widget node : keyRootPathTree1) {
             final Widget earlierNode = getEarlierNode(node, keyRootPathTree1);
@@ -35,25 +39,15 @@ public class TreeDistHelper {
 
         for (final Widget nodeTree1: keyRootPathTree1) {
             for (final Widget nodeTree2: keyRootPathTree2) {
-                // This equals is comparing AbstractIDCustom widget property
-                // See windows -> org.fruit.alayer.windows -> UIAWidget.java -> equals
                 final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
                 final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree2);
 
-                // TODO remove
-                System.out.println(getLeftMostArray(nodeTree1).getFirst().get(Tags.Title));
-                System.out.println(keyRootPathTree1.getFirst().get(Tags.Title));
-
-                // TODO remove
-                System.out.println(getLeftMostArray(nodeTree2).getFirst().get(Tags.Title));
-                System.out.println(keyRootPathTree2.getFirst().get(Tags.Title));
-
-                if (WidgetUtil.equals(getLeftMostArray(nodeTree1).getFirst(), keyRootPathTree1.getFirst())
-                        && WidgetUtil.equals(getLeftMostArray(nodeTree2).getFirst(), keyRootPathTree2.getFirst())) {
+                if (TreedistUtil.equals(getMostLeftWidget(nodeTree1), keyRootPathTree1.getFirst())
+                        && TreedistUtil.equals(getMostLeftWidget(nodeTree2), keyRootPathTree2.getFirst())) {
 
                     final int i = getDist(forestDist, earlierNode1, nodeTree2) + DELETE;
                     final int j = getDist(forestDist, nodeTree1, earlierNode2) + INSERT;
-                    final boolean nodesAreEqual = WidgetUtil.equals(nodeTree1, nodeTree2);
+                    final boolean nodesAreEqual = TreedistUtil.equals(nodeTree1, nodeTree2);
                     final int k = getDist(forestDist, earlierNode1, earlierNode2) + (nodesAreEqual ? MATCH : RELABLE);
 
                     final int min = NumberUtils.min(i, j, k);
@@ -62,21 +56,13 @@ public class TreeDistHelper {
                 } else {
                     final int i = getDist(forestDist, earlierNode1, nodeTree2) + DELETE;
                     final int j = getDist(forestDist, nodeTree1, earlierNode2) + INSERT;
-                    final Widget earlyLeftMost1 = getEarlierNode(getLeftMostArray(nodeTree1).getFirst(), keyRootPathTree1);
-                    final Widget earlyLeftMost2 = getEarlierNode(getLeftMostArray(nodeTree2).getFirst(), keyRootPathTree2);
+                    final Widget earlyLeftMost1 = getEarlierNode(getMostLeftWidget(nodeTree1), keyRootPathTree1);
+                    final Widget earlyLeftMost2 = getEarlierNode(getMostLeftWidget(nodeTree2), keyRootPathTree2);
                     final int k = getDist(forestDist, earlyLeftMost1, earlyLeftMost2) + getDist(treeDist,nodeTree1, nodeTree2);
 
                     forestDist.put(nodeTree1, nodeTree2, NumberUtils.min(i,j,k));
                 }
             }
         }
-    }
-
-    private Integer getDist(final MultiKeyMap dist, final Widget node1, final Widget node2) {
-        if (dist.get(node1, node2) == null){
-            return 0;
-        }
-
-        return (Integer) dist.get(node1, node2);
     }
 }

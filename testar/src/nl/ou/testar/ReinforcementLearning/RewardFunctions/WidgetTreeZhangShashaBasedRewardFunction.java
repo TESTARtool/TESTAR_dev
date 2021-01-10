@@ -12,7 +12,12 @@ import org.fruit.alayer.Widget;
 
 import java.util.Deque;
 
-
+/**
+ * This reward function is based on the article
+ * "Simple Fast Algorithms for the Editing Distance Between Trees and Related Problems"
+ * by Zhang AND Shasha
+ * DOI: 10.1137/0218082
+ */
 public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction {
 
     private static final Logger logger = LogManager.getLogger(WidgetTreeZhangShashaBasedRewardFunction.class);

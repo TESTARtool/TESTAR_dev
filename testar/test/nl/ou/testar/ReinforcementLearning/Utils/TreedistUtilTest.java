@@ -1,23 +1,20 @@
-package nl.ou.testar.ReinforcementLearning.RewardFunctions;
+package nl.ou.testar.ReinforcementLearning.Utils;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.StateStub;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.WidgetStub;
 import org.fruit.alayer.Tags;
-import org.junit.After;
+import org.fruit.alayer.Widget;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
+import static org.junit.Assert.*;
 
-    final StateStub previousState = new StateStub();
-
-    final StateStub state = new StateStub();
-
-    private final LRKeyrootsHelper lrKeyrootsHelper = new LRKeyrootsHelper();
-
-    private final TreeDistHelper treeDistHelper = new TreeDistHelper();
-
+public class TreedistUtilTest {
     // tree 1
+    final StateStub previousState = new StateStub();
     final WidgetStub widgetT1A = new WidgetStub();
     final WidgetStub widgetT1B = new WidgetStub();
     final WidgetStub widgetT1C = new WidgetStub();
@@ -32,12 +29,6 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
     final WidgetStub widgetT2D = new WidgetStub();
     final WidgetStub widgetT2E = new WidgetStub();
     final WidgetStub widgetT2F = new WidgetStub();
-
-    @After
-    public void cleanUp() {
-        WidgetTreeZhangShashaBasedRewardFunction.treeDist.clear();
-        WidgetTreeZhangShashaBasedRewardFunction.previousState = null;
-    }
 
     @Before
     public void setup() {
@@ -57,7 +48,6 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
         widgetT2D.set(Tags.Title, "d");
         widgetT2E.set(Tags.Title, "e");
         widgetT2F.set(Tags.Title, "f");
-        state.set(Tags.Title, "f");
 
         // tree 1
         previousState.addChild(widgetT1D);
@@ -76,10 +66,6 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
         widgetT1B.setParent(widgetT1C);
 
         // tree 2
-        state.addChild(widgetT2C);
-        widgetT2C.setParent(state);
-        state.addChild(widgetT2E);
-        widgetT2E.setParent(state);
         widgetT2F.addChild(widgetT2C);
         widgetT2C.setParent(widgetT2F);
         widgetT2F.addChild(widgetT2E);
@@ -93,15 +79,51 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest2 {
     }
 
     @Test
-    public void test() {
-        // given
-        final WidgetTreeZhangShashaBasedRewardFunction widgetTreeZhangShashaBasedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(lrKeyrootsHelper, treeDistHelper);
-        WidgetTreeZhangShashaBasedRewardFunction.previousState = previousState;
-
+    public void getPostOrder () {
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        final ArrayDeque<Widget> result = new ArrayDeque<>();
+         TreedistUtil.getPostOrder(widgetT2F, result);
 
         // then
-        assertEquals(2f, reward, 0.00001);
+        assertEquals(widgetT2A, result.removeFirst());
+        assertEquals(widgetT2B, result.removeFirst());
+        assertEquals(widgetT2D, result.removeFirst());
+        assertEquals(widgetT2C, result.removeFirst());
+        assertEquals(widgetT2E, result.removeFirst());
+        assertEquals(widgetT2F, result.removeFirst());
+    }
+
+    @Test
+    public void getLeftMostArray () {
+        // when
+        final Deque<Widget> result = TreedistUtil.getLeftMostArray(widgetT2F);
+
+        // then
+        assertEquals(widgetT2A, result.removeFirst());
+        assertEquals(widgetT2D, result.removeFirst());
+        assertEquals(widgetT2C, result.removeFirst());
+        assertEquals(widgetT2F, result.removeFirst());
+    }
+
+    @Test
+    public void getEarlierNode () {
+        // given
+        final Deque<Widget> deque = TreedistUtil.getLeftMostArray(widgetT2F);
+
+        // when
+        assertEquals(widgetT2C, TreedistUtil.getEarlierNode(widgetT2F, deque));
+
+    }
+
+    @Test
+    public void testWidgetUtil_widgetsAreEqual(){
+        assertTrue(TreedistUtil.equals(widgetT1A, widgetT2A));
+        assertTrue(TreedistUtil.equals(widgetT1B, widgetT2B));
+        assertTrue(TreedistUtil.equals(widgetT1C, widgetT2C));
+    }
+
+    @Test
+    public void testWidgetUtil_widgetsAreUnEquals(){
+        assertFalse(TreedistUtil.equals(widgetT1B, widgetT2A));
     }
 }
