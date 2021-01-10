@@ -32,9 +32,9 @@ public class TreedistUtil {
             return false;
         }
 
-        return widget1.get(Tags.Title).equals(widget2.get(Tags.Title));
+//        return widget1.get(Tags.Title).equals(widget2.get(Tags.Title));
 
-//        return widget1.getAbstractRepresentation().equals(widget2.getAbstractRepresentation());
+        return widget1.getAbstractRepresentation().equals(widget2.getAbstractRepresentation());
     }
 
     /**

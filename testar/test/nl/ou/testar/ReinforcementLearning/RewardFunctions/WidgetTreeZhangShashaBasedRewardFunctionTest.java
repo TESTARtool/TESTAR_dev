@@ -46,20 +46,20 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
     @Before
     public void setup() {
         // tree 1
-        widgetT1A.set(Tags.Title, "a");
-        widgetT1B.set(Tags.Title, "b");
-        widgetT1C.set(Tags.Title, "c");
-        widgetT1D.set(Tags.Title, "d");
-        widgetT1E.set(Tags.Title, "e");
-        previousState.set(Tags.Title, "f");
+        widgetT1A.set(Tags.AbstractIDCustom, "a");
+        widgetT1B.set(Tags.AbstractIDCustom, "b");
+        widgetT1C.set(Tags.AbstractIDCustom, "c");
+        widgetT1D.set(Tags.AbstractIDCustom, "d");
+        widgetT1E.set(Tags.AbstractIDCustom, "e");
+        previousState.set(Tags.AbstractIDCustom, "f");
 
         // tree 2
-        widgetT2A.set(Tags.Title, "a");
-        widgetT2B.set(Tags.Title, "b");
-        widgetT2C.set(Tags.Title, "c");
-        widgetT2D.set(Tags.Title, "d");
-        widgetT2E.set(Tags.Title, "e");
-        state.set(Tags.Title, "f");
+        widgetT2A.set(Tags.AbstractIDCustom, "a");
+        widgetT2B.set(Tags.AbstractIDCustom, "b");
+        widgetT2C.set(Tags.AbstractIDCustom, "c");
+        widgetT2D.set(Tags.AbstractIDCustom, "d");
+        widgetT2E.set(Tags.AbstractIDCustom, "e");
+        state.set(Tags.AbstractIDCustom, "f");
 
         // tree 1
         previousState.addChild(widgetT1D);

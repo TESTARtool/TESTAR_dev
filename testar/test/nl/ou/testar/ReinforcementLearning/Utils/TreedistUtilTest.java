@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 public class TreedistUtilTest {
     // tree 1
-    final StateStub previousState = new StateStub();
     final WidgetStub widgetT1A = new WidgetStub();
     final WidgetStub widgetT1B = new WidgetStub();
     final WidgetStub widgetT1C = new WidgetStub();
@@ -33,27 +32,22 @@ public class TreedistUtilTest {
     @Before
     public void setup() {
         // tree 1
-        widgetT1A.set(Tags.Title, "a");
-        widgetT1B.set(Tags.Title, "b");
-        widgetT1C.set(Tags.Title, "c");
-        widgetT1D.set(Tags.Title, "d");
-        widgetT1E.set(Tags.Title, "e");
-        widgetT1F.set(Tags.Title, "f");
-        previousState.set(Tags.Title, "f");
+        widgetT1A.set(Tags.AbstractIDCustom, "a");
+        widgetT1B.set(Tags.AbstractIDCustom, "b");
+        widgetT1C.set(Tags.AbstractIDCustom, "c");
+        widgetT1D.set(Tags.AbstractIDCustom, "d");
+        widgetT1E.set(Tags.AbstractIDCustom, "e");
+        widgetT1F.set(Tags.AbstractIDCustom, "f");
 
         // tree 2
-        widgetT2A.set(Tags.Title, "a");
-        widgetT2B.set(Tags.Title, "b");
-        widgetT2C.set(Tags.Title, "c");
-        widgetT2D.set(Tags.Title, "d");
-        widgetT2E.set(Tags.Title, "e");
-        widgetT2F.set(Tags.Title, "f");
+        widgetT2A.set(Tags.AbstractIDCustom, "a");
+        widgetT2B.set(Tags.AbstractIDCustom, "b");
+        widgetT2C.set(Tags.AbstractIDCustom, "c");
+        widgetT2D.set(Tags.AbstractIDCustom, "d");
+        widgetT2E.set(Tags.AbstractIDCustom, "e");
+        widgetT2F.set(Tags.AbstractIDCustom, "f");
 
         // tree 1
-        previousState.addChild(widgetT1D);
-        widgetT1D.setParent(previousState);
-        previousState.addChild(widgetT1E);
-        widgetT1E.setParent(previousState);
         widgetT1F.addChild(widgetT1D);
         widgetT1D.setParent(widgetT1F);
         widgetT1F.addChild(widgetT1E);
@@ -76,6 +70,24 @@ public class TreedistUtilTest {
         widgetT2A.setParent(widgetT2D);
         widgetT2D.addChild(widgetT2B);
         widgetT2B.setParent(widgetT2D);
+    }
+
+    @Test
+    public void abstractRepresentationEmpty() {
+        // when
+        final String abstractRepresentation = new WidgetStub().getAbstractRepresentation();
+
+        // then
+        assertEquals("AbstractIDCustom=null", abstractRepresentation);
+    }
+
+    @Test
+    public void abstractRepresentation() {
+        // when
+        final String abstractRepresentation = widgetT1A.getAbstractRepresentation();
+
+        // then
+        assertEquals("AbstractIDCustom=a", abstractRepresentation);
     }
 
     @Test
