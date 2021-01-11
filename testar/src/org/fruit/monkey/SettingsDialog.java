@@ -32,8 +32,9 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import javafx.util.Pair;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
+
+import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
@@ -129,8 +130,8 @@ public class SettingsDialog extends JFrame implements Observer {
     this.settings = settings;
     this.settingsFile = settingsFile;
     this.ret = null;
-    this.setVisible(true);
     populateInformation(settings);
+    this.setVisible(true);
 
     while (this.isShowing())
       Util.pause(0.1);
@@ -188,7 +189,7 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Temp Directory does not exist!");
     }
 
-    settingPanels.forEach((k,v) -> v.getValue().checkSettings());
+    settingPanels.forEach((k,v) -> v.right().checkSettings());
   }
 
   private void saveCurrentSettings() {
@@ -236,11 +237,11 @@ public class SettingsDialog extends JFrame implements Observer {
     }
     ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
-    settingPanels.forEach((k,v) -> v.getValue().populateFrom(settings));
+    settingPanels.forEach((k,v) -> v.right().populateFrom(settings));
   }
 
   private void extractInformation(Settings settings) {
-    settingPanels.forEach((k,v) -> v.getValue().extractInformation(settings));
+    settingPanels.forEach((k,v) -> v.right().extractInformation(settings));
   }
 
   private void initComponents() throws IOException {
@@ -260,7 +261,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
 
-    settingPanels.forEach((k,v) -> jTabsPane.add(v.getKey(),v.getValue()));
+    settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
 
     setLayout(jTabsPane);
     pack();
