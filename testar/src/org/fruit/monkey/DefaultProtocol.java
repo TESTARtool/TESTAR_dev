@@ -946,11 +946,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while(mode() == Modes.Spy && system.isRunning()) {
 
 			State state = getState(system);
+			cv.begin(); Util.clear(cv);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
-			cv.begin(); Util.clear(cv);
 			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);

@@ -63,7 +63,7 @@ import static org.fruit.alayer.Tags.Enabled;
  *
  * It also gives examples how to automate setting a username and password into a login screen.
  */
-public class Protocol_web_one_drive extends DesktopProtocol {
+public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
