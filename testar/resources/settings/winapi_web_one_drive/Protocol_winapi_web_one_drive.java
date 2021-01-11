@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,7 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
+import org.fruit.alayer.actions.PasteText;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.Type;
 import org.fruit.alayer.devices.AWTKeyboard;
@@ -62,7 +63,7 @@ import static org.fruit.alayer.Tags.Enabled;
  *
  * It also gives examples how to automate setting a username and password into a login screen.
  */
-public class Protocol_web_one_drive extends DesktopProtocol {
+public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
@@ -110,16 +111,10 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		for(Widget w :state) {
 			if(w.get(Tags.Title,"").contains("Email, phone, or Skype")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				Action a = ac.clickTypeInto(w, "testarhandson", true);
+				Action a = ac.pasteTextInto(w, "testarhandson@gmail.com", true);
 				executeAction(system, state, a);
 
-				//Based on ENG Keyboard, Shift + 2 typing arroba character
-				kb.press(KBKeys.VK_SHIFT);
-				kb.press(KBKeys.VK_2);
-				kb.release(KBKeys.VK_2);
-				kb.release(KBKeys.VK_SHIFT);
-
-				executeAction(system, state, ac.clickTypeInto(w, "gmail.com", false));
+				executeAction(system, state, ac.pasteTextInto(w, "gmail.com", false));
 
 			}
 		}
@@ -173,23 +168,14 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		 *  Work doing keyboard actions, without check the state and widgets
 		 */
 		new CompoundAction.Builder()   
-		.add(new Type("testarhandson"),0.5).build() //assume keyboard focus is on the user field   
-		.run(system, null, 0.5);
-
-		kb.press(KBKeys.VK_SHIFT);
-		kb.press(KBKeys.VK_2);
-		kb.release(KBKeys.VK_2);
-		kb.release(KBKeys.VK_SHIFT);
-
-		new CompoundAction.Builder()  
-		.add(new Type("gmail.com"),0.5)
+		.add(new PasteText("testarhandson@gmail.com"),0.5) //assume keyboard focus is on the user field   
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
 		.run(system, null, 1);
 
 		Util.pause(8);
 
 		new CompoundAction.Builder()
-		.add(new Type("0neDrivetestar"),0.5)   
+		.add(new PasteText("0neDrivetestar"),0.5)   
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
 		.run(system, null, 1);
 

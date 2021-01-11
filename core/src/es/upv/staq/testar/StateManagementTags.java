@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package es.upv.staq.testar;
 
 import com.google.common.collect.BiMap;
@@ -12,7 +42,7 @@ import java.util.Set;
 
 public class StateManagementTags {
 
-    public enum Group {General, ControlPattern}
+    public enum Group {General, ControlPattern, WebDriver}
 
 
     // a widget's control type
@@ -271,6 +301,24 @@ public class StateManagementTags {
     public static final Tag<Long> WidgetWindowWindowInteractionState = Tag.from("WidgetWindowWindowInteractionState", Long.class); // check
     public static final Tag<Long> WidgetWindowWindowVisualState = Tag.from("WidgetWindowWindowVisualState", Long.class); // check
 
+    // Web widgets
+    public static final Tag<String> WebWidgetId = Tag.from("Web Widget id", String.class);
+    public static final Tag<String> WebWidgetName = Tag.from("Web Widget name", String.class);
+    public static final Tag<String> WebWidgetTagName = Tag.from("Web Widget tag name", String.class);
+    public static final Tag<String> WebWidgetTextContent= Tag.from("Web Widget text content", String.class);
+    public static final Tag<String> WebWidgetTitle = Tag.from("Web Widget title", String.class);
+    public static final Tag<String> WebWidgetHref = Tag.from("Web Widget href", String.class);
+    public static final Tag<String> WebWidgetValue = Tag.from("Web Widget value", String.class);
+    public static final Tag<String> WebWidgetStyle = Tag.from("Web Widget style", String.class);
+    public static final Tag<String> WebWidgetTarget = Tag.from("Web Widget target", String.class);
+    public static final Tag<String> WebWidgetAlt = Tag.from("Web Widget alt", String.class);
+    public static final Tag<String> WebWidgetType = Tag.from("Web Widget type", String.class);
+    public static final Tag<String> WebWidgetCssClasses = Tag.from("Web Widget css classes", String.class);
+    public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
+    public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
+    public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
+    
+    
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
         {
@@ -340,6 +388,23 @@ public class StateManagementTags {
             add(WidgetValuePattern);
             add(WidgetVirtualizedItemPattern);
             add(WidgetWindowPattern);
+            
+            //Webdriver
+            add(WebWidgetId);
+            add(WebWidgetName);
+            add(WebWidgetTagName);
+            add(WebWidgetTextContent);
+            add(WebWidgetTitle);
+            add(WebWidgetHref);
+            add(WebWidgetValue);
+            add(WebWidgetStyle);
+            add(WebWidgetTarget);
+            add(WebWidgetAlt);
+            add(WebWidgetType);
+            add(WebWidgetCssClasses);
+            add(WebWidgetDisplay);
+            add(WebWidgetIsOffScreen);
+            add(WebWidgetSrc);
         }
     };
 
@@ -417,6 +482,23 @@ public class StateManagementTags {
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
+        
+        //Webdriver
+        settingsMap.put(WebWidgetId, "WebWidgetId");
+        settingsMap.put(WebWidgetName, "WebWidgetName");
+        settingsMap.put(WebWidgetTagName, "WebWidgetTagName");
+        settingsMap.put(WebWidgetTextContent, "WebWidgetTextContent");
+        settingsMap.put(WebWidgetTitle, "WebWidgetTitle");
+        settingsMap.put(WebWidgetHref, "WebWidgetHref");
+        settingsMap.put(WebWidgetValue, "WebWidgetValue");
+        settingsMap.put(WebWidgetStyle, "WebWidgetStyle");
+        settingsMap.put(WebWidgetTarget, "WebWidgetTarget");
+        settingsMap.put(WebWidgetAlt, "WebWidgetAlt");
+        settingsMap.put(WebWidgetType, "WebWidgetType");
+        settingsMap.put(WebWidgetCssClasses, "WebWidgetCssClasses");
+        settingsMap.put(WebWidgetDisplay, "WebWidgetDisplay");
+        settingsMap.put(WebWidgetIsOffScreen, "WebWidgetIsOffScreen");
+        settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
     }
 
     // a mapping of a tag to its group
@@ -484,6 +566,23 @@ public class StateManagementTags {
             put(WidgetValuePattern, Group.ControlPattern);
             put(WidgetVirtualizedItemPattern, Group.ControlPattern);
             put(WidgetWindowPattern, Group.ControlPattern);
+            
+            //Webdriver
+            put(WebWidgetId, Group.WebDriver);
+            put(WebWidgetName, Group.WebDriver);
+            put(WebWidgetTagName, Group.WebDriver);
+            put(WebWidgetTextContent, Group.WebDriver);
+            put(WebWidgetTitle, Group.WebDriver);
+            put(WebWidgetHref, Group.WebDriver);
+            put(WebWidgetValue, Group.WebDriver);
+            put(WebWidgetStyle, Group.WebDriver);
+            put(WebWidgetTarget, Group.WebDriver);
+            put(WebWidgetAlt, Group.WebDriver);
+            put(WebWidgetType, Group.WebDriver);
+            put(WebWidgetCssClasses, Group.WebDriver);
+            put(WebWidgetDisplay, Group.WebDriver);
+            put(WebWidgetIsOffScreen, Group.WebDriver);
+            put(WebWidgetSrc, Group.WebDriver);
         }
     };
 
@@ -754,10 +853,9 @@ public class StateManagementTags {
      * @param forWindows
      * @return
      */
-    public static <T> Tag<T> getMappedTag(Tag<T> mappedTag, boolean forWindows) {
-        {
-            return (Tag<T>) tagMappingOther.getOrDefault(mappedTag, null);
-        }
+    @SuppressWarnings("unchecked")
+    public static <T> Tag<T> getMappedTag(Tag<T> mappedTag) {
+    	return (Tag<T>) tagMappingOther.getOrDefault(mappedTag, null);
     }
 
     /**

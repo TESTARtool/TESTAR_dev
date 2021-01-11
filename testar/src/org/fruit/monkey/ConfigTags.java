@@ -73,6 +73,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class);
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
+  public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class);
 
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
@@ -92,12 +93,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> UnattendedTests = Tag.from("UnattendedTests", Boolean.class);
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
-
-  // graph db config tags
-  public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
-  public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
-  public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
-  public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);

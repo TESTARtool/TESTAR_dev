@@ -45,8 +45,7 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 
 	public AndroidProtocolUtil() {}
 
-	@Override
-	public String getActionshot(State state, Action action) {
+	public static String getActionshot(State state, Action action) {
 
 		if(action instanceof AndroidActionClick) {
 			try {
@@ -59,7 +58,7 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 			} catch(Exception e) {}
 		}
 
-		return super.getActionshot(state, action);
+		return ProtocolUtil.getActionshot(state, action);
 	}
 
 }

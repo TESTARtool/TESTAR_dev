@@ -61,7 +61,6 @@ public class Protocol_android_generic extends DesktopProtocol {
 		//TODO: Create AndroidProtocol and move OS initialization
 		NativeLinker.addAndroidOS();
 		super.initialize(settings);
-		protocolUtil = new AndroidProtocolUtil();
 	}
 	
 	/**

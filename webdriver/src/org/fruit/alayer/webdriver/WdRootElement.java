@@ -58,17 +58,32 @@ public class WdRootElement extends WdElement {
 
   @Override
   protected void fillScrollValues() {
+
+    // Vertical Scroll
+    vScroll = scrollHeight > clientHeight;
+    if (scrollHeight != clientHeight) {
+      vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+    }
+    vScrollViewSize = 100.0 * clientHeight / scrollHeight;
+
+    // TESTAR script function that compares document body height with browser height
+    if (WdDriver.executeScript("return isPageVerticalScrollable()") instanceof Boolean) {
+      vScroll = (Boolean)WdDriver.executeScript("return isPageVerticalScrollable()");
+      vScrollViewSize = 100.0 * rect.height() / clientHeight;
+    }
+
+    // Horizontal Scroll
     hScroll = scrollWidth > clientWidth;
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
     }
     hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
-    vScroll = scrollHeight > clientHeight;
-    if (scrollHeight != clientHeight) {
-      vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+    // TESTAR script function that compares document body width with browser width
+    if (WdDriver.executeScript("return isPageHorizontalScrollable()") instanceof Boolean) {
+      hScroll = (Boolean) WdDriver.executeScript("return isPageHorizontalScrollable()");
+      hScrollViewSize = 100.0 * rect.width() / clientWidth;
     }
-    vScrollViewSize = 100.0 * clientHeight / scrollHeight;
 
     scrollPattern = vScroll || hScroll;
   }
