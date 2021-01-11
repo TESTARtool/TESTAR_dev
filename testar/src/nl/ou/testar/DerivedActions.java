@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
  * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,11 +28,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package nl.ou.testar;
 
-public interface IExtendedSetting {
-    /**
-     * Save the setting to disk.
-     */
-    void Save();
+import org.fruit.alayer.Action;
+
+import java.util.Set;
+
+public class DerivedActions {
+
+    private Set<Action> filteredActions;
+    private Set<Action> availableActions;
+
+    public DerivedActions(Set<Action> availableActions, Set<Action> filteredActions) {
+        this.filteredActions = filteredActions;
+        this.availableActions = availableActions;
+    }
+
+    public Set<Action> getFilteredActions() {
+        return filteredActions;
+    }
+
+    public Set<Action> getAvailableActions() {
+        return availableActions;
+    }
+
+    public void addAvailableAction(Action action){
+        availableActions.add(action);
+    }
+
+    public void addFilteredAction(Action action){
+        filteredActions.add(action);
+    }
 }

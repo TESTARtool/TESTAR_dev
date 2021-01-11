@@ -29,10 +29,6 @@
 *******************************************************************************************************/
 
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import java.io.BufferedReader;
