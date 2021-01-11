@@ -43,8 +43,6 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 
 public class AndroidProtocolUtil extends ProtocolUtil {
 
-	public AndroidProtocolUtil() {}
-
 	public static String getActionshot(State state, Action action) {
 
 		if(action instanceof AndroidActionClick) {

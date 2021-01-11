@@ -94,6 +94,7 @@ import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
+import org.testar.android.AndroidProtocolUtil;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -1557,13 +1558,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
-			WdProtocolUtil.getActionshot(state,action);
-		}else{
-			//System.out.println("DEBUG: normal action shot");
-			ProtocolUtil.getActionshot(state,action);
-		}
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+	        //System.out.println("DEBUG: Using WebDriver specific action shot.");
+	        WdProtocolUtil.getActionshot(state,action);
+	    } else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)){
+	        //System.out.println("DEBUG: Using Android specific action shot.");
+	        AndroidProtocolUtil.getActionshot(state, action);
+	    } else{
+	        //System.out.println("DEBUG: normal action shot");
+	        ProtocolUtil.getActionshot(state,action);
+	    }
 		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 

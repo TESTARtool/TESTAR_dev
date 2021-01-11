@@ -30,7 +30,12 @@
 
 package org.testar.android.actions;
 
+import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Pen;
+import org.fruit.alayer.Position;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -38,6 +43,7 @@ import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionFailedException;
+import org.fruit.alayer.visualizers.EllipseVisualizer;
 import org.testar.android.AppiumFramework;
 import org.testar.android.enums.AndroidRoles;
 
@@ -47,13 +53,20 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	private String text;
 	private String resourceId;
+	
+	private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
+	        .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
 
 	public AndroidActionClick(State state, Widget w, String text, String resourceId) {
-		this.set(Tags.Role, AndroidRoles.AndroidWidget);
-		this.set(Tags.OriginWidget, w);
-		this.text = text;
-		this.resourceId = resourceId;
-		this.set(Tags.Desc, toShortString());
+	    this.set(Tags.Role, AndroidRoles.AndroidWidget);
+	    this.set(Tags.OriginWidget, w);
+	    this.text = text;
+	    this.resourceId = resourceId;
+	    this.set(Tags.Desc, toShortString());
+	    double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
+	    double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
+	    Position position = new AbsolutePosition(relX, relY);
+	    this.set(Tags.Visualizer, new EllipseVisualizer(position, LClickPen, 10, 10));
 	}
 
 	@Override

@@ -33,10 +33,12 @@ package org.testar.android;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import org.fruit.Util;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.windows.Windows;
 import org.openqa.selenium.By;
@@ -89,7 +91,12 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		AndroidState root = createWidgetTree(rootElement);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
-		
+
+		// After create the widget tree, set widgets Path
+		for (Widget w : root) {
+		    w.set(Tags.Path, Util.indexString(w));
+		}
+
 		Windows.CoUninitialize();
 
 		return root;

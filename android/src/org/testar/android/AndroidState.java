@@ -155,9 +155,6 @@ public class AndroidState extends AndroidWidget implements State {
 		else if (t.equals(Tags.Title)) {
 			ret = w.element.text;
 		}
-		else if (t.equals(Tags.Path)) {
-			ret = w.element.className;
-		}
 		else if (t.equals(Tags.PID)) {
 			ret = (long) -1;
 		}
