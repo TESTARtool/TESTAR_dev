@@ -15,40 +15,76 @@ note right   : PropositionMananager.JSON
 
 TemporalController -> TemporalDBmanager :computeTemporalModel
 activate TemporalDBmanager
-TemporalDBmanager -> TemporalDBmanager : getConcreteStates\nFromOrientDB
-  loop each: State
-   TemporalDBmanager -> TemporalModel : addStateEncoding
-   activate TemporalModel
-   TemporalModel -> TemporalModel :
-   activate TemporalModel
-   deactivate TemporalModel
-end
-TemporalDBmanager -> PropositionManager :setPassingFilters
-activate PropositionManager
-deactivate PropositionManager
 
-note right : for widgets
+TemporalDBmanager -> TemporalDBmanager : getConcreteStates
+loop each State
+
+activate TemporalDBmanager
+loop each Widget
 TemporalDBmanager -> TemporalDBmanager : getWidgetpropositions
-note left : from orientDB
+activate TemporalDBmanager
+TemporalDBmanager -> TemporalDBmanager :computeAtomicPropositions
+activate TemporalDBmanager
 TemporalDBmanager -> PropositionManager :setPassingFilters
 activate PropositionManager
+PropositionManager --> TemporalDBmanager :
 deactivate PropositionManager
-note right : for actions
+'note right : for Widgets
+deactivate TemporalDBmanager
+deactivate TemporalDBmanager
+end
+loop each Transition
+TemporalDBmanager -> TemporalDBmanager : getTransitions
+activate TemporalDBmanager
+TemporalDBmanager -> TemporalDBmanager :computeAtomicPropositions
+activate TemporalDBmanager
+TemporalDBmanager -> PropositionManager :setPassingFilters
+activate PropositionManager
+PropositionManager --> TemporalDBmanager :
+deactivate PropositionManager
+'note right : for Transitions
+deactivate TemporalDBmanager
+deactivate TemporalDBmanager
+end
+
+TemporalDBmanager -> TemporalDBmanager :computeAtomicPropositions
+activate TemporalDBmanager
+TemporalDBmanager -> PropositionManager :setPassingFilters
+activate PropositionManager
+PropositionManager --> TemporalDBmanager :
+deactivate PropositionManager
+'note right : for States
+deactivate TemporalDBmanager
+TemporalDBmanager -> TemporalModel :addStateEncoding
+activate TemporalModel
+TemporalModel -->  TemporalDBmanager  :
+deactivate TemporalModel
+deactivate TemporalDBmanager
+end
+
+
 TemporalDBmanager -> TemporalModel : finalizeTransitions
 
-TemporalModel -> TemporalModel :
 activate TemporalModel
+TemporalModel -->  TemporalDBmanager  :
 deactivate TemporalModel
-deactivate TemporalModel
-'TemporalDBmanager -> TemporalDBmanager : fetchTraces
-TemporalController -> TemporalDBmanager :saveToGraphMLFile
 
-TemporalDBmanager-> TemporalDBmanager :save
-activate TemporalDBmanager
-note right   : GraphML.XML files
 
+TemporalDBmanager -->   TemporalController :
+deactivate TemporalDBmanager
 deactivate TemporalDBmanager
 
+'activate TemporalDBmanager
+'TemporalDBmanager -> TemporalDBmanager : fetchTraces
+TemporalController -> TemporalDBmanager :saveToGraphMLFile
+activate TemporalDBmanager
+TemporalDBmanager-> TemporalDBmanager :save
+note right   : GraphML.XML
+TemporalDBmanager -->   TemporalController :
+deactivate TemporalDBmanager
+
+TemporalController -> TemporalController :save
+note right   : Model.JSON
 
 'TemporalController ->CheckerFactory :getModelChecker
 'activate CheckerFactory
@@ -60,11 +96,14 @@ activate ModelChecker
   loop each: ModelChecker
     TemporalController -> ModelChecker : setExecutable
     TemporalController -> ModelChecker : modelCheck
-
+    ModelChecker -> TemporalModel   : makeOutput
+    activate TemporalModel
+    TemporalModel -->  ModelChecker   :
+    deactivate TemporalModel
+ ModelChecker -->   TemporalController:
 end
 deactivate ModelChecker
 TemporalController -> TemporalController :save
-
 note right   : Checked Oracles
 TemporalController --> TESTAR
 deactivate TemporalController
