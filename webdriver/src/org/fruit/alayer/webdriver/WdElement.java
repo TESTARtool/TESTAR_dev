@@ -78,7 +78,8 @@ public class WdElement extends TaggableBase implements Serializable {
   String valuePattern, href, style, target, alt, src;
   public Object value;
   public Boolean checked;
-  
+  public Boolean selected;
+
   double zindex;
   int webZIndex = 0;
   public Rect rect;
@@ -123,6 +124,7 @@ public class WdElement extends TaggableBase implements Serializable {
     href = attributeMap.getOrDefault("href", "");
     value = (Object)packedElement.get("value");
     checked = (Boolean)packedElement.getOrDefault("checked", false);
+    selected = (Boolean)packedElement.getOrDefault("selected", false);
     style = attributeMap.getOrDefault("style", "");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");

@@ -1,5 +1,6 @@
 package org.fruit.alayer.actions;
 
+import org.checkerframework.checker.units.qual.s;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
@@ -7,6 +8,7 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.PositionException;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -58,8 +60,8 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
             RemoteWebElement remoteElement = widget.element.remoteWebElement;
             RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
             d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
-            org.fruit.Util.pause(0.1);
             remoteElement.clear();
+            org.fruit.Util.pause(0.05);
             remoteElement.sendKeys(keys);
         }
         catch (Exception e) {
