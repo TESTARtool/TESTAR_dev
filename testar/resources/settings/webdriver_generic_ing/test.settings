@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/rapido/chromedriver" "https://lion-web-components.netlify.app/iframe.html?id=forms-select--main&viewMode=story"
+SUTConnectorValue = "/Users/rapido/chromedriver" "https://www.ing.nl/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=1-my-situation-step"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 10
-SequenceLength = 100
+SequenceLength = 1000
 
 #################################################################
 # Oracles based on suspicious titles

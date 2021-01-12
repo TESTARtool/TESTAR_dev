@@ -102,8 +102,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
 
-		xqueryCompiler.setFastCompilation(true);
 		xqueryCompiler.declareNamespace("tst", testarNamespace);
+		xqueryCompiler.declareNamespace("h", "https://testar.org/html");
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -150,9 +150,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			printXML(r);
 
 			// fetch all input-rules
+
 			XQueryEvaluator e = xqueryCompiler.compile("//input-rule ").load();
-			e.setContextItem(saxonProcessor.newDocumentBuilder().wrap(r));
-			
+			XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(r);
+			e.setContextItem(_this);
+			e.setExternalVariable(new QName("this"), _this);
+
 			XdmValue result = e.evaluate();
 			List<GenRule> gr = new LinkedList<>();
 			
@@ -305,6 +308,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			if (el.checked != null) {
 				e.setAttribute("checked", el.checked.toString());
 			}
+			if (el.selected != null) {
+				e.setAttribute("selected", el.selected.toString());
+			}
 
 			for (int i = 0; i < w.childCount() ; i++) {
 				e.appendChild(toNode(d, w.child(i)));
@@ -439,6 +445,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private boolean match(XQueryEvaluator comp, XdmItem item) {
 		try {
 			comp.setContextItem(item);
+			comp.setExternalVariable(new QName("this"), item);
+			
 			XdmItem i = comp.evaluateSingle();
 			
 			if (i != null) {
@@ -543,7 +551,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 			WdWidget wdw = (WdWidget)widget;
-			
+
 			// slides can happen, even though the widget might be blocked
 			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
@@ -551,7 +559,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			if (!widget.get(Enabled, true)) {
 				continue;
 			}
-
+			
 			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
 				continue;
@@ -580,7 +588,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)) {
 				if (!isLinkDenied(widget)) {
+
+					Node n = widget.get(WdTags.DOM);
+					//printXML(n);
+					
 					Action action = new WdRemoteClickAction(wdw);
+
 
 					action.set(Tags.OriginWidget, widget);
 
@@ -613,42 +626,97 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		// TODO: turn this into a boolean expression
 		if (isWhite) { return false; }
-		else { return isBlack; }  
+		else { return isBlack; }
 	}
 
 	List<ActionRule> actionRules() {
 		return actionsRules(
-			new ActionRule("'true'", 1),                  // Default priority
-			new ActionRule(".[not(@type = 'submit') and not(@aria-invalid = 'true')] and tst:visits[@count > 0]", 0.2),  // if action already visited, except submit!
-			new ActionRule(".[(string-length(string(@value)) = 0) and (@type = 'text')]", 5), // Empty text fields
-			new ActionRule(".[@aria-invalid = 'true']", 5), // self is invalid
-			new ActionRule(".[@type = 'submit']", 3), // submit
-			new ActionRule("let $r := ancestor::*[@role = 'radiogroup']//ing-radio return .[@type = 'radio'] and (count($r) = count($r[@checked = 'false']))", 5), // unselected radiogroup
-			new ActionRule("ancestor::*[(@role = 'radiogroup') and (@aria-invalid = 'true')]", 5) // radiogroup is invalid
+			new ActionRule("'true'", "1"),                  // Default priority
+
+			new ActionRule(".[not(@type = 'submit')] and " +
+					"not(ancestor-or-self::*[h:is-invalid(.)]) and " +
+					"tst:visits[@count > 0]",
+					"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
+
+			new ActionRule(".[@type = 'submit']",
+				 "1 + count(ancestor::form//*[" +
+						 "(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.)) and " +
+						 "h:is-valid(.)" +
+						 "])"),
+
+			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
+			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
+
+			new ActionRule("h:is-radio(.)",
+					"1 div count(h:sibling-radios(.))"), // weighted radio button
+
+			new ActionRule("h:is-option(.)",
+						"1 div count(h:sibling-options(.))"), // weighted option
+
+			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
+				new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
+				new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
 		);
+	}
+
+	static String xqueryLibrary() {
+		String f1 = "declare function h:is-radio($n) { $n[(name() = 'input') and (@type = 'radio')] };";
+		String f2 =	"declare function h:is-valid($n) { not($n[@aria-invalid = 'true']) };";
+		String f3 =	"declare function h:is-invalid($n) { $n[@aria-invalid = 'true'] };";
+		String f4 = "declare function h:is-option($n) { $n[name() = 'option'] };";
+		String f5 = "declare function h:is-submit($n) { $n[@type = 'submit'] };";
+		String f6 = "declare function h:is-select($n) { $n[name() = 'select'] };";
+		String f7 = "declare function h:is-text($n) { $n[@type = 'text'] };";
+		String f8 = "declare function h:is-radiogroup($n) { $n[@role = 'radiogroup'] };";
+		String f9 = "declare function h:sibling-radios($n) { $n/ancestor::form//*[h:is-radio(.) and ($n/@name = @name)] };";
+		String f10 = "declare function h:sibling-options($n) { $n/ancestor::select//*[h:is-option(.)] }; ";
+		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
+		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
+		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
+
+		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
 	}
 	
 	List<GenRule> inputGenerators() {
 		List<GenRule> l = inputGenerators(
-			new GenRule("'true'", "[A-Za-z0-9]{1,20}", 1),                        // Generic input
+			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", 1),                        // Generic input
 
-			formInputRule("mySituationForm", "age", "[1-8][0-9]", 5),
-			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
-			formInputRule("income", "income", "[1-9][0-9]{4}", 5),
-			formInputRule("income", "profit", "[1-9][0-9]{4}", 5),
+			inputRule("firstName", "(Robbert)|(Mark)", 5),
+			inputRule("lastName", "(van Dalen)|(Bommel)", 5),
+			inputRule("surName", "(van Dalen)|(Bommel)", 5),
+			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", 5),
+			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", 5),
+			inputRule( "age", "[1-8][0-9]", 5),
+			inputRule("income", "[1-9][0-9]{4}", 5),
+			inputRule( "profit", "[1-9][0-9]{4}", 5),
 			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
-			formInputRule("monthlyIncome", "monthlyIncome", "[1-7][0-9]{3}", 5),
-			formInputRule("expensesForm", "studyLoan", "[1-3][0-9]{4}", 5),
-			formInputRule("expensesForm", "liabilities", "[1-3][0-9]{4}", 5),
-			formInputRule("expensesForm", "alimony", "[0-9]{3}", 5)
-		);
+			inputRule( "monthlyIncome", "[1-7][0-9]{3}", 5),
+			inputRule("studyLoan", "[1-3][0-9]{4}", 5),
+			inputRule( "liabilities", "[1-3][0-9]{4}", 5),
+			inputRule("alimony", "[0-9]{3}", 5),
+			inputRule("annualTurnover", "[1-9][0-9]{4,6}", 5),
+			inputRule("endBalance", "[1-9][0-9]{4,6}", 5),
+			inputRule("availableCash", "[1-9][0-9]{4,6}", 5),
+			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", 5),
+			inputRule("newLoan", "[1-9][0-9]{4,6}", 5),
+			inputRule("needAmount", "[1-9][0-9]{4,6}", 5),
+			inputRule("needDuration", "[1-3]|[0-9]", 5),
+			inputRule("numberEmployees", "[1-9]{2,4}", 5),
+
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name,'otherPaymentPostponement')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5)
+		);                                                           
 		l.addAll(modelGenRules);
 		return l;
 	}
-
+	
 	List<FilterRule> filterRules() {
 		return filterRules(
+				new FilterRule("@disabled", true),
 				new FilterRule(".[name() = 'label']", true),
+				new FilterRule(".[name() = 'select']", true),  // we select options
 				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']", true),  // ignore aria-hidden
 				new FilterRule(".[(name() = 'a') and (not(@href))]", true), // ignore links without href
 
@@ -680,6 +748,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return new LinkedList<>(Arrays.asList(rules));
 	}
 
+	GenRule inputRule(String n, String g, int p) {
+		String ln = n.toLowerCase();
+		String xquery = String.format(".[contains(lower-case(@name), '%s')]", ln);
+		return new GenRule(xquery, g, p);
+	}
+
 	GenRule formInputRule(String f, String n, String g, int p) {
 		String lf = f.toLowerCase();
 		String ln = n.toLowerCase();
@@ -698,7 +772,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			if (x < s) { return rule; }
 		}
 
-		throw new RuntimeException("there are no rules to pick");
+		return rules.get(0);
 	}
 
 	protected ActionPrio prioritizedRelativePick(List<ActionPrio> rules) {
@@ -713,6 +787,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 										map(m -> m.priority).
 										reduce(1.0, (r1, r2) -> r1 * r2))).
 						collect(Collectors.toList());
+
+		System.out.println("ABS PICKS START");
+		for (Object p: absPicks) {
+			System.out.println(p);
+		}
+		System.out.println("ABS PICKS END");    
 
 		return prioritizedAbsolutePick(absPicks);
 	}
@@ -733,7 +813,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		// Pick rule based on priority
 		if (matches.size() > 0) {
-			return prioritizedAbsolutePick(matches).generator.generate();
+			String s = prioritizedAbsolutePick(matches).generator.generate(new Random());
+			return s;
 		}
 
 		// else, return default behaviour
@@ -748,22 +829,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public boolean isValid() { return isValid; }
 	}
 
-	static class ActionRule extends PrioRule {
+	static class ActionRule {
+		protected String sprio = "";
+		protected boolean isValid = false;
 		protected String sexpr;
 		protected XQueryEvaluator expression;
+		protected XQueryEvaluator prio;
 
-		public ActionRule(String e, double p) {
+		public ActionRule(String e, String p) {
 			try {
 				sexpr = e;
-				expression = xqueryCompiler.compile(e).load();
-				isValid = true; priority = p;
+				expression = xqueryCompiler.compile(xqueryLibrary() + e).load();
+				prio = xqueryCompiler.compile(xqueryLibrary() + p).load();
+
+				isValid = true; sprio = p;
 			}
 			catch (Exception exception) {
 				System.out.println("WARNING: invalid action rule: " + exception.getMessage());
 			}
 		}
 		public String toString() {
-			return "ActionRule(" + sexpr + "," + priority + ")";
+			return "ActionRule(" + sexpr + "," + sprio + ")";
 		}
 	}
 
@@ -777,7 +863,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 
 		public String toString() {
-			return "ActionPrio(" + action.get(Tags.OriginWidget) + "," + priority + ")";
+			Object r = saxonProcessor.newDocumentBuilder().wrap(action.get(Tags.OriginWidget).get(WdTags.DOM));
+			return "ActionPrio(" + priority +"\n" + r + ")";
 		}
 	}
 	
@@ -791,7 +878,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			try {
 				sexpr = e;
 				gexpr = g;
-				expression = xqueryCompiler.compile(e).load(); generator = new RgxGen(g);
+				expression = xqueryCompiler.compile(xqueryLibrary() + e).load(); generator = new RgxGen(g);
 				isValid = true; priority = p;
 			}
 			catch (Exception exception) {
@@ -813,7 +900,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public FilterRule(String e, boolean b) {
 			sexpr = e;
 			try {
-				expr = xqueryCompiler.compile(e).load();
+				expr = xqueryCompiler.compile(xqueryLibrary() + e).load();
 				isBlack = b;
 				isValid = true;
 			}
@@ -886,7 +973,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-
+		
 		if (actions.size() == 0) {
 			nr_no_actions += 1;
 		}
@@ -930,13 +1017,20 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 				try {
 					if (match(r.expression, item)) {
-						if (r.priority < 1.0) {
-							/*System.out.println("RULE: " + r.sexpr);
-							System.out.println("PRIO: " + r.priority);
-							printXML(n);  */
+
+						r.prio.setContextItem(item);
+						r.prio.setExternalVariable(new QName("this"), item);
+
+						XdmItem pp = r.prio.evaluateSingle();
+						double pdouble = Double.parseDouble(pp.getStringValue());
+
+						if (pdouble > 3.0) {
+							System.out.println("RULE: " + r.sexpr);
+							System.out.println("PRIO: " + pdouble);
+							printXML(n);
 							
 						}
-						rules.add(new ActionPrio(action, r.priority));
+						rules.add(new ActionPrio(action, pdouble));
 					}
 
 				}
