@@ -97,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_generic/Protocol_webdriver_generic
+ProtocolClass = webdriver_remote_webcomponent/Protocol_webdriver_remote_webcomponent
 
 #################################################################
 # State identifier attributes

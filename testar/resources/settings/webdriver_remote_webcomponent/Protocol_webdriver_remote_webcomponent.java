@@ -52,7 +52,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_generic_webcomponent extends WebdriverProtocol {
+public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -225,7 +225,8 @@ public class Protocol_webdriver_generic_webcomponent extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					actions.add(new WdRemoteTypeAction((WdWidget)widget, getRandomText(widget)));
+					//actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
@@ -236,7 +237,8 @@ public class Protocol_webdriver_generic_webcomponent extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						actions.add(new WdRemoteClickAction((WdWidget)widget));
+						//actions.add(ac.leftClickAt(widget));
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
