@@ -1,5 +1,7 @@
 package org.fruit.alayer.actions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionFailedException;
@@ -12,7 +14,8 @@ import org.openqa.selenium.remote.RemoteWebElement;
 public class WdRemoteClickAction extends TaggableBase implements Action {
 
     protected WdWidget widget;
-
+    protected static final Logger logger = LogManager.getLogger();
+    
     private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
             .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
 
@@ -61,7 +64,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
             remoteElement.click();
         }
         catch (Exception e) {
-            System.out.println("ELEMENT " + widget.element.remoteWebElement.getId() + " IS STALE");
+            logger.warn("Remote click action failed", e);
         }
     }
 

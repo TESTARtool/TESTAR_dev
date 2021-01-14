@@ -1,5 +1,7 @@
 package org.fruit.alayer.actions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.units.qual.s;
 import org.fruit.Assert;
 import org.fruit.Pair;
@@ -16,6 +18,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 
     protected WdWidget widget;
     protected CharSequence keys;
+    protected static final Logger logger = LogManager.getLogger();
 
     private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
             .setFillPattern(FillPattern.None).setStrokeWidth(3).build();
@@ -67,7 +70,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
             remoteElement.sendKeys(keys);
         }
         catch (Exception e) {
-            System.out.println("ELEMENT " + widget.element.remoteWebElement.getId() + " IS STALE");
+            logger.warn("Remote type action failed", e);
         }
     }
 
