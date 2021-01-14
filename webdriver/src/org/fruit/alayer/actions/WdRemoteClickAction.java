@@ -15,7 +15,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 
     private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
             .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
-    
+
     public static class ClickVisualizer implements Visualizer {
         private static final long serialVersionUID = -2006402344810634504L;
         
@@ -44,6 +44,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 
     public WdRemoteClickAction(WdWidget widget) {
         this.widget = widget;
+        this.set(Tags.OriginWidget, widget);
         Role role = widget.get(Tags.Role, Roles.Widget);
         if (!role.equals(WdRoles.WdOPTION)) {
             this.set(Tags.Visualizer, new ClickVisualizer(widget.element.rect, LClickPen, 10, 10));
