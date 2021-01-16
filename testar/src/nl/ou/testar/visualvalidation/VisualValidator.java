@@ -4,6 +4,7 @@ import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
 import nl.ou.testar.visualvalidation.extractor.ExpectedTextCallback;
 import nl.ou.testar.visualvalidation.extractor.ExtractorFactory;
 import nl.ou.testar.visualvalidation.extractor.TextExtractorInterface;
+import nl.ou.testar.visualvalidation.matcher.MatcherResult;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcher;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcherFactory;
 import nl.ou.testar.visualvalidation.ocr.OcrConfiguration;
@@ -15,7 +16,14 @@ import org.apache.logging.log4j.Level;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.alayer.AWTCanvas;
+import org.fruit.alayer.AbsolutePosition;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Pen;
 import org.fruit.alayer.State;
+import org.fruit.alayer.StrokePattern;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.visualizers.TextVisualizer;
 import org.testar.Logger;
 
 import java.util.List;
@@ -25,7 +33,8 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     private final String TAG = "VisualValidator";
     private int analysisId = 0;
 
-    private final VisualMatcher matcher;
+    private final VisualMatcher _matcher;
+    private MatcherResult _matcherResult = null;
 
     private final OcrEngineInterface _ocrEngine;
     private final Object _ocrResultSync = new Object();
@@ -37,6 +46,9 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     private final AtomicBoolean _expectedTextReceived = new AtomicBoolean();
     private List<ExpectedElement> _expectedText = null;
 
+    protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+
     public VisualValidator(@NonNull VisualValidationSettings settings) {
         OcrConfiguration ocrConfig = settings.ocrConfiguration;
         if (ocrConfig.enabled) {
@@ -47,7 +59,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
 
         _extractor = ExtractorFactory.CreateTextExtractor();
 
-        matcher = VisualMatcherFactory.createDummyMatcher();
+        _matcher = VisualMatcherFactory.createLocationMatcher();
     }
 
     @Override
@@ -77,6 +89,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         synchronized (_expectedTextSync) {
             _expectedTextReceived.set(false);
         }
+        _matcherResult = null;
         Logger.log(Level.INFO, TAG, "Starting new analysis {}", analysisId);
     }
 
@@ -96,7 +109,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     private void matchText() {
         waitForResults();
 
-        Logger.log(Level.INFO, TAG, "Matching {} with {}", _ocrItems, _expectedText);
+        _matcherResult = _matcher.Match(_ocrItems, _expectedText);
     }
 
     private void waitForResult(@NonNull AtomicBoolean receivedFlag, Object syncObject) {
@@ -118,6 +131,17 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     }
 
     private void updateVerdict(State state) {
+
+        if (_matcherResult != null) {
+            // Analysis the raw result and create a verdict.
+            _matcherResult.getMatches();
+
+            Verdict result = new Verdict(Verdict.SEVERITY_WARNING, "Not all texts has been recognized",
+                    new TextVisualizer(new AbsolutePosition(10, 10), "->", RedPen));
+
+        } else {
+            // Set verdict to failure we should have a matcher result as minimal input.
+        }
         Logger.log(Level.INFO, TAG, "Updating verdict {}");
     }
 
@@ -127,7 +151,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
 
     @Override
     public void Destroy() {
-        matcher.destroy();
+        _matcher.destroy();
         _extractor.Destroy();
         if (_ocrEngine != null) {
             _ocrEngine.Destroy();
