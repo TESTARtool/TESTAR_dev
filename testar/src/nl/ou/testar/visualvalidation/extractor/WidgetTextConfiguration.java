@@ -18,13 +18,14 @@ public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfi
     public static WidgetTextConfiguration CreateDefault() {
         WidgetTextConfiguration instance = new WidgetTextConfiguration();
 
-        WidgetTextSetting scrollbar = WidgetTextSetting.CreateIgnore("UIAScrollBar");
+        WidgetTextSetting scrollBar = WidgetTextSetting.CreateIgnore("UIAScrollBar");
         WidgetTextSetting menuBar = WidgetTextSetting.CreateIgnore("UIAMenuBar");
+        WidgetTextSetting statusBar = WidgetTextSetting.CreateIgnore("UIAStatusBar");
         WidgetTextSetting textEdit = WidgetTextSetting.CreateExtract("UIAEdit", "UIAValueValue");
         WidgetTextSetting icon = WidgetTextSetting.CreateIgnoreAncestorBased("UIAMenuItem",
                 Arrays.asList("UIAMenuBar", "UIATitleBar", "UIAWindow", "Process"));
 
-        instance.widget = new ArrayList<>(Arrays.asList(scrollbar, menuBar, textEdit, icon));
+        instance.widget = new ArrayList<>(Arrays.asList(scrollBar, statusBar, menuBar, textEdit, icon));
         return instance;
     }
 

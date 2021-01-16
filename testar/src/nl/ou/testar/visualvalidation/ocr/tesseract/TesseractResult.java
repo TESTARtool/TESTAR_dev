@@ -5,6 +5,7 @@ import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.tesseract.ResultIterator;
 
+import java.awt.Rectangle;
 import java.util.function.Supplier;
 
 /**
@@ -27,22 +28,26 @@ public class TesseractResult {
         String recognizedText = ocrResult.getString().trim();
 
         float confidence = recognizedElement.Confidence(granularity);
-        IntPointer x1 = intPointerSupplier.get();
-        IntPointer y1 = intPointerSupplier.get();
-        IntPointer x2 = intPointerSupplier.get();
-        IntPointer y2 = intPointerSupplier.get();
-        boolean foundRectangle = recognizedElement.BoundingBox(granularity, x1, y1, x2, y2);
+        IntPointer left = intPointerSupplier.get();
+        IntPointer top = intPointerSupplier.get();
+        IntPointer right = intPointerSupplier.get();
+        IntPointer bottom = intPointerSupplier.get();
+        boolean foundRectangle = recognizedElement.BoundingBox(granularity, left, top, right, bottom);
 
         if (!foundRectangle) {
             throw new IllegalArgumentException("Could not find any rectangle for this element");
         }
 
-        RecognizedElement result = new RecognizedElement(x1.get(), y1.get(), x2.get(), y2.get(), confidence, recognizedText);
+        // Upper left coordinate = 0,0
+        int width = right.get() - left.get();
+        int height = bottom.get() - top.get();
+        Rectangle location = new Rectangle(left.get(), top.get(), width, height);
+        RecognizedElement result = new RecognizedElement(location, confidence, recognizedText);
 
-        x1.deallocate();
-        y1.deallocate();
-        x2.deallocate();
-        y2.deallocate();
+        left.deallocate();
+        top.deallocate();
+        right.deallocate();
+        bottom.deallocate();
         ocrResult.deallocate();
 
         return result;

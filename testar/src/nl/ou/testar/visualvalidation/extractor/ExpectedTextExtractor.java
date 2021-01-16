@@ -2,19 +2,23 @@ package nl.ou.testar.visualvalidation.extractor;
 
 
 import org.apache.logging.log4j.Level;
+import org.fruit.Environment;
 import org.fruit.Util;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.TagsBase;
 import org.fruit.alayer.Widget;
 import org.testar.Logger;
 import org.testar.settings.ExtendedSettingsFactory;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,7 @@ import static org.fruit.alayer.webdriver.enums.WdTags.WebTextContent;
 
 public class ExpectedTextExtractor extends Thread implements TextExtractorInterface {
     private static final String TAG = "ExpectedTextExtractor";
+    private final String rootElementPath = "[0]";
 
     AtomicBoolean running = new AtomicBoolean(true);
 
@@ -97,14 +102,36 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         }
     }
 
+    static Rectangle getLocation(Widget widget) {
+        Shape dimension = widget.get(Shape, null);
+
+        int x = dimension != null ? (int) dimension.x() : 0;
+        int y = dimension != null ? (int) dimension.y() : 0;
+        int width = dimension != null ? (int) dimension.width() : 0;
+        int height = dimension != null ? (int) dimension.height() : 0;
+
+        return new Rectangle(x, y, width, height);
+    }
+
     private void extractText() {
         if (_state == null || _callback == null) {
             Logger.log(Level.ERROR, TAG, "Should not try to extract text on empty state/callback");
             return;
         }
 
-        List<ExpectedElement> expectedElements = new ArrayList<>();
+        // Acquire the absolute location of the SUT on the screen.
+        Rectangle applicationPosition = null;
+        for (Widget widget : _state) {
+            if (widget.get(Path).contentEquals(rootElementPath)) {
+                applicationPosition = getLocation(widget);
+                break;
+            }
+        }
+        Objects.requireNonNull(applicationPosition);
 
+
+        double displayScale = Environment.getInstance().getDisplayScale(_state.child(0).get(Tags.HWND, (long) 0));
+        List<ExpectedElement> expectedElements = new ArrayList<>();
         for (Widget widget : _state) {
             String widgetRole = widget.get(Role).name();
 
@@ -112,13 +139,13 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
                 String text = widget.get(getVisualTextTag(widgetRole), "");
 
                 if (text != null && !text.isEmpty()) {
-                    Shape dimension = widget.get(Shape, null);
-                    int x1 = dimension != null ? (int) dimension.x() : 0;
-                    int y1 = dimension != null ? (int) dimension.y() : 0;
-                    int x2 = dimension != null ? (int) (dimension.width() + dimension.x()) : 0;
-                    int y2 = dimension != null ? (int) (dimension.height() + dimension.y()) : 0;
-
-                    expectedElements.add(new ExpectedElement(x1, y1, x2, y2, text));
+                    Rectangle absoluteLocation = getLocation(widget);
+                    Rectangle relativeLocation = new Rectangle(
+                            (int) ((absoluteLocation.x - applicationPosition.x) * displayScale),
+                            (int) ((absoluteLocation.y - applicationPosition.y) * displayScale),
+                            absoluteLocation.width,
+                            absoluteLocation.height);
+                    expectedElements.add(new ExpectedElement(relativeLocation, text));
                 }
             } else {
                 Logger.log(Level.DEBUG, TAG, "Widget {} ignored", widgetRole);
@@ -130,19 +157,20 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
 
     private boolean widgetIsIncluded(Widget w, String role) {
         boolean containsReadableText = true;
-        try {
-            String ancestors = _blacklist.get(role);
-            if (!ancestors.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                Util.ancestors(w).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
+        if (_blacklist.containsKey(role)) {
+            containsReadableText = false;
+            try {
+                String ancestors = _blacklist.get(role);
+                if (!ancestors.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    Util.ancestors(w).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
 
-                // Check if we should ignore this widget based on its ancestors.
-                if (sb.toString().equals(ancestors)) {
-                    containsReadableText = false;
+                    // Check if we should ignore this widget based on its ancestors.
+                    containsReadableText = !sb.toString().equals(ancestors);
                 }
-            }
-        } catch (NullPointerException ignored) {
+            } catch (NullPointerException ignored) {
 
+            }
         }
         return containsReadableText;
     }
