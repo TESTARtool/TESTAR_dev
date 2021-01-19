@@ -34,6 +34,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -167,35 +169,27 @@ public class JacocoReportReader {
 	        StringBuilder dataContent = new StringBuilder("");
 
 	        dataContent.append(OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname);
-	        dataContent.append(" | ");
+	        dataContent.append(": TOTAL");
 
-	        dataContent.append("Missed Instructions: " + INSTRUCTION_MISSED + " , ");
-	        dataContent.append("Total Instructions: " + TOTAL_INSTRUCTIONS + " , ");
-	        dataContent.append("Cov Instructions: " + (int)Math.round(INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS) + "%");
-	        dataContent.append(" | ");
+	        dataContent.append(" | Missed Instructions: " + NumberFormat.getNumberInstance(Locale.US).format(INSTRUCTION_MISSED));
+	        dataContent.append(" of " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_INSTRUCTIONS));
+	        dataContent.append(" | Cov: " + (int)Math.round(INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS) + "%");
 
-	        dataContent.append("Missed Branches: " + BRANCH_MISSED + " , ");
-	        dataContent.append("Total Branches: " + TOTAL_BRANCH + " , ");
-	        dataContent.append("Cov Branches: " + (int)Math.round(BRANCH_COVERED * 100 / TOTAL_BRANCH) + "%");
-	        dataContent.append(" | ");
+	        dataContent.append(" | Missed Branches: " + NumberFormat.getNumberInstance(Locale.US).format(BRANCH_MISSED));
+	        dataContent.append(" of " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_BRANCH));
+	        dataContent.append(" | Cov: " + (int)Math.round(BRANCH_COVERED * 100 / TOTAL_BRANCH) + "%");
+	        
+	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(COMPLEXITY_MISSED));
+	        dataContent.append(" | Cxty: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_COMPLEXITY));
 
-	        dataContent.append("Missed Lines: " + LINE_MISSED + " , ");
-	        dataContent.append("Total Lines: " + TOTAL_LINE + " , ");
-	        dataContent.append("Cov Lines: " + (int)Math.round(LINE_COVERED * 100 / TOTAL_LINE) + "%");
-	        dataContent.append(" | ");
+	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(LINE_MISSED));
+	        dataContent.append(" | Lines: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_LINE));
 
-	        dataContent.append("Missed Cxty: " + COMPLEXITY_MISSED + " , ");
-	        dataContent.append("Total Cxty: " + TOTAL_COMPLEXITY + " , ");
-	        dataContent.append("Cov Cxty: " + (int)Math.round(COMPLEXITY_COVERED * 100 / TOTAL_COMPLEXITY) + "%");
-	        dataContent.append(" | ");
+	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(METHOD_MISSED));
+	        dataContent.append(" | Methods: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_METHOD));
 
-	        dataContent.append("Missed Methods: " + METHOD_MISSED + " , ");
-	        dataContent.append("Total Methods: " + TOTAL_METHOD + " , ");
-	        dataContent.append("Cov Methods: " + (int)Math.round(METHOD_COVERED * 100 / TOTAL_METHOD) + "%");
-	        dataContent.append(" | ");
-
-	        dataContent.append("Total Classes: " + numberOfTotalClasses + " , ");
-	        dataContent.append("Missed Classes: " + numberOfMissedClasses);
+	        dataContent.append(" | Missed: " + numberOfMissedClasses);
+	        dataContent.append(" | Classes: " + numberOfTotalClasses);
 
 	        return dataContent.toString();
 
