@@ -178,8 +178,9 @@ public class RachotaProtocol extends JavaSwingProtocol {
 					}
 
 					// left click in Table Cells
-					if(isTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
-						actions.add(ac.leftClickAt(w));
+					// but filtering duration table cell widgets
+					if(isTableCell(w) && !isDurationTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
+					    actions.add(ac.leftClickAt(w));
 					}
 
 					// rachota: use spinboxes
@@ -262,7 +263,7 @@ public class RachotaProtocol extends JavaSwingProtocol {
 					// left click in Table Cells
 					// but filtering duration table cell widgets
 					if(isTableCell(w) && !isDurationTableCell(w) && (isUnfiltered(w) || whiteListed(w))) {
-						actions.add(ac.leftClickAt(w));
+					    actions.add(ac.leftClickAt(w));
 					}
 
 					// rachota: use spinboxes

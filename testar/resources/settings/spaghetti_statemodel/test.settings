@@ -42,8 +42,8 @@ AccessBridgeEnabled = true
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 10
+SequenceLength = 300
 
 #################################################################
 # Oracles based on suspicious titles
@@ -153,7 +153,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.3
-StartupTime = 20.0
+StartupTime = 30.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
