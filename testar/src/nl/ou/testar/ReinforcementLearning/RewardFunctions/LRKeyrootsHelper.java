@@ -1,16 +1,15 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Widget;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Helper class for the {@link WidgetTreeZhangShashaBasedRewardFunction}
+ */
 public class LRKeyrootsHelper {
-
-    private static final Logger logger = LogManager.getLogger(LRKeyrootsHelper.class);
 
     /**
      * Splitting a tree in sub trees. The LR Keyroots are the roots of each sub tree.
@@ -20,14 +19,8 @@ public class LRKeyrootsHelper {
      */
     public Deque<Widget> getLRKeyroots(final Widget widget) {
         final Deque<Widget> result = new ArrayDeque<>();
-        // add root element
-        //TODO: should the root node be stored at the left side of the deque or should it be the last item?
-        result.add(widget);
-
         processChilds(widget, result);
-
-        logger.info("Returned deque of widgets is '{}'", result);
-        logger.info("Returned deque of widgets is with size '{}'", result.size());
+        result.add(widget);
 
         return result;
     }
@@ -44,7 +37,7 @@ public class LRKeyrootsHelper {
         }
 
         return childList.stream()
-                .sorted(Comparator.comparing(childWidget -> childWidget.getAbstractRepresentation()))
+                .sorted(Comparator.comparing(Widget::getAbstractRepresentation))
                 .collect(Collectors.toList());
     }
 
@@ -55,28 +48,13 @@ public class LRKeyrootsHelper {
             return;
         }
 
-        // TODO: This is printing Java Widget object identifier, not informative for logs debugging
-        //logger.info("Sorted list is '{}'", sortedChildList);
-
-        // TODO Fernando: Why? Only One left Widget
-        // ANSWER FROM Olivia: I think this is actually accurate, left child nodes are not LRKeyroots,
-            // and each right child should be analyzed because they are indeed LRKeyroots
-            // Although the recursive call to processChild could be done here directly
-        // Then all other to right Widget
-        processLeftChild(sortedChildList.get(0), result);
+        // processLeftChild
+        processChilds(sortedChildList.get(0), result);
 
         IntStream.range(1, sortedChildList.size()).forEach(i -> processRightChild(sortedChildList.get(i), result));
     }
 
-    private void processLeftChild(final Widget leftChildWidget, final Deque<Widget> result) {
-    	// TODO Fernando: Why not? result.add(leftChildWidget);
-    	// ANSWER FROM Fernando: Probably something related with this LRKeyroots
-    	
-        processChilds(leftChildWidget, result);
-    }
-
     private void processRightChild(final Widget rightChildWidget, final Deque<Widget> result) {
-        // TODO: Maybe call processChilds before adding the widget?
         result.add(rightChildWidget);
 
         processChilds(rightChildWidget, result);

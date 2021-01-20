@@ -35,6 +35,9 @@ package org.fruit.alayer;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Drag;
 
 import es.upv.staq.testar.CodingManager;
@@ -49,6 +52,7 @@ import es.upv.staq.testar.CodingManager;
  * @see State
  */
 public interface Widget extends Taggable, Serializable {
+
 	State root();
 	Widget parent();
 	Widget child(int i);
@@ -88,7 +92,15 @@ public interface Widget extends Taggable, Serializable {
 				repr.append("," + tag.name() + "=" + this.get(tag));
 			}
 		}
-		return repr.toString();
+
+		final String abstractRepresentation = repr.toString();
+
+		// When no custom tag values can be retrieved then log a warning
+		if (StringUtils.equals(abstractRepresentation, "AbstractIDCustom=null")) {
+			LogManager.getLogger(Widget.class).warn("Widget has no custom tags, default abstractRepresentation is returned");
+		}
+
+		return abstractRepresentation;
 	}
 	
 	public abstract String toString(Tag<?>... tags);
