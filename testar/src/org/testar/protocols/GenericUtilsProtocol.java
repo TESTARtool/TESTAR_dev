@@ -43,7 +43,6 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
@@ -58,7 +57,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
@@ -481,16 +479,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	}
 	
 	/**
-	 * Compress JaCoCo report folder
+	 * Compress TESTAR output run report folder
 	 */
-	protected void compressJacocoReportFolder() {
-		//TODO: We also need to delete original folder after compression
-		try {
-			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "jacoco_reports";
-			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to compress JaCoCo report folder");
-		}
+	protected void compressOutputRunFolder() {
+	    Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
 	}
 }

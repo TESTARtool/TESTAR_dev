@@ -328,7 +328,7 @@ public class Protocol_jedit_prioritize_new_actions extends JavaSwingProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
 		}
 	}
 }

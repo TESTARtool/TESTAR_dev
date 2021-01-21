@@ -321,7 +321,7 @@ public class Protocol_jedit_purerandom extends JavaSwingProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
 		}
 	}
 }

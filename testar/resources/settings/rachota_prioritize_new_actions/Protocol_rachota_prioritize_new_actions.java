@@ -310,7 +310,7 @@ public class Protocol_rachota_prioritize_new_actions extends RachotaProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
 		}
 	}
 }
