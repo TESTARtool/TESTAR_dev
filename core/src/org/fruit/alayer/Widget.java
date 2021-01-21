@@ -35,7 +35,12 @@ package org.fruit.alayer;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Drag;
+
+import es.upv.staq.testar.CodingManager;
 
 /**
  * A Widget is usually a control element of an <code>SUT</code>.
@@ -47,6 +52,7 @@ import org.fruit.Drag;
  * @see State
  */
 public interface Widget extends Taggable, Serializable {
+
 	State root();
 	Widget parent();
 	Widget child(int i);
@@ -69,7 +75,33 @@ public interface Widget extends Taggable, Serializable {
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
+	// OLD IMPLEMENTATION
 	public String getRepresentation(String tab);
+	
+	/**
+	 * Get the Abstract Tags from a Widget (defined by users) 
+	 * to prepare a string that represents it at an abstract level. 
+	 * 
+	 * @return String that represents the widget at an abstract level.
+	 */
+	default String getAbstractRepresentation() {
+		StringBuilder repr = new StringBuilder();
+		repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+		for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
+			if(this.get(tag, null) != null) {
+				repr.append("," + tag.name() + "=" + this.get(tag));
+			}
+		}
+
+		final String abstractRepresentation = repr.toString();
+
+		// When no custom tag values can be retrieved then log a warning
+		if (StringUtils.equals(abstractRepresentation, "AbstractIDCustom=null")) {
+			LogManager.getLogger(Widget.class).warn("Widget has no custom tags, default abstractRepresentation is returned");
+		}
+
+		return abstractRepresentation;
+	}
 	
 	public abstract String toString(Tag<?>... tags);
 	
