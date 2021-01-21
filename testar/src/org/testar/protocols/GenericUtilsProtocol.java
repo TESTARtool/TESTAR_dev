@@ -50,6 +50,7 @@ import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.MergeJacocoFiles;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -427,9 +428,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 				lastCorrectJacocoCoverageFile = jacocoFile;
 			}
 
-			// Create the output JaCoCo Action report
-			// Example: "jacoco_reports/upm_sequence_1_action_3/index.html"
-			JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
+			// Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
+			// And get a string that represents obtained coverage
+			String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
+			writeCoverageFile("Sequence_" + OutputStructure.sequenceInnerLoopCount + "_Action_" + actionCount + ": " + actionCoverage);
 
 		} catch (Exception e) {
 			System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
@@ -451,9 +453,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// If everything works correctly will be the sequence report, if not, last correct action jacoco.exec file
 		jacocoFiles.add(lastCorrectJacocoCoverageFile);
 
-		// Create the output JaCoCo report
-		// Example: "jacoco_reports/upm_sequence_1/index.html"
-		JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		// Create the output JaCoCo report (Ex: "jacoco_reports/upm_sequence_1/report_jacoco.csv")
+		// And get a string that represents obtained coverage
+		String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		writeCoverageFile("Sequence_" + OutputStructure.sequenceInnerLoopCount + "_Total: " + sequenceCoverage);
 		
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
@@ -469,13 +472,32 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
 			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
 			
-			// Then create the report that contains the coverage of all executed sequences
-			// Example: jacoco_reports//TOTAL_MERGED//index.html
-			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+			// Then create the report that contains the coverage of all executed sequences (Ex: jacoco_reports/TOTAL_MERGED/report_jacoco.csv)
+			// And get a string that represents obtained coverage
+			String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+			writeCoverageFile("Run_Merged: " + runCoverage);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
 		}
+	}
+	
+	/**
+	 * Write the action coverage inside a coverage text file
+	 * 
+	 * @param coverageMetrics
+	 */
+	private void writeCoverageFile(String coverageInformation) {
+        try {
+            String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
+                    + OutputStructure.outerLoopName + "_coverageMetrics.txt";
+            FileWriter myWriter = new FileWriter(reportCoverageFile, true);
+            myWriter.write(coverageInformation + "\r\n");
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
+            e.printStackTrace();
+        }
 	}
 	
 	/**

@@ -168,10 +168,7 @@ public class JacocoReportReader {
 
 	        StringBuilder dataContent = new StringBuilder("");
 
-	        dataContent.append(OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname);
-	        dataContent.append(": TOTAL");
-
-	        dataContent.append(" | Missed Instructions: " + NumberFormat.getNumberInstance(Locale.US).format(INSTRUCTION_MISSED));
+	        dataContent.append("Missed Instructions: " + NumberFormat.getNumberInstance(Locale.US).format(INSTRUCTION_MISSED));
 	        dataContent.append(" of " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_INSTRUCTIONS));
 	        dataContent.append(" | Cov: " + (int)Math.round(INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS) + "%");
 

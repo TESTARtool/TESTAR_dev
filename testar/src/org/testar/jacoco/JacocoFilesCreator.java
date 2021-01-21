@@ -31,12 +31,7 @@
 package org.testar.jacoco;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.testar.OutputStructure;
 
 /**
@@ -93,7 +88,7 @@ public class JacocoFilesCreator {
 	 * @param jacocoFile
 	 * @param actionCount
 	 */
-	public static void createJacocoActionReport(String jacocoFile, String actionCount) {
+	public static String createJacocoActionReport(String jacocoFile, String actionCount) {
 		try {
 			// JaCoCo Action report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -103,10 +98,11 @@ public class JacocoFilesCreator {
 					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount
 					+ "_action_" + actionCount;
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoActionReport coverage report";
 	}
 
 	/**
@@ -114,7 +110,7 @@ public class JacocoFilesCreator {
 	 * 
 	 * @param jacocoFile
 	 */
-	public static void createJacocoSequenceReport(String jacocoFile) {
+	public static String createJacocoSequenceReport(String jacocoFile) {
 		try {
 			// JaCoCo Sequence report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -123,10 +119,11 @@ public class JacocoFilesCreator {
 					+ "_" + OutputStructure.executedSUTname
 					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoSequenceReport coverage report";
 	}
 
 	/**
@@ -134,7 +131,7 @@ public class JacocoFilesCreator {
 	 * 
 	 * @param jacocoFile
 	 */
-	public static void createJacocoMergedReport(String jacocoFile) {
+	public static String createJacocoMergedReport(String jacocoFile) {
 		try {
 			// JaCoCo Merged report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -143,10 +140,11 @@ public class JacocoFilesCreator {
 					+ "_" + OutputStructure.executedSUTname
 					+ "_TOTAL_MERGED";
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoMergedReport coverage report";
 	}
 
 	/**
@@ -156,7 +154,7 @@ public class JacocoFilesCreator {
 	 * @param jacocoFile
 	 * @param reportDir
 	 */
-	private static void createJacocoReport(String jacocoFile, String reportDir) {
+	private static String createJacocoReport(String jacocoFile, String reportDir) {
 	    try {
 	        // Using "HTML destdir" inside build.xml -> Creates the directory automatically
 	        // But using only "CSV destfile" needs to create this directory first
@@ -191,9 +189,12 @@ public class JacocoFilesCreator {
 	        
 	        String coverageInfoCSV = new JacocoReportReader(reportDir).obtainCSVSummary();
 	        System.out.println(coverageInfoCSV);
+	        return coverageInfoCSV;
 	        
 	    } catch (IOException | InterruptedException e) {
 	        e.printStackTrace();
 	    }
+	    
+	    return "ERROR creating JaCoCo coverage report";
 	}
 }
