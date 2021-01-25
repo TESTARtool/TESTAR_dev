@@ -56,7 +56,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_jedit_purerandom extends JavaSwingProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -77,6 +76,8 @@ public class Protocol_jedit_purerandom extends JavaSwingProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

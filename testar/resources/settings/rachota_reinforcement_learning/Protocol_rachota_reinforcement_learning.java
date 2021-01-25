@@ -62,7 +62,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 	
     private ActionSelector actionSelector = null;
@@ -105,6 +104,8 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

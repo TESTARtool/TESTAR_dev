@@ -51,7 +51,6 @@ import java.io.FileWriter;
  */
 public class Protocol_spaghetti_purerandom extends SpaghettiProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -77,6 +76,8 @@ public class Protocol_spaghetti_purerandom extends SpaghettiProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

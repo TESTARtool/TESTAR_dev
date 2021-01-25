@@ -54,7 +54,6 @@ import java.io.FileWriter;
  */
 public class Protocol_swingset2_statemodel extends SwingSet2Protocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -88,6 +87,8 @@ public class Protocol_swingset2_statemodel extends SwingSet2Protocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

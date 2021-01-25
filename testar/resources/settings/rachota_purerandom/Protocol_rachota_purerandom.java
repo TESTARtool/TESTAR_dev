@@ -53,7 +53,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_rachota_purerandom extends RachotaProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -82,6 +81,8 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

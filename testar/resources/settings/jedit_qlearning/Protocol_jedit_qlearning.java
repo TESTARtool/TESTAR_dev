@@ -56,7 +56,6 @@ import java.io.FileWriter;
  */
 public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 	
 	// QLearningActionSelector: Instead of random, we will use QLearning action selector
@@ -83,6 +82,8 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 	
 	/**

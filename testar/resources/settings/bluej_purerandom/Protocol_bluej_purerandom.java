@@ -59,7 +59,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_bluej_purerandom extends DesktopProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 	
 	// BlueJ: Some parts/windows of the SUT may not be interesting to explore
@@ -81,6 +80,8 @@ public class Protocol_bluej_purerandom extends DesktopProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

@@ -54,7 +54,6 @@ import java.io.FileWriter;
  */
 public class Protocol_rachota_prioritize_new_actions extends RachotaProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	// PrioritizeNewActionsSelector: Instead of random, we will prioritize new actions for action selection
@@ -86,6 +85,8 @@ public class Protocol_rachota_prioritize_new_actions extends RachotaProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**

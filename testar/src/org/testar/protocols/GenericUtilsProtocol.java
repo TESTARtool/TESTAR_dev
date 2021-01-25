@@ -388,6 +388,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
 	
+	protected long startSequenceTime;
+	protected long startRunTime;
+	
 	/**
 	 * Copy settings protocolName build.xml file to jacoco directory
 	 * Example: "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
@@ -431,7 +434,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			// Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
 			// And get a string that represents obtained coverage
 			String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
-			writeCoverageFile("Sequence_" + OutputStructure.sequenceInnerLoopCount + "_Action_" + actionCount + ": " + actionCoverage);
+			long  actionTime = System.currentTimeMillis() - startSequenceTime;
+			writeCoverageFile("Sequence | " + OutputStructure.sequenceInnerLoopCount +
+			        " | actionnr | " + actionCount +
+			        " | time | " + actionTime +
+			        " | " + actionCoverage);
 
 		} catch (Exception e) {
 			System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
@@ -456,7 +463,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// Create the output JaCoCo report (Ex: "jacoco_reports/upm_sequence_1/report_jacoco.csv")
 		// And get a string that represents obtained coverage
 		String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
-		writeCoverageFile("Sequence_" + OutputStructure.sequenceInnerLoopCount + "_Total: " + sequenceCoverage);
+		long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
+		writeCoverageFile("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+		        " | actionnr | " + actionCount +
+		        " | time | " + sequenceTime +
+		        " | " + sequenceCoverage);
 		
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
@@ -475,7 +486,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			// Then create the report that contains the coverage of all executed sequences (Ex: jacoco_reports/TOTAL_MERGED/report_jacoco.csv)
 			// And get a string that represents obtained coverage
 			String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
-			writeCoverageFile("Run_Merged: " + runCoverage);
+			long  runTime = System.currentTimeMillis() - startRunTime;
+			writeCoverageFile("RunTotal | time | " + runTime + " | " + runCoverage);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");

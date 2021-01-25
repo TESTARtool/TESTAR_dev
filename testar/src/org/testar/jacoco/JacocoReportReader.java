@@ -168,25 +168,25 @@ public class JacocoReportReader {
 
 	        StringBuilder dataContent = new StringBuilder("");
 
-	        dataContent.append("Missed Instructions: " + NumberFormat.getNumberInstance(Locale.US).format(INSTRUCTION_MISSED));
+	        dataContent.append("Missed Instructions | " + NumberFormat.getNumberInstance(Locale.US).format(INSTRUCTION_MISSED));
 	        dataContent.append(" of " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_INSTRUCTIONS));
-	        dataContent.append(" | Cov: " + (int)Math.round(INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS) + "%");
+	        dataContent.append(" | Cov | " + (int)Math.round(INSTRUCTION_COVERED * 100 / TOTAL_INSTRUCTIONS));
 
-	        dataContent.append(" | Missed Branches: " + NumberFormat.getNumberInstance(Locale.US).format(BRANCH_MISSED));
+	        dataContent.append(" | Missed Branches | " + NumberFormat.getNumberInstance(Locale.US).format(BRANCH_MISSED));
 	        dataContent.append(" of " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_BRANCH));
-	        dataContent.append(" | Cov: " + (int)Math.round(BRANCH_COVERED * 100 / TOTAL_BRANCH) + "%");
+	        dataContent.append(" | Cov | " + (int)Math.round(BRANCH_COVERED * 100 / TOTAL_BRANCH));
 	        
-	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(COMPLEXITY_MISSED));
-	        dataContent.append(" | Cxty: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_COMPLEXITY));
+	        dataContent.append(" | Missed | " + NumberFormat.getNumberInstance(Locale.US).format(COMPLEXITY_MISSED));
+	        dataContent.append(" | Cxty | " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_COMPLEXITY));
 
-	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(LINE_MISSED));
-	        dataContent.append(" | Lines: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_LINE));
+	        dataContent.append(" | Missed | " + NumberFormat.getNumberInstance(Locale.US).format(LINE_MISSED));
+	        dataContent.append(" | Lines | " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_LINE));
 
-	        dataContent.append(" | Missed: " + NumberFormat.getNumberInstance(Locale.US).format(METHOD_MISSED));
-	        dataContent.append(" | Methods: " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_METHOD));
+	        dataContent.append(" | Missed | " + NumberFormat.getNumberInstance(Locale.US).format(METHOD_MISSED));
+	        dataContent.append(" | Methods | " + NumberFormat.getNumberInstance(Locale.US).format(TOTAL_METHOD));
 
-	        dataContent.append(" | Missed: " + numberOfMissedClasses);
-	        dataContent.append(" | Classes: " + numberOfTotalClasses);
+	        dataContent.append(" | Missed | " + numberOfMissedClasses);
+	        dataContent.append(" | Classes | " + numberOfTotalClasses);
 
 	        return dataContent.toString();
 
