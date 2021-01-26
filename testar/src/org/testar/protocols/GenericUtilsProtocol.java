@@ -41,17 +41,230 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.fruit.alayer.Tags.Title;
+import static org.fruit.alayer.webdriver.enums.WdTags.*;
+import static org.fruit.alayer.webdriver.enums.WdTags.WebScrollVerticalPercent;
+import static org.fruit.alayer.webdriver.enums.WdTags.WebScrollVerticalViewSize;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
+
+
+    protected boolean randomScrollUntilWidgetTagContainingFound(Tag<?> tag, String value, State state, SUT system, int maxNumberOfScrolldowns){
+        int numberOfScrolldowns = 0;
+        while(numberOfScrolldowns<maxNumberOfScrolldowns){
+            System.out.println("DEBUG: "+numberOfScrolldowns+ " < "+maxNumberOfScrolldowns +" :: looking for "+tag+"="+value);
+            //looking for a widget with matching tag value:
+            Widget widget = getWidgetWithTagContaining(tag,value,state);
+            if(widget!=null && widget.get(WdTags.WebIsFullOnScreen).booleanValue()){
+                System.out.println("Matching widget was found on screen, executing left click action");
+//                for(Tag t:widget.tags()){
+//                    System.out.println(t.name()+" = "+widget.get(t));
+//                }
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+                System.out.println("DEBUG: executing left click on widget "+widget.get(Tags.Desc));
+                executeAction(system,state,ac.leftClickAt(widget));
+                // is waiting needed after the action has been executed?
+                return true;
+            }
+            else{
+                //slide down if possible
+                System.out.println("DEBUG: executing slide down");
+                executeRandomSlideAction(state,system);
+                state = getState(system);
+                numberOfScrolldowns++;
+            }
+        }
+        System.out.println("Matching widget was not found, "+tag.toString()+" contains " + value);
+        printTagValuesOfWidgets(tag,state);
+        return false;
+    }
+
+    protected boolean randomScrollUntilWidgetWithMatchingTagFound(Tag<?> tag, String value, State state, SUT system, int maxNumberOfScrolldowns){
+        int numberOfScrolldowns = 0;
+        while(numberOfScrolldowns<maxNumberOfScrolldowns){
+            System.out.println("DEBUG: "+numberOfScrolldowns+ " < "+maxNumberOfScrolldowns +" :: looking for "+tag+"="+value);
+            //looking for a widget with matching tag value:
+            Widget widget = getWidgetWithMatchingTag(tag,value,state);
+            if(widget!=null && widget.get(WdTags.WebIsFullOnScreen).booleanValue()){
+                System.out.println("Matching widget was found on screen, executing left click action");
+//                for(Tag t:widget.tags()){
+//                    System.out.println(t.name()+" = "+widget.get(t));
+//                }
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+                System.out.println("DEBUG: executing left click on widget "+widget.get(Tags.Desc));
+                executeAction(system,state,ac.leftClickAt(widget));
+                // is waiting needed after the action has been executed?
+                return true;
+            }
+            else{
+                //slide down if possible
+                System.out.println("DEBUG: executing slide down");
+                executeRandomSlideAction(state,system);
+                state = getState(system);
+                numberOfScrolldowns++;
+            }
+        }
+        System.out.println("Matching widget was not found, "+tag.toString()+" contains " + value);
+        printTagValuesOfWidgets(tag,state);
+        return false;
+    }
+
+    /*
+    protected Drag[] getRandomWebDriverVerticalScroll(Widget widget, double scrollArrowSize, double scrollThick) {
+        boolean hScroll = widget.get(WebHorizontallyScrollable, Boolean.FALSE);
+        boolean vScroll = widget.get(WebVerticallyScrollable, Boolean.FALSE);
+        if (!hScroll && !vScroll) {
+            return null;
+        }
+
+        Drag[] vDrags = null;
+        if (vScroll) {
+            double viewSize = widget.get(WebScrollVerticalViewSize, Double.MIN_VALUE);
+            if (viewSize > 0) {
+                double scrollPercent = widget.get(WebScrollVerticalPercent, -1.0);
+                Shape shape = widget.get(Tags.Shape, null);
+                if (shape != null) {
+                    //vDrags = getDrags(shape, false, vViewSize, vScrollPercent, scrollArrowSize, scrollThick);
+                    // system dependent
+                    double scrollableSize = (false ? shape.width() : shape.height()) - scrollArrowSize * 2;
+                    double fromX;
+                    double fromY;
+
+                    // vertical
+                        fromX = shape.x() + shape.width() - scrollThick / 2;
+                        fromY = shape.y() + scrollArrowSize +
+                                scrollableSize * scrollPercent / 100.0 +
+                                (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
+
+
+                    int dragC = (int) Math.ceil(100.0 / viewSize) - 1;
+                    if (dragC < 1) {
+                        return null;
+                    }
+                    double[] emptyDragPoints = calculateScrollDragPoints(dragC,
+                            false ? fromX - shape.x() : fromY - shape.y(),
+                            scrollableSize / (double) dragC);
+
+                    vDrags = new Drag[dragC];
+                    for (int i = 0; i < dragC; i++) {
+                        double toX = false ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fromX;
+                        double toY = false ? fromY : shape.y() + scrollArrowSize + emptyDragPoints[i];
+
+                        vDrags[i] = new Drag(fromX, fromY, toX, toY);
+                    }
+                }
+            }
+        }
+
+        return vDrags;
+    }
+*/
+
+    protected void executeRandomSlideAction(State state, SUT system){
+        Set<Action> scrollActions = new HashSet<>();
+        for(Widget widget:state){
+            Drag[] drags = null;
+            //If there are scroll (drags/drops) actions possible
+            if((drags = widget.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICK)) != null) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //For each possible drag, create an action
+                for (Drag drag : drags){
+                    //Create a slide action with the Action Compiler
+                    scrollActions.add(ac.slideFromTo(
+                            new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                            new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                            widget));
+                }
+            }
+        }
+        //executing randomly one slide action:
+        long graphTime = System.currentTimeMillis();
+        Random rnd = new Random(graphTime);
+        int randomNr = rnd.nextInt(scrollActions.size());
+        System.out.println("DEBUG: executing random drag action, "+scrollActions.size()+" scroll actions found, getting index "+randomNr);
+        //FIXME does not work as expected, takes one leap down and then clicks arrow up
+        executeAction(system,state,new ArrayList<Action>(scrollActions).get(randomNr));
+    }
+
+    protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
+    protected static double SCROLL_THICK = 16; //scroll thickness
+    protected void executeSlideDownAction(State state, SUT system){
+        for(Widget widget:state){
+            Drag[] drags = null;
+            //If there are scroll (drags/drops) actions possible
+            if((drags = widget.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICK)) != null) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //For each possible drag, create an action
+                for (Drag drag : drags){
+                    System.out.println("DEBUG: executing drag action");
+                    //Create a slide action with the Action Compiler
+                    executeAction(system,state,ac.slideFromTo(
+                            new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                            new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                            widget));
+                    // executing only 1 drag action:
+                    return;
+                }
+            }
+        }
+    }
+
+
+    protected boolean waitAndLeftClickWidgetWithTagContaining(Tag<?> tag, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+        int numberOfRetries = 0;
+        while(numberOfRetries<maxNumberOfRetries){
+            //looking for a widget with matching tag value:
+            Widget widget = getWidgetWithTagContaining(tag,value,state);
+            if(widget!=null){
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+                executeAction(system,state,ac.leftClickAt(widget));
+                // is waiting needed after the action has been executed?
+                return true;
+            }
+            else{
+                Util.pause(waitBetween);
+                state = getState(system);
+                numberOfRetries++;
+            }
+        }
+        System.out.println("Matching widget was not found, "+tag.toString()+" contains " + value);
+        printTagValuesOfWidgets(tag,state);
+        return false;
+    }
+
+    protected boolean waitAndLeftClickWidgetWithTagStartingWith(Tag<?> tag, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+        int numberOfRetries = 0;
+        while(numberOfRetries<maxNumberOfRetries){
+            //looking for a widget with matching tag value:
+            Widget widget = getWidgetWithTagStartingWith(tag,value,state);
+            if(widget!=null){
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
+                executeAction(system,state,ac.leftClickAt(widget));
+                // is waiting needed after the action has been executed?
+                return true;
+            }
+            else{
+                Util.pause(waitBetween);
+                state = getState(system);
+                numberOfRetries++;
+            }
+        }
+        System.out.println("Matching widget was not found, "+tag.toString()+" starts with " + value);
+        printTagValuesOfWidgets(tag,state);
+        return false;
+    }
+
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -178,13 +391,34 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             else if(widget.get(tag, null).toString().equals(value)){
                 return widget;
             }
-            else if(widget.get(tag, null).toString().contains(value)) {
+        }
+        return null;
+    }
+
+
+    protected Widget getWidgetWithTagContaining(Tag<?> tag, String value, State state){
+        for(Widget widget:state){
+            if(widget.get(tag, null)==null){
+                // this widget did not have a value for the given tag
+            }
+            else if(widget.get(tag, null).toString().contains(value)){
                 return widget;
             }
         }
         return null;
     }
 
+    protected Widget getWidgetWithTagStartingWith(Tag<?> tag, String value, State state){
+        for(Widget widget:state){
+            if(widget.get(tag, null)==null){
+                // this widget did not have a value for the given tag
+            }
+            else if(widget.get(tag, null).toString().startsWith(value)){
+                return widget;
+            }
+        }
+        return null;
+    }
 
     /**
      * Prints to system out all the widgets that have some value in the given tag.
