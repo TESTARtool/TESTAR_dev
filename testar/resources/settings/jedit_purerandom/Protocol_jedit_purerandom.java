@@ -323,6 +323,7 @@ public class Protocol_jedit_purerandom extends JavaSwingProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

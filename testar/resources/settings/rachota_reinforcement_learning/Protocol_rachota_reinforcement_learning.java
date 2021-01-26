@@ -335,6 +335,7 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

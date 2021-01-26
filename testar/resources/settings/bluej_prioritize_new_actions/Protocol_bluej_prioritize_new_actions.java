@@ -414,6 +414,7 @@ public class Protocol_bluej_prioritize_new_actions extends DesktopProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

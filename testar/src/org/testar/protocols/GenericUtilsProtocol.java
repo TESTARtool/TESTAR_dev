@@ -52,7 +52,14 @@ import org.testar.jacoco.MergeJacocoFiles;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -517,5 +524,87 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	 */
 	protected void compressOutputRunFolder() {
 	    Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
+	}
+	
+	/**
+	 * Obtain the IP address of the current host to create a folder inside destFolder, 
+	 * then copy all TESTAR output run results inside created folder. 
+	 * 
+	 * This is an utility method intended to copy output results inside a file server shared folder, 
+	 * used to save data of TESTAR experiments. 
+	 * 
+	 * @param destFolder
+	 */
+	protected void copyOutputToNewFolderUsingIpAddress(String destFolder) {
+	    // Obtain the ip address of the host
+	    // https://stackoverflow.com/a/38342964
+	    String ipAddress = "127.0.0.1";
+	    try(final DatagramSocket socket = new DatagramSocket()){
+	        socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+	        ipAddress = socket.getLocalAddress().getHostAddress();
+	    } catch (SocketException | UnknownHostException e) {
+	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+	        e.printStackTrace();
+	    }
+
+	    // Create a new directory inside desired destination using the ipAddress as name
+	    String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(folderIpAddress));
+	    } catch (IOException e) {
+	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+	        e.printStackTrace();
+	        return;
+	    }
+
+	    // Ignore non desired output folder
+	    List<String> ignoreFolderList =  Arrays.asList("graphs", "metrics", "Temp");
+	    // Copy all output folder that contains TESTAR run results
+	    for(File f : new File(Main.outputDir).listFiles()) {
+	        if(!ignoreFolderList.contains(f.getName())) {
+	            try {
+	                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + f.getName());
+	                if(f.isDirectory()) {
+	                    FileUtils.copyDirectory(f, fileIpAddressOutput);
+	                } else {
+	                    FileUtils.copyFile(f, fileIpAddressOutput);
+	                }
+	                System.out.println(String.format("Sucessfull copy %s to %s", f, fileIpAddressOutput));
+	            } catch (IOException e) {
+	                System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + f);
+	                e.printStackTrace();
+	            }
+	        }
+	    }
+
+	    copyCoverageMetricsToFolder(destFolder, ipAddress);
+	}
+
+	/**
+	 * Copy Coverage Metrics file inside the destination Folder. 
+	 * 
+	 * @param destFolder
+	 * @param ipAddress
+	 */
+	private void copyCoverageMetricsToFolder(String destFolder, String ipAddress) {
+	    // Create a new directory inside desired destination to store all metrics
+	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(metricsFolder));
+	    } catch (IOException e) {
+	        System.out.println("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
+	        e.printStackTrace();
+	        return;
+	    }
+
+	    File srcMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt");
+	    File destMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_coverageMetrics.txt");
+	    try {
+	        FileUtils.copyFile(srcMetrics, destMetrics);
+	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
+	    } catch (IOException e) {
+	        System.out.println("ERROR copyCoverageMetricsToFolder: trying to copy : " + destMetrics);
+	        e.printStackTrace();
+	    }
 	}
 }

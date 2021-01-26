@@ -337,6 +337,7 @@ public class Protocol_jedit_qlearning extends JavaSwingProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

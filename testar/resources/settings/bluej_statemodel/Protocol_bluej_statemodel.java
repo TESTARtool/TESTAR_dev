@@ -417,6 +417,7 @@ public class Protocol_bluej_statemodel extends DesktopProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

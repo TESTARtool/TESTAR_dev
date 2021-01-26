@@ -330,6 +330,7 @@ public class Protocol_jedit_prioritize_new_actions extends JavaSwingProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

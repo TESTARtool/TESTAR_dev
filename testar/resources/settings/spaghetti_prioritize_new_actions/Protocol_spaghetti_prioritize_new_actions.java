@@ -251,6 +251,7 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

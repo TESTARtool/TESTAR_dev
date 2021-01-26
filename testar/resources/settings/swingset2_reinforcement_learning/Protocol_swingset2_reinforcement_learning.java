@@ -278,6 +278,7 @@ public class Protocol_swingset2_reinforcement_learning extends SwingSet2Protocol
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

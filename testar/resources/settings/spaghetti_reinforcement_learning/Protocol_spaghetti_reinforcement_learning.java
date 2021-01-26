@@ -273,6 +273,7 @@ public class Protocol_spaghetti_reinforcement_learning extends SpaghettiProtocol
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }
