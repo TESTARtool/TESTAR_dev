@@ -1,6 +1,8 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
 import com.google.common.collect.Iterators;
+
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
@@ -13,56 +15,15 @@ import java.util.Set;
 
 public class BorjaReward3 implements RewardFunction{
 
-    private float numWidgetsBefore;
-    private State previousState=null;
-
     @Override
     public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction executedAction, Set<Action> actions) {
-        System.out.println("Calculating reward");
-        float numWidgetsNow = Iterators.size(state.iterator());
-        System.out.println("numWidgetsNow ---> " + Float.toString(numWidgetsNow));
-        float rewards = 0f;
-        float persistentDecrement = getPersistentDecrement(state);
-        System.out.println("persistentDecrement ---> " + Float.toString(persistentDecrement));
-        System.out.println("numWidgetsBefore ---> " + Float.toString(numWidgetsBefore));
-        if (numWidgetsBefore>0f){
-
-            if(numWidgetsBefore < numWidgetsNow) {
-                rewards = persistentDecrement - ((numWidgetsNow - numWidgetsBefore) / numWidgetsBefore);
-            }
-            else if(numWidgetsBefore > numWidgetsNow) {
-                rewards = persistentDecrement + (numWidgetsNow / numWidgetsBefore);
-            }
-            else{
-                rewards = persistentDecrement;
-            }
-        }
-        System.out.println("rewards ---> " + Float.toString(rewards));
-        numWidgetsBefore = numWidgetsNow;
-        previousState = state;
-        return rewards;
-    }
-    
-    private float getPersistentDecrement(State state) {
-        int persistentWidgetNum = 0;
-
-        for(Widget w : state) {
-            String wID = w.get(Tags.AbstractIDCustom);
-//            if(lastStateWIDList.contains(wID)) {
-            if(previousState == null){
-                persistentWidgetNum++;
-            }
-            else {
-                for (Widget pw : previousState) {
-                    if (w.get(Tags.AbstractIDCustom).equals(pw.get(Tags.AbstractIDCustom)))
-                        persistentWidgetNum++;
-                    break;
-                }
-            }
-//            }
-        }
-
-        float persistentDecrement = persistentWidgetNum * 0.01f;
-        return persistentDecrement;
+        float totalReward = 0f;
+		
+		if(executedAction.getAttributes().get(RLTags.QBorja, 0.0) == 0.0) {
+			executedAction.addAttribute(RLTags.QBorja, 1.0);
+		}
+        
+        totalReward += executedAction.getAttributes().get(RLTags.QBorja, 0.0);
+        return totalReward;
     }
 }
