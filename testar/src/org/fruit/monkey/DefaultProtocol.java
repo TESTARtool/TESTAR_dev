@@ -98,6 +98,7 @@ import org.openqa.selenium.SessionNotCreatedException;
 
 import org.testar.HttpReportServer;
 import org.testar.OutputStructure;
+import org.testar.pkm.PkmRequest;
 
 import com.orientechnologies.orient.core.exception.ODatabaseException;
 import com.orientechnologies.orient.core.exception.OSecurityAccessException;
@@ -230,6 +231,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = null;
 		
 		decoderExceptionThrown = false;
+		
+		// If not valid user or project, don't initialize TESTAR
+		if(!PkmRequest.validDecoderUserProject(settings)) {
+		    this.mode = Modes.Quit;
+		    decoderExceptionThrown = true;
+		    return;
+		}
 
 		try {
 			//initialize TESTAR with the given settings:

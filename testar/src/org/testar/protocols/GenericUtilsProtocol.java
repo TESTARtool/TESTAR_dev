@@ -46,16 +46,14 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.TimeOutException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.json.object.StateModelDifferenceJsonObject;
+import org.testar.pkm.PkmRequest;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -426,108 +424,50 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
     
     /**
-     * Execute a CURL command to interact with PKM.
+     * Insert TestResults Artefact in the PKM and return the ArtefactId. 
      * 
-     * @param command
+     * @param artefactTestResults
+     * @return artefactId
      */
-    protected String executeCURLCommandPKM(String command) {
+    protected String insertTestResultsPKM(String artefactTestResults) {
     	// TODO: Allow Record mode when Listening mode implemented
     	if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
-
-    		try {
-    			System.out.println("Executing PKM-API command: " + command);
-
-    			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
-    			Process p = builder.start();
-
-    			BufferedReader stdInput = new BufferedReader(new 
-    					InputStreamReader(p.getInputStream()));
-
-    			BufferedReader stdError = new BufferedReader(new 
-    					InputStreamReader(p.getErrorStream()));
-
-    			// read the output from the command
-    			System.out.println(" ? Standard output ? :\n");
-    			StringBuilder outputContent = new StringBuilder("");
-    			String s = null;
-    			while ((s = stdInput.readLine()) != null) {
-    				System.out.println(s);
-    				outputContent.append(s);
-    			}
-
-    			// read any errors from the attempted command
-    			System.out.println(" ? Standard error ? :\n");
-    			StringBuilder errorContent = new StringBuilder("");
-    			while ((s = stdError.readLine()) != null) {
-    				System.out.println(s);
-    				errorContent.append(s);
-    			}
-    			
-    			// curl command has no errors check if we are executing test_results or state_model 
-    			if(command.contains("test_results")) {
-    				return substringArtefactId(outputContent.toString(), "TESTARTestResults artefactId\":\"");
-    			}
-    			else if (command.contains("state_model")) {
-    				return substringArtefactId(outputContent.toString(), "TESTARStateModels artefactId\":\"");
-    			}
-    			// ErrorBuffer contains errors after execute curl command
-    			else if(errorContent.toString().contains("curl")) {
-    				decoderExceptionThrown = true;
-    				String msg = curlInsertArtefactError(command);
-    				msg = msg.concat(errorContent.toString());
-    				throw new TimeOutException(msg);
-    			}
-    			// Something strange happen, this command seems not correct
-    			else {
-    				decoderExceptionThrown = true;
-    				throw new TimeOutException(curlInsertArtefactError(command));
-    			}
-
-    		} catch (IOException e) {
-    			System.err.println("ERROR! : Trying to execute CURL command : " + command);
-    			e.printStackTrace();
-    		} catch (TimeOutException toe) {
-    			System.err.println(toe.getMessage());
-    		}
+    	    
+    	    String artefactIdTestResults = PkmRequest.postArtefactTestResults(settings, artefactTestResults);
+    	    
+    	    if(artefactIdTestResults != "TestResultsErrorArtefactId") {
+    	        return artefactIdTestResults;
+    	    }
+    	    
+    	    decoderExceptionThrown = true;
+    	    System.err.println("ERROR! Trying to Insert TestResults Artefact");
     	}
     	
-    	return "ErrorArtefactId";
+    	return "TestResultsErrorArtefactId";
     }
     
-	/**
-	 * With the TESTAR output message, obtain the Artefact Identifier of desired Artefact Name.
-	 * 
-	 * @param executionOutput
-	 * @param find
-	 * @return artefactId
-	 */
-	private String substringArtefactId(String executionOutput, String find) {
-		String artefactId = "ERROR";
-		
-		try {
-			String pkmOutputInfo = executionOutput.substring(executionOutput.indexOf(find) + find.length());
-			artefactId = StringUtils.split(pkmOutputInfo, " ")[0];
-			artefactId = artefactId.replace("\"}","").replace("\n", "").replace("\r", "");
-			artefactId = artefactId.trim();
-		} catch(Exception e) {
-			System.err.println("ERROR! : Trying to obtain : " + find);
-		}
-		
-		return artefactId;
-	}
-	
-	/**
-	 * Custom error message if curl failed trying to insert some Artefact.
-	 */
-	private String curlInsertArtefactError(String command) {
-		if(command.contains("test_results")) {
-			return "ERROR! Trying to Insert TestResults Artefact using curl. ";
-		}
-		if (command.contains("state_model")) {
-			return "ERROR! Trying to Insert StateModel Artefact using curl. ";
-		}
-		return "Unknown ERROR! Trying to Insert Artefact using curl. ";
-	}
+    /**
+     * Insert StateModel Artefact in the PKM and return the ArtefactId. 
+     * 
+     * @param artefactStateModel
+     * @return artefactId
+     */
+    protected String insertStateModelPKM(String artefactStateModel) {
+        // TODO: Allow Record mode when Listening mode implemented
+        if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
+            
+            String artefactIdStateModel = PkmRequest.postArtefactStateModel(settings, artefactStateModel);
+            
+            if(artefactIdStateModel != "StateModelErrorArtefactId") {
+                return artefactIdStateModel;
+            }
+            
+            decoderExceptionThrown = true;
+            System.err.println("ERROR! Trying to Insert StateModel Artefact");
+        }
+        
+        return "StateModelErrorArtefactId";
+    }
 	
     /**
      * DECODER needs a Map to have a relation between the TESTAR TestResults output results 

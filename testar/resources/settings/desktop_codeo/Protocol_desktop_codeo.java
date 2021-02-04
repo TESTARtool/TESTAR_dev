@@ -402,23 +402,16 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 
-		// Prepare CURL command based on PKM-API Test Results Artifact
-		String commandTestResults = prepareTestResultNodeCommand();
+        // Execute the POST request to insert and obtain the TestResults ArtefactId
+        String artefactIdTestResults = insertTestResultsPKM(testResultsArtefactDirectory);
 
-		// Execute the CURL command and obtain the TestResults ArtefactId
-		String artefactIdTestResults = executeCURLCommandPKM(commandTestResults);
+        if(settings.get(ConfigTags.StateModelEnabled, false)) {
+            // Execute the POST request to insert and obtain the StateModels ArtefactId
+            insertStateModelPKM(stateModelArtefactDirectory);
+        }
 
-		if(settings.get(ConfigTags.StateModelEnabled, false)) {
-
-			// Prepare CURL command based on PKM-API State Model Artifact
-			String commandStateModel = prepareStateModelNodeCommand();
-
-			// Execute the CURL command and obtain the StateModels ArtefactId
-			executeCURLCommandPKM(commandStateModel);
-		}
-
-		// Update TESTAR output run folder with artefact id to use the HttpReportServer web service
-		updateOutputRunFolder(artefactIdTestResults);
+        // Update TESTAR output run folder with artefact id to use the HttpReportServer web service
+        updateOutputRunFolder(artefactIdTestResults);
 	}
 
 }

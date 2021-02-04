@@ -299,19 +299,12 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 	protected void closeTestSession() {
 		super.closeTestSession();
 
-		// Prepare CURL command based on PKM-API Test Results Artifact
-		String commandTestResults = prepareTestResultNodeCommand();
-
-		// Execute the CURL command and obtain the TestResults ArtefactId
-		String artefactIdTestResults = executeCURLCommandPKM(commandTestResults);
+		// Execute the POST request to insert and obtain the TestResults ArtefactId
+		String artefactIdTestResults = insertTestResultsPKM(testResultsArtefactDirectory);
 
 		if(settings.get(ConfigTags.StateModelEnabled, false)) {
-
-			// Prepare CURL command based on PKM-API State Model Artifact
-			String commandStateModel = prepareStateModelNodeCommand();
-
-			// Execute the CURL command and obtain the StateModels ArtefactId
-			executeCURLCommandPKM(commandStateModel);
+			// Execute the POST request to insert and obtain the StateModels ArtefactId
+			insertStateModelPKM(stateModelArtefactDirectory);
 		}
 
 		// Update TESTAR output run folder with artefact id to use the HttpReportServer web service
