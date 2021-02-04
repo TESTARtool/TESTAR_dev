@@ -478,17 +478,27 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      */
     protected void updateOutputRunFolder(String artefactIdTestResults) {
 
-    	// If we are not in Generate Mode we do not want to move the output folder
-    	if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
-    		return;
-    	}
-    	try {
-    		File artefactOutputFolder = new File(Main.testarDir + artefactIdTestResults + File.separator + "output" + File.separator);
-    		File outputRunFile = new File(OutputStructure.outerLoopOutputDir);
-    		FileUtils.moveDirectory(outputRunFile, artefactOutputFolder);
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    		System.err.println("ERROR moving OutputRunFolder with ArtefactId");
-    	}
+        // If we are not in Generate Mode we do not want to move the output folder
+        if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
+            return;
+        }
+        try {
+            File artefactOutputFolder = new File(Main.testarDir + artefactIdTestResults + File.separator + "output" + File.separator);
+            File outputRunFile = new File(OutputStructure.outerLoopOutputDir);
+            FileUtils.moveDirectory(outputRunFile, artefactOutputFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR moving OutputRunFolder with ArtefactId");
+        }
+
+        // If permanent JettyServer exists, copy the folder inside resources directory
+        try {
+            String jettyPath = "JettyServer" + File.separator + "bin" + File.separator + "resources" + File.separator;
+            if(new File(Main.testarDir + jettyPath).exists()) {
+                FileUtils.copyDirectory(new File(Main.testarDir + artefactIdTestResults), new File(Main.testarDir + jettyPath + File.separator + artefactIdTestResults + File.separator));
+            }
+        } catch(Exception e) {
+            System.out.println("ERROR preparing JettyServer resources folder");
+        }
     }
 }
