@@ -1,3 +1,7 @@
+plugins {
+    id "de.undercouch.download" version "4.1.1"
+}
+
 apply plugin: 'application'
 
 sourceSets {
@@ -289,6 +293,49 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
             // kill notepad process
             ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_WINDOW_TITLE")
+        }
+    }
+}
+
+// Download last win32 chromedriver 
+task downloadChromedriver(type: Download, dependsOn: installDist) {
+    group = 'test_testar_workflow'
+    description ='downloadChromedriver'
+    
+    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
+    Process process = builder.start();
+    process.waitFor()
+    
+    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
+    dest 'target/install/testar/bin'
+    overwrite false
+}
+
+// Extract Chromedriver from downloaded file
+task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
+    group = 'test_testar_workflow'
+    description ='downloadAndUnzipChromedriver'
+    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
+    into downloadChromedriver.dest
+}
+
+// Verify that TESTAR correctly executes chromedriver
+// To be sure, connect to ou.nl and detect Onderwijs suspicious title
+task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic ApplicationName="webdriver_and_suspicious" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Onderwijs
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
     }
 }

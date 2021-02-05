@@ -13,6 +13,7 @@ jobs:
   test:
 
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - uses: actions/checkout@v2
@@ -54,3 +55,10 @@ jobs:
       with:
         name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
+    - name: Run webdriver protocol and detect SuspiciousTitle
+      run: ./gradlew runTestWebdriverSuspiciousTitle
+    - name: Save runTestWebdriverSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
