@@ -41,6 +41,9 @@ public class WdActionRoles {
 	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
 	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
 	SubmitScript = Role.from("SubmitScript", ExecuteScript),
-	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript);
+	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
+	RemoteAction = Role.from("RemoteAction", ActionRoles.Action),
+	RemoteClick = Role.from("RemoteClick", WdActionRoles.RemoteAction),
+	RemoteType = Role.from("RemoteType", WdActionRoles.RemoteAction);
 	
 }

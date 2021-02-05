@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -226,7 +226,6 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					actions.add(new WdRemoteTypeAction((WdWidget)widget, getRandomText(widget)));
-					//actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
@@ -238,7 +237,6 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
 						actions.add(new WdRemoteClickAction((WdWidget)widget));
-						//actions.add(ac.leftClickAt(widget));
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -301,6 +299,14 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 		}
 
 		return false;
+	}
+	
+	/**
+	 * Instead of use leftClickAt Windows level Action, use WdRemoteClickAction. 
+	 */
+	@Override
+	protected Action clickForcedPopupWidget(StdActionCompiler ac, Widget widget) {
+	    return new WdRemoteClickAction((WdWidget)widget);
 	}
 
 	/**
