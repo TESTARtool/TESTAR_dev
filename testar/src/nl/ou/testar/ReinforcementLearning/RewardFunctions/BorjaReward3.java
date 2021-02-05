@@ -14,16 +14,61 @@ import org.fruit.alayer.Widget;
 import java.util.Set;
 
 public class BorjaReward3 implements RewardFunction{
+    
+    private State previousState;
 
     @Override
     public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction executedAction, Set<Action> actions) {
-        float totalReward = 0f;
-		
-		if(executedAction.getAttributes().get(RLTags.QBorja, 0.0) == 0.0) {
-			executedAction.addAttribute(RLTags.QBorja, 1.0);
+        float reward = 0f;
+        int numWidgetsNow = getLeafWidgetsNum(currentAbstractState);
+		int numWidgetsBefore = getLeafWidgetsNum(previousState);
+				
+		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
+		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
+
+        if(numWidgetsBefore > 0) {
+			double persistentDecrement = getPersistentDecrement(currentAbstractState);
+			double numWidgetsBeforeDouble = numWidgetsBefore;
+			double numWidgetsNowDouble = numWidgetsNow;
+				
+			if(numWidgetsBefore < numWidgetsNow) {
+				reward = (float)((- persistentDecrement) + ((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble));
+			} else if(numWidgetsBefore > numWidgetsNow) {
+				reward = (float)((- persistentDecrement) - (numWidgetsNowDouble / numWidgetsBeforeDouble));
+			} else {
+			    reward = (float)(- persistentDecrement);
+			}
+
+            reward -= (0.01 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
 		}
         
-        totalReward += executedAction.getAttributes().get(RLTags.QBorja, 0.0);
-        return totalReward;
+        previousState = currentAbstractState;
+
+        return reward;
     }
+
+    private int getLeafWidgetsNum(State givenState) {
+		Set<AbstractAction> actions = givenState.getActions();
+		return actions.size();
+	}
+
+    private double getPersistentDecrement(State givenState) {
+		int persistentWidgetNum = 0;
+
+		Set<AbstractAction> actions = givenState.getActions();
+		Set<AbstractAction> prevActions = previousState.getActions();
+
+		for(Action currAct : actions) {
+			String currActID = currAct.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+
+			for(Action prevAct : prevActions) {
+				String prevActID = prevAct.get(Tags.OriginWidget).get(Tags.AbstractIDCustom);
+	
+				if(currActID == prevActID) persistentWidgetNum ++;
+			}
+		}
+
+		double persistentDecrement = persistentWidgetNum * 0.01;
+		return persistentDecrement;
+	}
 }
