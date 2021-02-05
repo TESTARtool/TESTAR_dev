@@ -31,6 +31,8 @@
 
 import java.util.Set;
 
+import nl.ou.testar.DerivedActions;
+import nl.ou.testar.SutVisualization;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -144,18 +146,22 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		// top level widgets of the GUI:
+		DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
-		if(actions.isEmpty()){
+		if(derived.getAvailableActions().isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+			derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
 		}
+
+		Set<Action> filteredActions = derived.getFilteredActions();
+		actions = derived.getAvailableActions();
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		//return the set of derived actions
 		return actions;
