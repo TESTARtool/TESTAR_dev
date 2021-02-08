@@ -32,6 +32,7 @@ import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import org.apache.commons.io.FileUtils;
+import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -82,7 +83,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         // Define a whitelist of allowed domains for links and pages
         // An empty list will be filled with the domain from the sut connector
         // Set to null to ignore this feature
-        domainsAllowed = Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+        domainsAllowed = Arrays.asList("mijn.awo.ou.nl", "login.awo.ou.nl");
 
         // If true, follow links opened in new tabs
         // If false, stay with the original (ignore links opened in new tabs)
@@ -110,17 +111,20 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         WdDriver.forceActivateTab = true;
     }
 
-    /**
-     * This method is used by TESTAR to determine the set of currently available actions.
-     * You can use the SUT's current state, analyze the widgets and their properties to create
-     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-     * will stop generation of the current action and continue with the next one.
-     *
-     * @param system the SUT
-     * @param state  the SUT's current state
-     * @return a set of actions
-     */
+    @Override
+    protected SUT startSystem() throws SystemStartException {
+        // We want to test WebdriverProtocol.ensureDomainsAllowed
+        // Then we don't include ou.nl domain by default
+        Assert.collectionNotContains(domainsAllowed, "www.ou.nl");
+        
+        SUT sut = super.startSystem();
+        
+        // Check if WebdriverProtocol.ensureDomainsAllowed feature works
+        Assert.collectionContains(domainsAllowed, "www.ou.nl");
+        
+        return sut;
+    }
+
     @Override
     protected Set<Action> deriveActions(SUT system, State state)
             throws ActionBuildException {
