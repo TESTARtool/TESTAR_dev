@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -413,6 +413,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     			stateModelDifferenceJsonObject.setNumberDisappearedAbstractStates(modelDifferenceManager.getNumberDisappearedAbstractStates());
     			stateModelDifferenceJsonObject.setNumberNewAbstractStates(modelDifferenceManager.getNumberNewAbstractStates());
     			stateModelDifferenceJsonObject.setStateModelDifferenceReport(dirName);
+    			stateModelDifferenceJsonObject.setSpecificWidgetTreeDifference(modelDifferenceManager.getSpecificWidgetTreeDifference());
 
     		} catch (Exception e) {
     			System.err.println("ERROR: Trying to create an automatic State Model Difference");

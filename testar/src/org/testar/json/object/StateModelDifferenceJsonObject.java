@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,11 @@
 
 package org.testar.json.object;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.fruit.Pair;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class StateModelDifferenceJsonObject {
@@ -40,6 +45,7 @@ public class StateModelDifferenceJsonObject {
 	int numberDisappearedAbstractStates;
 	int numberNewAbstractStates;
 	String stateModelDifferenceReport;
+	List<Pair<String, List<String>>> specificWidgetTreeDifference;
 
 	@JsonCreator
 	public StateModelDifferenceJsonObject() {
@@ -50,6 +56,7 @@ public class StateModelDifferenceJsonObject {
 		this.numberDisappearedAbstractStates = -1;
 		this.numberNewAbstractStates = -1;
 		this.stateModelDifferenceReport = "Previous State Model doesn't exist";
+		this.specificWidgetTreeDifference = Arrays.asList(new Pair<>("No specific widgetTreeDifference information", Arrays.asList("")));
 	}
 	
 	public void setPreviousStateModelAppName(String previousStateModelAppName) {
@@ -78,6 +85,10 @@ public class StateModelDifferenceJsonObject {
 
 	public String getStateModelDifferenceReport() {
 		return stateModelDifferenceReport;
+	}
+
+	public void setSpecificWidgetTreeDifference(List<Pair<String, List<String>>> widgetTreeDifference) {
+	    this.specificWidgetTreeDifference = widgetTreeDifference;
 	}
 
 }
