@@ -556,25 +556,33 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        e.printStackTrace();
 	        return;
 	    }
-
-	    // Ignore non desired output folder
-	    List<String> ignoreFolderList =  Arrays.asList("graphs", "metrics", "Temp");
-	    // Copy all output folder that contains TESTAR run results
-	    for(File f : new File(Main.outputDir).listFiles()) {
-	        if(!ignoreFolderList.contains(f.getName())) {
-	            try {
-	                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + f.getName());
-	                if(f.isDirectory()) {
-	                    FileUtils.copyDirectory(f, fileIpAddressOutput);
-	                } else {
-	                    FileUtils.copyFile(f, fileIpAddressOutput);
-	                }
-	                System.out.println(String.format("Sucessfull copy %s to %s", f, fileIpAddressOutput));
-	            } catch (IOException e) {
-	                System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + f);
-	                e.printStackTrace();
+	    
+	    // Copy run output folder to desired ip address output folder
+	    File outputFolder = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName);
+	    try {
+	        if(outputFolder.exists()) {
+	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFolder.getName());
+	            if(outputFolder.isDirectory()) {
+	                FileUtils.copyDirectory(outputFolder, fileIpAddressOutput);
 	            }
+	            System.out.println(String.format("Sucessfull copy %s to %s", outputFolder, fileIpAddressOutput));
 	        }
+	    } catch (IOException e) {
+	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + outputFolder);
+	        e.printStackTrace();
+	    }
+
+	    // Copy run zip file to desired ip address output folder
+	    File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
+	    try {
+	        if(outputZipFile.exists()) {
+	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputZipFile.getName());
+	            FileUtils.copyFile(outputZipFile, fileIpAddressOutput);
+	            System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
+	        }
+	    } catch (IOException e) {
+	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + outputZipFile);
+	        e.printStackTrace();
 	    }
 
 	    copyCoverageMetricsToFolder(destFolder, ipAddress);
