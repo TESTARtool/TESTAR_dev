@@ -136,7 +136,7 @@ public class Protocol_webdriver_sok extends WebdriverProtocol {
 
         // update the state after clicking:
         state = getState(system);
-
+/*
         waitAndLeftClickWidgetWithTagContaining(WdTags.WebName, "svenska", state, system, 5, 1.0);
 
         // update the state after clicking:
@@ -153,7 +153,7 @@ public class Protocol_webdriver_sok extends WebdriverProtocol {
 		state = getState(system);
 
 		randomScrollUntilWidgetTagContainingFound(WdTags.WebName, "Tankningsbonus", state, system, 20);
-
+*/
 	    super.beginSequence(system, state);
 	}
 
@@ -230,6 +230,18 @@ public class Protocol_webdriver_sok extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+
+			//application specific filtering:
+			// skip "Edut":
+			if(widget.get(WdTags.WebHref).contains("edut")){
+				if(isTypeable(widget)){
+					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				} else {
+					filteredActions.add(ac.leftClickAt(widget));
+				}
+				continue;
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
