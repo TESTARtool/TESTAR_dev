@@ -40,7 +40,11 @@ import org.fruit.alayer.Verdict;
 import org.testar.OutputStructure;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
 public class HtmlSequenceReport {
@@ -67,16 +71,40 @@ public class HtmlSequenceReport {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
-            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
-            		+ REPORT_FILENAME_AFT;
-            
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
-            for(String s:HEADER){
-                write(s);
-            }
-            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceInnerLoopCount+"</h1>");
+
+            //File htmlReport = new File();
+            //driver = new HtmlUnitDriver();
+
+            String reportPath = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+                    + REPORT_FILENAME_AFT;
+
+            //out = new PrintWriter(reportPath, HTMLReporter.CHARSET);
+
+            writeResults();
+
+
+//            for(String s:HEADER){
+//                write(s);
+//            }
+//            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceInnerLoopCount+"</h1>");
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeResults() {
+        try {
+            String reportInput = new String(Files.readAllBytes(Paths.get("C:\\Users\\Younes\\IdeaProjects\\TESTAR_dev\\testar\\src\\nl\\ou\\testar\\HtmlReporting\\TestarReport\\report.html")));
+            reportInput = reportInput.replace("#[issues]", "Numerous issues");
+            reportInput = reportInput.replace("#[verdict]", "Dong");
+
+            String reportPath = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+                    + REPORT_FILENAME_AFT;
+
+            Files.write(Paths.get(reportPath), reportInput.getBytes(), StandardOpenOption.CREATE);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
