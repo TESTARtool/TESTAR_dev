@@ -1,7 +1,7 @@
 /**
  * 
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,23 +34,17 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
-
 
 public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 
@@ -125,23 +119,6 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 		
 		// Set desired License
 		licenseSUT = new MyThaiStarLicense();
-	}
-	
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
 	}
 
 	/**
@@ -289,26 +266,6 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 			retAction = super.selectAction(state, actions);
 		}
 		return retAction;
-	}
-	
-	/**
-	 * All TESTAR test sequence sessions are closed (State Model + OrientDB included)
-	 * We can start other connection to create State Model Difference Report
-	 */
-	@Override
-	protected void closeTestSession() {
-		super.closeTestSession();
-
-		// Execute the POST request to insert and obtain the TestResults ArtefactId
-		String artefactIdTestResults = insertTestResultsPKM(testResultsArtefactDirectory);
-
-		if(settings.get(ConfigTags.StateModelEnabled, false)) {
-			// Execute the POST request to insert and obtain the StateModels ArtefactId
-			insertStateModelPKM(stateModelArtefactDirectory);
-		}
-
-		// Update TESTAR output run folder with artefact id to use the HttpReportServer web service
-		updateOutputRunFolder(artefactIdTestResults);
 	}
 
 	//Method to customize login action

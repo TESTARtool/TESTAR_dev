@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,22 +32,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
-import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.AWTKeyboard;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 import org.testar.jacoco.JacocoReportReader;
@@ -392,26 +385,6 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 		if(new File("jacoco.exec").exists()) {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
-	}
-	
-	/**
-	 * All TESTAR test sequence sessions are closed (State Model + OrientDB included)
-	 * We can start other connection to create State Model Difference Report
-	 */
-	@Override
-	protected void closeTestSession() {
-		super.closeTestSession();
-
-        // Execute the POST request to insert and obtain the TestResults ArtefactId
-        String artefactIdTestResults = insertTestResultsPKM(testResultsArtefactDirectory);
-
-        if(settings.get(ConfigTags.StateModelEnabled, false)) {
-            // Execute the POST request to insert and obtain the StateModels ArtefactId
-            insertStateModelPKM(stateModelArtefactDirectory);
-        }
-
-        // Update TESTAR output run folder with artefact id to use the HttpReportServer web service
-        updateOutputRunFolder(artefactIdTestResults);
 	}
 
 }

@@ -98,6 +98,7 @@ import org.openqa.selenium.SessionNotCreatedException;
 
 import org.testar.HttpReportServer;
 import org.testar.OutputStructure;
+import org.testar.json.JsonArtefactLogs;
 import org.testar.pkm.PkmRequest;
 
 import com.orientechnologies.orient.core.exception.ODatabaseException;
@@ -231,12 +232,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = null;
 		
 		decoderExceptionThrown = false;
+		JsonArtefactLogs.setStartRunningTime(new java.util.Date().toString());
+		JsonArtefactLogs.addMessage("Starting TESTAR tool process");
 		
 		// If not valid user or project, don't initialize TESTAR
 		if(!PkmRequest.validDecoderUserProject(settings)) {
 		    this.mode = Modes.Quit;
 		    decoderExceptionThrown = true;
+
+		    JsonArtefactLogs.addWarning("Error trying to verify user key or not found project in the database");
+		    finishAndPostLogArtefact();
+		    
 		    return;
+		} else {
+		    JsonArtefactLogs.addMessage("Valid user key and valid project");
 		}
 
 		try {
@@ -254,6 +263,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			this.mode = Modes.Quit;
 			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
 			return;
 			
 		} catch (OSecurityAccessException osae) {
@@ -267,6 +280,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			this.mode = Modes.Quit;
 			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
 			return;
 			
 		} catch (IllegalArgumentException iae) {
@@ -278,6 +295,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			this.mode = Modes.Quit;
 			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
 			return;
 		}
 
@@ -335,6 +356,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			decoderExceptionThrown = true;
 			this.mode = Modes.Quit;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
 			
 		} catch(SessionNotCreatedException e) {
 			
@@ -351,6 +375,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			
     			System.err.println(msg);
     			System.err.println(e.getMessage());
+    			
+    			decoderExceptionThrown = true;
+
+    			JsonArtefactLogs.addWarning(msg);
+    			finishAndPostLogArtefact();
     			
     		} else {
     			System.err.println("********** ERROR starting Selenium WebDriver ********");
@@ -369,6 +398,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				popupMessage(msg);
 
 				System.err.println(msg);
+				
+				decoderExceptionThrown = true;
+
+				JsonArtefactLogs.addWarning(msg);
+				finishAndPostLogArtefact();
 			
 			}else {
 				e.printStackTrace();
@@ -380,12 +414,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			e.printStackTrace();
 			this.mode = Modes.Quit;
 			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(e.getMessage());
+			finishAndPostLogArtefact();
 		}
 
 		//allowing close-up in the end of test session:
 		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
+		
+		JsonArtefactLogs.addMessage("TESTAR executed correctly");
+		finishAndPostLogArtefact();
+	}
+
+	private void finishAndPostLogArtefact() {
+	    JsonArtefactLogs.setEndRunningTime(new java.util.Date().toString());
+	    if(decoderExceptionThrown) {JsonArtefactLogs.setStatus(false);}
+	    String artefactLog = JsonArtefactLogs.generateLogsArtefact();
+	    PkmRequest.postArtefactLogs(settings, artefactLog);
 	}
 
 	/**

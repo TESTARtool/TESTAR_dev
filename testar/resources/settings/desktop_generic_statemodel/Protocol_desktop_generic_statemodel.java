@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,21 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
-
-import es.upv.staq.testar.NativeLinker;
 
 /**
  * This is a small change to Desktop Generic Protocol to use the learned state model for
@@ -268,17 +260,6 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
-
-        // Execute the POST request to insert and obtain the TestResults ArtefactId
-        String artefactIdTestResults = insertTestResultsPKM(testResultsArtefactDirectory);
-
-        if(settings.get(ConfigTags.StateModelEnabled, false)) {
-            // Execute the POST request to insert and obtain the StateModels ArtefactId
-            insertStateModelPKM(stateModelArtefactDirectory);
-        }
-
-        // Update TESTAR output run folder with artefact id to use the HttpReportServer web service
-        updateOutputRunFolder(artefactIdTestResults);
 	}
 
 }

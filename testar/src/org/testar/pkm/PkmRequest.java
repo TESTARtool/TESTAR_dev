@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.json.JsonArtefactLogs;
 
 public class PkmRequest {
 
@@ -132,6 +133,7 @@ public class PkmRequest {
                     }
                     // This print is used by the API to return the artefact value
                     System.out.println(response.toString());
+                    JsonArtefactLogs.addMessage("TESTAR TestResults inserted: " + response.toString());
                     return substringArtefactId(response.toString(), "TESTARTestResults artefactId\":\"");
                 }
             }
@@ -184,6 +186,7 @@ public class PkmRequest {
                     }
                     // This print is used by the API to return the artefact value
                     System.out.println(response.toString());
+                    JsonArtefactLogs.addMessage("TESTAR StateModel inserted: " + response.toString());
                     return substringArtefactId(response.toString(), "TESTARStateModels artefactId\":\"");
                 }
             }
@@ -216,6 +219,55 @@ public class PkmRequest {
         }
 
         return artefactId;
+    }
+    
+    /**
+     * Insert the Artefact Log inside the PKM. 
+     * POST http://10.101.0.224:8080/log/myproject
+     * 
+     * @param settings
+     * @param artefactLog
+     * @return
+     */
+    public static void postArtefactLogs(Settings settings, String artefactLog) {
+        String pkm = "http://" + settings.get(ConfigTags.PKMaddress) + ":" + settings.get(ConfigTags.PKMport) + "/log/" + settings.get(ConfigTags.PKMdatabase);
+
+        try {
+            URL url = new URL(pkm);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("key", settings.get(ConfigTags.PKMkey));
+            con.setRequestProperty("Content-Type", "application/json");
+
+            // Extract json data from the State Model Artefact
+            String jsonInputString = FileUtils.readFileToString(new File(artefactLog), StandardCharsets.UTF_8);
+
+            con.setDoOutput(true);
+            try(OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);           
+            }
+
+            con.connect();
+
+            int status = con.getResponseCode();
+
+            if(status == 200) {
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    return;
+                }
+            }
+
+            con.disconnect();
+        } catch (NoSuchTagException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

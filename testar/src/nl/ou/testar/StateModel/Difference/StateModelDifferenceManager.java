@@ -43,6 +43,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.webdriver.enums.WdMapping;
 import org.fruit.alayer.windows.UIAMapping;
 import org.fruit.monkey.Main;
+import org.testar.json.JsonArtefactLogs;
 
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
@@ -285,6 +286,7 @@ public class StateModelDifferenceManager {
 			System.out.println("Model One: " + abstractAttributesModelOne);
 			System.out.println("Model Two: " + abstractAttributesModelTwo);
 			System.out.println("\n ************************************************************************************ \n");
+			JsonArtefactLogs.addWarning("State Model Difference: We don't have two models to compare or Abstract Attributes are different");
 			return false;
 		} else {
 			// Update Set object "abstractAttributesTags" with the Tags
