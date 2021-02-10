@@ -90,9 +90,6 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
     public void run(SUT system, State state, double duration) throws ActionFailedException {
         try {
             RemoteWebElement remoteElement = widget.element.remoteWebElement;
-            RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
-            d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
-            org.fruit.Util.pause(0.1);
             remoteElement.click();
         }
         catch (Exception e) {
