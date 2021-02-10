@@ -32,9 +32,7 @@ package org.testar.json;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import java.util.LinkedList;
 import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.json.object.LogsJsonObject;
@@ -48,8 +46,8 @@ public class JsonArtefactLogs {
     static String natureOfReport = "TESTAR execution log";
     static String startRunningTime;
     static String endRunningTime;
-    static SortedSet<String> messages = new TreeSet<>();
-    static SortedSet<String> warnings = new TreeSet<>();
+    static LinkedList <String> messages = new LinkedList<>();
+    static LinkedList<String> warnings = new LinkedList<>();
     static boolean status = true;
 
     private JsonArtefactLogs() {}

@@ -32,6 +32,7 @@ package org.testar.json;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.LinkedList;
 import java.util.SortedSet;
 
 import org.fruit.monkey.Settings;
@@ -53,7 +54,7 @@ public class JsonArtefactTestResults {
 	public static String createTestResultsArtefact(Settings settings, Object license,
 			SortedSet<String> sequencesOutputDir, SortedSet<String> logsOutputDir,
 			SortedSet<String> htmlOutputDir, SortedSet<String> sequencesVerdicts,
-			SortedSet<String> coverageSummary, SortedSet<String> coverageDir) {
+			SortedSet<String> coverageSummary, SortedSet<String> coverageDir, LinkedList<LinkedList<String>> executionInfo) {
 
 		SettingsJsonObject settingJson = new SettingsJsonObject(settings);
 
@@ -78,6 +79,8 @@ public class JsonArtefactTestResults {
 			resultsJson.setCoverageSummary(coverageSummary);
 		if(!coverageDir.isEmpty())
 			resultsJson.setCoverageDirectory(coverageDir);
+		if(!executionInfo.isEmpty())
+		    resultsJson.setExecutionInfo(executionInfo);
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

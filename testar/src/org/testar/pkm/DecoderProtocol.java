@@ -32,6 +32,7 @@ package org.testar.pkm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -43,7 +44,9 @@ import org.fruit.Pair;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
@@ -71,6 +74,9 @@ public class DecoderProtocol extends GenericUtilsProtocol {
 
     protected SortedSet<String> coverageSummary = new TreeSet<>();
     protected SortedSet<String> coverageDir = new TreeSet<>();
+    
+    protected LinkedList<String> sequenceInfo = new LinkedList<>();
+    protected LinkedList<LinkedList<String>> runInfo = new LinkedList<>();
 
     protected Object licenseSUT = "";
 
@@ -85,6 +91,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
+        sequenceInfo.clear();
     }
 
     /**
@@ -112,6 +119,12 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected boolean executeAction(SUT system, State state, Action action){
         // adding the action that is going to be executed into HTML report:
         htmlReport.addSelectedAction(state, action);
+
+        // Update sequence info for DECODER Test Results Artefact
+        String actionInfo = String.format("Executed action %s widget: %s", 
+                action.get(Tags.Role, ActionRoles.Action), action.get(Tags.OriginWidget).getAbstractRepresentation());
+        sequenceInfo.add(actionInfo);
+
         return super.executeAction(system, state, action);
     }
 
@@ -143,6 +156,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         logsOutputDir.add(getGeneratedLogName());
         htmlOutputDir.add(htmlReport.getGeneratedHTMLName());
         sequencesVerdicts.add(verdictInfo);
+        runInfo.add(new LinkedList<String>(sequenceInfo));
 
         htmlReport.close();
     }
@@ -154,7 +168,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         // TODO: Allow Record mode when Listening mode implemented
         if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
             testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
-                    sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir);
+                    sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir, runInfo);
 
             if(settings.get(ConfigTags.StateModelEnabled, false)) {
                 JsonArtefactStateModel jsonArtefactStateModel = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);

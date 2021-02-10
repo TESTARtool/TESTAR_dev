@@ -30,9 +30,7 @@
 
 package org.testar.json.object;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import java.util.LinkedList;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class LogsJsonObject {
@@ -41,13 +39,13 @@ public class LogsJsonObject {
     String natureOfReport;
     String startRunningTime;
     String endRunningTime;
-    SortedSet<String> messages = new TreeSet<>();
-    SortedSet<String> warnings = new TreeSet<>();
+    LinkedList<String> messages = new LinkedList<>();
+    LinkedList<String> warnings = new LinkedList<>();
     boolean status;
 
     @JsonCreator
     public LogsJsonObject(String tool, String natureOfReport, String startRunningTime, String endRunningTime, 
-            SortedSet<String> messages, SortedSet<String> warnings, boolean status) {
+            LinkedList<String> messages, LinkedList<String> warnings, boolean status) {
         this.tool = tool;
         this.natureOfReport = natureOfReport;
         this.startRunningTime = startRunningTime;

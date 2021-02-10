@@ -30,23 +30,25 @@
 
 package org.testar.json.object;
 
+import java.util.LinkedList;
 import java.util.SortedSet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class TestResultsJsonObject {
 
-	String timestamp;
-	String url;
-	SortedSet<String> sequencesResult;
-	SortedSet<String> htmlsResult;
-	SortedSet<String> logsResult;
-	SortedSet<String> sequencesVerdicts;
-	SortedSet<String> coverageSummary;
-	SortedSet<String> coverageDirectory;
-	SutJsonObject sut;
-	ToolJsonObject tool;
-	SettingsJsonObject settings;
+    String timestamp;
+    String url;
+    SutJsonObject sut;
+    ToolJsonObject tool;
+    SettingsJsonObject settings;
+    SortedSet<String> sequencesResult;
+    SortedSet<String> htmlsResult;
+    SortedSet<String> logsResult;
+    SortedSet<String> sequencesVerdicts;
+    SortedSet<String> coverageSummary;
+    SortedSet<String> coverageDirectory;
+    LinkedList<LinkedList<String>> executionInfo;
 
 	@JsonCreator
 	public TestResultsJsonObject(String timestamp, String url, SutJsonObject sut, ToolJsonObject tool, SettingsJsonObject settings) {
@@ -79,6 +81,10 @@ public class TestResultsJsonObject {
 
 	public void setCoverageDirectory(SortedSet<String> coverageDirectory) {
 		this.coverageDirectory = coverageDirectory;
+	}
+
+	public void setExecutionInfo(LinkedList<LinkedList<String>> executionInfo) {
+	    this.executionInfo = executionInfo;
 	}
 
 }
