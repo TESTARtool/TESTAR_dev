@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class OptimisticQValuesInitializationPolicyTest {
 
-    private final static Policy policy =  new OptimisticQValuesInitializationPolicy(new GreedyPolicy(0.0f), 1.0f);
+    private final static Policy policy =  new OptimisticQValuesInitializationPolicy(new GreedyPolicy(0.0f, RLTags.SarsaValue), 1.0f);
 
     @Test
     public void applyPolicy_returnsAnAction_whenASetWithOneActionIsProvided () {

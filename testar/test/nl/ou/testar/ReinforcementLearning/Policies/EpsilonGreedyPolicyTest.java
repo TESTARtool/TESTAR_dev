@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.Policies;
 
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class EpsilonGreedyPolicyTest {
 
-    @Spy private final EpsilonGreedyPolicy policy = new EpsilonGreedyPolicy(new GreedyPolicy(0.0f), 0.7f);
+    @Spy private final EpsilonGreedyPolicy policy = new EpsilonGreedyPolicy(new GreedyPolicy(0.0f, RLTags.SarsaValue), 0.7f);
 
     @Before
     public void setup () {
