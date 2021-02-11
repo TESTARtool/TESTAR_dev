@@ -32,15 +32,28 @@
 package nl.ou.testar.HtmlReporting;
 
 import nl.ou.testar.a11y.reporting.HTMLReporter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.openqa.selenium.WebDriver;
 import org.testar.OutputStructure;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
 public class HtmlSequenceReport {
@@ -64,22 +77,31 @@ public class HtmlSequenceReport {
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
-        try{
-            //TODO put filename into settings, name with sequence number
-            // creating a new file for the report
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
-            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
-            		+ REPORT_FILENAME_AFT;
-            
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
-            for(String s:HEADER){
-                write(s);
-            }
-            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceInnerLoopCount+"</h1>");
-        }catch (Exception e){
+        writeResults();
+    }
+
+    public void writeResults() {
+        try {
+            Path resourceDirectory = Paths.get("../../../", "resources", "main", "output", "testar_report", "report.html");
+            String absolutePath = resourceDirectory.toFile().getCanonicalPath();
+
+            String reportInput = new String(Files.readAllBytes(Paths.get(absolutePath)));
+            reportInput = reportInput.replace("#[issues]", "");
+            reportInput = reportInput.replace("#[oracles]", "");
+            reportInput = reportInput.replace("#[sequences]", "");
+            reportInput = reportInput.replace("#[iterations]", "");
+            reportInput = reportInput.replace("#[url]", "");
+
+            String reportPath = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+                    + REPORT_FILENAME_AFT;
+
+            Files.write(Paths.get(reportPath), reportInput.getBytes(), StandardOpenOption.CREATE);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     public void addTitle(int h, String text){
         write("<h"+h+">"+text+"</h"+h+">");
