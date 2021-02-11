@@ -38,9 +38,8 @@ public class SarsaQFunction implements QFunction {
         if (previouslyExecutedAction != null) {
             oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
         }
-        System.out.println("OLD QVALUE of " + previouslyExecutedAction.getActionId() + " : " + Float.toString(oldQValue));
+        
         float newQValue = actionUnderExecution.getAttributes().get(rl_tag, defaultQValue);
-        System.out.println("NEW QVALUE of " + actionUnderExecution.getActionId() + " : " + Float.toString(newQValue));
 
         return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
     }

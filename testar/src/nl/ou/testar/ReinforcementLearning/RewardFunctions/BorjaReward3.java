@@ -117,4 +117,10 @@ public class BorjaReward3 implements RewardFunction{
 		double persistentDecrement = persistentWidgetNum * 0.01;
 		return persistentDecrement;
 	}*/
+    
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+        
+    }
 }

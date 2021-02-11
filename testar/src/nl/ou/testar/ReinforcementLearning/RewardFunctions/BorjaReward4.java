@@ -200,6 +200,12 @@ public class BorjaReward4 implements RewardFunction {
 
 		return "";
 	}
+
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+        
+    }
 }
 
 /**

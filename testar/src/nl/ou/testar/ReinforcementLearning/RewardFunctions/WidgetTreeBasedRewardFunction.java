@@ -52,4 +52,9 @@ public class WidgetTreeBasedRewardFunction implements RewardFunction {
         System.out.println("NOT EQUAL");
         return 1;
     }
+
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+    }
 }

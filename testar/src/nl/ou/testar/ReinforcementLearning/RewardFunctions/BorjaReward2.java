@@ -17,4 +17,10 @@ public class BorjaReward2 implements RewardFunction {
 
         return reward;
 	}
+
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+        
+    }
 }
