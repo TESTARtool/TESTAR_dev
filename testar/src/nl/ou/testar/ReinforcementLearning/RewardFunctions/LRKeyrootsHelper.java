@@ -1,16 +1,15 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
 import org.fruit.alayer.Widget;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Helper class for the {@link WidgetTreeZhangShashaBasedRewardFunction}
+ */
 public class LRKeyrootsHelper {
-
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Splitting a tree in sub trees. The LR Keyroots are the roots of each sub tree.
@@ -20,10 +19,8 @@ public class LRKeyrootsHelper {
      */
     public Deque<Widget> getLRKeyroots(final Widget widget) {
         final Deque<Widget> result = new ArrayDeque<>();
-        // add root element
-        result.add(widget);
-
         processChilds(widget, result);
+        result.add(widget);
 
         return result;
     }
@@ -33,34 +30,28 @@ public class LRKeyrootsHelper {
      * @param widget The widget for which to get the child nodes
      * @return A sorted list of {@link Widget}
      */
-    public List<Widget> getSortedChildList(final Widget widget) {
+    public static List<Widget> getSortedChildList(final Widget widget) {
         final List<Widget> childList = new ArrayList<>();
         for(int i = 0; i < widget.childCount(); i++) {
             childList.add(widget.child(i));
         }
 
         return childList.stream()
-                .sorted(Comparator.comparing(childWidget -> childWidget.getRepresentation("")))
+                .sorted(Comparator.comparing(Widget::getAbstractRepresentation))
                 .collect(Collectors.toList());
     }
 
     private void processChilds(final Widget childWidget, final Deque<Widget> result) {
         final List<Widget> sortedChildList = getSortedChildList(childWidget);
 
-        logger.debug("Sorted list is '{}'", sortedChildList);
-
         if (sortedChildList.isEmpty()) {
             return;
         }
 
-        processLeftChild(sortedChildList.get(0), result);
+        // processLeftChild
+        processChilds(sortedChildList.get(0), result);
 
-        IntStream.range(1, sortedChildList.size())
-                .forEach(i -> processRightChild(sortedChildList.get(i), result));
-    }
-
-    private void processLeftChild(final Widget leftChildWidget, final Deque<Widget> result) {
-        processChilds(leftChildWidget, result);
+        IntStream.range(1, sortedChildList.size()).forEach(i -> processRightChild(sortedChildList.get(i), result));
     }
 
     private void processRightChild(final Widget rightChildWidget, final Deque<Widget> result) {

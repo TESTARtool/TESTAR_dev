@@ -1,9 +1,15 @@
 package nl.ou.testar.ReinforcementLearning.QFunctions;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QFunctionFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(QFunctionFactory.class);
+
     private final static float ALPHA_DISCOUNT = 1.0f;
     private static final float GAMMA_DISCOUNT = .99f;
     private static final float DEFAULT_QVALUE = 0.0f;
@@ -13,7 +19,7 @@ public class QFunctionFactory {
         final float gammaDiscount = settings.get(ConfigTags.Gamma, GAMMA_DISCOUNT);
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, DEFAULT_QVALUE);
 
-        System.out.println(String.format("QFunction loaded with alpha='%s' gammaDiscount='%s' and defaultQValue='%s'", alphaDiscount, gammaDiscount, defaultQValue));
+        logger.info("QFunction loaded with alpha='{}' gammaDiscount='{}' and defaultQValue='{}'", alphaDiscount, gammaDiscount, defaultQValue);
 
         final String qfunction = settings.get(ConfigTags.QFunction, "");
         final QFunction selectedQFunction;

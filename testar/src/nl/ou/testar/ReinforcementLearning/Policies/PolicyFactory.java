@@ -2,10 +2,14 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 
 import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import org.fruit.alayer.Tag;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 public class PolicyFactory {
+
+    private static final Logger logger = LogManager.getLogger(PolicyFactory.class);
 
     public static Policy getPolicy(final Settings settings){
         final String policy = settings.get(ConfigTags.Policy, "");
@@ -28,7 +32,7 @@ public class PolicyFactory {
                 selectedPolicy = getGreedyPolicy(settings);
         }
 
-        System.out.println(String.format("Using policy=%s", selectedPolicy.getClass().getName()));
+        logger.info("Using policy={}", selectedPolicy.getClass().getName());
 
         return selectedPolicy;
     }

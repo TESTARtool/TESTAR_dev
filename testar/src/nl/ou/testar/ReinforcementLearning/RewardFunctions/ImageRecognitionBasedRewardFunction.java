@@ -5,18 +5,24 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.lang.Validate;
 import org.fruit.alayer.Action;
+import org.apache.logging.log4j.LogManager;
 import org.fruit.alayer.State;
 import org.sikuli.basics.Settings;
-import org.sikuli.script.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sikuli.script.Finder;
+import org.sikuli.script.Match;
+import org.sikuli.script.Pattern;
+import org.sikuli.script.Screen;
 
 import java.awt.image.BufferedImage;
 import java.util.Set;
 
+/**
+ * This reward function uses image recognition to compare two states.
+ * It makes extensively use of Sikulix, @see <a href="https://sikulix-2014.readthedocs.io/en/latest/basicinfo.html">link</a>
+ */
 public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ImageRecognitionBasedRewardFunction.class);
 
     private final float defaultReward;
 
@@ -26,9 +32,6 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
         this.defaultReward = defaultReward;
     }
 
-    /**
-    *{@inheritDoc}
-     */
     @Override
     public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
         try {
@@ -56,6 +59,12 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
     protected BufferedImage takeScreenshot() {
         return new Screen().capture().getImage();
+    }
+
+    @Override
+    public void reset() {
+        screenImagePreviouslyExecutedAction = null;
+        logger.info("ImageRecognitionBasedRewardFunction was reset");
     }
 
 }

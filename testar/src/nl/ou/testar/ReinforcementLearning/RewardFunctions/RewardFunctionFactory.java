@@ -1,9 +1,13 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 public class RewardFunctionFactory {
+
+    private static final Logger logger = LogManager.getLogger(RewardFunctionFactory.class);
 
     public static RewardFunction getRewardFunction (final Settings settings) {
         final String rewardFunction = settings.get(ConfigTags.RewardFunction, "");
@@ -11,7 +15,7 @@ public class RewardFunctionFactory {
 
         switch(rewardFunction) {
             case "WidgetTreeBasedRewardFunction":
-                selectedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(new LRKeyrootsHelper());
+                selectedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(new LRKeyrootsHelper(), new TreeDistHelper());
                 break;
             case "ImageRecognitionBasedRewardFunction":
                 final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
@@ -33,7 +37,7 @@ public class RewardFunctionFactory {
                 selectedRewardFunction = new CounterBasedRewardFunction();
         }
 
-        System.out.printf("Using rewardFunction='%S'", selectedRewardFunction.getClass().getName());
+        logger.info("Using rewardFunction='{}'", selectedRewardFunction.getClass().getName());
 
         return selectedRewardFunction;
     }
