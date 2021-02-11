@@ -5,23 +5,24 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tag;
 
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 
 public class QBorjaFunction2 implements QFunction {
 	
 	@Override
-	public float getQValue(Tag<Float> rl_tag, AbstractAction previousActionUnderExecution, AbstractAction actionUnderExecution, float reward, AbstractState currentAbstractState, Set<Action> actions) {
+	public float getQValue(Tag<Float> rl_tag, AbstractAction previousActionUnderExecution, AbstractAction actionUnderExecution, float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
 		float qValue;
-		float currentQValue = previouslyExecutedAction.getAttributes().get(RLTags.QBorja, 0f);
+		float currentQValue = previousActionUnderExecution.getAttributes().get(RLTags.QBorja, 0f);
         
 		if(currentQValue == 0f) {
-			previouslyExecutedAction.addAttribute(RLTags.QBorja, 1f);
+		    previousActionUnderExecution.addAttribute(RLTags.QBorja, 1f);
             currentQValue = 1f;
 		}
 
 		qValue = greaterThanZero(currentQValue + reward);
-		previouslyExecutedAction.getAttributes().set(RLTags.QBorja, qValue);
+		previousActionUnderExecution.getAttributes().set(RLTags.QBorja, qValue);
 
         return qValue;
 	}

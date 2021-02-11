@@ -3,6 +3,8 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
+import nl.ou.testar.a11y.reporting.HTMLReporter;
+
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
@@ -25,32 +27,48 @@ public class BorjaReward4 implements RewardFunction {
     @Override
     public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
         float reward = 0f;
-        HTMLDifference htmlDifference;
-        String differenceScreenshot;
+        HTMLDifference htmlDifference = new HTMLDifference();
+        String differenceScreenshot = "";
         String prevStateScrPath = previousState.get(Tags.ScreenshotPath, "");
-        String currStateScrPath = currentAbstractState.get(Tags.ScreenshotPath, "");
+        String currStateScrPath = state.get(Tags.ScreenshotPath, "");
         String prevStateID = previousState.get(Tags.AbstractIDCustom, "");
-        String currStateID = currentAbstractState.get(Tags.AbstractIDCustom, "");
+        String currStateID = state.get(Tags.AbstractIDCustom, "");
         
-        htmlDifference = new HTMLDifference();
         				
-		if(previousState != null && prevStateScrPath != null && currStateScrPath != null) {
+		if(previousState != null && !prevStateScrPath.isEmpty() && !currStateScrPath.isEmpty()) {
 			// Create and obtain the image-diff path
 			differenceScreenshot = getDifferenceImage(prevStateScrPath, prevStateID, currStateScrPath, currStateID);
 		}
-				
-        if(previousState != null) {
+	
+		// Pixel difference Reward
+        if(previousState != null && !differenceScreenshot.isEmpty()) {
 			try {
 				BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));
 				double diffPxPercentage = getDiffPxPercentage(diffScreanshot);
-				reward = diffPxPercentage;
+				reward = (float) diffPxPercentage;
 			} catch (IOException e) {
 		    	e.printStackTrace();
 			}
 		}
 
-        reward -= (0.01 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
-        previousState = currentAbstractState;
+        // Also decrement reward based on Widget Tree ZIndex
+
+        // TODO: Test if OriginWidget saved as Abstract Attribute
+        reward -= (0.01 * executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
+
+        // TODO: If previous executed action didnt work try this code
+        /*Action desiredAction = null;
+        for(Action a : actions) {
+            if(a.get(Tags.AbstractIDCustom).equals(executedAction.getActionId())) {
+                desiredAction = a;
+                break;
+            }
+        }
+        if(desiredAction != null){
+            reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+        }*/
+        
+        previousState = state;
 
         return reward;
     }
@@ -96,7 +114,6 @@ public class BorjaReward4 implements RewardFunction {
 			String previousStatePath = new File(previousStateDisk).getCanonicalFile().toString();
 			String statePath = new File(stateDisk).getCanonicalFile().toString();
 			
-			System.out.println("Action: " + actionCount);
 			System.out.println("PreviousState: " + previousStatePath);
 			System.out.println("CurrentState: " + statePath);
 			

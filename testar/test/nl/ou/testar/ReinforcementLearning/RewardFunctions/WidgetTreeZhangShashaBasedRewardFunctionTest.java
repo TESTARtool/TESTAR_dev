@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 import org.junit.Test;
@@ -9,6 +10,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -41,6 +44,9 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         when(lrKeyrootsHelper.getLRKeyroots(state)).thenReturn(widgets1);
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
 
         // when
         float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
@@ -63,6 +69,9 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         when(lrKeyrootsHelper.getLRKeyroots(state)).thenReturn(widgets1);
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
 
         // when
         float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
@@ -89,6 +98,9 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         when(lrKeyrootsHelper.getLRKeyroots(state)).thenReturn(widgets1);
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
 
         // when
         float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);
@@ -116,6 +128,9 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
         when(lrKeyrootsHelper.getLRKeyroots(state)).thenReturn(widgets1);
         when(lrKeyrootsHelper.getLRKeyroots(previousState)).thenReturn(widgets2);
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
 
         // when
         float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, actions);

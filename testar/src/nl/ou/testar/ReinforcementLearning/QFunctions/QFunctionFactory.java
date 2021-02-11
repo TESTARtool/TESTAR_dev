@@ -24,7 +24,7 @@ public class QFunctionFactory {
                 selectedQFunction = new QlearningFunction(alphaDiscount, gammaDiscount, defaultQValue);
                 break;
             case "QBorjaFunction4":
-                selectedQFunction = new QBorjaFunction4(defaultQValue);
+                selectedQFunction = new QBorjaFunction4();
                 break;
             case "QBorjaFunction3":
                 selectedQFunction = new QBorjaFunction3();

@@ -2,8 +2,15 @@ package nl.ou.testar.ReinforcementLearning.QFunctions;
 
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractState;
+
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.fruit.alayer.Action;
 
 public class SarsaQFunctionTest {
 
@@ -17,9 +24,14 @@ public class SarsaQFunctionTest {
         final AbstractAction actionUnderExecution = new AbstractAction("actionId");
         actionUnderExecution.getAttributes().set(RLTags.SarsaValue, 2f);
         final float reward = 0f;
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
+        final AbstractState abstractState = new AbstractState("stateId", abstractActions);
 
         // when
-        float qValue = Q_FUNCTION.getQValue(previousActionUnderExecution, actionUnderExecution, reward);
+        float qValue = Q_FUNCTION.getQValue(RLTags.SarsaValue, previousActionUnderExecution, actionUnderExecution, reward, abstractState, actions);
 
         //then
         final float expectedQValue = 1f + 1f * (reward + 0.99f * (2.0f) - 1f);
@@ -32,9 +44,14 @@ public class SarsaQFunctionTest {
         final AbstractAction actionUnderExecution = new AbstractAction("actionId");
         actionUnderExecution.getAttributes().set(RLTags.SarsaValue, 2f);
         final float reward = 0f;
+        
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
+        final AbstractState abstractState = new AbstractState("stateId", abstractActions);
 
         // when
-        float qValue = Q_FUNCTION.getQValue(null, actionUnderExecution, reward);
+        float qValue = Q_FUNCTION.getQValue(RLTags.SarsaValue, null, actionUnderExecution, reward, abstractState, actions);
 
         //then
         final float expectedQValue = 0f + 1f * (reward + 0.99f * (2f) - 0f);
