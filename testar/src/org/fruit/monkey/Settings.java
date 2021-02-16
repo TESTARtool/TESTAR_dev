@@ -45,6 +45,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import es.upv.staq.testar.ActionManagementTags;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -402,6 +403,11 @@ public class Settings extends TaggableBase implements Serializable {
 					+"AbstractStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Action identifier attributes\n"
+					+"#################################################################\n"
+					+"AbstractActionAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Override display scale\n"
 					+"#\n"
 					+"# Overrides the displayscale obtained from the system.\n"
@@ -453,28 +459,57 @@ public class Settings extends TaggableBase implements Serializable {
 	 * This method will check if the provided settings for the concrete and abstract state models are valid.
 	 */
 	private void verifySettings() {
-		// verify the concrete and abstract state settings
-		// the values provided should be valid state management tags
-        Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
+	    verifyStateManagementTagsSettings();
+	    verifyActionManagementTagsSettings();
+	}
 
-		// add only the state management tags that are available
-		Set<String> stateSet = new HashSet<>();
-        try {
-            List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
-            for (String abstractStateAttribute : abstractStateAttributes) {
-                if (allowedStateAttributes.contains(abstractStateAttribute)) {
-                    stateSet.add(abstractStateAttribute);
-                }
-            }
-            set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
-        }
-        catch (NoSuchTagException ex) {
-            // no need to do anything, nothing to verify
-        }
+	/**
+	 * Verify the concrete and abstract state settings. 
+	 */
+	private void verifyStateManagementTagsSettings() {
+	    // the values provided should be valid state management tags
+	    Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
+
+	    // add only the state management tags that are available
+	    Set<String> stateSet = new HashSet<>();
+	    try {
+	        List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
+	        for (String abstractStateAttribute : abstractStateAttributes) {
+	            if (allowedStateAttributes.contains(abstractStateAttribute)) {
+	                stateSet.add(abstractStateAttribute);
+	            }
+	        }
+	        set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
+	    }
+	    catch (NoSuchTagException ex) {
+	        // no need to do anything, nothing to verify
+	    }
+	}
+
+	/**
+	 * Verify the concrete and abstract action settings. 
+	 */
+	private void verifyActionManagementTagsSettings() {
+	    // the values provided should be valid action management tags
+	    Set<String> allowedActionAttributes = ActionManagementTags.getAllTags().stream().map(ActionManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
+
+	    // add only the action management tags that are available
+	    Set<String> actionSet = new HashSet<>();
+	    try {
+	        List<String> abstractActionAttributes = get(ConfigTags.AbstractActionAttributes);
+	        for (String abstractActionAttribute : abstractActionAttributes) {
+	            if (allowedActionAttributes.contains(abstractActionAttribute)) {
+	                actionSet.add(abstractActionAttribute);
+	            }
+	        }
+	        set(ConfigTags.AbstractActionAttributes, new ArrayList<>(actionSet));
+	    } catch (NoSuchTagException ex) {
+	        // no need to do anything, nothing to verify
+	    }
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)
-				? "," : ";";
+	    return (tag.equals(ConfigTags.AbstractStateAttributes) || tag.equals(ConfigTags.AbstractActionAttributes)) 
+	            ? "," : ";";
 	}
 }

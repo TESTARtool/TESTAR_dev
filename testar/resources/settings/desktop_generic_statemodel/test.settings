@@ -95,9 +95,9 @@ SUTProcesses =
 
 ProtocolClass = desktop_generic_statemodel/Protocol_desktop_generic_statemodel
 
-#################################################################\n"
+#################################################################
 # State model inference settings
-#################################################################\n"
+#################################################################
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
@@ -114,6 +114,11 @@ DataStoreMode = instant
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
 # Other more advanced settings

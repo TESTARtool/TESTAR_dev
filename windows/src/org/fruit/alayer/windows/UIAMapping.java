@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,9 @@ package org.fruit.alayer.windows;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+
+import es.upv.staq.testar.ActionManagementTags;
+
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
@@ -330,6 +333,22 @@ public class UIAMapping {
 
     public static long getPatternPropertyIdentifier(Tag<?> patternPropertyTag) {
         return patternPropertyMapping.inverse().getOrDefault(patternPropertyTag, null);
+    }
+
+    // a mapping from the action management tags
+    @SuppressWarnings("serial")
+    private static Map<Tag<?>, Tag<?>> actionTagMapping = new HashMap<Tag<?>, Tag<?>>()
+    {
+        {
+            put(ActionManagementTags.ActionOriginStateAbstractId, WinActionTags.OriginStateAbstractId);
+            put(ActionManagementTags.ActionOriginWidgetAbstractId, WinActionTags.OriginWidgetAbstractId);
+            put(ActionManagementTags.ActionOriginWidgetPath, WinActionTags.OriginWidgetPath);
+            put(ActionManagementTags.ActionOriginWidgetRole, WinActionTags.OriginWidgetRole);
+        }
+    };
+
+    public static Map<Tag<?>, Tag<?>> getActionTagMap() {
+        return actionTagMapping;
     }
 
 }
