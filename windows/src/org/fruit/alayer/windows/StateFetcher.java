@@ -105,8 +105,13 @@ public class StateFetcher implements Callable<UIAState>{
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
 
-		for (Widget w : root)
-			w.set(Tags.Path,Util.indexString(w));
+		// After build the UIAElement and create the Widget Tree assign the Path property
+		// This property is not obtained directly from Windows API
+		// If the UIAElement skeleton was not built correctly, this Path wont be correct
+		for (Widget w : root) {
+		    w.set(Tags.Path, Util.indexString(w));
+		}
+		
 		if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)
 			system.getNativeAutomationCache().releaseCachedAutomationElements(); // prevent SUT UI not ready due to caching
 
@@ -476,13 +481,20 @@ public class StateFetcher implements Callable<UIAState>{
 		setObjectValueIfNotNull(UIATags.UIAVisualEffects, obj, uiaElement);
 
 
-
+		if(uiaElement.ctrlId == Windows.UIA_MenuItemControlTypeId) {
+		    System.out.println("DEBUG: Windows.UIA_MenuItemControlTypeId : " + uiaElement.name);
+		    try {
+		        System.out.println("CheckExpandCollapseState ? " + Windows.CheckExpandCollapseState(uiaCachePointer, Windows.UIA_ExpandCollapsePatternId));
+		    } catch(Exception e) {
+		        System.out.println(e.getMessage());
+		    }
+		}
 
 
 		// get the properties for potential child elements
 		long uiaChildrenPointer = Windows.IUIAutomationElement_GetCachedChildren(uiaCachePointer);
 		if (releaseCachedAutomatinElement) {
-			Windows.IUnknown_Release(uiaCachePointer);
+		    Windows.IUnknown_Release(uiaCachePointer);
 		}
 
 		if(uiaChildrenPointer != 0){

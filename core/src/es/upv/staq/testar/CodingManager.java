@@ -213,15 +213,15 @@ public class CodingManager {
 	        CodingManager.buildIDs(state,a);
 
 	        // State Model ConcreteIDCustom and AbstractIDCustom
-	        System.out.println("DEBUG: ConcreteIDCustom");
+	        //System.out.println("DEBUG: ConcreteIDCustom");
 	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM + 
 	                CodingManager.codify(a, customTagsForActionConcreteId));
-	        System.out.println("ConcreteIDCustom : " + a.get(Tags.ConcreteIDCustom, "Not created correctly"));
+	        //System.out.println("ConcreteIDCustom : " + a.get(Tags.ConcreteIDCustom, "Not created correctly"));
 
-	        System.out.println("DEBUG: AbstractIDCustom");
+	        //System.out.println("DEBUG: AbstractIDCustom");
 	        a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM + 
 	                CodingManager.codify(a, customTagsForActionAbstractId));
-	        System.out.println("AbstractIDCustom : " + a.get(Tags.AbstractIDCustom, "Not created correctly"));
+	        //System.out.println("AbstractIDCustom : " + a.get(Tags.AbstractIDCustom, "Not created correctly"));
 
 	    }
 
@@ -347,10 +347,10 @@ public class CodingManager {
 	private static String getTaggedString(Action action, Tag<?>... tags){
 	    StringBuilder sb = new StringBuilder();
 	    for(Tag<?> t : tags) {
-	        System.out.println("tag name: " + t.name());
+	        //System.out.println("tag name: " + t.name());
 	        sb.append(action.get(t, null));
 	    }
-	    System.out.println("ACTIONS sb.toString : " + sb.toString());
+	    //System.out.println("ACTIONS sb.toString : " + sb.toString());
 	    return sb.toString();
 	}
 	

@@ -2036,6 +2036,25 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1GetCachedChildren)) (JNIEnv * env
 	return (jlong)ret;
 }
 
+/* CheckExpandCollapseState */
+JNI_SIG(jboolean, WINAPI_NS(CheckExpandCollapseState)) (JNIEnv * env, jclass, 
+		jlong pElement, jlong patternId){
+	try{
+		IUIAutomationElement* el = (IUIAutomationElement*) pElement;
+		IUnknown* ret;
+		HRESULT pr = el->GetCurrentPattern((PATTERNID)patternId, &ret);
+		
+		IExpandCollapseProvider* expandcollapse_provider = (IExpandCollapseProvider*) ret;
+		ExpandCollapseState state;
+		HRESULT hr = expandcollapse_provider->get_ExpandCollapseState(&state);
+
+		if (FAILED(hr))
+			return 0;
+		return 1;
+	} catch(...){
+		return 0;
+	}
+}
 
 /* IUIAutomationElement_GetRuntimeId */
 JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env, jclass,

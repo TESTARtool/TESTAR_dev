@@ -875,7 +875,8 @@ public final class Windows{
 	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);
 	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda	
 	public static native Object IUIAutomationElement_GetPropertyValueEx(long pElement, long propertyId, boolean ignoreDefaultValue, boolean fromCache);
-	public static native long IUIAutomationElement_GetCachedChildren(long pElement);	
+	public static native long IUIAutomationElement_GetCachedChildren(long pElement);
+	public static native boolean CheckExpandCollapseState(long pElement, long patternId);
 	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition) throws UIAException;
 	public static native long IUIAutomationElement_FindAllBuildCache(long pElement, long treeScope, long pCondition, long pCacheRequest) throws UIAException;
 	public static native boolean IUIAutomationWindowPattern_get_CanMaximize(long pElement, boolean fromCache);
