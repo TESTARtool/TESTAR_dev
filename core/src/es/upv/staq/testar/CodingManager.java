@@ -208,6 +208,11 @@ public class CodingManager {
 	 * @param actions The actions.
 	 */
 	public static synchronized void buildIDs(State state, Set<Action> actions){
+
+	    // TODO: Maybe not the best place to set the action Tags
+	    // We need to do it after deriveActions and before this buildIDs
+	    setActionTags(state, actions);
+
 	    for (Action a : actions) {
 	        // Build ConcreteID and AbstractID
 	        CodingManager.buildIDs(state,a);
@@ -250,7 +255,29 @@ public class CodingManager {
 				}
 		);*/
 	}
-	
+
+	private static void setActionTags(State state, Set<Action> actions) {
+	    for(Action a : actions) {
+	        a.set(Tags.OriginStateAbstractId, state.get(Tags.AbstractIDCustom));
+	        // Use OriginWidget, if does not exists use the state
+	        a.set(Tags.OriginWidgetAbstractId, a.get(Tags.OriginWidget, state).get(Tags.AbstractIDCustom));
+	        a.set(Tags.OriginWidgetPath, a.get(Tags.OriginWidget, state).get(Tags.Path));
+	        a.set(Tags.OriginWidgetRole, a.get(Tags.OriginWidget, state).get(Tags.Role));
+	        a.set(Tags.OriginWidgetTitle, a.get(Tags.OriginWidget, state).get(Tags.Title));
+	        a.set(Tags.OriginWidgetValuePattern, a.get(Tags.OriginWidget, state).get(Tags.ValuePattern, ""));
+	        // Now set the ActionManagementTags
+	        setActionManagementTags(a);
+	    }
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void setActionManagementTags(Action action) {
+	    for(Map.Entry<Tag<?>, Tag<?>> entry : ActionManagementTags.getActionTagMap().entrySet()) {
+	        Tag actionManagementTag = entry.getKey();
+	        action.set(actionManagementTag, action.get(entry.getValue()));
+	    }
+	}
+
 	/**
 	 * Builds IDs (abstract, concrete, precise) for an action.
 	 * @param action An action.

@@ -305,6 +305,7 @@ public class Main {
 			settings = loadSettings(args, testSettingsFileName);
 		} catch (ConfigException ce) {
 			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
+			System.out.println(ce.getMessage());
 		}
 
 		//TODO: Understand what this exactly does?

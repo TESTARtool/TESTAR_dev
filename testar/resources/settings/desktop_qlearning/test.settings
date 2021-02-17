@@ -104,6 +104,11 @@ ProtocolClass = desktop_qlearning/Protocol_desktop_qlearning
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

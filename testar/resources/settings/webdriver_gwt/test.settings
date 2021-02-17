@@ -108,6 +108,11 @@ ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

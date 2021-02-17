@@ -108,6 +108,11 @@ ProtocolClass = webdriver_spy_custom/Protocol_webdriver_spy_custom
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

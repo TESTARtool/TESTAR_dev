@@ -124,6 +124,10 @@ StateModelStoreWidgets = true
 #################################################################
 AbstractStateAttributes = WebWidgetId
 
+#################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
 # Override display scale

@@ -115,6 +115,11 @@ ProtocolClass = desktop_swingset2/Protocol_desktop_SwingSet2
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

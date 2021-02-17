@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -49,6 +50,8 @@ public class ActionManagementTags {
     public static final Tag<String> ActionOriginWidgetAbstractId = Tag.from("Action Origin Widget AbstractId", String.class);
     public static final Tag<String> ActionOriginWidgetPath = Tag.from("Action Origin Widget Path", String.class);
     public static final Tag<Role> ActionOriginWidgetRole = Tag.from("Action Origin Widget Role", Role.class);
+    public static final Tag<String> ActionOriginWidgetTitle = Tag.from("Action Origin Widget Title", String.class);
+    public static final Tag<String> ActionOriginWidgetValuePattern = Tag.from("Action Origin Widget ValuePattern", String.class);
 
     // a set containing the tags that are available for action management
     @SuppressWarnings("serial")
@@ -58,6 +61,8 @@ public class ActionManagementTags {
             add(ActionOriginWidgetAbstractId);
             add(ActionOriginWidgetPath);
             add(ActionOriginWidgetRole);
+            add(ActionOriginWidgetTitle);
+            add(ActionOriginWidgetValuePattern);
         }
     };
 
@@ -77,6 +82,8 @@ public class ActionManagementTags {
         settingsMap.put(ActionOriginWidgetAbstractId, "ActionOriginWidgetAbstractId");
         settingsMap.put(ActionOriginWidgetPath, "ActionOriginWidgetPath");
         settingsMap.put(ActionOriginWidgetRole, "ActionOriginWidgetRole");
+        settingsMap.put(ActionOriginWidgetTitle, "ActionOriginWidgetTitle");
+        settingsMap.put(ActionOriginWidgetValuePattern, "ActionOriginWidgetValuePattern");
     }
 
     // a mapping of a tag to its group
@@ -87,6 +94,8 @@ public class ActionManagementTags {
             put(ActionOriginWidgetAbstractId, Group.GeneralAction);
             put(ActionOriginWidgetPath, Group.GeneralAction);
             put(ActionOriginWidgetRole, Group.GeneralAction);
+            put(ActionOriginWidgetTitle, Group.GeneralAction);
+            put(ActionOriginWidgetValuePattern, Group.GeneralAction);
         }
     };
 
@@ -123,6 +132,24 @@ public class ActionManagementTags {
      */
     public static String getSettingsStringFromTag(Tag<?> tag) {
         return settingsMap.getOrDefault(tag, null);
+    }
+
+    // a mapping from the action management tags
+    @SuppressWarnings("serial")
+    private static Map<Tag<?>, Tag<?>> actionTagMapping = new HashMap<Tag<?>, Tag<?>>()
+    {
+        {
+            put(ActionManagementTags.ActionOriginStateAbstractId, Tags.OriginStateAbstractId);
+            put(ActionManagementTags.ActionOriginWidgetAbstractId, Tags.OriginWidgetAbstractId);
+            put(ActionManagementTags.ActionOriginWidgetPath, Tags.OriginWidgetPath);
+            put(ActionManagementTags.ActionOriginWidgetRole, Tags.OriginWidgetRole);
+            put(ActionManagementTags.ActionOriginWidgetTitle, Tags.OriginWidgetTitle);
+            put(ActionManagementTags.ActionOriginWidgetValuePattern, Tags.OriginWidgetValuePattern);
+        }
+    };
+
+    public static Map<Tag<?>, Tag<?>> getActionTagMap() {
+        return actionTagMapping;
     }
 
 }

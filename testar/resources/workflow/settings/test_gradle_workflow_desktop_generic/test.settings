@@ -104,6 +104,11 @@ ProtocolClass = test_gradle_workflow_desktop_generic/Protocol_test_gradle_workfl
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

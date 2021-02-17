@@ -51,7 +51,7 @@ public class AbstractStateSettings extends JDialog {
         this.allActionTags = Arrays.stream(allActionTags).sorted(Comparator.comparing(Tag::name)).toArray(Tag<?>[]::new);
         this.currentlySelectedActionTags = currentlySelectedActionTags;
         this.defaultActionTags = defaultActionTags;
-        setSize(1000, 600);
+        setSize(1000, 800);
         setLayout(null);
         setVisible(true);
         setLocationRelativeTo(null);
@@ -113,8 +113,8 @@ public class AbstractStateSettings extends JDialog {
         add(listScrollerWebdriver);
         
         ///////// ACTION MANAGEMENT TAGS /////////
-        label5.setBounds(710, 350, 250, 27);
-        //add(label5);
+        label5.setBounds(360, 450, 250, 27);
+        add(label5);
 
         generalActionList = new JList(Arrays.stream(allActionTags).filter(tag -> ActionManagementTags.getTagGroup(tag).equals(ActionManagementTags.Group.GeneralAction)).toArray()); //data has type Object[]
         generalActionList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -122,8 +122,8 @@ public class AbstractStateSettings extends JDialog {
         generalActionList.setVisibleRowCount(-1);
 
         JScrollPane listScrollerAction = new JScrollPane(generalActionList);
-        listScrollerAction.setPreferredSize(new Dimension(250, 100));
-        listScrollerAction.setBounds(710, 480, 250, 100);
+        listScrollerAction.setPreferredSize(new Dimension(250, 250));
+        listScrollerAction.setBounds(360, 480, 250, 250);
         add(listScrollerAction);
 
         // init the selection based on the currently selected state management tags

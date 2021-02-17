@@ -104,6 +104,11 @@ ProtocolClass = desktop_simple_stategraph_sikulix/Protocol_desktop_simple_stateg
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

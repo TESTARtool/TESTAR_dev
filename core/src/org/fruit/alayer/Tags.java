@@ -217,6 +217,13 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
+    public static final Tag<String> OriginStateAbstractId = Tag.from("OriginStateAbstractId", String.class);
+    public static final Tag<String> OriginWidgetAbstractId = Tag.from("OriginWidgetAbstractId", String.class);
+    public static final Tag<String> OriginWidgetPath = Tag.from("OriginWidgetPath", String.class);
+    public static final Tag<Role> OriginWidgetRole = Tag.from("OriginWidgetRole", Role.class);
+    public static final Tag<String> OriginWidgetTitle = Tag.from("OriginWidgetTitle", String.class);
+    public static final Tag<String> OriginWidgetValuePattern = Tag.from("OriginWidgetValuePattern", String.class);
+	
 	private static Set<Tag<String>> generalStringVerdictTags;
 	static {
 		generalStringVerdictTags = new HashSet<Tag<String>>();

@@ -34,8 +34,6 @@ import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.windows.UIAMapping;
-import org.fruit.alayer.windows.WinActionTags;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -80,30 +78,8 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		//}
 
-		setWindowsActionTags(state, actions);
-
 		//return the set of derived actions
 		return actions;
-	}
-
-	private void setWindowsActionTags(State state, Set<Action> actions) {
-	    for(Action a : actions) {
-	        a.set(WinActionTags.OriginStateAbstractId, state.get(Tags.AbstractIDCustom));
-	        // Use OriginWidget, if does not exists use the state
-	        a.set(WinActionTags.OriginWidgetAbstractId, a.get(Tags.OriginWidget, state).get(Tags.AbstractIDCustom));
-	        a.set(WinActionTags.OriginWidgetPath, a.get(Tags.OriginWidget, state).get(Tags.Path));
-	        a.set(WinActionTags.OriginWidgetRole, a.get(Tags.OriginWidget, state).get(Tags.Role));
-	        // Now set the ActionManagementTags
-	        setActionManagementTags(a);
-	    }
-	}
-
-	@SuppressWarnings("unchecked")
-	private void setActionManagementTags(Action action) {
-	    for(Map.Entry<Tag<?>, Tag<?>> entry : UIAMapping.getActionTagMap().entrySet()) {
-	        Tag actionManagementTag = entry.getKey();
-	        action.set(actionManagementTag, action.get(entry.getValue()));
-	    }
 	}
 
 	/**

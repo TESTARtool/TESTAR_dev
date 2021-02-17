@@ -108,6 +108,11 @@ ProtocolClass = test_gradle_workflow_webdriver_generic/Protocol_test_gradle_work
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

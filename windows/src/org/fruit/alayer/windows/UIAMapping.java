@@ -33,8 +33,6 @@ package org.fruit.alayer.windows;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import es.upv.staq.testar.ActionManagementTags;
-
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
@@ -333,22 +331,6 @@ public class UIAMapping {
 
     public static long getPatternPropertyIdentifier(Tag<?> patternPropertyTag) {
         return patternPropertyMapping.inverse().getOrDefault(patternPropertyTag, null);
-    }
-
-    // a mapping from the action management tags
-    @SuppressWarnings("serial")
-    private static Map<Tag<?>, Tag<?>> actionTagMapping = new HashMap<Tag<?>, Tag<?>>()
-    {
-        {
-            put(ActionManagementTags.ActionOriginStateAbstractId, WinActionTags.OriginStateAbstractId);
-            put(ActionManagementTags.ActionOriginWidgetAbstractId, WinActionTags.OriginWidgetAbstractId);
-            put(ActionManagementTags.ActionOriginWidgetPath, WinActionTags.OriginWidgetPath);
-            put(ActionManagementTags.ActionOriginWidgetRole, WinActionTags.OriginWidgetRole);
-        }
-    };
-
-    public static Map<Tag<?>, Tag<?>> getActionTagMap() {
-        return actionTagMapping;
     }
 
 }

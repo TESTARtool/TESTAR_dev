@@ -104,6 +104,11 @@ ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_ran
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Action identifier attributes
+#################################################################
+AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

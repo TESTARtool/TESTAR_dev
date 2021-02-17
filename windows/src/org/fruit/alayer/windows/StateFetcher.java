@@ -499,6 +499,7 @@ public class StateFetcher implements Callable<UIAState>{
 							modalElement = modalE;							
 					}
 				}
+				uiaElement.children = orderMenuControlTypeId(uiaElement.children);
 			}
 			Windows.IUnknown_Release(uiaChildrenPointer);
 		}
@@ -509,6 +510,32 @@ public class StateFetcher implements Callable<UIAState>{
 		return modalElement;
 	}
 	
+	/**
+	 * MenuControlTypeId elements that comes from menuItems are not created as child. 
+	 * By default is being inserted as menu panel element moving all widget tree structure. 
+	 * Detect them and try to move to the end, reducing the widget tree path impact.
+	 * 
+	 * @param childrenList
+	 * @return ordered childrenList
+	 */
+	private ArrayList<UIAElement> orderMenuControlTypeId(List<UIAElement> childrenList) {
+	    ArrayList<UIAElement> copyList = new ArrayList<>(childrenList);
+
+	    try {
+	        for(UIAElement element : copyList) {
+	            if(element.ctrlId == Windows.UIA_MenuControlTypeId) {
+	                childrenList.remove(element);
+	                childrenList.add(element);
+	            }
+	        }
+	        return new ArrayList<>(childrenList);
+	    } catch(Exception e) {
+	        System.out.println("ERROR Ordering MenuControlTypeId Elements");
+	    }
+
+	    return new ArrayList<>(childrenList);
+	}
+
 	// (through AccessBridge)
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
