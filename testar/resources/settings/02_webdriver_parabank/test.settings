@@ -173,3 +173,10 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+
+# Settings that can be used for user specified protocols:
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
