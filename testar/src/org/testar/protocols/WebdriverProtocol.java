@@ -86,24 +86,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
-	// Classes that are deemed clickable by the web framework
-	protected List<String> clickableClasses = new ArrayList<>();
-
-	// Disallow links and pages with these extensions
-	// Set to null to ignore this feature
-	protected List<String> deniedExtensions = new ArrayList<>();
-
-	// Define a whitelist of allowed domains for links and pages
-	// An empty list will be filled with the domain from the sut connector
-	// Set to null to ignore this feature
-	protected List<String> domainsAllowed = new ArrayList<>();
-
-	// If true, follow links opened in new tabs
-	// If false, stay with the original (ignore links opened in new tabs)
-	protected boolean followLinks = true;
+	// WedDriver settings from file:
+	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
+	protected boolean followLinks;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
+	//TODO web driver settings for login feature
 	protected Pair<String, String> login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
 	protected Pair<String, String> username = Pair.from("username", "");
 	protected Pair<String, String> password = Pair.from("password", "");
@@ -127,9 +116,27 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings){
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
-		
+
+		// reads the settings from file:
 		super.initialize(settings);
-	    
+
+		// Classes that are deemed clickable by the web framework
+		clickableClasses = settings.get(ConfigTags.ClickableClasses);
+
+		// Disallow links and pages with these extensions
+		// Set to null to ignore this feature
+		deniedExtensions = settings.get(ConfigTags.DeniedExtensions);
+
+		// Define a whitelist of allowed domains for links and pages
+		// An empty list will be filled with the domain from the sut connector
+		// Set to null to ignore this feature
+		domainsAllowed = settings.get(ConfigTags.DomainsAllowed);
+
+		// If true, follow links opened in new tabs
+		// If false, stay with the original (ignore links opened in new tabs)
+		followLinks = settings.get(ConfigTags.FollowLinks);
+		// Propagate followLinks setting
+		WdDriver.followLinks = followLinks;
 	}
 	
     /**

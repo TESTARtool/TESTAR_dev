@@ -495,6 +495,39 @@ public class Main {
 				}
 			}));
 
+			defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
+				{
+					add("v-menubar-menuitem");
+					add("v-menubar-menuitem-caption");
+				}
+			}));
+
+			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
+				{
+					add("pdf");
+					add("jpg");
+					add("png");
+				}
+			}));
+
+			defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+				{
+					add("www.ou.nl");
+					add("mijn.awo.ou.nl");
+					add("login.awo.ou.nl");
+				}
+			}));
+
+			defaults.add(Pair.from(FollowLinks, true));
+
+			/*
+			//TODO web driver settings for login feature
+			defaults.add(Pair.from(Login, null)); // null = feature not enabled
+			// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+			defaults.add(Pair.from(Username, ""));
+			defaults.add(Pair.from(Password, ""));
+			*/
+
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
 
