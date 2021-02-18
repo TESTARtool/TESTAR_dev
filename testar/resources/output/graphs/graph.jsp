@@ -85,6 +85,7 @@
             <div class="extra-margin-left">
                 <div class="stats-text" id="stats-abstract-states"></div>
                 <div class="stats-text" id="stats-abstract-actions"></div>
+                <div class="stats-text" id="stats-abstract-transitions"></div>
                 <div class="stats-text" id="stats-concrete-states"></div>
                 <div class="stats-text" id="stats-concrete-actions"></div>
             </div>
@@ -942,12 +943,21 @@
         cy.$('.dim').removeClass('dim');
         initLayers();
     });
+	
+	function countUniqueAbstractAction(arr){
+		const actions = {};
+		for (var i = 0; i < arr.length; i++) {
+			actions[arr[i].data('actionId')] = 1 + (actions[arr[i].data('actionId')] || 0);
+		};
+		return Object.keys(actions).length;
+	}
 
     function initLayers() {
         appStatus.nrOfAbstractStates =  cy.$('node.AbstractState').size();
         appStatus.nrOfConcreteStates = cy.$('node.ConcreteState').size();
         appStatus.nrOfSequenceNodes = cy.$('node.SequenceNode').size();
-        appStatus.nrOfAbstractActions = cy.$('edge.AbstractAction').size();
+        appStatus.nrOfAbstractActions = countUniqueAbstractAction(cy.$('edge.AbstractAction'));
+        appStatus.nrOfAbstractTransitions = cy.$('edge.AbstractAction').size();
         appStatus.nrOfConcreteActions = cy.$('edge.ConcreteAction').size();
         appStatus.nrOfUnvisitedAbstractActions = cy.$('edge.UnvisitedAbstractAction').size();
         appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
@@ -1040,6 +1050,10 @@
 
         div = document.getElementById('stats-abstract-actions');
         text = document.createTextNode("Nr of abstract actions: " + appStatus.nrOfAbstractActions);
+        div.append(text);
+		
+        div = document.getElementById('stats-abstract-transitions');
+        text = document.createTextNode("Nr of abstract transitions: " + appStatus.nrOfAbstractTransitions);
         div.append(text);
 
         div = document.getElementById('stats-concrete-states');

@@ -69,8 +69,8 @@ div.layout > div.column > div.legend-text {
 }
 
 div.layout > div.column div.stats-text {
-    height: 25px;
-    margin-bottom: 12px;
+    height: 15px;
+    margin-bottom: 10px;
     font-size: 1.2em;
     line-height: 30px;
     margin-left: -20px;
