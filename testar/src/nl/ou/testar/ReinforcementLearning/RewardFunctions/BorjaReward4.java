@@ -53,11 +53,10 @@ public class BorjaReward4 implements RewardFunction {
 
         // Also decrement reward based on Widget Tree ZIndex
 
-        // TODO: Test if OriginWidget saved as Abstract Attribute
-        reward -= (0.01 * executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
+        // TODO: OriginWidget is not saved as Abstract Attribute
+        //reward -= (0.01 * executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
 
-        // TODO: If previous executed action didnt work try this code
-        /*Action desiredAction = null;
+        Action desiredAction = null;
         for(Action a : actions) {
             if(a.get(Tags.AbstractIDCustom).equals(executedAction.getActionId())) {
                 desiredAction = a;
@@ -66,7 +65,9 @@ public class BorjaReward4 implements RewardFunction {
         }
         if(desiredAction != null){
             reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
-        }*/
+        } else {
+            System.out.println("WARNING: It was not possible to get the OriginWidget");
+        }
         
         previousState = state;
 

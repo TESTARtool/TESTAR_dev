@@ -19,7 +19,11 @@ public class QBorjaFunction4 implements QFunction {
      */
     @Override
     public float getQValue(Tag<Float> rl_tag, final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
-		float currentQValue = previousActionUnderExecution.getAttributes().get(RLTags.QBorja, 0f);
+        if(previousActionUnderExecution == null) {
+            return 0f;
+        }
+        
+        float currentQValue = previousActionUnderExecution.getAttributes().get(RLTags.QBorja, 0f);
         
 		if(currentQValue == 0f) {
 		    previousActionUnderExecution.addAttribute(RLTags.QBorja, 1f);

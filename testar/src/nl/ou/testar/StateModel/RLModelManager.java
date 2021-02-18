@@ -105,6 +105,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
             previousAbstractActionToExecute = selectedAbstractAction;
         } catch (final Exception e) {
             logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
+            e.printStackTrace();
         }
     }
 
