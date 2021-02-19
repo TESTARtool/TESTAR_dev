@@ -34,6 +34,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.apache.commons.io.FileUtils;
 import org.fruit.Assert;
 import org.fruit.Pair;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -61,7 +62,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
  * 
  * ".github/workflows/gradle.yml"
  */
-public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverProtocol {
+public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverProtocol {
 
     /**
      * Called once during the life time of TESTAR
@@ -73,31 +74,43 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     protected void initialize(Settings settings) {
         super.initialize(settings);
 
-        /**
-         *  WebDriver settings and features verification
-         */
-        // We want to test WebdriverProtocol.ensureDomainsAllowed (startSystem method)
-        // Then we don't include ou.nl domain by default
-        Assert.collectionNotContains(settings.get(ConfigTags.DomainsAllowed), "www.ou.nl");
-        Assert.collectionNotContains(domainsAllowed, "www.ou.nl");
-
-        // Check that WebDriver settings are correctly assigned to Webdriver features
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "mijn.awo.ou.nl");
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "login.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "mijn.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "login.awo.ou.nl");
-        Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
-        Assert.collectionSize(deniedExtensions, 3);
+        //WebDriver settings and features verification
+        Assert.collectionContains(domainsAllowed, "parabank.parasoft.com");
+        Assert.collectionSize(deniedExtensions, 5);
     }
 
+    /**
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
     @Override
-    protected SUT startSystem() throws SystemStartException {        
-        SUT sut = super.startSystem();
+    protected void beginSequence(SUT system, State state) {
+        // Verify we have login values using ProtocolSpecificSettings inserted by cmd (check gradle task)
+        Assert.hasTextSetting(settings.get(ConfigTags.ProtocolSpecificSetting_1, ""), ConfigTags.ProtocolSpecificSetting_1.name());
+        Assert.hasTextSetting(settings.get(ConfigTags.ProtocolSpecificSetting_2, ""), ConfigTags.ProtocolSpecificSetting_2.name());
 
-        // Check if WebdriverProtocol.ensureDomainsAllowed feature works
-        Assert.collectionContains(domainsAllowed, "www.ou.nl");
+        String user = settings.get(ConfigTags.ProtocolSpecificSetting_1, "");
+        String pass = settings.get(ConfigTags.ProtocolSpecificSetting_2, "");
 
-        return sut;
+        // Make a login inside parabank app
+        waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName, "username", user, state, system, 5, 1.0);
+        waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName, "password", pass, state, system, 5, 1.0);
+        waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
+
+        Util.pause(5);
+
+        // Get the state after Login and verify we logged correctly
+        State stateAfterLogin = getState(system);
+        boolean loggedUser = false;
+        for(Widget widget : stateAfterLogin) {
+            if(widget.get(WdTags.WebTextContent, "").trim().equals("John Smith")) {
+                loggedUser = true;
+            }
+        }
+
+        Assert.isTrue(loggedUser, String.format("Trying to login in parabank app with user %s and pass %s" , user, pass));
     }
 
     @Override

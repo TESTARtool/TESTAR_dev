@@ -64,3 +64,10 @@ jobs:
       with:
         name: runTestWebdriverSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
+    - name: Run webdriver to login in parabank app
+      run: ./gradlew runTestWebdriverParabankLogin
+    - name: Save runTestWebdriverParabankLogin HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverParabankLogin-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login
