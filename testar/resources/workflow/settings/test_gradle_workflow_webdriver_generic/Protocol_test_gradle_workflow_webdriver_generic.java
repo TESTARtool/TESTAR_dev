@@ -73,24 +73,6 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     protected void initialize(Settings settings) {
         super.initialize(settings);
 
-        // Classes that are deemed clickable by the web framework
-        clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-
-        // Disallow links and pages with these extensions
-        // Set to null to ignore this feature
-        deniedExtensions = Arrays.asList("pdf", "jpg", "png");
-
-        // Define a whitelist of allowed domains for links and pages
-        // An empty list will be filled with the domain from the sut connector
-        // Set to null to ignore this feature
-        domainsAllowed = Arrays.asList("mijn.awo.ou.nl", "login.awo.ou.nl");
-
-        // If true, follow links opened in new tabs
-        // If false, stay with the original (ignore links opened in new tabs)
-        followLinks = true;
-        // Propagate followLinks setting
-        WdDriver.followLinks = followLinks;
-
         // URL + form name, username input id + value, password input id + value
         // Set login to null to disable this feature
         login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
@@ -102,13 +84,6 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         policyAttributes = new HashMap<String, String>() {{
             put("class", "lfr-btn-label");
         }};
-
-        //Force the browser to run in full screen mode
-        WdDriver.fullScreen = true;
-
-        //Force webdriver to switch to a new tab if opened
-        //This feature can block the correct display of select dropdown elements 
-        WdDriver.forceActivateTab = true;
     }
 
     @Override

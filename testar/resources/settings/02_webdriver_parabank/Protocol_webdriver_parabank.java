@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,13 +64,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
     policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
-
-    //Force the browser to run in full screen mode
-    WdDriver.fullScreen = true;
-
-    //Force webdriver to switch to a new tab if opened
-    //This feature can block the correct display of select dropdown elements 
-    WdDriver.forceActivateTab = true;
   }
 
   /**

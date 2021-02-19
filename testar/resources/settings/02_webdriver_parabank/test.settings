@@ -124,6 +124,15 @@ StateModelStoreWidgets = true
 #################################################################
 AbstractStateAttributes = WebWidgetId
 
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png;pfx;xml
+DomainsAllowed = parabank.parasoft.com
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
 
 #################################################################
 # Override display scale
@@ -139,6 +148,15 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings
@@ -173,15 +191,3 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
-
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = parabank.parasoft.com
-FollowLinks = false
-
-# Settings that can be used for user specified protocols:
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 

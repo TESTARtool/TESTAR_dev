@@ -108,6 +108,16 @@ ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
@@ -121,6 +131,15 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings
@@ -156,15 +175,3 @@ TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
-
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
-FollowLinks = true
-
-# Settings that can be used for user specified protocols:
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 

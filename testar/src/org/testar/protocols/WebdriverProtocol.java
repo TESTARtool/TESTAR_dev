@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,7 +87,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	// WedDriver settings from file:
 	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
-	protected boolean followLinks;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
@@ -125,18 +123,23 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
-		deniedExtensions = settings.get(ConfigTags.DeniedExtensions);
+		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
 
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed);
+		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = settings.get(ConfigTags.FollowLinks);
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
+		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
+
+		//Force the browser to run in full screen mode
+		WdDriver.fullScreen = settings.get(ConfigTags.BrowserFullScreen);
+
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 	}
 	
     /**
