@@ -14,6 +14,10 @@ import org.sikuli.script.Screen;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * This reward function uses image recognition to compare two states.
+ * It makes extensively use of Sikulix, @see <a href="https://sikulix-2014.readthedocs.io/en/latest/basicinfo.html">link</a>
+ */
 public class ImageRecognitionBasedRewardFunction implements RewardFunction {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ImageRecognitionBasedRewardFunction.class);
@@ -26,9 +30,6 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
         this.defaultReward = defaultReward;
     }
 
-    /**
-    *{@inheritDoc}
-     */
     @Override
     public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
         try {

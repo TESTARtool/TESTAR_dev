@@ -407,6 +407,18 @@ public class Settings extends TaggableBase implements Serializable {
 					+"PreviousApplicationName =" + Util.lineSep()
 					+"PreviousApplicationVersion =" + Util.lineSep()
 					+"StateModelDifferenceAutomaticReport =" + Util.lineSep()
+					+"# Reinforcement learning settings\n"
+					+"#################################################################\n"
+					+"Alpha = " + Util.lineSep()
+					+"Gamma = " + Util.lineSep()
+					+"DefaultValue = " + Util.lineSep()
+					+"DefaultReward = " + Util.lineSep()
+					+"Epsilon = " + Util.lineSep()
+					+"MaxQValue = " + Util.lineSep()
+					+"DecayRate = " + Util.lineSep()
+					+"Temperature = " + Util.lineSep()
+					+"RewardFunction = " + Util.lineSep()
+					+"Policy = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Override display scale\n"

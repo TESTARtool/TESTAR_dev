@@ -22,16 +22,7 @@ public class WidgetStub implements Widget {
 
     private final List<Widget> widgets = new ArrayList<>();
 
-    public WidgetStub() { }
-
-    public WidgetStub(final Widget childNode1) {
-        widgets.add(childNode1);
-    }
-
-    public WidgetStub(final Widget childNode1, final Widget childNode2) {
-        widgets.add(childNode1);
-        widgets.add(childNode2);
-    }
+    private Widget parent = null;
 
     @Override
     public State root() {
@@ -40,7 +31,10 @@ public class WidgetStub implements Widget {
 
     @Override
     public Widget parent() {
-        return null;
+        return parent;
+    }
+    public void setParent(Widget parent) {
+        this.parent = parent;
     }
 
     @Override
@@ -66,6 +60,11 @@ public class WidgetStub implements Widget {
     @Override
     public Widget addChild() {
         throw new NotImplementedException();
+    }
+
+    public Widget addChild(Widget widget) {
+        widgets.add(widget);
+        return this;
     }
 
     @Override

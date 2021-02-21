@@ -34,6 +34,8 @@ import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 
+import es.upv.staq.testar.CodingManager;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -246,5 +248,18 @@ public class WdWidget implements Widget, Serializable {
   @Override
   public String toString(Tag<?>... tags) {
     return Util.treeDesc(this, 2, tags);
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+	  if(o == this) {
+		  return true;
+	  }
+
+	  if(!(o instanceof WdWidget)) {
+		  return false;
+	  }
+
+	  return this.get(Tags.AbstractIDCustom, "one").equals(((WdWidget) o).get(Tags.AbstractIDCustom, "two"));
   }
 }
