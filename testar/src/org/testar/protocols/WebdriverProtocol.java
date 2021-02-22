@@ -369,28 +369,29 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     protected void stopSystem(SUT system) {
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+        if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
-    		try {
-    			
-    			File folder = new File(Settings.getSettingsPath());
-    			File file = new File(folder, "existingCssClasses.txt");
-    			if(!file.exists())
-    				file.createNewFile();
+            try {
+                if(Settings.getSettingsPath() != null) {
+                    File folder = new File(Settings.getSettingsPath());
+                    File file = new File(folder, "existingCssClasses.txt");
+                    if(!file.exists())
+                        file.createNewFile();
 
-    			Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
-    			stream.forEach(line -> existingCssClasses.add(line));
-    			stream.close();
-    			
-    			PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
-    			for(String s : existingCssClasses)
-    			    write.println(s);
-    			write.close();
-    		
-    		} catch (IOException e) {System.out.println(e.getMessage());}
-    	}
-    	
-    	super.stopSystem(system);
+                    Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
+                    stream.forEach(line -> existingCssClasses.add(line));
+                    stream.close();
+
+                    PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
+                    for(String s : existingCssClasses)
+                        write.println(s);
+                    write.close();
+                }
+
+            } catch (Exception e) {System.out.println(e.getMessage());}
+        }
+
+        super.stopSystem(system);
     }
     
     @Override
