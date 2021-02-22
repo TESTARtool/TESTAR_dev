@@ -19,56 +19,65 @@ import java.util.Set;
 
 public class BorjaReward4 implements RewardFunction {
     
-    private State previousState;
+    private State previousState = null;
 
     /**
      *{@inheritDoc}
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
-        float reward = 0f;
-        HTMLDifference htmlDifference = new HTMLDifference();
-        String differenceScreenshot = "";
-        String prevStateScrPath = previousState.get(Tags.ScreenshotPath, "");
-        String currStateScrPath = state.get(Tags.ScreenshotPath, "");
-        String prevStateID = previousState.get(Tags.AbstractIDCustom, "");
-        String currStateID = state.get(Tags.AbstractIDCustom, "");
-        
-        				
-		if(previousState != null && !prevStateScrPath.isEmpty() && !currStateScrPath.isEmpty()) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction selectedAbstractAction, Set<Action> actions) {
+    	System.out.println(". . . . . Enfoque 4 . . . . .");
+		float reward = 0f;
+
+		if (previousState == null) {
+	        previousState = state;
+			return reward;
+		}
+		
+		// HTMLDifference htmlDifference = new HTMLDifference();
+		String differenceScreenshot = "";
+		String prevStateScrPath = previousState.get(Tags.ScreenshotPath, "");
+		String currStateScrPath = state.get(Tags.ScreenshotPath, "");
+		String prevStateID = previousState.get(Tags.AbstractIDCustom, "");
+		String currStateID = state.get(Tags.AbstractIDCustom, "");
+
+		if (previousState != null && !prevStateScrPath.isEmpty() && !currStateScrPath.isEmpty()) {
 			// Create and obtain the image-diff path
 			differenceScreenshot = getDifferenceImage(prevStateScrPath, prevStateID, currStateScrPath, currStateID);
 		}
-	
+
 		// Pixel difference Reward
-        if(previousState != null && !differenceScreenshot.isEmpty()) {
+		if (previousState != null && !differenceScreenshot.isEmpty()) {
 			try {
 				BufferedImage diffScreanshot = ImageIO.read(new File(differenceScreenshot));
 				double diffPxPercentage = getDiffPxPercentage(diffScreanshot);
 				reward = (float) diffPxPercentage;
 			} catch (IOException e) {
-		    	e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
-        // Also decrement reward based on Widget Tree ZIndex
+		// Also decrement reward based on Widget Tree ZIndex
 
-        // TODO: OriginWidget is not saved as Abstract Attribute
-        //reward -= (0.01 * executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
+		// TODO: OriginWidget is not saved as Abstract Attribute
+		// reward -= (0.01 *
+		// selectedAbstractAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
 
-        Action desiredAction = null;
-        for(Action a : actions) {
-            if(a.get(Tags.AbstractIDCustom).equals(executedAction.getActionId())) {
-                desiredAction = a;
-                break;
-            }
-        }
-        if(desiredAction != null){
-            reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
-        } else {
-            System.out.println("WARNING: It was not possible to get the OriginWidget");
-        }
-        
+		System.out.println(". . . . . Provisional Reward: " + reward);
+		
+		Action desiredAction = null;
+		for (Action a : actions) {
+			if (a.get(Tags.AbstractIDCustom).equals(selectedAbstractAction.getActionId())) {
+				desiredAction = a;
+				break;
+			}
+		}
+		if (desiredAction != null) {
+			reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+		} else {
+			System.out.println("WARNING: It was not possible to get the OriginWidget");
+		}
+
         previousState = state;
 
         return reward;
@@ -207,50 +216,4 @@ public class BorjaReward4 implements RewardFunction {
         // TODO Auto-generated method stub
         
     }
-}
-
-/**
- * Helper Class to prepare HTML State report Difference
- */
-class HTMLDifference {
-	
-	PrintWriter out = null;
-
-	public HTMLDifference () { 
-		String[] HEADER = new String[] {
-				"<!DOCTYPE html>",
-				"<html>",
-				"<style>",
-				".container {display: flex;}",
-				".float {display:inline-block;}",
-				"</style>",
-				"<head>",
-				"<title>TESTAR State Model difference report</title>",
-				"</head>",
-				"<body>"
-		};
-		
-		String htmlReportName =  OutputStructure.htmlOutputDir + File.separator + "StateDifferenceReport.html";
-
-		try {
-			out = new PrintWriter(new File(htmlReportName).getCanonicalPath(), HTMLReporter.CHARSET);
-		} catch (IOException e) { e.printStackTrace(); }
-
-		for(String s:HEADER){
-			out.println(s);
-			out.flush();
-		}
-	}
-	
-	public void addStateDifferenceStep(int actionCount, String previousState, String state, String difference) {
-		out.println("<h2> Specific State changes for action " + actionCount + " </h2>");
-		try {
-			out.println("<p><img src=\"" + new File(previousState).getCanonicalFile().toString() + "\">");
-			out.println("<img src=\"" + new File(state).getCanonicalFile().toString() + "\">");
-			out.println("<img src=\"" + new File(difference).getCanonicalFile().toString() + "\"></p>");
-		} catch (IOException e) {
-			out.println("<p> ERROR ADDING IMAGES </p>");;
-		}
-		out.flush();
-	}
 }

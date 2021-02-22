@@ -13,56 +13,63 @@ import java.util.Set;
 
 public class BorjaReward3 implements RewardFunction{
     
-    private State previousState;
-    private Set<Action> previousActions;
+    private State previousState = null;
+    //private Set<Action> previousActions;
 
     @Override
-    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction executedAction, Set<Action> actions) {
+    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction selectedAbstractAction, Set<Action> actions) {
+        System.out.println(". . . . . Enfoque 3 . . . . .");
         float reward = 0f;
         
-        // Consider all widgets (widget tree)
-        int numWidgetsNow = getWidgetsNum(state);
+        if(previousState == null) {
+            previousState = state;
+        	return reward;
+        }
+
+		// Consider all widgets (widget tree)
+		int numWidgetsNow = getWidgetsNum(state);
 		int numWidgetsBefore = getWidgetsNum(previousState);
-				
+
 		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
 		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
 
-        if(numWidgetsBefore > 0) {
-			double persistentDecrement = getPersistentDecrementOfWidgets(state);
-			double numWidgetsBeforeDouble = numWidgetsBefore;
-			double numWidgetsNowDouble = numWidgetsNow;
-			
-			// Widget Tree difference reward
-			if(numWidgetsBefore < numWidgetsNow) {
-				reward = (float)((- persistentDecrement) + ((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble));
-			} else if(numWidgetsBefore > numWidgetsNow) {
-				reward = (float)((- persistentDecrement) - (numWidgetsNowDouble / numWidgetsBeforeDouble));
-			} else {
-			    reward = (float)(- persistentDecrement);
+		double persistentDecrement = getPersistentDecrementOfWidgets(state);
+		double numWidgetsBeforeDouble = numWidgetsBefore;
+		double numWidgetsNowDouble = numWidgetsNow;
+
+		// Widget Tree difference reward
+		if (numWidgetsBefore < numWidgetsNow) {
+			reward = (float) ((-persistentDecrement)
+					+ ((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble));
+		} else if (numWidgetsBefore > numWidgetsNow) {
+			reward = (float) ((-persistentDecrement) - (numWidgetsNowDouble / numWidgetsBeforeDouble));
+		} else {
+			reward = (float) (-persistentDecrement);
+		}
+
+		// Also decrement reward based on Widget Tree ZIndex
+
+		// TODO: OriginWidget is not saved as Abstract Attribute
+		// reward -= (0.01 *
+		// executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
+
+		System.out.println(". . . . . Provisional Reward: " + reward);
+		
+		Action desiredAction = null;
+		for (Action a : actions) {
+			if (a.get(Tags.AbstractIDCustom).equals(selectedAbstractAction.getActionId())) {
+				desiredAction = a;
+				break;
 			}
-
-			// Also decrement reward based on Widget Tree ZIndex
-
-			// TODO: OriginWidget is not saved as Abstract Attribute
-			//reward -= (0.01 * executedAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
-
-			Action desiredAction = null;
-			for(Action a : actions) {
-			    if(a.get(Tags.AbstractIDCustom).equals(executedAction.getActionId())) {
-			        desiredAction = a;
-			        break;
-			    }
-			}
-			if(desiredAction != null){
-			    reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
-			} else {
-			    System.out.println("WARNING: It was not possible to get the OriginWidget");
-			}
-
-        }
+		}
+		if (desiredAction != null) {
+			reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+		} else {
+			System.out.println("WARNING: It was not possible to get the OriginWidget");
+		}
         
         previousState = state;
-        previousActions = actions;
+        //previousActions = actions;
 
         return reward;
     }

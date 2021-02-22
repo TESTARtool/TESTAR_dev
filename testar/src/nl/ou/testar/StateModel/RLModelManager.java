@@ -14,6 +14,8 @@ import org.fruit.alayer.Tags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,7 +28,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     private static final Logger logger = LoggerFactory.getLogger(RLModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
-    private AbstractAction previousAbstractActionToExecute = null;
+    private AbstractAction previouslyExecutedAction = null;
 
     /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
@@ -41,6 +43,10 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     private State state = null;
 
     private final Tag<?> tag;
+    
+    //*** FOR DEBUGGING PURPOSES
+    List<Float> qValuesList = new ArrayList<Float>();
+    //*** FOR DEBUGGING PURPOSES
 
     /**
      * Constructor
@@ -87,22 +93,33 @@ public class RLModelManager extends ModelManager implements StateModelManager {
      */
     private void updateQValue(final Action selectedAction, final Set<Action> actions) {
         try {
+        	System.out.println(". . . . . NEW ITERATION . . . . .");
+        	System.out.println(". . . . . qValuesList: " + qValuesList + " . . . . .");
+        	
             // validate input
             Validate.notNull(selectedAction, "No action was found to execute");
 
             // get abstract action which is used in the reward and QFunction
             final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
-
-            // get reward and Q-value
-            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
-            System.out.println("REWARD: " + Float.toString(reward));
-            final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
-
-            // set attribute for saving in the graph database
-            selectedAbstractAction.addAttribute(tag, qValue);
+            
+	        // get reward and Q-value
+	        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
+	        System.out.println("REWARD: " + Float.toString(reward));
+	        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previouslyExecutedAction, selectedAbstractAction, reward, currentAbstractState, actions);
+	
+	        // set attribute for saving in the graph database
+	        if(previouslyExecutedAction != null) {
+	            previouslyExecutedAction.addAttribute(tag, qValue);
+	        	
+	        	//*** FOR DEBUGGING PURPOSES
+	        	float lastQValue = previouslyExecutedAction.getAttributes().get(RLTags.QBorja);
+        		qValuesList.add(lastQValue);
+        		//*** FOR DEBUGGING PURPOSES
+        		
+            }
 
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
-            previousAbstractActionToExecute = selectedAbstractAction;
+            previouslyExecutedAction = selectedAbstractAction;
         } catch (final Exception e) {
             logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
             e.printStackTrace();

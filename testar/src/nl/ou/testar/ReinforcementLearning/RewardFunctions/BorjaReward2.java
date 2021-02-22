@@ -10,11 +10,19 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 
 public class BorjaReward2 implements RewardFunction {
-	
-	@Override
-	public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction executedAction, Set<Action> actions) {
-		float reward = 0.05f;
 
+    private State previousState = null;
+    
+	@Override
+	public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction selectedAbstractAction, Set<Action> actions) {
+		System.out.println(". . . . . Enfoque 2 . . . . .");
+		float reward = 0f;
+        
+        if(previousState != null) {
+        	reward = -0.05f;
+        }
+
+        previousState = state;
         return reward;
 	}
 
