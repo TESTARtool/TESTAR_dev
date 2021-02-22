@@ -147,7 +147,7 @@ Policy = EpsilonGreedyPolicy
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\desktop_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\rachota_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Other more advanced settings
