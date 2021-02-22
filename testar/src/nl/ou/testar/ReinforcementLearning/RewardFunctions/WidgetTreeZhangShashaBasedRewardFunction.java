@@ -21,6 +21,7 @@ import java.util.Deque;
 public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction {
 
     private static final Logger logger = LogManager.getLogger(WidgetTreeZhangShashaBasedRewardFunction.class);
+    public static final float MIN_REWARD = 0.0001f;
 
     private final LRKeyrootsHelper lrKeyrootsHelper;
     private final TreeDistHelper treeDistHelper;
@@ -59,31 +60,29 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
 
         int reward = (int) treeDist.get(previousState, state);
 
-//        int reward = (int) treeDist.get(previousState, state);
-
         /**
-         * Minor fixes for debugging purposes
+         * For debugging purposes
          */
-        // TODO: State (process Widget) has normally only 1 child =  windows container
-        // Then I think size of all State Widgets
-        //logger.info("Childcount previous state='{}'", previousState.childCount());
-        //logger.info("Childcount current state='{}'", state.childCount());
+        // State (process Widget) has normally only 1 child =  windows container
         logger.info("Number widgets Previous State='{}'", previousState.childCount() > 0 ? Iterables.size(previousState) : 0);
         logger.info("Number widgets Current State='{}'", state.childCount() > 0 ? Iterables.size(state) : 0);
         
-        // TODO: State is basically the process Widget, think that getAbstractRepresentation is not informative
-        logger.info("State", state.getAbstractRepresentation());
-        //logger.info("State", state.getAbstractRepresentation());
+        // State is basically the process Widget, think that getAbstractRepresentation is not informative
+        logger.info("State='{}'", state.getAbstractRepresentation());
 
-        // TODO: First child of the state is normally the windows container, not really informative
+        // First child of the state is normally the windows container, not really informative
         logger.info("First child of previous state='{}'", previousState.child(0).getAbstractRepresentation());
 
-        // TODO: This is returning the representation of the State = Widget process, not really informative
-        logger.info("Reward for previous state:{} and current state {} is {}", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
-        logger.info("Reward for Action Transition from Previous State to Current State is {}", reward);
+        // This is returning the representation of the State = Widget process, not really informative
+        logger.info("Reward for previous state:'{}' and current state '{}' is '{}'", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
+        logger.info("Reward for Action Transition from Previous State to Current State is '{}'", reward);
         
         previousState = state;
         treeDist.clear();
+
+        if (reward == 0){
+            return MIN_REWARD;
+        }
 
         return reward;
     }
