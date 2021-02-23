@@ -10,7 +10,7 @@
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
-        <rewardFunction>ImageRecognitionBasedRewardFunction</rewardFunction>
+        <rewardFunction>WidgetTreeBasedRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>
     </reinforcementLearningSettings>
 	
