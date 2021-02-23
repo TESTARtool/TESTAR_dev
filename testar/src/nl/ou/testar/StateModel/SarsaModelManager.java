@@ -4,9 +4,9 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
-import org.apache.commons.lang.Validate;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
@@ -26,9 +26,9 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     private static final Logger logger = LoggerFactory.getLogger(SarsaModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
-    private AbstractAction previousAbstractActionToExecute = null;
+    private AbstractAction previouslySelectedAbstractAction = null;
 
-    /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
+    /**  The {@link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
     */
     private final RewardFunction rewardFunction;
@@ -61,7 +61,12 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
     public void notifyNewStateReached(final State newState, final Set<Action> actions) {
         super.notifyNewStateReached(newState, actions);
         state = newState;
+    }
 
+    @Override
+    public void notifyTestSequenceStopped() {
+        super.notifyTestSequenceStopped();
+        rewardFunction.reset();
     }
 
     /**
@@ -72,40 +77,64 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         logger.info("Number of actions available:{}", actions.size());
         final Action selectedAction = super.getAbstractActionToExecute(actions);
         logger.info("Action selected:{}", selectedAction == null ? null :selectedAction.toShortString());
-        updateQValue(selectedAction);
+        final AbstractAction selectedAbstractAction = getAbstractAction(currentAbstractState, selectedAction);
+        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+        final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
+
+        updateQValue(previouslySelectedAbstractAction, sarsaQValue);
+        previouslySelectedAbstractAction = selectedAbstractAction;
+
         return selectedAction;
+    }
+
+    /**
+     * Get the Q-value for an {@link Action}
+     *
+     * @param selectedAbstractAction, can be null
+     * @param reward
+     */
+    private double getQValue(final AbstractAction selectedAbstractAction, final float reward) {
+        if (selectedAbstractAction == null) {
+            logger.debug("Update of Q-value failed because no action was found to execute");
+        }
+        return qFunction.getQValue(previouslySelectedAbstractAction, selectedAbstractAction, reward);
+    }
+
+    /**
+     * Gets the {@link AbstractAction}
+     * @param currentAbstractState
+     * @param selectedAction
+     * @return The found {@link AbstractAction} or null
+     */
+    private AbstractAction getAbstractAction(final AbstractState currentAbstractState, final Action selectedAction) {
+        if (currentAbstractState == null || selectedAction == null) {
+            return null;
+        }
+
+        try {
+            return currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
+        } catch (final ActionNotFoundException e) {
+            return null;
+        }
     }
 
     /**
      * Update the Q-value for an {@link Action}
      *
-     * @param selectedAction, can be null
+     * @param selectedAbstractAction, can be null
+     * @param qValue
      */
-    private void updateQValue(final Action selectedAction) {
-        try {
-            // validate input
-            Validate.notNull(selectedAction, "No action was found to execute");
-
-            // get abstract action which is used in the reward and QFunction
-            final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
-
-            // get reward and Q-value
-            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
-            final double qValue = qFunction.getQValue(previousAbstractActionToExecute, selectedAbstractAction, reward);
-
-            // set attribute for saving in the graph database
-            selectedAbstractAction.addAttribute(RLTags.SarsaValue, (float) qValue);
-
-            // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
-            previousAbstractActionToExecute = selectedAbstractAction;
-        } catch (final Exception e) {
-            logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
+    private void updateQValue(final AbstractAction selectedAbstractAction, double qValue) {
+        if (selectedAbstractAction == null) {
+            logger.debug("Update of Q-value failed because no action was found to execute");
+            return;
         }
-    }
 
-    @Override
-    public void notifyTestSequenceStopped() {
-        super.notifyTestSequenceStopped();
-        rewardFunction.reset();
+        if (previouslySelectedAbstractAction == null) {
+            logger.debug("Update of Q-value failed because no previous action was found");
+            return;
+        }
+
+        previouslySelectedAbstractAction.addAttribute(RLTags.SarsaValue, (float) qValue);
     }
 }
