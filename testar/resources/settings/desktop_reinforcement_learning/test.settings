@@ -100,7 +100,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb-3.0.28\\databases
+DataStoreDirectory = D:\\orientdb-3.1.8\\databases
 DataStoreDB = testarDB
 DataStoreUser = admin
 DataStorePassword = admin
@@ -119,13 +119,13 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Reinforcement learning settings
 #################################################################
-Alpha = 1.0
-Gamma = 0.99
+Alpha = 0.85
+Gamma = 0.85
 DefaultValue = 0.0
 DefaultReward = 0.0
 Epsilon = 0.7
 MaxQValue = 1.0
-DecayRate = 0.0001
+DecayRate = 0.01
 Temperature = 1.0
 RewardFunction = WidgetTreeBasedRewardFunction
 Policy = EpsilonGreedyPolicy
