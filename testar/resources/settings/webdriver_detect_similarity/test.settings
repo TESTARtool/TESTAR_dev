@@ -108,6 +108,16 @@ ProtocolClass = webdriver_detect_similarity/Protocol_webdriver_detect_similarity
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png;pfx;xml
+DomainsAllowed = null
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

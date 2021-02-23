@@ -96,4 +96,11 @@ public final class Assert {
 	        throw new IllegalArgumentException(message);
 	    }
 	}
+	
+	public static void collectionSize(Collection<String> collection, int size) {
+	    if(collection.size() != size) {
+	        String message = String.format("Collection %s has undesired size %s", collection.toString(), size);
+	        throw new IllegalArgumentException(message);
+	    }
+	}
 }
