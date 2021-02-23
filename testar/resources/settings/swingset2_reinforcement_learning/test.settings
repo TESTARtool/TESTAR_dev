@@ -116,9 +116,10 @@ DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = instant
+DataStoreMode = delayed
 ApplicationName = SwingSet2_RL
 ApplicationVersion = 1
+DataStoreDirectory = D:\\orientdb-3.0.28\\databases
 
 #################################################################
 # State identifier attributes

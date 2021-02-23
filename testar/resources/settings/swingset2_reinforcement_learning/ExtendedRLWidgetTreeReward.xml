@@ -8,7 +8,7 @@
         <defaultReward>0.0</defaultReward>
         <epsilon>0.5</epsilon>
         <maxQValue>1.0</maxQValue>
-        <decayRate>0.0001</decayRate>
+        <decayRate>0.05</decayRate>
         <temperature>1.0</temperature>
         <rewardFunction>WidgetTreeBasedRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>

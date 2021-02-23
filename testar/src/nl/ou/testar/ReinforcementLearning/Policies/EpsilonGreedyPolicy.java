@@ -2,15 +2,20 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 
 import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.StateModel.AbstractAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Set;
 
 public class EpsilonGreedyPolicy implements Policy {
+    private static final Logger logger = LogManager.getLogger(EpsilonGreedyPolicy.class);
+
     private final float epsilon; //The epsilon parameter should be between 0 and 1
 
     private final GreedyPolicy greedyPolicy;
 
     public EpsilonGreedyPolicy(final GreedyPolicy greedyPolicy, final float epsilon) {
+        logger.info("EpsilonGreedyPolicy initialized with epsilon='{}'", epsilon);
         this.greedyPolicy = greedyPolicy;
         this.epsilon = epsilon;
     }
