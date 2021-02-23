@@ -223,6 +223,7 @@ public final class Tags extends TagsBase {
     public static final Tag<Role> OriginWidgetRole = Tag.from("OriginWidgetRole", Role.class);
     public static final Tag<String> OriginWidgetTitle = Tag.from("OriginWidgetTitle", String.class);
     public static final Tag<String> OriginWidgetValuePattern = Tag.from("OriginWidgetValuePattern", String.class);
+    public static final Tag<Integer> debugExecutedTimes = Tag.from("debugExecutedTimes", Integer.class);
 	
 	private static Set<Tag<String>> generalStringVerdictTags;
 	static {

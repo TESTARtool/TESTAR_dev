@@ -14,6 +14,10 @@ public class CompoundFactory {
         if (settings.get(ConfigTags.ActionSelectionAlgorithm).equals("unvisited")) {
             selectors.add(new ImprovedUnvisitedActionSelector());
         }
+        if (settings.get(ConfigTags.ActionSelectionAlgorithm).equals("custom")) {
+            selectors.add(new CustomAbstractActionSelector());
+            selectors.add(new ImprovedUnvisitedActionSelector());
+        }
         selectors.add(new RandomActionSelector());
         return new CompoundActionSelector(selectors);
     }

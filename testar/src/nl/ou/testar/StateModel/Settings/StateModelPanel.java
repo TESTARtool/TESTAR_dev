@@ -82,7 +82,7 @@ public class StateModelPanel extends JPanel {
     private JPasswordField dataStorePasswordfield = new JPasswordField();
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
-    private JComboBox<String> actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first"});
+    private JComboBox<String> actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first", "Unvisited custom"});
     private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
     private Set<JComponent> components;
     private JCheckBox accessBridgeEnabledBox = new JCheckBox();
@@ -318,6 +318,10 @@ public class StateModelPanel extends JPanel {
                 actionSelectionBox.setSelectedIndex(i);
                 break;
             }
+            if (actionSelectionBox.getItemAt(i).equals("Unvisited custom") && currentAlgorithm.equals("custom")) {
+                actionSelectionBox.setSelectedIndex(i);
+                break;
+            }
         }
 
     }
@@ -344,6 +348,9 @@ public class StateModelPanel extends JPanel {
         switch ((String) actionSelectionBox.getSelectedItem()) {
             case "Unvisited actions first":
                 settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");
+                break;
+            case "Unvisited custom":
+                settings.set(ConfigTags.ActionSelectionAlgorithm, "custom");
                 break;
 
             default:

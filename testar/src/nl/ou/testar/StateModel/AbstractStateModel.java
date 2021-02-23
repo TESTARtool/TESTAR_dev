@@ -68,6 +68,8 @@ public class AbstractStateModel {
         for (int i = 0; i < eventListeners.length;i++) {
             this.eventListeners.add(eventListeners[i]);
         }
+        this.unvisitedCustomAction = new HashMap<>();
+        this.executedCustomAction = new HashMap<>();
         initStateModel();
     }
 
@@ -300,5 +302,41 @@ public class AbstractStateModel {
      */
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+
+    // list of possible actions that have not yet been executed
+    private Map<String, AbstractAction> unvisitedCustomAction;
+
+    // executed action
+    private Map<String, AbstractAction> executedCustomAction;
+
+    public Map<String, AbstractAction> getUnvisitedCustomActions() {
+        return unvisitedCustomAction;
+    }
+
+    public Map<String, AbstractAction> getExecutedCustomActions() {
+        return executedCustomAction;
+    }
+
+    public void addNewUnvisitedCustomAction(AbstractAction abstractAction) {
+        if(!this.executedCustomAction.containsKey(abstractAction.getActionId())) {
+            unvisitedCustomAction.put(abstractAction.getActionId(), abstractAction);
+        }
+    }
+
+    public void addExecutedCustomAction(AbstractAction abstractAction) {
+        if(!this.executedCustomAction.containsKey(abstractAction.getActionId())) {
+            executedCustomAction.put(abstractAction.getActionId(), abstractAction);
+        }
+        unvisitedCustomAction.remove(abstractAction.getActionId());
+    }
+    
+    public void updateTransitionWithActionTag(AbstractAction abstractAction, Tag tag, Object value) {
+        for(AbstractStateTransition transition : stateTransitions) {
+            if(transition.getActionId().equals(abstractAction.getActionId())) {
+                System.out.println("DEBUG updateTransitionWithActionTag ActionId: " + transition.getActionId() + ", with value: " + value);
+                transition.getAction().addAttribute(tag, value);
+            }
+        }
     }
 }

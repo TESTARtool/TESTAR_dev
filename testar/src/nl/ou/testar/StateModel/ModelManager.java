@@ -7,6 +7,8 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
+import nl.ou.testar.StateModel.Util.ActionHelper;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
@@ -101,6 +103,11 @@ public class ModelManager implements StateModelManager {
                 newAbstractState = abstractStateModel.getState(abstractStateId);
                 // update the abstract state
                 AbstractStateService.updateAbstractStateActions(newAbstractState, actions);
+                
+                // update state model action
+                for (AbstractAction abstractAction : ActionHelper.convertActionsToAbstractActions(actions)) {
+                    abstractStateModel.addNewUnvisitedCustomAction(abstractAction);
+                }
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();
@@ -108,6 +115,10 @@ public class ModelManager implements StateModelManager {
             }
         } else {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
+            // update state model action
+            for (AbstractAction abstractAction : ActionHelper.convertActionsToAbstractActions(actions)) {
+                abstractStateModel.addNewUnvisitedCustomAction(abstractAction);
+            }
         }
 
         // add the concrete state id to the abstract state
@@ -175,7 +186,10 @@ public class ModelManager implements StateModelManager {
         // temporarily output the number of unvisited actions still left
         System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
                 Collection::stream
-        ).count() + " unvisited actions left");
+        ).count() + " unvisited action transitions left");
+        System.out.println("----------------------------");
+        // temporarily output the number of unvisited actions still left
+        System.out.println(abstractStateModel.getUnvisitedCustomActions().size() + " unvisited custom actions left");
         System.out.println("----------------------------");
         System.out.println();
     }
@@ -196,11 +210,21 @@ public class ModelManager implements StateModelManager {
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
+            abstractStateModel.addNewUnvisitedCustomAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
         System.out.println("Executing action: " + action.get(Tags.Desc));
         System.out.println("----------------------------------");
+        
+        abstractStateModel.addExecutedCustomAction(actionUnderExecution);
+        AbstractAction genericAction = abstractStateModel.getExecutedCustomActions().get(actionUnderExecution.getActionId());
+        int t = genericAction.getAttributes().get(Tags.debugExecutedTimes, 0);
+        genericAction.addAttribute(Tags.debugExecutedTimes, t+1);
+        System.out.println("DEBUG debugExecutedTimes: " + genericAction.getAttributes().get(Tags.debugExecutedTimes));
+        System.out.println("----------------------------------");
+        
+        abstractStateModel.updateTransitionWithActionTag(genericAction, Tags.debugExecutedTimes, genericAction.getAttributes().get(Tags.debugExecutedTimes));
 
         // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
         if (errorMessages.length() > 0) {
