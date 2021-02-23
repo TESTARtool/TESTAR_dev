@@ -2,11 +2,11 @@
 <root>
 	<!-- RL Policy and Reward Function + Values -->
     <reinforcementLearningSettings>
-        <alpha>0.8</alpha>
-        <gamma>0.8</gamma>
+        <alpha>0.95</alpha>
+        <gamma>0.95</gamma>
         <defaultValue>0.0</defaultValue>
         <defaultReward>0.0</defaultReward>
-        <epsilon>0.1</epsilon>
+        <epsilon>0.5</epsilon>
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
