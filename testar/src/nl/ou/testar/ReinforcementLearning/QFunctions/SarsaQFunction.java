@@ -2,11 +2,15 @@ package nl.ou.testar.ReinforcementLearning.QFunctions;
 
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Implements the default Q-function of Sarsa
  */
 public class SarsaQFunction implements QFunction {
+
+    private static final Logger logger = LogManager.getLogger(SarsaQFunction.class);
 
     private final float alphaDiscount;
     private final float gammaDiscount;
@@ -19,6 +23,7 @@ public class SarsaQFunction implements QFunction {
      * @param defaultQValue
      */
     public SarsaQFunction(float alphaDiscount, final float gammaDiscount, final float defaultQValue) {
+        logger.info("SarsaQFunction initialized with alpha='{} gamma='{}' and defaultQValue='{}'", alphaDiscount, gammaDiscount, defaultQValue);
         this.alphaDiscount = alphaDiscount;
         this.gammaDiscount = gammaDiscount;
         this.defaultQValue = defaultQValue;
