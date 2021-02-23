@@ -80,10 +80,6 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         previousState = state;
         treeDist.clear();
 
-        if (reward == 0){
-            return MIN_REWARD;
-        }
-
         return reward;
     }
 
