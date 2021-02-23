@@ -1,0 +1,12 @@
+<?xml version = "1.0"?>
+<oracle>
+   <trigger>	
+	<widget_attribute>Title</widget_attribute>
+	<widget_value>Open</widget_value>
+   </trigger>
+   <verdict>	
+	<severity>0.5</severity>
+	<message>Title Open found</message>
+   </verdict>
+
+</oracle>

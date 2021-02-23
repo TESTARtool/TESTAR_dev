@@ -490,6 +490,9 @@ public class Main {
 				}
 			}));
 
+			defaults.add(Pair.from(OracleFilePath, "")); //empty = feature disabled
+
+
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
 
