@@ -39,42 +39,43 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 public class AnalysisProtocol {
 
-	private String outputDir;
-	private Config analysisConfig;
-	private JettyServer jettyServer;
+    private String outputDir;
+    private Config analysisConfig;
+    private JettyServer jettyServer;
 
-	public AnalysisProtocol (Settings settings) {
-		// create a config object for the orientdb database connection info
-		Config config = new Config();
-		config.setConnectionType(settings.get(ConfigTags.DataStoreType, ""));
-		config.setServer(settings.get(ConfigTags.DataStoreServer, ""));
-		config.setDatabase(settings.get(ConfigTags.DataStoreDB, ""));
-		config.setUser(settings.get(ConfigTags.DataStoreUser, ""));
-		config.setPassword(settings.get(ConfigTags.DataStorePassword, ""));
-		config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory, ""));
+    public AnalysisProtocol (Settings settings) {
+        // create a config object for the orientdb database connection info
+        Config config = new Config();
+        config.setConnectionType(settings.get(ConfigTags.DataStoreType, ""));
+        config.setServer(settings.get(ConfigTags.DataStoreServer, ""));
+        config.setDatabase(settings.get(ConfigTags.DataStoreDB, ""));
+        config.setUser(settings.get(ConfigTags.DataStoreUser, ""));
+        config.setPassword(settings.get(ConfigTags.DataStorePassword, ""));
+        config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory, ""));
 
-		this.analysisConfig = config;
+        this.analysisConfig = config;
 
-		outputDir = settings.get(ConfigTags.OutputDir, "");
-		// check if the output directory has a trailing line separator
-		if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-			outputDir += File.separator;
-		}
-		outputDir = outputDir + "graphs" + File.separator;
-	}
+        outputDir = settings.get(ConfigTags.OutputDir, "");
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "graphs" + File.separator;
+    }
 
-	public void startStateModelAnalysis() {
-		try {
-			AnalysisManager analysisManager = new AnalysisManager(analysisConfig, outputDir);
-			jettyServer = new JettyServer();
-			jettyServer.start(outputDir, analysisManager);
-		} catch (Exception e) {
-			System.out.println("Please check your connection credentials.");
-		}
-	}
-	
-	public boolean isAnalyzerActive() {
-		return jettyServer.isJettyServerRunning();
-	}
+    public void startStateModelAnalysis(long maxTime) {
+        try {
+            AnalysisManager analysisManager = new AnalysisManager(analysisConfig, outputDir);
+            jettyServer = new JettyServer();
+            jettyServer.setMaxTime(maxTime);
+            jettyServer.start(outputDir, analysisManager);
+        } catch (Exception e) {
+            System.out.println("Please check your connection credentials.");
+        }
+    }
+
+    public boolean isAnalyzerActive() {
+        return jettyServer.isJettyServerRunning() && !jettyServer.reachedMaxRunningTime();
+    }
 
 }

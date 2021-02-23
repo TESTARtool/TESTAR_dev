@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2018, 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,9 @@ import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.GraphServlet;
 import nl.ou.testar.StateModel.Analysis.ShutdownServlet;
 import nl.ou.testar.StateModel.Analysis.StateModelServlet;
+
+import java.util.Date;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -47,6 +50,13 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class JettyServer {
     private Server server;
     private ShutdownServlet shutdownServlet;
+    private long startTime;
+    private long maxTime;
+
+    public void setMaxTime(long maxTime) {
+        startTime = new Date().getTime();
+        this.maxTime = maxTime;
+    }
 
     /**
      * Call this method to start running the jetty server.
@@ -71,11 +81,11 @@ public class JettyServer {
         webAppContext.setResourceBase(resourceBase);
         webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
         webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
-        
+
         // Shutdown this server
         shutdownServlet = new ShutdownServlet(server);
         webAppContext.addServlet(new ServletHolder(shutdownServlet), "/shutdown");
-        
+
         webAppContext.setAttribute("analysisManager", analysisManager);
 
         Configuration.ClassList classlist = Configuration.ClassList
@@ -93,12 +103,25 @@ public class JettyServer {
         handlerList.addHandler(webAppContext);
         handlerList.addHandler(new DefaultHandler());
         server.setHandler(handlerList);
-        
+
         server.setStopTimeout(10000L);
         server.start();
     }
-    
+
     public boolean isJettyServerRunning() {
-    	return shutdownServlet.isServerRunning();
+        return shutdownServlet.isServerRunning();
+    }
+
+    public boolean reachedMaxRunningTime() {
+        if((new Date().getTime() - startTime) > maxTime) {
+            try {
+                server.stop();
+            } catch (Exception e) {
+                System.out.println("Failed to stop Jetty server by MaxTime");
+            }
+            return true;
+        }
+
+        return false;
     }
 }

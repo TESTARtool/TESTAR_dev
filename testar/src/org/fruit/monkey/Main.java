@@ -49,6 +49,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 import org.fruit.alayer.windows.Windows10;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.HttpWebServer;
 
 import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
@@ -106,11 +107,19 @@ public class Main {
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
 		Settings settings = loadTestarSettings(args, testSettingsFileName);
+		
+		// TESTAR is executed to offer some Web Server feature.
+		if(webServerMode(settings) && !settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+
+		    setTestarDirectory(settings);
+
+		    HttpWebServer webServer = new HttpWebServer(settings, 60000L);
+		    webServer.runWebServer();
+		}
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
-		// Also disabled if TESTAR is executed to offer some Web Server feature.
-		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup) || webServerMode(settings)){
+		else if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
 			setTestarDirectory(settings);
 
@@ -144,6 +153,13 @@ public class Main {
 
 		System.exit(0);
 
+	}
+	
+	/**
+	 * Check if TESTAR was launched to offer a Web Server feature
+	 */
+	private static boolean webServerMode(Settings settings) {
+	    return (settings.get(ConfigTags.Mode).equals(Modes.Analysis) || settings.get(ConfigTags.Mode).equals(Modes.Report));
 	}
 
 	private static boolean isValidJavaEnvironment() {
@@ -221,14 +237,6 @@ public class Main {
 			//Use the only file that was found
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
-	}
-	
-	/**
-	 * Check if TESTAR was launched to offer a Web Server feature
-	 */
-	private static boolean webServerMode(Settings settings) {
-		return (settings.get(ConfigTags.Mode).equals(Modes.Analysis) 
-				|| settings.get(ConfigTags.Mode).equals(Modes.Report));
 	}
 
 	/**
