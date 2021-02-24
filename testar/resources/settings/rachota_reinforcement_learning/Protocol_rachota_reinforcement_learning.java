@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.GreedyPolicy;
@@ -225,9 +226,13 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 	    if (preSelectedAction != null) {
 	        return preSelectedAction;
 	    }
-
-	    // select action based on state and set of actions
-	    return stateModelManager.getAbstractActionToExecute(actions);
+	    Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+	    if(modelAction==null) {
+	        System.out.println("State model based action selection did not find an action. Using random action selection.");
+	        // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+	        return RandomActionSelector.selectAction(actions);
+	    }
+	    return modelAction;
 	}
 
 	/**
