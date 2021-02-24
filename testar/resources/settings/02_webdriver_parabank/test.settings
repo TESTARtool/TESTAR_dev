@@ -130,6 +130,16 @@ AbstractStateAttributes = WebWidgetId
 AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png;pfx;xml
+DomainsAllowed = parabank.parasoft.com
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
@@ -143,6 +153,15 @@ AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,Ac
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings

@@ -125,6 +125,16 @@ AbstractStateAttributes = WebWidgetId
 AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.w3schools.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

@@ -109,6 +109,15 @@ AbstractStateAttributes = WidgetControlType
 AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

@@ -113,6 +113,16 @@ AbstractStateAttributes = WebWidgetId
 AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = mijn.awo.ou.nl;login.awo.ou.nl
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

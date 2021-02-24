@@ -113,6 +113,16 @@ AbstractStateAttributes = WebWidgetId
 AbstractActionAttributes = ActionOriginStateAbstractId,ActionOriginWidgetPath,ActionOriginWidgetRole
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = selectItemLiteText;etreeCell;etreeCellSelected;etreeCellSelectedOver;checkboxFalse;checkboxFalseOver;checkboxTrue;checkboxTrueOver;showcaseTileIcon;vScrollStart;vScrollEnd
+DeniedExtensions = pdf;jpg;png;jsp
+DomainsAllowed = www.smartclient.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
