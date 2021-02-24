@@ -17,16 +17,19 @@ public class VCSPanel extends JPanel {
     private JLabel gitUsernameLabel;
     private JLabel gitPasswordLabel;
     private JLabel authorizationRequiredLabel;
+    private JButton cloneButton;
     private final static String GIT_URL_LABEL = "Repository URL";
     private final static String GIT_USERNAME_LABEL = "Username";
     private final static String GIT_PASSWORD_LABEL = "Password";
     private final static String AUTHORIZATION_REQUIRED_LABEL = "Authorization required";
+    private final static String CLONE_BUTTON = "Clone";
 
     public VCSPanel() {
         initGitRepositoryUrl();
         initGitUsername();
         initGitPassword();
         initAuthorizationRequired();
+        initClone();
         initLayout();
     }
 
@@ -58,6 +61,10 @@ public class VCSPanel extends JPanel {
         gitPasswordTextField.setEnabled(enabled);
     }
 
+    private void initClone() {
+        cloneButton = new JButton(CLONE_BUTTON);
+    }
+
     private void initLayout() {
         GroupLayout groupLayout = new GroupLayout(this);
         this.setLayout(groupLayout);
@@ -80,7 +87,10 @@ public class VCSPanel extends JPanel {
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addComponent(gitPasswordLabel, PREFERRED_SIZE, 120, PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(gitPasswordTextField, PREFERRED_SIZE, 346, PREFERRED_SIZE))));
+                                        .addComponent(gitPasswordTextField, PREFERRED_SIZE, 346, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(cloneButton, PREFERRED_SIZE, 65, PREFERRED_SIZE))));
         groupLayout.setVerticalGroup(
                 groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(groupLayout.createSequentialGroup()
@@ -100,6 +110,9 @@ public class VCSPanel extends JPanel {
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(gitPasswordTextField, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
                                         .addComponent(gitPasswordLabel))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cloneButton, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
                                 .addPreferredGap(UNRELATED))
         );
     }
