@@ -89,6 +89,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private StateModelPanel stateModelPanel;
+  private VCSPanel vcsPanel;
 
   /**
    * Starts the settings Dialog.
@@ -272,6 +273,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
+    vcsPanel = new VCSPanel();
+    jTabsPane.addTab("VCS Options", vcsPanel);
 
     setLayout(jTabsPane);
     pack();
