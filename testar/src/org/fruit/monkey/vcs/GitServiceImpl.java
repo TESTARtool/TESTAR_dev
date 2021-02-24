@@ -27,12 +27,12 @@ public class GitServiceImpl implements GitService {
     }
 
     @Override
-    public boolean cloneRepositoryWithAuth(String repositoryUrl, GitAuth gitAuth) {
+    public boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials) {
         try {
             Git.cloneRepository()
                     .setURI(repositoryUrl)
                     .setDirectory(prepareRepositoryDirectory(repositoryUrl))
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitAuth.getUsername(), gitAuth.getPassword()))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitCredentials.getUsername(), gitCredentials.getPassword()))
                     .call();
             return true;
         } catch (GitAPIException e) {

@@ -1,15 +1,15 @@
 package org.fruit.monkey.vcs;
 
-public class GitAuth {
+public class GitCredentials {
     private String username;
     private String password;
 
-    public GitAuth(String username, String password) {
+    public GitCredentials(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
-    public GitAuth() {
+    public GitCredentials() {
     }
 
     public String getUsername() {

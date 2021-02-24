@@ -4,5 +4,5 @@ public interface GitService {
 
     boolean cloneRepository(String repositoryUrl);
 
-    boolean cloneRepositoryWithAuth(String repositoryUrl, GitAuth gitAuth);
+    boolean cloneRepository(String repositoryUrl, GitCredentials gitAuth);
 }
