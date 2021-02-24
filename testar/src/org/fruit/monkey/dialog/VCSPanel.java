@@ -1,6 +1,13 @@
 package org.fruit.monkey.dialog;
 
+import org.fruit.monkey.vcs.GitCredentials;
+import org.fruit.monkey.vcs.GitService;
+import org.fruit.monkey.vcs.GitServiceImpl;
+
 import javax.swing.*;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
@@ -11,7 +18,7 @@ public class VCSPanel extends JPanel {
 
     private JTextField gitRepositoryUrlTextField;
     private JTextField gitUsernameTextField;
-    private JTextField gitPasswordTextField;
+    private JPasswordField gitPasswordField;
     private JCheckBox authorizationRequiredCheckBox;
     private JLabel gitRepositoryUrlLabel;
     private JLabel gitUsernameLabel;
@@ -24,7 +31,10 @@ public class VCSPanel extends JPanel {
     private final static String AUTHORIZATION_REQUIRED_LABEL = "Authorization required";
     private final static String CLONE_BUTTON = "Clone";
 
+    private GitService gitService;
+
     public VCSPanel() {
+        gitService = new GitServiceImpl();
         initGitRepositoryUrl();
         initGitUsername();
         initGitPassword();
@@ -46,7 +56,7 @@ public class VCSPanel extends JPanel {
 
     private void initGitPassword() {
         gitPasswordLabel = new JLabel(GIT_PASSWORD_LABEL);
-        gitPasswordTextField = new JTextField();
+        gitPasswordField = new JPasswordField();
     }
 
     private void initAuthorizationRequired() {
@@ -58,11 +68,20 @@ public class VCSPanel extends JPanel {
 
     private void setAuthorizationFieldsEnabled(boolean enabled) {
         gitUsernameTextField.setEnabled(enabled);
-        gitPasswordTextField.setEnabled(enabled);
+        gitPasswordField.setEnabled(enabled);
     }
 
     private void initClone() {
         cloneButton = new JButton(CLONE_BUTTON);
+        cloneButton.addActionListener(e -> {
+            if(authorizationRequiredCheckBox.isSelected()) {
+                GitCredentials gitCredentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
+                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), gitCredentials, new CloneListener());
+
+            } else {
+                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new CloneListener());
+            }
+        });
     }
 
     private void initLayout() {
@@ -87,7 +106,7 @@ public class VCSPanel extends JPanel {
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addComponent(gitPasswordLabel, PREFERRED_SIZE, 120, PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(gitPasswordTextField, PREFERRED_SIZE, 346, PREFERRED_SIZE))
+                                        .addComponent(gitPasswordField, PREFERRED_SIZE, 346, PREFERRED_SIZE))
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
                                         .addComponent(cloneButton, PREFERRED_SIZE, 65, PREFERRED_SIZE))));
@@ -108,12 +127,25 @@ public class VCSPanel extends JPanel {
                                         .addComponent(gitUsernameLabel))
                                 .addPreferredGap(RELATED)
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(gitPasswordTextField, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
+                                        .addComponent(gitPasswordField, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
                                         .addComponent(gitPasswordLabel))
                                 .addPreferredGap(RELATED)
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(cloneButton, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
                                 .addPreferredGap(UNRELATED))
         );
+    }
+
+    class CloneListener implements PropertyChangeListener {
+        //TODO add some confirmation/error dialogs
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            Boolean cloneSuccessful = (Boolean) evt.getNewValue();
+            if(cloneSuccessful) {
+                System.out.println("CLONE SUCCESS");
+            } else {
+                System.out.println("CLONE ERROR");
+            }
+        }
     }
 }
