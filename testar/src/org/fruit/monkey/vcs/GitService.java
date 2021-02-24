@@ -1,8 +1,10 @@
 package org.fruit.monkey.vcs;
 
+import java.beans.PropertyChangeListener;
+
 public interface GitService {
 
-    boolean cloneRepository(String repositoryUrl);
+    void cloneRepository(String repositoryUrl, PropertyChangeListener cloningListener);
 
-    boolean cloneRepository(String repositoryUrl, GitCredentials gitAuth);
+    void cloneRepository(String repositoryUrl, GitCredentials gitAuth, PropertyChangeListener cloningListener);
 }
