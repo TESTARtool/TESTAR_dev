@@ -15,12 +15,14 @@ import org.testar.settings.ExtendedSettingsFactory;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.fruit.alayer.Tags.*;
 import static org.fruit.alayer.webdriver.enums.WdTags.WebTextContent;
@@ -40,7 +42,7 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
      * readable text. Optional when the value (which represents the ancestor path) is set, the {@link Widget} should
      * only be ignored when the ancestor path is equal with the {@link Widget} under investigation.
      */
-    private final Map<String, String> _blacklist = new HashMap<>();
+    private final Map<String, List<String>> _blacklist = new HashMap<>();
 
     /**
      * A lookup table which indicates based on the {@code Role} which {@link Tag} should be used to extract the text.
@@ -61,7 +63,10 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         // Load the extractor configuration into a lookup table for quick access.
         config.widget.forEach(it -> {
             if (it.ignore) {
-                _blacklist.put(it.role, it.ancestor);
+                List<String> ancestor = it.ancestor.isEmpty() ?
+                        Collections.emptyList() : Collections.singletonList(it.ancestor);
+                _blacklist.merge(it.role, ancestor, (list1, list2) ->
+                        Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList()));
             } else {
                 _lookupTable.put(it.role, it.tag);
             }
@@ -160,13 +165,14 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         if (_blacklist.containsKey(role)) {
             containsReadableText = false;
             try {
-                String ancestors = _blacklist.get(role);
-                if (!ancestors.isEmpty()) {
+                List<String> blacklistedAncestors = _blacklist.get(role);
+                if (!blacklistedAncestors.isEmpty()) {
                     StringBuilder sb = new StringBuilder();
                     Util.ancestors(w).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
 
                     // Check if we should ignore this widget based on its ancestors.
-                    containsReadableText = !sb.toString().equals(ancestors);
+                    String ancestors = sb.toString();
+                    containsReadableText = blacklistedAncestors.stream().noneMatch(ancestors::equals);
                 }
             } catch (NullPointerException ignored) {
 

@@ -24,8 +24,12 @@ public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfi
         WidgetTextSetting textEdit = WidgetTextSetting.CreateExtract("UIAEdit", "UIAValueValue");
         WidgetTextSetting icon = WidgetTextSetting.CreateIgnoreAncestorBased("UIAMenuItem",
                 Arrays.asList("UIAMenuBar", "UIATitleBar", "UIAWindow", "Process"));
+        WidgetTextSetting toolBarButtons = WidgetTextSetting.CreateIgnoreAncestorBased("UIAButton",
+                Arrays.asList("UIATitleBar", "UIAWindow", "Process"));
+        WidgetTextSetting scrollBarButtons = WidgetTextSetting.CreateIgnoreAncestorBased("UIAButton",
+                Arrays.asList("UIAScrollBar", "UIAEdit", "UIAWindow", "Process"));
 
-        instance.widget = new ArrayList<>(Arrays.asList(scrollBar, statusBar, menuBar, textEdit, icon));
+        instance.widget = new ArrayList<>(Arrays.asList(scrollBar, statusBar, menuBar, textEdit, icon, toolBarButtons, scrollBarButtons));
         return instance;
     }
 
