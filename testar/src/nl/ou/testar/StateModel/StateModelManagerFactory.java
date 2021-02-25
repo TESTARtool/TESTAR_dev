@@ -83,38 +83,41 @@ public class StateModelManagerFactory {
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
 
-            logger.info("State model with sarsaModelManager selected");
+            logger.info("RLModelManager State Model");
             switch (stateModelRL){
-                case "SarsaModelManager":
-                    new SarsaModelManager(abstractStateModel,
-                            actionSelector,
-                            persistenceManager,
-                            concreteStateTags,
-                            sequenceManager,
-                            storeWidgets,
-                            rewardFunction,
-                            qFunction,
-                            tag);
-                case "BorjaModelManager":
-                    new BorjaModelManager(abstractStateModel,
-                            actionSelector,
-                            persistenceManager,
-                            concreteStateTags,
-                            sequenceManager,
-                            storeWidgets,
-                            rewardFunction,
-                            qFunction,
-                            tag);
-                default:
-                    new SarsaModelManager(abstractStateModel,
-                            actionSelector,
-                            persistenceManager,
-                            concreteStateTags,
-                            sequenceManager,
-                            storeWidgets,
-                            rewardFunction,
-                            qFunction,
-                            tag);
+            case "SarsaModelManager":
+                logger.info("State model with sarsaModelManager selected");
+                return new SarsaModelManager(abstractStateModel,
+                        actionSelector,
+                        persistenceManager,
+                        concreteStateTags,
+                        sequenceManager,
+                        storeWidgets,
+                        rewardFunction,
+                        qFunction,
+                        tag);
+            case "BorjaModelManager":
+                logger.info("State model with BorjaModelManager selected");
+                return new BorjaModelManager(abstractStateModel,
+                        actionSelector,
+                        persistenceManager,
+                        concreteStateTags,
+                        sequenceManager,
+                        storeWidgets,
+                        rewardFunction,
+                        qFunction,
+                        tag);
+            default:
+                logger.info("State model with sarsaModelManager selected");
+                return new SarsaModelManager(abstractStateModel,
+                        actionSelector,
+                        persistenceManager,
+                        concreteStateTags,
+                        sequenceManager,
+                        storeWidgets,
+                        rewardFunction,
+                        qFunction,
+                        tag);
             }
         }
         

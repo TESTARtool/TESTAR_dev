@@ -13,7 +13,7 @@ import org.fruit.alayer.Tags;
 
 import java.util.Set;
 
-public class BorjaModelManager extends RLModelManager  implements StateModelManager {
+public class BorjaModelManager extends RLModelManager implements StateModelManager {
 
     public BorjaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag);
@@ -24,6 +24,13 @@ public class BorjaModelManager extends RLModelManager  implements StateModelMana
         super.notifyNewStateReached(newState, actions);
         state = newState;
 
+        // Previous super invocation has created/updated currentAbstractState (+ AbstractActions)
+        // If one AbstractAction of the currentAbstractState is new (has not a RLTag), set the default value to 1f
+        for(AbstractAction abstractAction : currentAbstractState.getActions()) {
+            if(abstractAction.getAttributes().get(tag, null) == null) {
+                abstractAction.addAttribute(tag, 1f);
+            }
+        }
     }
 
     @Override
