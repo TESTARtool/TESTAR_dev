@@ -17,7 +17,7 @@ public class BorjaReward3 implements RewardFunction{
     //private Set<Action> previousActions;
 
     @Override
-    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, AbstractAction selectedAbstractAction, Set<Action> actions) {
+    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, Action executedAction, AbstractAction executedAbstractAction,  AbstractAction selectedAction, Set<Action> actions) {
         System.out.println(". . . . . Enfoque 3 . . . . .");
         float reward = 0f;
         
@@ -55,15 +55,8 @@ public class BorjaReward3 implements RewardFunction{
 
 		System.out.println(". . . . . Provisional Reward: " + reward);
 		
-		Action desiredAction = null;
-		for (Action a : actions) {
-			if (a.get(Tags.AbstractIDCustom).equals(selectedAbstractAction.getActionId())) {
-				desiredAction = a;
-				break;
-			}
-		}
-		if (desiredAction != null) {
-			reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+		if (executedAction != null) {
+			reward -= (0.01 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
 		} else {
 			System.out.println("WARNING: It was not possible to get the OriginWidget");
 		}

@@ -19,9 +19,9 @@ public class CounterBasedRewardFunction implements RewardFunction {
     private static final Logger logger = LoggerFactory.getLogger(CounterBasedRewardFunction.class);
 
     @Override
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
-        int executionCounter = executedAction.getAttributes().get(RLTags.Counter, 0) + 1;
-        executedAction.getAttributes().set(RLTags.Counter, executionCounter);
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction,  final AbstractAction selectedAbstractAction, Set<Action> actions) {
+        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
+        executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
 
         logger.debug("DEBUG: executionCounter={}", executionCounter);
         float reward = 1.0f / (float) executionCounter;

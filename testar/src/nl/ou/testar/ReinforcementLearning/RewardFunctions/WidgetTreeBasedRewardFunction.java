@@ -26,7 +26,7 @@ public class WidgetTreeBasedRewardFunction implements RewardFunction {
      * @return The calculated reward
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
         final Map<Tag<?>, Object>  tags = currentConcreteState.getAttributes().getTagValues();
         final int noOfEqualElements = tags.keySet().stream()
                 .mapToInt(key -> isAttributeEqualToAttributeInPreviousState(key, tags, attributesInPreviousState))

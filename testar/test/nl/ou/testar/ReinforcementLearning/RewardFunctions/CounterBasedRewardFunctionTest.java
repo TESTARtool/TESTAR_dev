@@ -51,7 +51,7 @@ public class CounterBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction, actions);
+        float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions);
 
         // then
         assertEquals(1f, reward , 0f);

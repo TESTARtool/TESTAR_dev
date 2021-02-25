@@ -33,7 +33,8 @@ public class BorjaModelManager extends RLModelManager  implements StateModelMana
         final Action selectedAction = super.getAbstractActionToExecute(actions);
         // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
         try {
-            previouslyExecutedAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
+            previouslyExecutedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
+            previouslyExecutedTestarAction = selectedAction;
         }
         catch (ActionNotFoundException e){
             logger.debug("Update of previous action failed because: '{}'", e.getMessage());

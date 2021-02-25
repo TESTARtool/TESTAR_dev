@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
 
+import org.apache.commons.math3.analysis.function.Abs;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
@@ -25,7 +26,7 @@ public class BorjaReward4 implements RewardFunction {
      *{@inheritDoc}
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction selectedAbstractAction, Set<Action> actions) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
     	System.out.println(". . . . . Enfoque 4 . . . . .");
 		float reward = 0f;
 
@@ -64,16 +65,9 @@ public class BorjaReward4 implements RewardFunction {
 		// selectedAbstractAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
 
 		System.out.println(". . . . . Provisional Reward: " + reward);
-		
-		Action desiredAction = null;
-		for (Action a : actions) {
-			if (a.get(Tags.AbstractIDCustom).equals(selectedAbstractAction.getActionId())) {
-				desiredAction = a;
-				break;
-			}
-		}
-		if (desiredAction != null) {
-			reward -= (0.01 * desiredAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+
+		if (executedAction != null) {
+			reward -= (0.01 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
 		} else {
 			System.out.println("WARNING: It was not possible to get the OriginWidget");
 		}

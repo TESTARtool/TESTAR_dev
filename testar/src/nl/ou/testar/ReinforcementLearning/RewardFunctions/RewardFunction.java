@@ -25,7 +25,7 @@ public interface RewardFunction {
      * @param actions
      * @return The calculated reward
      */
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions);
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions);
 
     /**
      * Resets the reward function

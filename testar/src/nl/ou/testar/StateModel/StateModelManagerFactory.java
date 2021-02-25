@@ -76,6 +76,7 @@ public class StateModelManagerFactory {
                 abstractTags,
                 persistenceManager != null ? (StateModelEventListener) persistenceManager : null);
         String stateModelRL = settings.get(ConfigTags.StateModelReinforcementLearningEnabled, "");
+        System.out.println(stateModelRL);
         if (!stateModelRL.equals("")) {
             Tag<?> tag = ReinforcementLearningUtil.getTag(settings);
             final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
@@ -83,20 +84,11 @@ public class StateModelManagerFactory {
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
 
-            logger.info("State model with sarsaModelManager selected");
+            logger.info("State model with Reinforcement Learning Model Manager selected");
             switch (stateModelRL){
-                case "SarsaModelManager":
-                    new SarsaModelManager(abstractStateModel,
-                            actionSelector,
-                            persistenceManager,
-                            concreteStateTags,
-                            sequenceManager,
-                            storeWidgets,
-                            rewardFunction,
-                            qFunction,
-                            tag);
                 case "BorjaModelManager":
-                    new BorjaModelManager(abstractStateModel,
+                    logger.info("State model with BorjaModelManager selected");
+                    return new BorjaModelManager(abstractStateModel,
                             actionSelector,
                             persistenceManager,
                             concreteStateTags,
@@ -106,7 +98,7 @@ public class StateModelManagerFactory {
                             qFunction,
                             tag);
                 default:
-                    new SarsaModelManager(abstractStateModel,
+                    return new SarsaModelManager(abstractStateModel,
                             actionSelector,
                             persistenceManager,
                             concreteStateTags,

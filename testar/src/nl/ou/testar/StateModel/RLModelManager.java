@@ -26,7 +26,8 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     protected static final Logger logger = LoggerFactory.getLogger(RLModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
-    protected AbstractAction previouslyExecutedAction = null;
+    protected AbstractAction previouslyExecutedAbstractAction = null;
+    protected Action previouslyExecutedTestarAction = null;
 
     /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
@@ -90,16 +91,17 @@ public class RLModelManager extends ModelManager implements StateModelManager {
      */
     protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {
         // get reward and Q-value
-        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
+        System.out.println("UpdateQValue RLModelManager");
+        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, previouslyExecutedTestarAction, previouslyExecutedAbstractAction, selectedAbstractAction, actions);
         System.out.println("REWARD: " + Float.toString(reward));
-        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, selectedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions);
+        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previouslyExecutedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions);
 
         // set attribute for saving in the graph database
-        if(previouslyExecutedAction != null) {
-            previouslyExecutedAction.addAttribute(tag, qValue);
+        if(previouslyExecutedAbstractAction != null) {
+            previouslyExecutedAbstractAction.addAttribute(tag, qValue);
 
             //*** FOR DEBUGGING PURPOSES
-            float lastQValue = previouslyExecutedAction.getAttributes().get(RLTags.QBorja);
+            float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag);
             qValuesList.add(lastQValue);
             //*** FOR DEBUGGING PURPOSES
 

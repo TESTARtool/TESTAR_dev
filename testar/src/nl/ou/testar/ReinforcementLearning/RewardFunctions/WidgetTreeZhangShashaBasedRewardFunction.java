@@ -37,7 +37,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
     }
 
     @Override
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
         if (state == null) {
             return 0f;
         }

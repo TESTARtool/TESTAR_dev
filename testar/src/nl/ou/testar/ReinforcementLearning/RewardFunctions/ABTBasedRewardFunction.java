@@ -28,7 +28,7 @@ public class ABTBasedRewardFunction implements RewardFunction {
      * @return The calculated reward
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction, Set<Action> actions) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAction, Set<Action> actions) {
         final Map<Tag<?>, Object>  tags = currentConcreteState.getAttributes().getTagValues();
 //        System.out.println("\n+++++------------------------------");
 //        System.out.println(currentConcreteState.getAttributes().getTagValues());

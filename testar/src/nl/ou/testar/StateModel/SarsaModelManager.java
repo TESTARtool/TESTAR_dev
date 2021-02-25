@@ -43,7 +43,8 @@ public class SarsaModelManager extends RLModelManager  implements StateModelMana
             updateQValue(selectedAbstractAction, actions);
 
             // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
-            previouslyExecutedAction = selectedAbstractAction;
+            previouslyExecutedAbstractAction = selectedAbstractAction;
+            previouslyExecutedTestarAction = selectedAction;
         } catch (final Exception e) {
             logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
         }
