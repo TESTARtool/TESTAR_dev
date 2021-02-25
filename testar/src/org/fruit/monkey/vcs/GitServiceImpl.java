@@ -2,6 +2,7 @@ package org.fruit.monkey.vcs;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.beans.PropertyChangeListener;
@@ -53,7 +54,7 @@ public class GitServiceImpl implements GitService {
                         .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitCredentials.getUsername(), gitCredentials.getPassword()))
                         .call();
                 propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, true);
-            } catch (GitAPIException e) {
+            } catch (GitAPIException | JGitInternalException e) {
                 e.printStackTrace();
                 propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, false);
             } finally {

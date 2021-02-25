@@ -30,6 +30,10 @@ public class VCSPanel extends JPanel {
     private final static String GIT_PASSWORD_LABEL = "Password";
     private final static String AUTHORIZATION_REQUIRED_LABEL = "Authorization required";
     private final static String CLONE_BUTTON = "Clone";
+    private final static String CLONE_ERROR_TITLE = "Clone error";
+    private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned.";
+    private final static String CLONE_SUCCESS_TITLE = "Clone success";
+    private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
 
     private GitService gitService;
 
@@ -76,10 +80,10 @@ public class VCSPanel extends JPanel {
         cloneButton.addActionListener(e -> {
             if(authorizationRequiredCheckBox.isSelected()) {
                 GitCredentials gitCredentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), gitCredentials, new CloneListener());
+                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), gitCredentials, this::propertyChange);
 
             } else {
-                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new CloneListener());
+                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), this::propertyChange);
             }
         });
     }
@@ -136,16 +140,39 @@ public class VCSPanel extends JPanel {
         );
     }
 
-    class CloneListener implements PropertyChangeListener {
-        //TODO add some confirmation/error dialogs
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            Boolean cloneSuccessful = (Boolean) evt.getNewValue();
-            if(cloneSuccessful) {
-                System.out.println("CLONE SUCCESS");
-            } else {
-                System.out.println("CLONE ERROR");
-            }
+    private void propertyChange(PropertyChangeEvent evt) {
+        Boolean cloneSuccessful = (Boolean) evt.getNewValue();
+        if(cloneSuccessful) {
+            showCloneSuccessDialog();
+        } else {
+            showCloneErrorDialog();
         }
     }
+
+    private void showCloneErrorDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_ERROR_MESSAGE,
+                CLONE_ERROR_TITLE,
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showCloneSuccessDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_SUCCESS_MESSAGE,
+                CLONE_SUCCESS_TITLE,
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+//    private class CloneListener implements PropertyChangeListener {
+//        //TODO add some confirmation/error dialogs
+//        @Override
+//        public void propertyChange(PropertyChangeEvent evt) {
+//            Boolean cloneSuccessful = (Boolean) evt.getNewValue();
+//            if(cloneSuccessful) {
+//                System.out.println("CLONE SUCCESS");
+//            } else {
+//                System.out.println("CLONE ERROR");
+//            }
+//        }
+//    }
 }
