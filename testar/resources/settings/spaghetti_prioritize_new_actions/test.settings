@@ -106,30 +106,13 @@ SUTProcesses =
 
 ProtocolClass = spaghetti_prioritize_new_actions/Protocol_spaghetti_prioritize_new_actions
 
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-<<<<<<< HEAD:testar/resources/settings/spaghetti_prioritize_new_actions/test.settings
 AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
-=======
-AbstractStateAttributes = WidgetControlType
-
-#################################################################
-# Reinforcement learning settings
-#################################################################
-Alpha = 0.85
-Gamma = 0.85
-DefaultValue = 0.0
-DefaultReward = 0.0
-Epsilon = 0.7
-MaxQValue = 1.0
-DecayRate = 0.01
-Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
-Policy = EpsilonGreedyPolicy
->>>>>>> 57f49f53ba16ce5db97a20fe228c91ddd0522a48:testar/resources/settings/desktop_reinforcement_learning/test.settings
 
 #################################################################
 # Other more advanced settings

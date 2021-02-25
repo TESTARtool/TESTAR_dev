@@ -111,8 +111,8 @@ ProtocolClass = swingset2_statemodel/Protocol_swingset2_statemodel
 #################################################################\n"
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
