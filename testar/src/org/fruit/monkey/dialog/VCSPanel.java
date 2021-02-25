@@ -162,17 +162,4 @@ public class VCSPanel extends JPanel {
                 CLONE_SUCCESS_TITLE,
                 JOptionPane.INFORMATION_MESSAGE);
     }
-
-//    private class CloneListener implements PropertyChangeListener {
-//        //TODO add some confirmation/error dialogs
-//        @Override
-//        public void propertyChange(PropertyChangeEvent evt) {
-//            Boolean cloneSuccessful = (Boolean) evt.getNewValue();
-//            if(cloneSuccessful) {
-//                System.out.println("CLONE SUCCESS");
-//            } else {
-//                System.out.println("CLONE ERROR");
-//            }
-//        }
-//    }
 }
