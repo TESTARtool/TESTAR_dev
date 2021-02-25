@@ -33,7 +33,7 @@ public class GitServiceImpl implements GitService {
                         .setDirectory(prepareRepositoryDirectory(repositoryUrl))
                         .call();
                 propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, true);
-            } catch (GitAPIException e) {
+            } catch (GitAPIException | JGitInternalException e) {
                 e.printStackTrace();
                 propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, false);
             } finally {

@@ -7,7 +7,6 @@ import org.fruit.monkey.vcs.GitServiceImpl;
 import javax.swing.*;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
@@ -31,7 +30,7 @@ public class VCSPanel extends JPanel {
     private final static String AUTHORIZATION_REQUIRED_LABEL = "Authorization required";
     private final static String CLONE_BUTTON = "Clone";
     private final static String CLONE_ERROR_TITLE = "Clone error";
-    private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned.";
+    private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned. Check whether the repository already exists locally or authorization is required.";
     private final static String CLONE_SUCCESS_TITLE = "Clone success";
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
 
@@ -39,31 +38,31 @@ public class VCSPanel extends JPanel {
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
-        initGitRepositoryUrl();
-        initGitUsername();
-        initGitPassword();
-        initAuthorizationRequired();
-        initClone();
+        initGitRepositoryUrlSection();
+        initGitUsernameSection();
+        initGitPasswordSection();
+        initAuthorizationRequiredSection();
+        initCloneSection();
         initLayout();
     }
 
-    private void initGitRepositoryUrl() {
+    private void initGitRepositoryUrlSection() {
         gitRepositoryUrlLabel = new JLabel(GIT_URL_LABEL);
         gitRepositoryUrlTextField = new JTextField();
     }
 
-    private void initGitUsername() {
+    private void initGitUsernameSection() {
         gitUsernameLabel = new JLabel(GIT_USERNAME_LABEL);
         gitUsernameTextField = new JTextField();
 
     }
 
-    private void initGitPassword() {
+    private void initGitPasswordSection() {
         gitPasswordLabel = new JLabel(GIT_PASSWORD_LABEL);
         gitPasswordField = new JPasswordField();
     }
 
-    private void initAuthorizationRequired() {
+    private void initAuthorizationRequiredSection() {
         authorizationRequiredLabel = new JLabel(AUTHORIZATION_REQUIRED_LABEL);
         authorizationRequiredCheckBox = new JCheckBox();
         authorizationRequiredCheckBox.setSelected(true);
@@ -75,7 +74,7 @@ public class VCSPanel extends JPanel {
         gitPasswordField.setEnabled(enabled);
     }
 
-    private void initClone() {
+    private void initCloneSection() {
         cloneButton = new JButton(CLONE_BUTTON);
         cloneButton.addActionListener(e -> {
             if(authorizationRequiredCheckBox.isSelected()) {
@@ -86,6 +85,29 @@ public class VCSPanel extends JPanel {
                 gitService.cloneRepository(gitRepositoryUrlTextField.getText(), this::propertyChange);
             }
         });
+    }
+
+    private void propertyChange(PropertyChangeEvent evt) {
+        Boolean cloneSuccessful = (Boolean) evt.getNewValue();
+        if(cloneSuccessful) {
+            showCloneSuccessDialog();
+        } else {
+            showCloneErrorDialog();
+        }
+    }
+
+    private void showCloneErrorDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_ERROR_MESSAGE,
+                CLONE_ERROR_TITLE,
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showCloneSuccessDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_SUCCESS_MESSAGE,
+                CLONE_SUCCESS_TITLE,
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void initLayout() {
@@ -138,28 +160,5 @@ public class VCSPanel extends JPanel {
                                         .addComponent(cloneButton, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
                                 .addPreferredGap(UNRELATED))
         );
-    }
-
-    private void propertyChange(PropertyChangeEvent evt) {
-        Boolean cloneSuccessful = (Boolean) evt.getNewValue();
-        if(cloneSuccessful) {
-            showCloneSuccessDialog();
-        } else {
-            showCloneErrorDialog();
-        }
-    }
-
-    private void showCloneErrorDialog() {
-        JOptionPane.showMessageDialog(this,
-                CLONE_ERROR_MESSAGE,
-                CLONE_ERROR_TITLE,
-                JOptionPane.ERROR_MESSAGE);
-    }
-
-    private void showCloneSuccessDialog() {
-        JOptionPane.showMessageDialog(this,
-                CLONE_SUCCESS_MESSAGE,
-                CLONE_SUCCESS_TITLE,
-                JOptionPane.INFORMATION_MESSAGE);
     }
 }
