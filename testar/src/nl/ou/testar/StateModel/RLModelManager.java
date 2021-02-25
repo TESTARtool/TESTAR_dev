@@ -4,17 +4,16 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
-import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
-import org.apache.commons.lang.Validate;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,7 +26,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     protected static final Logger logger = LoggerFactory.getLogger(RLModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
-    protected AbstractAction previousAbstractActionToExecute = null;
+    protected AbstractAction previouslyExecutedAction = null;
 
     /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
@@ -42,6 +41,10 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     protected State state = null;
 
     protected final Tag<?> tag;
+
+    //*** FOR DEBUGGING PURPOSES
+    List<Float> qValuesList = new ArrayList<Float>();
+    //*** FOR DEBUGGING PURPOSES
 
     /**
      * Constructor
@@ -89,10 +92,18 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         // get reward and Q-value
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
         System.out.println("REWARD: " + Float.toString(reward));
-        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
+        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, selectedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions);
 
         // set attribute for saving in the graph database
-        previousAbstractActionToExecute.addAttribute(tag, qValue);
+        if(previouslyExecutedAction != null) {
+            previouslyExecutedAction.addAttribute(tag, qValue);
+
+            //*** FOR DEBUGGING PURPOSES
+            float lastQValue = previouslyExecutedAction.getAttributes().get(RLTags.QBorja);
+            qValuesList.add(lastQValue);
+            //*** FOR DEBUGGING PURPOSES
+
+        }
 
     }
 
