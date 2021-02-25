@@ -13,54 +13,37 @@ import java.nio.file.Paths;
 
 public class GitServiceImpl implements GitService {
 
-    private static final String LOCAL_REPOSITORIES_PATH = "cloned";
-
-    public static final String CLONING_PROPERTY = "cloned_successfully";
-
-    private PropertyChangeSupport propertyChangeSupport;
-
-    public GitServiceImpl() {
-        this.propertyChangeSupport = new PropertyChangeSupport(this);
-    }
+    public static final String LOCAL_REPOSITORIES_PATH = "cloned";
 
     @Override
-    public void cloneRepository(String repositoryUrl, PropertyChangeListener cloningListener) {
-        propertyChangeSupport.addPropertyChangeListener(cloningListener);
-        new Thread(() -> {
+    public boolean cloneRepository(String repositoryUrl) {
             try {
                 Git.cloneRepository()
                         .setURI(repositoryUrl)
                         .setDirectory(prepareRepositoryDirectory(repositoryUrl))
                         .call();
-                propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, true);
+                return true;
             } catch (GitAPIException | JGitInternalException e) {
                 e.printStackTrace();
-                propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, false);
-            } finally {
-                propertyChangeSupport.removePropertyChangeListener(cloningListener);
+                return false;
             }
-        }).start();
 
     }
 
     @Override
-    public void cloneRepository(String repositoryUrl, GitCredentials gitCredentials, PropertyChangeListener cloningListener) {
-        propertyChangeSupport.addPropertyChangeListener(cloningListener);
-        new Thread(() -> {
+    public boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials) {
             try {
                 Git.cloneRepository()
                         .setURI(repositoryUrl)
                         .setDirectory(prepareRepositoryDirectory(repositoryUrl))
                         .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitCredentials.getUsername(), gitCredentials.getPassword()))
                         .call();
-                propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, true);
+
+                return true;
             } catch (GitAPIException | JGitInternalException e) {
                 e.printStackTrace();
-                propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, false);
-            } finally {
-                propertyChangeSupport.removePropertyChangeListener(cloningListener);
+                return false;
             }
-        }).start();
     }
 
     private File prepareRepositoryDirectory(String repositoryUrl) {

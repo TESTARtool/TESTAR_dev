@@ -7,6 +7,8 @@ import org.fruit.monkey.vcs.GitServiceImpl;
 import javax.swing.*;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
@@ -30,14 +32,19 @@ public class VCSPanel extends JPanel {
     private final static String AUTHORIZATION_REQUIRED_LABEL = "Authorization required";
     private final static String CLONE_BUTTON = "Clone";
     private final static String CLONE_ERROR_TITLE = "Clone error";
-    private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned. Check whether the repository already exists locally or authorization is required.";
+    private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned. Check whether the repository already exists locally or credentials are valid.";
     private final static String CLONE_SUCCESS_TITLE = "Clone success";
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
+    private final static String CLONING_PROPERTY = "cloned_successfully";
+
+
+    private PropertyChangeSupport propertyChangeSupport;
 
     private GitService gitService;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
+        propertyChangeSupport = new PropertyChangeSupport(this);
         initGitRepositoryUrlSection();
         initGitUsernameSection();
         initGitPasswordSection();
@@ -78,22 +85,39 @@ public class VCSPanel extends JPanel {
         cloneButton = new JButton(CLONE_BUTTON);
         cloneButton.addActionListener(e -> {
             if(authorizationRequiredCheckBox.isSelected()) {
-                GitCredentials gitCredentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), gitCredentials, this::propertyChange);
-
+                cloneRepositoryWithAuth(this::cloneFinished);
             } else {
-                gitService.cloneRepository(gitRepositoryUrlTextField.getText(), this::propertyChange);
+                cloneRepository(this::cloneFinished);
             }
+            setEnabled(false);
         });
     }
 
-    private void propertyChange(PropertyChangeEvent evt) {
+    private void cloneRepository(PropertyChangeListener cloneListener) {
+        propertyChangeSupport.addPropertyChangeListener(cloneListener);
+        new Thread(() -> {
+            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText());
+            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
+        }).start();
+    }
+
+    private void cloneRepositoryWithAuth(PropertyChangeListener cloneListener) {
+        propertyChangeSupport.addPropertyChangeListener(cloneListener);
+        new Thread(() -> {
+            GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
+            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials);
+            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
+        }).start();
+    }
+
+    private void cloneFinished(PropertyChangeEvent evt) {
         Boolean cloneSuccessful = (Boolean) evt.getNewValue();
         if(cloneSuccessful) {
             showCloneSuccessDialog();
         } else {
             showCloneErrorDialog();
         }
+        cloneButton.setEnabled(true);
     }
 
     private void showCloneErrorDialog() {

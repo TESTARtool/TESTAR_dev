@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 
 public interface GitService {
 
-    void cloneRepository(String repositoryUrl, PropertyChangeListener cloningListener);
+    boolean cloneRepository(String repositoryUrl);
 
-    void cloneRepository(String repositoryUrl, GitCredentials gitAuth, PropertyChangeListener cloningListener);
+    boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials);
 }
