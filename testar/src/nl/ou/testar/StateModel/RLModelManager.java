@@ -4,6 +4,7 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.apache.commons.lang.Validate;
@@ -23,24 +24,24 @@ import java.util.Set;
  */
 public class RLModelManager extends ModelManager implements StateModelManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(RLModelManager.class);
+    protected static final Logger logger = LoggerFactory.getLogger(RLModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
-    private AbstractAction previousAbstractActionToExecute = null;
+    protected AbstractAction previousAbstractActionToExecute = null;
 
     /**  The {@Link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
     *  The reward is used in the {@link QFunction}
     */
-    private final RewardFunction rewardFunction;
+    protected final RewardFunction rewardFunction;
 
     /**
      * The {@link QFunction} or Quality function determines the desirability of an {@link AbstractAction}
      */
-    private final QFunction qFunction;
+    protected final QFunction qFunction;
 
-    private State state = null;
+    protected State state = null;
 
-    private final Tag<?> tag;
+    protected final Tag<?> tag;
 
     /**
      * Constructor
@@ -76,36 +77,23 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         logger.info("Number of actions available:{}", actions.size());
         final Action selectedAction = super.getAbstractActionToExecute(actions);
         logger.info("Action selected:{}", selectedAction == null ? null :selectedAction.toShortString());
-        updateQValue(selectedAction, actions);
         return selectedAction;
     }
 
     /**
      * Update the Q-value for an {@link Action}
      *
-     * @param selectedAction, can be null
+     * @param selectedAbstractAction, can be null
      */
-    private void updateQValue(final Action selectedAction, final Set<Action> actions) {
-        try {
-            // validate input
-            Validate.notNull(selectedAction, "No action was found to execute");
+    protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {
+        // get reward and Q-value
+        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
+        System.out.println("REWARD: " + Float.toString(reward));
+        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
 
-            // get abstract action which is used in the reward and QFunction
-            final AbstractAction selectedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
+        // set attribute for saving in the graph database
+        previousAbstractActionToExecute.addAttribute(tag, qValue);
 
-            // get reward and Q-value
-            float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction, actions);
-            System.out.println("REWARD: " + Float.toString(reward));
-            final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previousAbstractActionToExecute, selectedAbstractAction, reward, currentAbstractState, actions);
-
-            // set attribute for saving in the graph database
-            selectedAbstractAction.addAttribute(tag, qValue);
-
-            // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
-            previousAbstractActionToExecute = selectedAbstractAction;
-        } catch (final Exception e) {
-            logger.debug("Update of Q-value failed because: '{}'", e.getMessage());
-        }
     }
 
     @Override

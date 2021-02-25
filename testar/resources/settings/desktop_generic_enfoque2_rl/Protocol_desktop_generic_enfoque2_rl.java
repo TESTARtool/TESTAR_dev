@@ -62,7 +62,7 @@ public class Protocol_desktop_generic_enfoque2_rl extends DesktopProtocol {
     @Override
     protected void initialize(final Settings settings) {
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
 
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);

@@ -68,7 +68,7 @@ public class Protocol_swingset2_rl_image_diff extends SwingSet2Protocol {
 	@Override
 	protected void initialize(Settings settings){
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "SarsaModelManager");
 
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);

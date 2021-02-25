@@ -75,8 +75,8 @@ public class StateModelManagerFactory {
                 settings.get(ConfigTags.ApplicationVersion),
                 abstractTags,
                 persistenceManager != null ? (StateModelEventListener) persistenceManager : null);
-
-        if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
+        String stateModelRL = settings.get(ConfigTags.StateModelReinforcementLearningEnabled, "");
+        if (!stateModelRL.equals("")) {
             Tag<?> tag = ReinforcementLearningUtil.getTag(settings);
             final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
 
@@ -84,15 +84,38 @@ public class StateModelManagerFactory {
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
 
             logger.info("State model with sarsaModelManager selected");
-            return new RLModelManager(abstractStateModel,
-                    actionSelector,
-                    persistenceManager,
-                    concreteStateTags,
-                    sequenceManager,
-                    storeWidgets,
-                    rewardFunction,
-                    qFunction,
-                    tag);
+            switch (stateModelRL){
+                case "SarsaModelManager":
+                    new SarsaModelManager(abstractStateModel,
+                            actionSelector,
+                            persistenceManager,
+                            concreteStateTags,
+                            sequenceManager,
+                            storeWidgets,
+                            rewardFunction,
+                            qFunction,
+                            tag);
+                case "BorjaModelManager":
+                    new BorjaModelManager(abstractStateModel,
+                            actionSelector,
+                            persistenceManager,
+                            concreteStateTags,
+                            sequenceManager,
+                            storeWidgets,
+                            rewardFunction,
+                            qFunction,
+                            tag);
+                default:
+                    new SarsaModelManager(abstractStateModel,
+                            actionSelector,
+                            persistenceManager,
+                            concreteStateTags,
+                            sequenceManager,
+                            storeWidgets,
+                            rewardFunction,
+                            qFunction,
+                            tag);
+            }
         }
         
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);

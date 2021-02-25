@@ -68,7 +68,7 @@ public class Protocol_desktop_reinforcement_learning extends DesktopProtocol {
     @Override
     protected void initialize(final Settings settings) {
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "SarsaModelManager");
 
         policy = PolicyFactory.getPolicy(settings);
         actionSelector = new ReinforcementLearningActionSelector(policy);
