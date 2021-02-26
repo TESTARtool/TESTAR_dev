@@ -1,5 +1,7 @@
 package org.fruit.monkey.dialog;
 
+import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
@@ -26,6 +28,9 @@ public class VCSPanel extends JPanel {
     private JLabel gitPasswordLabel;
     private JLabel authorizationRequiredLabel;
     private JButton cloneButton;
+    private JLabel cloneProcessingLabel;
+    private JProgressBar cloneProcessingProgressBar;
+    private JLabel cloneTaskLabel;
     private final static String GIT_URL_LABEL = "Repository URL";
     private final static String GIT_USERNAME_LABEL = "Username";
     private final static String GIT_PASSWORD_LABEL = "Password";
@@ -36,6 +41,7 @@ public class VCSPanel extends JPanel {
     private final static String CLONE_SUCCESS_TITLE = "Clone success";
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
     private final static String CLONING_PROPERTY = "cloned_successfully";
+    private final static String CLONE_PROCESSING_LABEL = "Cloning project...";
 
 
     private PropertyChangeSupport propertyChangeSupport;
@@ -89,23 +95,36 @@ public class VCSPanel extends JPanel {
             } else {
                 cloneRepository(this::cloneFinished);
             }
-            setEnabled(false);
+            cloneButton.setEnabled(false);
         });
+        cloneProcessingLabel = new JLabel(CLONE_PROCESSING_LABEL);
+        cloneProcessingProgressBar = new JProgressBar();
+        cloneTaskLabel = new JLabel();
+        toggleCloneProcessingVisibility(false);
     }
 
     private void cloneRepository(PropertyChangeListener cloneListener) {
+        toggleCloneProcessingVisibility(true);
         propertyChangeSupport.addPropertyChangeListener(cloneListener);
         new Thread(() -> {
-            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText());
+            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
             propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
+            toggleCloneProcessingVisibility(false);
         }).start();
     }
 
+    private void toggleCloneProcessingVisibility(boolean visible) {
+        cloneProcessingLabel.setVisible(visible);
+        cloneProcessingProgressBar.setVisible(visible);
+        cloneTaskLabel.setVisible(visible);
+    }
+
     private void cloneRepositoryWithAuth(PropertyChangeListener cloneListener) {
+        toggleCloneProcessingVisibility(true);
         propertyChangeSupport.addPropertyChangeListener(cloneListener);
         new Thread(() -> {
             GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials);
+            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
             propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
         }).start();
     }
@@ -118,6 +137,7 @@ public class VCSPanel extends JPanel {
             showCloneErrorDialog();
         }
         cloneButton.setEnabled(true);
+        toggleCloneProcessingVisibility(false);
     }
 
     private void showCloneErrorDialog() {
@@ -159,7 +179,17 @@ public class VCSPanel extends JPanel {
                                         .addComponent(gitPasswordField, PREFERRED_SIZE, 346, PREFERRED_SIZE))
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
-                                        .addComponent(cloneButton, PREFERRED_SIZE, 65, PREFERRED_SIZE))));
+                                        .addComponent(cloneButton, PREFERRED_SIZE, 65, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(cloneProcessingLabel, PREFERRED_SIZE, 120, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(cloneProcessingProgressBar, PREFERRED_SIZE, 200, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(cloneTaskLabel, PREFERRED_SIZE, 200, PREFERRED_SIZE))));
+
         groupLayout.setVerticalGroup(
                 groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(groupLayout.createSequentialGroup()
@@ -182,7 +212,48 @@ public class VCSPanel extends JPanel {
                                 .addPreferredGap(RELATED)
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(cloneButton, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
-                                .addPreferredGap(UNRELATED))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cloneProcessingLabel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cloneProcessingProgressBar, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cloneTaskLabel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
+                                .addPreferredGap(UNRELATED)
+                        )
         );
+    }
+
+    private class ProgressBarMonitor implements ProgressMonitor {
+
+        @Override
+        public void start(int totalTasks) {}
+
+        @Override
+        public void beginTask(String title, int totalWork) {
+            cloneProcessingProgressBar.setMinimum(0);
+            cloneProcessingProgressBar.setMaximum(totalWork);
+            cloneProcessingProgressBar.setValue(0);
+            cloneTaskLabel.setText(title);
+        }
+
+        @Override
+        public void update(int completed) {
+            cloneProcessingProgressBar.setValue(cloneProcessingProgressBar.getValue()+completed);
+        }
+
+        @Override
+        public void endTask() {
+            cloneProcessingProgressBar.setValue(cloneProcessingProgressBar.getMaximum());
+            cloneTaskLabel.setText("");
+
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
     }
 }

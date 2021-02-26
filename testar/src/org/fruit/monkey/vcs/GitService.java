@@ -1,10 +1,11 @@
 package org.fruit.monkey.vcs;
 
-import java.beans.PropertyChangeListener;
+
+import org.eclipse.jgit.lib.ProgressMonitor;
 
 public interface GitService {
 
-    boolean cloneRepository(String repositoryUrl);
+    boolean cloneRepository(String repositoryUrl, ProgressMonitor progressMonitor);
 
-    boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials);
+    boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials, ProgressMonitor progressMonitor);
 }
