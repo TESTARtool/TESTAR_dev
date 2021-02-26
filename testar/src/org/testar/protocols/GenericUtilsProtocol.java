@@ -33,6 +33,7 @@ package org.testar.protocols;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 
 import org.apache.commons.io.FileUtils;
 import nl.ou.testar.DerivedActions;
@@ -418,7 +419,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 				FileUtils.copyFile(originalBuildFile, destbuildFile);
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
+			LogSerialiser.log("ERROR Trying to move settings protocolName build.xml file to jacoco directory",
+			        LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
 		}
 	}
 	
@@ -448,7 +451,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			        " | " + actionCoverage);
 
 		} catch (Exception e) {
-			System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+			LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
+                    LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
 		}
 	}
 	
@@ -496,8 +501,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			long  runTime = System.currentTimeMillis() - startRunTime;
 			writeCoverageFile("RunTotal | time | " + runTime + " | " + runCoverage);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
+			System.err.println(e.getMessage());
+	        LogSerialiser.log("ERROR: Trying to MergeMojo feature with JaCoCo Files",
+	                    LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
 		}
 	}
 	
@@ -514,7 +521,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             myWriter.write(coverageInformation + "\r\n");
             myWriter.close();
         } catch (IOException e) {
-            System.out.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
+            LogSerialiser.log("ERROR: Writing Coverage Metrics inside coverageMetrics text file",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
             e.printStackTrace();
         }
 	}
@@ -543,7 +552,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 	        ipAddress = socket.getLocalAddress().getHostAddress();
 	    } catch (SocketException | UnknownHostException e) {
-	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
 	        e.printStackTrace();
 	    }
 
@@ -552,13 +563,15 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	    try {
 	        Files.createDirectories(Paths.get(folderIpAddress));
 	    } catch (IOException e) {
-	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
 	        e.printStackTrace();
 	        return;
 	    }
 	    
 	    // Copy run output folder to desired ip address output folder
-	    File outputFolder = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName);
+	    /*File outputFolder = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName);
 	    try {
 	        if(outputFolder.exists()) {
 	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFolder.getName());
@@ -568,9 +581,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	            System.out.println(String.format("Sucessfull copy %s to %s", outputFolder, fileIpAddressOutput));
 	        }
 	    } catch (IOException e) {
-	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + outputFolder);
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ALL FILES, specific : " + outputFolder,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ALL FILES, specific : " + outputFolder);
 	        e.printStackTrace();
-	    }
+	    }*/
 
 	    // Copy run zip file to desired ip address output folder
 	    File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
@@ -581,7 +596,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	            System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
 	        }
 	    } catch (IOException e) {
-	        System.out.println("ERROR copyOutputToNewFolderUsingIpAddress: trying to copy : " + outputZipFile);
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile);
 	        e.printStackTrace();
 	    }
 
@@ -600,7 +617,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	    try {
 	        Files.createDirectories(Paths.get(metricsFolder));
 	    } catch (IOException e) {
-	        System.out.println("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
+	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
 	        e.printStackTrace();
 	        return;
 	    }
@@ -611,7 +630,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        FileUtils.copyFile(srcMetrics, destMetrics);
 	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
 	    } catch (IOException e) {
-	        System.out.println("ERROR copyCoverageMetricsToFolder: trying to copy : " + destMetrics);
+	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics);
 	        e.printStackTrace();
 	    }
 	}

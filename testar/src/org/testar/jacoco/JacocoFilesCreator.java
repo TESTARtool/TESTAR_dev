@@ -34,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import org.testar.OutputStructure;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
+
 /**
  * This class allow users to extract jacoco.exec files from the JVM using MBeanClient.
  * And create the JaCoCO report that contains the coverage information.
@@ -54,7 +56,7 @@ public class JacocoFilesCreator {
 				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo Action " + actionCount + "exec report");
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
+			System.err.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
@@ -76,7 +78,7 @@ public class JacocoFilesCreator {
 				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
+			System.err.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
@@ -100,6 +102,7 @@ public class JacocoFilesCreator {
 
 			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoActionReport coverage report");
 			e.printStackTrace();
 		}
 		return "ERROR creating createJacocoActionReport coverage report";
@@ -121,6 +124,7 @@ public class JacocoFilesCreator {
 
 			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoSequenceReport coverage report");
 			e.printStackTrace();
 		}
 		return "ERROR creating createJacocoSequenceReport coverage report";
@@ -142,6 +146,7 @@ public class JacocoFilesCreator {
 
 			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoMergedReport coverage report");
 			e.printStackTrace();
 		}
 		return "ERROR creating createJacocoMergedReport coverage report";
@@ -179,6 +184,7 @@ public class JacocoFilesCreator {
 	            System.out.println("************************************************");
 	        } else {
 	            System.out.println("JaCoCo report created : " + reportDir);
+	            LogSerialiser.log("JaCoCo report created : " + reportDir, LogSerialiser.LogLevel.Info);
 	        }
 
 	        // HTML output report creates lot of files because we are creating Action Coverage
@@ -189,9 +195,11 @@ public class JacocoFilesCreator {
 	        
 	        String coverageInfoCSV = new JacocoReportReader(reportDir).obtainCSVSummary();
 	        System.out.println(coverageInfoCSV);
+	        LogSerialiser.log(coverageInfoCSV, LogSerialiser.LogLevel.Info);
 	        return coverageInfoCSV;
 	        
 	    } catch (IOException | InterruptedException e) {
+	        System.err.println("ERROR creating JaCoCo coverage report");
 	        e.printStackTrace();
 	    }
 	    

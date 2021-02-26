@@ -38,6 +38,8 @@ import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
+
 import javax.tools.*;
 import java.io.*;
 import java.nio.channels.Channels;
@@ -761,7 +763,8 @@ public final class Util {
 
           return true;
       } catch (Exception e) {
-          System.out.println("ERROR Compressing folder: " + folderToCompress);
+          LogSerialiser.log("ERROR Compressing folder: " + folderToCompress, LogSerialiser.LogLevel.Info);
+          System.err.println("ERROR Compressing folder: " + folderToCompress);
           e.printStackTrace();
       }
       return false;
