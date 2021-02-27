@@ -5,6 +5,7 @@ import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.apache.logging.log4j.Level;
 import org.testar.Logger;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,6 +19,16 @@ public class LocationMatcher implements VisualMatcher {
     public MatcherResult Match(List<RecognizedElement> ocrResult, List<ExpectedElement> expectedText) {
         MatcherResult result = new MatcherResult();
         List<RecognizedElement> _ocrResult = new ArrayList<>(ocrResult);
+
+        // We first match them based on their location, if they intersect we mark them as match.
+        // Because there are windows and frames included as well we need to make sure that we don't assign them to
+        // these elements before we can assign them to the actual widget which is presented on the panel/window.
+        expectedText.sort((element1, element2) -> {
+            // Sort based on the area size of the element, from small to big
+            Dimension element1Size = element1._location.getSize();
+            Dimension element2Size = element2._location.getSize();
+            return ((element1Size.width * element1Size.height) - (element2Size.width * element2Size.height));
+        });
 
         expectedText.forEach(expectedElement -> {
             final Match[] match = {null};
@@ -52,12 +63,8 @@ public class LocationMatcher implements VisualMatcher {
             if (match[0] != null) {
                 result.addMatch(match[0]);
 
-                // TODO TM: Find solution to enable this to speed up the matcher. Currently when the "title bar" is
-                //  being matched it uses the entire window as area of interest so all OCR items are marked as
-                //  interesting, but if a text in title bar is also found in a different location it will be removed
-                //  for an invalid reason.
                 // Remove the items from the recognized list.
-                // removeRecognizedList.forEach(_ocrResult::remove);
+                removeRecognizedList.forEach(_ocrResult::remove);
             }
         });
 
