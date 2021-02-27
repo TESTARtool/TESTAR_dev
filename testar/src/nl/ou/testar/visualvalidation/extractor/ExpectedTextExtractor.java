@@ -148,8 +148,8 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
                     Rectangle relativeLocation = new Rectangle(
                             (int) ((absoluteLocation.x - applicationPosition.x) * displayScale),
                             (int) ((absoluteLocation.y - applicationPosition.y) * displayScale),
-                            absoluteLocation.width,
-                            absoluteLocation.height);
+                            (int) (absoluteLocation.width * displayScale),
+                            (int) (absoluteLocation.height * displayScale));
                     expectedElements.add(new ExpectedElement(relativeLocation, text));
                 }
             } else {
