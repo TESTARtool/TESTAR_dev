@@ -285,7 +285,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}
     		
 		}catch (IllegalStateException e) {
-			if (e.getMessage().contains("driver executable does not exist")) {
+			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
 				
 				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)

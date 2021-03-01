@@ -91,6 +91,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                     // SUT process is running but GUI needs time to load
                     printSutInfo = "Waiting for the GUI to be accessible ...";
                     FlashFeedback.flash(printSutInfo, 2000);
+                    System.out.println("SUT is running but: Waiting for the GUI to be accessible...");
                 }
             } else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
