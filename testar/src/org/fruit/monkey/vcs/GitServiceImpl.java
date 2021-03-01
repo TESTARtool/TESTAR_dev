@@ -3,6 +3,7 @@ package org.fruit.monkey.vcs;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.beans.PropertyChangeListener;
@@ -16,11 +17,12 @@ public class GitServiceImpl implements GitService {
     public static final String LOCAL_REPOSITORIES_PATH = "cloned";
 
     @Override
-    public boolean cloneRepository(String repositoryUrl) {
+    public boolean cloneRepository(String repositoryUrl, ProgressMonitor progressMonitor) {
             try {
                 Git.cloneRepository()
                         .setURI(repositoryUrl)
                         .setDirectory(prepareRepositoryDirectory(repositoryUrl))
+                        .setProgressMonitor(progressMonitor)
                         .call();
                 return true;
             } catch (GitAPIException | JGitInternalException e) {
@@ -31,12 +33,13 @@ public class GitServiceImpl implements GitService {
     }
 
     @Override
-    public boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials) {
+    public boolean cloneRepository(String repositoryUrl, GitCredentials gitCredentials, ProgressMonitor progressMonitor) {
             try {
                 Git.cloneRepository()
                         .setURI(repositoryUrl)
                         .setDirectory(prepareRepositoryDirectory(repositoryUrl))
                         .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitCredentials.getUsername(), gitCredentials.getPassword()))
+                        .setProgressMonitor(progressMonitor)
                         .call();
 
                 return true;
