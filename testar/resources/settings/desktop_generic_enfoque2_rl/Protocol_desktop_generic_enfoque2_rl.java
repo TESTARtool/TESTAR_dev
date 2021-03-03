@@ -28,6 +28,7 @@
  */
 
 
+import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.Policy;
 import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
@@ -161,7 +162,12 @@ public class Protocol_desktop_generic_enfoque2_rl extends DesktopProtocol {
             return preSelectedAction;
         }
 
-        // select action based on state and set of actions
-        return stateModelManager.getAbstractActionToExecute(actions);
+        Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+        if(modelAction==null) {
+            System.out.println("State model based action selection did not find an action. Using random action selection.");
+            // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+            return RandomActionSelector.selectAction(actions);
+        }
+        return modelAction;
     }
 }

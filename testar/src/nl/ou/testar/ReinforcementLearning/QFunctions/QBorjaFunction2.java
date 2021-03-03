@@ -9,13 +9,15 @@ import org.fruit.alayer.Tags;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
-import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 
 public class QBorjaFunction2 implements QFunction {
 	
 	@Override
 	public float getQValue(Tag<Float> rl_tag, AbstractAction previouslyExecutedAction, AbstractAction selectedAbstractAction, float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
-        if(previouslyExecutedAction == null) {
+        
+	    // selectedAbstractAction will be null because BorjaModelManager is sending a null selectedAction
+	    
+	    if(previouslyExecutedAction == null) {
             return 0f;
         }
 	    
@@ -37,6 +39,9 @@ public class QBorjaFunction2 implements QFunction {
 		        break;
 		    }
 		}
+		
+		if(previousAction == null) {return qValue;}
+		
 		String previousActionType = previousAction.get(Tags.OriginWidget).get(Tags.Role).toString();
 		double previousActionDepth = previousAction.get(Tags.OriginWidget).get(Tags.ZIndex);
 		
