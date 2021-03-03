@@ -7,9 +7,10 @@ import org.fruit.alayer.Widget;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 import static nl.ou.testar.ReinforcementLearning.Utils.TreedistUtil.*;
-import static nl.ou.testar.ReinforcementLearning.Utils.TreedistUtil.getEarlierNode;
 
 /**
  * Helper class for the {@link WidgetTreeZhangShashaBasedRewardFunction}
@@ -37,13 +38,23 @@ public class TreeDistHelper {
             forestDist.put(null, node, getDist(forestDist, null, earlierNode) + INSERT);
         }
 
+        final Map<Widget, Widget> leftMostWidgetMapNodeTree1 = new HashMap();
+        for (final Widget nodeTree1: keyRootPathTree1) {
+            leftMostWidgetMapNodeTree1.put(nodeTree1, getMostLeftWidget(nodeTree1));
+        }
+
+        final Map<Widget, Widget> leftMostWidgetMapNodeTree2 = new HashMap();
+        for (final Widget nodeTree2: keyRootPathTree2) {
+            leftMostWidgetMapNodeTree2.put(nodeTree2, getMostLeftWidget(nodeTree2));
+        }
+
         for (final Widget nodeTree1: keyRootPathTree1) {
             for (final Widget nodeTree2: keyRootPathTree2) {
                 final Widget earlierNode1 = getEarlierNode(nodeTree1, keyRootPathTree1);
                 final Widget earlierNode2 = getEarlierNode(nodeTree2, keyRootPathTree2);
 
-                if (TreedistUtil.equals(getMostLeftWidget(nodeTree1), keyRootPathTree1.getFirst())
-                        && TreedistUtil.equals(getMostLeftWidget(nodeTree2), keyRootPathTree2.getFirst())) {
+                if (TreedistUtil.equals(leftMostWidgetMapNodeTree1.get(nodeTree1), keyRootPathTree1.getFirst())
+                        && TreedistUtil.equals(leftMostWidgetMapNodeTree2.get(nodeTree2), keyRootPathTree2.getFirst())) {
 
                     final int i = getDist(forestDist, earlierNode1, nodeTree2) + DELETE;
                     final int j = getDist(forestDist, nodeTree1, earlierNode2) + INSERT;
@@ -56,8 +67,8 @@ public class TreeDistHelper {
                 } else {
                     final int i = getDist(forestDist, earlierNode1, nodeTree2) + DELETE;
                     final int j = getDist(forestDist, nodeTree1, earlierNode2) + INSERT;
-                    final Widget earlyLeftMost1 = getEarlierNode(getMostLeftWidget(nodeTree1), keyRootPathTree1);
-                    final Widget earlyLeftMost2 = getEarlierNode(getMostLeftWidget(nodeTree2), keyRootPathTree2);
+                    final Widget earlyLeftMost1 = getEarlierNode(getMostLeftWidget(leftMostWidgetMapNodeTree1.get(nodeTree1)), keyRootPathTree1);
+                    final Widget earlyLeftMost2 = getEarlierNode(leftMostWidgetMapNodeTree2.get(nodeTree2), keyRootPathTree2);
                     final int k = getDist(forestDist, earlyLeftMost1, earlyLeftMost2) + getDist(treeDist,nodeTree1, nodeTree2);
 
                     forestDist.put(nodeTree1, nodeTree2, NumberUtils.min(i,j,k));
