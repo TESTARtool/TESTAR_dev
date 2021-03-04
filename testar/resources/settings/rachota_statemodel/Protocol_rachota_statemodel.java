@@ -100,13 +100,13 @@ public class Protocol_rachota_statemodel extends RachotaProtocol {
 		super.preSequencePreparations();
 		try {
 			// Create rachota settings configuration file, and disable detectInactivity feature
-			File rachotaFile = new File("C:\\Users\\testar\\.rachota");
+			File rachotaFile = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota");
 			if(!rachotaFile.exists()) {
 				rachotaFile.mkdirs();
 			}
-			File rachotaSettings = new File("C:\\Users\\testar\\.rachota\\settings.cfg");
+			File rachotaSettings = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
 			if(rachotaSettings.createNewFile() || rachotaFile.exists()) {
-				FileWriter settingsWriter = new FileWriter("C:\\Users\\testar\\.rachota\\settings.cfg");
+				FileWriter settingsWriter = new FileWriter("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
 				settingsWriter.write("detectInactivity = false");
 				settingsWriter.close();
 			}
@@ -302,7 +302,7 @@ public class Protocol_rachota_statemodel extends RachotaProtocol {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
 		}
 
-		String rachotaPath = "C:\\Users\\testar\\.rachota";
+		String rachotaPath = "C:\\Users\\" + System.getProperty("user.name") + "\\.rachota";
 
 		// Delete rachota files then next sequence will have same initial state without tasks
 		if(new File(rachotaPath).exists()) {

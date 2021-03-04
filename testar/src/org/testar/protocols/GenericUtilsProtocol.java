@@ -437,7 +437,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
 			// If is not empty, save as last correct file in case the SUT crashes executing next actions
-			if(!jacocoFile.isEmpty()) {
+			if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
 				lastCorrectJacocoCoverageFile = jacocoFile;
 			}
 
@@ -464,7 +464,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// Dump the sequence JaCoCo report from the remote JVM
 		// Example: jacoco-upm_sequence_1.exec
 		String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
-		if(!jacocoFile.isEmpty()) {
+		if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
 			lastCorrectJacocoCoverageFile = jacocoFile;
 		}
 
@@ -570,23 +570,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        return;
 	    }
 	    
-	    // Copy run output folder to desired ip address output folder
-	    /*File outputFolder = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName);
-	    try {
-	        if(outputFolder.exists()) {
-	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFolder.getName());
-	            if(outputFolder.isDirectory()) {
-	                FileUtils.copyDirectory(outputFolder, fileIpAddressOutput);
-	            }
-	            System.out.println(String.format("Sucessfull copy %s to %s", outputFolder, fileIpAddressOutput));
-	        }
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ALL FILES, specific : " + outputFolder,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ALL FILES, specific : " + outputFolder);
-	        e.printStackTrace();
-	    }*/
-
 	    // Copy run zip file to desired ip address output folder
 	    File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
 	    try {
