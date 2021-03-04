@@ -93,29 +93,6 @@ public class Protocol_rachota_statemodel extends RachotaProtocol {
 	}
 
 	/**
-	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-	 */
-	@Override
-	protected void preSequencePreparations() {
-		super.preSequencePreparations();
-		try {
-			// Create rachota settings configuration file, and disable detectInactivity feature
-			File rachotaFile = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota");
-			if(!rachotaFile.exists()) {
-				rachotaFile.mkdirs();
-			}
-			File rachotaSettings = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
-			if(rachotaSettings.createNewFile() || rachotaFile.exists()) {
-				FileWriter settingsWriter = new FileWriter("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
-				settingsWriter.write("detectInactivity = false");
-				settingsWriter.close();
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR trying to disable detectInactivity configuration feature");
-		}
-	}
-
-	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -300,15 +277,6 @@ public class Protocol_rachota_statemodel extends RachotaProtocol {
 		// In this protocol this one is residual, so just delete
 		if(new File("jacoco.exec").exists()) {
 			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
-		}
-
-		String rachotaPath = "C:\\Users\\" + System.getProperty("user.name") + "\\.rachota";
-
-		// Delete rachota files then next sequence will have same initial state without tasks
-		if(new File(rachotaPath).exists()) {
-			try {
-				FileUtils.deleteDirectory(new File(rachotaPath));
-			} catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
 		}
 	}
 

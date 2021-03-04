@@ -33,12 +33,15 @@ package org.testar.protocols.experiments;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Rect;
@@ -64,6 +67,30 @@ public class RachotaProtocol extends JavaSwingProtocol {
 
 	// rachota: sometimes SUT stop responding, we need this empty actions countdown
 	protected int countEmptyStateTimes = 0;
+	
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+	    super.preSequencePreparations();
+	    deleteRachotaConfig();
+	    try {
+	        // Create rachota settings configuration file, and disable detectInactivity feature
+	        File rachotaFile = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota");
+	        if(!rachotaFile.exists()) {
+	            rachotaFile.mkdirs();
+	        }
+	        File rachotaSettings = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
+	        if(rachotaSettings.createNewFile() || rachotaFile.exists()) {
+	            FileWriter settingsWriter = new FileWriter("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
+	            settingsWriter.write("detectInactivity = false");
+	            settingsWriter.close();
+	        }
+	    } catch (Exception e) {
+	        System.out.println("ERROR trying to disable detectInactivity configuration feature");
+	    }
+	}
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -533,5 +560,29 @@ public class RachotaProtocol extends JavaSwingProtocol {
 			}
 		}
 		return super.isUnfiltered(w);
+	}
+	
+	/**
+	 * This methods stops the SUT
+	 *
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
+	    super.stopSystem(system);
+	    deleteRachotaConfig();
+	}
+
+	/**
+	 * Delete rachota files to have same initial state without tasks
+	 */
+	private void deleteRachotaConfig() {
+	    String rachotaPath = "C:\\Users\\" + System.getProperty("user.name") + "\\.rachota";
+
+	    if(new File(rachotaPath).exists()) {
+	        try {
+	            FileUtils.deleteDirectory(new File(rachotaPath));
+	        } catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
+	    }
 	}
 }
