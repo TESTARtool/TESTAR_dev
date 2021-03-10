@@ -159,7 +159,7 @@ StateModelDifferenceAutomaticReport = true
 #################################################################
 
 OverrideWebDriverDisplayScale = 
-OverrideWebDriverScreenshotDisplay = 
+OverrideWebDriverScreenshotDisplay = 1.5
 
 #################################################################
 # Other more advanced settings

@@ -227,7 +227,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = null;
 		
 		decoderExceptionThrown = false;
-		JsonArtefactLogs.setStartRunningTime(new java.util.Date().toString());
+		////2021-02-24T12:19:40.000+00:00
+		JsonArtefactLogs.setStartRunningTime(Util.dateString("yyyy-MM-ddTHH:mm:ss"));
 		JsonArtefactLogs.addMessage("Starting TESTAR tool process");
 		
 		// If not valid user or project, don't initialize TESTAR
@@ -418,7 +419,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private void finishAndPostLogArtefact() {
-	    JsonArtefactLogs.setEndRunningTime(new java.util.Date().toString());
+	    JsonArtefactLogs.setEndRunningTime(Util.dateString("yyyy-MM-ddTHH:mm:ss"));
 	    if(decoderExceptionThrown) {JsonArtefactLogs.setStatus(false);}
 	    String artefactLog = JsonArtefactLogs.generateLogsArtefact();
 	    PkmRequest.postArtefactLogs(settings, artefactLog);
