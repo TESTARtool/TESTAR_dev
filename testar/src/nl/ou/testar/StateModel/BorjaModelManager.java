@@ -21,7 +21,10 @@ public class BorjaModelManager extends RLModelManager implements StateModelManag
 
     @Override
     public void notifyNewStateReached(final State newState, final Set<Action> actions) {
-        super.notifyNewStateReached(newState, actions);
+    	previousAbstractState = currentAbstractState;
+    	
+    	super.notifyNewStateReached(newState, actions);
+              
         state = newState;
 
         // Previous super invocation has created/updated currentAbstractState (+ AbstractActions)
@@ -37,11 +40,16 @@ public class BorjaModelManager extends RLModelManager implements StateModelManag
     public Action getAbstractActionToExecute(Set<Action> actions) {
         // First update Q, then select action
         updateQValue(null, actions);
-        final Action selectedAction = super.getAbstractActionToExecute(actions);
+        Action selectedAction = null;
         // set previousActionUnderExecute to current abstractActionToExecute for the next iteration
         try {
-            previouslyExecutedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
-            previouslyExecutedTestarAction = selectedAction;
+        	selectedAction = super.getAbstractActionToExecute(actions);
+        	if(selectedAction != null) {
+        		previouslyExecutedAbstractAction = currentAbstractState.getAction(selectedAction.get(Tags.AbstractIDCustom, ""));
+                previouslyExecutedTestarAction = selectedAction;
+        	}
+            
+            previousTestarActions = actions;
         }
         catch (ActionNotFoundException e){
             logger.debug("Update of previous action failed because: '{}'", e.getMessage());

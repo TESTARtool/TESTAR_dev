@@ -9,6 +9,7 @@ import org.fruit.alayer.Tags;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 
 public class QBorjaFunction2 implements QFunction {
 	
@@ -31,6 +32,7 @@ public class QBorjaFunction2 implements QFunction {
 
 		float qValue = greaterThanZero(currentQValue + reward);
 		
+		/*
 		// Update Q-value of actions of the same type and depth, with the new calculated Q-value
 		Action previousAction = null;
 		for(Action a : actions) {
@@ -49,9 +51,17 @@ public class QBorjaFunction2 implements QFunction {
 			String aType = a.get(Tags.OriginWidget).get(Tags.Role).toString();
 			double aDepth = a.get(Tags.OriginWidget).get(Tags.ZIndex);
 			if((previousActionType == aType) && (previousActionDepth == aDepth)) {
-	            a.set(RLTags.QBorja, qValue);
+	            //a.set(RLTags.QBorja, qValue);
+				try {
+                    AbstractAction abstractAction = currentAbstractState.getAction(a.get(Tags.AbstractIDCustom, "Nothing"));
+                    abstractAction.addAttribute(RLTags.QBorja, qValue);
+                } catch (ActionNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 			}
-		}
+		}*/
+		
 
         return qValue;
 	}

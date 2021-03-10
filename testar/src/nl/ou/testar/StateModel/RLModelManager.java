@@ -4,11 +4,13 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,10 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     protected State state = null;
 
     protected final Tag<?> tag;
+    
+    protected AbstractState previousAbstractState = null;
+    
+    protected Set<Action> previousTestarActions;
 
     //*** FOR DEBUGGING PURPOSES
     List<Float> qValuesList = new ArrayList<Float>();
@@ -89,7 +95,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
      *
      * @param selectedAbstractAction, can be null
      */
-    protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {
+    protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {    
         // get reward and Q-value
         System.out.println("UpdateQValue RLModelManager");
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, previouslyExecutedTestarAction, previouslyExecutedAbstractAction, selectedAbstractAction, actions);
@@ -99,13 +105,33 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         // set attribute for saving in the graph database
         if(previouslyExecutedAbstractAction != null) {
             previouslyExecutedAbstractAction.addAttribute(tag, qValue);
+            System.out.println("qFunction.getClass().getName(): " + qFunction.getClass().getName());
+            if (qFunction.getClass().getName() == "QBorjaFunction2") equalizeQValues(qValue);
 
             //*** FOR DEBUGGING PURPOSES
             float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag);
             qValuesList.add(lastQValue);
+            System.out.println("qValuesList: " + qValuesList);
             //*** FOR DEBUGGING PURPOSES
 
         }
+        
+        //*** FOR DEBUGGING PURPOSES
+        if (previousAbstractState != null) {
+			System.out.println(". . . CURRENT ACTIONS:");
+			for (Action a : previousTestarActions) {
+				AbstractAction absAction;
+				try {
+					absAction = previousAbstractState.getAction(a.get(Tags.AbstractIDCustom, ""));
+					System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc) + ". QValue: "
+							+ absAction.getAttributes().get(RLTags.QBorja, 0f));
+				} catch (ActionNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+        }
+        //*** FOR DEBUGGING PURPOSES
 
     }
 
@@ -113,5 +139,38 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     public void notifyTestSequenceStopped() {
         super.notifyTestSequenceStopped();
         rewardFunction.reset();
+    }
+    
+    public void equalizeQValues(float qValue) {
+		// Update Q-value of actions of the same type and depth, with the new calculated
+		// Q-value
+		Action previousAction = null;
+		
+		for (Action a : previousTestarActions) {
+			if (a.get(Tags.AbstractIDCustom).equals(previouslyExecutedAbstractAction.getActionId())) {
+				previousAction = a; // Get the action to access the Role and ZIndex
+				break;
+			}
+		}
+		
+		if(previousAction == null || previousAbstractState == null) {return;}
+    	
+		String previousActionType = previousAction.get(Tags.OriginWidget).get(Tags.Role).toString();
+		double previousActionDepth = previousAction.get(Tags.OriginWidget).get(Tags.ZIndex);
+		
+		for(Action a : previousTestarActions) {
+			String aType = a.get(Tags.OriginWidget).get(Tags.Role).toString();
+			double aDepth = a.get(Tags.OriginWidget).get(Tags.ZIndex);
+			if((previousActionType == aType) && (previousActionDepth == aDepth)) {
+	            //a.set(RLTags.QBorja, qValue);
+				try {
+                    AbstractAction abstractAction = previousAbstractState.getAction(a.get(Tags.AbstractIDCustom, "Nothing"));
+                    abstractAction.addAttribute(RLTags.QBorja, qValue);
+                } catch (ActionNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+			}
+		}
     }
 }

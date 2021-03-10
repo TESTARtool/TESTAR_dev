@@ -67,7 +67,7 @@ public class BorjaReward4 implements RewardFunction {
 		System.out.println(". . . . . Provisional Reward: " + reward);
 
 		if (executedAction != null) {
-			reward -= (0.01 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
+			reward -= (0.03 * executedAction.get(Tags.OriginWidget).get(Tags.ZIndex));
 		} else {
 			System.out.println("WARNING: It was not possible to get the OriginWidget");
 		}
