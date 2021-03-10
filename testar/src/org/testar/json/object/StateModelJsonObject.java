@@ -42,6 +42,7 @@ public class StateModelJsonObject {
 
 	String timestamp;
 	String url;
+	String type = "TESTAR_State_Model";
 	SutJsonObject sut;
 	ToolJsonObject tool;
 	String stateModelDataStore;

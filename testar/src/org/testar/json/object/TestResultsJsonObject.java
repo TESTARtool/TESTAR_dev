@@ -39,6 +39,7 @@ public class TestResultsJsonObject {
 
     String timestamp;
     String url;
+    String type = "TESTAR_Test_Results";
     SutJsonObject sut;
     ToolJsonObject tool;
     SettingsJsonObject settings;
