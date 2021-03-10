@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -228,7 +229,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		decoderExceptionThrown = false;
 		////2021-02-24T12:19:40.000+00:00
-		JsonArtefactLogs.setStartRunningTime(Util.dateString("yyyy-MM-ddTHH:mm:ss"));
+		JsonArtefactLogs.setStartRunningTime(LocalDateTime.now().toString());
 		JsonArtefactLogs.addMessage("Starting TESTAR tool process");
 		
 		// If not valid user or project, don't initialize TESTAR
@@ -419,7 +420,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private void finishAndPostLogArtefact() {
-	    JsonArtefactLogs.setEndRunningTime(Util.dateString("yyyy-MM-ddTHH:mm:ss"));
+	    JsonArtefactLogs.setEndRunningTime(LocalDateTime.now().toString().toString());
 	    if(decoderExceptionThrown) {JsonArtefactLogs.setStatus(false);}
 	    String artefactLog = JsonArtefactLogs.generateLogsArtefact();
 	    PkmRequest.postArtefactLogs(settings, artefactLog);
