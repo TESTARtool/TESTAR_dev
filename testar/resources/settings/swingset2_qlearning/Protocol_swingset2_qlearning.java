@@ -52,7 +52,6 @@ import java.io.FileWriter;
  */
 public class Protocol_swingset2_qlearning extends SwingSet2Protocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	// QLearningActionSelector: Instead of random, we will use QLearning action selector
@@ -65,6 +64,11 @@ public class Protocol_swingset2_qlearning extends SwingSet2Protocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		// QLearningActionSelector: initializing simple GUI state graph for Q-learning:
 		// this implementation uses AbstractCustomID for state abstraction: test.settings -> AbstractStateAttributes
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
@@ -82,6 +86,8 @@ public class Protocol_swingset2_qlearning extends SwingSet2Protocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -253,7 +259,8 @@ public class Protocol_swingset2_qlearning extends SwingSet2Protocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

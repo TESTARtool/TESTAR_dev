@@ -60,7 +60,6 @@ import java.io.FileWriter;
  */
 public class Protocol_bluej_qlearning extends DesktopProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 	
 	// BlueJ: Some parts/windows of the SUT may not be interesting to explore
@@ -88,6 +87,8 @@ public class Protocol_bluej_qlearning extends DesktopProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -411,7 +412,8 @@ public class Protocol_bluej_qlearning extends DesktopProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

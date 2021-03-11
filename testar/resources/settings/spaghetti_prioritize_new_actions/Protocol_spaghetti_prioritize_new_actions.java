@@ -53,7 +53,6 @@ import java.io.FileWriter;
  */
 public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	// PrioritizeNewActionsSelector: Instead of random, we will prioritize new actions for action selection
@@ -66,6 +65,11 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// Spaghetti: Requires Java Access Bridge
@@ -77,6 +81,8 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -244,7 +250,8 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

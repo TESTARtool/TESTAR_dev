@@ -89,6 +89,7 @@ dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     compile group: 'org.apache.maven', name: 'maven-core', version: '3.6.3'
     compile group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.6'
+    compile group: 'com.opencsv', name: 'opencsv', version: '5.3'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')

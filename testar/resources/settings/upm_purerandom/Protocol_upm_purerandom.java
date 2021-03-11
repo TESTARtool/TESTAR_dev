@@ -56,7 +56,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_upm_purerandom extends JavaSwingProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -65,7 +64,12 @@ public class Protocol_upm_purerandom extends JavaSwingProtocol {
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){		
+	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// Swing Requires Java Access Bridge
@@ -77,6 +81,8 @@ public class Protocol_upm_purerandom extends JavaSwingProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -247,7 +253,8 @@ public class Protocol_upm_purerandom extends JavaSwingProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			//compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

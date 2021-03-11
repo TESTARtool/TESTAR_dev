@@ -23,7 +23,18 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\lib\\jacocoagent.jar=jmx=true "suts\\SwingSet2.jar"
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = true
 
 #################################################################
 # Sequences
@@ -31,8 +42,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 5
+Sequences = 10
+SequenceLength = 300
 
 #################################################################
 # Oracles based on suspicious titles
@@ -53,7 +64,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -76,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*JFileChooser.*
 
 #################################################################
 # Processfilter
@@ -93,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
+ProtocolClass = swingset2_reinforcement_learning/Protocol_swingset2_reinforcement_learning
 
 #################################################################
 # State model inference settings
@@ -101,14 +112,15 @@ ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_le
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
-DataStoreServer = localhost
-DataStoreDirectory = C:\\local\\orientdb\\databases
-DataStoreDB = testarDB
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = delayed
-ApplicationName = Notepad
-ApplicationVersion = 1.0.0
+DataStoreMode = instant
+ApplicationName = SwingSet2_RL
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -116,7 +128,7 @@ ApplicationVersion = 1.0.0
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
 # Reinforcement learning settings
@@ -129,10 +141,15 @@ Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
-RewardFunction = BorjaReward4
-Policy = GreedyPolicy
-TagName = qborja
-QFunction = QBorjaFunction4
+RewardFunction = WidgetTreeBasedRewardFunction
+Policy = EpsilonGreedyPolicy
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Other more advanced settings
@@ -156,8 +173,8 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+TimeToWaitAfterAction = 0.3
+StartupTime = 120.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

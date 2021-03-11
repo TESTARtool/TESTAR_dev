@@ -80,7 +80,7 @@ class UIAWidget implements Widget, Serializable {
 
 	
 	final boolean valid(){ return root != null; }
-	final void check(){ if(root == null) throw new IllegalStateException(); }
+	final void check(){ if(root == null) throw new IllegalStateException("UIAState root not initialized!"); }
 	
 	final public void moveTo(Widget p, int idx) { /*check();*/ root.setParent(this, p, idx); }
 	public final UIAWidget addChild() { /*check();*/ return root.addChild(this, null); }

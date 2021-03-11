@@ -31,13 +31,10 @@
 package org.testar.jacoco;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.testar.OutputStructure;
+
+import es.upv.staq.testar.serialisation.LogSerialiser;
 
 /**
  * This class allow users to extract jacoco.exec files from the JVM using MBeanClient.
@@ -59,7 +56,7 @@ public class JacocoFilesCreator {
 				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo Action " + actionCount + "exec report");
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
+			System.err.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
@@ -81,7 +78,7 @@ public class JacocoFilesCreator {
 				System.out.println("ERROR: MBeanClient was not able to dump the JaCoCo exec report");
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR: Reading jacocoFile path: " + jacocoFile);
+			System.err.println("ERROR: Reading jacocoFile path: " + jacocoFile);
 		}
 
 		return jacocoFile;
@@ -93,7 +90,7 @@ public class JacocoFilesCreator {
 	 * @param jacocoFile
 	 * @param actionCount
 	 */
-	public static void createJacocoActionReport(String jacocoFile, String actionCount) {
+	public static String createJacocoActionReport(String jacocoFile, String actionCount) {
 		try {
 			// JaCoCo Action report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -103,10 +100,12 @@ public class JacocoFilesCreator {
 					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount
 					+ "_action_" + actionCount;
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoActionReport coverage report");
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoActionReport coverage report";
 	}
 
 	/**
@@ -114,7 +113,7 @@ public class JacocoFilesCreator {
 	 * 
 	 * @param jacocoFile
 	 */
-	public static void createJacocoSequenceReport(String jacocoFile) {
+	public static String createJacocoSequenceReport(String jacocoFile) {
 		try {
 			// JaCoCo Sequence report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -123,10 +122,12 @@ public class JacocoFilesCreator {
 					+ "_" + OutputStructure.executedSUTname
 					+ "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoSequenceReport coverage report");
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoSequenceReport coverage report";
 	}
 
 	/**
@@ -134,7 +135,7 @@ public class JacocoFilesCreator {
 	 * 
 	 * @param jacocoFile
 	 */
-	public static void createJacocoMergedReport(String jacocoFile) {
+	public static String createJacocoMergedReport(String jacocoFile) {
 		try {
 			// JaCoCo Merged report inside output\SUTexecuted folder
 			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -143,10 +144,12 @@ public class JacocoFilesCreator {
 					+ "_" + OutputStructure.executedSUTname
 					+ "_TOTAL_MERGED";
 
-			createJacocoReport(jacocoFile, reportDir);
+			return createJacocoReport(jacocoFile, reportDir);
 		} catch (IOException e) {
+		    System.err.println("ERROR creating createJacocoMergedReport coverage report");
 			e.printStackTrace();
 		}
+		return "ERROR creating createJacocoMergedReport coverage report";
 	}
 
 	/**
@@ -156,82 +159,50 @@ public class JacocoFilesCreator {
 	 * @param jacocoFile
 	 * @param reportDir
 	 */
-	private static void createJacocoReport(String jacocoFile, String reportDir) {
-		try {
-			// Launch JaCoCo report (build.xml) and overwrite desired parameters
-			String antCommand = "cd jacoco && ant report"
-					+ " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
-					+ " -DreportCoverageDir=" + reportDir;
+	private static String createJacocoReport(String jacocoFile, String reportDir) {
+	    try {
+	        // Using "HTML destdir" inside build.xml -> Creates the directory automatically
+	        // But using only "CSV destfile" needs to create this directory first
+	        if(!new File(reportDir).exists()) {
+	            new File(reportDir).mkdirs();
+	        }
 
-			ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-			Process p = builder.start();
-			p.waitFor();
+	        // Launch JaCoCo report (build.xml) and overwrite desired parameters
+	        String antCommand = "cd jacoco && ant report"
+	                + " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
+	                + " -DreportCoverageDir=" + reportDir;
 
-			System.out.println("JaCoCo report created : " + reportDir);
+	        ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
+	        Process p = builder.start();
+	        p.waitFor();
 
-			String coverageInfo = new JacocoReportReader(reportDir).obtainHTMLSummary();
-			System.out.println(coverageInfo);
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+	        if(!new File(reportDir + File.separator + "report_jacoco.csv").exists()) {
+	            System.out.println("************************************************");
+	            System.out.println("ERROR creating JaCoCo report");
+	            System.out.println("Check: If ant library is installed in the system");
+	            System.out.println("Command Line: ant -version");
+	            System.out.println("************************************************");
+	        } else {
+	            System.out.println("JaCoCo report created : " + reportDir);
+	            LogSerialiser.log("JaCoCo report created : " + reportDir, LogSerialiser.LogLevel.Info);
+	        }
 
-	/**
-	 * Compress desired folder
-	 * https://www.baeldung.com/java-compress-and-uncompress
-	 * 
-	 * @param jacocoReportFolder
-	 */
-	public static boolean compressJacocoReportFile(String jacocoReportFolder) {
-		try {
-			System.out.println("Compressing folder... " + jacocoReportFolder);
-
-			String compressedFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "JacocoReportCompress.zip";
-
-			FileOutputStream fos = new FileOutputStream(compressedFile);
-			ZipOutputStream zipOut = new ZipOutputStream(fos);
-			File fileToZip = new File(jacocoReportFolder);
-
-			zipFile(fileToZip, fileToZip.getName(), zipOut);
-			zipOut.close();
-			fos.close();
-
-			System.out.println("OK! Compressed successfully : " + compressedFile);
-
-			return true;
-		} catch (Exception e) {
-			System.out.println("ERROR Compressing folder: " + jacocoReportFolder);
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
-		if (fileToZip.isHidden()) {
-			return;
-		}
-		if (fileToZip.isDirectory()) {
-			if (fileName.endsWith("/")) {
-				zipOut.putNextEntry(new ZipEntry(fileName));
-				zipOut.closeEntry();
-			} else {
-				zipOut.putNextEntry(new ZipEntry(fileName + "/"));
-				zipOut.closeEntry();
-			}
-			File[] children = fileToZip.listFiles();
-			for (File childFile : children) {
-				zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
-			}
-			return;
-		}
-		FileInputStream fis = new FileInputStream(fileToZip);
-		ZipEntry zipEntry = new ZipEntry(fileName);
-		zipOut.putNextEntry(zipEntry);
-		byte[] bytes = new byte[1024];
-		int length;
-		while ((length = fis.read(bytes)) >= 0) {
-			zipOut.write(bytes, 0, length);
-		}
-		fis.close();
+	        // HTML output report creates lot of files because we are creating Action Coverage
+	        /*
+	        String coverageInfoHTML = new JacocoReportReader(reportDir).obtainHTMLSummary();
+	        System.out.println(coverageInfoHTML);
+	        */
+	        
+	        String coverageInfoCSV = new JacocoReportReader(reportDir).obtainCSVSummary();
+	        System.out.println(coverageInfoCSV);
+	        LogSerialiser.log(coverageInfoCSV, LogSerialiser.LogLevel.Info);
+	        return coverageInfoCSV;
+	        
+	    } catch (IOException | InterruptedException e) {
+	        System.err.println("ERROR creating JaCoCo coverage report");
+	        e.printStackTrace();
+	    }
+	    
+	    return "ERROR creating JaCoCo coverage report";
 	}
 }

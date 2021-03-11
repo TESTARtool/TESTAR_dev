@@ -13,5 +13,6 @@ build.bat
 *.sse
 *.class
 *.log
+/logs
 
 !testar/distributionSUTs/SwingSet2_files/*

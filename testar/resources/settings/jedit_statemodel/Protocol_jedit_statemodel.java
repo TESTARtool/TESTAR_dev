@@ -58,7 +58,6 @@ import java.io.FileWriter;
  */
 public class Protocol_jedit_statemodel extends JavaSwingProtocol {
 	
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -84,6 +83,8 @@ public class Protocol_jedit_statemodel extends JavaSwingProtocol {
 		
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -339,7 +340,8 @@ public class Protocol_jedit_statemodel extends JavaSwingProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

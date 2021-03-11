@@ -42,8 +42,8 @@ AccessBridgeEnabled = true
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 10
+SequenceLength = 300
 
 #################################################################
 # Oracles based on suspicious titles
@@ -111,8 +111,8 @@ ProtocolClass = rachota_statemodel/Protocol_rachota_statemodel
 #################################################################\n"
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -128,7 +128,7 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+AbstractStateAttributes = WidgetPath,WidgetControlType
 
 #################################################################
 # Other more advanced settings
@@ -153,7 +153,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.3
-StartupTime = 10.0
+StartupTime = 120.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

@@ -29,10 +29,6 @@
 *******************************************************************************************************/
 
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import java.io.BufferedReader;
@@ -436,6 +432,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Extended settings file\n"
+					+"#\n"
+					+"# Relative path to extended settings file.\n"
+					+"#################################################################\n"
+					+"ExtendedSettingsFile =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

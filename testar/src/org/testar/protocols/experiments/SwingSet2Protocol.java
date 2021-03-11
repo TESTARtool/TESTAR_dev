@@ -157,6 +157,22 @@ public class SwingSet2Protocol extends JavaSwingProtocol {
 
 		return actions;
 	}
+	
+	/**
+	 * Check whether a widget is clickable
+	 * @param w
+	 * @return
+	 */
+	@Override
+	protected boolean isClickable(Widget w){
+	    // SwingSet2 app contains some CheckBox that are out of the main State coordinates
+	    // We need to verify the coordinates or TESTAR will click out of the SUT coordinates
+	    // Root is the process (all screen), first child is the main State
+	    if(w.get(Tags.Role).toString().contains("CheckBox") && !containsWidget(w.root().child(0), w)) {
+	        return false;
+	    }
+	    return super.isClickable(w);
+	}
 
 	/**
 	 * SwingSet2 application contains a TabElement called "SourceCode"
@@ -176,12 +192,15 @@ public class SwingSet2Protocol extends JavaSwingProtocol {
 	 * Iterate through the child of the specified widget to derive a click Action
 	 */
 	private void forceWidgetTreeClickAction(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
-		for(int i = 0; i<w.childCount(); i++) {
-			forceWidgetTreeClickAction(w.child(i), actions);
-		}
+	    StdActionCompiler ac = new AnnotatingActionCompiler();
+	    if(containsWidget(w.root().child(0), w)) {
+	        //actions.add(ac.leftClickAt(w));
+	        actions.add(ac.leftDoubleClickAt(w));
+	        w.set(Tags.ActionSet, actions);
+	    }
+	    for(int i = 0; i<w.childCount(); i++) {
+	        forceWidgetTreeClickAction(w.child(i), actions);
+	    }
 	}
 
 	/**
@@ -215,5 +234,21 @@ public class SwingSet2Protocol extends JavaSwingProtocol {
 				forceComboBoxClickAction(w.child(i), visibleContainer, actions);
 			}
 		} catch(Exception e) {}
+	}
+	
+	/**
+	 * Check if specific Widget container contains the desired widget.
+	 * 
+	 * @param container
+	 * @param w
+	 * @return
+	 */
+	private boolean containsWidget(Widget container, Widget w) {
+	    Rect containerBounds = Rect.from(container.get(Tags.Shape).x(), container.get(Tags.Shape).y(),
+	            container.get(Tags.Shape).width(), container.get(Tags.Shape).height());
+	    Rect widgetBounds = Rect.from(w.get(Tags.Shape).x(), w.get(Tags.Shape).y(),
+	            w.get(Tags.Shape).width(), w.get(Tags.Shape).height());
+
+	    return Rect.contains(containerBounds, widgetBounds);
 	}
 }

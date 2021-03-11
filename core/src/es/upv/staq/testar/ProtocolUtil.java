@@ -295,7 +295,7 @@ public class ProtocolUtil {
 	private static long getRootWindowHandle(State state) {
 		long windowHandle = 0;
 		if (state.childCount() > 0) {
-			windowHandle = state.child(0).get(Tags.HWND);
+			windowHandle = state.child(0).get(Tags.HWND, (long)0);
 		}
 		return windowHandle;
 	}

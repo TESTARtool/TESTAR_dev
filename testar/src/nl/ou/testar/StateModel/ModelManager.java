@@ -196,16 +196,16 @@ public class ModelManager implements StateModelManager {
         try {
             logger.info("NotifyActionExecution action:'{}'", action.toShortString());
             actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
-        } catch (final ActionNotFoundException ex) {
-            System.out.println("Action not found in state model");
+        } catch (final NullPointerException | ActionNotFoundException ex) {
+            logger.info("Action not found in state model");
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
-        System.out.println("Executing action: " + action.get(Tags.Desc));
-        System.out.println("----------------------------------");
+        logger.info("Executing action: " + action.get(Tags.Desc));
+        logger.info("----------------------------------");
 
         // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
         if (errorMessages.length() > 0) {

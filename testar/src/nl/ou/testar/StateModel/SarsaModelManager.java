@@ -5,6 +5,7 @@ import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
+
 import org.apache.commons.lang.Validate;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tag;
@@ -12,7 +13,7 @@ import org.fruit.alayer.Tags;
 
 import java.util.Set;
 
-public class SarsaModelManager extends RLModelManager  implements StateModelManager {
+public class SarsaModelManager extends RLModelManager implements StateModelManager {
 
     public SarsaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag);

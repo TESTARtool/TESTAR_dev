@@ -53,7 +53,6 @@ import java.io.FileWriter;
  */
 public class Protocol_spaghetti_statemodel extends SpaghettiProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -63,6 +62,11 @@ public class Protocol_spaghetti_statemodel extends SpaghettiProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
 		super.initialize(settings);
 
 		// StateModel Unvisited Action: This should be "unvisited", if not execution is not valid
@@ -79,6 +83,8 @@ public class Protocol_spaghetti_statemodel extends SpaghettiProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -253,7 +259,8 @@ public class Protocol_spaghetti_statemodel extends SpaghettiProtocol {
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressJacocoReportFolder();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }

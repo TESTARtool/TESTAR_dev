@@ -33,8 +33,10 @@ package org.testar.protocols;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 
 import org.apache.commons.io.FileUtils;
+import nl.ou.testar.DerivedActions;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -49,14 +51,20 @@ import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.MergeJacocoFiles;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
@@ -220,7 +228,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param scrollThick
      * @param widget
      */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+    @Deprecated
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget){
         Drag[] drags = null;
         //If there are scroll (drags/drops) actions possible
         if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
@@ -235,6 +244,37 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             }
         }
+    }
+
+    @Deprecated
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+    }
+
+    /**
+     * Adds sliding actions into available actions of the DerivedActions for the given widget
+     * and returns DerivedActions after that
+     *
+     * @param derived
+     * @param ac
+     * @param drags
+     * @param widget
+     * @return DerivedActions with added sliding actions in the available actions
+     */
+    protected DerivedActions addSlidingActions(DerivedActions derived, StdActionCompiler ac, Drag[] drags, Widget widget){
+
+            //TODO creates multiple drag actions for one widget?
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                derived.addAvailableAction(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
+                ));
+
+            }
+        return derived;
     }
 
     /**
@@ -324,12 +364,39 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return false;
     }
     
+    /**
+     * Disconnect from Windows Remote Desktop without close the GUI session.
+     */
+    protected void disconnectRDP() {
+		try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(60);
+    }
+    
 	// Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
 
 	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
+	
+	protected long startSequenceTime;
+	protected long startRunTime;
 	
 	/**
 	 * Copy settings protocolName build.xml file to jacoco directory
@@ -351,7 +418,9 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 				FileUtils.copyFile(originalBuildFile, destbuildFile);
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
+			LogSerialiser.log("ERROR Trying to move settings protocolName build.xml file to jacoco directory",
+			        LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
 		}
 	}
 	
@@ -367,16 +436,23 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
 			// If is not empty, save as last correct file in case the SUT crashes executing next actions
-			if(!jacocoFile.isEmpty()) {
+			if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
 				lastCorrectJacocoCoverageFile = jacocoFile;
 			}
 
-			// Create the output JaCoCo Action report
-			// Example: "jacoco_reports/upm_sequence_1_action_3/index.html"
-			JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
+			// Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
+			// And get a string that represents obtained coverage
+			String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
+			long  actionTime = System.currentTimeMillis() - startSequenceTime;
+			writeCoverageFile("Sequence | " + OutputStructure.sequenceInnerLoopCount +
+			        " | actionnr | " + actionCount +
+			        " | time | " + actionTime +
+			        " | " + actionCoverage);
 
 		} catch (Exception e) {
-			System.out.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+			LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
+                    LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
 		}
 	}
 	
@@ -387,7 +463,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// Dump the sequence JaCoCo report from the remote JVM
 		// Example: jacoco-upm_sequence_1.exec
 		String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
-		if(!jacocoFile.isEmpty()) {
+		if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
 			lastCorrectJacocoCoverageFile = jacocoFile;
 		}
 
@@ -395,9 +471,14 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// If everything works correctly will be the sequence report, if not, last correct action jacoco.exec file
 		jacocoFiles.add(lastCorrectJacocoCoverageFile);
 
-		// Create the output JaCoCo report
-		// Example: "jacoco_reports/upm_sequence_1/index.html"
-		JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		// Create the output JaCoCo report (Ex: "jacoco_reports/upm_sequence_1/report_jacoco.csv")
+		// And get a string that represents obtained coverage
+		String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
+		writeCoverageFile("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+		        " | actionnr | " + actionCount +
+		        " | time | " + sequenceTime +
+		        " | " + sequenceCoverage);
 		
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
@@ -413,26 +494,128 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
 			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
 			
-			// Then create the report that contains the coverage of all executed sequences
-			// Example: jacoco_reports//TOTAL_MERGED//index.html
-			JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+			// Then create the report that contains the coverage of all executed sequences (Ex: jacoco_reports/TOTAL_MERGED/report_jacoco.csv)
+			// And get a string that represents obtained coverage
+			String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+			long  runTime = System.currentTimeMillis() - startRunTime;
+			writeCoverageFile("RunTotal | time | " + runTime + " | " + runCoverage);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
+			System.err.println(e.getMessage());
+	        LogSerialiser.log("ERROR: Trying to MergeMojo feature with JaCoCo Files",
+	                    LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
 		}
 	}
 	
 	/**
-	 * Compress JaCoCo report folder
+	 * Write the action coverage inside a coverage text file
+	 * 
+	 * @param coverageMetrics
 	 */
-	protected void compressJacocoReportFolder() {
-		//TODO: We also need to delete original folder after compression
-		try {
-			String jacocoReportFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "jacoco_reports";
-			JacocoFilesCreator.compressJacocoReportFile(jacocoReportFolder);
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-			System.out.println("ERROR: Trying to compress JaCoCo report folder");
-		}
+	private void writeCoverageFile(String coverageInformation) {
+        try {
+            String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
+                    + OutputStructure.outerLoopName + "_coverageMetrics.txt";
+            FileWriter myWriter = new FileWriter(reportCoverageFile, true);
+            myWriter.write(coverageInformation + "\r\n");
+            myWriter.close();
+        } catch (IOException e) {
+            LogSerialiser.log("ERROR: Writing Coverage Metrics inside coverageMetrics text file",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
+            e.printStackTrace();
+        }
+	}
+	
+	/**
+	 * Compress TESTAR output run report folder
+	 */
+	protected void compressOutputRunFolder() {
+	    Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
+	}
+	
+	/**
+	 * Obtain the IP address of the current host to create a folder inside destFolder, 
+	 * then copy all TESTAR output run results inside created folder. 
+	 * 
+	 * This is an utility method intended to copy output results inside a file server shared folder, 
+	 * used to save data of TESTAR experiments. 
+	 * 
+	 * @param destFolder
+	 */
+	protected void copyOutputToNewFolderUsingIpAddress(String destFolder) {
+	    // Obtain the ip address of the host
+	    // https://stackoverflow.com/a/38342964
+	    String ipAddress = "127.0.0.1";
+	    try(final DatagramSocket socket = new DatagramSocket()){
+	        socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+	        ipAddress = socket.getLocalAddress().getHostAddress();
+	    } catch (SocketException | UnknownHostException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+	        e.printStackTrace();
+	    }
+
+	    // Create a new directory inside desired destination using the ipAddress as name
+	    String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(folderIpAddress));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+	        e.printStackTrace();
+	        return;
+	    }
+	    
+	    // Copy run zip file to desired ip address output folder
+	    File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
+	    try {
+	        if(outputZipFile.exists()) {
+	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputZipFile.getName());
+	            FileUtils.copyFile(outputZipFile, fileIpAddressOutput);
+	            System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
+	        }
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile);
+	        e.printStackTrace();
+	    }
+
+	    copyCoverageMetricsToFolder(destFolder, ipAddress);
+	}
+
+	/**
+	 * Copy Coverage Metrics file inside the destination Folder. 
+	 * 
+	 * @param destFolder
+	 * @param ipAddress
+	 */
+	private void copyCoverageMetricsToFolder(String destFolder, String ipAddress) {
+	    // Create a new directory inside desired destination to store all metrics
+	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(metricsFolder));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
+	        e.printStackTrace();
+	        return;
+	    }
+
+	    File srcMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt");
+	    File destMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_coverageMetrics.txt");
+	    try {
+	        FileUtils.copyFile(srcMetrics, destMetrics);
+	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics);
+	        e.printStackTrace();
+	    }
 	}
 }

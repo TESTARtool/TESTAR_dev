@@ -411,7 +411,7 @@ public final class WinProcess extends SUTBase {
 
 	public long pid(){
 		if(!isRunning())
-			throw new IllegalStateException();
+			throw new IllegalStateException("WinProcess SUT is not running!");
 		return Windows.GetProcessId(hProcess);
 	}
 
