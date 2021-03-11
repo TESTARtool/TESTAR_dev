@@ -119,7 +119,6 @@ DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = SwingSet2_RL
 ApplicationVersion = 1
-ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################
@@ -141,15 +140,17 @@ Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
-Policy = EpsilonGreedyPolicy
+RewardFunction = BorjaReward2
+Policy = GreedyPolicy
+TagName = qborja
+QFunction = QBorjaFunction2
 
 #################################################################
 # Extended settings file
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLBorjaActionGroup.xml
 
 #################################################################
 # Other more advanced settings
@@ -167,7 +168,7 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.3
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =

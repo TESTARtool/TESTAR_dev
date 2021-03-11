@@ -54,7 +54,6 @@ import java.io.FileWriter;
  */
 public class Protocol_buddi_purerandom extends BuddiProtocol {
 
-	private long startSequenceTime;
 	private String reportTimeDir;
 
 	/**
@@ -78,6 +77,8 @@ public class Protocol_buddi_purerandom extends BuddiProtocol {
 
 		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 		copyJacocoBuildFile();
+		
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -236,11 +237,12 @@ public class Protocol_buddi_purerandom extends BuddiProtocol {
 	 */
 	@Override
 	protected void closeTestSession() {
-		super.closeTestSession();
-		// Extract and create JaCoCo run coverage report for Generate Mode
-		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-			extractJacocoRunReport();
-			compressJacocoReportFolder();
-		}
+	    super.closeTestSession();
+	    // Extract and create JaCoCo run coverage report for Generate Mode
+	    if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+	        extractJacocoRunReport();
+	        compressOutputRunFolder();
+	        copyOutputToNewFolderUsingIpAddress("N:");
+	    }
 	}
 }

@@ -111,14 +111,15 @@ ProtocolClass = rachota_reinforcement_learning/Protocol_rachota_reinforcement_le
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = rachota_RL
 ApplicationVersion = 1
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -139,15 +140,17 @@ Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
-Policy = EpsilonGreedyPolicy
+RewardFunction = BorjaReward2
+Policy = GreedyPolicy
+TagName = qborja
+QFunction = QBorjaFunction2
 
 #################################################################
 # Extended settings file
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\rachota_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\rachota_reinforcement_learning\\ExtendedRLBorjaActionGroup.xml
 
 #################################################################
 # Other more advanced settings

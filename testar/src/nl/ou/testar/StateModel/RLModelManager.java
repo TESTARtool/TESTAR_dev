@@ -116,8 +116,8 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 
         }
         
-        //*** FOR DEBUGGING PURPOSES
-        if (previousAbstractState != null) {
+        //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
+        if (previousAbstractState != null && qFunction.getClass().getName() == "QBorjaFunction2") {
 			System.out.println(". . . CURRENT ACTIONS:");
 			for (Action a : previousTestarActions) {
 				AbstractAction absAction;
@@ -131,7 +131,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 				}
 			}
         }
-        //*** FOR DEBUGGING PURPOSES
+        //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
 
     }
 
