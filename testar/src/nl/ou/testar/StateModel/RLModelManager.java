@@ -106,7 +106,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         if(previouslyExecutedAbstractAction != null) {
             previouslyExecutedAbstractAction.addAttribute(tag, qValue);
             System.out.println("qFunction.getClass().getName(): " + qFunction.getClass().getName());
-            if (qFunction.getClass().getName() == "QBorjaFunction2") equalizeQValues(qValue);
+            if (qFunction.getClass().getName().contains("QBorjaFunction2")) equalizeQValues(qValue);
 
             //*** FOR DEBUGGING PURPOSES
             float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag);
@@ -117,7 +117,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         }
         
         //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
-        if (previousAbstractState != null && qFunction.getClass().getName() == "QBorjaFunction2") {
+        if (previousAbstractState != null && qFunction.getClass().getName().contains("QBorjaFunction2")) {
 			System.out.println(". . . CURRENT ACTIONS:");
 			for (Action a : previousTestarActions) {
 				AbstractAction absAction;
