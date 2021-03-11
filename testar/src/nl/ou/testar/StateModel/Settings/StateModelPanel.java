@@ -453,7 +453,7 @@ public class StateModelPanel extends JPanel {
             JettyServer jettyServer = new JettyServer();
             jettyServer.start(outputDir, analysisManager);
             Desktop desktop = java.awt.Desktop.getDesktop();
-            URI uri = new URI("http://localhost:8090/models");
+            URI uri = new URI("http://localhost:8090/models/models");
             desktop.browse(uri);
         }
         catch (Exception ex) {

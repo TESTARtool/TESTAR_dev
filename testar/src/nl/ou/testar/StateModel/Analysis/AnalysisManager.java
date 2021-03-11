@@ -47,7 +47,7 @@ public class AnalysisManager {
     public AnalysisManager(final Config config, String outputDir) {
         dbConfig = config;
         startUp();
-        this.outputDir = outputDir;
+        this.outputDir = outputDir + File.separator + "models";
 
         // check if the credentials are valid
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {

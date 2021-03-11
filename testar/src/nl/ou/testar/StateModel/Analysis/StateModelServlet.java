@@ -27,7 +27,7 @@ public class StateModelServlet extends HttpServlet {
 
         try {
             request.setAttribute("models", models);
-            RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
+            RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models/models.jsp");
             dispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class StateModelServlet extends HttpServlet {
             request.setAttribute("contentFolder", sequenceId);
             request.setAttribute("visualizations", visualizations);
 
-            RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/sequence.jsp");
+            RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models/sequence.jsp");
             dispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();

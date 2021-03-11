@@ -79,12 +79,12 @@ public class JettyServer {
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
         webAppContext.setResourceBase(resourceBase);
-        webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
-        webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
+        webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models/models");
+        webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/models/graph");
 
         // Shutdown this server
         shutdownServlet = new ShutdownServlet(server);
-        webAppContext.addServlet(new ServletHolder(shutdownServlet), "/shutdown");
+        webAppContext.addServlet(new ServletHolder(shutdownServlet), "/models/shutdown");
 
         webAppContext.setAttribute("analysisManager", analysisManager);
 
