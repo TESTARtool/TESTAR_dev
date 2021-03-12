@@ -14,13 +14,35 @@ import java.util.stream.Stream;
 
 public class HtmlTestReport {
 
+    /** Directory that is used to store our template in */
     private static final String OUTPUT_DATA_DIR = "output/Testar-Report/";
+    /** Name of our report file */
     private static final String HTML_INDEX_PATH = "report.html";
+    /** Location of our Issue Chart.js file */
     private static final String HTML_JS_ISSUE_CHART_PATH = "js/issueMetricChart.js";
+    /** Location of our Oracle Chart.js file */
     private static final String HTML_JS_ORACLE_CHART_PATH = "js/oracleMetricChart.js";
+    /** Location of our CSS file */
     private static final String HTML_CSS_REPORT_PATH = "css/report.css";
-    private String htmlIndex, htmlJsIssueChart, htmlJsOracleChart, htmlCssReport;
+    /** Content of the index template */
+    private String htmlIndex;
+    /** Content of our Issue chart.js template */
+    private String htmlJsIssueChart;
+    /** Content of our Oracle chart.js template */
+    private String htmlJsOracleChart;
+    /** Content of our css template */
+    private String htmlCssReport;
 
+    /** Number of sequences executed */
+    private int sequences = 0;
+    /** Number of total actions executed */
+    private int actions = 0;
+    /** Number of non-severe issues found */
+    private int nonSevereIssues = 0;
+    /** Number of severe issues found */
+    private int severeIssues = 0;
+
+    /** Location where we should store our report in */
     private final String reportDir;
 
     public HtmlTestReport() {
@@ -52,10 +74,12 @@ public class HtmlTestReport {
         cssDirectory = new File(this.reportDir + "css/");
 
         if(!jsDirectory.exists())
-            jsDirectory.mkdirs();
+            if (!jsDirectory.mkdirs())
+                System.err.println("Failed to create JS report directory!");
 
         if(!cssDirectory.exists())
-            cssDirectory.mkdirs();
+            if (cssDirectory.mkdirs())
+                System.err.println("Failed to create CSS report directory!");
     }
 
     private static String readFileAsString(String filePath) throws IOException {
@@ -69,16 +93,27 @@ public class HtmlTestReport {
     }
 
     @FunctionalInterface
-    private interface saveFile<T> {
+    private interface SaveFile<T> {
         void apply(T location, T content);
     }
 
-    private void saveReport() {
+    private String parseIndexTemplate(
+            final int actionsPerSequence
+    ) {
+        return this.htmlIndex
+                .replace("#[sequences]", Integer.toString(this.sequences))
+                .replace("#[actions]", Integer.toString(this.actions))
+                .replace("#[actions_per_sequence]", Integer.toString(actionsPerSequence));
+    }
+
+    public void saveReport(
+            final int actionsPerSequence
+    ) {
         // Make sure that the directories exists before we write to it.
         createReportDirs();
 
         // Create a lambda for saving data to files
-        saveFile<String> saveFile = (location, content) -> {
+        SaveFile<String> saveFile = (location, content) -> {
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(location));
                 writer.write(content);
@@ -89,7 +124,7 @@ public class HtmlTestReport {
         };
 
         // Save the template files
-        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.htmlIndex);
+        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence));
         saveFile.apply(this.reportDir + HTML_JS_ISSUE_CHART_PATH, this.htmlJsIssueChart);
         saveFile.apply(this.reportDir + HTML_JS_ORACLE_CHART_PATH, this.htmlJsOracleChart);
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);
@@ -102,9 +137,10 @@ public class HtmlTestReport {
     }
 
     public void addSelectedAction(State state, Action action) {
+        this.actions++;
     }
 
     public void addTestVerdict(Verdict verdict) {
-        this.saveReport();
+        this.sequences++;
     }
 }

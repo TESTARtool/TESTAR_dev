@@ -69,6 +69,7 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -115,6 +116,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 			}};
 
+	@Override
+	protected void initialize(Settings settings) {
+		super.initialize(settings);
+		this.htmlTestReport = new HtmlTestReport();
+	}
+
+	@Override
+	protected void onTestEndEvent() {
+		this.htmlTestReport.saveReport(
+				this.actionCount() - 1 // FIXME: Why is this value always +1 what I fill in the GUI?
+		);
+	}
+
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
      */
@@ -122,7 +136,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
-		htmlTestReport = new HtmlTestReport();
     }
     
     /**
