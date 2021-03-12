@@ -78,7 +78,7 @@ public class HtmlTestReport {
                 System.err.println("Failed to create JS report directory!");
 
         if(!cssDirectory.exists())
-            if (cssDirectory.mkdirs())
+            if (!cssDirectory.mkdirs())
                 System.err.println("Failed to create CSS report directory!");
     }
 
@@ -98,16 +98,30 @@ public class HtmlTestReport {
     }
 
     private String parseIndexTemplate(
-            final int actionsPerSequence
+            final int actionsPerSequence,
+            final String url
     ) {
+        String title = url
+                .replace("https://", "")
+                .replace("http://", "")
+                .replace("www2.", "")
+                .replace("www.", "")
+                .replace("\\", "")
+                .replace("/", "");
+
         return this.htmlIndex
                 .replace("#[sequences]", Integer.toString(this.sequences))
                 .replace("#[actions]", Integer.toString(this.actions))
-                .replace("#[actions_per_sequence]", Integer.toString(actionsPerSequence));
+                .replace("#[actions_per_sequence]", Integer.toString(actionsPerSequence))
+                .replace(
+                        "<a href=\"https://www.example.com\">#[url]</a>",
+                        String.format("<a href=\"%s\">%s</a>", url, title)
+                        );
     }
 
     public void saveReport(
-            final int actionsPerSequence
+            final int actionsPerSequence,
+            final String url
     ) {
         // Make sure that the directories exists before we write to it.
         createReportDirs();
@@ -124,7 +138,7 @@ public class HtmlTestReport {
         };
 
         // Save the template files
-        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence));
+        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence, url));
         saveFile.apply(this.reportDir + HTML_JS_ISSUE_CHART_PATH, this.htmlJsIssueChart);
         saveFile.apply(this.reportDir + HTML_JS_ORACLE_CHART_PATH, this.htmlJsOracleChart);
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);

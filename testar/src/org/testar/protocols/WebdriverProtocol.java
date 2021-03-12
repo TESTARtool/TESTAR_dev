@@ -84,7 +84,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected HtmlSequenceReport htmlReport;
 	protected HtmlTestReport htmlTestReport;
     protected State latestState;
-    
+
+    protected String firstNonNullUrl;
+
     protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// Classes that are deemed clickable by the web framework
@@ -120,12 +122,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 		this.htmlTestReport = new HtmlTestReport();
+		this.firstNonNullUrl = null;
 	}
 
 	@Override
 	protected void onTestEndEvent() {
 		this.htmlTestReport.saveReport(
-				this.actionCount() - 1 // FIXME: Why is this value always +1 what I fill in the GUI?
+				this.actionCount() - 1, // FIXME: Why is this value always +1 what I fill in the GUI?
+				this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
 		);
 	}
 
@@ -385,6 +389,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Check if the current page is a login page
 		String currentUrl = WdDriver.getCurrentUrl();
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		if (currentUrl.startsWith(login.left())) {
 			CompoundAction.Builder builder = new CompoundAction.Builder();
 			// Set username and password
@@ -449,6 +454,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	protected Set<Action> detectForcedDeniedUrl() {
 		String currentUrl = WdDriver.getCurrentUrl();
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
@@ -469,6 +475,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check if the current address has a denied extension (PDF etc.)
 	 */
 	protected boolean isExtensionDenied(String currentUrl) {
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		// If the current page doesn't have an extension, always allow
 		if (!currentUrl.contains(".")) {
 			return false;
@@ -488,6 +495,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check if the URL is denied
 	 */
 	protected boolean isUrlDenied(String currentUrl) {
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		if (currentUrl.startsWith("mailto:")) {
 			return true;
 		}
