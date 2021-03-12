@@ -128,7 +128,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	@Override
 	protected void onTestEndEvent() {
 		this.htmlTestReport.saveReport(
-				this.actionCount() - 1, // FIXME: Why is this value always +1 what I fill in the GUI?
+				this.settings().get(ConfigTags.SequenceLength),
+				this.settings().get(ConfigTags.Sequences),
 				this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
 		);
 	}

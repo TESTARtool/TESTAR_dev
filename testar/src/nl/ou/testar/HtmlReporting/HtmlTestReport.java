@@ -181,6 +181,7 @@ public class HtmlTestReport {
 
     private String parseIndexTemplate(
             final int actionsPerSequence,
+            final int totalSequences,
             final String url
     ) {
         String title = url
@@ -192,7 +193,7 @@ public class HtmlTestReport {
                 .replace("/", "");
 
         return this.htmlIndex
-                .replace("#[sequences]", Integer.toString(this.sequences))
+                .replace("#[sequences]", this.sequences + "/" + totalSequences)
                 .replace("#[actions]", Integer.toString(this.actions))
                 .replace("#[actions_per_sequence]", Integer.toString(actionsPerSequence))
                 .replace(
@@ -205,6 +206,7 @@ public class HtmlTestReport {
 
     public void saveReport(
             final int actionsPerSequence,
+            final int totalSequences,
             final String url
     ) {
         // Make sure that the directories exists before we write to it.
@@ -222,7 +224,7 @@ public class HtmlTestReport {
         };
 
         // Save the template files
-        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence, url));
+        saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence, totalSequences, url));
         saveFile.apply(this.reportDir + HTML_JS_ISSUE_CHART_PATH, this.htmlJsIssueChart);
         saveFile.apply(this.reportDir + HTML_JS_ORACLE_CHART_PATH, this.htmlJsOracleChart);
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);
