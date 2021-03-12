@@ -110,11 +110,9 @@ public class HtmlTestReport {
     public HtmlTestReport() {
         /// Create a file name with the format: $outputDir/$dateTime_$sutName-report.html
         this.reportDir = String.format(
-                "%s%s%s_%s-report%s",
+                "%s%sFull Report%s",
                 OutputStructure.htmlOutputDir,
                 File.separator,
-                OutputStructure.startInnerLoopDateString,
-                OutputStructure.executedSUTname,
                 File.separator
         );
 
