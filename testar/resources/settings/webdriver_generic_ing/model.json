@@ -1,0 +1,678 @@
+{
+  "communicationStructure": {
+    "translationCode": "communication",
+    "subject": "",
+    "from": "",
+    "couponToMail": ""
+  },
+  "generalStructure": {
+    "translationCode": "general",
+    "supportedLanguages": [
+      "EN",
+      "NL",
+      "FR"
+    ],
+    "segment": [
+      "1"
+    ],
+    "flowType": [
+      "Open"
+    ],
+    "name": {
+      "translationCode": "general.modeltest",
+      "EN": "ModelTest",
+      "FR": "",
+      "NL": "",
+      "DE": "",
+      "_technical": "modeltest"
+    },
+    "engineVersion": "1.1",
+    "description": {
+      "translationCode": "general.description",
+      "EN": "",
+      "FR": "",
+      "NL": "",
+      "DE": ""
+    },
+    "title": null,
+    "pathName": "modeltest",
+    "urlPath": "/bll/flow/FORM-20210107115211715",
+    "id": "FORM-20210107115211715",
+    "extraValues": [],
+    "forceUpdate": true,
+    "assetId": "8",
+    "functionalName": "ModelTest",
+    "showProgress": true,
+    "createdBy": "nn85mf"
+  },
+  "screenStructure": {
+    "translationCode": "screen",
+    "title": {
+      "translationCode": "screen.model-test",
+      "EN": "model test",
+      "FR": "model test",
+      "NL": "model test",
+      "DE": "",
+      "_technical": "model-test"
+    },
+    "captchaRequested": false,
+    "sections": [
+      {
+        "sectionId": "personal-details",
+        "sectionClassName": "Step0PersonalDetails",
+        "sectionTagName": "step-0-personal-details",
+        "sectionPropertyName": "personalDetails",
+        "translationCode": "screen.page-0",
+        "displayTitle": true,
+        "title": {
+          "translationCode": "screen.page-0.personal-details",
+          "EN": "Personal details",
+          "FR": "Données personnelles",
+          "NL": "Persoonlijke gegevens",
+          "DE": "",
+          "_technical": "personal-details"
+        },
+        "fields": [
+          {
+            "translationCode": "screen.page-0.title",
+            "name": "title",
+            "type": "radio",
+            "EN": "Title",
+            "FR": "Titre",
+            "NL": "Aanspreektitel",
+            "options": [
+              {
+                "translationCode": "screen.page-0.title.options-0",
+                "EN": "Mr.",
+                "FR": "Monsieur",
+                "NL": "De heer",
+                "value": "mister",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-0.title.options-1",
+                "EN": "Mrs.",
+                "FR": "Madame",
+                "NL": "Mevrouw",
+                "value": "madam",
+                "DE": ""
+              }
+            ],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.title.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.title.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "title"
+          },
+          {
+            "translationCode": "screen.page-0.first-name",
+            "name": "firstname",
+            "type": "input",
+            "EN": "First name",
+            "FR": "Prénom",
+            "NL": "Voornaam",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.first-name.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.first-name.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.first-name.validators-alphabetical",
+                "type": "alphabetical",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.first-name.validators-alphabetical.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "first-name"
+          },
+          {
+            "translationCode": "screen.page-0.surname",
+            "name": "name",
+            "type": "input",
+            "EN": "Surname",
+            "FR": "Nom",
+            "NL": "Naam",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.surname.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.surname.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.surname.validators-alphabetical",
+                "type": "alphabetical",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.surname.validators-alphabetical.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "surname"
+          },
+          {
+            "translationCode": "screen.page-0.date-of-birth",
+            "name": "dataOfBirth",
+            "type": "date",
+            "EN": "Date of birth",
+            "FR": "Date de naissance",
+            "NL": "Geboortedatum",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.date-of-birth.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.date-of-birth.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "date-of-birth"
+          },
+          {
+            "translationCode": "screen.page-0.street",
+            "name": "street",
+            "type": "input",
+            "EN": "Street",
+            "FR": "Rue",
+            "NL": "Straat",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.street.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.street.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "street"
+          },
+          {
+            "translationCode": "screen.page-0.number",
+            "name": "number",
+            "type": "input",
+            "EN": "Number",
+            "FR": "Numéro",
+            "NL": "Nummer",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.number.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.number.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.number.validators-alphanumeric",
+                "type": "alphanumeric",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.number.validators-alphanumeric.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "number"
+          },
+          {
+            "translationCode": "screen.page-0.box-number",
+            "name": "boxNumber",
+            "type": "input",
+            "EN": "Box number",
+            "FR": "Boîte",
+            "NL": "Bus",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.box-number.validators-alphanumeric",
+                "type": "alphanumeric",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.box-number.validators-alphanumeric.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "box-number"
+          },
+          {
+            "translationCode": "screen.page-0.postal-code",
+            "name": "postalCode",
+            "type": "input",
+            "EN": "Postal code",
+            "FR": "Code postal",
+            "NL": "Postcode",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.postal-code.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.postal-code.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.postal-code.validators-numeric",
+                "type": "numeric",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.postal-code.validators-numeric.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "postal-code"
+          },
+          {
+            "translationCode": "screen.page-0.city-town",
+            "name": "city",
+            "type": "input",
+            "EN": "City/Town",
+            "FR": "Localité",
+            "NL": "Plaats",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.city-town.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.city-town.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.city-town.validators-alphabetical",
+                "type": "alphabetical",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.city-town.validators-alphabetical.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "city-town"
+          },
+          {
+            "translationCode": "screen.page-0.e-mail",
+            "name": "email",
+            "type": "input",
+            "EN": "E-mail",
+            "FR": "E-mail",
+            "NL": "E-mail",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.e-mail.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.e-mail.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.e-mail.validators-email",
+                "type": "email",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.e-mail.validators-email.errorMessage",
+                  "EN": "Please enter a valid e-mail address (address@mail.com).",
+                  "FR": "Vul een geldig e-mailadres in (adres@mail.com).",
+                  "NL": "Vul een geldig e-mailadres in (adres@mail.com).",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "e-mail"
+          },
+          {
+            "translationCode": "screen.page-0.mobile",
+            "name": "mobile",
+            "type": "input",
+            "EN": "Mobile",
+            "FR": "GSM",
+            "NL": "GSM",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-0.mobile.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.mobile.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": "null"
+              },
+              {
+                "translationCode": "screen.page-0.mobile.validators-telephone",
+                "type": "telephone",
+                "errorMessage": {
+                  "translationCode": "screen.page-0.mobile.validators-telephone.errorMessage",
+                  "EN": "Please check the marked fields and correct where necessary.",
+                  "FR": "Vérifiez les champs indiqués et corrigez-les ou complétez-les.",
+                  "NL": "Controleer de aangeduide velden en pas aan waar nodig.",
+                  "DE": ""
+                },
+                "value": "null"
+              }
+            ],
+            "DE": "",
+            "_technical": "mobile"
+          }
+        ]
+      },
+      {
+        "sectionId": "favorite",
+        "sectionClassName": "Step1Favorite",
+        "sectionTagName": "step-1-favorite",
+        "sectionPropertyName": "favorite",
+        "translationCode": "screen.page-1",
+        "displayTitle": true,
+        "title": {
+          "translationCode": "screen.page-1.favorite",
+          "EN": "Favorite",
+          "FR": "favorite",
+          "NL": "Favoriet",
+          "DE": "",
+          "_technical": "favorite"
+        },
+        "fields": [
+          {
+            "translationCode": "screen.page-1.animal",
+            "name": "animal",
+            "type": "radio",
+            "EN": "animal",
+            "FR": "animal",
+            "NL": "dier",
+            "options": [
+              {
+                "translationCode": "screen.page-1.animal.options-0",
+                "EN": "Lion",
+                "FR": "lion",
+                "NL": "Leeuw",
+                "value": "lion",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-1.animal.options-1",
+                "EN": "Mouse",
+                "FR": "mouse",
+                "NL": "Muis",
+                "value": "mouse",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-1.animal.options-2",
+                "EN": "Cow",
+                "FR": "cow",
+                "NL": "Koe",
+                "value": "cow",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-1.animal.options-3",
+                "EN": "Other",
+                "FR": "other",
+                "NL": "Anders",
+                "value": "other",
+                "DE": ""
+              }
+            ],
+            "variant": null,
+            "picker": false,
+            "validators": [],
+            "DE": "",
+            "_technical": "animal"
+          },
+          {
+            "translationCode": "screen.page-1.drink",
+            "name": "drink",
+            "type": "checkbox-group",
+            "EN": "Drink",
+            "FR": "drink",
+            "NL": "Drank",
+            "options": [
+              {
+                "translationCode": "screen.page-1.drink.options-0",
+                "EN": "Coffee",
+                "FR": "coffee",
+                "NL": "Koffie",
+                "value": "coffee",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-1.drink.options-1",
+                "EN": "Tea",
+                "FR": "tea",
+                "NL": "Thee",
+                "value": "tea",
+                "DE": ""
+              },
+              {
+                "translationCode": "screen.page-1.drink.options-2",
+                "EN": "Water",
+                "FR": "water",
+                "NL": "Water",
+                "value": "water",
+                "DE": ""
+              }
+            ],
+            "variant": null,
+            "picker": false,
+            "validators": [],
+            "DE": "",
+            "_technical": "drink"
+          }
+        ]
+      },
+      {
+        "sectionId": "corporate-details",
+        "sectionClassName": "Step2CorporateDetails",
+        "sectionTagName": "step-2-corporate-details",
+        "sectionPropertyName": "corporateDetails",
+        "translationCode": "screen.page-2",
+        "displayTitle": true,
+        "title": {
+          "translationCode": "screen.page-2.corporate-details",
+          "EN": "Corporate details",
+          "FR": "corporate details",
+          "NL": "Bedrijf details",
+          "DE": "",
+          "_technical": "corporate-details"
+        },
+        "fields": [
+          {
+            "translationCode": "screen.page-2.iban-nl",
+            "name": "iban-nl",
+            "type": "input",
+            "EN": "IBAN (NL)",
+            "FR": "IBAN (NL)",
+            "NL": "IBAN (NL)",
+            "options": [],
+            "variant": null,
+            "picker": false,
+            "validators": [
+              {
+                "translationCode": "screen.page-2.iban-nl.validators-required",
+                "type": "required",
+                "errorMessage": {
+                  "translationCode": "screen.page-2.iban-nl.validators-required.errorMessage",
+                  "EN": "This field is required.",
+                  "FR": "Ce champ est obligatoire.",
+                  "NL": "Dit veld is verplicht.",
+                  "DE": ""
+                },
+                "value": null
+              },
+              {
+                "translationCode": "screen.page-2.iban-nl.validators-iban-nl",
+                "type": "iban-nl",
+                "errorMessage": {
+                  "translationCode": "screen.page-2.iban-nl.validators-iban-nl.errorMessage",
+                  "EN": "Please enter a valid account number (NL91 ABNA 0417 1643 00).",
+                  "FR": "Indiquez un numéro de compte valable (NL91 ABNA 0417 1643 00).",
+                  "NL": "Vul een geldig rekeningnummer in (NL91 ABNA 0417 1643 00).",
+                  "DE": ""
+                },
+                "value": null
+              }
+            ],
+            "DE": "",
+            "_technical": "iban-nl"
+          }
+        ]
+      }
+    ],
+    "hasError": false
+  },
+  "confirmationStructure": {
+    "translationCode": "confirmation",
+    "subTitle": {
+      "translationCode": "confirmation.subTitle",
+      "EN": "OK, thanks!",
+      "FR": "",
+      "NL": "",
+      "DE": ""
+    },
+    "subCopy": {
+      "translationCode": "confirmation.subCopy",
+      "EN": "",
+      "FR": "",
+      "NL": "",
+      "DE": ""
+    },
+    "callToAction": {
+      "translationCode": "confirmation.callToAction",
+      "required": false
+    }
+  },
+  "legalStructure": {
+    "translationCode": "legal",
+    "subTitle": null,
+    "subCopy": null,
+    "agreement": {
+      "translationCode": "legal.agreement",
+      "EN": true,
+      "FR": true,
+      "NL": true
+    },
+    "footers": [],
+    "hasError": false
+  },
+  "selectedPage": "pageConfig",
+  "masterLanguage": "EN",
+  "currentLanguage": "NL",
+  "published": false
+}
