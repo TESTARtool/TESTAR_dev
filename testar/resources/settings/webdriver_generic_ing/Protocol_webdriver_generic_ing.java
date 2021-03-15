@@ -68,9 +68,6 @@ import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
-    protected int highWebModalZIndex = 0;
-    protected Widget widgetModal;
-
     protected VisitedActionsData visitedActionsData = new VisitedActionsData();
 	protected List<ActionRule> actionRules = actionRules();
 	protected List<GenRule> generatorRules = inputGenerators();
@@ -85,7 +82,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private static Xslt30Transformer compileModelTemplate;
 
 	private static String testarNamespace = "http://testar.org/state";
-
 	private static List<GenRule> modelGenRules;
 
 	private int nr_no_actions = 0;
@@ -139,11 +135,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			Document r = documentBuilder.newDocument();
 			compileModelTemplate.transform(new DOMSource(d), new DOMDestination(r));
 			
-			printXML(r);
+			//printXML(r);
 
 			// fetch all input-rules
 
-			XQueryEvaluator e = xqueryCompiler.compile("//input-rule ").load();
+			XQueryEvaluator e = xqueryCompiler.compile("//input-rule").load();
 			XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(r);
 			e.setContextItem(_this);
 			e.setExternalVariable(new QName("this"), _this);
@@ -171,57 +167,27 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	static void printXML(Node d) {
 		try {
-			Transformer tform = TransformerFactory.newInstance().newTransformer();
-			tform.setOutputProperty(OutputKeys.INDENT, "yes");
-			tform.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			tform.transform(new DOMSource(d), new StreamResult(System.out));
+			Transformer t = TransformerFactory.newInstance().newTransformer();
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			t.transform(new DOMSource(d), new StreamResult(System.out));
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Could not print XML", e);
 		}
 	}
-
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
+	
 	@Override
 	protected void initialize(Settings settings) {
 		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
 		ensureDomainsAllowed();
-
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = null; //Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
-
+		
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
 		followLinks = true;
 		// Propagate followLinks setting
 		WdDriver.followLinks = followLinks;
-
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		login = null ; //Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = null; /*new HashMap<String, String>() {{
-			put("class", "lfr-btn-label");
-		}};*/
 	}
 
 	protected void setDOM(WdState s) {
@@ -238,31 +204,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				throw new RuntimeException("Cannot create DOM representation ", e);
 			}
 		}
-	}
-
-	protected void asNode(Document d, String namespace, Element e, Object o) {
-		if (o instanceof Map) {
-			Map<?, ?> m = (Map<?, ?>)o;
-			for (Object key : m.keySet()) {
-				Element cn = d.createElementNS(namespace, "node");
-				cn.setAttributeNS(namespace, "key", key.toString());
-				asNode(d, namespace, cn, m.get(key));
-				e.appendChild(cn);
-			}
-		}
-		else if (o instanceof List) {
-			List<?> l = (List<?>)o;
-			int i = 0;
-			for (Object el: l) {
-				Element cn = d.createElementNS(namespace, "node");
-				cn.setAttributeNS(namespace, "index", "" + i);
-				asNode(d, namespace, cn, el);
-				e.appendChild(cn);
-				i++;
-			}
-		}
-		else if (o == null) {} /* do nothing */
-		else { e.setTextContent(o.toString()); }
 	}
 
 	protected Node toNode(Document d, WdWidget w) {
@@ -284,8 +225,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		return e;
 	}
-
-
+	
 	private String hashString(String message, String algorithm) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
@@ -295,16 +235,16 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 	}
 
-	public void buildIDs(State state, Set<Action> actions) {
+	public void buildActionsIdsAndAnnotate(State state, Set<Action> actions) {
 		for (Action a: actions) {
-			buildIDs(a);
+			buildActionsIds(a);
 		}
 		// Annotate DOM with previously visited Actions
 		Node d = state.get(MyTags.DOM);
 		visitedActionsData.annotateVisits((Document)d, (WdState)state);
 	}
 
-	public void buildIDs(Action action) {
+	public void buildActionsIds(Action action) {
 		Widget widget = action.get(Tags.OriginWidget, null);
 		if (widget != null) {
 			Node d = widget.get(MyTags.DOM);
@@ -350,8 +290,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
-		State state = super.getState(system);
-
+		WdState state = (WdState)super.getState(system);
+		setDOM(state); // annotate the Widget Tree with XML nodes
 		return state;                                                                        
 	}
 
@@ -384,14 +324,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		for (Widget widget : state) {
 			WdWidget wdw = (WdWidget)widget;
 
-			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) { continue; }
 
 			if (widget.get(Tags.Role).isA(Roles.Process)) { continue; }
-				// If the element is blocked, TESTAR can't click on or type in the widget
-			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
-				continue;
-			}
+
+			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) { continue; }
 
 			if (blackListedWithFilter(widget)) { continue; }
 			
@@ -423,110 +360,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			try { if (match(f.expr, item)) return true; }
 			catch (Exception e) { throw new RuntimeException("Cannot evaluate ", e); }
 		}
+		
 		return false;
-	}
-
-	List<ActionRule> actionRules() {
-		return actionsRules(
-			new ActionRule("'true'", "1"),                  // Default priority
-			new ActionRule(".[not(@type = 'submit')] and " +
-					"not(ancestor-or-self::*[h:is-invalid(.)]) and " +
-					"tst:visits[@count > 0]",
-					"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
-			new ActionRule(".[@type = 'submit']",
-				 "1 + count(ancestor::form//*[" +
-						 "(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.)) and " +
-						 "h:is-valid(.)" +
-						 "])"),
-			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
-			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
-			new ActionRule("h:is-radio(.)",
-					"1 div count(h:sibling-radios(.))"), // weighted radio button
-			new ActionRule("h:is-option(.)",
-						"1 div count(h:sibling-options(.))"), // weighted option
-			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
-			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
-			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
-		);
-	}
-
-	static String xqueryLibrary() {
-		String f1 = "declare function h:is-radio($n) { $n[(name() = 'input') and (@type = 'radio')] };";
-		String f2 =	"declare function h:is-valid($n) { not($n[@aria-invalid = 'true']) };";
-		String f3 =	"declare function h:is-invalid($n) { $n[@aria-invalid = 'true'] };";
-		String f4 = "declare function h:is-option($n) { $n[name() = 'option'] };";
-		String f5 = "declare function h:is-submit($n) { $n[@type = 'submit'] };";
-		String f6 = "declare function h:is-select($n) { $n[name() = 'select'] };";
-		String f7 = "declare function h:is-text($n) { $n[@type = 'text'] };";
-		String f8 = "declare function h:is-radiogroup($n) { $n[@role = 'radiogroup'] };";
-		String f9 = "declare function h:sibling-radios($n) { $n/ancestor::form//*[h:is-radio(.) and ($n/@name = @name)] };";
-		String f10 = "declare function h:sibling-options($n) { $n/ancestor::select//*[h:is-option(.)] }; ";
-		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
-		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
-		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
-
-		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
-	}
-	
-	List<GenRule> inputGenerators() {
-		List<GenRule> l = inputGenerators(
-			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", 1),                        // Generic input
-
-			inputRule("firstName", "(Robbert)|(Mark)", 5),
-			inputRule("lastName", "(van Dalen)|(Bommel)", 5),
-			inputRule("surName", "(van Dalen)|(Bommel)", 5),
-			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", 5),
-			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", 5),
-			inputRule( "age", "[1-8][0-9]", 5),
-			inputRule("income", "[1-9][0-9]{4}", 5),
-			inputRule( "profit", "[1-9][0-9]{4}", 5),
-			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
-			inputRule( "monthlyIncome", "[1-7][0-9]{3}", 5),
-			inputRule("studyLoan", "[1-3][0-9]{4}", 5),
-			inputRule( "liabilities", "[1-3][0-9]{4}", 5),
-			inputRule("alimony", "[0-9]{3}", 5),
-			inputRule("annualTurnover", "[1-9][0-9]{4,6}", 5),
-			inputRule("endBalance", "[1-9][0-9]{4,6}", 5),
-			inputRule("availableCash", "[1-9][0-9]{4,6}", 5),
-			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", 5),
-			inputRule("newLoan", "[1-9][0-9]{4,6}", 5),
-			inputRule("needAmount", "[1-9][0-9]{4,6}", 5),
-			inputRule("needDuration", "[1-3]|[0-9]", 5),
-			inputRule("numberEmployees", "[1-9]{2,4}", 5),
-
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name,'otherPaymentPostponement')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5)
-		);                                                           
-		l.addAll(modelGenRules);
-		return l;
-	}
-	
-	List<FilterRule> filterRules() {
-		return filterRules(
-				new FilterRule("@disabled"),
-				new FilterRule(".[name() = 'label']"),
-				new FilterRule(".[name() = 'select']"),  // we select options
-				new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']"),  // ignore aria-hidden
-				new FilterRule(".[(name() = 'a') and (not(@href))]"), // ignore links without href
-
-				new FilterRule("ancestor::header"), // ignore header
-				new FilterRule("ancestor::ing-feat-sc-house-next-step-based-on-house-card"), // ignore next step
-				new FilterRule("ancestor-or-self::ing-button[contains(@id, 'moreInfoButton')]"), // ignore more info
-
-				new FilterRule(".[@id = 'action-stop']"), // ignore stop button
-				new FilterRule(".[@id = 'action-back']"), // ignore back button
-
-				new FilterRule(".[name() = 'body']"), // ignore body
-				new FilterRule("ancestor::*[contains(@slot, 'progress')]"), // ignore progress section
-		 		new FilterRule("ancestor::*[contains(@class, 'progress')]"), // ignore progress section
-				new FilterRule("ancestor::section[@class = 'demo-menu']"), // ignore demo
-
-				new FilterRule(".[contains(@href, 'bel-me-nu')]"), // ignore outside links
-				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]"),
-				new FilterRule(".[@target = '_blank']")
-		);
 	}
 
 	List <ActionRule> actionsRules(ActionRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
@@ -682,7 +517,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				System.out.println("WARNING: invalid filter rule: " + exception.getMessage());
 			}
 		}
-		public boolean isValid() { return isValid; }
 		public String toString() { return "FilterRule(" +  sexpr + ");"; }
 	}
 
@@ -726,7 +560,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		
+		buildActionsIdsAndAnnotate(state, actions);
+
 		if (actions.size() == 0) {
 			nr_no_actions += 1;
 		}
@@ -740,7 +575,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			//System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, using random:
 			retAction = selectRuleAction(state, actions);
 			if (retAction == null) {
@@ -754,7 +588,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
 		boolean success = super.executeAction(system, state, action);
-		visitedActionsData.addAction((WdState)state, action);
+		if (success) visitedActionsData.addAction((WdState)state, action);
 		return success;
 	}
 
@@ -774,8 +608,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 						r.prio.setExternalVariable(new QName("this"), item);
 
 						XdmItem pp = r.prio.evaluateSingle();
-						double pdouble = Double.parseDouble(pp.getStringValue());
-						rules.add(new ActionPrio(action, pdouble));
+						rules.add(new ActionPrio(action, Double.parseDouble(pp.getStringValue())));
 					}
 
 				}
@@ -849,5 +682,108 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		private void visit(Map<String, Integer> m, String id) {
 			m.put(id, m.getOrDefault(id, 0) + 1);
 		}
+	}
+	
+	List<ActionRule> actionRules() {
+		return actionsRules(
+			new ActionRule("'true'", "1"),                  // Default priority
+			new ActionRule(".[not(@type = 'submit')] and " +
+				"not(ancestor-or-self::*[h:is-invalid(.)]) and " +
+				"tst:visits[@count > 0]",
+				"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
+			new ActionRule(".[@type = 'submit']",
+				"1 + count(ancestor::form//*[" +
+					"(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.)) and " +
+					"h:is-valid(.)" +
+					"])"),
+			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
+			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
+			new ActionRule("h:is-radio(.)",
+				"1 div count(h:sibling-radios(.))"), // weighted radio button
+			new ActionRule("h:is-option(.)",
+				"1 div count(h:sibling-options(.))"), // weighted option
+			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
+			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
+			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
+		);
+	}
+	
+	static String xqueryLibrary() {
+		String f1 = "declare function h:is-radio($n) { $n[(name() = 'input') and (@type = 'radio')] };";
+		String f2 =	"declare function h:is-valid($n) { not($n[@aria-invalid = 'true']) };";
+		String f3 =	"declare function h:is-invalid($n) { $n[@aria-invalid = 'true'] };";
+		String f4 = "declare function h:is-option($n) { $n[name() = 'option'] };";
+		String f5 = "declare function h:is-submit($n) { $n[@type = 'submit'] };";
+		String f6 = "declare function h:is-select($n) { $n[name() = 'select'] };";
+		String f7 = "declare function h:is-text($n) { $n[@type = 'text'] };";
+		String f8 = "declare function h:is-radiogroup($n) { $n[@role = 'radiogroup'] };";
+		String f9 = "declare function h:sibling-radios($n) { $n/ancestor::form//*[h:is-radio(.) and ($n/@name = @name)] };";
+		String f10 = "declare function h:sibling-options($n) { $n/ancestor::select//*[h:is-option(.)] }; ";
+		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
+		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
+		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
+		
+		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
+	}
+	
+	List<GenRule> inputGenerators() {
+		List<GenRule> l = inputGenerators(
+			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", 1),                        // Generic input
+			
+			inputRule("firstName", "(Robbert)|(Mark)", 5),
+			inputRule("lastName", "(van Dalen)|(Bommel)", 5),
+			inputRule("surName", "(van Dalen)|(Bommel)", 5),
+			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", 5),
+			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", 5),
+			inputRule("age", "[1-8][0-9]", 5),
+			inputRule("income", "[1-9][0-9]{4}", 5),
+			inputRule("profit", "[1-9][0-9]{4}", 5),
+			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
+			inputRule("monthlyIncome", "[1-7][0-9]{3}", 5),
+			inputRule("studyLoan", "[1-3][0-9]{4}", 5),
+			inputRule("liabilities", "[1-3][0-9]{4}", 5),
+			inputRule("alimony", "[0-9]{3}", 5),
+			inputRule("annualTurnover", "[1-9][0-9]{4,6}", 5),
+			inputRule("endBalance", "[1-9][0-9]{4,6}", 5),
+			inputRule("availableCash", "[1-9][0-9]{4,6}", 5),
+			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", 5),
+			inputRule("newLoan", "[1-9][0-9]{4,6}", 5),
+			inputRule("needAmount", "[1-9][0-9]{4,6}", 5),
+			inputRule("needDuration", "[1-3]|[0-9]", 5),
+			inputRule("numberEmployees", "[1-9]{2,4}", 5),
+			
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'otherPaymentPostponement')]", "[1-9][0-9]{4}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5)
+		);
+		l.addAll(modelGenRules);
+		return l;
+	}
+	
+	List<FilterRule> filterRules() {
+		return filterRules(
+			new FilterRule("@disabled"),
+			new FilterRule(".[name() = 'label']"),
+			new FilterRule(".[name() = 'select']"),  // we select options
+			new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']"),  // ignore aria-hidden
+			new FilterRule(".[(name() = 'a') and (not(@href))]"), // ignore links without href
+			
+			new FilterRule("ancestor::header"), // ignore header
+			new FilterRule("ancestor::ing-feat-sc-house-next-step-based-on-house-card"), // ignore next step
+			new FilterRule("ancestor-or-self::ing-button[contains(@id, 'moreInfoButton')]"), // ignore more info
+			
+			new FilterRule(".[@id = 'action-stop']"), // ignore stop button
+			new FilterRule(".[@id = 'action-back']"), // ignore back button
+			
+			new FilterRule(".[name() = 'body']"), // ignore body
+			new FilterRule("ancestor::*[contains(@slot, 'progress')]"), // ignore progress section
+			new FilterRule("ancestor::*[contains(@class, 'progress')]"), // ignore progress section
+			new FilterRule("ancestor::section[@class = 'demo-menu']"), // ignore demo
+			
+			new FilterRule(".[contains(@href, 'bel-me-nu')]"), // ignore outside links
+			new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]"),
+			new FilterRule(".[@target = '_blank']")
+		);
 	}
 }
