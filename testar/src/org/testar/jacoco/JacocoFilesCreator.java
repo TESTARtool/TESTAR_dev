@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -109,6 +109,31 @@ public class JacocoFilesCreator {
 	}
 
 	/**
+	 * With the current Action jacocoFile and previous Action jacocoFile, 
+	 * merge both results and create a report file.
+	 * 
+	 * @param jacocoFile
+	 * @param actionCount
+	 */
+	public static String createJacocoActionMergedReport(String jacocoFile, String actionCount) {
+	    try {
+	        // JaCoCo Merged report inside output\SUTexecuted folder
+	        String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
+	                + File.separator + "jacoco_reports"
+	                + File.separator + "merged_" + OutputStructure.startInnerLoopDateString 
+	                + "_" + OutputStructure.executedSUTname
+	                + "_sequence_" + OutputStructure.sequenceInnerLoopCount
+	                + "_action_" + actionCount;
+
+	        return createJacocoReport(jacocoFile, reportDir);
+	    } catch (IOException e) {
+	        System.err.println("ERROR creating createJacocoActionMergedReport coverage report");
+	        e.printStackTrace();
+	    }
+	    return "ERROR creating createJacocoActionMergedReport coverage report";
+	}
+
+	/**
 	 * With the dumped Sequence jacocoFile create the JaCoCo Sequence report files.
 	 * 
 	 * @param jacocoFile
@@ -186,14 +211,8 @@ public class JacocoFilesCreator {
 	            System.out.println("JaCoCo report created : " + reportDir);
 	            LogSerialiser.log("JaCoCo report created : " + reportDir, LogSerialiser.LogLevel.Info);
 	        }
-
-	        // HTML output report creates lot of files because we are creating Action Coverage
-	        /*
-	        String coverageInfoHTML = new JacocoReportReader(reportDir).obtainHTMLSummary();
-	        System.out.println(coverageInfoHTML);
-	        */
 	        
-	        String coverageInfoCSV = new JacocoReportReader(reportDir).obtainCSVSummary();
+	        String coverageInfoCSV = JacocoReportReader.obtainCSVSummary(reportDir);
 	        System.out.println(coverageInfoCSV);
 	        LogSerialiser.log(coverageInfoCSV, LogSerialiser.LogLevel.Info);
 	        return coverageInfoCSV;
