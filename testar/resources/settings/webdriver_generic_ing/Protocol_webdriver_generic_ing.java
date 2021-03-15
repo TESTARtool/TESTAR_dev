@@ -119,7 +119,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			File xsl2 = new File(Settings.getSettingsPath(), "abstract-widget.xsl");
 			File xsl3 = new File(Settings.getSettingsPath(), "compile-model.xsl");
 
-
 			XsltCompiler compiler = saxonProcessor.newXsltCompiler();
 			XsltExecutable s1 = compiler.compile(new StreamSource(xsl1));
 			XsltExecutable s2 = compiler.compile(new StreamSource(xsl2));
@@ -146,12 +145,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 			Document r = documentBuilder.newDocument();
 			compileModelTemplate.transform(new DOMSource(d), new DOMDestination(r));
-			
-			printXML(r);
 
 			// fetch all input-rules
-
-			XQueryEvaluator e = xqueryCompiler.compile("//input-rule ").load();
+			
+			XQueryEvaluator e = xqueryCompiler.compile("//input-rule").load();
 			XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(r);
 			e.setContextItem(_this);
 			e.setExternalVariable(new QName("this"), _this);
@@ -346,9 +343,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 					widget.set(Tags.ConcreteIDCustom, hashString(source.toString(), "MD5"));
 					widget.set(Tags.AbstractIDCustom, hashString(result.toString(), "MD5"));
 					
-					//System.out.println("ABSTRACT DATA: " + result);
-					//System.out.println("ABSTRACT ID CUSTOM: " + widget.get(Tags.AbstractIDCustom));
-
 					for (Widget w : widget.root()) {
 						if (w != widget) {
 							buildIDs(w);
@@ -383,7 +377,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 				try {
 					XdmValue result = abstractWidgetTemplate.applyTemplates(source);
-					//System.out.println("CONCRETE ID " + source);
 					widget.set(WdTags.ActionAbstractState, hashString(result.toString(), "MD5"));
 				}
 				catch (Exception e) {
@@ -559,8 +552,11 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			if (!widget.get(Enabled, true)) {
 				continue;
 			}
-			
-			// If the element is blocked, TESTAR can't click on or type in the widget
+
+			if (widget.get(Tags.Role).isA(Roles.Process)) {
+				continue;
+			}
+				// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
 				continue;
 			}
@@ -590,10 +586,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				if (!isLinkDenied(widget)) {
 
 					Node n = widget.get(WdTags.DOM);
-					//printXML(n);
 					
 					Action action = new WdRemoteClickAction(wdw);
-
 
 					action.set(Tags.OriginWidget, widget);
 
@@ -601,7 +595,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				}
 			}
 		}
-		
+
 		return actions;
 	}
 
@@ -610,7 +604,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		boolean isBlack = false;
 
 		Node n = w.get(WdTags.DOM);
-		XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
+		XdmNode item = saxonProcessor.newDocumentBuilder().wrap(n);
 
 		for (FilterRule f : filterRules) {
 			try {
@@ -624,14 +618,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 		}
 
-		// TODO: turn this into a boolean expression
 		if (isWhite) { return false; }
 		else { return isBlack; }
 	}
 
 	List<ActionRule> actionRules() {
 		return actionsRules(
-			new ActionRule("'true'", "1"),                  // Default priority
+			new ActionRule("'true'", "1"),              // Default priority
 
 			new ActionRule(".[not(@type = 'submit')] and " +
 					"not(ancestor-or-self::*[h:is-invalid(.)]) and " +
@@ -639,23 +632,18 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 					"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
 
 			new ActionRule(".[@type = 'submit']",
-				 "1 + count(ancestor::form//*[" +
+				 "1 + (count(ancestor::form//*[" +
 						 "(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.)) and " +
 						 "h:is-valid(.)" +
-						 "])"),
+						 "]) * 0.5)"),
 
 			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
 			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
-
-			new ActionRule("h:is-radio(.)",
-					"1 div count(h:sibling-radios(.))"), // weighted radio button
-
-			new ActionRule("h:is-option(.)",
-						"1 div count(h:sibling-options(.))"), // weighted option
-
+			new ActionRule("h:is-radio(.)", "1 div count(h:sibling-radios(.))"), // weighted radio button
+			new ActionRule("h:is-option(.)", "1 div count(h:sibling-options(.))"), // weighted option
 			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
-				new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
-				new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
+			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
+			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
 		);
 	}
 
@@ -727,8 +715,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				new FilterRule(".[@id = 'action-stop']", true), // ignore stop button
 				new FilterRule(".[@id = 'action-back']", true), // ignore back button
 
+				new FilterRule(".[name() = 'body']", true), // ignore body
 				new FilterRule("ancestor::*[contains(@slot, 'progress')]", true), // ignore progress section
 		 		new FilterRule("ancestor::*[contains(@class, 'progress')]", true), // ignore progress section
+				new FilterRule("ancestor::section[@class = 'demo-menu']", true), // ignore demo
 
 				new FilterRule(".[contains(@href, 'bel-me-nu')]", true), // ignore outside links
 				new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]", true),
@@ -787,13 +777,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 										map(m -> m.priority).
 										reduce(1.0, (r1, r2) -> r1 * r2))).
 						collect(Collectors.toList());
-
-		System.out.println("ABS PICKS START");
-		for (Object p: absPicks) {
-			System.out.println(p);
-		}
-		System.out.println("ABS PICKS END");    
-
+		
 		return prioritizedAbsolutePick(absPicks);
 	}
 
@@ -807,7 +791,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		
 		// Collect all matches rules
 		List <GenRule> matches = generatorRules.stream().
-				filter(GenRule::isValid).       				// only consider valid rules
+				filter(GenRule::isValid).       		// only consider valid rules
 				filter(r -> match(r.expression, item)). // only those that match
 				collect(Collectors.toList());
 
@@ -987,7 +971,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			//System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, using random:
 			retAction = selectRuleAction(state, actions);
 			if (retAction == null) {
@@ -1023,13 +1006,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 						XdmItem pp = r.prio.evaluateSingle();
 						double pdouble = Double.parseDouble(pp.getStringValue());
-
-						if (pdouble > 3.0) {
-							System.out.println("RULE: " + r.sexpr);
-							System.out.println("PRIO: " + pdouble);
-							printXML(n);
-							
-						}
+						
 						rules.add(new ActionPrio(action, pdouble));
 					}
 

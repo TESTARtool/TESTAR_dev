@@ -17,8 +17,8 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
             .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
     
     public static class ClickVisualizer implements Visualizer {
-
-        private static final long serialVersionUID = -6006402344810634504L;
+        private static final long serialVersionUID = -2006402344810634504L;
+        
         private final double width, height;
         private final Pen pen;
         private final Rect rec;
@@ -55,7 +55,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
         try {
             RemoteWebElement remoteElement = widget.element.remoteWebElement;
             RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
-            d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
+            d.executeScript("arguments[0].scrollIntoView(true)", remoteElement); // focus
             org.fruit.Util.pause(0.1);
             remoteElement.click();
         }

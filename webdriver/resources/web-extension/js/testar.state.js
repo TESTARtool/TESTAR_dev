@@ -174,6 +174,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         textContent: "",
         value: element.value,
         checked: element.checked,
+        selected: element.selected,
         display: computedStyle.getPropertyValue('display'),
 
         zIndex: getZIndexTestar(element), // TESTAR z-index value not real value given by web page developers
