@@ -38,6 +38,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.pkm.PkmRequest;
 
 import nl.ou.testar.StateModel.Analysis.AnalysisProtocol;
 
@@ -52,10 +53,22 @@ public class HttpWebServer {
     }
 
     public void runWebServer() {
-        if(settings.get(ConfigTags.Mode).equals(Modes.Analysis)) {
-            runAnalysisMode();
-        } else if(settings.get(ConfigTags.Mode).equals(Modes.Report)) {
-            runReportMode();
+        // TODO: Extract this information from the PKM
+        settings.set(ConfigTags.DataStoreType, "remote");
+        settings.set(ConfigTags.DataStoreServer, "127.0.0.1");
+        settings.set(ConfigTags.DataStoreUser, "testar");
+        settings.set(ConfigTags.DataStorePassword, "testar");
+        settings.set(ConfigTags.PKMaddress, "ow2-decoder.xsalto.net");
+        settings.set(ConfigTags.PKMport, "8080");
+        settings.set(ConfigTags.PKMdatabase, "mythaistar");
+
+        //First validate DECODER PKM User Key
+        if(PkmRequest.validDecoderUserProject(settings)) {
+            if(settings.get(ConfigTags.Mode).equals(Modes.Analysis)) {
+                runAnalysisMode();
+            } else if(settings.get(ConfigTags.Mode).equals(Modes.Report)) {
+                runReportMode();
+            }
         }
     }
 

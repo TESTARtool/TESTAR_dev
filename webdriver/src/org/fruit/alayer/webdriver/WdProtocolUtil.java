@@ -105,9 +105,13 @@ public class WdProtocolUtil extends ProtocolUtil {
 			  && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
 		  //Get a screenshot of all the screen, because SUT ended and we can't obtain the size
 		  Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		  AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(screenRect.getX(), screenRect.getY(),
-				  screenRect.getWidth(), screenRect.getHeight()), state.get(Tags.HWND, (long)0), AWTCanvas.StorageFormat.PNG, 1);
-		  return scrshot;
+		  Rect rect = Rect.from(screenRect.getX(), screenRect.getY(), screenRect.getWidth(), screenRect.getHeight());
+		  
+	      if(isOverrideWebdriver()) {
+	          return WdScreenshot.fromScreenshot(rect, getOverrideScreenshotDisplayScale());
+	      }
+	      
+		  return WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
 	  }
 	  
 	  double width = CanvasDimensions.getCanvasWidth() + (state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
