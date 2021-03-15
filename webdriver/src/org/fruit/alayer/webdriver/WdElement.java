@@ -71,7 +71,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
   String valuePattern, href, style, target, alt, src;
-  Object value;
+  public Object value;
   
   double zindex;
   public Rect rect;
@@ -79,7 +79,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
 
-  boolean checked, selected;
+  public boolean checked, selected;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
