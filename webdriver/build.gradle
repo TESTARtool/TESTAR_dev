@@ -11,4 +11,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
+    // https://mvnrepository.com/artifact/com.github.curious-odd-man/rgxgen
+    compile group: 'com.github.curious-odd-man', name: 'rgxgen', version: '1.2'
+    // https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
+    compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '10.3'
 }
