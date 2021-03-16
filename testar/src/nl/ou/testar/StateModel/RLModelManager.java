@@ -5,6 +5,7 @@ import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
+import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.fruit.alayer.Action;
@@ -47,7 +48,10 @@ public class RLModelManager extends ModelManager implements StateModelManager {
     
     protected AbstractState previousAbstractState = null;
     
+    protected Set<Action> currentTestarActions;
     protected Set<Action> previousTestarActions;
+    
+    private AbstractStateModel abstractStateModel;
 
     //*** FOR DEBUGGING PURPOSES
     List<Float> qValuesList = new ArrayList<Float>();
@@ -67,6 +71,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
                              final QFunction qFunction,
                              final Tag<?> tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+        this.abstractStateModel = abstractStateModel;
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
         this.tag = tag;
@@ -74,9 +79,25 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 
     @Override
     public void notifyNewStateReached(final State newState, final Set<Action> actions) {
+        // Previous State discovery created an AbstractState that contains AbstractActions 
+        // with default RLTags values. 
+        // Then default RLTags values were updated with the different RL approaches,
+        // after the AbstractState creation (getAbstractActionToExecute).
+        // Now we need to send an event to update the previous AbstractActions of the previous AbstractState, 
+        // with the calculated RL values.
+        try {
+            // RLModelManager uses AbstractStateModelReinforcementLearning, but we check it anyway
+            if(abstractStateModel instanceof AbstractStateModelReinforcementLearning) {
+                ((AbstractStateModelReinforcementLearning) abstractStateModel).updatePreviousTransitionAction();
+            }
+        } catch (StateModelException e) {
+            e.printStackTrace();
+        }
+        // Then we can notify the new AbstractState with the new AbstractActions in the model. 
         super.notifyNewStateReached(newState, actions);
         state = newState;
-
+        // It is necessary to save current TESTAR Actions for the last RLTags update of the sequence
+        currentTestarActions = actions;
     }
 
     /**
@@ -137,40 +158,61 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 
     @Override
     public void notifyTestSequenceStopped() {
+        // We are going to finish the sequence and we are in the last State of TESTAR. 
+        // However the RL approaches are using getAbstractActionToExecute to update the RL values, 
+        // this means that: we need actions + 1 -> to update last RLTags values of the state-action pair
+        getAbstractActionToExecute(currentTestarActions);
+
+        // Now we need to send an event to update the previous AbstractActions of the previous AbstractState, 
+        // with the calculated RL values.
+        try {
+            // RLModelManager uses AbstractStateModelReinforcementLearning, but we check it anyway
+            if(abstractStateModel instanceof AbstractStateModelReinforcementLearning) {
+                ((AbstractStateModelReinforcementLearning) abstractStateModel).updatePreviousTransitionAction();
+            }
+        } catch (StateModelException e) {
+            e.printStackTrace();
+        }
         super.notifyTestSequenceStopped();
         rewardFunction.reset();
     }
     
     public void equalizeQValues(float qValue) {
-		// Update Q-value of actions of the same type and depth, with the new calculated
-		// Q-value
-		Action previousAction = null;
-		
-		for (Action a : previousTestarActions) {
-			if (a.get(Tags.AbstractIDCustom).equals(previouslyExecutedAbstractAction.getActionId())) {
-				previousAction = a; // Get the action to access the Role and ZIndex
-				break;
-			}
-		}
-		
-		if(previousAction == null || previousAbstractState == null) {return;}
-    	
-		String previousActionType = previousAction.get(Tags.OriginWidget).get(Tags.Role).toString();
-		double previousActionDepth = previousAction.get(Tags.OriginWidget).get(Tags.ZIndex);
-		
-		for(Action a : previousTestarActions) {
-			String aType = a.get(Tags.OriginWidget).get(Tags.Role).toString();
-			double aDepth = a.get(Tags.OriginWidget).get(Tags.ZIndex);
-			if((previousActionType == aType) && (previousActionDepth == aDepth)) {
-	            //a.set(RLTags.QBorja, qValue);
-				try {
+        // Update Q-value of actions of the same type and depth, with the new calculated
+        // Q-value
+        Action previousAction = null;
+
+        for (Action a : previousTestarActions) {
+            if (a.get(Tags.AbstractIDCustom).equals(previouslyExecutedAbstractAction.getActionId())) {
+                previousAction = a; // Get the action to access the Role and ZIndex
+                break;
+            }
+        }
+
+        if(previousAction == null || previousAbstractState == null) {return;}
+
+        String previousActionType = previousAction.get(Tags.OriginWidget).get(Tags.Role).toString();
+        double previousActionDepth = previousAction.get(Tags.OriginWidget).get(Tags.ZIndex);
+
+        for(Action a : previousTestarActions) {
+            String aType = a.get(Tags.OriginWidget).get(Tags.Role).toString();
+            double aDepth = a.get(Tags.OriginWidget).get(Tags.ZIndex);
+            if((previousActionType == aType) && (previousActionDepth == aDepth)) {
+                //a.set(RLTags.QBorja, qValue);
+                try {
                     AbstractAction abstractAction = previousAbstractState.getAction(a.get(Tags.AbstractIDCustom, "Nothing"));
                     abstractAction.addAttribute(RLTags.QBorja, qValue);
-                } catch (ActionNotFoundException e) {
+
+                    // ActionGroup approach needs this extra update in the previous AbstractState
+                    // RLModelManager uses AbstractStateModelReinforcementLearning, but we check it anyway
+                    if(abstractStateModel instanceof AbstractStateModelReinforcementLearning) {
+                        ((AbstractStateModelReinforcementLearning) abstractStateModel).updateSpecificActionFromLastTransition(abstractAction);
+                    }
+                } catch (StateModelException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-			}
-		}
+            }
+        }
     }
 }
