@@ -35,7 +35,6 @@ import net.sf.saxon.s9api.*;
 import net.sf.saxon.value.BooleanValue;
 import nl.ou.testar.RandomActionSelector;
 import org.apache.commons.codec.binary.Base64;
-import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.actions.*;
@@ -60,6 +59,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -96,12 +96,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-		try {
-			documentBuilder = factory.newDocumentBuilder();
-		}
-		catch (Exception e)  {
-			throw new RuntimeException("Cannot create documentBuilder: ", e);
-		}
+		try {  documentBuilder = factory.newDocumentBuilder(); }
+		catch (Exception e) { throw new RuntimeException("Cannot create documentBuilder: ", e); }
 
 		try {
 			File xsl1 = new File(Settings.getSettingsPath(), "abstract-state.xsl");
@@ -117,33 +113,34 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			abstractWidgetTemplate = s2.load30();
 			compileModelTemplate = s3.load30();
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Could not compile: ",  e);
-		}
+		catch (Exception e) { throw new RuntimeException("Could not compile: ", e); }
+		
+		consumeArcadeBuilderModel();
+	}
 
+	static void consumeArcadeBuilderModel() {
 		String modelFileName = (new File(Settings.getSettingsPath(), "model.json")).toURI().toString();
-		Map<QName, XdmValue> parameters = new HashMap();
+		Map<QName, XdmValue> parameters = new HashMap<>();
 		parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
-
+		
 		try {
 			compileModelTemplate.setStylesheetParameters(parameters);
 			
 			Document d = documentBuilder.newDocument();
 			Node n = d.createElement("root");
 			d.adoptNode(n);
-
+			
 			Document r = documentBuilder.newDocument();
 			compileModelTemplate.transform(new DOMSource(d), new DOMDestination(r));
 			
 			//printXML(r);
-
+			
 			// fetch all input-rules
-
 			XQueryEvaluator e = xqueryCompiler.compile("//input-rule").load();
 			XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(r);
 			e.setContextItem(_this);
 			e.setExternalVariable(new QName("this"), _this);
-
+			
 			XdmValue result = e.evaluate();
 			List<GenRule> gr = new LinkedList<>();
 			
@@ -151,17 +148,16 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				XdmNode node = (XdmNode)rule;
 				gr.add(new GenRule(node.attribute("xquery"), node.attribute("regexp"), 5));
 			}
-
+			
 			modelGenRules = gr;
 		}
 		
-		catch (Exception e) {
-			throw new RuntimeException("Could not compile: " + e);
-		}
+		catch (Exception e) { throw new RuntimeException("Could not compile: " + e); }
 	}
-
+	
+	// We annotate each Widget with its XML representation and each Action with an Abstract State mapping
 	static class MyTags extends TagsBase {
-		public static final Tag<Node> DOM = from("DOM", Node.class);
+		public static final Tag<Node> XML = from("XML", Node.class);
 		public static final Tag<String> ActionAbstractState = from("ActionAbstractState", String.class);
 	}
 	
@@ -183,25 +179,21 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		super.initialize(settings);
 		ensureDomainsAllowed();
 		
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
+		WdDriver.followLinks = true;
 	}
 
-	protected void setDOM(WdState s) {
-		// check if WDState has top-level DOM attribute
-		if (s.get(MyTags.DOM, null) == null) {
+	protected void annotateWithXML(WdState s) {
+		// check if WDState has top-level XML tag
+		if (s.get(MyTags.XML, null) == null) {
 			try {
 				Document d = documentBuilder.newDocument();
 				// recursive through all widgets
 				Node n = toNode(d, s);
 				d.appendChild(n);
-				s.set(MyTags.DOM, d);
+				s.set(MyTags.XML, d);
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot create DOM representation ", e);
+				throw new RuntimeException("Cannot create XML representation ", e);
 			}
 		}
 	}
@@ -221,7 +213,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		for (int i = 0; i < w.childCount() ; i++) { e.appendChild(toNode(d, w.child(i))); }
 
-		w.set(MyTags.DOM, e);
+		w.set(MyTags.XML, e);
 
 		return e;
 	}
@@ -229,25 +221,24 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private String hashString(String message, String algorithm) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
-			return Base64.encodeBase64String(digest.digest(message.getBytes("UTF-8")));
+			return Base64.encodeBase64String(digest.digest(message.getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception e) {
 			throw new RuntimeException("Could not generate hash from String", e);
 		}
 	}
 
 	public void buildActionsIdsAndAnnotate(State state, Set<Action> actions) {
-		for (Action a: actions) {
-			buildActionsIds(a);
-		}
-		// Annotate DOM with previously visited Actions
-		Node d = state.get(MyTags.DOM);
+		for (Action a: actions) { buildActionsIds(a); }
+		
+		// Additionally annotate XML with previously visited Actions
+		Node d = state.get(MyTags.XML);
 		visitedActionsData.annotateVisits((Document)d, (WdState)state);
 	}
 
 	public void buildActionsIds(Action action) {
 		Widget widget = action.get(Tags.OriginWidget, null);
 		if (widget != null) {
-			Node d = widget.get(MyTags.DOM);
+			Node d = widget.get(MyTags.XML);
 			XdmValue source = saxonProcessor.newDocumentBuilder().wrap(d);
 
 			try {
@@ -291,7 +282,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		WdState state = (WdState)super.getState(system);
-		setDOM(state); // annotate the Widget Tree with XML nodes
+		annotateWithXML(state); // annotate the Widget Tree with XML nodes
 		return state;                                                                        
 	}
 
@@ -334,18 +325,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			
 			// type into text boxes
 			if (isTypeable(widget)) {
-				Action action = new WdRemoteTypeAction(wdw, this.getRandomText(widget));
-				action.set(Tags.OriginWidget, widget);
-				actions.add(action);
+				actions.add(new WdRemoteTypeAction(wdw, this.getRandomText(widget)));
 			}
 
 			// left clicks, but ignore links outside domain
-			if (isClickable(widget)) {
-				if (!isLinkDenied(widget)) {
-					Action action = new WdRemoteClickAction(wdw);
-					action.set(Tags.OriginWidget, widget);
-					actions.add(action);
-				}
+			if (isClickable(widget) && !isLinkDenied(widget)) {
+				actions.add(new WdRemoteClickAction(wdw));
 			}
 		}
 
@@ -353,7 +338,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	}
 
 	Boolean blackListedWithFilter(Widget w) {
-		Node n = w.get(MyTags.DOM);
+		Node n = w.get(MyTags.XML);
 		XdmNode item = saxonProcessor.newDocumentBuilder().wrap(n);
 
 		for (FilterRule f : filterRules) {
@@ -368,11 +353,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	List <FilterRule> filterRules(FilterRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
 	List<GenRule> inputGenerators(GenRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
 
+	// Match the name of the element, all lower-case
 	GenRule inputRule(String n, String g, int p) {
 		String xquery = String.format(".[contains(lower-case(@name), '%s')]", n.toLowerCase());
 		return new GenRule(xquery, g, p);
 	}
-
+	
+	// Match the name of the element and the name of its (parents), all lower-case
 	GenRule formInputRule(String f, String n, String g, int p) {
 		String xquery = String.format(
 			".[contains(lower-case(@name), '%s')]/" +
@@ -380,7 +367,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return new GenRule(xquery, g, p);
 	}
 
-	// Choose Rule based on priorities
+	// Randomly pick a Rule (with a priority) from a list of Rules, based on absolute priorities
 	protected <R extends PrioRule> R prioritizedAbsolutePick(List<R> rules) {
 		double sum = rules.stream().map(r -> r.priority).reduce(0.0, Double::sum);
 		double x = (new Random()).nextDouble() * sum;
@@ -394,8 +381,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return rules.get(0);
 	}
 
-	protected ActionPrio prioritizedRelativePick(List<ActionPrio> rules) {
-		Map<Action, List<ActionPrio>> groups = rules.stream().collect(Collectors.groupingBy(x -> x.action));
+	// Randomly pick an Action (with a priority) from a list of Actions, based on their relative priorities
+	protected ActionPrio prioritizedRelativePick(List<ActionPrio> actions) {
+		Map<Action, List<ActionPrio>> groups = actions.stream().collect(Collectors.groupingBy(x -> x.action));
 		List<ActionPrio> absPicks =
 				groups.
 						keySet().
@@ -415,7 +403,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		// Default behaviour
 		String sText = super.getRandomText(w);
 
-		Node n = w.get(MyTags.DOM);
+		Node n = w.get(MyTags.XML);
 		XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
 		
 		// Collect all matches rules
@@ -475,7 +463,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 
 		public String toString() {
-			Object r = saxonProcessor.newDocumentBuilder().wrap(action.get(Tags.OriginWidget).get(MyTags.DOM));
+			Object r = saxonProcessor.newDocumentBuilder().wrap(action.get(Tags.OriginWidget).get(MyTags.XML));
 			return "ActionPrio(" + priority +"\n" + r + ")";
 		}
 	}
@@ -534,9 +522,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			return true;
 		}
 		
-		if (element.isClickable) {
-			return true;
-		}
+		if (element.isClickable) { return true; }
 
 		Set<String> clickSet = new HashSet<>(clickableClasses);
 		clickSet.retainAll(element.cssClasses);
@@ -565,15 +551,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		if (actions.size() == 0) {
 			nr_no_actions += 1;
 		}
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
+		
 		Action retAction = preSelectAction(state, actions);
 		
 		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			//using the action selector of the state model:
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
+		
 		if(retAction==null) {
 			// if state model fails, using random:
 			retAction = selectRuleAction(state, actions);
@@ -592,6 +576,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return success;
 	}
 
+	/* We select a (random) Action, based on a list of ActionRule that have relative priority */
 	protected Action selectRuleAction(State state, Set<Action> actions) {
 		List<ActionPrio> rules = new LinkedList<>();
 
@@ -599,7 +584,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			for (ActionRule r: actionRules) {
 				Widget w = action.get(Tags.OriginWidget);
 
-				Node n = w.get(MyTags.DOM);
+				Node n = w.get(MyTags.XML);
 				XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
 
 				try {
@@ -623,39 +608,26 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 		return null;
 	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 *
-	 * @return if <code>true</code> continue generation, else stop
-	 */
+	
 	@Override
 	protected boolean moreActions(State state) {
 		return super.moreActions(state) && (nr_no_actions < 3);
 	}
 
-	/**
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
 	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 *
-	 * @return if <code>true</code> continue test, else stop
-	 */
+	
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
-
+	
+	/**
+	 * VisitedActionsData is a simple store of all actions that have been 'visited' (executed)
+	 * An Action is (re-)identified via its ActionAbstractState tag.
+ 	 */
 	static class VisitedActionsData {
 		Map<String, Integer> visitedAbstractActions = new HashMap<>();
 
@@ -668,7 +640,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 		public void annotateVisits(Document d, WdState s) {
 			for (Widget w: s) {
-				Node n = w.get(MyTags.DOM);
+				Node n = w.get(MyTags.XML);
 				String abstractId = w.get(MyTags.ActionAbstractState, null);
 				
 				if (visitedAbstractActions.containsKey(abstractId)) {
@@ -682,6 +654,25 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		private void visit(Map<String, Integer> m, String id) {
 			m.put(id, m.getOrDefault(id, 0) + 1);
 		}
+	}
+	
+	/* A poor man's library that is duplicated for every rule */
+	static String xqueryLibrary() {
+		String f1 = "declare function h:is-radio($n) { $n[(name() = 'input') and (@type = 'radio')] };";
+		String f2 =	"declare function h:is-valid($n) { not($n[@aria-invalid = 'true']) };";
+		String f3 =	"declare function h:is-invalid($n) { $n[@aria-invalid = 'true'] };";
+		String f4 = "declare function h:is-option($n) { $n[name() = 'option'] };";
+		String f5 = "declare function h:is-submit($n) { $n[@type = 'submit'] };";
+		String f6 = "declare function h:is-select($n) { $n[name() = 'select'] };";
+		String f7 = "declare function h:is-text($n) { $n[@type = 'text'] };";
+		String f8 = "declare function h:is-radiogroup($n) { $n[@role = 'radiogroup'] };";
+		String f9 = "declare function h:sibling-radios($n) { $n/ancestor::form//*[h:is-radio(.) and ($n/@name = @name)] };";
+		String f10 = "declare function h:sibling-options($n) { $n/ancestor::select//*[h:is-option(.)] }; ";
+		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
+		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
+		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
+		
+		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
 	}
 	
 	List<ActionRule> actionRules() {
@@ -706,24 +697,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
 			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
 		);
-	}
-	
-	static String xqueryLibrary() {
-		String f1 = "declare function h:is-radio($n) { $n[(name() = 'input') and (@type = 'radio')] };";
-		String f2 =	"declare function h:is-valid($n) { not($n[@aria-invalid = 'true']) };";
-		String f3 =	"declare function h:is-invalid($n) { $n[@aria-invalid = 'true'] };";
-		String f4 = "declare function h:is-option($n) { $n[name() = 'option'] };";
-		String f5 = "declare function h:is-submit($n) { $n[@type = 'submit'] };";
-		String f6 = "declare function h:is-select($n) { $n[name() = 'select'] };";
-		String f7 = "declare function h:is-text($n) { $n[@type = 'text'] };";
-		String f8 = "declare function h:is-radiogroup($n) { $n[@role = 'radiogroup'] };";
-		String f9 = "declare function h:sibling-radios($n) { $n/ancestor::form//*[h:is-radio(.) and ($n/@name = @name)] };";
-		String f10 = "declare function h:sibling-options($n) { $n/ancestor::select//*[h:is-option(.)] }; ";
-		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
-		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
-		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
-		
-		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
 	}
 	
 	List<GenRule> inputGenerators() {
@@ -765,7 +738,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return filterRules(
 			new FilterRule("@disabled"),
 			new FilterRule(".[name() = 'label']"),
-			new FilterRule(".[name() = 'select']"),  // we select options
+			new FilterRule(".[name() = 'select']"),  // we select options, not the select widget itself
 			new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']"),  // ignore aria-hidden
 			new FilterRule(".[(name() = 'a') and (not(@href))]"), // ignore links without href
 			
