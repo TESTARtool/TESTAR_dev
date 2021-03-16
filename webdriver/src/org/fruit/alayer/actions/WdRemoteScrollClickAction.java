@@ -43,7 +43,7 @@ public class WdRemoteScrollClickAction extends WdRemoteClickAction {
 
     public WdRemoteScrollClickAction(WdWidget widget) {
         super(widget);
-        this.set(Tags.Desc, "Remote scroll and click " + widget.element.remoteWebElement.getText());
+        this.set(Tags.Desc, "Remote scroll and click " + widget.element.remoteWebElement.getId());
         this.set(Tags.Role, WdActionRoles.RemoteScrollClick);
     }
 
@@ -63,7 +63,7 @@ public class WdRemoteScrollClickAction extends WdRemoteClickAction {
 
     @Override
     public String toShortString() {
-        return "Remote scroll and click " + widget.element.remoteWebElement.getId();
+        return "Remote scroll and click " + widget.element.getElementDescription();
     }
 
 }
