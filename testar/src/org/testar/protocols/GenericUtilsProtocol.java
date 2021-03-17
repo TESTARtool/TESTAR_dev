@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -391,6 +391,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	// Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
 	// we use this variable to store after each action the last correct coverage
 	private String lastCorrectJacocoCoverageFile = "";
+	private String lastActionMergedCoverageFile = "";
 
 	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
@@ -428,32 +429,75 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	 * Extract and create JaCoCo action coverage report.
 	 */
 	protected void extractJacocoActionReport() {
-		try {
-			System.out.println("Extracting JaCoCo report for Action number: " + actionCount);
+	    try {
+	        System.out.println("Extracting JaCoCo report for Action number: " + actionCount);
 
-			// Dump the JaCoCo Action report from the remote JVM
-			// Example: jacoco-upm_sequence_1_action_3.exec
-			String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
+	        // Dump the JaCoCo Action report from the remote JVM
+	        // Example: jacoco-upm_sequence_1_action_3.exec
+	        String jacocoFileAction = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
-			// If is not empty, save as last correct file in case the SUT crashes executing next actions
-			if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
-				lastCorrectJacocoCoverageFile = jacocoFile;
-			}
+	        // If is not empty, save as last correct file in case the SUT crashes executing next actions
+	        if(!jacocoFileAction.isEmpty() && new File(jacocoFileAction).exists()) {
+	            lastCorrectJacocoCoverageFile = jacocoFileAction;
+	        }
 
-			// Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
-			// And get a string that represents obtained coverage
-			String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFile, Integer.toString(actionCount));
-			long  actionTime = System.currentTimeMillis() - startSequenceTime;
-			writeCoverageFile("Sequence | " + OutputStructure.sequenceInnerLoopCount +
-			        " | actionnr | " + actionCount +
-			        " | time | " + actionTime +
-			        " | " + actionCoverage);
+	        // Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
+	        // And get a string that represents obtained coverage
+	        String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFileAction, Integer.toString(actionCount));
+	        long  actionTime = System.currentTimeMillis() - startSequenceTime;
+	        writeCoverageFile("Sequence | " + OutputStructure.sequenceInnerLoopCount +
+	                " | actionnr | " + actionCount +
+	                " | time | " + actionTime +
+	                " | " + actionCoverage);
 
-		} catch (Exception e) {
-			LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
-                    LogSerialiser.LogLevel.Info);
-			System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
-		}
+	        extractJacocoActionMergedReport(jacocoFileAction);
+
+	    } catch (Exception e) {
+	        LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+	    }
+	}
+
+	/**
+	 * Prepare and create the continuous action merge coverage report. 
+	 * Always merge current action coverage with previous one (even previous sequences). 
+	 * 
+	 * @param jacocoFileAction
+	 */
+	private void extractJacocoActionMergedReport(String jacocoFileAction) {
+	    // First one will not exists
+	    if(lastActionMergedCoverageFile.isEmpty()) lastActionMergedCoverageFile = jacocoFileAction;
+
+	    try {
+	        System.out.println("Extracting JaCoCo Merged report for Action number: " + actionCount);
+	        
+	        if(new File(jacocoFileAction).length() > 0 && new File(lastActionMergedCoverageFile).length() > 0) {
+	            String actionMergedJacocoFilename = OutputStructure.outerLoopOutputDir + File.separator + 
+	                    "merged-jacoco-" + OutputStructure.executedSUTname +
+	                    "_sequence_" + OutputStructure.sequenceInnerLoopCount +
+	                    "_action_" + actionCount;
+	            File actionMergedJacocoFile = new File(actionMergedJacocoFilename);
+
+	            Set<String> filesToMerge = new HashSet<>(Arrays.asList(lastActionMergedCoverageFile, jacocoFileAction));
+	            
+	            MergeJacocoFiles mergeActionsJacoco = new MergeJacocoFiles();
+	            mergeActionsJacoco.testarExecuteMojo(new ArrayList<>(filesToMerge), actionMergedJacocoFile);
+
+	            long  runTime = System.currentTimeMillis() - startRunTime;
+	            String iterativeActionMerge = JacocoFilesCreator.createJacocoActionMergedReport(actionMergedJacocoFile.getCanonicalPath(), Integer.toString(actionCount));
+	            writeMergedCoverageFile("Merged Sequence | " + OutputStructure.sequenceInnerLoopCount +
+	                    " | actionnr | " + actionCount +
+	                    " | time | " + runTime +
+	                    " | " + iterativeActionMerge);
+
+	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
+	        }
+	    } catch (Exception e) {
+	        LogSerialiser.log("ERROR Creating JaCoCo Iterative Merged Coverage for specific action: " + actionCount,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Creating JaCoCo Iterative Merged Coverage for specific action: " + actionCount);
+	    }
 	}
 	
 	/**
@@ -510,21 +554,41 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	/**
 	 * Write the action coverage inside a coverage text file
 	 * 
-	 * @param coverageMetrics
+	 * @param coverageInformation
 	 */
 	private void writeCoverageFile(String coverageInformation) {
-        try {
-            String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
-                    + OutputStructure.outerLoopName + "_coverageMetrics.txt";
-            FileWriter myWriter = new FileWriter(reportCoverageFile, true);
-            myWriter.write(coverageInformation + "\r\n");
-            myWriter.close();
-        } catch (IOException e) {
-            LogSerialiser.log("ERROR: Writing Coverage Metrics inside coverageMetrics text file",
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
-            e.printStackTrace();
-        }
+	    try {
+	        String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
+	                + OutputStructure.outerLoopName + "_coverageMetrics.txt";
+	        FileWriter myWriter = new FileWriter(reportCoverageFile, true);
+	        myWriter.write(coverageInformation + "\r\n");
+	        myWriter.close();
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR: Writing Coverage Metrics inside coverageMetrics text file",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
+	        e.printStackTrace();
+	    }
+	}
+
+	/**
+	 * Write the action merged coverage inside a coverage text file
+	 * 
+	 * @param coverageMergedInformation
+	 */
+	private void writeMergedCoverageFile(String coverageMergedInformation) {
+	    try {
+	        String reportMergedCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
+	                + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt";
+	        FileWriter myWriter = new FileWriter(reportMergedCoverageFile, true);
+	        myWriter.write(coverageMergedInformation + "\r\n");
+	        myWriter.close();
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR: Writing Merged Coverage Metrics inside coverageMetrics text file",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR: Writing Merged Coverage Metrics inside coverageMetrics text file");
+	        e.printStackTrace();
+	    }
 	}
 	
 	/**
@@ -615,6 +679,18 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics,
 	                LogSerialiser.LogLevel.Info);
 	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics);
+	        e.printStackTrace();
+	    }
+
+	    File srcMergedMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt");
+	    File destMergedMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt");
+	    try {
+	        FileUtils.copyFile(srcMergedMetrics, destMergedMetrics);
+	        System.out.println(String.format("Sucessfull copy %s to %s", srcMergedMetrics, destMergedMetrics));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics);
 	        e.printStackTrace();
 	    }
 	}
