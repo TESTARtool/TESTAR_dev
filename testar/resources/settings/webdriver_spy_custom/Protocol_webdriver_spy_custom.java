@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -80,34 +80,11 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.smartclient.com");
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
-
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = new HashMap<String, String>() {{
 			put("class", "iAgreeButton");
 		}};
-		
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-		
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
 
 		try {
 			File folder = new File(settings.getSettingsPath());
@@ -124,23 +101,6 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 			System.out.println("ERROR reading customizedCssClasses.txt file");
 		}
 
-	}
-
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
 	}
 
 	/**
