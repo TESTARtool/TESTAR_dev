@@ -1,6 +1,7 @@
 package org.fruit.monkey.vcs;
 import static org.junit.Assert.*;
 
+import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,10 +53,10 @@ public class GitServiceImplTest {
 
     @Test
     public void cloneRepository() {
-        boolean resultSuccess = gitService.cloneRepository(PUBLIC_REPOSITORY_URL);
-        boolean resultDirectoryExistsError = gitService.cloneRepository(PUBLIC_REPOSITORY_URL);
-        assertTrue(resultSuccess);
-        assertFalse(resultDirectoryExistsError);
+        Path resultSuccess = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor());
+        Path resultDirectoryExistsError = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor());
+        assertNotNull(resultSuccess);
+        assertNull(resultDirectoryExistsError);
     }
 
     @Test
@@ -63,12 +64,12 @@ public class GitServiceImplTest {
         GitCredentials wrongCredentials = new GitCredentials(PRIVATE_REPOSITORY_USERNAME, PRIVATE_REPOSITORY_WRONG_PASSWORD);
         GitCredentials correctCredentials = new GitCredentials(PRIVATE_REPOSITORY_USERNAME, PRIVATE_REPOSITORY_CORRECT_PASSWORD);
 
-        boolean resultAuthError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, wrongCredentials);
-        boolean resultAuthSuccess = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials);
-        boolean resultDirectoryExistsError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials);
+        Path resultAuthError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, wrongCredentials, new TextProgressMonitor());
+        Path resultAuthSuccess = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor());
+        Path resultDirectoryExistsError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor());
 
-        assertFalse(resultAuthError);
-        assertTrue(resultAuthSuccess);
-        assertFalse(resultDirectoryExistsError);
+        assertNull(resultAuthError);
+        assertNotNull(resultAuthSuccess);
+        assertNull(resultDirectoryExistsError);
     }
 }

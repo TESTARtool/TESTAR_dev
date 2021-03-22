@@ -8,6 +8,12 @@ sourceSets {
         }
     }
 
+    test {
+        resources {
+            srcDirs = ['test_resources']
+        }
+    }
+
     oracle {
         java {
             srcDirs =['resources/settings']

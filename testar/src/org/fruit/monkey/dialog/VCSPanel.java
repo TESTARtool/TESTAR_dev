@@ -1,16 +1,27 @@
 package org.fruit.monkey.dialog;
 
 import org.eclipse.jgit.lib.ProgressMonitor;
-import org.eclipse.jgit.lib.TextProgressMonitor;
+import org.fruit.monkey.codeanalysis.CodeAnalysisService;
+import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
+import org.fruit.monkey.codeanalysis.RepositoryLanguage;
+import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
 import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
@@ -31,6 +42,13 @@ public class VCSPanel extends JPanel {
     private JLabel cloneProcessingLabel;
     private JProgressBar cloneProcessingProgressBar;
     private JLabel cloneTaskLabel;
+    private final JProgressBar[] languageContentProgressBars = new JProgressBar[LANGUAGES_TO_DISPLAY];
+    private final JLabel[] languageContentLabels = new JLabel[LANGUAGES_TO_DISPLAY];
+    private JButton fullScanningReportButton;
+    private final static int LANGUAGES_TO_DISPLAY = 3;
+    private final static int LANGUAGE_CONTENT_BAR_MIN = 0;
+    private final static int LANGUAGE_CONTENT_BAR_MAX = 100;
+    private final static int LANGUAGE_CONTENT_SCALE = 0;
     private final static String GIT_URL_LABEL = "Repository URL";
     private final static String GIT_USERNAME_LABEL = "Username";
     private final static String GIT_PASSWORD_LABEL = "Password";
@@ -40,23 +58,55 @@ public class VCSPanel extends JPanel {
     private final static String CLONE_ERROR_MESSAGE = "Something went wrong, repository wasn't cloned cloned. Check whether the repository already exists locally or credentials are valid.";
     private final static String CLONE_SUCCESS_TITLE = "Clone success";
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
-    private final static String CLONING_PROPERTY = "cloned_successfully";
     private final static String CLONE_PROCESSING_LABEL = "Cloning project...";
+    private final static String FULL_REPORT_BUTTON = "Full report";
+    private final static String CLONING_PROPERTY = "cloning_property";
 
 
     private PropertyChangeSupport propertyChangeSupport;
 
     private GitService gitService;
+    private CodeAnalysisService codeAnalysisService;
+
+    private RepositoryLanguageComposition repositoryComposition;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
+        codeAnalysisService = new CodeAnalysisServiceImpl();
         propertyChangeSupport = new PropertyChangeSupport(this);
+        propertyChangeSupport.addPropertyChangeListener(this::cloneFinished);
         initGitRepositoryUrlSection();
         initGitUsernameSection();
         initGitPasswordSection();
         initAuthorizationRequiredSection();
         initCloneSection();
+        initLanguagesSection();
         initLayout();
+    }
+
+    private void cloneFinished(PropertyChangeEvent evt) {
+        Object cloneSuccessful = evt.getNewValue();
+        if(cloneSuccessful!=null) {
+            showCloneSuccessDialog();
+        } else {
+            showCloneErrorDialog();
+        }
+        cloneButton.setEnabled(true);
+        toggleCloneProcessingVisibility(false);
+    }
+
+    private void showCloneErrorDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_ERROR_MESSAGE,
+                CLONE_ERROR_TITLE,
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showCloneSuccessDialog() {
+        JOptionPane.showMessageDialog(this,
+                CLONE_SUCCESS_MESSAGE,
+                CLONE_SUCCESS_TITLE,
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void initGitRepositoryUrlSection() {
@@ -90,12 +140,13 @@ public class VCSPanel extends JPanel {
     private void initCloneSection() {
         cloneButton = new JButton(CLONE_BUTTON);
         cloneButton.addActionListener(e -> {
-            if(authorizationRequiredCheckBox.isSelected()) {
-                cloneRepositoryWithAuth(this::cloneFinished);
-            } else {
-                cloneRepository(this::cloneFinished);
-            }
             cloneButton.setEnabled(false);
+            toggleLanguageSectionVisibility(false);
+            if(authorizationRequiredCheckBox.isSelected()) {
+                cloneRepositoryWithAuth();
+            } else {
+                cloneRepository();
+            }
         });
         cloneProcessingLabel = new JLabel(CLONE_PROCESSING_LABEL);
         cloneProcessingProgressBar = new JProgressBar();
@@ -103,13 +154,27 @@ public class VCSPanel extends JPanel {
         toggleCloneProcessingVisibility(false);
     }
 
-    private void cloneRepository(PropertyChangeListener cloneListener) {
+    private void toggleLanguageSectionVisibility(boolean visible) {
+        for(int i=0; i<LANGUAGES_TO_DISPLAY; i++) {
+            toggleLanguageVisibility(visible, i);
+        }
+        this.fullScanningReportButton.setVisible(visible);
+    }
+
+    private void toggleLanguageVisibility(boolean visible, int index) {
+        languageContentProgressBars[index].setVisible(visible);
+        languageContentLabels[index].setVisible(visible);
+    }
+
+    private void cloneRepositoryWithAuth() {
         toggleCloneProcessingVisibility(true);
-        propertyChangeSupport.addPropertyChangeListener(cloneListener);
         new Thread(() -> {
-            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
-            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
+            GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
+            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
+            scanRepository(repositoryPath);
             toggleCloneProcessingVisibility(false);
+            viewRepositoryComposition();
+            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, repositoryPath);
         }).start();
     }
 
@@ -119,39 +184,67 @@ public class VCSPanel extends JPanel {
         cloneTaskLabel.setVisible(visible);
     }
 
-    private void cloneRepositoryWithAuth(PropertyChangeListener cloneListener) {
+    private void scanRepository(Path repositoryPath) {
+        cloneTaskLabel.setText("Scanning languages...");
+        this.repositoryComposition = codeAnalysisService.scanRepository(repositoryPath);
+        cloneTaskLabel.setText("");
+    }
+
+    private void viewRepositoryComposition() {
+        List<RepositoryLanguage> repositoryLanguages = repositoryComposition.getRepositoryLanguages()
+                .stream()
+                .sorted(Comparator.comparing(RepositoryLanguage::getLinesOfCode, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+        for(int i=0; (i<LANGUAGES_TO_DISPLAY) && (i<repositoryComposition.getRepositoryLanguages().size()); i++) {
+            setLanguageValue(repositoryLanguages.get(i), i);
+        }
+        if(repositoryComposition.getRepositoryLanguages().size()>LANGUAGES_TO_DISPLAY) {
+            fullScanningReportButton.setVisible(true);
+        }
+    }
+
+    private void setLanguageValue(RepositoryLanguage repositoryLanguage, int index) {
+        toggleLanguageVisibility(true, index);
+        styleLanguageProgressBar(languageContentProgressBars[index]);
+        languageContentProgressBars[index].setValue(repositoryLanguage.getPercentage()
+                .multiply(new BigDecimal(Math.pow(10, LANGUAGE_CONTENT_SCALE)))
+                .intValue());
+        languageContentLabels[index].setText(repositoryLanguage.getPercentage().setScale(LANGUAGE_CONTENT_SCALE, RoundingMode.HALF_UP).toString() + "% " + repositoryLanguage.getSupportedLanguage().getName());
+    }
+
+    private void styleLanguageProgressBar(JProgressBar progressBar) {
+        Random colorGen = new Random();
+        progressBar.setUI(new LanguageProgressBarUI());
+        Color foregroundColor = new Color(colorGen.nextInt(255), colorGen.nextInt(255), colorGen.nextInt(255));
+        progressBar.setForeground(foregroundColor);
+        progressBar.setBackground(Color.LIGHT_GRAY);
+    }
+
+    private void cloneRepository() {
         toggleCloneProcessingVisibility(true);
-        propertyChangeSupport.addPropertyChangeListener(cloneListener);
         new Thread(() -> {
-            GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-            boolean cloneSuccess = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
-            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, cloneSuccess);
+            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
+            scanRepository(repositoryPath);
+            toggleCloneProcessingVisibility(false);
+            viewRepositoryComposition();
+            propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, repositoryPath);
         }).start();
     }
 
-    private void cloneFinished(PropertyChangeEvent evt) {
-        Boolean cloneSuccessful = (Boolean) evt.getNewValue();
-        if(cloneSuccessful) {
-            showCloneSuccessDialog();
-        } else {
-            showCloneErrorDialog();
+    private void initLanguagesSection() {
+        for(int i=0; i<LANGUAGES_TO_DISPLAY; i++) {
+            languageContentLabels[i] = new JLabel();
+            languageContentProgressBars[i] = new JProgressBar(LANGUAGE_CONTENT_BAR_MIN, LANGUAGE_CONTENT_BAR_MAX);
         }
-        cloneButton.setEnabled(true);
-        toggleCloneProcessingVisibility(false);
+        this.fullScanningReportButton = new JButton(FULL_REPORT_BUTTON);
+        this.fullScanningReportButton.addActionListener((event) -> {
+            viewFullReport();
+        });
+        toggleLanguageSectionVisibility(false);
     }
 
-    private void showCloneErrorDialog() {
-        JOptionPane.showMessageDialog(this,
-                CLONE_ERROR_MESSAGE,
-                CLONE_ERROR_TITLE,
-                JOptionPane.ERROR_MESSAGE);
-    }
-
-    private void showCloneSuccessDialog() {
-        JOptionPane.showMessageDialog(this,
-                CLONE_SUCCESS_MESSAGE,
-                CLONE_SUCCESS_TITLE,
-                JOptionPane.INFORMATION_MESSAGE);
+    private void viewFullReport() {
+        new ScanningReportDialog(repositoryComposition);
     }
 
     private void initLayout() {
@@ -188,7 +281,26 @@ public class VCSPanel extends JPanel {
                                         .addComponent(cloneProcessingProgressBar, PREFERRED_SIZE, 200, PREFERRED_SIZE))
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
-                                        .addComponent(cloneTaskLabel, PREFERRED_SIZE, 200, PREFERRED_SIZE))));
+                                        .addComponent(cloneTaskLabel, PREFERRED_SIZE, 200, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(languageContentProgressBars[0], PREFERRED_SIZE, 200, PREFERRED_SIZE)
+                                        .addGap(PREFERRED_SIZE, 10, PREFERRED_SIZE)
+                                        .addComponent(languageContentLabels[0], 20, 60, 200))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(languageContentProgressBars[1], PREFERRED_SIZE, 200, PREFERRED_SIZE)
+                                        .addGap(PREFERRED_SIZE, 10, PREFERRED_SIZE)
+                                        .addComponent(languageContentLabels[1], 20, 60, 200))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(languageContentProgressBars[2], PREFERRED_SIZE, 200, PREFERRED_SIZE)
+                                        .addGap(PREFERRED_SIZE, 10, PREFERRED_SIZE)
+                                        .addComponent(languageContentLabels[2], 20, 60, 200))
+                                .addGroup(groupLayout.createSequentialGroup()
+                                        .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
+                                        .addComponent(fullScanningReportButton))
+                        ));
 
         groupLayout.setVerticalGroup(
                 groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -221,9 +333,21 @@ public class VCSPanel extends JPanel {
                                 .addPreferredGap(RELATED)
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(cloneTaskLabel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE))
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(languageContentProgressBars[0])
+                                        .addComponent(languageContentLabels[0]))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(languageContentProgressBars[1])
+                                        .addComponent(languageContentLabels[1]))
+                                .addPreferredGap(RELATED)
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(languageContentProgressBars[2])
+                                        .addComponent(languageContentLabels[2]))
+                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(fullScanningReportButton))
                                 .addPreferredGap(UNRELATED)
-                        )
-        );
+                        ));
     }
 
     private class ProgressBarMonitor implements ProgressMonitor {
@@ -248,12 +372,24 @@ public class VCSPanel extends JPanel {
         public void endTask() {
             cloneProcessingProgressBar.setValue(cloneProcessingProgressBar.getMaximum());
             cloneTaskLabel.setText("");
-
         }
 
         @Override
         public boolean isCancelled() {
             return false;
+        }
+    }
+
+    class LanguageProgressBarUI extends BasicProgressBarUI {
+        Rectangle r = new Rectangle();
+        @Override
+        protected void paintIndeterminate(Graphics g, JComponent c) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            r = getBox(r);
+            g.setColor(progressBar.getForeground());
+            g.fillOval(r.x, r.y, r.width, r.height);
         }
     }
 }
