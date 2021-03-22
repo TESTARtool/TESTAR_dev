@@ -84,6 +84,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.windows.WinApiException;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -164,7 +165,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public static Action lastExecutedAction = null;
 
 	protected long lastStamp = -1;
-	protected ProtocolUtil protocolUtil = new ProtocolUtil();
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
@@ -1068,7 +1068,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv, state);
+			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
 
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
@@ -1574,7 +1574,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+		        state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+		    } else {
+		        state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+		    }
 		}
 
 		calculateZIndices(state);
@@ -1629,10 +1633,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Take a Screenshot of the State and associate the path into state tag
 	 */
 	private void setStateScreenshot(State state) {
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
+	    Shape viewPort = state.get(Tags.Shape, null);
+	    if(viewPort != null){
+	        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	            state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+	        } else {
+	            state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+	        }
+	    }
 	}
 
 	@Override
@@ -1805,7 +1813,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 		
-		protocolUtil.getActionshot(state,action);
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	        WdProtocolUtil.getActionshot(state,action);
+	    } else {
+	        ProtocolUtil.getActionshot(state,action);
+	    }
 		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
@@ -2015,7 +2027,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);

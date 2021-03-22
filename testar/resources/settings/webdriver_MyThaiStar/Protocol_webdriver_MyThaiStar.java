@@ -113,9 +113,6 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 		policyAttributes = null;
 		
 		login = null;
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
 		
 		// Set desired License
 		licenseSUT = new MyThaiStarLicense();

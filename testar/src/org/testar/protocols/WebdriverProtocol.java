@@ -70,6 +70,7 @@ import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.testar.pkm.DecoderProtocol;
 
+import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public class WebdriverProtocol extends DecoderProtocol {
@@ -153,8 +154,8 @@ public class WebdriverProtocol extends DecoderProtocol {
         		double webDriverScreenshotDisplay = Double.parseDouble(overrideScreenshotDisplayAsString);
         		if(webDriverScreenshotDisplay > 0.0) {
         			System.out.println("Changing OverrideWebDriverScreenshotDisplay to: " + webDriverScreenshotDisplay);
-        			protocolUtil.setOverrideScreenshot(true);
-        			protocolUtil.setOverrideScreenshotDisplay(webDriverScreenshotDisplay);
+        			ProtocolUtil.overrideScreenshot = true;
+        			ProtocolUtil.overrideScreenshotDisplayScale = webDriverScreenshotDisplay;
         		}
         	}
         } catch (NumberFormatException e) {

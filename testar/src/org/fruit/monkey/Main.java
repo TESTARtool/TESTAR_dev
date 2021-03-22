@@ -113,7 +113,8 @@ public class Main {
 
 		    setTestarDirectory(settings);
 
-		    HttpWebServer webServer = new HttpWebServer(settings, 60000L);
+		    // 2 minutes running
+		    HttpWebServer webServer = new HttpWebServer(settings, 120000L);
 		    webServer.runWebServer();
 		}
 
