@@ -132,9 +132,13 @@ public class BorjaReward4 implements RewardFunction {
 			
 			BufferedImage img1 = ImageIO.read(new File(previousStatePath));
 			BufferedImage img2 = ImageIO.read(new File(statePath));
+			
+			if(img2 == null) {
+				img2 = new BufferedImage(img1.getWidth(), img1.getHeight(), img1.getType());
+			}
 
-			int width1 = img1.getWidth(); // Change - getWidth() and getHeight() for BufferedImage
-			int width2 = img2.getWidth(); // take no arguments
+			int width1 = img1.getWidth();
+			int width2 = img2.getWidth();
 			int height1 = img1.getHeight();
 			int height2 = img2.getHeight();
 			if ((width1 != width2) || (height1 != height2)) {
