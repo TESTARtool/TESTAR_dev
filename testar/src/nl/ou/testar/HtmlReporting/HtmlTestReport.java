@@ -194,11 +194,12 @@ public class HtmlTestReport {
                 .replace("#[sequences]", this.sequences + "/" + totalSequences)
                 .replace("#[actions]", Integer.toString(this.actions))
                 .replace("#[actions_per_sequence]", Integer.toString(actionsPerSequence))
+                .replace("#[issues]", Integer.toString(this.nonSevereIssues))
+                .replace("#[oracles]", Integer.toString(this.severeIssues))
                 .replace(
                         "<a href=\"https://www.example.com\">#[url]</a>",
                         String.format("<a href=\"%s\">%s</a>", url, title)
                 )
-
                 .replace("#[iteration_trs]", this.getIterationsAsHtml());
     }
 
@@ -239,6 +240,11 @@ public class HtmlTestReport {
     }
 
     public void addTestVerdict(Verdict verdict) {
+        if (verdict.severity() >= Verdict.SEVERITY_NOT_RESPONDING && verdict.severity() <= Verdict.SEVERITY_MAX) {
+            this.severeIssues++;
+        } else if (verdict.severity() >= Verdict.SEVERITY_WARNING) {
+            this.nonSevereIssues++;
+        }
         this.sequences++;
 
         this.iterations.add(
