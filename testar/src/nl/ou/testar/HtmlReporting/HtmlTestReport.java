@@ -64,13 +64,21 @@ public class HtmlTestReport {
      */
     private int actions = 0;
     /**
-     * Number of non-severe issues found
+     * Total number of non-severe issues found
      */
     private int nonSevereIssues = 0;
     /**
-     * Number of severe issues found
+     * Current number of non-severe issues found
+     */
+    private int curNonSevereIssues = 0;
+    /**
+     * Total number of severe issues found
      */
     private int severeIssues = 0;
+    /**
+     * Current number of severe issues found
+     */
+    private int curSevereIssues = 0;
 
     /**
      * Location where we should store our report in
@@ -177,6 +185,36 @@ public class HtmlTestReport {
         return sb.toString();
     }
 
+    private String getIssuesPerSequenceAsJsonArray() {
+        StringBuilder sb = new StringBuilder("");
+        sb.append('[');
+
+        Boolean firstItem = true;
+        for (TestIteration it : this.iterations) {
+            if (!firstItem) {
+                sb.append(',');
+            } else {
+                firstItem = false;
+            }
+            sb.append(it.getIssues());
+        }
+
+        sb.append(']');
+        return sb.toString();
+    }
+
+    private String getOraclesPerSequenceAsJsonArray() {
+        StringBuilder sb = new StringBuilder("");
+        sb.append('[');
+
+        sb.append(this.severeIssues);
+        sb.append(',');
+        sb.append(this.sequences - this.severeIssues);
+
+        sb.append(']');
+        return sb.toString();
+    }
+
     private String parseIndexTemplate(
             final int actionsPerSequence,
             final int totalSequences,
@@ -200,7 +238,10 @@ public class HtmlTestReport {
                         "<a href=\"https://www.example.com\">#[url]</a>",
                         String.format("<a href=\"%s\">%s</a>", url, title)
                 )
-                .replace("#[iteration_trs]", this.getIterationsAsHtml());
+                .replace("#[iteration_trs]", this.getIterationsAsHtml())
+                .replace("0//#[chart_iteration]", Integer.toString(this.sequences))
+                .replace("[0]//#[chart_issues]", this.getIssuesPerSequenceAsJsonArray())
+                .replace("[0]//#[chart_oracles]", this.getOraclesPerSequenceAsJsonArray());
     }
 
     public void saveReport(
@@ -239,19 +280,23 @@ public class HtmlTestReport {
         this.actions++;
     }
 
-    public void addTestVerdict(Verdict verdict) {
+    public void addTestVerdict(Verdict verdict) { // Even non-severe issues cancel the test? e.g. suspicious titles?
         if (verdict.severity() >= Verdict.SEVERITY_NOT_RESPONDING && verdict.severity() <= Verdict.SEVERITY_MAX) {
             this.severeIssues++;
+            this.curSevereIssues++;
         } else if (verdict.severity() >= Verdict.SEVERITY_WARNING) {
             this.nonSevereIssues++;
+            this.curNonSevereIssues++;
         }
-        this.sequences++;
 
         this.iterations.add(
                 new TestIteration(
-                        this.nonSevereIssues,
-                        this.severeIssues
+                        this.curNonSevereIssues,
+                        this.curSevereIssues
                 )
         );
+        this.curSevereIssues = 0;
+        this.curNonSevereIssues = 0;
+        this.sequences++;
     }
 }
