@@ -27,6 +27,10 @@ public class HtmlTestReport {
      */
     private static final String HTML_INDEX_PATH = "report.html";
     /**
+     * Location of our pagination js file
+     */
+    private static final String HTML_JS_PAGINATE_TABLE_PATH = "js/paginateTable.js";
+    /**
      * Location of our Issue Chart.js file
      */
     private static final String HTML_JS_ISSUE_CHART_PATH = "js/issueMetricChart.js";
@@ -42,6 +46,10 @@ public class HtmlTestReport {
      * Content of the index template
      */
     private String htmlIndex;
+    /**
+     * Content of the pagination js template
+     */
+    private String htmlJsPaginateTable;
     /**
      * Content of our Issue chart.js template
      */
@@ -129,6 +137,7 @@ public class HtmlTestReport {
         try {
             // Read the report templates
             this.htmlIndex = readFileAsString(HTML_INDEX_PATH);
+            this.htmlJsPaginateTable = readFileAsString(HTML_JS_PAGINATE_TABLE_PATH);
             this.htmlJsIssueChart = readFileAsString(HTML_JS_ISSUE_CHART_PATH);
             this.htmlJsOracleChart = readFileAsString(HTML_JS_ORACLE_CHART_PATH);
             this.htmlCssReport = readFileAsString(HTML_CSS_REPORT_PATH);
@@ -265,6 +274,7 @@ public class HtmlTestReport {
 
         // Save the template files
         saveFile.apply(this.reportDir + HTML_INDEX_PATH, this.parseIndexTemplate(actionsPerSequence, totalSequences, url));
+        saveFile.apply(this.reportDir + HTML_JS_PAGINATE_TABLE_PATH, this.htmlJsPaginateTable);
         saveFile.apply(this.reportDir + HTML_JS_ISSUE_CHART_PATH, this.htmlJsIssueChart);
         saveFile.apply(this.reportDir + HTML_JS_ORACLE_CHART_PATH, this.htmlJsOracleChart);
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);
