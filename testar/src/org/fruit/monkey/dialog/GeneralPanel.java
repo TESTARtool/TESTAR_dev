@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -41,10 +41,11 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
+import java.util.Observer;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-public class GeneralPanel extends JPanel {
+public class GeneralPanel extends JPanel implements Observer {
 
   private static final long serialVersionUID = -7401834140061189752L;
 
@@ -55,12 +56,17 @@ public class GeneralPanel extends JPanel {
   private JSpinner spnSequenceLength;
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
-  private JCheckBox compileCheckBox;
+  private JCheckBox compileCheckBox, checkActionVisualization;
   
   private JLabel labelAppName = new JLabel("Application name");
   private JLabel labelAppVersion = new JLabel("Application version");
+
   private JTextField applicationNameField = new JTextField();
   private JTextField applicationVersionField = new JTextField();
+
+  private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
+  private JTextField overrideWebDriverDisplayScaleField = new JTextField();
+
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -111,6 +117,7 @@ public class GeneralPanel extends JPanel {
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
+    myItemListener.addObserver(this);
     comboBoxProtocol.addItemListener(myItemListener);
     comboBoxProtocol.setToolTipText(comboBoxProtocolTTT);
     add(comboBoxProtocol);
@@ -124,16 +131,45 @@ public class GeneralPanel extends JPanel {
     checkStopOnFault.setBounds(10, 240, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);*/
+
+    checkActionVisualization = new JCheckBox("Visualize actions on GUI");
+    checkActionVisualization.setBounds(10, 240, 192, 21);
+    //checkActionVisualization.setToolTipText(checkStopOnFaultTTT);
+    add(checkActionVisualization);
     
     labelAppName.setBounds(330, 242, 150, 27);
+    labelAppName.setToolTipText(applicationNameTTT);
     add(labelAppName);
     applicationNameField.setBounds(480, 242, 125, 27);
+    applicationNameField.setToolTipText(applicationNameTTT);
     add(applicationNameField);
 
     labelAppVersion.setBounds(330, 280, 150, 27);
+    labelAppVersion.setToolTipText(applicationVersionTTT);
     add(labelAppVersion);
     applicationVersionField.setBounds(480, 280, 125, 27);
+    applicationVersionField.setToolTipText(applicationVersionTTT);
     add(applicationVersionField);
+
+    // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
+    setOverrideWebDriverDisplayScaleVisibility(false);
+    labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
+    labelOverrideWebDriverDisplayScale.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(labelOverrideWebDriverDisplayScale);
+    overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
+    overrideWebDriverDisplayScaleField.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(overrideWebDriverDisplayScaleField);
+  }
+
+  private void setOverrideWebDriverDisplayScaleVisibility(boolean isVisible){
+    labelOverrideWebDriverDisplayScale.setVisible(isVisible);
+    overrideWebDriverDisplayScaleField.setVisible(isVisible);
+  }
+
+  @Override
+  public void update(Observable o, Object arg) {
+    boolean showWidgets = arg.toString().contains("webdriver");
+    setOverrideWebDriverDisplayScaleVisibility(showWidgets);
   }
 
   private void addGeneralControlsLocal() {
@@ -218,6 +254,7 @@ public class GeneralPanel extends JPanel {
 
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
+    checkActionVisualization.setSelected(settings.get(ConfigTags.VisualizeActions));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
@@ -225,6 +262,7 @@ public class GeneralPanel extends JPanel {
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
+    overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
   }
 
   /**
@@ -236,12 +274,14 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
+    settings.set(ConfigTags.VisualizeActions, checkActionVisualization.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
+    settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

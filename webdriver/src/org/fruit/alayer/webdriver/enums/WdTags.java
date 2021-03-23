@@ -77,6 +77,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebName = from("WebName", String.class);
   
   /**
+   * Web generic representative title of a widget.
+   */
+  public static final Tag<String> WebGenericTitle = from("WebGenericTitle", String.class);
+  
+  /**
    * Web title of a widget.
    */
   public static final Tag<String> WebTitle = from("WebTitle", String.class);
@@ -84,7 +89,7 @@ public class WdTags extends TagsBase {
   /**
    * Web text context of a widget.
    */
-  public static final Tag<String> WebTextContext = from("WebTextContext", String.class);
+  public static final Tag<String> WebTextContent = from("WebTextContent", String.class);
   
   /**
    * Web Hypertext Reference of a widget.
@@ -120,6 +125,11 @@ public class WdTags extends TagsBase {
    * Web type of input of a widget.
    */
   public static final Tag<String> WebType = from("WebType", String.class);
+  
+  /**
+   * Web src of a widget.
+   */
+  public static final Tag<String> WebSrc = from("WebSrc", String.class);
   
   /**
    * Web zIndex of a widget
@@ -203,6 +213,11 @@ public class WdTags extends TagsBase {
    * Whether this widget is currently clickable.
    */
   public static final Tag<Boolean> WebIsClickable = from("WebIsClickable", Boolean.class);
+  
+  /**
+   * Whether this widget comes from Shadow Tree.
+   */
+  public static final Tag<Boolean> WebIsShadow = from("WebIsShadow", Boolean.class);
   
   /**
    * Whether this widget has keyboard focus (i.e. will receive keyboard input)

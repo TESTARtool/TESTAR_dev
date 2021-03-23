@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -72,6 +73,27 @@ public class ToolTipTexts {
   public static String intervalTTT = "Set the sampling interval";
   public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
   public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
+  public static String applicationNameTTT = "<html>" +
+		  "Use a name identifier to represent the current application.<br>" + 
+		  "This will be used to create the output structure reports and for State Model purposes.<br>" +
+		  "Example: Notepad" +
+		  "</html>";
+  public static String applicationVersionTTT = "<html>" +
+		  "Use a version identifier to represent the current application.<br>" + 
+		  "This will be used to create the output structure reports and for State Model purposes.<br>" + 
+		  "Example: 1.0.0" +
+		  "</html>";
+  public static String overrideWebDriverDisplayScaleTTT = "<html>" +
+		  "NOTE: KEEP this field EMPTY if the coordinates of <br>" +
+		  "the widgets and actions are detected correctly with SPY and GENERATE mode.<br><br>" + 
+		  "Overrides the displayscale obtained from the system.<br>" + 
+		  "Can solve problems when the mouse clicks are not aligned with the elements on the screen.<br>" + 
+		  "This can easily be detected when running the spy mode.<br>" + 
+		  "For example hover over a text element and the popup window should appear with information<br>" + 
+		  "about the element, if the popup window is not shown or when the mouse is<br>" + 
+		  "located somewhere else you can try to override the displayscale<br>" + 
+		  "Values should be provided as doubles (1.5)." +
+		  "</html>";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";

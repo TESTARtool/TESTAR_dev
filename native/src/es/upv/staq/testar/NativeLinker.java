@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -100,20 +100,26 @@ public class NativeLinker {
 	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
-			boolean accessBridgeEnabled,
-			String SUTProcesses){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
+			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			}
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				// TODO: a win10 state builder might make use of the new CUI8 Automation object.
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			}
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+			else {
+				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org.");
+				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			}
+		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return new AtSpiStateBuilder(timeToFreeze);
+		}
+		
 		System.out.println("TESTAR detected OS: " + osName + " and this is not yet supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org. Exiting with Exception.");
 		throw new UnsupportedPlatformException();
 	}
@@ -144,20 +150,30 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
+			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
-				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
-					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-				else
-					return WinProcess.fromExecutableUwp(executableCommand);
 			}
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
+				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
+					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+				}
+				else {
+					return WinProcess.fromExecutableUwp(executableCommand);
+				}
+			}
+			else {
+				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported.");
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+			}
+		}
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return LinuxProcess.fromExecutable(executableCommand);
+		}
 		throw new UnsupportedPlatformException();
 	}
 

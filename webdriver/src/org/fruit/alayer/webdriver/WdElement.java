@@ -56,19 +56,20 @@ public class WdElement extends TaggableBase implements Serializable {
   WdWidget backRef;
 
   public boolean blocked;
-  long culture = 0L;
+  //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, tagName, textContent, helpText, title;
+  public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
 
   boolean enabled, ignore;
   public boolean isClickable;
+  public boolean isShadow;
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt;
+  String valuePattern, href, value, style, target, alt, src;
 
   double zindex;
   Rect rect;
@@ -102,31 +103,26 @@ public class WdElement extends TaggableBase implements Serializable {
     	System.out.println("-------------------------------------------------------------------------------------");
     	throw e;
     }
-
+    
     id = attributeMap.getOrDefault("id", "");
-    name = (String) packedElement.get("name");
+    name = attributeMap.getOrDefault("name", "");
+    genericTitle = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
-    helpText = attributeMap.get("title");
     title = attributeMap.getOrDefault("title","");
-    
-    valuePattern = attributeMap.getOrDefault("href", "");
-    if (valuePattern == null || valuePattern.equals("")) {
-      valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
-    }
-    
     href = attributeMap.getOrDefault("href", "");
-    value = String.valueOf(packedElement.getOrDefault("value", ""));
+    value = attributeMap.getOrDefault("value", "");
     style = attributeMap.getOrDefault("style", "");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
+    type = attributeMap.getOrDefault("type", "");
+    src = attributeMap.getOrDefault("src", "");
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
       cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
-    type = attributeMap.get("type");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -136,6 +132,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
     blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");
+    isShadow = (parent != null && parent.isShadow) || (Boolean) packedElement.get("isShadowElement");
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
@@ -156,6 +153,15 @@ public class WdElement extends TaggableBase implements Serializable {
 
     setName();
     fillScrollValues();
+    
+    // Empty string ?
+    //textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
+    //helpText = attributeMap.get("title");
+    //value = String.valueOf(packedElement.getOrDefault("value", ""));
+    /*valuePattern = attributeMap.getOrDefault("href", "");
+    if (valuePattern == null || valuePattern.equals("")) {
+      valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
+    }*/
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
@@ -165,6 +171,35 @@ public class WdElement extends TaggableBase implements Serializable {
   private void readObject(ObjectInputStream ois)
       throws IOException, ClassNotFoundException {
     ois.defaultReadObject();
+  }
+  
+  /**
+   * Check web element parameters and try to find an appropriate one to act as description
+   */
+  public String getElementDescription() {
+	  if(name != null && !name.isEmpty()) {
+		  return name;
+	  }
+	  else if(textContent != null && !textContent.isEmpty()) {
+		  return textContent;
+	  }
+	  else if(id != null && !id.isEmpty()) {
+		  return id;
+	  }
+	  else if(value != null && !value.isEmpty()) {
+		  return value;
+	  }
+	  else if(tagName != null && !tagName.isEmpty()) {
+		  return tagName;
+	  }
+	  else if(title != null && !title.isEmpty()) {
+		  return title;
+	  }
+	  else if(href != null && !href.isEmpty()) {
+		  return href;
+	  }
+
+	  return String.join(",", cssClasses);
   }
 
   private void setName() {

@@ -30,18 +30,16 @@
 
 package org.fruit.alayer.webdriver;
 
+import org.fruit.Environment;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-
 
 /**
  * Extend AWTCanvas to get the screenshot from WebDriver
@@ -53,7 +51,7 @@ public class WdScreenshot extends AWTCanvas {
     super(1, 1, 1, 1);
   }
 
-  public static WdScreenshot fromScreenshot(Rect r)
+  public static WdScreenshot fromScreenshot(Rect r, long windowHandle)
       throws StateBuildException {
     WdScreenshot wdScreenshot = new WdScreenshot();
     RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
@@ -61,10 +59,11 @@ public class WdScreenshot extends AWTCanvas {
     try {
       File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
       BufferedImage fullImg = ImageIO.read(screenshot);
-      int x = (int) Math.max(0, r.x());
-      int y = (int) Math.max(0, r.y());
-      int width = (int) Math.min(fullImg.getWidth(), r.width());
-      int height = (int) Math.min(fullImg.getHeight(), r.height());
+      double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
+      int x = (int) Math.max(0, r.x() * displayScale);
+      int y = (int) Math.max(0, r.y() * displayScale);
+      int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
+      int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
       wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
     }
     catch (Exception ignored) {

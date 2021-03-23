@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,15 +29,11 @@
 *******************************************************************************************************/
 
 
-/**
- * @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 public final class ConfigTags {
@@ -76,8 +73,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class);
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
+  public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class);
 
-  // begin by urueda
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
   public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);
@@ -96,12 +93,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> UnattendedTests = Tag.from("UnattendedTests", Boolean.class);
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
-
-  // begin by florendegier
-  public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
-  public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
-  public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
-  public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
@@ -126,4 +117,33 @@ public final class ConfigTags {
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
+
+  // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
+  public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
+
+  // 5 settings that can be used in user specified TESTAR protocols for anything:
+  public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_2 = Tag.from("ProtocolSpecificSetting_2", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_3 = Tag.from("ProtocolSpecificSetting_3", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_4 = Tag.from("ProtocolSpecificSetting_4", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class);
+
+  // WebDriver specific settings:
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> ClickableClasses = Tag.from("ClickableClasses", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> DeniedExtensions = Tag.from("DeniedExtensions", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class);
+  public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
+  public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
+
+  /*
+  //TODO web driver settings for login feature
+  public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  // Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+  public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  */
 }

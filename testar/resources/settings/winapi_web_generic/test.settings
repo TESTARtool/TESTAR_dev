@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.upv.es"
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.google.com/"
 
 #################################################################
 # Sequences
@@ -32,7 +32,7 @@ SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https:
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious titles
@@ -76,7 +76,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
 
 #################################################################
 # Processfilter
@@ -93,29 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_orientdb/Protocol_web_orientdb
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################\n"
-# State model inference settings
-#################################################################\n"
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = instant
-ApplicationName = UPV web
-ApplicationVersion = 1.0.0
+ProtocolClass = winapi_web_generic/Protocol_winapi_web_generic
 
 #################################################################
 # State identifier attributes
@@ -147,7 +125,7 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.9
+TimeToWaitAfterAction = 0.1
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

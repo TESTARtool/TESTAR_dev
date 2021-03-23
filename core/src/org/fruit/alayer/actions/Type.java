@@ -69,26 +69,35 @@ public final class Type extends TaggableBase implements Action {
 		double d = duration / text.length();
 		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
 		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
-		for(int i = 0; i < text.length(); i++){
-			char c = text.charAt(i);
-			boolean shift = false;
 
-			if(Character.isLetter(c)){
-				if(Character.isLowerCase(c))
-					c = Character.toUpperCase(c);
-				else
-					shift = true;
+		for(int i = 0; i < text.length(); i++){
+
+			try {
+
+				char c = text.charAt(i);
+				boolean shift = false;
+
+				if(Character.isLetter(c)){
+					if(Character.isLowerCase(c))
+						c = Character.toUpperCase(c);
+					else
+						shift = true;
+				}
+
+				KBKeys key = getKey(c);
+
+				if(shift)
+					shiftDown.run(system, state, .0);
+				new KeyDown(key).run(system, state, .0);
+				new KeyUp(key).run(system, state, .0);
+				if(shift)
+					shiftUp.run(system, state, .0);
+				Util.pause(d);
+
+			} catch(IllegalArgumentException e) {
+				System.out.println("TESTAR support for better character encodings is being developed");
+				System.out.println(e.getMessage());
 			}
-			
-			KBKeys key = getKey(c);
-						
-			if(shift)
-				shiftDown.run(system, state, .0);
-			new KeyDown(key).run(system, state, .0);
-			new KeyUp(key).run(system, state, .0);
-			if(shift)
-				shiftUp.run(system, state, .0);
-			Util.pause(d);
 		}
 	}
 		

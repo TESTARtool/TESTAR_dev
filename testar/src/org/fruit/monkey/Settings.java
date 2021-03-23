@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,11 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import java.io.BufferedReader;
@@ -44,7 +40,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -281,15 +276,15 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#\n"
 					+"# Indicate how you want to connect to the SUT:\n"
 					+"#\n"
-					+"# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that\n"
+					+"# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that\n"
 					+"# starts the SUT.\n"
 					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
 					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
+					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed\n"
 					+"# in the SUT main window. The SUT must be manually started and closed.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.\n"
+					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.\n"
 					+"# The SUT must be manually started and closed.\n"
 					+"#################################################################\n"
 					+"SUTConnector = " + Util.lineSep()
@@ -366,7 +361,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# but that you do not want to test.\n"
 					+"#################################################################\n"
 					+"\n"
-					+"SUTProcesses =" + Util.lineSep()
+					+"SUTProcesses = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Protocolclass\n"
@@ -377,37 +372,65 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProtocolClass = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
-					+"# Graphdatabase settings (experimental)\n"
-					+"#################################################################\n"
-					+"GraphDBEnabled = false" + Util.lineSep()
-					+"GraphDBUrl =" + Util.lineSep()
-					+"GraphDBUser =" + Util.lineSep()
-					+"GraphDBPassword =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
 					+"# State model inference settings\n"
 					+"#################################################################\n"
-					+"StateModelEnabled = false" + Util.lineSep()
-					+"DataStore = OrientDB" + Util.lineSep()
-					+"DataStoreType = remote" + Util.lineSep()
-					+"DataStoreServer = localhost" + Util.lineSep()
-					+"DataStoreDirectory =" + Util.lineSep()
-					+"DataStoreDB =" + Util.lineSep()
-					+"DataStoreUser =" + Util.lineSep()
-					+"DataStorePassword =" + Util.lineSep()
-					+"DataStoreMode = instant" + Util.lineSep()
-					+"ApplicationName = Buggy calculator" + Util.lineSep()
-					+"ApplicationVersion = 1.0.0" + Util.lineSep()
-					+"ActionSelectionAlgorithm =" + Util.lineSep()
-					+"StateModelStoreWidgets =" + Util.lineSep()
+					+"StateModelEnabled = " + Util.lineSep()
+					+"DataStore = " + Util.lineSep()
+					+"DataStoreType = " + Util.lineSep()
+					+"DataStoreServer = " + Util.lineSep()
+					+"DataStoreDirectory = " + Util.lineSep()
+					+"DataStoreDB = " + Util.lineSep()
+					+"DataStoreUser = " + Util.lineSep()
+					+"DataStorePassword = " + Util.lineSep()
+					+"DataStoreMode = " + Util.lineSep()
+					+"ApplicationName = " + Util.lineSep()
+					+"ApplicationVersion = " + Util.lineSep()
+					+"ActionSelectionAlgorithm = " + Util.lineSep()
+					+"StateModelStoreWidgets = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
-                    +"#################################################################\n"
-			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"#################################################################\n"
+					+"AbstractStateAttributes = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# WebDriver features\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ClickableClasses = " + Util.lineSep()
+					+"DeniedExtensions = " + Util.lineSep()
+					+"DomainsAllowed = " + Util.lineSep()
+					+"FollowLinks = " + Util.lineSep()
+					+"BrowserFullScreen = " + Util.lineSep()
+					+"SwitchNewTabs = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Override display scale\n"
+					+"#\n"
+					+"# Overrides the displayscale obtained from the system.\n"
+					+"# Can solve problems when the mouse clicks are not aligned with\n"
+					+"# the elements on the screen. This can easily be detected when\n"
+					+"# running the spy mode. For example hover over a text element and\n"
+					+"# the popup window should appear with information about the\n"
+					+"# element, if the popup window is not shown or when the mouse is\n"
+					+"# located somewhere else you can try to override the displayscale\n"
+					+"# Values should be provided as doubles (1.5).\n"
+					+"#################################################################\n"
+					+"\n"
+					+"OverrideWebDriverDisplayScale = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Settings (string) that can be used for user specified protocols\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProtocolSpecificSetting_1 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_2 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_3 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_4 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_5 = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"
