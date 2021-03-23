@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,8 @@
 
 package nl.ou.testar.ScreenshotJsonFile;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public class WidgetJsonObject {
     boolean enabled;
     String role;
@@ -42,7 +44,9 @@ public class WidgetJsonObject {
     String toolTipText;
     String valuePattern;
 
-    public WidgetJsonObject(boolean enabled, String role, boolean blocked, BoundingPoly boundingPoly, String className, String title, String desc, String name, String toolTipText, String valuePattern) {
+    @JsonCreator
+    public WidgetJsonObject(boolean enabled, String role, boolean blocked, BoundingPoly boundingPoly,
+            String className, String title, String desc, String name, String toolTipText, String valuePattern) {
         this.enabled = enabled;
         this.role = role;
         this.blocked = blocked;

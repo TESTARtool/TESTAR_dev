@@ -30,8 +30,6 @@
 
 package nl.ou.testar.ScreenshotJsonFile;
 
-import java.util.Set;
-
 public class BoundingPoly {
     Vertice[] vertices;
 

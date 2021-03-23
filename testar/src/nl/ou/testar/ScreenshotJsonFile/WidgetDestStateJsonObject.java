@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,19 +30,23 @@
 
 package nl.ou.testar.ScreenshotJsonFile;
 
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class ScreenshotWidgetJsonObject {
-    Set<WidgetJsonObject> widgetJsonObjects;
-    String screenshotPath;
-    String screenshotId;
+public class WidgetDestStateJsonObject extends WidgetJsonObject {
+
+    String widgetId;
+    String destinationState;
 
     @JsonCreator
-    public ScreenshotWidgetJsonObject(Set<WidgetJsonObject> widgetJsonObjects, String screenshotPath, String screenshotId) {
-        this.widgetJsonObjects = widgetJsonObjects;
-        this.screenshotPath = screenshotPath;
-        this.screenshotId = screenshotId;
+    public WidgetDestStateJsonObject(boolean enabled, String role, boolean blocked, BoundingPoly boundingPoly,
+            String className, String title, String desc, String name, String toolTipText, String valuePattern, 
+            String widgetId) {
+        super(enabled, role, blocked, boundingPoly, className, title, desc, name, toolTipText, valuePattern);
+        this.widgetId = widgetId;
+        this.destinationState = "";
+    }
+
+    public void addDestinationState(String destinationState) {
+        this.destinationState = destinationState;
     }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,11 @@ package nl.ou.testar.ScreenshotJsonFile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import nl.ou.testar.ScreenshotJsonFile.BoundingPoly;
 import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
 import nl.ou.testar.ScreenshotJsonFile.Vertice;
@@ -42,60 +47,168 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.windows.UIATags;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
 public class JsonUtils {
 
+    private JsonUtils() {}
+
+    /**
+     * Based on a TESTAR State extract the properties of the existing widgets in a JSON file. 
+     * 
+     * @param state
+     */
     public static void createWidgetInfoJsonFile(State state){
-    	
-    	Rect sutRect;
-    	try {
-    		sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-    	}catch(Exception e){
-    		System.out.println("ERROR: Reading State bounds for JSON file");
-    		return;
-    	}
-//        System.out.println("DEBUG: SUT rect x="+sutRect.x()+", y="+sutRect.y()+", width="+sutRect.width()+", height="+sutRect.height());
+
+        Rect sutRect;
+        try {
+            sutRect = (Rect) state.child(0).get(Tags.Shape, null);
+        }catch(Exception e){
+            System.out.println("ERROR: Reading State bounds for JSON file");
+            return;
+        }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
-        for(Widget widget:state){
+        Set<WidgetJsonObject> widgetJsonObjects = new HashSet<>();
+
+        // Iterate over all the widgets of the State to extract the desired properties
+        for(Widget widget : state){
             boolean enabled = widget.get(Tags.Enabled, null);
             String role = widget.get(Tags.Role, null).toString();
             boolean blocked = widget.get(Tags.Blocked, null);
+
             Rect rect = (Rect) widget.get(Tags.Shape, null);
             Vertice[] vertices = new Vertice[4];
-            vertices[0]=new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y());
-            vertices[1]=new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y());
-            vertices[2]=new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()+rect.height());
-            vertices[3]=new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()+rect.height());
+            vertices[0] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y());  // up-left
+            vertices[1] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y()); // up-right
+            vertices[2] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y() + rect.height()); // down-right
+            vertices[3] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y() + rect.height()); // down-left
             BoundingPoly boundingPoly = new BoundingPoly(vertices);
-            String className= widget.get(UIATags.UIAClassName, "");
-            String title= widget.get(Tags.Title, "");
-            String desc= widget.get(Tags.Desc, "");
-            String name= widget.get(UIATags.UIAName, "");
-            String toolTipText= widget.get(Tags.ToolTipText, "");
-            String valuePattern= widget.get(Tags.ValuePattern, "");
+
+            String className = widget.get(UIATags.UIAClassName, "");
+            String title = widget.get(Tags.Title, "");
+            String desc = widget.get(Tags.Desc, "");
+            String name = widget.get(UIATags.UIAName, "");
+            String toolTipText = widget.get(Tags.ToolTipText, "");
+            String valuePattern = widget.get(Tags.ValuePattern, "");
+
             WidgetJsonObject widgetJsonObject = new WidgetJsonObject(enabled, role, blocked, boundingPoly, className, title, desc, name, toolTipText, valuePattern);
             widgetJsonObjects.add(widgetJsonObject);
-//			for(Tag tag:widget.tags()){
-//				System.out.println("Tag:"+tag.toString()+"="+widget.get(tag));
-//			}
         }
-//        System.out.println("Widget size="+widgetJsonObjects.size());
+
         String screenshotPath = state.get(Tags.ScreenshotPath);
-//        System.out.println("ScreenshotPath="+screenshotPath);
-        ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath);
-//        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
-        String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
-//        System.out.println("FilePath="+filePath);
+        String screenshotId = screenshotPath.substring(screenshotPath.lastIndexOf('\\') + 1, screenshotPath.lastIndexOf('.'));
+
+        ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath, screenshotId);
+
+        String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf('.')) + ".json";
+
         try{
             FileWriter fileWriter = new FileWriter(filePath);
             gson.toJson(screenshotWidgetJsonObject, fileWriter);
-            fileWriter.flush(); //flush data to file   <---
-            fileWriter.close(); //close write          <---
+            fileWriter.flush();
+            fileWriter.close();
+        }catch(Exception e){
+            System.out.println("ERROR: Writing JSON into file failed!");
+        }
+    }
+
+    /**
+     * Based on a TESTAR previous State extract the properties of the previous widgets in a JSON file. 
+     * This method should be used after an action execution to extract the previous properties. 
+     * 
+     * @param state
+     * @param previousState
+     */
+    public static void createWidgetInfoPreviousStateJsonFile(State state, State previousState, Widget executedWidget){
+
+        String destinationState = "";
+        String executedWidgetId = executedWidget.get(Tags.ConcreteIDCustom, "");
+
+        Rect sutRect;
+        try {
+            sutRect = (Rect) previousState.child(0).get(Tags.Shape, null);
+        }catch(Exception e){
+            System.out.println("ERROR: Reading State bounds for JSON file");
+            return;
+        }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Set<WidgetJsonObject> widgetJsonObjects = new HashSet<>();
+
+        // Iterate over all the widgets of the State to extract the desired properties
+        for(Widget widget : previousState){
+            boolean enabled = widget.get(Tags.Enabled, null);
+            String role = widget.get(Tags.Role, null).toString();
+            boolean blocked = widget.get(Tags.Blocked, null);
+
+            Rect rect = (Rect) widget.get(Tags.Shape, null);
+            Vertice[] vertices = new Vertice[4];
+            vertices[0] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y());  // up-left
+            vertices[1] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y()); // up-right
+            vertices[2] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y() + rect.height()); // down-right
+            vertices[3] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y() + rect.height()); // down-left
+            BoundingPoly boundingPoly = new BoundingPoly(vertices);
+
+            String className = widget.get(UIATags.UIAClassName, "");
+            String title = widget.get(Tags.Title, "");
+            String desc = widget.get(Tags.Desc, "");
+            String name = widget.get(UIATags.UIAName, "");
+            String toolTipText = widget.get(Tags.ToolTipText, "");
+            String valuePattern = widget.get(Tags.ValuePattern, "");
+
+            WidgetDestStateJsonObject widgetJsonObject = new WidgetDestStateJsonObject(enabled, role, blocked, boundingPoly,
+                    className, title, desc, name, toolTipText, valuePattern,
+                    widget.get(Tags.ConcreteIDCustom));
+
+            // Add the destinationState of the executed Widget
+            if(widget.get(Tags.ConcreteIDCustom, "none").equals(executedWidgetId)) {
+                destinationState = state.get(Tags.ConcreteIDCustom, "");
+                widgetJsonObject.addDestinationState(destinationState);
+            }
+
+            widgetJsonObjects.add(widgetJsonObject);
+        }
+
+        String screenshotPath = previousState.get(Tags.ScreenshotPath);
+        String screenshotId = screenshotPath.substring(screenshotPath.lastIndexOf('\\') + 1, screenshotPath.lastIndexOf('.'));
+
+        ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath, screenshotId);
+
+        String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf('.')) + ".json";
+
+        try{
+            // If the State JSON file exists we already have the widget properties information
+            // We need to extract the JSON object from the existing file and update the destinationState
+            if(new File(filePath).exists()) {
+                FileReader reader = new FileReader(filePath);
+                JsonParser jsonParser = new JsonParser();
+                JsonObject jsonObject = (JsonObject) jsonParser.parse(reader);
+
+                JsonArray jsonWidgets = jsonObject.getAsJsonArray("widgetJsonObjects");
+                for(JsonElement elementWidget : jsonWidgets) {
+                    JsonElement elementWidgetId = elementWidget.getAsJsonObject().get("widgetId");
+                    if(elementWidgetId.getAsString().equals(executedWidgetId)) {
+                        elementWidget.getAsJsonObject().addProperty("destinationState", destinationState);
+                    }
+                }
+
+                FileWriter fileWriter = new FileWriter(filePath);
+                gson.toJson(jsonObject, fileWriter);
+                fileWriter.flush();
+                fileWriter.close();
+            } 
+            // First time we create the State JSON file
+            else {
+                FileWriter fileWriter = new FileWriter(filePath);
+                gson.toJson(screenshotWidgetJsonObject, fileWriter);
+                fileWriter.flush();
+                fileWriter.close();
+            }
         }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
         }
