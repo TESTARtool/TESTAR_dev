@@ -3,14 +3,13 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
-import nl.ou.testar.a11y.reporting.HTMLReporter;
-
-import org.apache.commons.math3.analysis.function.Abs;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
 import javax.imageio.ImageIO;
@@ -19,6 +18,8 @@ import java.io.*;
 import java.util.Set;
 
 public class BorjaReward4 implements RewardFunction {
+    
+    private static final Logger logger = LoggerFactory.getLogger(BorjaReward4.class);
     
     private State previousState = null;
 
@@ -35,14 +36,13 @@ public class BorjaReward4 implements RewardFunction {
 			return reward;
 		}
 		
-		// HTMLDifference htmlDifference = new HTMLDifference();
 		String differenceScreenshot = "";
 		String prevStateScrPath = previousState.get(Tags.ScreenshotPath, "");
 		String currStateScrPath = state.get(Tags.ScreenshotPath, "");
 		String prevStateID = previousState.get(Tags.AbstractIDCustom, "");
 		String currStateID = state.get(Tags.AbstractIDCustom, "");
 
-		if (previousState != null && !prevStateScrPath.isEmpty() && !currStateScrPath.isEmpty()) {
+		if (!prevStateScrPath.isEmpty() && !currStateScrPath.isEmpty()) {
 			// Create and obtain the image-diff path
 			differenceScreenshot = getDifferenceImage(prevStateScrPath, prevStateID, currStateScrPath, currStateID);
 		}
@@ -54,16 +54,11 @@ public class BorjaReward4 implements RewardFunction {
 				double diffPxPercentage = getDiffPxPercentage(diffScreanshot);
 				reward = (float) diffPxPercentage;
 			} catch (IOException e) {
-				e.printStackTrace();
+			    logger.debug("Pixel difference Reward IOException : " + e.getMessage());
 			}
 		}
 
 		// Also decrement reward based on Widget Tree ZIndex
-
-		// TODO: OriginWidget is not saved as Abstract Attribute
-		// reward -= (0.01 *
-		// selectedAbstractAction.getAttributes().get(Tags.OriginWidget).get(Tags.ZIndex));
-
 		System.out.println(". . . . . Provisional Reward: " + reward);
 
 		if (executedAction != null) {
@@ -113,7 +108,6 @@ public class BorjaReward4 implements RewardFunction {
 	 */
 	private String getDifferenceImage(String previousStateDisk, String namePreviousState, String stateDisk, String nameState) {
 		try {
-
 			// State Images paths
 			String previousStatePath = new File(previousStateDisk).getCanonicalFile().toString();
 			String statePath = new File(stateDisk).getCanonicalFile().toString();
@@ -143,6 +137,7 @@ public class BorjaReward4 implements RewardFunction {
 			int height2 = img2.getHeight();
 			if ((width1 != width2) || (height1 != height2)) {
 				System.out.println("Error: Images dimensions mismatch");
+				logger.debug("getDifferenceImage Error: Images dimensions mismatch");
 				return "";
 			}
 
@@ -183,8 +178,7 @@ public class BorjaReward4 implements RewardFunction {
 				try {
 					return screenshotFile.getCanonicalPath();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				    logger.debug("getDifferenceImage IOException : " + e.getMessage());
 				}
 			}
 			FileOutputStream outputStream = new FileOutputStream(screenshotFile.getCanonicalPath());
@@ -200,10 +194,10 @@ public class BorjaReward4 implements RewardFunction {
 			return screenshotFile.getCanonicalPath();
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		    logger.debug("getDifferenceImage FileNotFoundException : " + e.getMessage());
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+		    logger.debug("getDifferenceImage IOException : " + e.getMessage());
 		}
 
 		return "";
