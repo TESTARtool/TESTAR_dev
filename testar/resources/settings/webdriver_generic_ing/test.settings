@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Generate
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/rapido/chromedriver" "https://www.ing.nl/particulier/hypotheken/hypotheek-berekenen/gebaseerd-op-inkomen/index.html?flow-step=1-my-situation-step"
+SUTConnectorValue = "/Users/rapido/chromedriver" "http://localhost:8000/iframe.html?id=mortgage-online-intake-request--mortgage-online-intake-request-open&viewMode=story&flow-step=intro"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -149,50 +149,50 @@ OverrideWebDriverDisplayScale =
 #################################################################
 # Other more advanced settings
 #################################################################
-Delete = 
-TimeToFreeze = 30.0
-NonReactingUIThreshold = 100
-GraphDBPassword = 
-AlgorithmFormsFilling = false
-MyClassPath = ./settings
-LogLevel = 1
-CopyFromTo = 
-MaxReward = 9999999.0
-ShowVisualSettingsDialogOnStartup = true
-ReplayRetryTime = 30.0
-FaultThreshold = 1.0E-9
-GraphDBUrl = 
-StartupTime = 2.0
-GraphResuming = true
-StateScreenshotSimilarityThreshold = 1.4E-45
-ActionDuration = 0.2
-PathToReplaySequence = ./output/temp
-VisualizeActions = true
 TypingTextsForExecutedAction = 10
-OutputDir = ./output
-OfflineGraphConversion = true
-DrawWidgetUnderCursor = false
-ProcessesToKillDuringTest = 
 RefreshSpyCanvas = 1.0
-OnlySaveFaultySequences = false
-MaxTime = 3.1536E7
-AlwaysCompile = true
-ExplorationSampleInterval = 1
 Discount = 0.95
-UnattendedTests = false
-ResetDataStore = false
-DrawWidgetInfo = false
-GraphsActivated = true
-VisualizeSelectedAction = true
-TimeToWaitAfterAction = 0.2
-ShowSettingsAfterTest = true
-ForceToSequenceLength = true
 TempDir = ./output/temp
-ForceForeground = true
-TestGenerator = random
-DrawWidgetTree = false
-GraphDBEnabled = false
-ExecuteActions = true
+MaxTime = 3.1536E7
+GraphDBUrl = 
 StopGenerationOnFault = true
 GraphDBUser = 
+GraphDBEnabled = false
+ExecuteActions = true
+DrawWidgetTree = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
+ForceForeground = true
+AlgorithmFormsFilling = false
+FaultThreshold = 1.0E-9
+DrawWidgetInfo = false
+MaxReward = 9999999.0
+LogLevel = 1
+VisualizeSelectedAction = true
+Delete = 
+MyClassPath = ./settings
+ReplayRetryTime = 30.0
+ProcessesToKillDuringTest = 
+ShowSettingsAfterTest = true
+ForceToSequenceLength = true
+OutputDir = ./output
+UnattendedTests = false
+TestGenerator = random
+StartupTime = 2.0
+ActionDuration = 0.2
+NonReactingUIThreshold = 100
+GraphsActivated = true
+GraphResuming = true
+GraphDBPassword = 
+CopyFromTo = 
+TimeToFreeze = 30.0
+StateScreenshotSimilarityThreshold = 1.4E-45
+ShowVisualSettingsDialogOnStartup = true
+ResetDataStore = false
+TimeToWaitAfterAction = 0.2
+DrawWidgetUnderCursor = false
+AlwaysCompile = true
+PathToReplaySequence = ./output/temp
+VisualizeActions = true
+ExplorationSampleInterval = 1
+OnlySaveFaultySequences = false
+OfflineGraphConversion = true

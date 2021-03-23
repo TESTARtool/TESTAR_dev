@@ -695,7 +695,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				"1 div count(h:sibling-options(.))"), // weighted option
 			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
 			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
-			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3")
+			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3"),
+			
+			/***** ACTION RULES for ing-feat-mortgage-online-intake-request *****/
+		    new ActionRule("ancestor-or-self::*[@aria-label = 'Close']", "0.3") // de-prioritize close button
 		);
 	}
 	
@@ -728,7 +731,30 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", 5),
 			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", 5),
 			new GenRule("ancestor::ing-flow-form[contains(@name, 'otherPaymentPostponement')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5)
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5),
+			
+			/*****  RULES for ing-feat-mortgage-online-intake-request *****/
+			// Incomes
+			new GenRule("ancestor::*[contains(lower-case(@label), 'yearly amount')]", "[1-7][0-9]{4}", 5),
+			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly amount')]", "[1-4][0-9]{3}", 5),
+			inputRule("monthlyReimbursementInput", "[1-2][0-9]{2,3}", 5),
+			
+			// Repayment
+			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly repayment')]", "[1-9][0-9]{3}", 1),
+			
+			inputRule("dependantsValue", "[1-6]", 5), // dependants
+			inputRule("ownFundsInput", "[1-9][0-9]{4}", 5), // own funds
+			inputRule("postalCode", "[1-9]{4}", 5), // postal code
+			inputRule("street", "Fantasy Street", 5), // street
+			inputRule("box", "[1-9]", 5), // box number
+			inputRule("number", "[1-9][1-9]{1,2}", 5), // (street) number
+			inputRule("ingId", "(0000000097)|(0144658019)", 5), // ing Id
+			inputRule("phone", "0648949801",5),  // phone
+			inputRule("transferabilityRegistrationFeesAmount", "[1-9]{3}",5), // registration fee
+			inputRule("birthdate", "[0-2][1-9]\\/[1-9]\\/19[1-9]{2}", 5),  // birth date
+			inputRule("buildingPrice", "[1-9][0-9]{4,5}", 5),     // building price
+			inputRule("homePrice", "[1-2][0-9]{5}", 5),     // home price
+			inputRule("constructionLotPrice", "[1-9][0-9]{4,5}", 5) // construction price
 		);
 		l.addAll(modelGenRules);
 		return l;
@@ -756,7 +782,16 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			
 			new FilterRule(".[contains(@href, 'bel-me-nu')]"), // ignore outside links
 			new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]"),
-			new FilterRule(".[@target = '_blank']")
+			new FilterRule(".[@target = '_blank']"),
+			
+			/***** FILTERS for ing-feat-mortgage-online-intake-request *****/
+			// don't login in
+			new FilterRule("ancestor::*[@data-tag-name = 'ing-feat-moir-intro'] and .[not(@id = 'startFlow')]"),
+			new FilterRule(".[@name = 'incomeWrapper']"),	// ignore income wrapper
+			new FilterRule(".[name() = 'form']"), 			// ignore form
+			new FilterRule("ancestor::*[@slot = 'details']"), 	// don't consider changing details
+			// don't confirm appointment
+			new FilterRule("ancestor-or-self::*[@name = 'ing-feat-moir-appointment-confirmation']")
 		);
 	}
 }
