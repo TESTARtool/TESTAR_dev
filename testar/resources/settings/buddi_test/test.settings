@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[cC]errar [vV]entana.*|.*[cC]lose [wW]indow.*|.*[sS]alir [dD]e [bB]uddi.*|.*[qQ]uit [bB]uddi.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[gG]uardar [cC]omo.*|.*[sS]ave [aA]s.*|.*[gG]uardar [tT]odo.*|.*[sS]ave [aA]ll.*|.*[aA]bout [bB]uddi.*|.*[sS]obre [bB]uddi.*|.*[bB]uddi [hH]elp.*|.*[aA]yuda [dD]e [bB]uddi.*|.*[bB]uddi [tT]utorial.*|.*[tT]utorial [dD]e [bB]uddi.*|.*[dD]ownload [pP]lugins.*|.*[cC]heck [fF]or [uU]pdates.*|.*[bB]uscar [aA]ctualizaciones.*|
 
 #################################################################
 # Processfilter

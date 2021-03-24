@@ -31,6 +31,8 @@
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.experiments.BuddiProtocol;
@@ -113,6 +115,20 @@ public class Protocol_buddi_test extends BuddiProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		Action actionNo;
+		String popUpDesc = "";
+		for (Widget w : state) {
+			if (w.get(Tags.Desc) == popUpDesc) {
+				for (Action a : actions) {
+					if (w.get(Tags.Desc) == "No") {
+						actionNo = a;
+						break;
+					}
+				}
+				return actionNo;
+			}
+		}
+		
 		// RandomSelector: Desktop protocol will return a random action
 		return(super.selectAction(state, actions));
 	}
