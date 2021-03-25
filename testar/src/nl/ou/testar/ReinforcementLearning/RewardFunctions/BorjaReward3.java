@@ -1,6 +1,8 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
 import com.google.common.collect.Iterables;
+
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
@@ -33,18 +35,23 @@ public class BorjaReward3 implements RewardFunction{
 		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
 		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
 
-		double persistentDecrement = getPersistentDecrementOfWidgets(state);
-		double numWidgetsBeforeDouble = numWidgetsBefore;
-		double numWidgetsNowDouble = numWidgetsNow;
+		float currentQValue = executedAbstractAction.getAttributes().get(RLTags.QBorja, 0f);
+		double persistentWidgetNum = getPersistentWidgetNum(state);
 
-		// Widget Tree difference reward
+		// Widget Tree difference reward		
 		if (numWidgetsBefore < numWidgetsNow) {
-			reward = (float) ((-persistentDecrement)
-					+ ((numWidgetsNowDouble - numWidgetsBeforeDouble) / numWidgetsBeforeDouble));
+			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsBefore));
+			float widgetDifference = (float) (currentQValue * (numWidgetsBefore / numWidgetsNow));
+			
+			reward = (float) (- (persistentDecrement + widgetDifference));
 		} else if (numWidgetsBefore > numWidgetsNow) {
-			reward = (float) ((-persistentDecrement) - (numWidgetsNowDouble / numWidgetsBeforeDouble));
+			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsNow));
+			float widgetDifference = (float) (currentQValue * (numWidgetsNow / numWidgetsBefore));
+			
+			reward = (float) (- (1 - (persistentDecrement + widgetDifference)));
 		} else {
-			reward = (float) (-persistentDecrement);
+			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsNow));			
+			reward = (float) (- persistentDecrement);
 		}
 
 		// Also decrement reward based on Widget Tree ZIndex
@@ -87,7 +94,7 @@ public class BorjaReward3 implements RewardFunction{
         return Iterables.size(state);
     }
     
-    private double getPersistentDecrementOfWidgets(State currentState) {
+    private double getPersistentWidgetNum(State currentState) {
         int persistentWidgetNum = 0;
 
         for(Widget widget : currentState) {
@@ -99,9 +106,10 @@ public class BorjaReward3 implements RewardFunction{
                 if(currWidgetId.equals(prevWidgetId)) persistentWidgetNum ++;
             }
         }
-
-        double persistentDecrement = persistentWidgetNum * 0.01;
-        return persistentDecrement;
+        
+        //double persistentDecrement = persistentWidgetNum * 0.01
+        
+        return persistentWidgetNum;
     }
 
     /*private double getPersistentDecrementOfActions(State givenState, Set<Action> actions) {
