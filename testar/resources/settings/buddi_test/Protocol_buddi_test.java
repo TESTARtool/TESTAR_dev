@@ -115,7 +115,8 @@ public class Protocol_buddi_test extends BuddiProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		Action actionNo;
+	    // TODO: Move to beginSequence and use widgets instead of actions
+	    /*Action actionNo = null;
 		String popUpDesc = "";
 		for (Widget w : state) {
 			if (w.get(Tags.Desc) == popUpDesc) {
@@ -127,7 +128,7 @@ public class Protocol_buddi_test extends BuddiProtocol {
 				}
 				return actionNo;
 			}
-		}
+		}*/
 		
 		// RandomSelector: Desktop protocol will return a random action
 		return(super.selectAction(state, actions));
