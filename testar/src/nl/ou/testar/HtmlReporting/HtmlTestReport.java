@@ -2,6 +2,7 @@ package nl.ou.testar.HtmlReporting;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.testar.OutputStructure;
 
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -93,15 +96,60 @@ public class HtmlTestReport {
      */
     private final String reportDir;
 
+    private class TestAction {
+        private final String description;
+        private final String name;
+        private final int id;
+        private final String status;
+        private final String screenshot;
+        private final String start;
+
+        private TestAction(String description, String name, int id, String status, String screenshot, String start) {
+            this.description = description;
+            this.name = name;
+            this.id = id;
+            this.status = status;
+            this.screenshot = screenshot;
+            this.start = start;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getScreenshot() {
+            return screenshot;
+        }
+
+        public String getStart() {
+            return start;
+        }
+    }
+
     private class TestIteration {
         private final int nonSevereIssues;
         private final int severeIssues;
         private final boolean hitOracle;
 
-        public TestIteration(int nonSevereIssues, int severeIssues) {
+        private ArrayList<TestAction> actions;
+
+        public TestIteration(int nonSevereIssues, int severeIssues, ArrayList<TestAction> actions) {
             this.nonSevereIssues = nonSevereIssues;
             this.severeIssues = severeIssues;
             this.hitOracle = severeIssues > 0;
+            this.actions = actions;
         }
 
         public int getNonSevereIssues() {
@@ -122,6 +170,7 @@ public class HtmlTestReport {
     }
 
     private ArrayList<TestIteration> iterations;
+    private ArrayList<TestAction> curActions;
 
     public HtmlTestReport() {
         /// Create a file name with the format: $outputDir/$dateTime_$sutName-report.html
@@ -133,6 +182,7 @@ public class HtmlTestReport {
         );
 
         this.iterations = new ArrayList<>();
+        this.curActions = new ArrayList<>();
 
         try {
             // Read the report templates
@@ -184,8 +234,8 @@ public class HtmlTestReport {
             sb.append("<tr class=\"value\">\n");
             sb.append(
                     String.format(
-                            "<td>%d</td> <td>%d</td> <td>%s</td> <td> <button id=\"%s\" class=\"show-details\">Details</button> </td>\n",
-                            i, it.getIssues(), it.hasHitOracle() ? "True" : "False", "iteration_id_" + i
+                            "<td>%d</td> <td>%d</td> <td>%s</td> <td> <button id=\"%s\" class=\"show-details\" onclick=\"location.href='sequences/details-%d.html'\">Details</button> </td>\n",
+                            i, it.getIssues(), it.hasHitOracle() ? "True" : "False", "iteration_id_" + i, i
                     )
             );
             sb.append("</tr>\n");
@@ -253,6 +303,57 @@ public class HtmlTestReport {
                 .replace("[0]//#[chart_oracles]", this.getOraclesPerSequenceAsJsonArray());
     }
 
+    public void saveActions() {
+        File sequenceDirectory = new File(this.reportDir + "sequences/");
+
+        if (!sequenceDirectory.exists())
+            if (!sequenceDirectory.mkdirs())
+                System.err.println("Failed to create sequences directory!");
+
+        StringBuilder tableBuilder = new StringBuilder("");
+
+        tableBuilder.append("<html> <head> <title>Sequence report " + this.sequences + "</title> " +
+                "<link href=\"../css/report.css\" rel=\"stylesheet\"/>" +
+                "</head> <body>\n");
+
+        tableBuilder.append("<table id=\"sequenceOverviewTable\">\n");
+        tableBuilder.append("<thead>\n" +
+                "                <tr>\n" +
+                "                    <th id=\"action-desc\">Description</th>\n" +
+                "                    <th id=\"action-name\">Name</th>\n" +
+                "                    <th id=\"action-id\">Action ID</th>\n" +
+                "                    <th id=\"action-status\">Status</th>\n" +
+                "                    <th id=\"action-screenshot\">Screenshot</th>\n" +
+                "                    <th id=\"action-start\">Start</th>\n" +
+                "                </tr>\n" +
+                "            </thead>\n" +
+                "            <tbody>\n");
+
+        this.curActions.forEach(it -> {
+            tableBuilder.append("<tr>");
+
+            tableBuilder.append("<td>" + it.getDescription() + "</td>"); // Desc
+            tableBuilder.append("<td>" + it.getName() + "</td>"); // Name
+            tableBuilder.append("<td>" + it.getId() + "</td>"); // Id
+            tableBuilder.append("<td>" + it.getStatus() + "</td>"); // Status
+            tableBuilder.append("<td>" + it.getScreenshot() + "</td>"); // Screenshot
+            tableBuilder.append("<td>" + it.getStart() + "</td>"); // Start
+
+            tableBuilder.append("</tr>");
+        });
+        tableBuilder.append("            </tbody>\n" + "</table>\n</body></html>\n");
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(
+                    this.reportDir + "sequences/details-" + this.sequences + ".html"
+            ));
+            writer.write(tableBuilder.toString());
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void saveReport(
             final int actionsPerSequence,
             final int totalSequences,
@@ -280,17 +381,32 @@ public class HtmlTestReport {
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);
     }
 
-    public void addState(State state) {
-    }
+    public void addState(State _) { }
 
-    public void addActions(Set<Action> actions) {
+    public void addActions(Set<Action> _) { }
+
+    private void addAction(Action action, State state) {
+        Date date = new Date(state.get(Tags.TimeStamp));
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+        this.curActions.add(
+                new TestAction(
+                        action.toString(),
+                        action.toShortString(),
+                        this.curActions.size(),
+                        state.get(Tags.OracleVerdict).verdictSeverityTitle(),
+                        "<img src=\"../../../../." + state.get(Tags.ScreenshotPath) + "\" />",
+                        df.format(date)
+                )
+        );
     }
 
     public void addSelectedAction(State state, Action action) {
+        this.addAction(action, state);
         this.actions++;
     }
 
-    public void addTestVerdict(Verdict verdict) { // Even non-severe issues cancel the test? e.g. suspicious titles?
+    public void addTestVerdict(Verdict verdict, Action action, State state) { // Even non-severe issues cancel the test? e.g. suspicious titles?
         if (verdict.severity() >= Verdict.SEVERITY_NOT_RESPONDING && verdict.severity() <= Verdict.SEVERITY_MAX) {
             this.severeIssues++;
             this.curSevereIssues++;
@@ -299,14 +415,17 @@ public class HtmlTestReport {
             this.curNonSevereIssues++;
         }
 
+        this.addAction(action, state);
         this.iterations.add(
                 new TestIteration(
                         this.curNonSevereIssues,
-                        this.curSevereIssues
-                )
+                        this.curSevereIssues,
+                        this.curActions)
         );
         this.curSevereIssues = 0;
         this.curNonSevereIssues = 0;
+        this.saveActions();
+        this.curActions = new ArrayList<>();
         this.sequences++;
     }
 }

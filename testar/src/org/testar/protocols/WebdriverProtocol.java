@@ -302,7 +302,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
     	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-    	htmlTestReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+    	htmlTestReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
 
     	String sequencesPath = getGeneratedSequenceName();
     	try {
