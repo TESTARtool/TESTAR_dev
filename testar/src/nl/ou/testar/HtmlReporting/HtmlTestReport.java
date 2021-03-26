@@ -1,5 +1,7 @@
 package nl.ou.testar.HtmlReporting;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -96,6 +98,8 @@ public class HtmlTestReport {
      */
     private final String reportDir;
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private class TestAction {
         private final String description;
         private final String name;
@@ -143,13 +147,10 @@ public class HtmlTestReport {
         private final int severeIssues;
         private final boolean hitOracle;
 
-        private ArrayList<TestAction> actions;
-
-        public TestIteration(int nonSevereIssues, int severeIssues, ArrayList<TestAction> actions) {
+        public TestIteration(int nonSevereIssues, int severeIssues) {
             this.nonSevereIssues = nonSevereIssues;
             this.severeIssues = severeIssues;
             this.hitOracle = severeIssues > 0;
-            this.actions = actions;
         }
 
         public int getNonSevereIssues() {
@@ -198,17 +199,14 @@ public class HtmlTestReport {
 
     private void createReportDirs() {
         // Create report dirs if they don't exists already
-        File jsDirectory, cssDirectory;
-        jsDirectory = new File(this.reportDir + "js/");
-        cssDirectory = new File(this.reportDir + "css/");
+        File jsDirectory = new File(this.reportDir + "js/");
+        File cssDirectory = new File(this.reportDir + "css/");
 
-        if (!jsDirectory.exists())
-            if (!jsDirectory.mkdirs())
-                System.err.println("Failed to create JS report directory!");
+        if (!jsDirectory.exists() && !jsDirectory.mkdirs())
+            LOGGER.error("Failed to create JS report directory!");
 
-        if (!cssDirectory.exists())
-            if (!cssDirectory.mkdirs())
-                System.err.println("Failed to create CSS report directory!");
+        if (!cssDirectory.exists() && !cssDirectory.mkdirs())
+            LOGGER.error("Failed to create CSS report directory!");
     }
 
     private static String readFileAsString(String filePath) throws IOException {
@@ -227,14 +225,14 @@ public class HtmlTestReport {
     }
 
     private String getIterationsAsHtml() {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < this.iterations.size(); i++) {
             TestIteration it = this.iterations.get(i);
             sb.append("<tr class=\"value\">\n");
             sb.append(
                     String.format(
-                            "<td>%d</td> <td>%d</td> <td>%s</td> <td> <button id=\"%s\" class=\"show-details\" onclick=\"location.href='sequences/details-%d.html'\">Details</button> </td>\n",
+                            "<td>%d</td> <td>%d</td> <td>%s</td> <td> <button id=\"%s\" class=\"show-details\" onclick=\"location.href='sequences/details-%d.html'\">Details</button> </td>%n",
                             i, it.getIssues(), it.hasHitOracle() ? "True" : "False", "iteration_id_" + i, i
                     )
             );
@@ -245,15 +243,15 @@ public class HtmlTestReport {
     }
 
     private String getIssuesPerSequenceAsJsonArray() {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         sb.append('[');
 
-        Boolean firstItem = true;
+        boolean firstItem = true;
         for (TestIteration it : this.iterations) {
-            if (!firstItem) {
-                sb.append(',');
-            } else {
+            if (firstItem) {
                 firstItem = false;
+            } else {
+                sb.append(',');
             }
             sb.append(it.getIssues());
         }
@@ -263,15 +261,14 @@ public class HtmlTestReport {
     }
 
     private String getOraclesPerSequenceAsJsonArray() {
-        StringBuilder sb = new StringBuilder("");
-        sb.append('[');
+        String jsonArray = "[";
 
-        sb.append(this.severeIssues);
-        sb.append(',');
-        sb.append(this.sequences - this.severeIssues);
+        jsonArray += this.severeIssues;
+        jsonArray +=  ',';
+        jsonArray += this.sequences - this.severeIssues;
 
-        sb.append(']');
-        return sb.toString();
+        jsonArray += ']';
+        return jsonArray;
     }
 
     private String parseIndexTemplate(
@@ -306,49 +303,54 @@ public class HtmlTestReport {
     public void saveActions() {
         File sequenceDirectory = new File(this.reportDir + "sequences/");
 
-        if (!sequenceDirectory.exists())
-            if (!sequenceDirectory.mkdirs())
-                System.err.println("Failed to create sequences directory!");
+        if (!sequenceDirectory.exists() && !sequenceDirectory.mkdirs())
+            LOGGER.error("Failed to create sequences directory!");
 
-        StringBuilder tableBuilder = new StringBuilder("");
+        StringBuilder tableBuilder = new StringBuilder();
 
-        tableBuilder.append("<html> <head> <title>Sequence report " + this.sequences + "</title> " +
-                "<link href=\"../css/report.css\" rel=\"stylesheet\"/>" +
-                "</head> <body>\n");
+        tableBuilder.append("<html> <head> <title>Sequence report ")
+                .append(this.sequences)
+                .append("</title> ")
+                .append("<link href=\"../css/report.css\" rel=\"stylesheet\"/>")
+                .append("</head> <body>\n");
 
         tableBuilder.append("<table id=\"sequenceOverviewTable\">\n");
-        tableBuilder.append("<thead>\n" +
-                "                <tr>\n" +
-                "                    <th id=\"action-desc\">Description</th>\n" +
-                "                    <th id=\"action-name\">Name</th>\n" +
-                "                    <th id=\"action-id\">Action ID</th>\n" +
-                "                    <th id=\"action-status\">Status</th>\n" +
-                "                    <th id=\"action-screenshot\">Screenshot</th>\n" +
-                "                    <th id=\"action-start\">Start</th>\n" +
-                "                </tr>\n" +
-                "            </thead>\n" +
-                "            <tbody>\n");
 
+        tableBuilder.append("<thead>\n")
+                .append("                <tr>\n")
+                .append("                    <th id=\"action-desc\">Description</th>\n")
+                .append("                    <th id=\"action-name\">Name</th>\n")
+                .append("                    <th id=\"action-id\">Action ID</th>\n")
+                .append("                    <th id=\"action-status\">Status</th>\n")
+                .append("                    <th id=\"action-screenshot\">Screenshot</th>\n")
+                .append("                    <th id=\"action-start\">Start</th>\n")
+                .append("                </tr>\n")
+                .append("            </thead>\n")
+                .append("            <tbody>\n");
+
+        final String TD_OPEN = "<td>";
+        final String TD_CLOSE = "</td>";
         this.curActions.forEach(it -> {
             tableBuilder.append("<tr>");
 
-            tableBuilder.append("<td>" + it.getDescription() + "</td>"); // Desc
-            tableBuilder.append("<td>" + it.getName() + "</td>"); // Name
-            tableBuilder.append("<td>" + it.getId() + "</td>"); // Id
-            tableBuilder.append("<td>" + it.getStatus() + "</td>"); // Status
-            tableBuilder.append("<td>" + it.getScreenshot() + "</td>"); // Screenshot
-            tableBuilder.append("<td>" + it.getStart() + "</td>"); // Start
+            tableBuilder.append(TD_OPEN).append(it.getDescription()).append(TD_CLOSE); // Desc
+            tableBuilder.append(TD_OPEN).append(it.getName()).append(TD_CLOSE); // Name
+            tableBuilder.append(TD_OPEN).append(it.getId()).append(TD_CLOSE); // Id
+            tableBuilder.append(TD_OPEN).append(it.getStatus()).append(TD_CLOSE); // Status
+            tableBuilder.append(TD_OPEN).append(it.getScreenshot()).append(TD_CLOSE); // Screenshot
+            tableBuilder.append(TD_OPEN).append(it.getStart()).append(TD_CLOSE); // Start
 
             tableBuilder.append("</tr>");
         });
         tableBuilder.append("            </tbody>\n" + "</table>\n</body></html>\n");
 
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                    this.reportDir + "sequences/details-" + this.sequences + ".html"
-            ));
+        try (
+                BufferedWriter writer = new BufferedWriter(
+                        new FileWriter(
+                                this.reportDir + "sequences/details-" + this.sequences + ".html"
+                        ))
+        ) {
             writer.write(tableBuilder.toString());
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -381,9 +383,17 @@ public class HtmlTestReport {
         saveFile.apply(this.reportDir + HTML_CSS_REPORT_PATH, this.htmlCssReport);
     }
 
-    public void addState(State _) { }
+    public void addState(State state) {
+        /*
+         * Currently not used but may be useful in the future for extra reporting. This is also used in the original report
+         */
+    }
 
-    public void addActions(Set<Action> _) { }
+    public void addActions(Set<Action> actions) {
+        /*
+         * Currently not used but may be useful in the future for extra reporting. This is also used in the original report
+         */
+    }
 
     private void addAction(Action action, State state) {
         Date date = new Date(state.get(Tags.TimeStamp));
@@ -419,8 +429,7 @@ public class HtmlTestReport {
         this.iterations.add(
                 new TestIteration(
                         this.curNonSevereIssues,
-                        this.curSevereIssues,
-                        this.curActions)
+                        this.curSevereIssues)
         );
         this.curSevereIssues = 0;
         this.curNonSevereIssues = 0;
