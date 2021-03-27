@@ -283,6 +283,17 @@ public class ProtocolUtil {
 		return null;
 	}	
 
+	public static String getWidgetShot(State state, Widget widget) {
+	    Shape shape = widget.get(Tags.Shape, null);
+	    if(shape == null) {
+	        return null;
+	    }
+
+	    AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(shape.x(), shape.y(), shape.width(), shape.height()), 
+	            getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
+	    return ScreenshotSerialiser.saveWidgetshot(widget.get(Tags.ConcreteIDCustom, "NoWidgetIdAvailable"), scrshot);
+	}
+
 	private static long getRootWindowHandle(State state) {
 		long windowHandle = 0;
 		if (state.childCount() > 0) {

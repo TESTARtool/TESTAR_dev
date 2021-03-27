@@ -63,7 +63,8 @@ public class StateFetcher implements Callable<UIAState>{
 
 	private List<Map<String , String>> mappedValues;
 
-	
+	public static boolean removeInvisibleBorders = false;
+
 	public StateFetcher(SUT system, long automationPointer, long cacheRequestPointer,
 						boolean accessBridgeEnabled, String SUTProcesses){		
 		this.system = system;
@@ -229,7 +230,19 @@ public class StateFetcher implements Callable<UIAState>{
 		buildTLCMap(uiaRoot);
 		markBlockedElements(uiaRoot);
 
-		markBlockedElements(uiaRoot,modalElement);	
+		markBlockedElements(uiaRoot,modalElement);
+
+		//Remove invisible borders from Windows 10 desktop apps
+		//https://stackoverflow.com/questions/34139450/getwindowrect-returns-a-size-including-invisible-borders
+		if(removeInvisibleBorders && System.getProperty("os.name").contains("Windows 10")) {
+		    UIAElement mainWindows = uiaRoot.children.get(0);
+		    Rect r = mainWindows.rect;
+		    try {
+		        mainWindows.rect = Rect.from(r.x()+7, r.y(), r.width()-14, r.height()-7);
+		    } catch (Exception e) {
+		        System.out.println(e.getMessage());
+		    }
+		}
 
 		return uiaRoot;
 	}

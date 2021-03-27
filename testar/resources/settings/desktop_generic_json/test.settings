@@ -95,13 +95,28 @@ SUTProcesses =
 
 ProtocolClass = desktop_generic_json/Protocol_desktop_generic_json
 
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
+ApplicationName = json_data
+
 #################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetControlType,WidgetTitle
 
 #################################################################
 # Other more advanced settings
@@ -119,13 +134,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 1
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 1
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

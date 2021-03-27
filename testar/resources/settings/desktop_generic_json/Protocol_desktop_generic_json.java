@@ -28,15 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
 
 import java.util.Set;
 
 import org.fruit.alayer.*;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
+import org.fruit.alayer.windows.StateFetcher;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
+
+import es.upv.staq.testar.ProtocolUtil;
 
 /**
  * This is a small change to Desktop Generic Protocol to create JSON files describing the widgets
@@ -45,6 +54,19 @@ import org.testar.protocols.DesktopProtocol;
  *  It only changes the getState() method.
  */
 public class Protocol_desktop_generic_json extends DesktopProtocol {
+
+    /**
+     * Called once during the life time of TESTAR
+     * This method can be used to perform initial setup work
+     * @param   settings  the current TESTAR settings as specified by the user.
+     */
+    @Override
+    protected void initialize(Settings settings){
+        super.initialize(settings);
+        // Not the best solution to deal with
+        // https://stackoverflow.com/questions/34139450/getwindowrect-returns-a-size-including-invisible-borders
+        StateFetcher.removeInvisibleBorders = true;
+    }
 
     /**
      * This method is called when the TESTAR requests the state of the SUT.
@@ -58,14 +80,25 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        State destinationState = latestState;
+        State previousState = latestState;
         State state = super.getState(system);
+
+        // Take a screenshot for each widget of the state
+        for(Widget widget : state) {
+            // Ignore the widget Process
+            if(widget.get(Tags.Role, Roles.Process).equals(Roles.Process)) {continue;}
+            ProtocolUtil.getWidgetShot(state, widget);
+        }
 
         // Creating a JSON file with information about widgets and their location on the screenshot:
         if(settings.get(ConfigTags.Mode) == Modes.Generate) {
+            // Create the basic JSON File
             //JsonUtils.createWidgetInfoJsonFile(state);
-            if(lastExecutedAction != null) {
-                JsonUtils.createWidgetInfoPreviousStateJsonFile(state, destinationState, lastExecutedAction.get(Tags.OriginWidget));
+
+            // Create the JSON File with the "destinationState" information
+            if(lastExecutedAction != null && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
+                Widget executedWidget = lastExecutedAction.get(Tags.OriginWidget);
+                JsonUtils.createWidgetInfoPreviousStateJsonFile(state, previousState, executedWidget);
             }
         }
 
@@ -90,19 +123,87 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
         Set<Action> actions = super.deriveActions(system,state);
 
-
-        // Derive left-click actions, click and type actions, and scroll actions from
-        // top level (highest Z-index) widgets of the GUI:
-        actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
-
-        if(actions.isEmpty()){
-            // If the top level widgets did not have any executable widgets, try all widgets:
-            // Derive left-click actions, click and type actions, and scroll actions from
-            // all widgets of the GUI:
-            actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-        }
+        getClickActionFromWidgetsOfState(actions, state);
 
         //return the set of derived actions
         return actions;
     }
+
+    private Set<Action> getClickActionFromWidgetsOfState(Set<Action> actions, State state){
+        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+
+        // Iterate through top level widgets of the state trying to execute more interesting actions
+        //for(Widget w : getTopWidgets(state)){
+
+        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+        for(Widget w : state){
+
+            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+                continue;
+            }
+
+            // Only consider enabled and non-blocked widgets
+            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+                // Do not build actions for widgets on the blacklist
+                // The blackListed widgets are those that have been filtered during the SPY mode with the
+                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+                if (!blackListed(w)){
+
+                    //For widgets that are:
+                    // - clickable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of left clicking on them
+                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.leftClickAt(w));
+                    }
+                }
+            }
+        }
+
+        return actions;
+    }
+
+    /**
+     * Take a screenshot of the widget executed by the action. 
+     * 
+     * @param state
+     * @param action
+     */
+    @Override
+    protected void getActionScreenshot(State state, Action action) {
+        // Disable the action screenshots (none will appear in the HTML report)
+    }
+
+    /**
+     * Select one of the available actions using an action selection algorithm (for example random action selection)
+     *
+     * @param state the SUT's current state
+     * @param actions the set of derived actions
+     * @return  the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions){
+
+        //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+        //unwanted processes are killed and SUT is put into foreground.
+        Action retAction = preSelectAction(state, actions);
+        if (retAction== null) {
+            //if no preSelected actions are needed, then implement your own action selection strategy
+            //using the action selector of the state model:
+            retAction = stateModelManager.getAbstractActionToExecute(actions);
+        }
+        if(retAction==null) {
+            System.out.println("State model based action selection did not find an action. Using random action selection.");
+            // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+            retAction = RandomActionSelector.selectAction(actions);
+        }
+        return retAction;
+    }
+
 }

@@ -1557,14 +1557,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
-			WdProtocolUtil.getActionshot(state,action);
-		}else{
-			//System.out.println("DEBUG: normal action shot");
-			ProtocolUtil.getActionshot(state,action);
-		}
-		
+	    getActionScreenshot(state, action);
+
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
 		try{
@@ -1588,6 +1582,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}catch(ActionFailedException afe){
 			return false;
 		}
+	}
+
+	/**
+	 * Take a screenshot of the widget executed by the action. 
+	 * 
+	 * @param state
+	 * @param action
+	 */
+	protected void getActionScreenshot(State state, Action action) {
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+	        WdProtocolUtil.getActionshot(state, action);
+	    }else{
+	        ProtocolUtil.getActionshot(state, action);
+	    }
 	}
 
 	/**

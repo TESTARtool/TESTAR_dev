@@ -41,7 +41,10 @@ import nl.ou.testar.ScreenshotJsonFile.BoundingPoly;
 import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
 import nl.ou.testar.ScreenshotJsonFile.Vertice;
 import nl.ou.testar.ScreenshotJsonFile.WidgetJsonObject;
+
+import org.fruit.alayer.Action;
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
@@ -127,7 +130,7 @@ public class JsonUtils {
     public static void createWidgetInfoPreviousStateJsonFile(State state, State previousState, Widget executedWidget){
 
         String destinationState = "";
-        String executedWidgetId = executedWidget.get(Tags.ConcreteIDCustom, "");
+        String executedWidgetId = executedWidget.get(Tags.ConcreteIDCustom);
 
         Rect sutRect;
         try {
@@ -142,17 +145,16 @@ public class JsonUtils {
 
         // Iterate over all the widgets of the State to extract the desired properties
         for(Widget widget : previousState){
+
+            // Ignore the widget Process
+            if(widget.get(Tags.Role, Roles.Process).equals(Roles.Process)) {continue;}
+
             boolean enabled = widget.get(Tags.Enabled, null);
             String role = widget.get(Tags.Role, null).toString();
             boolean blocked = widget.get(Tags.Blocked, null);
 
-            Rect rect = (Rect) widget.get(Tags.Shape, null);
-            Vertice[] vertices = new Vertice[4];
-            vertices[0] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y());  // up-left
-            vertices[1] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y()); // up-right
-            vertices[2] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y() + rect.height()); // down-right
-            vertices[3] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y() + rect.height()); // down-left
-            BoundingPoly boundingPoly = new BoundingPoly(vertices);
+            //BoundingPoly boundingPoly = calculateWidgetBoundingPoly(widget, sutRect);
+            BoundingPoly boundingPoly = calculateNormalizeWidgetBoundingPoly(widget, sutRect);
 
             String className = widget.get(UIATags.UIAClassName, "");
             String title = widget.get(Tags.Title, "");
@@ -165,9 +167,9 @@ public class JsonUtils {
                     className, title, desc, name, toolTipText, valuePattern,
                     widget.get(Tags.ConcreteIDCustom));
 
-            // Add the destinationState of the executed Widget
-            if(widget.get(Tags.ConcreteIDCustom, "none").equals(executedWidgetId)) {
-                destinationState = state.get(Tags.ConcreteIDCustom, "");
+            // If widget is the executed one, add the destinationState
+            if(widget.get(Tags.ConcreteIDCustom).equals(executedWidgetId)) {
+                destinationState = state.get(Tags.ConcreteIDCustom);
                 widgetJsonObject.addDestinationState(destinationState);
             }
 
@@ -212,5 +214,30 @@ public class JsonUtils {
         }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
         }
+    }
+
+    private static BoundingPoly calculateWidgetBoundingPoly(Widget widget, Rect sutRect) {
+        Rect rect = (Rect) widget.get(Tags.Shape, null);
+        Vertice[] vertices = new Vertice[4];
+        vertices[0] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y());  // up-left
+        vertices[1] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y()); // up-right
+        vertices[2] = new Vertice(rect.x() - sutRect.x() + rect.width(), rect.y() - sutRect.y() + rect.height()); // down-right
+        vertices[3] = new Vertice(rect.x() - sutRect.x(), rect.y() - sutRect.y() + rect.height()); // down-left
+        return new BoundingPoly(vertices);
+    }
+
+    private static BoundingPoly calculateNormalizeWidgetBoundingPoly(Widget widget, Rect sutRect) {
+        Rect rect = (Rect) widget.get(Tags.Shape, null);
+        Vertice[] vertices = new Vertice[4];
+        vertices[0] = new Vertice((rect.x() - sutRect.x()) / sutRect.width(), 
+                (rect.y() - sutRect.y()) / sutRect.height());  // up-left
+        vertices[1] = new Vertice((rect.x() - sutRect.x() + rect.width()) / sutRect.width(), 
+                (rect.y() - sutRect.y()) / sutRect.height()); // up-right
+        vertices[2] = new Vertice((rect.x() - sutRect.x() + rect.width()) / sutRect.width(), 
+                (rect.y() - sutRect.y() + rect.height()) / sutRect.height()); // down-right
+        vertices[3] = new Vertice((rect.x() - sutRect.x()) / sutRect.width(), 
+                (rect.y() - sutRect.y() + rect.height()) / sutRect.height()); // down-left
+
+        return new BoundingPoly(vertices);
     }
 }
