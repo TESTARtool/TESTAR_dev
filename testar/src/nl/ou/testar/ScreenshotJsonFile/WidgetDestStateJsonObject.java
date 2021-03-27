@@ -43,7 +43,7 @@ public class WidgetDestStateJsonObject extends WidgetJsonObject {
             String widgetId) {
         super(enabled, role, blocked, boundingPoly, className, title, desc, name, toolTipText, valuePattern);
         this.widgetId = widgetId;
-        this.destinationState = "";
+        this.destinationState = "none";
     }
 
     public void addDestinationState(String destinationState) {

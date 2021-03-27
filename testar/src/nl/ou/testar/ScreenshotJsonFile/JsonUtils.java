@@ -240,4 +240,55 @@ public class JsonUtils {
 
         return new BoundingPoly(vertices);
     }
+
+    /**
+     * Based on previousState and previous unvisitedActions, 
+     * update the "destinationState" property with the value "unvisited" 
+     * to indicate that we have not discovered the State because we need more exploration. 
+     * 
+     * @param previousState
+     * @param unvisitedActions
+     */
+    public static void updateUnvisitedActionsOfPreviousState(State previousState, Set<Action> unvisitedActions) {
+        String screenshotPath = previousState.get(Tags.ScreenshotPath);
+        String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf('.')) + ".json";
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        for(Action action : unvisitedActions) {
+
+            // Ignore actions without origin widget
+            if(action.get(Tags.OriginWidget, null) == null) {continue;}
+
+            // Get widget Id of the current action
+            String unvisitedWidgetId = action.get(Tags.OriginWidget).get(Tags.ConcreteIDCustom);
+
+            // State JSON file should exists, 
+            // we need to check the origin widget of the action and update the destinationState property if current value is "none"
+            try{
+                if(new File(filePath).exists()) {
+                    FileReader reader = new FileReader(filePath);
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = (JsonObject) jsonParser.parse(reader);
+
+                    JsonArray jsonWidgets = jsonObject.getAsJsonArray("widgetJsonObjects");
+                    for(JsonElement elementWidget : jsonWidgets) {
+                        JsonElement elementWidgetId = elementWidget.getAsJsonObject().get("widgetId");
+                        JsonElement elementDestinationState = elementWidget.getAsJsonObject().get("destinationState");
+
+                        if(elementWidgetId.getAsString().equals(unvisitedWidgetId) && elementDestinationState.getAsString().equals("none")) {
+                            elementWidget.getAsJsonObject().addProperty("destinationState", "unvisited");
+                        }
+                    }
+
+                    FileWriter fileWriter = new FileWriter(filePath);
+                    gson.toJson(jsonObject, fileWriter);
+                    fileWriter.flush();
+                    fileWriter.close();
+                } 
+            }catch(Exception e){
+                System.out.println("ERROR: Updating Unvisited Action From Previous State");
+            }
+        }
+    }
 }

@@ -36,6 +36,7 @@ import static org.fruit.alayer.Tags.Enabled;
 
 import java.util.Set;
 
+import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -54,6 +55,8 @@ import es.upv.staq.testar.ProtocolUtil;
  *  It only changes the getState() method.
  */
 public class Protocol_desktop_generic_json extends DesktopProtocol {
+
+    private Pair<String, Set<Action>> unvisitedActionsOfPreviousState;
 
     /**
      * Called once during the life time of TESTAR
@@ -99,6 +102,12 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
             if(lastExecutedAction != null && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
                 Widget executedWidget = lastExecutedAction.get(Tags.OriginWidget);
                 JsonUtils.createWidgetInfoPreviousStateJsonFile(state, previousState, executedWidget);
+
+                // If we have the previous unvisited actions from the previous state, 
+                // update the "destinationState" information as "unvisited"
+                if(unvisitedActionsOfPreviousState != null && unvisitedActionsOfPreviousState.left().equals(previousState.get(Tags.ConcreteIDCustom))) {
+                    JsonUtils.updateUnvisitedActionsOfPreviousState(previousState, unvisitedActionsOfPreviousState.right());
+                }
             }
         }
 
@@ -189,6 +198,8 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
      */
     @Override
     protected Action selectAction(State state, Set<Action> actions){
+
+        unvisitedActionsOfPreviousState = new Pair<>(state.get(Tags.ConcreteIDCustom), actions);
 
         //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
         //unwanted processes are killed and SUT is put into foreground.
