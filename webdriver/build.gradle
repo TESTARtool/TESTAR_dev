@@ -15,4 +15,6 @@ dependencies {
     compile group: 'com.github.curious-odd-man', name: 'rgxgen', version: '1.2'
     // https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
     compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '10.3'
+    // https://mvnrepository.com/artifact/net.sourceforge.cssparser/cssparser/0.9.29
+    compile group: 'net.sourceforge.cssparser', name: 'cssparser', version: '0.9.29'
 }
