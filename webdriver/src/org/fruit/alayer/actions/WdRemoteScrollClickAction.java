@@ -63,7 +63,7 @@ public class WdRemoteScrollClickAction extends WdRemoteClickAction {
 
     @Override
     public String toShortString() {
-        return "Remote scroll and click " + widget.element.remoteWebElement.getId();
+        return "Remote scroll and click " + widget.element.getElementDescription();
     }
 
 }

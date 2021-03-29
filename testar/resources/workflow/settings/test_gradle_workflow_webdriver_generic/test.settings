@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
+SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parab
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 2
 
 #################################################################
 # Oracles based on suspicious titles
@@ -97,24 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
-
-#################################################################
-# State model inference settings
-#################################################################
-StateModelEnabled = false
-DataStore =
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
-DataStoreMode = none
-ApplicationName = Parabank
-ApplicationVersion =
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+ProtocolClass = test_gradle_workflow_webdriver_generic/Protocol_test_gradle_workflow_webdriver_generic
 
 #################################################################
 # State identifier attributes
@@ -128,9 +111,9 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = parabank.parasoft.com
-FollowLinks = false
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = mijn.awo.ou.nl;login.awo.ou.nl
+FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
 
@@ -148,15 +131,6 @@ SwitchNewTabs = true
 #################################################################
 
 OverrideWebDriverDisplayScale = 
-
-#################################################################
-# Settings (string) that can be used for user specified protocols
-#################################################################
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings
@@ -191,3 +165,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0

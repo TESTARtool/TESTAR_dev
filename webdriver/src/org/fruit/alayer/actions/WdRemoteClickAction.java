@@ -99,7 +99,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 
     @Override
     public String toShortString() {
-        return "Remote click " + widget.element.remoteWebElement.getId();
+        return "Remote click " + widget.element.getElementDescription();
     }
 
     @Override

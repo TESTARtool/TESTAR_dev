@@ -106,7 +106,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 
     @Override
     public String toShortString() {
-        return "Remote type " + keys + " " + widget.element.remoteWebElement.getId();
+        return "Remote type " + keys + " " + widget.element.getElementDescription();
     }
 
     @Override
