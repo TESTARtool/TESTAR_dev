@@ -122,9 +122,6 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 			System.out.println(". . . CURRENT ACTIONS:");
 			for (Action a : actions) {
 				org.fruit.alayer.Widget w = a.get(Tags.OriginWidget);
-				if(!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner")
-						&& (!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
-								&& (!w.get(Tags.Title,"").contains("Price per hour") || !w.get(Tags.Title,"").contains("Filename:")))) {
 					AbstractAction absAction;
 					try {
 						absAction = currentAbstractState.getAction(a.get(Tags.AbstractIDCustom, ""));
@@ -134,7 +131,6 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
 			}
         }
         //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
@@ -166,9 +162,6 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 		
 		for(Action a : actions) {
 			org.fruit.alayer.Widget w = a.get(Tags.OriginWidget);
-			if(!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner")
-					&& (!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
-							&& (!w.get(Tags.Title,"").contains("Price per hour") || !w.get(Tags.Title,"").contains("Filename:")))) {
 				String aType = w.get(Tags.Role).toString();
 				double aDepth = w.get(Tags.ZIndex);
 				if((previousActionType == aType) && (previousActionDepth == aDepth)) {
@@ -180,7 +173,6 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 	                    e.printStackTrace();
 	                }
 				}
-			}
 		}
     }
 }
