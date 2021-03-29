@@ -62,6 +62,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -76,11 +77,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private static DocumentBuilder documentBuilder;
 	private static Processor saxonProcessor;
 	private static XQueryCompiler xqueryCompiler;
-
+	private static XsltCompiler xsltCompiler;
+	
 	private static Xslt30Transformer abstractDocumentTemplate;
 	private static Xslt30Transformer abstractWidgetTemplate;
 	private static Xslt30Transformer compileModelTemplate;
-
+	private static Xslt30Transformer readRulesTemplate;
+	
 	private static String testarNamespace = "http://testar.org/state";
 	private static List<GenRule> modelGenRules;
 
@@ -90,68 +93,117 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		WdDriver.forceActivateTab = false;
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
-
+		xsltCompiler = saxonProcessor.newXsltCompiler();
 		xqueryCompiler.declareNamespace("tst", testarNamespace);
 		xqueryCompiler.declareNamespace("h", "https://testar.org/html");
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
 		try {  documentBuilder = factory.newDocumentBuilder(); }
-		catch (Exception e) { throw new RuntimeException("Cannot create documentBuilder: ", e); }
-
-		try {
-			File xsl1 = new File(Settings.getSettingsPath(), "abstract-state.xsl");
-			File xsl2 = new File(Settings.getSettingsPath(), "abstract-widget.xsl");
-			File xsl3 = new File(Settings.getSettingsPath(), "compile-model.xsl");
-
-			XsltCompiler compiler = saxonProcessor.newXsltCompiler();
-			XsltExecutable s1 = compiler.compile(new StreamSource(xsl1));
-			XsltExecutable s2 = compiler.compile(new StreamSource(xsl2));
-			XsltExecutable s3 = compiler.compile(new StreamSource(xsl3));
-
-			abstractDocumentTemplate = s1.load30();
-			abstractWidgetTemplate = s2.load30();
-			compileModelTemplate = s3.load30();
-		}
-		catch (Exception e) { throw new RuntimeException("Could not compile: ", e); }
+		catch (Exception e) { throw new RuntimeException("Cannot create documentBuilder", e); }
 		
+		abstractDocumentTemplate = compileTransformer("abstract-state.xsl");
+		abstractWidgetTemplate = compileTransformer("abstract-widget.xsl");
+		compileModelTemplate = compileTransformer("compile-model.xsl");
+		readRulesTemplate = compileTransformer("read-rules.xsl");
+	
 		consumeArcadeBuilderModel();
+		consumeRulesFile();
 	}
 
-	static void consumeArcadeBuilderModel() {
-		String modelFileName = (new File(Settings.getSettingsPath(), "model.json")).toURI().toString();
-		Map<QName, XdmValue> parameters = new HashMap<>();
-		parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
-		
+	static Xslt30Transformer compileTransformer(String file) {
 		try {
-			compileModelTemplate.setStylesheetParameters(parameters);
+			return xsltCompiler.compile(new StreamSource(new File(Settings.getSettingsPath(), file))).load30();
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Could not compile" + file, e);
+		}
+	}
+	
+	static Document transformJson(String jsonFile, Xslt30Transformer template) {
+		try {
+			String modelFileName = (new File(Settings.getSettingsPath(), jsonFile)).toURI().toString();
+			Map<QName, XdmValue> parameters = new HashMap<>();
+			parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
+			
+			template.setStylesheetParameters(parameters);
 			
 			Document d = documentBuilder.newDocument();
 			Node n = d.createElement("root");
 			d.adoptNode(n);
 			
 			Document r = documentBuilder.newDocument();
-			compileModelTemplate.transform(new DOMSource(d), new DOMDestination(r));
 			
-			//printXML(r);
+			template.transform(new DOMSource(d), new DOMDestination(r));
+			return r;
+		}
+		catch (Exception e) {
+			throw new RuntimeException("cannot transform", e);
+		}
+	}
+	
+	static void consumeArcadeBuilderModel() {
+		Document result = transformJson("model.json", compileModelTemplate);
+		printXML(result);
+		XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(result);
+		
+		modelGenRules = xmlToJava(_this, "//input-rule",
+		node -> new GenRule(
+			node.attribute("xquery"),
+			node.attribute("regexp"),
+			"5"));
+	}
+	
+	static void consumeRulesFile() {
+		Document result = transformJson("rules.json", readRulesTemplate);
+		printXML(result);
+		XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(result);
+		
+		List<FilterRule> filterRules = xmlToJava(_this, "//filter",
+			node -> new FilterRule(node.attribute("xquery")));
+		
+		List<ActionRule> actionRules = xmlToJava(_this, "//action-priority",
+			node -> new ActionRule(
+				node.attribute("xquery"),
+				node.attribute("priority")));
+		
+		List<GenRule> genericInput = xmlToJava(_this, "//generic-input",
+			node -> new GenRule(
+				node.attribute("xquery"),
+				node.attribute("regexp"),
+				node.attribute("priority")));
+		
+		List<GenRule> fieldInput = xmlToJava(_this, "//field-input",
+			node -> inputRule(node.attribute("name"), node.attribute("regexp"), node.attribute("priority")));
+		
+		List<GenRule> formInput = xmlToJava(_this, "//form-input",
+			node -> formInputRule(
+				node.attribute("form"),
+				node.attribute("name"),
+				node.attribute("regexp"),
+				node.attribute("priority")));
+		
+		System.out.println(filterRules);
+		System.out.println(actionRules);
+		System.out.println(genericInput);
+		System.out.println(fieldInput);
+		System.out.println(formInput);
+	}
+	
+	static <R> List<R> xmlToJava(XdmNode _this, String query, Function<XdmNode, R> mapper) {
+		try {
+			List<R> rlist = new LinkedList<>();
 			
-			// fetch all input-rules
-			XQueryEvaluator e = xqueryCompiler.compile("//input-rule").load();
-			XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(r);
+			XQueryEvaluator e = xqueryCompiler.compile(query).load();
 			e.setContextItem(_this);
 			e.setExternalVariable(new QName("this"), _this);
 			
 			XdmValue result = e.evaluate();
-			List<GenRule> gr = new LinkedList<>();
 			
-			for (XdmItem rule: result) {
-				XdmNode node = (XdmNode)rule;
-				gr.add(new GenRule(node.attribute("xquery"), node.attribute("regexp"), 5));
-			}
+			for (XdmItem item: result) { rlist.add(mapper.apply((XdmNode)item)); }
 			
-			modelGenRules = gr;
+			return rlist;
 		}
-		
 		catch (Exception e) { throw new RuntimeException("Could not compile: " + e); }
 	}
 	
@@ -193,7 +245,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				s.set(MyTags.XML, d);
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot create XML representation ", e);
+				throw new RuntimeException("Cannot create XML representation", e);
 			}
 		}
 	}
@@ -246,7 +298,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				widget.set(MyTags.ActionAbstractState, hashString(result.toString(), "MD5"));
 			}
 			catch (Exception e) {
-				throw new RuntimeException("Cannot apply template: ", e);
+				throw new RuntimeException("Cannot apply template", e);
 			}
 		}
 		else throw new RuntimeException("Action: " + action + " has no origin!");
@@ -276,7 +328,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			}
 			return false;
 		}
-		catch (Exception e) { throw new RuntimeException("Cannot evaluate ", e); }
+		catch (Exception e) { throw new RuntimeException("Cannot evaluate", e); }
 	}
 	
 	@Override
@@ -354,13 +406,13 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	List<GenRule> inputGenerators(GenRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
 
 	// Match the name of the element, all lower-case
-	GenRule inputRule(String n, String g, int p) {
+	static GenRule inputRule(String n, String g, String p) {
 		String xquery = String.format(".[contains(lower-case(@name), '%s')]", n.toLowerCase());
 		return new GenRule(xquery, g, p);
 	}
 	
 	// Match the name of the element and the name of its (parents), all lower-case
-	GenRule formInputRule(String f, String n, String g, int p) {
+	static GenRule formInputRule(String f, String n, String g, String p) {
 		String xquery = String.format(
 			".[contains(lower-case(@name), '%s')]/" +
 				"ancestor::*[contains(lower-case(@name), '%s')]", n.toLowerCase(), f.toLowerCase());
@@ -407,9 +459,18 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
 		
 		// Collect all matches rules
-		List <GenRule> matches = generatorRules.stream().
-				filter(GenRule::isValid).       		// only consider valid rules
-				filter(r -> match(r.expression, item)). // only those that match
+		List <InputRule> matches = generatorRules.stream().
+				filter(r -> match(r.expression, item)).
+			    map(r -> {
+			    	try {
+						r.prio.setContextItem(item);
+						r.prio.setExternalVariable(new QName("this"), item);
+						return new InputRule(r.generator, Double.parseDouble(r.prio.evaluateSingle().getStringValue()));
+					}
+			    	catch (Exception e) {
+			    		throw new RuntimeException("cannot set context", e);
+					}
+				}). // only those that match
 				collect(Collectors.toList());
 
 		// Pick rule based on priority
@@ -423,15 +484,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	static abstract class PrioRule {
 		protected double priority = 0;
-		protected boolean isValid = false;
 
 		public double priority() { return priority; }
-		public boolean isValid() { return isValid; }
 	}
 
 	static class ActionRule {
-		protected String sprio = "";
-		protected boolean isValid = false;
+		protected String sprio;
 		protected String sexpr;
 		protected XQueryEvaluator expression;
 		protected XQueryEvaluator prio;
@@ -441,11 +499,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				sexpr = e;
 				expression = xqueryCompiler.compile(xqueryLibrary() + e).load();
 				prio = xqueryCompiler.compile(xqueryLibrary() + p).load();
-				isValid = true;
 				sprio = p;
 			}
-			catch (Exception exception) {
-				System.out.println("WARNING: invalid action rule: " + exception.getMessage());
+			catch (Exception ex) {
+				throw new RuntimeException("Invalid action-priority rule", ex);
 			}
 		}
 		public String toString() {
@@ -459,7 +516,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		public ActionPrio(Action a, double prio) {
 			action = a;
 			priority = prio;
-			isValid = true;
 		}
 
 		public String toString() {
@@ -468,26 +524,38 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 	}
 	
-	static class GenRule extends PrioRule {
+	static class InputRule extends PrioRule {
+		protected RgxGen generator;
+		
+		public InputRule(RgxGen gen, Double prio) {
+			generator = gen; priority = prio;
+		}
+		
+	}
+	static class GenRule  {
 		protected String sexpr;
 		protected String gexpr;
+		protected String pexpr;
+		
 		protected XQueryEvaluator expression;
+		protected XQueryEvaluator prio;
 		protected RgxGen generator;
-
-		public GenRule(String e, String g, double p) {
+		
+		public GenRule(String e, String g, String p) {
 			try {
 				sexpr = e;
 				gexpr = g;
-				expression = xqueryCompiler.compile(xqueryLibrary() + e).load(); generator = new RgxGen(g);
-				isValid = true;
-				priority = p;
+				pexpr = p;
+				expression = xqueryCompiler.compile(xqueryLibrary() + e).load();
+				generator = new RgxGen(g);
+				prio = xqueryCompiler.compile(xqueryLibrary() + p).load();
 			}
-			catch (Exception exception) {
-				System.out.println("WARNING: invalid generator rule: " + exception.getMessage());
+			catch (Exception ex) {
+				throw new RuntimeException("Invalid generator rule", ex);
 			}
 		}
 
-		public String toString() { return "GenRule(" +  sexpr + ", " + gexpr + "," + priority + ");"; }
+		public String toString() { return "GenRule(" +  sexpr + ", " + gexpr + "," + pexpr + ");"; }
 	}
 
 	static class FilterRule  {
@@ -501,8 +569,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				expr = xqueryCompiler.compile(xqueryLibrary() + e).load();
 				isValid = true;
 			}
-			catch (Exception exception) {
-				System.out.println("WARNING: invalid filter rule: " + exception.getMessage());
+			catch (Exception ex) {
+				throw new RuntimeException("Invalid filter rule", ex);
 			}
 		}
 		public String toString() { return "FilterRule(" +  sexpr + ");"; }
@@ -598,7 +666,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 				}
 				catch (Exception e) {
-					throw new RuntimeException("Cannot evaluate xquery: ", e);
+					throw new RuntimeException("Cannot evaluate xquery", e);
 				}
 			}
 		}
@@ -675,18 +743,15 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
 	}
 	
+	
 	List<ActionRule> actionRules() {
 		return actionsRules(
 			new ActionRule("'true'", "1"),                  // Default priority
-			new ActionRule(".[not(@type = 'submit')] and " +
-				"not(ancestor-or-self::*[h:is-invalid(.)]) and " +
-				"tst:visits[@count > 0]",
+			new ActionRule(".[not(@type = 'submit')] and not(ancestor-or-self::*[h:is-invalid(.)]) and tst:visits[@count > 0]",
 				"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
 			new ActionRule(".[@type = 'submit']",
-				"1 + count(ancestor::form//*[" +
-					"(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.)) and " +
-					"h:is-valid(.)" +
-					"])"),
+				"1 + count(ancestor::form//*[(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.))" +
+					" and h:is-valid(.)])"),
 			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
 			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
 			new ActionRule("h:is-radio(.)",
@@ -704,57 +769,57 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	List<GenRule> inputGenerators() {
 		List<GenRule> l = inputGenerators(
-			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", 1),                        // Generic input
+			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", "1"),                        // Generic input
 			
-			inputRule("firstName", "(Robbert)|(Mark)", 5),
-			inputRule("lastName", "(van Dalen)|(Bommel)", 5),
-			inputRule("surName", "(van Dalen)|(Bommel)", 5),
-			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", 5),
-			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", 5),
-			inputRule("age", "[1-8][0-9]", 5),
-			inputRule("income", "[1-9][0-9]{4}", 5),
-			inputRule("profit", "[1-9][0-9]{4}", 5),
-			formInputRule("income", "years[]", "[1-9][0-9]{4}", 5),
-			inputRule("monthlyIncome", "[1-7][0-9]{3}", 5),
-			inputRule("studyLoan", "[1-3][0-9]{4}", 5),
-			inputRule("liabilities", "[1-3][0-9]{4}", 5),
-			inputRule("alimony", "[0-9]{3}", 5),
-			inputRule("annualTurnover", "[1-9][0-9]{4,6}", 5),
-			inputRule("endBalance", "[1-9][0-9]{4,6}", 5),
-			inputRule("availableCash", "[1-9][0-9]{4,6}", 5),
-			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", 5),
-			inputRule("newLoan", "[1-9][0-9]{4,6}", 5),
-			inputRule("needAmount", "[1-9][0-9]{4,6}", 5),
-			inputRule("needDuration", "[1-3]|[0-9]", 5),
-			inputRule("numberEmployees", "[1-9]{2,4}", 5),
+			inputRule("firstName", "(Robbert)|(Mark)", "5"),
+			inputRule("lastName", "(van Dalen)|(Bommel)", "5"),
+			inputRule("surName", "(van Dalen)|(Bommel)", "5"),
+			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", "5"),
+			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", "5"),
+			inputRule("age", "[1-8][0-9]", "5"),
+			inputRule("income", "[1-9][0-9]{4}", "5"),
+			inputRule("profit", "[1-9][0-9]{4}", "5"),
+			formInputRule("income", "years[]", "[1-9][0-9]{4}", "5"),
+			inputRule("monthlyIncome", "[1-7][0-9]{3}", "5"),
+			inputRule("studyLoan", "[1-3][0-9]{4}", "5"),
+			inputRule("liabilities", "[1-3][0-9]{4}", "5"),
+			inputRule("alimony", "[0-9]{3}", "5"),
+			inputRule("annualTurnover", "[1-9][0-9]{4,6}", "5"),
+			inputRule("endBalance", "[1-9][0-9]{4,6}", "5"),
+			inputRule("availableCash", "[1-9][0-9]{4,6}", "5"),
+			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", "5"),
+			inputRule("newLoan", "[1-9][0-9]{4,6}", "5"),
+			inputRule("needAmount", "[1-9][0-9]{4,6}", "5"),
+			inputRule("needDuration", "[1-3]|[0-9]", "5"),
+			inputRule("numberEmployees", "[1-9]{2,4}", "5"),
 			
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'otherPaymentPostponement')]", "[1-9][0-9]{4}", 5),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", 5),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", "5"),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", "5"),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'otherPaymentPostponement')]", "[1-9][0-9]{4}", "5"),
+			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", "5"),
 			
 			/*****  RULES for ing-feat-mortgage-online-intake-request *****/
 			// Incomes
-			new GenRule("ancestor::*[contains(lower-case(@label), 'yearly amount')]", "[1-7][0-9]{4}", 5),
-			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly amount')]", "[1-4][0-9]{3}", 5),
-			inputRule("monthlyReimbursementInput", "[1-2][0-9]{2,3}", 5),
+			new GenRule("ancestor::*[contains(lower-case(@label), 'yearly amount')]", "[1-7][0-9]{4}", "5"),
+			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly amount')]", "[1-4][0-9]{3}", "5"),
+			inputRule("monthlyReimbursementInput", "[1-2][0-9]{2,3}", "5"),
 			
 			// Repayment
-			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly repayment')]", "[1-9][0-9]{3}", 1),
+			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly repayment')]", "[1-9][0-9]{3}", "1"),
 			
-			inputRule("dependantsValue", "[1-6]", 5), // dependants
-			inputRule("ownFundsInput", "[1-9][0-9]{4}", 5), // own funds
-			inputRule("postalCode", "[1-9]{4}", 5), // postal code
-			inputRule("street", "Fantasy Street", 5), // street
-			inputRule("box", "[1-9]", 5), // box number
-			inputRule("number", "[1-9][1-9]{1,2}", 5), // (street) number
-			inputRule("ingId", "(0000000097)|(0144658019)", 5), // ing Id
-			inputRule("phone", "0648949801",5),  // phone
-			inputRule("transferabilityRegistrationFeesAmount", "[1-9]{3}",5), // registration fee
-			inputRule("birthdate", "[0-2][1-9]\\/[1-9]\\/19[1-9]{2}", 5),  // birth date
-			inputRule("buildingPrice", "[1-9][0-9]{4,5}", 5),     // building price
-			inputRule("homePrice", "[1-2][0-9]{5}", 5),     // home price
-			inputRule("constructionLotPrice", "[1-9][0-9]{4,5}", 5) // construction price
+			inputRule("dependantsValue", "[1-6]", "5"), // dependants
+			inputRule("ownFundsInput", "[1-9][0-9]{4}", "5"), // own funds
+			inputRule("postalCode", "[1-9]{4}", "5"), // postal code
+			inputRule("street", "Fantasy Street", "5"), // street
+			inputRule("box", "[1-9]", "5"), // box number
+			inputRule("number", "[1-9][1-9]{1,2}", "5"), // (street) number
+			inputRule("ingId", "(0000000097)|(0144658019)", "5"), // ing Id
+			inputRule("phone", "0648949801","5"),  // phone
+			inputRule("transferabilityRegistrationFeesAmount", "[1-9]{3}", "5"), // registration fee
+			inputRule("birthdate", "[0-2][1-9]\\/[1-9]\\/19[1-9]{2}", "5"),  // birth date
+			inputRule("buildingPrice", "[1-9][0-9]{4,5}", "5"),     // building price
+			inputRule("homePrice", "[1-2][0-9]{5}", "5"),     // home price
+			inputRule("constructionLotPrice", "[1-9][0-9]{4,5}", "5") // construction price
 		);
 		l.addAll(modelGenRules);
 		return l;

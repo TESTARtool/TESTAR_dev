@@ -1,0 +1,64 @@
+{
+  "filter": [
+    {
+      "doc": [ "don't login in" ],
+      "xquery": [ "ancestor::*[@data-tag-name = 'ing-feat-moir-intro'] and .[not(@id = 'startFlow')]" ]
+    },
+    {
+      "doc": [ "don't consider changing details" ],
+      "xquery": [ "ancestor::*[@slot = 'details']" ]
+    },
+    {
+      "doc": [ "don't confirm appointment" ],
+      "xquery": [ "ancestor-or-self::*[@name = 'ing-feat-moir-appointment-confirmation']" ]
+    }
+  ],
+  "input": [
+    {
+      "doc": [ "yearly amount" ],
+      "type": "generic",
+      "xquery": [ "ancestor::*[contains(lower-case(@label), 'yearly amount')]" ],
+      "regexp": [ "[1-7][0-9]{4}" ],
+      "priority": [ "5" ]
+    },
+    {
+      "doc": [ "enterprise number" ],
+      "type": "field",
+      "name": "enterpriseNumber",
+      "regexp": [ "(0415580365)|(0[0-9]{9})" ],
+      "priority": [ "5" ]
+    },
+    {
+      "doc": [ "year income" ],
+      "type": "form",
+      "form": "income",
+      "name": "years[]",
+      "regexp": [ "[1-9][0-9]{4}" ],
+      "priority": [ "5" ]
+    }
+  ],
+  "action-priority": [
+    {
+      "doc": [ "if action visited and not submit or invalid" ],
+      "xquery": [
+        ".[not(@type = 'submit')] and",
+        "not(ancestor-or-self::*[h:is-invalid(.)]) and ",
+        "tst:visits[@count > 0]"
+      ],
+      "priority": [ "1 div (1 + count(tst:visits))" ]
+    },
+    {
+      "doc": [ "weighted radio button" ],
+      "xquery": [ "h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]" ],
+      "priority": [ "3.0" ]
+    },
+    {
+      "doc": [ "submit button has higher priority" ],
+      "xquery": [ ".[@type = 'submit']" ],
+      "priority": [
+        "1 + count(ancestor::form//*[(h:radiogroup-is-empty(.) or ",
+        "h:text-is-empty(.) or h:select-is-empty(.)) and h:is-valid(.)])"
+      ]
+    }
+  ]
+}
