@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,15 +30,12 @@
 
 package nl.ou.testar.ScreenshotJsonFile;
 
-public class BoundingPoly {
-    Vertice[] vertices;
-    StringVertice[] stringVertice;
+public class StringVertice {
+    String x;
+    String y;
 
-    public BoundingPoly(Vertice[] vertices) {
-        this.vertices = vertices;
-    }
-
-    public BoundingPoly(StringVertice[] stringVertice) {
-        this.stringVertice = stringVertice;
+    public StringVertice(String x, String y) {
+        this.x = x;
+        this.y = y;
     }
 }

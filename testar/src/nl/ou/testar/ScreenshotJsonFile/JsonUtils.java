@@ -228,15 +228,23 @@ public class JsonUtils {
 
     private static BoundingPoly calculateNormalizeWidgetBoundingPoly(Widget widget, Rect sutRect) {
         Rect rect = (Rect) widget.get(Tags.Shape, null);
-        Vertice[] vertices = new Vertice[4];
-        vertices[0] = new Vertice((rect.x() - sutRect.x()) / sutRect.width(), 
-                (rect.y() - sutRect.y()) / sutRect.height());  // up-left
-        vertices[1] = new Vertice((rect.x() - sutRect.x() + rect.width()) / sutRect.width(), 
-                (rect.y() - sutRect.y()) / sutRect.height()); // up-right
-        vertices[2] = new Vertice((rect.x() - sutRect.x() + rect.width()) / sutRect.width(), 
-                (rect.y() - sutRect.y() + rect.height()) / sutRect.height()); // down-right
-        vertices[3] = new Vertice((rect.x() - sutRect.x()) / sutRect.width(), 
-                (rect.y() - sutRect.y() + rect.height()) / sutRect.height()); // down-left
+        StringVertice[] vertices = new StringVertice[4];
+        vertices[0] = new StringVertice(
+                String.format("%.9f", (rect.x() - sutRect.x()) / sutRect.width()), 
+                String.format("%.9f", (rect.y() - sutRect.y()) / sutRect.height())
+                );  // up-left
+        vertices[1] = new StringVertice(
+                String.format("%.9f", (rect.x() - sutRect.x() + rect.width()) / sutRect.width()), 
+                String.format("%.9f", (rect.y() - sutRect.y()) / sutRect.height())
+                ); // up-right
+        vertices[2] = new StringVertice(
+                String.format("%.9f", (rect.x() - sutRect.x() + rect.width()) / sutRect.width()), 
+                String.format("%.9f", (rect.y() - sutRect.y() + rect.height()) / sutRect.height())
+                ); // down-right
+        vertices[3] = new StringVertice(
+                String.format("%.9f", (rect.x() - sutRect.x()) / sutRect.width()), 
+                String.format("%.9f", (rect.y() - sutRect.y() + rect.height()) / sutRect.height())
+                ); // down-left
 
         return new BoundingPoly(vertices);
     }
