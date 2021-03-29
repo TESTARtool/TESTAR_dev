@@ -8,6 +8,7 @@ import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
@@ -106,7 +107,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         if(previouslyExecutedAbstractAction != null) {
             previouslyExecutedAbstractAction.addAttribute(tag, qValue);
             System.out.println("qFunction.getClass().getName(): " + qFunction.getClass().getName());
-            if (qFunction.getClass().getName().contains("QBorjaFunction2")) equalizeQValues(qValue);
+            if (qFunction.getClass().getName().contains("QBorjaFunction2")) equalizeQValues(qValue, actions);
 
             //*** FOR DEBUGGING PURPOSES
             float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag);
@@ -119,15 +120,20 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
         if (previousAbstractState != null && qFunction.getClass().getName().contains("QBorjaFunction2")) {
 			System.out.println(". . . CURRENT ACTIONS:");
-			for (Action a : previousTestarActions) {
-				AbstractAction absAction;
-				try {
-					absAction = previousAbstractState.getAction(a.get(Tags.AbstractIDCustom, ""));
-					System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc) + ". QValue: "
-							+ absAction.getAttributes().get(RLTags.QBorja, 0f));
-				} catch (ActionNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			for (Action a : actions) {
+				org.fruit.alayer.Widget w = a.get(Tags.OriginWidget);
+				if(!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner")
+						&& (!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+								&& (!w.get(Tags.Title,"").contains("Price per hour") || !w.get(Tags.Title,"").contains("Filename:")))) {
+					AbstractAction absAction;
+					try {
+						absAction = currentAbstractState.getAction(a.get(Tags.AbstractIDCustom, ""));
+						System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc) + ". QValue: "
+								+ absAction.getAttributes().get(RLTags.QBorja, 0f));
+					} catch (ActionNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
         }
@@ -141,7 +147,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         rewardFunction.reset();
     }
     
-    public void equalizeQValues(float qValue) {
+    public void equalizeQValues(float qValue, Set<Action> actions) {
 		// Update Q-value of actions of the same type and depth, with the new calculated
 		// Q-value
 		Action previousAction = null;
@@ -158,18 +164,22 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 		String previousActionType = previousAction.get(Tags.OriginWidget).get(Tags.Role).toString();
 		double previousActionDepth = previousAction.get(Tags.OriginWidget).get(Tags.ZIndex);
 		
-		for(Action a : previousTestarActions) {
-			String aType = a.get(Tags.OriginWidget).get(Tags.Role).toString();
-			double aDepth = a.get(Tags.OriginWidget).get(Tags.ZIndex);
-			if((previousActionType == aType) && (previousActionDepth == aDepth)) {
-	            //a.set(RLTags.QBorja, qValue);
-				try {
-                    AbstractAction abstractAction = previousAbstractState.getAction(a.get(Tags.AbstractIDCustom, "Nothing"));
-                    abstractAction.addAttribute(RLTags.QBorja, qValue);
-                } catch (ActionNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+		for(Action a : actions) {
+			org.fruit.alayer.Widget w = a.get(Tags.OriginWidget);
+			if(!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner")
+					&& (!w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+							&& (!w.get(Tags.Title,"").contains("Price per hour") || !w.get(Tags.Title,"").contains("Filename:")))) {
+				String aType = w.get(Tags.Role).toString();
+				double aDepth = w.get(Tags.ZIndex);
+				if((previousActionType == aType) && (previousActionDepth == aDepth)) {
+					try {
+	                    AbstractAction abstractAction = currentAbstractState.getAction(a.get(Tags.AbstractIDCustom, "Nothing"));
+	    				abstractAction.addAttribute(RLTags.QBorja, qValue);
+	                } catch (ActionNotFoundException e) {
+	                    // TODO Auto-generated catch block
+	                    e.printStackTrace();
+	                }
+				}
 			}
 		}
     }
