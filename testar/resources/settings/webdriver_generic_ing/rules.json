@@ -13,21 +13,23 @@
       "xquery": [ "ancestor-or-self::*[@name = 'ing-feat-moir-appointment-confirmation']" ]
     }
   ],
-  "input": [
+  "generic-input": [
     {
       "doc": [ "yearly amount" ],
-      "type": "generic",
       "xquery": [ "ancestor::*[contains(lower-case(@label), 'yearly amount')]" ],
       "regexp": [ "[1-7][0-9]{4}" ],
       "priority": [ "5" ]
-    },
+    }
+  ],
+  "field-input": [
     {
       "doc": [ "enterprise number" ],
-      "type": "field",
       "name": "enterpriseNumber",
       "regexp": [ "(0415580365)|(0[0-9]{9})" ],
       "priority": [ "5" ]
-    },
+    }
+  ],
+  "form-input": [
     {
       "doc": [ "year income" ],
       "type": "form",

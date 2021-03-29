@@ -13,7 +13,9 @@
 
         <root>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'filter']/*" mode="filter"/>
-            <xsl:apply-templates select="$x/*:map/*:array[@key = 'input']/*" mode="input"/>
+            <xsl:apply-templates select="$x/*:map/*:array[@key = 'generic-input']/*" mode="generic-input"/>
+            <xsl:apply-templates select="$x/*:map/*:array[@key = 'field-input']/*" mode="field-input"/>
+            <xsl:apply-templates select="$x/*:map/*:array[@key = 'form-input']/*" mode="form-input"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'action-priority']/*" mode="action-priority"/>
         </root>
     </xsl:template>
@@ -25,35 +27,32 @@
         />
     </xsl:template>
 
-    <xsl:template match="*:map" mode="input">
-        <xsl:variable name="type" select="*:string[@key ='type']"/>
-        <xsl:choose>
-            <xsl:when test="$type = 'generic'">
-                <generic-input
-                        doc="{*:array[@key = 'doc']/*:string}"
-                        xquery="{*:array[@key = 'xquery']/*:string}"
-                        regexp="{*:array[@key = 'regexp']/*:string}"
-                        priority="{*:array[@key = 'priority']/*:string}"
-                />
-            </xsl:when>
-            <xsl:when test="$type = 'field'">
-                <field-input
-                        doc="{*:array[@key = 'doc']/*:string}"
-                        name="{*:string[@key = 'name']}"
-                        regexp="{*:array[@key = 'regexp']/*:string}"
-                        priority="{*:array[@key = 'priority']/*:string}"
-                />
-            </xsl:when>
-            <xsl:when test="$type = 'form'">
-                <form-input
-                        doc="{*:array[@key = 'doc']/*:string}"
-                        form="{*:string[@key = 'form']}"
-                        name="{*:string[@key = 'name']}"
-                        regexp="{*:array[@key = 'regexp']/*:string}"
-                        priority="{*:array[@key = 'priority']/*:string}"
-                />
-            </xsl:when>
-        </xsl:choose>
+    <xsl:template match="*:map" mode="generic-input">
+        <generic-input
+                doc="{*:array[@key = 'doc']/*:string}"
+                xquery="{*:array[@key = 'xquery']/*:string}"
+                regexp="{*:array[@key = 'regexp']/*:string}"
+                priority="{*:array[@key = 'priority']/*:string}"
+        />
+    </xsl:template>
+
+    <xsl:template match="*:map" mode="field-input">
+        <field-input
+                doc="{*:array[@key = 'doc']/*:string}"
+                name="{*:string[@key = 'name']}"
+                regexp="{*:array[@key = 'regexp']/*:string}"
+                priority="{*:array[@key = 'priority']/*:string}"
+        />
+    </xsl:template>
+
+    <xsl:template match="*:map" mode="form-input">
+        <form-input
+                doc="{*:array[@key = 'doc']/*:string}"
+                form="{*:string[@key = 'form']}"
+                name="{*:string[@key = 'name']}"
+                regexp="{*:array[@key = 'regexp']/*:string}"
+                priority="{*:array[@key = 'priority']/*:string}"
+        />
     </xsl:template>
 
     <xsl:template match="*:map" mode="action-priority">
