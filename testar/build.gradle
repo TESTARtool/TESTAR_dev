@@ -309,6 +309,11 @@ task downloadChromedriver(type: Download, dependsOn: installDist) {
     group = 'test_testar_workflow'
     description ='downloadChromedriver'
     
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
     ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
     Process process = builder.start();
     process.waitFor()
@@ -322,6 +327,12 @@ task downloadChromedriver(type: Download, dependsOn: installDist) {
 task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
     group = 'test_testar_workflow'
     description ='downloadAndUnzipChromedriver'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
     from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
     into downloadChromedriver.dest
 }
