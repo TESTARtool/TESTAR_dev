@@ -35,22 +35,21 @@ public class BorjaReward3 implements RewardFunction{
 		System.out.println("*** numWidgetsBefore: " + numWidgetsBefore);
 		System.out.println("*** numWidgetsNow: " + numWidgetsNow);
 
-		float currentQValue = executedAbstractAction.getAttributes().get(RLTags.QBorja, 0f);
 		double persistentWidgetNum = getPersistentWidgetNum(state);
 
 		// Widget Tree difference reward		
 		if (numWidgetsBefore < numWidgetsNow) {
-			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsBefore));
-			float widgetDifference = (float) (currentQValue * (numWidgetsBefore / numWidgetsNow));
+			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsBefore);
+			float widgetDifference = (float) (numWidgetsBefore / numWidgetsNow);
 			
 			reward = (float) (- (persistentDecrement + widgetDifference));
 		} else if (numWidgetsBefore > numWidgetsNow) {
-			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsNow));
-			float widgetDifference = (float) (currentQValue * (numWidgetsNow / numWidgetsBefore));
+			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsNow);
+			float widgetDifference = (float) (numWidgetsNow / numWidgetsBefore);
 			
 			reward = (float) (- (1 - (persistentDecrement + widgetDifference)));
 		} else {
-			float persistentDecrement = (float) (currentQValue * (persistentWidgetNum / numWidgetsNow));			
+			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsNow);			
 			reward = (float) (- persistentDecrement);
 		}
 

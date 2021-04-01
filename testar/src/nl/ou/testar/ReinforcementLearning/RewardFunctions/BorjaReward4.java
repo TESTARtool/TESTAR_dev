@@ -42,10 +42,9 @@ public class BorjaReward4 implements RewardFunction {
 			return reward;
 		}
 
-		float currentQValue = executedAbstractAction.getAttributes().get(RLTags.QBorja, 0f);
-		float diffPxPercentage = getDiffPercentage(currentStateCanvas, previousStateCanvas);
-		System.out.println("... diffPxPercentage: " + diffPxPercentage);
-		reward = (float) - (1 - (currentQValue * diffPxPercentage));
+		float diffPxProportion = getDiffPxProportion(currentStateCanvas, previousStateCanvas);
+		System.out.println("... diffPxProportion: " + diffPxProportion);
+		reward = (float) - (1 - diffPxProportion);
 		
 		// Also decrement reward based on Widget Tree ZIndex
 
@@ -68,7 +67,7 @@ public class BorjaReward4 implements RewardFunction {
     }
     public transient BufferedImage img;
     
-    private float getDiffPercentage(AWTCanvas img1, AWTCanvas img2) {
+    private float getDiffPxProportion(AWTCanvas img1, AWTCanvas img2) {
     	float diff = 0f;
 		BufferedImage bufImg1 = img1.image();
     	BufferedImage bufImg2 = img2.image();
