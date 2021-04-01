@@ -39,15 +39,17 @@ public class BorjaReward3 implements RewardFunction{
 
 		// Widget Tree difference reward		
 		if (numWidgetsBefore < numWidgetsNow) {
-			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsBefore);
+			float persistentDecrement = (float) (0.01 * (persistentWidgetNum / numWidgetsBefore));
 			float widgetDifference = (float) (numWidgetsBefore / numWidgetsNow);
+			float provisionalReward = halfAssociator((greaterThanOne(persistentDecrement + widgetDifference)), 1);
 			
-			reward = (float) (- (persistentDecrement + widgetDifference));
+			reward = (float) (- provisionalReward);
 		} else if (numWidgetsBefore > numWidgetsNow) {
-			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsNow);
+			float persistentDecrement = (float) (0.01 * (persistentWidgetNum / numWidgetsNow));
 			float widgetDifference = (float) (numWidgetsNow / numWidgetsBefore);
+			float provisionalReward = 1 - halfAssociator((greaterThanOne(persistentDecrement + widgetDifference)), 2);
 			
-			reward = (float) (- (1 - (persistentDecrement + widgetDifference)));
+			reward = (float) (- provisionalReward);
 		} else {
 			float persistentDecrement = (float) (persistentWidgetNum / numWidgetsNow);			
 			reward = (float) (- persistentDecrement);
@@ -91,6 +93,26 @@ public class BorjaReward3 implements RewardFunction{
         if(state == null)
             return 0;
         return Iterables.size(state);
+    }
+    
+    private float greaterThanOne(float value) {
+    	if(value > 1f) {
+    		return 1f;
+    	} else {
+    		return value;
+    	}
+    }
+    
+    private float halfAssociator(float value, int half) {
+    	float newValue = 0;
+    	
+    	if(half == 1) {
+    		newValue = value * 0.5f;
+    	} else {
+    		newValue = (value * 0.5f) + 0.5f;
+    	}
+    	
+    	return newValue;
     }
     
     private double getPersistentWidgetNum(State currentState) {
