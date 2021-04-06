@@ -12,7 +12,7 @@
         <xsl:variable name="x" select="json-to-xml($d)"/>
 
         <root>
-            <xsl:apply-templates select="$x/*:map/*:array[@key = 'filter']/*" mode="filter"/>
+            <xsl:apply-templates select="$x/*:map/*:array[@key = 'ignore-filter']/*" mode="filter"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'generic-input']/*" mode="generic-input"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'field-input']/*" mode="field-input"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'form-input']/*" mode="form-input"/>

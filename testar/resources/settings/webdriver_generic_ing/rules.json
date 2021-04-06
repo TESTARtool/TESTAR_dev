@@ -1,5 +1,5 @@
 {
-  "filter": [
+  "ignore-filter": [
     {
       "doc": [ "don't login in" ],
       "xquery": [ "ancestor::*[@data-tag-name = 'ing-feat-moir-intro'] and .[not(@id = 'startFlow')]" ]
