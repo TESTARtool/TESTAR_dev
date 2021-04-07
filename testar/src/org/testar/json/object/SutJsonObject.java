@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,25 +30,17 @@
 
 package org.testar.json.object;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public class SutJsonObject {
 
-	String title;
-	String name;
-	boolean isOpenSource;
-	String license;
-	String url;
-	String version;
+	Object license;
 	String runtimeOS;
-	
-	public SutJsonObject(String title, String name, boolean isOpenSource, String license, String url, String version,
-			String runtimeOS) {
-		this.title = title;
-		this.name = name;
-		this.isOpenSource = isOpenSource;
+
+	@JsonCreator
+	public SutJsonObject(Object license, String runtimeOS) {
 		this.license = license;
-		this.url = url;
-		this.version = version;
 		this.runtimeOS = runtimeOS;
 	}
-	
+
 }

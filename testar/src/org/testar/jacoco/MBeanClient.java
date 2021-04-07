@@ -1,4 +1,3 @@
-package org.testar.jacoco;
 /*******************************************************************************
  * Copyright (c) 2009, 2020 Mountainminds GmbH & Co. KG and Contributors
  * This program and the accompanying materials are made available under
@@ -9,8 +8,11 @@ package org.testar.jacoco;
  *
  * Contributors:
  *    Evgeny Mandrikov - initial API and implementation
+ *    Fernando Pastor Ricos - adapt original code for TESTAR purposes
  *
  *******************************************************************************/
+
+package org.testar.jacoco;
 
 import java.io.File;
 
@@ -39,6 +41,22 @@ public final class MBeanClient {
 
 	private static final String SERVICE_URL = "service:jmx:rmi:///jndi/rmi://localhost:5000/jmxrmi";
 
+	private MBeanClient() {}
+	
+	public interface IProxy {
+		String getVersion();
+
+		String getSessionId();
+
+		void setSessionId(String id);
+
+		byte[] getExecutionData(boolean reset);
+
+		void dump(boolean reset);
+
+		void reset();
+	}
+
 	/**
 	 * Execute the example.
 	 *
@@ -46,13 +64,12 @@ public final class MBeanClient {
 	 * @throws Exception
 	 */
 	public static String dumpJaCoCoReport() throws Exception {
-		
+
 		String destFile = OutputStructure.outerLoopOutputDir + File.separator 
 				+ "jacoco-"
 				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
 				+ ".exec";
-		//String destFile = "jacoco-client.exec";
-		
+
 		// Open connection to the coverage agent:
 		final JMXServiceURL url = new JMXServiceURL(SERVICE_URL);
 		final JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
@@ -76,24 +93,8 @@ public final class MBeanClient {
 
 		// Close connection:
 		jmxc.close();
-		
+
 		return destFile;
 	}
 
-	public interface IProxy {
-		String getVersion();
-
-		String getSessionId();
-
-		void setSessionId(String id);
-
-		byte[] getExecutionData(boolean reset);
-
-		void dump(boolean reset);
-
-		void reset();
-	}
-
-	private MBeanClient() {
-	}
 }

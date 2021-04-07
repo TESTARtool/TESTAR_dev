@@ -33,17 +33,29 @@ package org.testar.json.object;
 
 import java.util.SortedSet;
 
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class StateModelJsonObject {
 
 	String timestamp;
 	String url;
+	String type = "TESTAR_State_Model";
 	SutJsonObject sut;
 	ToolJsonObject tool;
+	String stateModelDataStore;
+	String stateModelDataStoreType;
+	String stateModelDataStoreServer;
+	String stateModelDataStoreDirectory;
+	String stateModelDataStoreDB;
+	String stateModelDataStoreUser;
+	String stateModelDataStorePassword;
 	String stateModelIdentifier;
 	String stateModelAppName;
 	String stateModelAppVersion;
+	StateModelDifferenceJsonObject stateModelDifference;
 	String abstractionId;
 	boolean deterministic;
 	long unvisitedAbstractActions;
@@ -57,7 +69,7 @@ public class StateModelJsonObject {
 	SortedSet<StateModelTestSequenceJsonObject> testSequences;
 
 	@JsonCreator
-	public StateModelJsonObject(String timestamp, String url, SutJsonObject sut, ToolJsonObject tool,
+	public StateModelJsonObject(String timestamp, String url, SutJsonObject sut, ToolJsonObject tool, Settings settings,
 			String stateModelAppName, String stateModelAppVersion, String stateModelIdentifier,
 			String abstractionId, boolean deterministic, long unvisitedAbstractActions,
 			long numberAbstractStates, long numberAbstractActions, long numberConcreteStates, long numberConcreteActions,
@@ -66,6 +78,13 @@ public class StateModelJsonObject {
 		this.url = url;
 		this.sut = sut;
 		this.tool = tool;
+		this.stateModelDataStore = settings.get(ConfigTags.DataStore);
+		this.stateModelDataStoreType = settings.get(ConfigTags.DataStoreType);
+		this.stateModelDataStoreServer = settings.get(ConfigTags.DataStoreServer);
+		this.stateModelDataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
+		this.stateModelDataStoreDB = settings.get(ConfigTags.DataStoreDB);
+		this.stateModelDataStoreUser = settings.get(ConfigTags.DataStoreUser);
+		this.stateModelDataStorePassword = settings.get(ConfigTags.DataStorePassword);
 		this.stateModelIdentifier = stateModelIdentifier;
 		this.stateModelAppName = stateModelAppName;
 		this.stateModelAppVersion = stateModelAppVersion;
@@ -80,9 +99,13 @@ public class StateModelJsonObject {
 		this.numberWidgets = numberWidgets;
 		this.numberTestSequences = numberTestSequences;
 	}
-	
+
+	public void setStateModelDifference(StateModelDifferenceJsonObject stateModelDifference) {
+		this.stateModelDifference = stateModelDifference;
+	}
+
 	public void setTestSequences(SortedSet<StateModelTestSequenceJsonObject> testSequences) {
 		this.testSequences = testSequences;
 	}
-	
+
 }

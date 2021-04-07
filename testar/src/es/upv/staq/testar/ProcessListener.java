@@ -47,6 +47,7 @@ import org.fruit.alayer.Verdict;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 
 public class ProcessListener{
@@ -63,6 +64,12 @@ public class ProcessListener{
 		if(!settings.get(ConfigTags.ProcessListenerEnabled))
 			return false;
 
+		//Disabled with Spy Mode, don't need for SUT exploration
+		if(settings.get(ConfigTags.Mode).equals(Modes.Spy)) {
+			System.out.println("INFO: Process Listeners feature is disabled in Spy Mode");
+			return false;
+		}
+		
 		//Only for SUTs executed with command_line
 		if(!settings.get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			System.out.println("INFO: Process Listeners only allowed for Desktop Aplications invoked by SUTConnector: COMMAND_LINE");

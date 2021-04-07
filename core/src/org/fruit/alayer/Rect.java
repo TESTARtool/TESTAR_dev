@@ -68,7 +68,17 @@ public final class Rect implements Shape {
 		if(y2 < y1 || x2 < x1) return null;
 		return Rect.fromCoordinates(x1, y1, x2, y2);
 	}
-
+	
+	public static Rect union(Rect r1, Rect r2){
+		if(r2 == null) return r1;
+		if(r1 == null) return null;
+		double x1 = Math.min(r1.x(), r2.x());
+		double x2 = Math.max(r1.x() + r1.width(),r2.x() + r2.width());
+		double y1 = Math.min(r1.y(), r2.y());
+		double y2 = Math.max(r1.y() + r1.height(), r2.y() + r2.height());
+		if(y2 < y1 || x2 < x1) return null;
+		return Rect.fromCoordinates(x1, y1, x2, y2);
+	}
 
 	public static Rect from(double x, double y, double width, double height){ return new Rect(x, y, width, height); }
 	public static Rect fromCoordinates(double x1, double y1, double x2, double y2){ return new Rect(x1, y1, x2 - x1, y2 - y1); }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,9 +30,6 @@
 
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
@@ -43,21 +40,18 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.fruit.*;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.Windows10;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.HttpWebServer;
 
-import static java.lang.System.exit;
+import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -113,10 +107,20 @@ public class Main {
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
 		Settings settings = loadTestarSettings(args, testSettingsFileName);
+		
+		// TESTAR is executed to offer some Web Server feature.
+		if(webServerMode(settings) && !settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+
+		    setTestarDirectory(settings);
+
+		    // 2 minutes running
+		    HttpWebServer webServer = new HttpWebServer(settings, 120000L);
+		    webServer.runWebServer();
+		}
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
-		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
+		else if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
 			setTestarDirectory(settings);
 
@@ -124,7 +128,7 @@ public class Main {
 
 			initOperatingSystem();
 
-			startTestar(settings, testSettingsFileName);
+			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
@@ -140,7 +144,7 @@ public class Main {
 
 				initOperatingSystem();
 
-				startTestar(settings, testSettingsFileName);
+				startTestar(settings);
 			}
 		}
 
@@ -150,6 +154,13 @@ public class Main {
 
 		System.exit(0);
 
+	}
+	
+	/**
+	 * Check if TESTAR was launched to offer a Web Server feature
+	 */
+	private static boolean webServerMode(Settings settings) {
+	    return (settings.get(ConfigTags.Mode).equals(Modes.Analysis) || settings.get(ConfigTags.Mode).equals(Modes.Report));
 	}
 
 	private static boolean isValidJavaEnvironment() {
@@ -188,8 +199,9 @@ public class Main {
 	 * Find or create the .sse file, to known with what settings and protocol start TESTAR
 	 * 
 	 * @param args
+	 * @throws IOException 
 	 */
-	private static void initTestarSSE(String[] args){
+	private static void initTestarSSE(String[] args) throws IOException{
 
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -199,10 +211,9 @@ public class Main {
 
 		//Allow users to use command line to choose a protocol modifying sse file
 		for(String sett : args) {
-			if(sett.toString().contains("sse="))
-				try {
-					protocolFromCmd(sett);
-				}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
+			if(sett.toString().contains("sse=")) {
+				protocolFromCmd(sett);
+			}
 		}
 
 		String[] files = getSSE();
@@ -329,7 +340,12 @@ public class Main {
 	 * @param settings
 	 * @param testSettings
 	 */
-	private static void startTestar(Settings settings, String testSettings) {
+	private static void startTestar(Settings settings) {
+
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+		}
 
 		URLClassLoader loader = null;
 
@@ -425,6 +441,7 @@ public class Main {
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
 			defaults.add(Pair.from(ShowSettingsAfterTest, true));
+			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -461,11 +478,28 @@ public class Main {
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
+			
+			// state model difference
+			defaults.add(Pair.from(PreviousApplicationName, ""));
+			defaults.add(Pair.from(PreviousApplicationVersion, ""));
+			defaults.add(Pair.from(StateModelDifferenceAutomaticReport, false));
+			
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+
 			defaults.add(Pair.from(ListeningMode, false));
+
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(OverrideWebDriverScreenshotDisplay, ""));
+			
+			defaults.add(Pair.from(HTMLreportServerFile, outputDir));
+			defaults.add(Pair.from(PKMaddress, "127.0.0.1"));
+			defaults.add(Pair.from(PKMport, "27017"));
+			defaults.add(Pair.from(PKMdatabase, "mydb"));
+			defaults.add(Pair.from(PKMusername, "admin"));
+			defaults.add(Pair.from(PKMkey, "admin"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
@@ -524,7 +558,10 @@ public class Main {
 		}
 
 		//Command line protocol doesn't exist
-		if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+		if(!existSSE) {
+			System.err.println("ERROR: Protocol: "+sseName+" doesn't exist");
+			throw new IllegalArgumentException("ERROR: Command line SSE protocol doesn't exist");
+		}
 
 		else{
 			//Obtain previous sse file and delete it (if exist)

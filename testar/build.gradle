@@ -78,15 +78,15 @@ dependencies {
     compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
-    compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
+    compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.7'
     runtime project(':windows')
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
 evaluationDependsOn(':windows')
 
@@ -105,9 +105,23 @@ task prepareOracles(type: Copy) {
     into 'target/scripts/settings'
 }
 
+task prepareJacoco(type: Copy) {
+    from 'jacoco'
+    into 'target/scripts/jacoco'
+}
+
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
     into 'target/scripts/output'
+}
+
+/**
+ * Copy existing testar/resources/windows10/windows.dll as temporally file
+ */
+task prepareCopyOfExistingWindows10dll(type: Copy) {
+    from '../testar/resources/windows10'
+    into 'target/scripts'
+    include 'windows.dll'
 }
 
 /**
@@ -115,9 +129,11 @@ task prepareOutputFolder(type: Copy) {
  * so it can be used with the creation of the distribution.
  */
 task prepareWindowsDLL(type: Copy) {
-    from '../windows/target/resources/main'
-    into 'target/scripts'
-    include 'windows.dll'
+    if(new File('../windows/target/resources/main/windows.dll').exists()) {
+        from '../windows/target/resources/main'
+        into 'target/scripts'
+        include 'windows.dll'
+    }
 }
 
 applicationDistribution.from("../webdriver/resources/web-extension") {
@@ -132,10 +148,10 @@ prepareOracles.dependsOn(oracleClasses)
  */
 startScripts {
     if(System.getProperty('DEBUG', 'false') ) {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
+        applicationDefaultJvmArgs = ['-Dlog4j.configurationFile=log4j2.xml',
                                      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
     } else {
-        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+        applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.xml"]
     }
     
     doLast {
@@ -153,5 +169,26 @@ startScripts.dependsOn {
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
+
+/**
+ * Build TESTAR using Visual Studio Tools to create a windows.dll
+ */
+task windowsDistribution(dependsOn:['buildWindows','installDist','distZip']){
+	group = 'distribution'
+	description ='Build TESTAR distribution for Windows'
+}
+
+task buildWindows(type: Exec) {
+    if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
+        workingDir '../windows/native_src'
+        commandLine 'cmd', '/c', 'compile_w7.bat'
+    } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
+        workingDir '../windows/native_src'
+        commandLine 'cmd', '/c', 'compile_w10.bat'
+    } else  {
+        commandLine './dummy.sh'
+    }
+}
+buildWindows.dependsOn classes
 
 mainClassName='org.fruit.monkey.Main'

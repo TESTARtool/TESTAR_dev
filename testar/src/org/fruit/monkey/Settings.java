@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -44,7 +45,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -281,15 +281,15 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#\n"
 					+"# Indicate how you want to connect to the SUT:\n"
 					+"#\n"
-					+"# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that\n"
+					+"# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that\n"
 					+"# starts the SUT.\n"
 					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
 					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
+					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed\n"
 					+"# in the SUT main window. The SUT must be manually started and closed.\n"
 					+"#\n"
-					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.\n"
+					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.\n"
 					+"# The SUT must be manually started and closed.\n"
 					+"#################################################################\n"
 					+"SUTConnector = " + Util.lineSep()
@@ -406,8 +406,40 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
-                    +"#################################################################\n"
-			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"#################################################################\n"
+					+"AbstractStateAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# PKM address\n"
+					+"#################################################################\n"					
+					+"PKMaddress =" + Util.lineSep()
+					+"PKMport =" + Util.lineSep()
+					+"PKMdatabase =" + Util.lineSep()
+					+"PKMusername =" + Util.lineSep()
+					+"PKMkey =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Previous State model difference settings\n"
+					+"#################################################################\n"
+					+"PreviousApplicationName =" + Util.lineSep()
+					+"PreviousApplicationVersion =" + Util.lineSep()
+					+"StateModelDifferenceAutomaticReport =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Override display scale\n"
+					+"#\n"
+					+"# Overrides the displayscale obtained from the system.\n"
+					+"# Can solve problems when the mouse clicks are not aligned with\n"
+					+"# the elements on the screen. This can easily be detected when\n"
+					+"# running the spy mode. For example hover over a text element and\n"
+					+"# the popup window should appear with information about the\n"
+					+"# element, if the popup window is not shown or when the mouse is\n"
+					+"# located somewhere else you can try to override the displayscale\n"
+					+"# Values should be provided as doubles (1.5).\n"
+					+"#################################################################\n"
+					+"\n"
+					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
+					+"OverrideWebDriverScreenshotDisplay =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

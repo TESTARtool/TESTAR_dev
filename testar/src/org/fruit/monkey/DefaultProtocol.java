@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,7 @@ import static org.fruit.alayer.Tags.ExecutedAction;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -54,9 +52,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -69,31 +67,12 @@ import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
-import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
@@ -106,9 +85,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.windows.WinApiException;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
-
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -116,8 +94,14 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
-import org.slf4j.LoggerFactory;
+
 import org.testar.OutputStructure;
+import org.testar.json.JsonArtefactLogs;
+import org.testar.pkm.PkmRequest;
+
+import com.orientechnologies.orient.core.exception.ODatabaseException;
+import com.orientechnologies.orient.core.exception.OSecurityAccessException;
+import com.orientechnologies.orient.core.exception.OStorageException;
 
 import com.google.common.collect.Sets;
 
@@ -179,13 +163,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
 
 	protected long lastStamp = -1;
-	protected ProtocolUtil protocolUtil = new ProtocolUtil();
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
@@ -195,11 +178,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false;
-	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
+	
+	protected int escAttempts = 0;
+	protected static final int MAX_ESC_ATTEMPTS = 99;
 
 	protected boolean exceptionThrown = false;
+	protected boolean decoderExceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -244,9 +230,78 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.settings = settings;
 
 		SUT system = null;
+		
+		decoderExceptionThrown = false;
+		////2021-02-24T12:19:40.000+00:00
+		JsonArtefactLogs.setStartRunningTime(LocalDateTime.now().toString());
+		JsonArtefactLogs.addMessage("Starting TESTAR tool process");
+		
+		// If not valid user or project, don't initialize TESTAR
+		if(!PkmRequest.validDecoderUserProject(settings)) {
+		    this.mode = Modes.Quit;
+		    decoderExceptionThrown = true;
 
-		//initialize TESTAR with the given settings:
-		initialize(settings);
+		    JsonArtefactLogs.addWarning("Error trying to verify user key or not found project in the database");
+		    finishAndPostLogArtefact();
+		    
+		    return;
+		} else {
+		    JsonArtefactLogs.addMessage("Valid user key and valid project");
+		}
+
+		try {
+			//initialize TESTAR with the given settings:
+			initialize(settings);
+		} catch (OStorageException | ODatabaseException ode) {
+			String msg = "Error trying to connect with OrientDB database. \n"
+					+ String.format("Check settings connection and OrientDB database name:\n %s %s %s %s", 
+							settings.get(ConfigTags.DataStoreType), settings.get(ConfigTags.DataStoreServer), 
+							settings.get(ConfigTags.DataStoreDirectory), settings.get(ConfigTags.DataStoreDB));
+
+			popupMessage(msg);
+			System.out.println(msg);
+			System.out.println(ode.getMessage());
+
+			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
+			return;
+			
+		} catch (OSecurityAccessException osae) {
+			String msg = "Error trying to connect with OrientDB database. \n"
+					+ String.format("Credentials error:\n %s %s", 
+							settings.get(ConfigTags.DataStoreUser), "NotCorrectPassword");
+
+			popupMessage(msg);
+			System.out.println(msg);
+			System.out.println(osae.getMessage());
+
+			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
+			return;
+			
+		} catch (IllegalArgumentException iae) {
+			String msg = String.format("Error with DataStore type: %s", settings.get(ConfigTags.DataStore));
+
+			popupMessage(msg);
+			System.out.println(msg);
+			System.out.println(iae.getMessage());
+
+			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
+			
+			return;
+		}
 
 		try {
 
@@ -255,7 +310,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 						Desktop.getDesktop().browse(file.toURI());
-					}catch (Exception e) {
+					} catch (Exception e) {
 						popupMessage("Exception: Check the path of the file, something is wrong");
 						System.out.println("Exception: Check the path of the file, something is wrong");
 					}
@@ -263,7 +318,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
-					}catch (Exception e) {
+					} catch (Exception e) {
 						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
 					}
@@ -284,18 +339,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runGenerateOuterLoop(system);
 			}
 
-		}catch(WinApiException we) {
+		} catch(SystemStartException | WinApiException e) {
 
 			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
 			+" is a correct definition";
 
 			popupMessage(msg);
 
-			System.out.println(msg);
+			System.err.println(msg);
+			System.err.println(e.getMessage());
 
+			decoderExceptionThrown = true;
 			this.mode = Modes.Quit;
+
+			JsonArtefactLogs.addWarning(msg);
+			finishAndPostLogArtefact();
 			
-		}catch(SessionNotCreatedException e) {
+		} catch(SessionNotCreatedException e) {
 			
     		if(e.getMessage().contains("Chrome version")) {
     			
@@ -308,15 +368,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			
     			popupMessage(msg);
     			
-    			System.out.println(msg);
-    			System.out.println(e.getMessage());
+    			System.err.println(msg);
+    			System.err.println(e.getMessage());
     			
-    		}else {
-    			System.out.println("********** ERROR starting Selenium WebDriver ********");
-    			System.out.println(e.getMessage());
+    			decoderExceptionThrown = true;
+
+    			JsonArtefactLogs.addWarning(msg);
+    			finishAndPostLogArtefact();
+    			
+    		} else {
+    			System.err.println("********** ERROR starting Selenium WebDriver ********");
+    			System.err.println(e.getMessage());
     		}
     		
-		}catch (IllegalStateException e) {
+    		decoderExceptionThrown = true;
+    		
+		} catch (IllegalStateException e) {
 			if (e.getMessage().contains("driver executable does not exist")) {
 				
 				String msg = "Exception: Check if chromedriver.exe path: \n"
@@ -325,26 +392,42 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				popupMessage(msg);
 
-				System.out.println(msg);
+				System.err.println(msg);
+				
+				decoderExceptionThrown = true;
+
+				JsonArtefactLogs.addWarning(msg);
+				finishAndPostLogArtefact();
 			
 			}else {
 				e.printStackTrace();
 			}
+			
+			decoderExceptionThrown = true;
 		
-		}catch(SystemStartException SystemStartException) {
-			SystemStartException.printStackTrace();
-			//INDEXLOG.error("Exception: ",SystemStartException);
-			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
+			decoderExceptionThrown = true;
+
+			JsonArtefactLogs.addWarning(e.getMessage());
+			finishAndPostLogArtefact();
 		}
 
 		//allowing close-up in the end of test session:
 		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
+		
+		JsonArtefactLogs.addMessage("TESTAR executed correctly");
+		finishAndPostLogArtefact();
+	}
+
+	private void finishAndPostLogArtefact() {
+	    JsonArtefactLogs.setEndRunningTime(LocalDateTime.now().toString().toString());
+	    if(decoderExceptionThrown) {JsonArtefactLogs.setStatus(false);}
+	    String artefactLog = JsonArtefactLogs.generateLogsArtefact();
+	    PkmRequest.postArtefactLogs(settings, artefactLog);
 	}
 
 	/**
@@ -361,7 +444,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
 
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -382,7 +464,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
 
@@ -437,8 +519,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Check if the selected file to View is a html file
 	 */
 	private boolean isHtmlFile() {
-		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html")) {
 			return true;
+		} else if(settings.get(ConfigTags.HTMLreportServerFile).contains(".html")) {
+			return true;
+		}
 
 		return false;
 	}
@@ -479,7 +564,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Show a popup message to get the user's attention and inform him.
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
-	private void popupMessage(String message) {
+	protected void popupMessage(String message) {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);
@@ -516,6 +601,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
 		generatedLog = logFileName;
 
+		generatedLog = logFileName;
+		
 		String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir;
 
@@ -524,7 +611,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
-			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
 
@@ -554,7 +640,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			//INDEXLOG.error("Exception: ",e);
 		}
 
 		return currentSeqObject;
@@ -598,7 +683,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -624,7 +708,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
 
 		//Delete the temporally testar file
 		try {
@@ -632,7 +715,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (IOException e2) {
 			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
-
 	}
 
 	/**
@@ -677,11 +759,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
+
 		//method for defining other init actions, like setup of external environment
 		initTestSession();
 
 		//initializing TESTAR for generate mode:
-
 		initGenerateMode();
 
 		/*
@@ -718,6 +800,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
+				
+				//update state after begin sequence SUT modification
+				state = getState(system);
 
 				//initializing fragment for recording replayable test sequence:
 				initFragmentForReplayableSequence(state);
@@ -820,8 +905,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
-			//Not visualizing the widget info under cursor while in Generate-mode:
-			//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
@@ -830,20 +913,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
-			if(actions.isEmpty()){
-				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				}
-				//----------------------------------
-				// THERE MUST ALMOST BE ONE ACTION!
-				//----------------------------------
-				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildEnvironmentActionIDs(state, escAction);
-				actions.add(escAction);
-				escAttempts++;
-			} else
-				escAttempts = 0;
 			//Showing the green dots if visualization is on:
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
@@ -938,7 +1007,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//Wait since TestSerialiser write all fragments on sequence File
 		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			//System.out.println("Saving sequences...");
 			synchronized (this) {
 				try {
 					this.wait(1000);
@@ -978,12 +1046,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
-
-		//bin folder
-		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
-
-
 	}
 
 	/**
@@ -999,25 +1061,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			State state = getState(system);
 
-			cv.begin(); Util.clear(cv);
-
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
+			cv.begin(); Util.clear(cv);
+			
+			//in Spy-mode, always visualize the widget info under the mouse cursor:
+			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
+
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
+			
 			cv.end();
 
-			//TODO: Prepare Spy Mode refresh time on settings file
-			//Wait 500ms to show the actions
+			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
+			
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(msRefresh);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -1033,7 +1095,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		cv.end();
 		
 		//finishSequence() content, but SPY mode is not a sequence
-		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		}
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
@@ -1190,6 +1254,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+	/**
+	 * Method to run TESTAR in replay mode.
+	 * The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
+	 */
 	protected void runReplayLoop(){
 		actionCount = 1;
 		boolean success = true;
@@ -1208,7 +1276,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			//ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(seqFile)));
 			fis = new FileInputStream(seqFile);
 			bis = new BufferedInputStream(fis);
 			gis = new GZIPInputStream(bis);
@@ -1237,8 +1304,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				while(!success && (Util.time() - start < rrt)){
 					tries++;
 					cv.begin(); Util.clear(cv);
-					//In Replay-mode, we DO NOT show the widget info under cursor:
-					//SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
@@ -1253,7 +1318,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try{
 						if(tries < 2){
 							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							//System.out.println(replayMessage);
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						}else{
 							if(tries % 50 == 0)
@@ -1284,10 +1348,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
 		} catch(IOException ioe){
-			//INDEXLOG.error("Exception: ",ioe);
 			throw new RuntimeException("Cannot read file.", ioe);
 		} catch (ClassNotFoundException cnfe) {
-			//INDEXLOG.error("Exception: ",cnfe);
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
@@ -1343,7 +1405,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected Canvas buildCanvas() {
-		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
@@ -1393,7 +1454,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
-		else{ // Settings.SUT_CONNECTOR_CMDLINE
+		else{
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 
 			//Read the settings to know if user wants to start the process listener
@@ -1524,8 +1585,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+		        state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+		    } else {
+		        state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+		    }
 		}
 
 		calculateZIndices(state);
@@ -1580,10 +1644,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Take a Screenshot of the State and associate the path into state tag
 	 */
 	private void setStateScreenshot(State state) {
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
+	    Shape viewPort = state.get(Tags.Shape, null);
+	    if(viewPort != null){
+	        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	            state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+	        } else {
+	            state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+	        }
+	    }
 	}
 
 	@Override
@@ -1607,24 +1675,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		if (this.suspiciousTitlesPattern == null)
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
-		Matcher m;
-		// search all widgets for suspicious titles
-		for(Widget w : state){
-			String title = w.get(Title, "");
-			if (title != null && !title.isEmpty()){
-				m = this.suspiciousTitlesMatchers.get(title);
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(title);
-					this.suspiciousTitlesMatchers.put(title, m);
-				}
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
-				}
+
+		// search all widgets for suspicious String Values
+		Verdict suspiciousValueVerdict = Verdict.OK;
+		for(Widget w : state) {
+			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
+			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+				return suspiciousValueVerdict;
 			}
 		}
 
@@ -1634,6 +1691,38 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// if everything was OK ...
+		return Verdict.OK;
+	}
+	
+	private Verdict suspiciousStringValueMatcher(Widget w) {
+		Matcher m;
+		
+		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
+			
+			if(t != null && !w.get(t,"").isEmpty()) {
+				
+				//Ignore value ValuePattern for UIAEdit widgets
+				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+					continue;
+				}
+				
+				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
+				if (m == null){
+					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
+					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
+				}
+				
+				if (m.matches()){
+					Visualizer visualizer = Util.NullVisualizer;
+					// visualize the problematic widget, by marking it with a red box
+					if(w.get(Tags.Shape, null) != null)
+						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
+							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
+				}
+			} 
+		}
+
 		return Verdict.OK;
 	}
 
@@ -1691,42 +1780,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Action preSelectAction(State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
 
-		//If deriveActions indicated that there are processes that need to be killed
-		//because they are in the process filters
-		//Then here we will select the action to do that killing
+		// If deriveActions indicated that there are processes that need to be killed
+		// because they are in the process filters
+		// Then here we will select the action to do that killing
 
 		if (this.forceKillProcess != null){
 			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action actionKillProcess = KillProcess.byName(this.forceKillProcess, 0);
-			actionKillProcess.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildEnvironmentActionIDs(state, actionKillProcess);
+			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
+			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildEnvironmentActionIDs(state, killProcessAction);
 			this.forceKillProcess = null;
-			return actionKillProcess;
+			return killProcessAction;
 		}
-		//If deriveActions indicated that the SUT should be put back in the foreground
-		//Then here we will select the action to do that
+
+		// If deriveActions indicated that the SUT should be put back in the foreground
+		// Then here we will select the action to do that
 
 		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action actionActivateSystem = new ActivateSystem();
-			actionActivateSystem.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, actionActivateSystem);
+			Action foregroundAction = new ActivateSystem();
+			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
 			this.forceToForeground = false;
-			return actionActivateSystem;
+			return foregroundAction;
 		}
 
-		//TODO: This seems not to be used yet...
+		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (this.forceNextActionESC){
-			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
+		else if (actions.isEmpty()){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action actionEscape = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildEnvironmentActionIDs(state, actionEscape);
-			this.forceNextActionESC = false;
-			return actionEscape;
-		} else
-			return null;
+			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildEnvironmentActionIDs(state, escAction);
+			return escAction;
+		}
+
+		return null;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
@@ -1734,7 +1824,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 		
-		protocolUtil.getActionshot(state,action);
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	        WdProtocolUtil.getActionshot(state,action);
+	    } else {
+	        ProtocolUtil.getActionshot(state,action);
+	    }
 		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
@@ -1814,75 +1908,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Return a list of widgets that have the maximal Zindex
-	 * @param state
-	 * @return
-	 */
-	protected List<Widget> getTopWidgets(State state){
-		List<Widget> topWidgets = new ArrayList<>();
-		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
-			if (w.get(Tags.ZIndex) == maxZIndex)
-				topWidgets.add(w);
-		return topWidgets;
-	}
-
-	/**
-	 * Check whether widget w should be filtered based on
-	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
-	 * that is cannot be hit
-	 * @param w
-	 * @return
-	 */
-	protected boolean isUnfiltered(Widget w){
-		//Check whether the widget can be hit
-		// If not, it should be filtered
-		if(!Util.hitTest(w, 0.5, 0.5))
-			return false;
-
-		//Check whether the widget has an empty title or no title
-		//If it has, it is unfiltered
-		//Because it cannot match the regular expression of the Action Filter.
-		String title = w.get(Title, "");
-		if (title == null || title.isEmpty())
-			return true;
-
-		//If no clickFilterPattern exists, then create it
-		//Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
-		if (this.clickFilterPattern == null)
-			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-
-		//Check whether the title matches any of the clickFilterPatterns
-		Matcher m = this.clickFilterMatchers.get(title);
-		if (m == null){
-			m = this.clickFilterPattern.matcher(title);
-			this.clickFilterMatchers.put(title, m);
-		}
-		return !m.matches();
-	}
-
-	/**
-	 * Check whether a widget is clickable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isClickable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
-			return true;
-		return false;
-	}
-
-	/**
-	 * Check whether a widget is typeable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isTypeable(Widget w){
-		return NativeLinker.isNativeTypeable(w);
-	}
-
-	/**
 	 * STOP criteria for selecting more actions for a sequence
 	 * @param state
 	 * @return
@@ -1900,8 +1925,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreSequences() {
-		//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-		//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
@@ -1982,7 +2005,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
@@ -2068,51 +2091,4 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		return null;
 	}
-
-	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-	protected boolean isNOP(Action action){
-		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID))
-			return true;
-		else
-			return false;
-	}
-
-	protected boolean isESC(Action action){
-		Role r = action.get(Tags.Role, null);
-		if (r != null && r.isA(ActionRoles.HitKey)){
-			String desc = action.get(Tags.Desc, null);
-			if (desc != null && desc.contains("VK_ESCAPE"))
-				return true;
-		}
-		return false;
-	}
-
-	/**
-     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-     * @param actions
-     * @param ac
-     * @param scrollArrowSize
-     * @param scrollThick
-     * @param widget
-     */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
-        Drag[] drags = null;
-        //If there are scroll (drags/drops) actions possible
-        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
-            //For each possible drag, create an action and add it to the derived actions
-            for (Drag drag : drags){
-                //Create a slide action with the Action Compiler, and add it to the set of derived actions
-                actions.add(ac.slideFromTo(
-                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-                        widget
-                ));
-
-            }
-        }
-    }
-
 }

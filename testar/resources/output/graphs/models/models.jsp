@@ -74,7 +74,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form target="_blank" method="post" action="graph">
+                    <form target="_self" method="post" action="graph">
                         <input type="hidden" value="${model.modelIdentifier}" name="modelIdentifier">
                         <div class="modal-body">
                             <div class="row">

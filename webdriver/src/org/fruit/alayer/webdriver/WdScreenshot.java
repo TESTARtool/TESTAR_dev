@@ -71,4 +71,23 @@ public class WdScreenshot extends AWTCanvas {
     }
     return wdScreenshot;
   }
+  
+  public static WdScreenshot fromScreenshot(Rect r, double displayScale) throws StateBuildException {
+	  WdScreenshot wdScreenshot = new WdScreenshot();
+	  RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
+
+	  try {
+		  File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
+		  BufferedImage fullImg = ImageIO.read(screenshot);
+		  int x = (int) Math.max(0, r.x() * displayScale);
+		  int y = (int) Math.max(0, r.y() * displayScale);
+		  int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
+		  int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
+		  wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
+	  }
+	  catch (Exception ignored) {
+
+	  }
+	  return wdScreenshot;
+  }
 }

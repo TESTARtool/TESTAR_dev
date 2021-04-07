@@ -503,7 +503,7 @@
 
             form.method = "POST";
             form.action = "graph";
-            form.target = "_blank";
+            form.target = "_self";
             contentPanel.appendChild(form);
 
             let widgetTreeButton = document.createElement("button");

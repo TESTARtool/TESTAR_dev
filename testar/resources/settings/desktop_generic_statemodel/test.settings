@@ -22,8 +22,8 @@ Mode = Spy
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = SUT_WINDOW_TITLE
-SUTConnectorValue = CODEO
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -109,13 +109,11 @@ GraphDBPassword = testar
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = 10.101.0.238
-DataStoreDB = codeo
+DataStoreServer = 10.102.0.244
+DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-StateModelStoreWidgets = false
-ActionSelectionAlgorithm = unvisited
 
 #################################################################
 # State identifier attributes
@@ -124,6 +122,22 @@ ActionSelectionAlgorithm = unvisited
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# PKM address
+#################################################################
+PKMaddress = 10.101.0.224
+PKMport = 8080
+PKMdatabase = myproject
+PKMusername = demo
+PKMkey = admin
+
+#################################################################
+# Previous State model difference settings
+#################################################################
+PreviousApplicationName =
+PreviousApplicationVersion =
+StateModelDifferenceAutomaticReport = true
 
 #################################################################
 # Other more advanced settings

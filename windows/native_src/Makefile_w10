@@ -28,7 +28,7 @@ CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-	javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
+	"$(JAVA_HOME)\bin\javah.exe" -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
 
 $(OBJFILES): windows.h
 

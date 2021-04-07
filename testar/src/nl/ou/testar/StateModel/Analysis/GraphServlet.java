@@ -33,7 +33,7 @@ public class GraphServlet  extends HttpServlet {
 
             // check if there were any layers requested
             if (!(abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired)) {
-                response.sendRedirect("/models");
+                response.sendRedirect("/models/models");
             }
 
             // fetch the model
@@ -42,7 +42,7 @@ public class GraphServlet  extends HttpServlet {
             try {
                 request.setAttribute("graphContentFile", jsonFileName);
                 request.setAttribute("contentFolder", modelIdentifier);
-                RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
+                RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models/graph.jsp");
                 dispatcher.forward(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -58,20 +58,15 @@ public class GraphServlet  extends HttpServlet {
             try {
                 request.setAttribute("graphContentFile", jsonFileName);
                 request.setAttribute("contentFolder", concreteStateIdentifier);
-                RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
+                RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models/graph.jsp");
                 dispatcher.forward(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         else {
-            response.sendRedirect("/models");
+            response.sendRedirect("/models/models");
         }
-
-
-
-
-
 
     }
 

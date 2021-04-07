@@ -67,21 +67,21 @@ public class ImportDatabaseDialog extends JDialog {
 	private JLabel labelPassword = new JLabel("RootPassword");
 	private JLabel labelImportDB = new JLabel("DB to import");
 	private JLabel labelNameDB = new JLabel("New DB name");
-	
+
 	private JTextField textFieldStoreServer = new JTextField();
 	private JTextField textFieldStoreDirectory = new JTextField();
 	private JTextField textFieldRoot = new JTextField();
 	private JPasswordField textFieldPassword = new JPasswordField();
 	private JTextField textFieldImportDB = new JTextField();
 	private JTextField textFieldNameDB = new JTextField();
-	
+
 	private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
-	
+
     private JButton dirButton = new JButton("..");
 	private JButton buttonSelectDB = new JButton("Select DB");
 	private JButton buttonImport = new JButton("Import Selected DB");
 	private JButton buttonCancel = new JButton("Cancel Import");
-	
+
 	// orient db instance that will create database sessions
     private transient OrientDB orientDB;
 
@@ -91,7 +91,7 @@ public class ImportDatabaseDialog extends JDialog {
 	public ImportDatabaseDialog(String storeType, String storeServer, String storeDirectory) {
 		initialize(storeType, storeServer, storeDirectory);
 	}
-	
+
 	private void initialize(String storeType, String storeServer, String storeDirectory) {
 
 		setTitle("TESTAR Import OrientDB database");
@@ -119,13 +119,13 @@ public class ImportDatabaseDialog extends JDialog {
 		textFieldStoreServer.setBounds(160,52,125,27);
 		textFieldStoreServer.setText(storeServer);
 		add(textFieldStoreServer);
-		
+
 		labelStoreDirectory.setBounds(10,90,150,27);
 		add(labelStoreDirectory);
 		textFieldStoreDirectory.setBounds(160,90,125,27);
 		textFieldStoreDirectory.setText(storeDirectory);
 		add(textFieldStoreDirectory);
-		
+
         dirButton.setBounds(290, 90, 20, 27);
         dirButton.addActionListener(this::chooseFileActionPerformed);
         dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation. Make sure the OrientDB server is not running.");
@@ -141,12 +141,12 @@ public class ImportDatabaseDialog extends JDialog {
 		add(labelPassword);
 		textFieldPassword.setBounds(160,166,125,27);
 		add(textFieldPassword);
-		
+
 		labelImportDB.setBounds(10,204,150,27);
 		add(labelImportDB);
 		textFieldImportDB.setBounds(160,204,325,27);
 		add(textFieldImportDB);
-		
+
 		buttonSelectDB.setBounds(330,242,150,27);
 		buttonSelectDB.addActionListener(new ActionListener() {
 			@Override
@@ -155,12 +155,12 @@ public class ImportDatabaseDialog extends JDialog {
 			}
 		});
 		add(buttonSelectDB);
-		
+
 		labelNameDB.setBounds(10,280,150,27);
 		add(labelNameDB);
 		textFieldNameDB.setBounds(160,280,150,27);
 		add(textFieldNameDB);
-		
+
 		buttonImport.setBounds(330,318,150,27);
 		buttonImport.addActionListener(new ActionListener() {
 			@Override
@@ -170,7 +170,7 @@ public class ImportDatabaseDialog extends JDialog {
 			}
 		});
 		add(buttonImport);
-		
+
 		buttonCancel.setBounds(330, 408, 150, 27);
 		buttonCancel.addActionListener(new ActionListener() {
 			@Override
@@ -180,7 +180,7 @@ public class ImportDatabaseDialog extends JDialog {
 			}
 		});
 		add(buttonCancel);
-		
+
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 	        @Override
 	        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -189,14 +189,14 @@ public class ImportDatabaseDialog extends JDialog {
 	    });
 
 	}
-	
+
     // make sure the right text fields are enabled based on the selected data store type (remote or local)
     private void checkDataType() {
         textFieldStoreServer.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote"));
         textFieldStoreDirectory.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
         dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
     }
-    
+
     // show a file dialog to choose the directory where the local install of OrientDB is located
     private void chooseFileActionPerformed(ActionEvent evt) {
         JFileChooser fd = new JFileChooser();
@@ -210,7 +210,7 @@ public class ImportDatabaseDialog extends JDialog {
             textFieldStoreDirectory.setText(file);
         }
     }
-	
+
 	private void chooseFileToImport() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -221,7 +221,7 @@ public class ImportDatabaseDialog extends JDialog {
 		    obtainDefaultDBname(selectedFile.getAbsolutePath());
 		}
 	}
-	
+
 	private void obtainDefaultDBname(String dbPath) {
 		if(dbPath.contains(".export.gz")) {
 			try {
@@ -232,9 +232,9 @@ public class ImportDatabaseDialog extends JDialog {
 			}catch(Exception e) {}
 		}			
 	}
-	
+
 	private boolean checkIfDatabaseExists() {
-		
+
 		dbConfig = new Config();
 		dbConfig.setConnectionType(dataStoreTypeBox.getSelectedItem().toString());
 		dbConfig.setServer(textFieldStoreServer.getText());
@@ -243,7 +243,7 @@ public class ImportDatabaseDialog extends JDialog {
 		dbConfig.setDatabaseDirectory(textFieldStoreDirectory.getText());
 
 		try {
-			
+
 	        String connectionString = dbConfig.getConnectionType() + ":" + (dbConfig.getConnectionType().equals("remote") ?
 	                dbConfig.getServer() : dbConfig.getDatabaseDirectory()) + "/";
 
@@ -270,11 +270,11 @@ public class ImportDatabaseDialog extends JDialog {
 		} finally {
 			orientDB.close();
 		}
-		
+
 		return false;
 
 	}
-	
+
 	private void importDatabase() {
 		dbConfig = new Config();
 		dbConfig.setConnectionType(dataStoreTypeBox.getSelectedItem().toString());
@@ -282,16 +282,16 @@ public class ImportDatabaseDialog extends JDialog {
 		dbConfig.setUser(textFieldRoot.getText());
 		dbConfig.setPassword(getPassword());
 		dbConfig.setDatabaseDirectory(textFieldStoreDirectory.getText());
-		
+
         String connectionString = dbConfig.getConnectionType() + ":" + (dbConfig.getConnectionType().equals("remote") ?
                 dbConfig.getServer() : dbConfig.getDatabaseDirectory()) + "/";
-		
+
         orientDB = new OrientDB(connectionString, dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 
         //First we need to create the database
 		orientDB.create(textFieldNameDB.getText(), ODatabaseType.PLOCAL, OrientDBConfig.defaultConfig());
 		dbConfig.setDatabase(textFieldNameDB.getText());
-		
+
 		try (ODatabaseSession sessionDB = orientDB.open(dbConfig.getDatabase(), "admin", "admin")){
 
 			OCommandOutputListener listener = new OCommandOutputListener() {
@@ -304,7 +304,7 @@ public class ImportDatabaseDialog extends JDialog {
 			ODatabaseImport importDB = new ODatabaseImport((ODatabaseDocumentInternal)sessionDB, textFieldImportDB.getText(), listener);
 			importDB.importDatabase();
 			importDB.close();
-			
+
 		} catch(OSecurityAccessException e) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, 
@@ -317,9 +317,9 @@ public class ImportDatabaseDialog extends JDialog {
 		} finally {
 			orientDB.close();
 		}
-		
+
 	}
-	
+
 	/**
      * Convert password field to string.
      * @return password as String.
@@ -331,10 +331,10 @@ public class ImportDatabaseDialog extends JDialog {
         }
         return  result.toString();
     }
-    
+
     private void closeOrientDB() {
     	if(orientDB!=null && orientDB.isOpen())
     		orientDB.close();
     }
-	
+
 }

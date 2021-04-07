@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,70 +43,80 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
 public class WdProtocolUtil extends ProtocolUtil {
-  public WdProtocolUtil() {
-  }
 
-  @Override
-  public String getStateshot(State state) {
-    double width = CanvasDimensions.getCanvasWidth() + (
-        state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
-    double height = CanvasDimensions.getCanvasHeight() + (
-        state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
-    Rect rect = Rect.from(0, 0, width, height);
-    AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
-  }
+    public static String getStateshot(State state) {
+        double width = CanvasDimensions.getCanvasWidth() + (state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+        double height = CanvasDimensions.getCanvasHeight() + (state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+        Rect rect = Rect.from(0, 0, width, height);
 
-  @Override
-  public String getActionshot(State state, Action action) {
-    List<Finder> targets = action.get(Tags.Targets, null);
-    if (targets == null) {
-      return null;
+        if(ProtocolUtil.overrideScreenshot) {
+            AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, ProtocolUtil.overrideScreenshotDisplayScale);
+            return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
+        }
+
+        AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
+        return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
     }
 
-    Rectangle actionArea = new Rectangle(
-        Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-    for (Finder f : targets) {
-      Widget widget = f.apply(state);
-      Shape shape = widget.get(Tags.Shape);
-      Rectangle r = new Rectangle((int) shape.x(), (int) shape.y(), (int) shape.width(), (int) shape.height());
-      actionArea = actionArea.union(r);
-    }
-    if (actionArea.isEmpty()) {
-      return null;
+    public static String getActionshot(State state, Action action) {
+        List<Finder> targets = action.get(Tags.Targets, null);
+        if (targets == null) {
+            return null;
+        }
+
+        Rectangle actionArea = new Rectangle(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        for (Finder f : targets) {
+            Widget widget = f.apply(state);
+            Shape shape = widget.get(Tags.Shape);
+            Rectangle r = new Rectangle((int) shape.x(), (int) shape.y(), (int) shape.width(), (int) shape.height());
+            actionArea = actionArea.union(r);
+        }
+        if (actionArea.isEmpty()) {
+            return null;
+        }
+
+        // Actionarea is outside viewport
+        if (actionArea.x < 0 || actionArea.y < 0 ||
+                actionArea.x + actionArea.width > CanvasDimensions.getCanvasWidth() ||
+                actionArea.y + actionArea.height > CanvasDimensions.getCanvasHeight()) {
+            return null;
+        }
+
+        Rect rect = Rect.from(actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
+
+        if(ProtocolUtil.overrideScreenshot) {
+            AWTCanvas actionScrshot = WdScreenshot.fromScreenshot(rect, ProtocolUtil.overrideScreenshotDisplayScale);
+            return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), 
+                    action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), actionScrshot);
+        }
+
+        AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
+        return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
     }
 
-    // Actionarea is outside viewport
-    if (actionArea.x < 0 || actionArea.y < 0 ||
-        actionArea.x + actionArea.width > CanvasDimensions.getCanvasWidth() ||
-        actionArea.y + actionArea.height > CanvasDimensions.getCanvasHeight()) {
-      return null;
-    }
+    public static AWTCanvas getStateshotBinary(State state) {
+        //If these State Tags are not obtained, the State has an error, use full monitor screen
+        if(state.get(WdTags.WebVerticallyScrollable, null) == null 
+                && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
+            //Get a screenshot of all the screen, because SUT ended and we can't obtain the size
+            Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+            Rect rect = Rect.from(screenRect.getX(), screenRect.getY(), screenRect.getWidth(), screenRect.getHeight());
 
-    Rect rect = Rect.from(
-        actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
-    AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
-  }
-  
-  @Override
-  public AWTCanvas getStateshotBinary(State state) {
-	  //If these State Tags are not obtained, the State has an error, use full monitor screen
-	  if(state.get(WdTags.WebVerticallyScrollable, null) == null 
-			  && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
-		  //Get a screenshot of all the screen, because SUT ended and we can't obtain the size
-		  Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		  AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(screenRect.getX(), screenRect.getY(),
-				  screenRect.getWidth(), screenRect.getHeight()), state.get(Tags.HWND, (long)0), AWTCanvas.StorageFormat.PNG, 1);
-		  return scrshot;
-	  }
-	  
-	  double width = CanvasDimensions.getCanvasWidth() + (
-			  state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
-	  double height = CanvasDimensions.getCanvasHeight() + (
-			  state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
-	  Rect rect = Rect.from(0, 0, width, height);
-	  AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-	  return screenshot;
-  }
+            if(ProtocolUtil.overrideScreenshot) {
+                return WdScreenshot.fromScreenshot(rect, ProtocolUtil.overrideScreenshotDisplayScale);
+            }
+
+            return WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
+        }
+
+        double width = CanvasDimensions.getCanvasWidth() + (state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+        double height = CanvasDimensions.getCanvasHeight() + (state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+        Rect rect = Rect.from(0, 0, width, height);
+
+        if(ProtocolUtil.overrideScreenshot) {
+            return WdScreenshot.fromScreenshot(rect, ProtocolUtil.overrideScreenshotDisplayScale);
+        }
+
+        return WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
+    }
 }
