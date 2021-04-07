@@ -23,11 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-<<<<<<< HEAD:testar/resources/settings/desktop_listening_reward/test.settings
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
-=======
 SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\lib\\jacocoagent.jar=jmx=true "C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar"
->>>>>>> decoder_dev:testar/resources/settings/desktop_codeo/test.settings
 
 #################################################################
 # Sequences
@@ -97,11 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-<<<<<<< HEAD:testar/resources/settings/desktop_listening_reward/test.settings
-ProtocolClass = desktop_listening_reward/Protocol_desktop_listening_reward
-=======
 ProtocolClass = desktop_codeo/Protocol_desktop_codeo
->>>>>>> decoder_dev:testar/resources/settings/desktop_codeo/test.settings
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -122,11 +114,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-<<<<<<< HEAD:testar/resources/settings/desktop_listening_reward/test.settings
-=======
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
->>>>>>> decoder_dev:testar/resources/settings/desktop_codeo/test.settings
 
 #################################################################
 # State identifier attributes
@@ -174,11 +163,7 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-<<<<<<< HEAD:testar/resources/settings/desktop_listening_reward/test.settings
-TimeToWaitAfterAction = 0.1
-=======
 TimeToWaitAfterAction = 0.5
->>>>>>> decoder_dev:testar/resources/settings/desktop_codeo/test.settings
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
