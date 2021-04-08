@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,10 +59,6 @@ public class NativeLinker {
 	private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
 	private static String osName;
 	
-	public static String getOsName() {
-		return osName;
-	}
-	
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.
@@ -104,23 +100,28 @@ public class NativeLinker {
 	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
+			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			}
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				// TODO: a win10 state builder might make use of the new CUI8 Automation object.
+				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			}
+			else {
+				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org.");
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			}
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return new AtSpiStateBuilder(timeToFreeze);
 		}
-		// Not specific OS detected. Run default Windows implementation.
-		System.out.println("WARNING: TESTAR detected OS: " + osName + " is not fully supported. Running default Windows OS integration. "
-				+ "If the detected OS is wrong, please contact the TESTAR team at info@testar.org.");
-		return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+		
+		System.out.println("TESTAR detected OS: " + osName + " and this is not yet supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org. Exiting with Exception.");
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -140,8 +141,7 @@ public class NativeLinker {
 			return new GdkScreenCanvas();
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
 		}
-		// Not specific OS detected. Run default Windows implementation.
-		return GDIScreenCanvas.fromPrimaryMonitor(pen);
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -150,23 +150,31 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
+			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
-				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
-					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-				else
-					return WinProcess.fromExecutableUwp(executableCommand);
 			}
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
+				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
+					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+				}
+				else {
+					return WinProcess.fromExecutableUwp(executableCommand);
+				}
+			}
+			else {
+				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported.");
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+			}
+		}
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return LinuxProcess.fromExecutable(executableCommand);
 		}
-		// Not specific OS detected. Run default Windows implementation.
-		return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -175,36 +183,29 @@ public class NativeLinker {
 	 * @return A list of running processes wrapped in a SUT class.
 	 */
 	public static List<SUT> getNativeProcesses(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdDriver.fromAll();
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return LinuxProcess.fromAll();
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return WinProcess.fromAll();
+		throw new UnsupportedPlatformException();
 	}
 
 	public static SUT getNativeProcess(String processName){
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromProcName(processName);
-		}
 		//else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 		// TODO
-		
-		// Not specific OS detected. Run default Windows implementation.
-		return WinProcess.fromProcName(processName);
+		throw new UnsupportedPlatformException();
 	}
 
 	public static ProcessHandle getNativeProcessHandle(long processPID){
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new WinProcHandle(processPID);
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new LinuxProcessHandle(processPID);
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return new WinProcHandle(processPID);
+		throw new UnsupportedPlatformException();
 	}
 
 	/** Gets the memory usage for a SUT.
@@ -212,15 +213,13 @@ public class NativeLinker {
 	 * @return Memory usage in KB.
 	 */
 	public static int getMemUsage(SUT nativeSUT){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return 0;
-		} if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024);
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -245,26 +244,18 @@ public class NativeLinker {
 					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT)),
 					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT))};
 		}
-		// Not specific OS detected. Run default Windows implementation.
-		long now = System.currentTimeMillis();
-		long cpuFrame = now - lastCPUquery;
-		lastCPUquery = now;
-		long[] cpums = WinProcess.getCPUsage((WinProcess)nativeSUT);
-		return new long[]{ cpums[0], cpums[1], cpuFrame };
+		throw new UnsupportedPlatformException();
 	}
 
 	public static Collection<Role> getNativeRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdRoles.rolesSet();
 		}
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
-		}
 		// else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 		// TODO
-		
-		// Not specific OS detected. Run default Windows implementation.
-		return UIARoles.rolesSet();
+		throw new UnsupportedPlatformException();
 	}
 
 	public static Role getNativeRole(String roleName){
@@ -292,13 +283,11 @@ public class NativeLinker {
 	 * @return The native Role wrapper for a window.
 	 */
 	public static Role getNativeRole_Window(){
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAWindow;
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiRolesWrapper.AtSpiWindow;
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return UIARoles.UIAWindow;
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -306,15 +295,13 @@ public class NativeLinker {
 	 * @return The native Role wrapper for a button.
 	 */
 	public static Role getNativeRole_Button(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdRoles.WdBUTTON;
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAButton;
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiRolesWrapper.AtSpiPushButton;
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return UIARoles.UIAButton;
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -322,15 +309,13 @@ public class NativeLinker {
 	 * @return The native Role wrapper for a menu item.
 	 */
 	public static Role getNativeRole_Menuitem(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdRoles.WdUnknown;
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAMenuItem;
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiMenuItem;
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return UIARoles.UIAMenuItem;
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -338,15 +323,13 @@ public class NativeLinker {
 	 * @return Native tags.
 	 */
 	public static Set<Tag<?>> getNativeTags(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdTags.tagSet();
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIATags.tagSet();
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiTags.tagSet();
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return UIATags.tagSet();
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -398,12 +381,7 @@ public class NativeLinker {
 					AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
 					AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
 		}
-		// Not specific OS detected. Run default Windows implementation.
-		return new Role[]{UIAMenu, UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
-				UIAComboBox, UIAList, UIAListItem,
-				UIATabItem, UIAHyperlink, UIADataItem, UIATree, UIATreeItem,
-				UIASlider, UIASpinner, UIAScrollBar, UIASplitButton,
-				UIACustomControl}; // be careful on custom control (we do not know what they are)
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -411,16 +389,14 @@ public class NativeLinker {
 	 * @return All roles that correspond to elements that can be edited.
 	 */
 	public static Role[] getNativeTypeableRoles(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdRoles.nativeTypeableRoles();
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new Role[]{UIADocument, UIAEdit, UIAText};
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new Role[]{AtSpiPasswordText, AtSpiText, AtSpiDocumentText, AtSpiDocumentWeb,
 					AtSpiDocumentEmail};
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return new Role[]{UIADocument, UIAEdit, UIAText};
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -429,16 +405,12 @@ public class NativeLinker {
 	 * @return True if the widget supports typing; False otherwise.
 	 */
 	public static boolean isNativeTypeable(Widget w){
-		if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles())) {
+		if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles()))
 			return false;
-		} else if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)){
-			return w.get(WdTags.WebIsKeyboardFocusable);
-		} else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return w.get(UIATags.UIAIsKeyboardFocusable);
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return w.get(AtSpiTags.AtSpiIsFocusable);
-		}
-		// Not specific OS detected. Run default Windows implementation.
-		return w.get(UIATags.UIAIsKeyboardFocusable);
+		throw new UnsupportedPlatformException();
 	}
 }

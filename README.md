@@ -118,121 +118,64 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 		SuspiciousTitles -> The errors that TESTAR will search in the execution
 
 Example: 
-testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"
 
-
-## Known issues
-https://github.com/TESTARtool/TESTAR_dev/issues
+``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
 ## State Model / Graph database support
-TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR State Model.
+TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.
 Detected Widget's, Actions, States and their respective relations are recorded to this graph database.
 
 ### Use of the State Mode and the graph database
-The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Management.
+The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Sequence.
 
 The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
 
-More information about how to configure TESTAR State Model is available starting on the slide 28:
-https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
+### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
+https://www.orientdb.org/download
+https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip
 
-### Using OrientDB graphdb on the local filesystem
-OrientDB graph database can be used remotely or locally.
-Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server.
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
+``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
 
 ### Install and configure OrientDB Server
-In order to use the graphdb feature it's advised to install a graph database on your machine.
-The current implementation  of TESTAR has a backend for Orientdb.
-You can download the community edition from [orientdb](orientdb.com).
-Follow the installation instructions to install the database on your machine. 
+In order to use the graphdb feature it's advised to install a graph database on your machine or in a remote server.
+
+Follow the installation instructions about how to configure TESTAR State Model on slide 28:
+https://testar.org/images/development/TESTAR_webdriver_state_model.pdf 
+
+Also TESTAR HandsOn (Section 6) contains more information about State Model settings: https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_October_14.pdf
 
 When orientdb is started the first time. The root password needs to be configured. Make sure you remember this password.
 
-In order to use the graphdb feature. A database must be created in Orientdb. To do this follow the following procedure;
+In order to use the graphdb feature. A database must be created in OrientDB. To do this follow the following procedure:
 - Start the database server (ORIENTDB_HOME/bin/server.bat)
 - Start orientdb studio in a webbrowser [http://localhost:2480](http://localhost:2480)
-- Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/adimin 
-user/password).
+- Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/admin  user/password).
+- Go to Security tab and create a new user (testar/testar) with an active status and the admin role
 
-After starting TESTAR, it's required to configure the database settings in the tab "GraphDB".
-- url : remote:<hostname>/&lt;database name> (for instance remote:/localhost/demo)
-- user: admin
-- password: admin
-- Check the checkbox.
+### Using OrientDB graphdb on the local filesystem
+OrientDB graph database can be used remotely or locally.
+Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server:
 
-When TESTAR finishes, the data be inspected in the database. The easiest way to see the complete
-graph is to type the following query in the graph tab "Select * From E". This will display the complete
-graph.
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = remote
+		DataStoreServer = localhost
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
 
-### Requirements for a protocol when using GraphDB.
+Also is possible to connect at file level without deploy the OrientDB locally:
 
-A part of the interaction with the graph database occurs in the method *deriveActions*. In this method, the available 
-widgets are stored as they are derived within the protocol. When using the graph database extension, the user needs
-to be aware the widgets are stored. When this is not done, the model in the database is incomplete. A sample can be 
-found in the protocol *desktop_generic_graphdb.java*.
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = plocal
+		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
+		
+## Known issues
+https://github.com/TESTARtool/TESTAR_dev/issues
 
-### Exploring the graph database with Gremlin.
-
-[Gremlin](http://tinkerpop.apache.org/docs/current/reference/#_tinkerpop3) is a graph traversel engine which can be used 
-to query a graph database. OrientDB supports Gremlin and provides an implementation of the traversal engine in it's 
-community release.
-
-To start Gremlin run the following command; orientdb-gremlin. This command is delivered with the community 
-edition of Orientdb.
-
-See the manuals of orientdb to learn about the possibilities to query the model.
-
-
-## DECODER
-
-### TESTAR HandsOn:
-https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_Feb_5.pdf
-
-### Webdriver and State Model
-https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
-
-### DECODER Required Environment for distributed TESTAR version:
-1. Windows 10
-2. Java 1.8
-3. Node JS
-
-### TESTAR - DECODER remote API
-TODO: Currently in development
-
-### PKM Connection - Currently MongoDB URL and MongoDB port is defined in JavaScript files:
-1. inside testar\bin\settings\validate_and_insert_testar_test_results.js
-2. inside testar\bin\settings\validate_and_insert_testar_state_model.js
-
-TODO: Implement authentication (In development by CEA + Integration will be done by UPV - TESTAR)
-TODO: Implement TESTAR settings to select MongoDB URL + port
-TODO: Remote API will include parameters to configure this MongoDB TESTAR settings
-
-
-### State Model storage - OrientDB - NECESSARY FOR ALL PROTOCOLS:
-
-Visual information about configuration in Slides 44 - 61:
-https://testar.org/images/development/TESTAR_webdriver_state_model.pdf
-
-1. Download OrientDB Community Edition: https://orientdb.com/download-2/
-2. Extract and execute \orientdb-3.X.X\bin\ ( server.bat | server.sh )
-3. First time admin credential will be required
-4. Use the browser to acces to OrientDB management page localhost:2480 (2480 it is the port by default)
-4. Create a new database with admin credentials
-5. Create new user in the Security tab (user:testar + password:testar is used by default in TESTAR settings)
-6. Now it is possible to connect with remote mode (IPaddress:port) or plocal mode (\orientdb-3.X.X\bin\databases directory)
-7. Configure TESTAR settings - TESTAR GUI -> State Model tab
-
-TODO: Remote API will include parameters to configure this OrientDB TESTAR settings
-
-
-### MyThaiStar protocol:
-1. Download Selenium Chromedriver based on Chrome Browser version
-2. It is necessary to indicate (SUTConnectorValue) the web server IP:port that contains MyThaiStar running
-
-
-### CODEO protocol:
-TODO:
+## Release notes
+https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes

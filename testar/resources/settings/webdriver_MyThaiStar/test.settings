@@ -99,14 +99,6 @@ SUTProcesses =
 
 ProtocolClass = webdriver_MyThaiStar/Protocol_webdriver_MyThaiStar
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"

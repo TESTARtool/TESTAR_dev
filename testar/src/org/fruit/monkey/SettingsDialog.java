@@ -68,7 +68,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  public static final String TESTAR_VERSION = "DECODER version - 2.2.11 (3-November-2020)";
+  public static final String TESTAR_VERSION = "DECODER version - 2.2.12 (26-Nov-2020)";
 
   private String settingsFile;
   private Settings settings;

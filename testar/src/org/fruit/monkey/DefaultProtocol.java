@@ -437,6 +437,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void initialize(Settings settings) {
 
+		visualizationOn = settings.get(ConfigTags.VisualizeActions);
+
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
@@ -1187,15 +1189,32 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (actionStatus.isUserEventAction()) {
 
 				Action recordedAction = actionStatus.getAction();
-				
-				// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
-				for(Action a : actions)
-					if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None")))
-						recordedAction = a;
+
+				// Map Recorded Type Actions with existing action
+				if(recordedAction.get(Tags.Desc, "Nothing").contains("Type")) {
+					for(Action a : actions) {
+						if(a.get(Tags.OriginWidget).get(Tags.Path)
+								.equals(actionStatus.getAction().get(Tags.OriginWidget).get(Tags.Path))) {
+							recordedAction = a;
+							break;
+						}
+					}
+				} else {
+					// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
+					for(Action a : actions) {
+						if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None"))) {
+							recordedAction = a;
+							break;
+						}
+					}
+				}
 				
 				// If something went wrong trying to find the action, we need to create the AbstractIDCustom
-				if(recordedAction.get(Tags.AbstractIDCustom, null) == null)
+				if(recordedAction.get(Tags.AbstractIDCustom, null) == null) {
+					System.out.println("Recorded Action has not AbstractIDCustom, creating...");
 					CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
+					System.out.println(recordedAction.get(Tags.AbstractIDCustom));
+				}
 				
 				//notify the state model manager of the Recorded action
 				stateModelManager.notifyRecordedAction(recordedAction);
@@ -1419,43 +1438,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 
-	// refactored
-	protected SUT startSystem() throws SystemStartException{
-		return startSystem(null);
-	}
-
-	/**
-	 *
-	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
-	 * @return
-	 * @throws SystemStartException
-	 */
-	protected SUT startSystem(String mustContain) throws SystemStartException{
-		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
-	}
-
-
-	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
-		try{// refactored from "protected SUT startSystem() throws SystemStartException"
+		try{
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
 			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo))
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 		}catch(IOException ioe){
 			throw new SystemStartException(ioe);
-		} // end refactoring
-		String sutConnector = settings().get(ConfigTags.SUTConnector);
-		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
-		else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-			return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
-		else if (sutConnector.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
-		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
-		else{
-			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
+		}
+		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
+		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
+			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			return sutConnector.startOrConnectSut();
+		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			return sutConnector.startOrConnectSut();
+		}else{
+			// COMMANDLINE and WebDriver SUT CONNECTOR:
+			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
 
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
@@ -1463,138 +1465,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
-
-			//Print info to the user to know that TESTAR is NOT READY for its use :-(
-			String printSutInfo = "Waiting for the SUT to be accessible ...";
-			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
-			int timeFlash = (int)startupTime;
-
-			//Refresh the flash information, to avoid that SUT hide the information
-			int countTimeFlash = 0;
-			while(countTimeFlash<timeFlash && !sut.isRunning()) {
-				FlashFeedback.flash(printSutInfo, 2000);
-				countTimeFlash += 2000;
-			}
-
-			final long now = System.currentTimeMillis(),
-					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
-					State state;
-					do{
-						if (sut.isRunning()){
-							//Print info to the user to know that TESTAR is READY for its use :-)
-							printSutInfo = "SUT is READY";
-							FlashFeedback.flash(printSutInfo,2000);
-							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
-							state = builder.apply(sut);
-							if (state != null && state.childCount() > 0){
-								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
-								return sut;
-							}
-						}else {
-							//Print info to the user to know that TESTAR is NOT READY for its use :-(
-							printSutInfo = "Waiting for the SUT to be accessible ...";
-							FlashFeedback.flash(printSutInfo, 500);
-						}
-						Util.pauseMs(500);
-					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-					if (sut.isRunning())
-						sut.stop();
-
-					if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
-						throw new WinApiException("JAVA SUT PATH EXCEPTION");
-
-					// issue starting the SUT
-					if (tryToKillIfRunning){
-						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
-						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
+			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
+					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
+			return sutConnector.startOrConnectSut();
 		}
-	}
-
-	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
-		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
-		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
-			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
-			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
-		} else // unable to kill SUT
-			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc, "No SUT Desc available") + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
-	}
-
-	private SUT getSUTByProcessName(String processName) throws SystemStartException{
-		Assert.hasText(processName);
-		List<SUT> suts = null;
-		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
-		do{
-			Util.pauseMs(100);
-			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
-				String desc;
-				for (SUT theSUT : suts){
-					desc = theSUT.get(Tags.Desc, null);
-					if (desc != null && desc.contains(processName)){
-						System.out.println("SUT with Process Name -" + processName + "- DETECTED!");
-						return theSUT;
-					}
-				}
-			}
-		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
-	}
-
-	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
-		Assert.hasText(windowTitle);
-		List<SUT> suts = null;
-		State state; Role role; String title;
-		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
-		do{
-			Util.pauseMs(100);
-			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
-				for (SUT theSUT : suts){
-					state = getStateByWindowTitle(theSUT);
-					if (state.get(Tags.Foreground)){
-						for (Widget w : state){
-							role = w.get(Tags.Role, null);
-							if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
-								title = w.get(Tags.Title, null);
-								if (title != null && title.contains(windowTitle)){
-									System.out.println("SUT with Window Title -" + windowTitle + "- DETECTED!");
-									return theSUT;
-								}
-							}
-						}
-					}
-				}
-			}
-		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");
-	}
-
-	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
-		Assert.notNull(system);
-		State state = builder.apply(system);
-
-		CodingManager.buildIDs(state);
-
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-		    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-		        state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
-		    } else {
-		        state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
-		    }
-		}
-
-		calculateZIndices(state);
-
-		return state;
 	}
 
 	/**
@@ -1606,12 +1481,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @throws StateBuildException
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		Assert.notNull(system);
 		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
-		calculateZIndices(state);
+		state = ProtocolUtil.calculateZIndices(state);
 		
 		setStateForClickFilterLayerProtocol(state);
 
@@ -1888,24 +1763,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return DataManager.getRandomData();
 	}
 
-	/**
-	 * Calculate the max and the min ZIndex of all the widgets in a state
-	 * @param state
-	 */
-	protected void calculateZIndices(State state) {
-		double minZIndex = Double.MAX_VALUE,
-				maxZIndex = Double.MIN_VALUE,
-				zindex;
-		for (Widget w : state){
-			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
-				minZIndex = zindex;
-			if (zindex > maxZIndex)
-				maxZIndex = zindex;
-		}
-		state.set(Tags.MinZIndex, minZIndex);
-		state.set(Tags.MaxZIndex, maxZIndex);
-	}
 
 	/**
 	 * STOP criteria for selecting more actions for a sequence
@@ -1982,7 +1839,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//	 */
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
 		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
+			
+			executeScriptEvent(system, state);
+			
+			if (userEvent != null && !typeReady){
 				Action mapAction = mapUserEvent(system, state);
 				//Only set the Action if was found on widget tree map
 				if(mapAction != null) {
@@ -2074,8 +1934,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				return null;
 			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
+		} else if(!typedText.isEmpty() && typedText.length() > 1) {
+			// By default the widget is the state
+			Widget w = state;
+
+			// If this event was created listening the scripts get the widget
+			if(userEvent[0] != null && userEvent[0].toString().contains("script")) {
+				double x = ((Double)userEvent[1]).doubleValue();
+				double y = ((Double)userEvent[2]).doubleValue();
+				w = Util.widgetFromPoint(state, x, y);
+			}
+
+			Action typeIntoState = (new AnnotatingActionCompiler()).clickTypeInto(w, typedText, false);
+			typedText = "";
+			return typeIntoState;
+		} else if (userEvent[0] instanceof KBKeys) { // key events
 			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+		}
 		else if (userEvent[0] instanceof String){ // type events
 			if (lastExecutedAction == null)
 				return null;
@@ -2090,5 +1965,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 		return null;
+	}
+	
+	protected void executeScriptEvent(SUT system, State state) {
+		//Future implementation for listening mode + script events
 	}
 }
