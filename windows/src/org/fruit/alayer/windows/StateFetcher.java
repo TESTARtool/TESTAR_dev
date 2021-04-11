@@ -104,7 +104,7 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
-
+		root.set(Tags.HWND, uiaRoot.children.get(0).get(Tags.HWND));
 		for (Widget w : root)
 			w.set(Tags.Path,Util.indexString(w));
 		if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)

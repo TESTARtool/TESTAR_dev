@@ -134,8 +134,7 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         }
         Objects.requireNonNull(applicationPosition);
 
-
-        double displayScale = Environment.getInstance().getDisplayScale(_state.child(0).get(Tags.HWND, (long) 0));
+        double displayScale = Environment.getInstance().getDisplayScale(_state.get(Tags.HWND, (long) 0));
         List<ExpectedElement> expectedElements = new ArrayList<>();
         for (Widget widget : _state) {
             String widgetRole = widget.get(Role).name();
