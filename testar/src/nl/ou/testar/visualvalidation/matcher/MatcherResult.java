@@ -28,8 +28,8 @@ public class MatcherResult {
     @Override
     public String toString() {
         return "MatcherResult{" +
-                "noMatches=" + noMatches +
-                ", matches=" + matches +
+                "noMatches(" + noMatches.size() + ")=" + noMatches +
+                ", matches(" + matches.size() + ")=" + matches +
                 '}';
     }
 }
