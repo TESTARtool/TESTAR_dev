@@ -76,7 +76,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         // This is returning the representation of the State = Widget process, not really informative
         logger.info("Reward for previous state:'{}' and current state '{}' is '{}'", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
         logger.info("Reward for Action Transition from Previous State to Current State is '{}'", reward);
-        
+
         previousState = state;
         treeDist.clear();
 
