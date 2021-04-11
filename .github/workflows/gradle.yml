@@ -13,6 +13,7 @@ jobs:
   test:
 
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - uses: actions/checkout@v2
@@ -22,6 +23,8 @@ jobs:
         java-version: 1.8
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
     - name: Build TESTAR with Gradle
       run: ./gradlew build
     - name: Prepare installed distribution of TESTAR with Gradle
@@ -54,3 +57,17 @@ jobs:
       with:
         name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
+    - name: Run webdriver protocol and detect SuspiciousTitle
+      run: ./gradlew runTestWebdriverSuspiciousTitle
+    - name: Save runTestWebdriverSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
+    - name: Run webdriver to login in parabank app
+      run: ./gradlew runTestWebdriverParabankLogin
+    - name: Save runTestWebdriverParabankLogin HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverParabankLogin-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login
