@@ -36,7 +36,7 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
             Settings.MinSimilarity = 0.01; //override default of 0.3
             Validate.notNull(screenImagePreviouslyExecutedAction, "ScreenImagePreviouslyExecutedAction has the value null");
             final Pattern patternOfPreviousSceenshot = new Pattern(screenImagePreviouslyExecutedAction);
-            Validate.isTrue(patternOfPreviousSceenshot.isValid(), "Sceenshot of previously executed action could not be retrieved");
+            Validate.isTrue(patternOfPreviousSceenshot.isValid(), "Screenshot of previously executed action could not be retrieved");
 
             // compare screenshots
             final BufferedImage screenshot = takeScreenshot();

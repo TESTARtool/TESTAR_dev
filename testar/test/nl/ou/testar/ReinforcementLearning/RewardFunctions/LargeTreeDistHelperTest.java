@@ -5,6 +5,7 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Deque;
 
@@ -18,7 +19,6 @@ import static junit.framework.TestCase.fail;
  */
 public class LargeTreeDistHelperTest {
 
-    @Test
     public void treeDist_LargeTree() {
         // given
         try {
