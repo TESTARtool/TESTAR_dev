@@ -1,3 +1,7 @@
+plugins {
+    id "de.undercouch.download" version "4.1.1"
+}
+
 apply plugin: 'application'
 
 sourceSets {
@@ -191,6 +195,13 @@ mainClassName='org.fruit.monkey.Main'
 /**
  * Tasks to test TESTAR using gradle
  */
+ 
+task init_workflow_test(type: Copy) {
+    group = 'test_testar_workflow'
+    description ='init_workflow_test'
+    from 'resources/workflow/settings'
+    into 'target/scripts/settings'
+}
 
 // Default COMMAND_LINE execution to run Notepad, execute 2 actions and verdict should be OK
 task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
@@ -199,7 +210,7 @@ task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineOk'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -221,7 +232,7 @@ task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'inst
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_command_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -251,7 +262,7 @@ task runTestDesktopGenericProcessNameSuspiciousTitle(type: Exec, dependsOn:['ins
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericProcessNameSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -276,7 +287,7 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericTitleNameSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -289,6 +300,80 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
             // kill notepad process
             ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_WINDOW_TITLE")
+        }
+    }
+}
+
+// Download last win32 chromedriver 
+task downloadChromedriver(type: Download, dependsOn: installDist) {
+    group = 'test_testar_workflow'
+    description ='downloadChromedriver'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
+    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
+    Process process = builder.start();
+    process.waitFor()
+    
+    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
+    dest 'target/install/testar/bin'
+    overwrite false
+}
+
+// Extract Chromedriver from downloaded file
+task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
+    group = 'test_testar_workflow'
+    description ='downloadAndUnzipChromedriver'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
+    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
+    into downloadChromedriver.dest
+}
+
+// Verify that TESTAR correctly executes chromedriver
+// To be sure, connect to ou.nl and detect Onderwijs suspicious title
+task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Onderwijs
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+    }
+}
+
+// Connect to parabank.parasoft.com and make a login
+task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankLogin'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
         }
     }
 }

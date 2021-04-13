@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,48 +64,50 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
+		/*
+		These settings are initialized in WebdriverProtocol:
+
 		// Classes that are deemed clickable by the web framework
-		//TODO put into settings file
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+		// getting from the settings file:
+		clickableClasses = settings.get(ConfigTags.ClickableClasses);
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
-		//TODO put into settings file
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
+		// getting from the settings file:
+		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
 
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		//TODO put into settings file
-		domainsAllowed = Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+		// getting from the settings file:
+		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
-		//TODO put into settings file
-		followLinks = true;
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
+		// getting from the settings file:
+		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
+
+		//Force the browser to run in full screen mode
+		WdDriver.fullScreen = true;
+
+		//Force webdriver to switch to a new tab if opened
+		//This feature can block the correct display of select dropdown elements 
+		WdDriver.forceActivateTab = true;
+		*/
 
 		// URL + form name, username input id + value, password input id + value
 		// Set login to null to disable this feature
-		//TODO put into settings file
+		// TODO: getting from the settings file, not sure if this works:
 		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
 		username = Pair.from("username", "");
 		password = Pair.from("password", "");
 
-		// List of atributes to identify and close policy popups
+		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
 		//TODO put into settings file
 		policyAttributes = new HashMap<String, String>() {{
 			put("class", "lfr-btn-label");
 		}};
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-		
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
 	}
 
 	/**

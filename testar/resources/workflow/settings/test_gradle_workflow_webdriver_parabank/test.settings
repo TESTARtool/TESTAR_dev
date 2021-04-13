@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
+SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://parabank.parasoft.com/"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parab
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious titles
@@ -97,24 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
-
-#################################################################
-# State model inference settings
-#################################################################
-StateModelEnabled = false
-DataStore =
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
-DataStoreMode = none
-ApplicationName = Parabank
-ApplicationVersion =
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+ProtocolClass = test_gradle_workflow_webdriver_parabank/Protocol_test_gradle_workflow_webdriver_parabank
 
 #################################################################
 # State identifier attributes
@@ -127,10 +110,10 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
 DomainsAllowed = parabank.parasoft.com
-FollowLinks = false
+FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
 
@@ -191,3 +174,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0

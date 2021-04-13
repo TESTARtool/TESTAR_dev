@@ -123,6 +123,16 @@ AbstractStateAttributes = WebWidgetId
 OverrideWebDriverDisplayScale = 
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = 
+DeniedExtensions = pdf;jpg;png;jsp
+DomainsAllowed = www.smartclient.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
