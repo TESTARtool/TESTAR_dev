@@ -51,7 +51,7 @@ SequenceLength = 300
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -63,8 +63,8 @@ SuspiciousTitles =
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = false
-SuspiciousProcessOutput = 
+ProcessListenerEnabled = true
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs

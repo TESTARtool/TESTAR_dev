@@ -408,8 +408,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// JaCoCo: Move settings protocolName build.xml file to jacoco directory
 		try {
 			// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
-			String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
-			File originalBuildFile = new File(Main.settingsDir + File.separator + protocolName + File.separator + "build.xml").getCanonicalFile();
+			//String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
+			// For mutants we use "bin/settings/build_Spaghetti_COI_25.xml" naming
+			String buildXMLname = "build_" + settings.get(ConfigTags.ApplicationName, "") + ".xml";
+			File originalBuildFile = new File(Main.settingsDir + File.separator + buildXMLname).getCanonicalFile();
 			System.out.println("originalBuildFile: " + originalBuildFile);
 			if(originalBuildFile.exists()) {
 				File destbuildFile = new File(Main.testarDir + File.separator + "jacoco" + File.separator + "build.xml").getCanonicalFile();
@@ -590,6 +592,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        System.err.println("ERROR: Writing Merged Coverage Metrics inside coverageMetrics text file");
 	        e.printStackTrace();
 	    }
+	}
+	
+	protected void addVerdictToMergedFile(String verdict) {
+	    writeMergedCoverageFile(verdict);
 	}
 	
 	/**

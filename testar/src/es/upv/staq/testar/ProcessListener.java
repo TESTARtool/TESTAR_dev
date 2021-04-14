@@ -121,7 +121,8 @@ public class ProcessListener{
 					//Get process buffer of the SUT
 					BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 
-					String actionId = "unknown";
+					String actionId = "unknownId";
+					String actionDesc = "unknownDesc";
 					String ch;
 					Matcher matcherOracles, matcherLogs;
 
@@ -133,12 +134,15 @@ public class ProcessListener{
 						//if the process buffer information matches with the Oracles
 						if(processOracles!=null && matcherOracles.matches()) {		
 
-							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+						    //Prepare Verdict report
+						    if(DefaultProtocol.lastExecutedAction!=null) {
+						        actionId = DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+						        actionDesc = DefaultProtocol.lastExecutedAction.get(Tags.Desc, "unknownDesc");
+						    }
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+						    Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						            "Process Listener suspicious title: '" + ch 
+						            + ", on Action:	'" + actionId + " with Desc: '" + actionDesc + ".");
 
 							//Set that we found an error
 							DefaultProtocol.processVerdict = verdict;
@@ -193,7 +197,8 @@ public class ProcessListener{
 					//Get process buffer of the SUT
 					BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 
-					String actionId = "unknown";
+					String actionId = "unknownId";
+					String actionDesc = "unknownDesc";
 					String ch;
 					Matcher matcherOracles, matcherLogs;
 
@@ -205,12 +210,15 @@ public class ProcessListener{
 						//if the process buffer information matches with the Oracles
 						if(processOracles!=null && matcherOracles.matches()) {	
 
-							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+						    //Prepare Verdict report
+						    if(DefaultProtocol.lastExecutedAction!=null) {
+						        actionId = DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+						        actionDesc = DefaultProtocol.lastExecutedAction.get(Tags.Desc, "unknownDesc");
+						    }
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+						    Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						            "Process Listener suspicious title: '" + ch 
+						            + ", on Action: '" + actionId + " with Desc: '" + actionDesc + ".");
 
 							//Set that we found an error
 							DefaultProtocol.processVerdict = verdict;

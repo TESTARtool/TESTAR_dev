@@ -185,5 +185,7 @@ public class JavaSwingProtocol extends GenericUtilsProtocol {
 				+ " " + settings.get(ConfigTags.Mode, mode())
 				+ " " + sequencesPath
 				+ " " + status + " \"" + statusInfo + "\"" );
+		
+		addVerdictToMergedFile(status + " \"" + statusInfo + "\"");
 	}
 }

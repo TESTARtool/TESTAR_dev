@@ -51,7 +51,7 @@ SequenceLength = 300
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -63,7 +63,7 @@ SuspiciousTitles =
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = false
+ProcessListenerEnabled = true
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|FILE
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[mM]aximi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|FILE
 
 #################################################################
 # Processfilter
