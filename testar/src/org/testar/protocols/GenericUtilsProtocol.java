@@ -409,8 +409,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		try {
 			// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
 			//String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
-			// For mutants we use "bin/settings/build_Spaghetti_COI_25.xml" naming
-			String buildXMLname = "build_" + settings.get(ConfigTags.ApplicationName, "") + ".xml";
+			// For mutants we use "bin/settings/build_Spaghetti_COI_25.xml" version
+			String buildXMLname = "build_" + settings.get(ConfigTags.ApplicationVersion, "") + ".xml";
 			File originalBuildFile = new File(Main.settingsDir + File.separator + buildXMLname).getCanonicalFile();
 			System.out.println("originalBuildFile: " + originalBuildFile);
 			if(originalBuildFile.exists()) {
@@ -629,7 +629,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	    }
 
 	    // Create a new directory inside desired destination using the ipAddress as name
-	    String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    String folderIpAddress = destFolder + File.separator + ipAddress + File.separator 
+	            + settings.get(ConfigTags.ApplicationName, "") + "_" + settings.get(ConfigTags.ApplicationVersion, "");
 	    try {
 	        Files.createDirectories(Paths.get(folderIpAddress));
 	    } catch (IOException e) {
@@ -666,7 +667,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	 */
 	private void copyCoverageMetricsToFolder(String destFolder, String ipAddress) {
 	    // Create a new directory inside desired destination to store all metrics
-	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator 
+	            + settings.get(ConfigTags.ApplicationName, "") + "_" + settings.get(ConfigTags.ApplicationVersion, "");
 	    try {
 	        Files.createDirectories(Paths.get(metricsFolder));
 	    } catch (IOException e) {
