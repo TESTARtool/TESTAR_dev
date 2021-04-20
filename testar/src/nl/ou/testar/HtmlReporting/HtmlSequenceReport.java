@@ -42,7 +42,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Set;
 
-public class HtmlSequenceReport {
+public class HtmlSequenceReport implements Reporting {
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
@@ -84,6 +84,7 @@ public class HtmlSequenceReport {
         write("<h"+h+">"+text+"</h"+h+">");
     }
 
+    @Override
     public void addSequenceStep(State state, String actionImagePath){
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
@@ -101,6 +102,7 @@ public class HtmlSequenceReport {
     	}
     }
 
+    @Override
     public void addState(State state){
         if(firstStateAdded){
             if(firstActionsAdded){
@@ -140,6 +142,7 @@ public class HtmlSequenceReport {
     }
 
 
+    @Override
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
         write("<h4>Set of actions:</h4><ul>");
@@ -159,6 +162,7 @@ public class HtmlSequenceReport {
         write("</ul>");
     }
 
+    @Override
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
         if(!firstActionsAdded) firstActionsAdded = true;
         if(actions.size()==concreteIdsOfUnvisitedActions.size()){
@@ -194,6 +198,7 @@ public class HtmlSequenceReport {
         }
     }
 
+    @Override
     public void addSelectedAction(State state, Action action){
     	String screenshotDir = OutputStructure.screenshotsOutputDir;
 //        System.out.println("path="+state_path);
@@ -219,6 +224,7 @@ public class HtmlSequenceReport {
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
 
+    @Override
     public void addTestVerdict(Verdict verdict){
     	String verdictInfo = verdict.info();
     	if(verdict.severity() > Verdict.OK.severity())
@@ -228,7 +234,7 @@ public class HtmlSequenceReport {
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
 
-    
+    @Override
     public void close() {
         for(String s:HTMLReporter.FOOTER){
             write(s);
