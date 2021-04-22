@@ -295,25 +295,42 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         if(!Util.hitTest(w, 0.5, 0.5))
             return false;
 
-        //Check whether the widget has an empty title or no title
-        //If it has, it is unfiltered
-        //Because it cannot match the regular expression of the Action Filter.
-        String title = w.get(Title, "");
-        if (title == null || title.isEmpty())
-            return true;
+        Boolean isFiltered = false;
 
-        //If no clickFilterPattern exists, then create it
-        //Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
-        if (this.clickFilterPattern == null)
-            this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+        for(String tagToFilter:settings.get(ConfigTags.TagsToFilter)){
+            String tagValue = "";
+            // First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
+            for(Tag tag:w.tags()){
+                if(tag.name().equals(tagToFilter)){
+                    tagValue=w.get(tag, "");
+                    //System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
+                }
+            }
 
-        //Check whether the title matches any of the clickFilterPatterns
-        Matcher m = this.clickFilterMatchers.get(title);
-        if (m == null){
-            m = this.clickFilterPattern.matcher(title);
-            this.clickFilterMatchers.put(title, m);
+            //Check whether the Tag value is empty or null
+            //If it is, it is unfiltered
+            //Because it cannot match the regular expression of the Action Filter.
+            if (tagValue == null || tagValue.isEmpty())
+                continue; //no action, isFiltered is still false (cannot return directly if other Tags are checked)
+
+            //If no clickFilterPattern exists, then create it
+            //Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
+            if (this.clickFilterPattern == null)
+                this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+
+            //Check whether the title matches any of the clickFilterPatterns
+            Matcher m = this.clickFilterMatchers.get(tagValue);
+            if (m == null){
+                m = this.clickFilterPattern.matcher(tagValue);
+                this.clickFilterMatchers.put(tagValue, m);
+            }
+            isFiltered = m.matches();
+            // if filtered, no need to check if it should be filtered multiple times:
+            if(isFiltered) return(!isFiltered); //method is for is-UN-filtered
+
         }
-        return !m.matches();
+        //method is for is-UN-filtered
+        return !isFiltered;
     }
 
     /**
