@@ -117,14 +117,12 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-<<<<<<< Updated upstream
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
-=======
 GraphDBEnabled = false
 GraphDBUrl = 
 GraphDBUser = 
@@ -154,7 +152,6 @@ StateModelStoreWidgets = false
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
->>>>>>> Stashed changes
 
 #################################################################
 # Override display scale
@@ -222,16 +219,15 @@ DrawWidgetUnderCursor = true
 AlwaysCompile = true
 PathToReplaySequence = ./output/temp
 VisualizeActions = false
-<<<<<<< Updated upstream
+
 VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
-=======
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
 OfflineGraphConversion = true
 ExecuteImmediately = false
 ReportingClass = NUNIT 3.0 Reporting
->>>>>>> Stashed changes
+
