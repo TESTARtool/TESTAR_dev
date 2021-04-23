@@ -115,6 +115,7 @@ public class LogSerialiser extends Thread {
 	}
 	
 	public static void log(String logS, LogLevel logLevel){
+		System.out.println(logS);
 		if(alive && logLevel.significance() <= LogSerialiser.logLevel){
 			synchronized(logSavingQueue){
 				logSavingQueue.add(new LogRecord(logS,logLevel));

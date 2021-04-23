@@ -84,7 +84,7 @@ public class WdDriver extends SUTBase {
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
-
+  static Boolean headless = true;
   private WdDriver(String sutConnector) {
 	
     String[] parts = sutConnector.split(" ");
@@ -115,6 +115,7 @@ public class WdDriver extends SUTBase {
 
       }
     }
+   
     String path = System.getProperty("user.dir");
     String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
 
@@ -181,9 +182,12 @@ public class WdDriver extends SUTBase {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
-    if(fullScreen) {
+    
+    if (headless)
+      options.addArguments("--headless");
+    if(fullScreen)
     	options.addArguments("--start-maximized");
-    }
+    
     if(disableSecurity) {
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");

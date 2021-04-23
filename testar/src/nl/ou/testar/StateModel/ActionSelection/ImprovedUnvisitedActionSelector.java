@@ -42,6 +42,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
         // when that is the case, this action selector is not really useful anymore, because it can get stuck in a loop
         // there are several smart ways to fix this, but we opt for an easy one for now:
         // we throw an exception, so the random action selection algorithm can take over
+        System.out.println("ImprovedUnvisitedActionSelector");
         if (nrOfFlowAlterations >= MAX_FLOW_ALTERATIONS) {
             System.out.println("Too many alterations in the flow. Throwing exception.");
             throw new ActionNotFoundException();

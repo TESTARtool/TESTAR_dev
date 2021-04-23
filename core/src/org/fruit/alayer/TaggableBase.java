@@ -55,6 +55,7 @@ public class TaggableBase implements Taggable, Serializable {
 		return ret;
 	}
 
+
 	@SuppressWarnings("unchecked")
 	public final <T> T get(Tag<T> tag, T defaultValue) {
 		Assert.notNull(tag);

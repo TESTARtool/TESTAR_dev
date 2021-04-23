@@ -207,6 +207,12 @@ public class Settings extends TaggableBase implements Serializable {
 
 	public Settings(Properties props){ this(new ArrayList<Pair<?, ?>>(), props); }
 
+	private static Settings _settings;
+
+	public static Settings getSettingsIfLoaded() {
+		return _settings;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Settings(List<Pair<?, ?>> defaults, Properties props){
 		Assert.notNull(props, defaults);
@@ -241,6 +247,7 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 
 		verifySettings();
+		_settings = this;
 	}
 
 	public String toString(){

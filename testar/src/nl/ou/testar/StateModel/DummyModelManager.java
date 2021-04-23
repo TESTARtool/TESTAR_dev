@@ -2,11 +2,17 @@ package nl.ou.testar.StateModel;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
-
+import org.fruit.monkey.Settings;
 import java.util.Set;
 
 public class DummyModelManager implements StateModelManager{
 
+    
+    public DummyModelManager(Settings settings)
+    {
+        
+
+    }
     @Override
     public void notifyNewStateReached(State newState, Set<Action> actions) {
 
@@ -24,6 +30,7 @@ public class DummyModelManager implements StateModelManager{
 
     @Override
     public Action getAbstractActionToExecute(Set<Action> actions) {
+        
         return null;
     }
 

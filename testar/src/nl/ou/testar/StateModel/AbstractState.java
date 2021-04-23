@@ -62,6 +62,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      */
     public void addVisitedAction(AbstractAction action) {
         unvisitedActions.remove(action.getActionId());
+        System.out.println("addVisitedAction: ik moet nu database bijwerken, heb een actie bezocht"+action.getActionId());
         visitedActions.put(action.getActionId(), action);
     }
 
@@ -106,7 +107,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * This method returns the actions that have not yet been visited from this state
      * @return
      */
-    public Set<AbstractAction> getUnvisitedActions() {
+    public Set<AbstractAction> getUnvisitedActions() {        
+        
+        System.out.println("Unvisited actions zonder gebruik te maken van db (lokale cache): "+this.getStateId()+"  "+unvisitedActions.values().size());
+        
         return new HashSet<>(unvisitedActions.values());
     }
 

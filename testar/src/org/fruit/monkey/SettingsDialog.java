@@ -151,7 +151,11 @@ public class SettingsDialog extends JFrame implements Observer {
       checkSettings(settings);
       settings.set(ConfigTags.Mode, mode);
       saveCurrentSettings();
+<<<<<<< Updated upstream
       ret = settings;
+=======
+      ret = settings;      
+>>>>>>> Stashed changes
       this.dispose();
     } catch (IllegalStateException ise) {
       JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);

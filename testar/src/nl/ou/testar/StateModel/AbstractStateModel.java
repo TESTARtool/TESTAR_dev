@@ -146,6 +146,14 @@ public class AbstractStateModel {
     public void addState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
+            // check if state exists in database
+            // #TODO: Haal de states uit de database
+            System.out.println("Emit event retrieve state");
+            
+            boolean currentEvents = emitEvents;
+            activateEvents();
+            emitEvent(new StateModelEvent(StateModelEventType.RETRIEVE_STATE, this));
+            if (!currentEvents) { deactivateEvents(); }
             // provide the state with this state model's abstract identifier
             newState.setModelIdentifier(modelIdentifier);
             // provide the state with the event listeners from this state model
@@ -183,6 +191,11 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractState> getStates() {
+
+        // door mij geplaatst #TODO
+        //System.out.println("GetStates emitEvent enz. voordat emitEvent = states.values().count = "+states.values().size());
+        //emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_MODEL_INITIALIZED, this));
+        //System.out.println("GetStates na emitEvent states count = "+states.values().size());
         return new HashSet<>(states.values());
     }
 

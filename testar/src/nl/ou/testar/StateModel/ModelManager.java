@@ -60,6 +60,7 @@ public class ModelManager implements StateModelManager {
      */
     public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
                         Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
+        System.out.println("ActionSelector of type "+actionSelector.getClass());
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;

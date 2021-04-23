@@ -161,6 +161,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
         entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
 
+        
         // step 2:
         // all unvisited actions go to the black hole vertex!
         try {
@@ -184,7 +185,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractAction(AbstractAction abstractAction) {
-
+        
     }
 
     @Override
@@ -437,6 +438,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // in which case we load it, or it doesn't exist yet, in which case we save it
         // first, disable the event listener. We do not want to process the events resulting from our object creations
         setListening(false);
+        System.out.println("init abstract state model");
 
         EntityClass stateModelClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
         VertexEntity stateModelEntity = new VertexEntity(stateModelClass);
@@ -455,31 +457,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityManager.saveEntity(stateModelEntity);
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
-        EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
-
-        // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
-        Map<String, PropertyValue> entityProperties = new HashMap<>();
-        Property stateModelClassIdentifier = stateModelClass.getIdentifier();
-        if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
-
-        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties);
-        if (retrievedDocuments.isEmpty()) {
-            System.out.println("Could not find abstract states in the model");
-        }
-        else {
-            // we need to create the abstract states from the returned document entities
-            try {
-                EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
-                for (DocumentEntity documentEntity : retrievedDocuments) {
-                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
-                    abstractStateModel.addState(abstractState);
-                }
-            } catch (ExtractionException | StateModelException e) {
-                e.printStackTrace();
-            }
-        }
+        Set<DocumentEntity> retrievedDocuments;
+        Map<String, PropertyValue> entityProperties = getAbstractStatesTiedToStateModel(abstractStateModel, stateModelClass, stateModelEntity);
 
         // step 3: fetch the transitions from the database
         EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
@@ -505,6 +484,36 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // enable the event listener again
         setListening(true);
+    }
+
+    private Map<String, PropertyValue> getAbstractStatesTiedToStateModel(AbstractStateModel abstractStateModel, EntityClass stateModelClass,
+            VertexEntity stateModelEntity) {
+        EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
+
+        // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
+        Map<String, PropertyValue> entityProperties = new HashMap<>();
+        Property stateModelClassIdentifier = stateModelClass.getIdentifier();
+        if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
+        entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
+
+        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties);
+        if (retrievedDocuments.isEmpty()) {
+            System.out.println("Could not find abstract states in the model");
+        }
+        else {
+            // we need to create the abstract states from the returned document entities
+            try {
+                EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
+                for (DocumentEntity documentEntity : retrievedDocuments) {
+                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
+                    abstractStateModel.addState(abstractState);
+                }
+            } catch (ExtractionException | StateModelException e) {
+                e.printStackTrace();
+            }
+        }
+        return entityProperties;
     }
 
     public void persistSequence(Sequence sequence) {
@@ -645,6 +654,13 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         switch (event.getEventType()) {
+            case RETRIEVE_STATE:
+                System.out.println("Event Retrieve state ontvangen");
+                long timebefore = System.currentTimeMillis();
+                initAbstractStateModel((AbstractStateModel)event.getPayload());
+                long timeafter = System.currentTimeMillis();
+                System.out.println("Loading init abstract model took "+(timeafter-timebefore));
+                break;
             case ABSTRACT_STATE_ADDED:
             case ABSTRACT_STATE_CHANGED:
                 persistAbstractState((AbstractState) (event.getPayload()));

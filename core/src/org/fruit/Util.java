@@ -795,6 +795,7 @@ public final class Util {
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
         options.add(settingsDir);
+        System.out.println("Compile use settingsDir = "+settingsDir);
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,

@@ -74,6 +74,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
+        
         processRequest(() -> delegateManager.persistAbstractState(abstractState), abstractState);
     }
 
@@ -85,6 +86,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
         processRequest(() -> delegateManager.persistAbstractStateTransition(abstractStateTransition), abstractStateTransition);
+        
     }
 
     @Override

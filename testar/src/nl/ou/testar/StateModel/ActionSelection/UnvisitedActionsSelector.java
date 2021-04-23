@@ -5,8 +5,6 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.AbstractStateTransition;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
-import nl.ou.testar.StateModel.Exception.StateModelException;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -19,6 +17,7 @@ public class UnvisitedActionsSelector implements ActionSelector {
 
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException{
+        
         Set<AbstractAction> unvisitedActions = getUnvisitedActions(currentState, abstractStateModel, MAX_HOPS);
         if (unvisitedActions.size() == 0) {
             throw new ActionNotFoundException();
@@ -42,8 +41,9 @@ public class UnvisitedActionsSelector implements ActionSelector {
      * @param nrOfHopsLeft
      * @return
      */
-    private Set<AbstractAction> getUnvisitedActions(AbstractState state, AbstractStateModel abstractStateModel, int nrOfHopsLeft) {
-        Set<AbstractAction> actions = state.getUnvisitedActions();
+    protected Set<AbstractAction> getUnvisitedActions(AbstractState state, AbstractStateModel abstractStateModel, int nrOfHopsLeft) {
+        
+         Set<AbstractAction> actions = state.getUnvisitedActions();
         if (!actions.isEmpty() || nrOfHopsLeft == 0) {
             return actions;
         }

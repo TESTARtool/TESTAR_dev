@@ -52,6 +52,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
   private JComboBox<String> actionSelectionBox;
+  private JComboBox<String> reportingClassBox;
   private JTextArea txtSutPath;
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
@@ -68,6 +69,11 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
 
+<<<<<<< Updated upstream
+=======
+  private JLabel reportingClass = new JLabel("Reporting class");
+
+>>>>>>> Stashed changes
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
 
@@ -115,6 +121,10 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
     
 
+    reportingClassBox = new JComboBox<>(new String[]{"HTML Reporting","NUNIT 3.0 Reporting"});
+    reportingClassBox.setBounds(160,290,170,25);
+    add(reportingClassBox);
+    
     actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first","Unvisited actions from db"});
     actionSelectionBox.setBounds(10,235,280,30);
     add(actionSelectionBox);
@@ -155,6 +165,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     applicationVersionField.setBounds(480, 280, 125, 27);
     applicationVersionField.setToolTipText(applicationVersionTTT);
     add(applicationVersionField);
+
+
 
     // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
     setOverrideWebDriverDisplayScaleVisibility(false);
@@ -219,6 +231,10 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     lblProtocol.setBounds(286, 164, 64, 14);
     lblProtocol.setToolTipText(comboBoxProtocolTTT);
     add(lblProtocol);
+
+    reportingClass.setBounds(10,290,135,14);
+    //reportingClass.setToolTipText(reportingClassTTT);
+    add(reportingClass);
   }
 
   private void btnSutPathActionPerformed(ActionEvent evt) {
@@ -268,6 +284,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
+    reportingClassBox.setSelectedItem(settings.get(ConfigTags.ReportingClass,""));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
 
     String currentAlgorithm = settings.get(ConfigTags.ActionSelectionAlgorithm);
@@ -301,6 +318,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
+    settings.set(ConfigTags.ReportingClass, (String) reportingClassBox.getSelectedItem());
     switch ((String) actionSelectionBox.getSelectedItem()) {
       case "Unvisited actions first":
           settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");

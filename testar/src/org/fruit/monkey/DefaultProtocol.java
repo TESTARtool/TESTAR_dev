@@ -1358,11 +1358,75 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
+<<<<<<< Updated upstream
 			// for most windows applications and most jar files, this is where the SUT gets created!
 			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
 					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
+=======
+			// for most windows applications and most jar files, this is where the SUT gets
+			// created!
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
+
+			// Print info to the user to know that TESTAR is NOT READY for its use :-(
+			String printSutInfo = "Waiting for the SUT to be accessible ...";
+			double startupTime = settings().get(ConfigTags.StartupTime) * 1000;
+			int timeFlash = (int) startupTime;
+
+			// Refresh the flash information, to avoid that SUT hide the information
+			int countTimeFlash = 0;
+			while (countTimeFlash < timeFlash && !sut.isRunning()) {
+				if (!settings.get(ConfigTags.Headless,false)) {
+					FlashFeedback.flash(printSutInfo, 2000);
+					countTimeFlash += 2000;
+				}
+			}
+
+			final long now = System.currentTimeMillis(),
+					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is
+																										// expected for
+																										// the
+																										// implementation
+			State state;
+			do {
+				if (sut.isRunning()) {
+					// Print info to the user to know that TESTAR is READY for its use :-)
+					printSutInfo = "SUT is READY";
+					if (!settings().get(ConfigTags.Headless,false)) {
+						FlashFeedback.flash(printSutInfo, 2000);
+					}
+					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now)
+							+ "> ms ... waiting UI to be accessible");
+					state = builder.apply(sut);
+					if (state != null && state.childCount() > 0) {
+						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
+						System.out.println(
+								"SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+						return sut;
+					}
+				} else {
+					// Print info to the user to know that TESTAR is NOT READY for its use :-(
+					printSutInfo = "Waiting for the SUT to be accessible ...";
+					if (!settings().get(ConfigTags.Headless,false)) {
+						FlashFeedback.flash(printSutInfo, 500);
+					}
+				}
+				Util.pauseMs(500);
+			} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
+			if (sut.isRunning())
+				sut.stop();
+
+			if (settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
+				throw new WinApiException("JAVA SUT PATH EXCEPTION");
+
+			// issue starting the SUT
+			if (tryToKillIfRunning) {
+				System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
+				return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
+			} else
+				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
+>>>>>>> Stashed changes
 		}
 	}
 

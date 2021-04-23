@@ -155,8 +155,6 @@ public class Main {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			/*if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
-				System.out.println("Java version is not JDK 1.8, please install ");*/
 		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
 				+"Check if JAVA_HOME system variable is correctly defined \n \n"
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
@@ -329,6 +327,9 @@ public class Main {
 	public static boolean startTestarDialog(Settings settings, String testSettingsFileName) {
 		// Start up the TESTAR Dialog
 		try {
+			Boolean generateImmediately = settings.get(ConfigTags.ExecuteImmediately, false);
+			settings.set(ConfigTags.ExecuteImmediately, generateImmediately);
+			System.out.println("testSettingsFileName = "+testSettingsFileName+" settings = null == "+(settings == null)+"Generate immediately = "+generateImmediately);
 			if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
 				return false;
 			}
@@ -347,12 +348,19 @@ public class Main {
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
+<<<<<<< Updated upstream
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
 			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
 		}
+=======
+>>>>>>> Stashed changes
 
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+		}
 		URLClassLoader loader = null;
 
 		try {
@@ -368,8 +376,10 @@ public class Main {
 			String pc = settings.get(ProtocolClass);
 			String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
 
-			LogSerialiser.log("Trying to load TESTAR protocol in class '" +protocolClass +
-					"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
+			String msg = "Trying to load TESTAR protocol in class '" +protocolClass +
+			"' with class path '" + Util.toString(cp) + "'\n";
+			System.out.println(msg);
+			LogSerialiser.log(msg, LogSerialiser.LogLevel.Debug);
 
 			@SuppressWarnings("unchecked")
 			UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
@@ -485,11 +495,16 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+<<<<<<< Updated upstream
 			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
+=======
+			defaults.add(Pair.from(Headless,false));
+			defaults.add(Pair.from(ReportingClass,"NUNIT 3.0 Reporting"));
+>>>>>>> Stashed changes
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

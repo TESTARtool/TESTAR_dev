@@ -19,6 +19,7 @@ public class CompoundActionSelector implements ActionSelector{
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         for(ActionSelector selector:selectors) {
             try {
+                System.out.println("Probeer selector "+selector.getClass());
                 return selector.selectAction(currentState, abstractStateModel);
             }
             catch (ActionNotFoundException ex) {

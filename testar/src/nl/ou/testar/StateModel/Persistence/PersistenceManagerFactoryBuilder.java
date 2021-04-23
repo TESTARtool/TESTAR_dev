@@ -17,8 +17,7 @@ public abstract class PersistenceManagerFactoryBuilder {
     public static PersistenceManagerFactory createPersistenceManagerFactory(ManagerType managerType) {
         switch (managerType) {
             case ORIENTDB:
-                return new OrientDBManagerFactory();
-
+                return new OrientDBManagerFactory();            
             case DUMMY:
             default:
                 return new DummyManagerFactory();
