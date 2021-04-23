@@ -348,14 +348,6 @@ public class Main {
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
-<<<<<<< Updated upstream
-
-		// Compile the Java protocols if AlwaysCompile setting is true
-		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
-		}
-=======
->>>>>>> Stashed changes
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
@@ -495,16 +487,13 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
-<<<<<<< Updated upstream
 			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
-=======
 			defaults.add(Pair.from(Headless,false));
 			defaults.add(Pair.from(ReportingClass,"NUNIT 3.0 Reporting"));
->>>>>>> Stashed changes
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
