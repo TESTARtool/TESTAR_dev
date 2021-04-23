@@ -53,12 +53,11 @@ public class SutVisualization {
      * @param showExtendedWidgetInfo
      * @param markParentWidget
      * @param mouse
-     * @param protocolUtil
      * @param lastPrintParentsOf
      * @param canvas
      * @param state
      */
-    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, boolean markParentWidget, Mouse mouse, ProtocolUtil protocolUtil,String lastPrintParentsOf, Canvas canvas, State state){
+    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, boolean markParentWidget, Mouse mouse, String lastPrintParentsOf, Canvas canvas, State state){
         Point cursor = mouse.cursor();
         Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
 
@@ -82,7 +81,7 @@ public class SutVisualization {
                     Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
                             cwShape.y() + cwShape.height()/2 + 32,
                             miniwidgetInfoW, miniwidgetInfoH);
-                    Shape repositionShape = protocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+                    Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
                     if (repositionShape != minicwShape){
                         double x = repositionShape.x() - repositionShape.width() - 32,
                                 y = repositionShape.y() - repositionShape.height() - 32;
@@ -105,17 +104,17 @@ public class SutVisualization {
                         lastPrintParentsOf = cursorWidgetID;
                         System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
                     }
-                    int lvls = protocolUtil.markParents(canvas,cursorWidget,protocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
+                    int lvls = ProtocolUtil.markParents(canvas,cursorWidget,ProtocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
                     if (lvls > 0){
-                        Shape legendShape = protocolUtil.repositionShape(canvas,Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
+                        Shape legendShape = ProtocolUtil.repositionShape(canvas,Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
                         canvas.rect(Pen.PEN_WHITE_ALPHA, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
                         canvas.rect(Pen.PEN_BLACK, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
                         int shadow = 2;
                         String l;
-                        Iterator<String> it = protocolUtil.ancestorsMarkingColors.keySet().iterator();
+                        Iterator<String> it = ProtocolUtil.ancestorsMarkingColors.keySet().iterator();
                         for (int i=0; i<lvls; i++){
                             l = it.next();
-                            Pen lpen = Pen.newPen().setColor(protocolUtil.ancestorsMarkingColors.get(l)).build();
+                            Pen lpen = Pen.newPen().setColor(ProtocolUtil.ancestorsMarkingColors.get(l)).build();
                             canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i*25, 0, l);
                             canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
                             canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
@@ -130,7 +129,7 @@ public class SutVisualization {
                 double widgetInfoH = (1 + Util.size(cursorWidget.tags()) +
                         Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
                         * 20;
-                cwShape = protocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
+                cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
 
                 if(showExtendedWidgetInfo){
                     //canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
@@ -159,30 +158,17 @@ public class SutVisualization {
                             sb.append("\t");
                         }
                     }
-                    if (i > 0)
+                    if (i > 0) {
                         canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
+                    }
 
                     for(Tag<?> t : cursorWidget.tags()){
-                        canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
-                                cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-                        // (multi-line display without abbreviation)
-							/*final int MAX_TEXT = 50;
-							String text = Util.abbreviate(Util.toString(cursorWidget.get(t)), Integer.MAX_VALUE, "NO_SENSE");
-							int fragment = 0, limit;
-							while (fragment < text.length()){
-								limit = fragment + MAX_TEXT > text.length() ? text.length() : fragment + MAX_TEXT;
-								canvas.text((t.equals(Tags.Title) || t.equals(Tags.Role)) ? rpen : apen, cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " +
-									text.substring(fragment,limit));
-								fragment = limit;
-							}*/
+                    	if(cursorWidget.get(t,null) != null && !cursorWidget.get(t).toString().isEmpty()) {
+                    		canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
+                    				cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
+                    	}
                     }
                 }
-
-                // Disabled functionality - not useful:
-//                    if (settings.get(ConfigTags.DrawWidgetTree)){
-//                        canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-//                        protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);
-//                    }
             }
         }
     }
@@ -271,6 +257,20 @@ public class SutVisualization {
             canvas.begin();
             visualizer.run(state, canvas, redPen);
             canvas.end();
+        }
+    }
+
+    /**
+     * Visualizing filtered actions with grey colored dots
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
+    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
+        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
+        for(Action a : actions){
+            a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
         }
     }
 }

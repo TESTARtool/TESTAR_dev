@@ -29,6 +29,8 @@
 *******************************************************************************************************/
 
 import java.util.Set;
+
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
@@ -98,9 +100,9 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+			retAction = RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
 	}

@@ -99,14 +99,6 @@ SUTProcesses =
 
 ProtocolClass = webdriver_statemodel/Protocol_webdriver_statemodel
 
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
 #################################################################\n"
 # State model inference settings
 #################################################################\n"
@@ -125,7 +117,17 @@ DataStoreMode = instant
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WebWidgetId
+
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.w3schools.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
 
 #################################################################
 # Override display scale
@@ -175,3 +177,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0

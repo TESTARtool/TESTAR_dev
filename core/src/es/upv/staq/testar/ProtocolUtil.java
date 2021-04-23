@@ -1,7 +1,8 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2020 Open Universiteit - www.ou.nl
+* 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
 *
@@ -62,7 +63,7 @@ public class ProtocolUtil {
 	//	Ancestors marking
 	// ###################
 	
-	public LinkedHashMap<String,Color> ancestorsMarkingColors = new LinkedHashMap<String,Color>(){
+	public static LinkedHashMap<String,Color> ancestorsMarkingColors = new LinkedHashMap<String,Color>(){
 		private static final long serialVersionUID = 8186743549563447423L;
 	{
 		put("1. ===   black",	Color.from(  0,   0,   0, 255));
@@ -82,7 +83,7 @@ public class ProtocolUtil {
 		put("f. ===    gray",	Color.from(128, 128, 128, 255));
 	}};
 	
-	public int markParents(Canvas canvas ,Widget w, Iterator<String> it, int lvl, boolean print){
+	public static int markParents(Canvas canvas ,Widget w, Iterator<String> it, int lvl, boolean print){
 		Widget parent;
 		if (!it.hasNext() || // marking colors exhausted
 				(parent = w.parent()) == null)
@@ -108,12 +109,12 @@ public class ProtocolUtil {
 	//	Widget tree renderer
 	// ######################
 	
-	private void colorShadowText(Canvas canvas, Pen pen, Pen shadowPen, double x, double y, String text){
+	private static void colorShadowText(Canvas canvas, Pen pen, Pen shadowPen, double x, double y, String text){
 		canvas.text(shadowPen,x+1,y+1,0,text);
 		canvas.text(pen,x,y,0,text);
 	}
 	
-	private String briefRepresentation(Widget widget){
+	private static String briefRepresentation(Widget widget){
 		String briefS = "";
 		Role role = widget.get(Tags.Role, null);
 		if (role != null)
@@ -124,7 +125,7 @@ public class ProtocolUtil {
 		return briefS;
 	}
 	
-	public int[] drawWidgetTree(SUT system, Canvas canvas, int x, int y, Widget wtWidget, Widget cursorWidget, int printedIDs){
+	public static int[] drawWidgetTree(SUT system, Canvas canvas, int x, int y, Widget wtWidget, Widget cursorWidget, int printedIDs){
 		final int WIDGET_TREE_NODE_WIDTH = 1, WIDGET_TREE_NODE_HEIGHT = 16;
 		final int FONT_SIZE = 12; //(int)Pen.PEN_WHITE_TEXT_12px.fontSize().doubleValue(); 
 		int nw = WIDGET_TREE_NODE_WIDTH, nh = WIDGET_TREE_NODE_HEIGHT;
@@ -191,14 +192,14 @@ public class ProtocolUtil {
 	//	Rendering offset calculations
 	// ###############################
 	
-	private double[] calculateOffset(Canvas canvas, Shape shape){
+	private static double[] calculateOffset(Canvas canvas, Shape shape){
 		return new double[]{
 			canvas.x() + canvas.width() - (shape.x() + shape.width()),
 			canvas.y() + canvas.height() - (shape.y() + shape.height())
 		};
 	}
 	
-	private Shape calculateInnerShape(Shape shape, double[] offset){
+	private static Shape calculateInnerShape(Shape shape, double[] offset){
 		if (offset[0] > 0 && offset[1] > 0)
 			return shape;
 		else{
@@ -209,15 +210,20 @@ public class ProtocolUtil {
 		}
 	}
 	
-	public Shape repositionShape(Canvas canvas, Shape shape){
+	public static Shape repositionShape(Canvas canvas, Shape shape){
 		double[] offset = calculateOffset(canvas,shape); // x,y
 		return calculateInnerShape(shape,offset);		
 	}
 	
 	// fix WidgetInfo panel outside screen in some cases
-	public Shape calculateWidgetInfoShape(Canvas canvas, Shape cwShape, double widgetInfoW, double widgetInfoH){
+	public static Shape calculateWidgetInfoShape(Canvas canvas, Shape cwShape, double widgetInfoW, double widgetInfoH){
 		Shape s = Rect.from(cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 		Shape rs = repositionShape(canvas,s);
+		
+		// If y-axis canvas is over the screen (negative value), set to 0.0
+		if(s.y() < 0.0) {s = Rect.from(cwShape.x(), 0.0, widgetInfoW, widgetInfoH);}
+		if(rs.y() < 0.0) {rs = Rect.from(rs.x(), 0.0, rs.width(), rs.height());}
+		
 		if (s == rs)
 			return cwShape;
 		else
@@ -228,7 +234,7 @@ public class ProtocolUtil {
 	//  Screenshots helpers
 	// #####################
 	
-	public String getStateshot(State state){
+	public static String getStateshot(State state){
 		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state));
 	}
 
@@ -237,7 +243,7 @@ public class ProtocolUtil {
 	 * @param state
 	 * @return
 	 */
-	public AWTCanvas getStateshotBinary(State state) {
+	public static AWTCanvas getStateshotBinary(State state) {
 		Shape viewPort = null;
 		if (state.childCount() > 0){
 			viewPort = state.child(0).get(Tags.Shape, null);
@@ -255,7 +261,7 @@ public class ProtocolUtil {
 		return scrshot;
 	}
 	
-	public String getActionshot(State state, Action action){
+	public static String getActionshot(State state, Action action){
 		List<Finder> targets = action.get(Tags.Targets, null);
 		if (targets != null){
 			Widget w;
@@ -283,6 +289,27 @@ public class ProtocolUtil {
 			windowHandle = state.child(0).get(Tags.HWND);
 		}
 		return windowHandle;
+	}
+
+
+	/**
+	 * Calculate the max and the min ZIndex of all the widgets in a state
+	 * @param state
+	 */
+	public static State calculateZIndices(State state) {
+		double minZIndex = Double.MAX_VALUE,
+				maxZIndex = Double.MIN_VALUE,
+				zindex;
+		for (Widget w : state){
+			zindex = w.get(Tags.ZIndex).doubleValue();
+			if (zindex < minZIndex)
+				minZIndex = zindex;
+			if (zindex > maxZIndex)
+				maxZIndex = zindex;
+		}
+		state.set(Tags.MinZIndex, minZIndex);
+		state.set(Tags.MaxZIndex, maxZIndex);
+		return state;
 	}
 
 }
