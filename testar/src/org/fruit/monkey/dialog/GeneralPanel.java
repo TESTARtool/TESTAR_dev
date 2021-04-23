@@ -69,11 +69,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
 
-<<<<<<< Updated upstream
-=======
   private JLabel reportingClass = new JLabel("Reporting class");
 
->>>>>>> Stashed changes
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
 

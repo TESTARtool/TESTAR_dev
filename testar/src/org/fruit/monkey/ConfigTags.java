@@ -122,7 +122,6 @@ public final class ConfigTags {
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
 
-<<<<<<< Updated upstream
   public static final Tag<String> ExtendedSettingsFile = Tag.from("ExtendedSettingsFile", String.class);
 
   // 5 settings that can be used in user specified TESTAR protocols for anything:
@@ -150,12 +149,10 @@ public final class ConfigTags {
   public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   */
-=======
   // Specific for running headless; ReportingClass can be specified in UI as well
   public static final Tag<Boolean> ExecuteImmediately = Tag.from("ExecuteImmediately", Boolean.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
   public static final Tag<String> ReportingDirectory = Tag.from("ReportingDirectory", String.class);
   public static final Tag<Boolean> Headless = Tag.from("Headless",Boolean.class);
 
->>>>>>> Stashed changes
 }

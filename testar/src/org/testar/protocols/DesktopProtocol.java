@@ -31,12 +31,8 @@
 
 package org.testar.protocols;
 
-<<<<<<< Updated upstream
 import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-=======
 import nl.ou.testar.HtmlReporting.Reporting;
->>>>>>> Stashed changes
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.Environment;
