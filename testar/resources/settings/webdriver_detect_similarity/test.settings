@@ -21,9 +21,13 @@ Mode = Spy
 #
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = WEB_DRIVER: SUTConnectorValue property consists of webdriver path and web url
+# Format : <path of webdriver> [optional size/position] <url of web application>
+# Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "file:///C:/Users/testar/Desktop/webdriver/testar/bin/suts/similar_menu.html"
 
 #################################################################
 # Sequences
@@ -31,8 +35,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
-SequenceLength = 10
+Sequences = 1
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious titles
@@ -76,7 +80,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
 
 #################################################################
 # Processfilter
@@ -93,7 +97,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_disconnect_rdp/Protocol_desktop_disconnect_rdp
+ProtocolClass = webdriver_detect_similarity/Protocol_webdriver_detect_similarity
 
 #################################################################
 # State identifier attributes
@@ -101,16 +105,32 @@ ProtocolClass = desktop_disconnect_rdp/Protocol_desktop_disconnect_rdp
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetValueValue,WidgetControlType
+AbstractStateAttributes = WebWidgetId
 
 #################################################################
-# Settings (string) that can be used for user specified protocols
+# WebDriver features
 #################################################################
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png;pfx;xml
+DomainsAllowed = null
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system. 
+# Can solve problems when the mouse clicks are not aligned with 
+# the elements on the screen. This can easily be detected when
+# running the spy mode. For example hover over a text element and
+# the popup window should appear with information about the 
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5). 
+#################################################################
+
+OverrideWebDriverDisplayScale = 
 
 #################################################################
 # Other more advanced settings
@@ -124,7 +144,7 @@ UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 ExecuteActions = true
-FaultThreshold = 0.000000001
+FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
@@ -135,7 +155,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
@@ -145,3 +165,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0

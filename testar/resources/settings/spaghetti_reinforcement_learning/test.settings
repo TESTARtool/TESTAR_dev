@@ -129,7 +129,30 @@ ApplicationVersion = 1
 AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
+<<<<<<< HEAD:testar/resources/settings/spaghetti_reinforcement_learning/test.settings
 # Reinforcement learning settings
+=======
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.w3schools.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system. 
+# Can solve problems when the mouse clicks are not aligned with 
+# the elements on the screen. This can easily be detected when
+# running the spy mode. For example hover over a text element and
+# the popup window should appear with information about the 
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5). 
+>>>>>>> 4bc3fbaf31c447488f2ac16d508a94ad6a46ae12:testar/resources/settings/webdriver_statemodel/test.settings
 #################################################################
 Alpha = 1.0
 Gamma = 0.99
