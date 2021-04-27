@@ -6,10 +6,16 @@ import nl.ou.testar.StateModel.AbstractAction;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class BoltzmannDistributedExplorationPolicy implements Policy {
+
+    private static final Logger logger = LogManager.getLogger(BoltzmannDistributedExplorationPolicy.class);
 
     /**
      * Defines with how much the temperature declines every time the policy is used
@@ -35,25 +41,22 @@ public class BoltzmannDistributedExplorationPolicy implements Policy {
         final List<Pair<AbstractAction,Double>> probabilityOfActions = new ArrayList<>();
 
         try {
-            // get sum of utility values for all actions
             double sumOfUtilityForAllActions = actions.stream()
                     .mapToDouble(this::getActionUtility)
                     .sum();
             Validate.isTrue(sumOfUtilityForAllActions != 0.0f, "Utility or q-function for all actions results in zero");
 
-            // get probability for every action
+            // get probability for all actions
             actions.forEach(abstractAction -> probabilityOfActions.add(new Pair<>(abstractAction, getProbabilityForAction(abstractAction, sumOfUtilityForAllActions))));
 
-            // select action based on probability
-            AbstractAction selectedAbstractAction = selectActionBasedOnProbability(probabilityOfActions);
+            final AbstractAction selectedAbstractAction = selectActionBasedOnProbability(probabilityOfActions);
 
-            // update temperature
-            updateTemperature ();
+            updateTemperature();
 
-            // return
             return selectedAbstractAction;
         } catch (final Exception e) {
             // fallback to random action selection
+            logger.warn(e.getMessage());
             return RandomActionSelector.selectAbstractAction(actions);
         }
     }
@@ -67,7 +70,7 @@ public class BoltzmannDistributedExplorationPolicy implements Policy {
     }
 
     private double getActionUtility(AbstractAction abstractAction) {
-        float qValue = abstractAction.getAttributes().get(RLTags.SarsaValue, 0f);
+        final float qValue = abstractAction.getAttributes().get(RLTags.SarsaValue, 0f);
         Validate.isTrue(boltzmannTemperature != 0.0f, "The BoltzmannTemperature is now zero");
         return Math.exp(qValue / boltzmannTemperature);
     }
