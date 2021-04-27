@@ -34,6 +34,7 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public final class ConfigTags {
@@ -134,6 +135,8 @@ public final class ConfigTags {
 
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
+
+  public static final Tag<String> ExtendedSettingsFile = Tag.from("ExtendedSettingsFile", String.class);
 
   // 5 settings that can be used in user specified TESTAR protocols for anything:
   public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class);

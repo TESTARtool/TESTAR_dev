@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -32,6 +33,7 @@ package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsPanel;
 
 import javax.swing.*;
 
@@ -40,7 +42,7 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static org.fruit.monkey.dialog.ToolTipTexts.label1TTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.label2TTT;
 
-public class FilterPanel extends JPanel {
+public class FilterPanel extends SettingsPanel {
 
   private static final long serialVersionUID = 1572649050808020748L;
  
@@ -105,6 +107,7 @@ public class FilterPanel extends JPanel {
    * Populate Filter Fields from Settings structure.
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     txtClickFilter.setText(settings.get(ConfigTags.ClickFilter));
     txtProcessFilter.setText(settings.get(ConfigTags.ProcessesToKillDuringTest));
@@ -114,6 +117,7 @@ public class FilterPanel extends JPanel {
    * Retrieve information from the Filter  GUI.
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.ClickFilter, txtClickFilter.getText());
     settings.set(ConfigTags.ProcessesToKillDuringTest, txtProcessFilter.getText());

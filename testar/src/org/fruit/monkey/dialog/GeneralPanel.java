@@ -45,7 +45,7 @@ import java.util.Observer;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-public class GeneralPanel extends JPanel implements Observer {
+public class GeneralPanel extends SettingsPanel implements Observer {
 
   private static final long serialVersionUID = -7401834140061189752L;
 
@@ -66,7 +66,6 @@ public class GeneralPanel extends JPanel implements Observer {
 
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
-
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -249,6 +248,7 @@ public class GeneralPanel extends JPanel implements Observer {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     this.settings = settings;
 
@@ -270,6 +270,7 @@ public class GeneralPanel extends JPanel implements Observer {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
