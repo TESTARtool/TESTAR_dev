@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,8 +48,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
@@ -297,12 +295,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
         Boolean isFiltered = false;
 
-        for(String tagToFilter:settings.get(ConfigTags.TagsToFilter)){
+        for(String tagToFilter : settings.get(ConfigTags.TagsToFilter)){
             String tagValue = "";
             // First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-            for(Tag tag:w.tags()){
+            for(Tag tag : w.tags()){
                 if(tag.name().equals(tagToFilter)){
-                    tagValue=w.get(tag, "");
+                    tagValue = w.get(tag, "");
                     //System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
                 }
             }
