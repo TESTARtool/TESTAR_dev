@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,17 +31,21 @@
 
 package org.fruit.monkey.dialog;
 
+import nl.ou.testar.visualvalidation.VisualValidationSettings;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsPanel;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.swing.*;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
+import static org.fruit.monkey.dialog.ToolTipTexts.enableVisualValidationTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
 
-public class OraclePanel extends JPanel {
+public class OraclePanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -8633257917450402330L;
 
@@ -48,6 +53,7 @@ public class OraclePanel extends JPanel {
 	private JCheckBox processCheckBox;
 	private JTextArea txtProcTitles;
 	private JSpinner spnFreezeTime;
+	private JCheckBox enableVisualValidationCheckBox;
 
 	public OraclePanel() {
 		txtSuspTitles = new JTextArea();
@@ -75,6 +81,10 @@ public class OraclePanel extends JPanel {
 		JLabel freezeTimeLabel = new JLabel("Freeze Time:");
 		JLabel secondsLabel = new JLabel("seconds");
 
+		enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
+		enableVisualValidationCheckBox.setBounds(10, 280, 180, 20);
+		enableVisualValidationCheckBox.setToolTipText(enableVisualValidationTTT);
+
 		GroupLayout gl_jPanelOracles = new GroupLayout(this);
 		this.setLayout(gl_jPanelOracles);
 		gl_jPanelOracles.setHorizontalGroup(
@@ -84,6 +94,9 @@ public class OraclePanel extends JPanel {
 						.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING, false)
 								.addGroup(gl_jPanelOracles.createSequentialGroup()
 										.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING)
+												.addGroup(GroupLayout.Alignment.LEADING, gl_jPanelOracles.createSequentialGroup()
+														.addComponent(enableVisualValidationCheckBox, PREFERRED_SIZE, 180, PREFERRED_SIZE)
+														.addGap(121))
 												.addGroup(gl_jPanelOracles.createSequentialGroup()
 														.addComponent(freezeTimeLabel, PREFERRED_SIZE, 92, PREFERRED_SIZE)
 														.addGap(10)
@@ -116,6 +129,8 @@ public class OraclePanel extends JPanel {
 								.addComponent(spnFreezeTime, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
 								.addComponent(secondsLabel)
 								.addComponent(freezeTimeLabel))
+						.addGap(20)
+						.addComponent(enableVisualValidationCheckBox)
 						.addContainerGap(120, Short.MAX_VALUE))
 				.addGroup(gl_jPanelOracles.createSequentialGroup()
 						.addGap(160)
@@ -134,21 +149,27 @@ public class OraclePanel extends JPanel {
 	 * Populate Oracle Fields from Settings structure.
 	 * @param settings The settings to load.
 	 */
+	@Override
 	public void populateFrom(final Settings settings) {
 		txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTitles));
 		processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
 		txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
 		spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
+		VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
+		enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
 	}
 
 	/**
 	 * Retrieve information from the Oracle GUI.
 	 * @param settings reference to the object where the settings will be stored.
 	 */
+	@Override
 	public void extractInformation(final Settings settings) {
 		settings.set(ConfigTags.SuspiciousTitles, txtSuspTitles.getText());
 		settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
 		settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
 		settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
+		VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
+		visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
 	}
 }

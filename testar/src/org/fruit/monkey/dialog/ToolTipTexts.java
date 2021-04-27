@@ -117,6 +117,7 @@ public class ToolTipTexts {
           "which is applied to each<br>widget's Title property. " +
           "If TESTAR finds a widget on the screen, whose title matches the given<br>\n" +
           "expression, it will consider the current sequence to be erroneous.\n</html>";
+  public static String enableVisualValidationTTT = "Use visual validation to validate the text labels";
 
   // TTTs for the timing panel
   public static String actionDurationTTT = "<html>\nAction Duration: " +

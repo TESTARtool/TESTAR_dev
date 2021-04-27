@@ -46,7 +46,11 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.windows.Windows10;
+import org.testar.settings.ExtendedSettingFile;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
@@ -342,7 +346,6 @@ public class Main {
 	 * This method get the specific protocol class of the selected settings to run TESTAR
 	 * 
 	 * @param settings
-	 * @param testSettings
 	 */
 	private static void startTestar(Settings settings) {
 
@@ -560,13 +563,19 @@ public class Main {
 
 			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+			    throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
 			}
 
 			// check that the abstract action properties have at least 1 value
 			if ((settings.get(AbstractActionAttributes)).isEmpty()) {
 			    throw new ConfigException("Please provide at least 1 valid abstract action attribute or leave the key out of the settings file");
 			}
+			try{
+			    settings.get(ConfigTags.ExtendedSettingsFile);
+			} catch (NoSuchTagException e){
+			    settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
+			}
+			ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
 			return settings;
 		} catch (IOException ioe) {
