@@ -15,10 +15,16 @@ public class CounterBasedRewardFunction implements RewardFunction {
 
     private static final Logger logger = LogManager.getLogger(CounterBasedRewardFunction.class);
 
+    private final float defaultReward;
+
+    public CounterBasedRewardFunction(float defaultReward) {
+        this.defaultReward = defaultReward;
+    }
+
     @Override
     public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
         if (executedAction == null || executedAction.getAttributes() == null) {
-            return 0f;
+            return defaultReward;
         }
 
         int executionCounter = executedAction.getAttributes().get(RLTags.Counter, 0) + 1;

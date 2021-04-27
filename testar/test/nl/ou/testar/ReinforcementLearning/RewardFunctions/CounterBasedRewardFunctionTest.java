@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class CounterBasedRewardFunctionTest {
 
     @Spy
-    private final CounterBasedRewardFunction rewardFunction = new CounterBasedRewardFunction();
+    private final CounterBasedRewardFunction rewardFunction = new CounterBasedRewardFunction(0f);
 
     @Mock
     private AbstractState currentAbstractState;

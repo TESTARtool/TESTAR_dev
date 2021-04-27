@@ -12,17 +12,17 @@ public class RewardFunctionFactory {
     public static RewardFunction getRewardFunction (final Settings settings) {
         final String rewardFunction = settings.get(ConfigTags.RewardFunction, "");
         final RewardFunction selectedRewardFunction;
+        final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
 
         switch(rewardFunction) {
             case "WidgetTreeBasedRewardFunction":
                 selectedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(new LRKeyrootsHelper(), new TreeDistHelper());
                 break;
             case "ImageRecognitionBasedRewardFunction":
-                final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
                 selectedRewardFunction = new ImageRecognitionBasedRewardFunction(defaultReward);
                 break;
             default:
-                selectedRewardFunction = new CounterBasedRewardFunction();
+                selectedRewardFunction = new CounterBasedRewardFunction(defaultReward);
         }
 
         logger.info("Using rewardFunction='{}'", selectedRewardFunction.getClass().getName());
