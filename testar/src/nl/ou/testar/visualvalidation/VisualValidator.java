@@ -57,7 +57,11 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
             _ocrEngine = null;
         }
 
-        _extractor = ExtractorFactory.CreateTextExtractor();
+        if (settings.protocol.contains("webdriver_generic")) {
+            _extractor = ExtractorFactory.CreateExpectedTextExtractorWebdriver();
+        } else {
+            _extractor = ExtractorFactory.CreateExpectedTextExtractorDesktop();
+        }
 
         _matcher = VisualMatcherFactory.createLocationMatcher();
     }

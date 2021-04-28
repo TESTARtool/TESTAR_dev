@@ -42,6 +42,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class VisualValidationSettings extends ExtendedSettingBase<VisualValidationSettings> {
     public Boolean enabled;
     public OcrConfiguration ocrConfiguration;
+    // The selected protocol will be set automatically when we initialize TESTAR.
+    public String protocol;
 
     @Override
     public int compareTo(VisualValidationSettings other) {

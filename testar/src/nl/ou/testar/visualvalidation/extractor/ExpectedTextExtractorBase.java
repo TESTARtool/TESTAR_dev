@@ -25,9 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.fruit.alayer.Tags.*;
-import static org.fruit.alayer.webdriver.enums.WdTags.WebTextContent;
 
-public class ExpectedTextExtractor extends Thread implements TextExtractorInterface {
+public class ExpectedTextExtractorBase extends Thread implements TextExtractorInterface {
     private static final String TAG = "ExpectedTextExtractor";
     private final String rootElementPath = "[0]";
 
@@ -36,6 +35,10 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
     private final Boolean _threadSync = true;
     private org.fruit.alayer.State _state = null;
     private ExpectedTextCallback _callback = null;
+
+    final private Tag<String> defaultTag;
+
+    private boolean _loggingEnabled;
 
     /**
      * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because the don't contain
@@ -58,7 +61,7 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
             .filter(tag -> tag.type().equals(String.class))
             .collect(Collectors.toMap(Tag::name, tag -> (Tag<String>) tag));
 
-    ExpectedTextExtractor() {
+    ExpectedTextExtractorBase(Tag<String> defaultTag) {
         WidgetTextConfiguration config = ExtendedSettingsFactory.createWidgetTextConfiguration();
         // Load the extractor configuration into a lookup table for quick access.
         config.widget.forEach(it -> {
@@ -72,6 +75,10 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
             }
         });
 
+        _loggingEnabled = config.loggingEnabled;
+
+        this.defaultTag = defaultTag;
+
         setName(TAG);
         start();
     }
@@ -81,7 +88,9 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         synchronized (_threadSync) {
             _state = state;
             _callback = callback;
-            Logger.log(Level.TRACE, TAG, "Queue new text extract.");
+            if (_loggingEnabled) {
+                Logger.log(Level.TRACE, TAG, "Queue new text extract.");
+            }
             _threadSync.notifyAll();
         }
     }
@@ -100,7 +109,9 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
 
                 } catch (InterruptedException e) {
                     // Happens if someone interrupts your thread.
-                    Logger.log(Level.INFO, TAG, "Wait interrupted");
+                    if (_loggingEnabled) {
+                        Logger.log(Level.INFO, TAG, "Wait interrupted");
+                    }
                     e.printStackTrace();
                 }
             }
@@ -138,10 +149,9 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
         List<ExpectedElement> expectedElements = new ArrayList<>();
         for (Widget widget : _state) {
             String widgetRole = widget.get(Role).name();
+            String text = widget.get(getVisualTextTag(widgetRole), "");
 
             if (widgetIsIncluded(widget, widgetRole)) {
-                String text = widget.get(getVisualTextTag(widgetRole), "");
-
                 if (text != null && !text.isEmpty()) {
                     Rectangle absoluteLocation = getLocation(widget);
                     Rectangle relativeLocation = new Rectangle(
@@ -152,14 +162,16 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
                     expectedElements.add(new ExpectedElement(relativeLocation, text));
                 }
             } else {
-                Logger.log(Level.DEBUG, TAG, "Widget {} ignored", widgetRole);
+                if (_loggingEnabled) {
+                    Logger.log(Level.DEBUG, TAG, "Widget {} with role {} is ignored", text, widgetRole);
+                }
             }
         }
 
         _callback.ReportExtractedText(expectedElements);
     }
 
-    private boolean widgetIsIncluded(Widget w, String role) {
+    protected boolean widgetIsIncluded(Widget widget, String role) {
         boolean containsReadableText = true;
         if (_blacklist.containsKey(role)) {
             containsReadableText = false;
@@ -167,7 +179,7 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
                 List<String> blacklistedAncestors = _blacklist.get(role);
                 if (!blacklistedAncestors.isEmpty()) {
                     StringBuilder sb = new StringBuilder();
-                    Util.ancestors(w).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
+                    Util.ancestors(widget).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
 
                     // Check if we should ignore this widget based on its ancestors.
                     String ancestors = sb.toString();
@@ -181,18 +193,15 @@ public class ExpectedTextExtractor extends Thread implements TextExtractorInterf
     }
 
     private Tag<String> getVisualTextTag(String widgetRole) {
-        // Check if we have specified a custom tag for this widget, if so convert the string identifier into the actual
-        // Tag.
-        // TODO TM: Should inject this based on the selected protocol?
-        Tag<String> defaultTag = widgetRole.contains("Wd") ? WebTextContent : Title;
         return _tag.getOrDefault(_lookupTable.getOrDefault(widgetRole, ""), defaultTag);
     }
 
     @Override
     public void Destroy() {
         stopAndJoinThread();
-
-        Logger.log(Level.DEBUG, TAG, "Extractor destroyed.");
+        if (_loggingEnabled) {
+            Logger.log(Level.DEBUG, TAG, "Extractor destroyed.");
+        }
     }
 
     private void stopAndJoinThread() {

@@ -40,6 +40,7 @@ import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.ProtocolClass;
 
 import java.awt.*;
 import java.io.BufferedInputStream;
@@ -102,6 +103,7 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.Logger;
 import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
@@ -364,7 +366,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
-			visualValidationManager = VisualValidationFactory.createVisualValidator();
+			visualValidationManager = VisualValidationFactory.createVisualValidator(settings.get(ProtocolClass));
 		}
 
 		try {
