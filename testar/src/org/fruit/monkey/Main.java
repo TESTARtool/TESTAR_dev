@@ -527,6 +527,15 @@ public class Main {
                 }
             }));
 
+
+			defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
+				{
+					add("Title");
+					add("WebName");
+					add("WebTagName");
+				}
+			}));
+
 			defaults.add(Pair.from(FollowLinks, true));
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));

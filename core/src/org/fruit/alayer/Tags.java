@@ -217,15 +217,4 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
-	private static Set<Tag<String>> generalStringVerdictTags;
-	static {
-		generalStringVerdictTags = new HashSet<Tag<String>>();
-		generalStringVerdictTags.add(Title);
-		generalStringVerdictTags.add(ValuePattern);
-	}
-
-	public static Set<Tag<String>> getGeneralStringVerdictTags() {
-		return generalStringVerdictTags;
-	}
-	
 }
