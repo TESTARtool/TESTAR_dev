@@ -72,11 +72,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = 
+TagsToFilter = Title
 
 #################################################################
 # Processfilter
