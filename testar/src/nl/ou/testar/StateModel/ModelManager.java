@@ -278,4 +278,8 @@ public class ModelManager implements StateModelManager {
     public ConcreteState getCurrentConcreteState() {
         return currentConcreteState;
     }
+
+    protected SequenceManager getSequenceManager() {
+        return sequenceManager;
+    }
 }
