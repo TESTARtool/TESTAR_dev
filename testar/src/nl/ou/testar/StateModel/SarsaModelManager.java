@@ -7,12 +7,12 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class SarsaModelManager extends ModelManager implements StateModelManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(SarsaModelManager.class);
+    private static final Logger logger = LogManager.getLogger(SarsaModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
     private AbstractAction previouslySelectedAbstractAction = null;
@@ -74,9 +74,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      */
     @Override
     public Action getAbstractActionToExecute(final Set<Action> actions) {
-        logger.info("Number of actions available:{}", actions.size());
         final Action selectedAction = super.getAbstractActionToExecute(actions);
-        logger.info("Action selected:{}", selectedAction == null ? null :selectedAction.toShortString());
         final AbstractAction selectedAbstractAction = getAbstractAction(currentAbstractState, selectedAction);
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
         final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
@@ -84,7 +82,25 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         updateQValue(previouslySelectedAbstractAction, sarsaQValue);
         previouslySelectedAbstractAction = selectedAbstractAction;
 
+        log(actions, selectedAction, selectedAbstractAction);
+
         return selectedAction;
+    }
+
+    private void log(final Set<Action> actions, final Action selectedAction,final AbstractAction selectedAbstractAction) {
+        logger.info("Number of actions available={}", actions.size());
+        if (selectedAction != null) {
+            logger.info("Action selected shortString={}", selectedAction.toShortString());
+
+            // add counter
+            final int counterSelectedAction = selectedAction.get(RLTags.Counter, 0);
+            selectedAction.set(RLTags.Counter, counterSelectedAction + 1);
+            logger.info("Action selected counter={}", selectedAction.get(RLTags.Counter));
+        }
+        if(selectedAbstractAction != null) {
+            logger.info("Abstract action selected abstractActionID={}, id={}", selectedAbstractAction.getActionId(), selectedAbstractAction.getId());
+        }
+        logger.info("SequenceID={}", getSequenceManager().getSequenceID());
     }
 
     /**
@@ -95,7 +111,7 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      */
     private double getQValue(final AbstractAction selectedAbstractAction, final float reward) {
         if (selectedAbstractAction == null) {
-            logger.debug("Update of Q-value failed because no action was found to execute");
+            logger.info("Update of Q-value failed because no action was found to execute");
         }
         return qFunction.getQValue(previouslySelectedAbstractAction, selectedAbstractAction, reward);
     }
@@ -126,15 +142,16 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
      */
     private void updateQValue(final AbstractAction selectedAbstractAction, double qValue) {
         if (selectedAbstractAction == null) {
-            logger.debug("Update of Q-value failed because no action was found to execute");
+            logger.warn("Update of Q-value failed because no action was found to execute");
             return;
         }
 
         if (previouslySelectedAbstractAction == null) {
-            logger.debug("Update of Q-value failed because no previous action was found");
+            logger.warn("Update of Q-value failed because no previous action was found");
             return;
         }
-
+        logger.info("Q-value of abstractAction before updating with ID={} and q-value={}", previouslySelectedAbstractAction.getId(),  previouslySelectedAbstractAction.getAttributes().get(RLTags.SarsaValue, 0f));
         previouslySelectedAbstractAction.addAttribute(RLTags.SarsaValue, (float) qValue);
+        logger.info("Q-value of abstractAction after updating with ID={} and q-value={}", previouslySelectedAbstractAction.getId(),  previouslySelectedAbstractAction.getAttributes().get(RLTags.SarsaValue));
     }
 }

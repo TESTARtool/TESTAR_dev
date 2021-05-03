@@ -111,4 +111,11 @@ public class SequenceManager {
         }
     }
 
+    /**
+     * Retrieves the UUID of the current sequence
+     * @return a UUID
+     */
+    public String getSequenceID() {
+        return currentSequence.getCurrentSequenceId();
+    }
 }
