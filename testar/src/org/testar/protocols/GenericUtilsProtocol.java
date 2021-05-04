@@ -301,6 +301,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             for(Tag tag : w.tags()){
                 if(tag.name().equals(tagToFilter)){
                     tagValue = w.get(tag, "");
+                    break;
                     //System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
                 }
             }

@@ -224,7 +224,8 @@ task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
 }
 
 // Default COMMAND_LINE execution to run Notepad
-// Force TESTAR to find a Suspicious Title Error (Format widget)
+// Test TagsForSuspiciousOracle feature using the UIATags.UIAAutomationId
+// Force TESTAR to find a Suspicious Title (MenuBar widget)
 // And verify it reading output command line
 task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'installDist') {
 	// Read command line output
@@ -232,15 +233,15 @@ task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'inst
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
-		// Use Format (for English and Spanish)
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
-            println "\n${output} \nTESTAR has successfully detected Format Suspicious Title! "
+		// Verify MenuBar UIAAutomationId has been detected
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'UIAAutomationId' : 'MenuBar")}) {
+            println "\n${output} \nTESTAR has successfully detected MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId! "
         } else {
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect Format Suspicious Title")
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId")
         }
     }
 }
@@ -255,7 +256,7 @@ task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle(type: Exec, d
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTitles=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTitles=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -368,7 +369,7 @@ task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChro
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
