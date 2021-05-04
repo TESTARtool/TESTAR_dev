@@ -348,11 +348,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Actionfilter\n"
 					+"#\n"
-					+"# Regular expression. More filters can be added in Spy mode,\n"
+					+"# Regular expression and Tags to apply them.\n"
+					+"# More filters can be added in Spy mode,\n"
 					+"# these will be added to the protocol_filter.xml file.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ClickFilter = " + Util.lineSep()
+					+"TagsToFilter = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Processfilter\n"
@@ -431,6 +433,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProtocolSpecificSetting_3 = " + Util.lineSep()
 					+"ProtocolSpecificSetting_4 = " + Util.lineSep()
 					+"ProtocolSpecificSetting_5 = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Extended settings file\n"
+					+"#\n"
+					+"# Relative path to extended settings file.\n"
+					+"#################################################################\n"
+					+"ExtendedSettingsFile =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

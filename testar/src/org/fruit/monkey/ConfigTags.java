@@ -34,6 +34,7 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public final class ConfigTags {
@@ -121,6 +122,8 @@ public final class ConfigTags {
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
 
+  public static final Tag<String> ExtendedSettingsFile = Tag.from("ExtendedSettingsFile", String.class);
+
   // 5 settings that can be used in user specified TESTAR protocols for anything:
   public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class);
   public static final Tag<String> ProtocolSpecificSetting_2 = Tag.from("ProtocolSpecificSetting_2", String.class);
@@ -135,6 +138,7 @@ public final class ConfigTags {
   public static final Tag<List<String>> DeniedExtensions = Tag.from("DeniedExtensions", (Class<List<String>>) (Class<?>) List.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<List<String>> TagsToFilter = Tag.from("TagsToFilter", (Class<List<String>>) (Class<?>) List.class);
   public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class);
   public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
   public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
