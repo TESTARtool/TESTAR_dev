@@ -106,7 +106,7 @@ public final class UIAStateBuilder implements StateBuilder {
 		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_DescribedByPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_FlowsToPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_FrameworkIdPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_FullDescriptionPropertyId);
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_FullDescriptionPropertyId); //Issue with Windows7
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_HasKeyboardFocusPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_HelpTextPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsContentElementPropertyId);
@@ -130,21 +130,22 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_AriaPropertiesPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_AriaRolePropertyId);
 //		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDialogPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsPeripheralPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LandmarkTypePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LocalizedLandmarkTypePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LevelPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LiveSettingPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_PositionInSetPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_SizeOfSetPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RotationPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_VisualEffectsPropertyId);
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsPeripheralPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LandmarkTypePropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LocalizedLandmarkTypePropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LevelPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LiveSettingPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_PositionInSetPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_SizeOfSetPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RotationPropertyId); //Issue with Windows7
+		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_VisualEffectsPropertyId); //Issue with Windows7
 
 		// cache all active pattern availability and pattern properties
-		UIATags.getPatternAvailabilityTags().stream().flatMap(tag -> Stream.concat(Stream.of(tag), UIATags.getChildTags(tag).stream()))
-				.filter(UIATags::tagIsActive).forEach(tag ->
-					Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, UIAMapping.getPatternPropertyIdentifier(tag))
-		);
+		// Issue with Windows7
+		//UIATags.getPatternAvailabilityTags().stream().flatMap(tag -> Stream.concat(Stream.of(tag), UIATags.getChildTags(tag).stream()))
+				//.filter(UIATags::tagIsActive).forEach(tag ->
+					//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, UIAMapping.getPatternPropertyIdentifier(tag))
+		//);
 
 
 		// the following properties are left in for backwards compatibility
