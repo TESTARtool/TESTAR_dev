@@ -23,11 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-<<<<<<< HEAD:testar/resources/settings/desktop_codeo/test.settings
-SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\lib\\jacocoagent.jar=jmx=true "C:\\sysgo\\opt\\codeo-6.2\\codeo\\plugins\\org.eclipse.equinox.launcher_1.3.200.v20160318-1642.jar"
-=======
 SUTConnectorValue = c:\\windows\\system32\\notepad.exe
->>>>>>> master:testar/resources/workflow/settings/test_gradle_workflow_desktop_generic/test.settings
 
 #################################################################
 # Sequences
@@ -35,13 +31,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-<<<<<<< HEAD:testar/resources/settings/desktop_codeo/test.settings
-Sequences = 1
-SequenceLength = 50
-=======
 Sequences = 8
 SequenceLength = 10
->>>>>>> master:testar/resources/workflow/settings/test_gradle_workflow_desktop_generic/test.settings
 
 #################################################################
 # Oracles based on suspicious titles
@@ -102,57 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-<<<<<<< HEAD:testar/resources/settings/desktop_codeo/test.settings
-ProtocolClass = desktop_codeo/Protocol_desktop_codeo
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################\n"
-# State model inference settings
-#################################################################\n"
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = 10.102.0.244
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = instant
-ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = false
-=======
 ProtocolClass = test_gradle_workflow_desktop_generic/Protocol_test_gradle_workflow_desktop_generic
->>>>>>> master:testar/resources/workflow/settings/test_gradle_workflow_desktop_generic/test.settings
-
-#################################################################
-# State identifier attributes
-#
-# Specify the widget attributes that you wish to use in constructing
-# the widget and state hash strings. Use a comma separated list.
-#################################################################
-AbstractStateAttributes = WidgetTitle,WidgetPath,WidgetControlType
-
-#################################################################
-# PKM address
-#################################################################
-PKMaddress = 10.101.0.224
-PKMport = 8080
-PKMdatabase = myproject
-PKMusername = demo
-PKMkey = admin
-
-#################################################################
-# Previous State model difference settings
-#################################################################
-PreviousApplicationName =
-PreviousApplicationVersion =
-StateModelDifferenceAutomaticReport = true
 
 #################################################################
 # Other more advanced settings
@@ -176,13 +117,8 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-<<<<<<< HEAD:testar/resources/settings/desktop_codeo/test.settings
-TimeToWaitAfterAction = 0.5
-StartupTime = 2.0
-=======
 TimeToWaitAfterAction = 0.1
 StartupTime = 10.0
->>>>>>> master:testar/resources/workflow/settings/test_gradle_workflow_desktop_generic/test.settings
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

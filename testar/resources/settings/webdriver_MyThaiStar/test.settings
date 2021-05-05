@@ -145,7 +145,7 @@ StateModelDifferenceAutomaticReport = true
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.w3schools.com
+DomainsAllowed = 
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true

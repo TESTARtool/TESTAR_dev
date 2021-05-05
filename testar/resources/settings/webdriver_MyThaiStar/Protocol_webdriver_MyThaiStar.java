@@ -101,7 +101,7 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 
         // If true, follow links opened in new tabs
         // If false, stay with the original (ignore links opened in new tabs)
-        WdDriver.followLinks = false;
+        WdDriver.followLinks = true;
 
         //Force the browser to run in full screen mode
         WdDriver.fullScreen = true;
