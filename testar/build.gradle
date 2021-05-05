@@ -1,3 +1,7 @@
+plugins {
+    id "de.undercouch.download" version "4.1.1"
+}
+
 apply plugin: 'application'
 
 sourceSets {
@@ -192,3 +196,214 @@ task buildWindows(type: Exec) {
 buildWindows.dependsOn classes
 
 mainClassName='org.fruit.monkey.Main'
+
+
+/**
+ * Tasks to test TESTAR using gradle
+ */
+ 
+task init_workflow_test(type: Copy) {
+    group = 'test_testar_workflow'
+    description ='init_workflow_test'
+    from 'resources/workflow/settings'
+    into 'target/scripts/settings'
+}
+
+// Default COMMAND_LINE execution to run Notepad, execute 2 actions and verdict should be OK
+task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericCommandLineOk'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Default COMMAND_LINE execution to run Notepad
+// Test TagsForSuspiciousOracle feature using the UIATags.UIAAutomationId
+// Force TESTAR to find a Suspicious Title (MenuBar widget)
+// And verify it reading output command line
+task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericCommandLineSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Verify MenuBar UIAAutomationId has been detected
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'UIAAutomationId' : 'MenuBar")}) {
+            println "\n${output} \nTESTAR has successfully detected MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId")
+        }
+    }
+}
+
+// Default COMMAND_LINE execution to run Notepad
+// Test TagsToFilter feature using the Tag.Desc
+// Then force TESTAR to navigate and find a Suspicious Title Error (Script text)
+// And verify it reading output command line
+task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTitles=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Verify Script title has been detected
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Script")}) {
+            println "\n${output} \nTESTAR has successfully filtered using TagsToFilter Desc and detected Script Suspicious Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt filter using TagsToFilter Desc")
+        }
+    }
+}
+
+// Help task to run Notepad before start TESTAR (to connect with process or title)
+task runNotepad {
+    group = 'test_testar_workflow'
+    description ='runNotepad'
+    doFirst{
+        ext.process = new ProcessBuilder().command('cmd', '/c', 'C:\\Windows\\System32\\notepad.exe').start()
+    }
+}
+
+// Verify that TESTAR correctly connects using process name
+// To be sure, connect to process and detect Format suspicious title
+task runTestDesktopGenericProcessNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericProcessNameSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Format (for English and Spanish)
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
+            println "\n${output} \nTESTAR has successfully connect with SUT_PROCESS_NAME and detected Format Suspicious Title! "
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+        } else {
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_PROCESS_NAME")
+        }
+    }
+}
+
+// Verify that TESTAR correctly connects using windows title
+// To be sure, connect with windows title and detect Format suspicious title
+task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericTitleNameSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Format (for English and Spanish)
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
+            println "\n${output} \nTESTAR has successfully connect with SUT_WINDOW_TITLE and detected Format Suspicious Title! "
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+        } else {
+            // kill notepad process
+            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_WINDOW_TITLE")
+        }
+    }
+}
+
+// Download last win32 chromedriver 
+task downloadChromedriver(type: Download, dependsOn: installDist) {
+    group = 'test_testar_workflow'
+    description ='downloadChromedriver'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
+    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
+    Process process = builder.start();
+    process.waitFor()
+    
+    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
+    dest 'target/install/testar/bin'
+    overwrite false
+}
+
+// Extract Chromedriver from downloaded file
+task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
+    group = 'test_testar_workflow'
+    description ='downloadAndUnzipChromedriver'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
+    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
+    into downloadChromedriver.dest
+}
+
+// Verify that TESTAR correctly executes chromedriver
+// To be sure, connect to ou.nl and detect Onderwijs suspicious title
+task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTitle'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Onderwijs
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+    }
+}
+
+// Connect to parabank.parasoft.com and make a login
+task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankLogin'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}

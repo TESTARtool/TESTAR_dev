@@ -1,5 +1,4 @@
 /***************************************************************************************************
- *
  * Copyright (c) 2016 - 2021 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  * Redistribution and use in source and binary forms, with or without
@@ -325,6 +324,26 @@ public class ProtocolUtil {
         }
 
         return rectSUT;
+    }
+
+    /**
+     * Calculate the max and the min ZIndex of all the widgets in a state
+     * @param state
+     */
+    public static State calculateZIndices(State state) {
+        double minZIndex = Double.MAX_VALUE,
+                maxZIndex = Double.MIN_VALUE,
+                zindex;
+        for (Widget w : state){
+            zindex = w.get(Tags.ZIndex).doubleValue();
+            if (zindex < minZIndex)
+                minZIndex = zindex;
+            if (zindex > maxZIndex)
+                maxZIndex = zindex;
+        }
+        state.set(Tags.MinZIndex, minZIndex);
+        state.set(Tags.MaxZIndex, maxZIndex);
+        return state;
     }
 
 }

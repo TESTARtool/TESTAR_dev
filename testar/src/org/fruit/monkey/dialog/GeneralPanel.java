@@ -45,7 +45,7 @@ import java.util.Observer;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-public class GeneralPanel extends JPanel implements Observer {
+public class GeneralPanel extends SettingsPanel implements Observer {
 
   private static final long serialVersionUID = -7401834140061189752L;
 
@@ -56,7 +56,7 @@ public class GeneralPanel extends JPanel implements Observer {
   private JSpinner spnSequenceLength;
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
-  private JCheckBox compileCheckBox;
+  private JCheckBox compileCheckBox, checkActionVisualization;
   
   private JLabel labelAppName = new JLabel("Application name");
   private JLabel labelAppVersion = new JLabel("Application version");
@@ -66,7 +66,6 @@ public class GeneralPanel extends JPanel implements Observer {
 
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
-
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -131,6 +130,11 @@ public class GeneralPanel extends JPanel implements Observer {
     checkStopOnFault.setBounds(10, 240, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);*/
+
+    checkActionVisualization = new JCheckBox("Visualize actions on GUI");
+    checkActionVisualization.setBounds(10, 240, 192, 21);
+    //checkActionVisualization.setToolTipText(checkStopOnFaultTTT);
+    add(checkActionVisualization);
     
     labelAppName.setBounds(330, 242, 150, 27);
     labelAppName.setToolTipText(applicationNameTTT);
@@ -244,11 +248,13 @@ public class GeneralPanel extends JPanel implements Observer {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     this.settings = settings;
 
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
+    checkActionVisualization.setSelected(settings.get(ConfigTags.VisualizeActions));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
@@ -264,10 +270,12 @@ public class GeneralPanel extends JPanel implements Observer {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
+    settings.set(ConfigTags.VisualizeActions, checkActionVisualization.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
