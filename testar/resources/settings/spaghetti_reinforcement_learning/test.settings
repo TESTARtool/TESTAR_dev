@@ -130,26 +130,6 @@ AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
 # Reinforcement learning settings
-# WebDriver features
-#################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.w3schools.com
-FollowLinks = true
-BrowserFullScreen = true
-SwitchNewTabs = true
-
-#################################################################
-# Override display scale
-#
-# Overrides the displayscale obtained from the system. 
-# Can solve problems when the mouse clicks are not aligned with 
-# the elements on the screen. This can easily be detected when
-# running the spy mode. For example hover over a text element and
-# the popup window should appear with information about the 
-# element, if the popup window is not shown or when the mouse is
-# located somewhere else you can try to override the displayscale
-# Values should be provided as doubles (1.5). 
 #################################################################
 Alpha = 1.0
 Gamma = 0.99
