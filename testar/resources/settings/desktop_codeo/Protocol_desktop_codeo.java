@@ -68,6 +68,12 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
         // CODEO takes his time to start, wait 30s by default
         WinProcess.codeo_pause = 30;
 
+        // Execute Record Mode is the ListeningMode activation
+        if(settings.get(ConfigTags.Mode).equals(Modes.Record)) {
+            settings.set(ConfigTags.ListeningMode, true);
+            visualizationOn = true;
+        }
+
         // Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
         copyJacocoBuildFile();
     }

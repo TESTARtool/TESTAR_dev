@@ -165,8 +165,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected void closeTestSession() {
         super.closeTestSession();
 
-        // TODO: Allow Record mode when Listening mode implemented
-        if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
+        if(!decoderExceptionThrown) {
             testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
                     sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir, runInfo);
 
@@ -211,8 +210,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         // Create the JSON Object that contains the information about State Model Difference
         StateModelDifferenceJsonObject stateModelDifferenceJsonObject = new StateModelDifferenceJsonObject();
 
-        if(settings.get(ConfigTags.Mode) == Modes.Generate 
-                && settings.get(ConfigTags.StateModelEnabled, false)
+        if(settings.get(ConfigTags.StateModelEnabled, false)
                 && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)
                 && !decoderExceptionThrown) {
 
@@ -304,8 +302,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
      * @return artefactId
      */
     protected String insertTestResultsPKM(String artefactTestResults) {
-        // TODO: Allow Record mode when Listening mode implemented
-        if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
+        if(!decoderExceptionThrown) {
 
             String artefactIdTestResults = PkmRequest.postArtefactTestResults(settings, artefactTestResults);
 
@@ -328,8 +325,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
      * @return artefactId
      */
     protected String insertStateModelPKM(String artefactStateModel) {
-        // TODO: Allow Record mode when Listening mode implemented
-        if(settings.get(ConfigTags.Mode) == Modes.Generate && !decoderExceptionThrown) {
+        if(!decoderExceptionThrown) {
 
             String artefactIdStateModel = PkmRequest.postArtefactStateModel(settings, artefactStateModel);
 
@@ -355,7 +351,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected void updateOutputRunFolder(String artefactIdTestResults) {
 
         // If we are not in Generate Mode we do not want to move the output folder
-        if(settings.get(ConfigTags.Mode) != Modes.Generate || decoderExceptionThrown) {
+        if(decoderExceptionThrown) {
             return;
         }
         

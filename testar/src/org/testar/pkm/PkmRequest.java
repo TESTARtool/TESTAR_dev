@@ -58,6 +58,12 @@ public class PkmRequest {
      * @return true or false
      */
     public static boolean validDecoderUserProject(Settings settings) {
+        //If user is using TESTAR locally with the GUI, validate and continue
+        if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup, false)) {
+            System.out.println("INFO: Local execution running, not validating DECODER PKM key");
+            return true;
+        }
+
         String pkm = "http://" + settings.get(ConfigTags.PKMaddress) + ":" + settings.get(ConfigTags.PKMport) + "/project/" + settings.get(ConfigTags.PKMdatabase);
 
         try {
@@ -220,7 +226,7 @@ public class PkmRequest {
 
         return artefactId;
     }
-    
+
     /**
      * Insert the Artefact Log inside the PKM. 
      * POST http://10.101.0.224:8080/log/myproject
