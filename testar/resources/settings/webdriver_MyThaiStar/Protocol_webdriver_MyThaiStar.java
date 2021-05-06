@@ -30,6 +30,8 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
+
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
@@ -48,286 +50,283 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
 
-	private static List<String> alwaysClickableClasses = Arrays.asList("owl-dt-control-button-content");
+    private static List<String> alwaysClickableClasses = Arrays.asList("owl-dt-control-button-content");
 
-	private static List<String> typeableClasses = Arrays.asList(
-			//Text input of Menu page
-			"mat-form-field-label-wrapper", //bookTable Page, Sign UP and Email
-			"owl-dt-timer-input" //Calendar dates
-			);
+    private static List<String> typeableClasses = Arrays.asList(
+            //Text input of Menu page
+            "mat-form-field-label-wrapper", //bookTable Page, Sign UP and Email
+            "owl-dt-timer-input" //Calendar dates
+            );
 
-	private static List<String> slidesClasses = Arrays.asList(
-			"mat-slider" //Not working yet, customize these kind of actions
-			);
+    private static List<String> slidesClasses = Arrays.asList(
+            "mat-slider" //Not working yet, customize these kind of actions
+            );
 
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
-		super.initialize(settings);
-		ensureDomainsAllowed();
+    /**
+     * Called once during the life time of TESTAR
+     * This method can be used to perform initial setup work
+     *
+     * @param settings the current TESTAR settings as specified by the user.
+     */
+    @Override
+    protected void initialize(Settings settings) {
+        super.initialize(settings);
 
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList(
-				"v-menubar-menuitem", "v-menubar-menuitem-caption",
-				//Main page
-				"mat-button-ripple", "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content", //OK
-				//Menu page
-				"mat-checkbox-label",
-				"mat-select-arrow",
-				"mat-expansion-panel-header-title",
-				"order",
-				//Sort by and options
-				"mat-select-placeholder", "mat-option-ripple",
-				//Calendar
-				"owl-dt-calendar-cell-content",
-				// Reservation cells
-				"mat-cell",
-				"ng-star-inserted"
-				);
+        // Classes that are deemed clickable by the web framework
+        clickableClasses = Arrays.asList(
+                "v-menubar-menuitem", "v-menubar-menuitem-caption",
+                //Main page
+                "mat-button-ripple", "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content", //OK
+                //Menu page
+                "mat-checkbox-label",
+                "mat-select-arrow",
+                "mat-expansion-panel-header-title",
+                "order",
+                //Sort by and options
+                "mat-select-placeholder", "mat-option-ripple",
+                //Calendar
+                "owl-dt-calendar-cell-content",
+                // Reservation cells
+                "mat-cell",
+                "ng-star-inserted"
+                );
 
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
+        // Disallow links and pages with these extensions
+        // Set to null to ignore this feature
+        deniedExtensions = Arrays.asList("pdf", "jpg", "png");
 
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = null;
+        // Define a whitelist of allowed domains for links and pages
+        // An empty list will be filled with the domain from the sut connector
+        // Set to null to ignore this feature
+        domainsAllowed = null;
 
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
+        // If true, follow links opened in new tabs
+        // If false, stay with the original (ignore links opened in new tabs)
+        WdDriver.followLinks = true;
 
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
-		WdDriver.fullScreen = true;
+        //Force the browser to run in full screen mode
+        WdDriver.fullScreen = true;
 
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = null;
-		
-		login = null;
-		
-		// Set desired License
-		licenseSUT = new MyThaiStarLicense();
-	}
+        // List of atributes to identify and close policy popups
+        // Set to null to disable this feature
+        policyAttributes = null;
 
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	 * will stop generation of the current action and continue with the next one.
-	 *
-	 * @param system the SUT
-	 * @param state  the SUT's current state
-	 * @return a set of actions
-	 */
-	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-		// Kill unwanted processes, force SUT to foreground
-		Set<Action> actions = super.deriveActions(system, state);
+        login = null;
 
-		// create an action compiler, which helps us create actions
-		// such as clicks, drag&drop, typing ...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+        // Set desired License
+        licenseSUT = new MyThaiStarLicense();
+    }
 
-		loginMyThaiStarAction("waiter", "waiter", actions, state, ac);
+    /**
+     * This method is used by TESTAR to determine the set of currently available actions.
+     * You can use the SUT's current state, analyze the widgets and their properties to create
+     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+     * will stop generation of the current action and continue with the next one.
+     *
+     * @param system the SUT
+     * @param state  the SUT's current state
+     * @return a set of actions
+     */
+    @Override
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+        // Kill unwanted processes, force SUT to foreground
+        Set<Action> actions = super.deriveActions(system, state);
 
-		registerMyThaiStarAction("email@email.com", "password", actions, state, ac);
+        // create an action compiler, which helps us create actions
+        // such as clicks, drag&drop, typing ...
+        StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// Check if forced actions are needed to stay within allowed domains
-		Set<Action> forcedActions = detectForcedActions(state, ac);
-		if (forcedActions != null && forcedActions.size() > 0) {
-			return forcedActions;
-		}
+        loginMyThaiStarAction("waiter", "waiter", actions, state, ac);
 
-		// iterate through all widgets
-		for (Widget widget : state) {
-			// left clicks, but ignore links outside domain
-			if (isAlwaysClickable(widget)) {
-				actions.add(ac.leftClickAt(widget));
-			}
+        registerMyThaiStarAction("email@email.com", "password", actions, state, ac);
 
-			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
-				continue;
-			}
+        // Check if forced actions are needed to stay within allowed domains
+        Set<Action> forcedActions = detectForcedActions(state, ac);
+        if (forcedActions != null && forcedActions.size() > 0) {
+            return forcedActions;
+        }
 
-			// slides can happen, even though the widget might be blocked
-			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+        // iterate through all widgets
+        for (Widget widget : state) {
+            // left clicks, but ignore links outside domain
+            if (isAlwaysClickable(widget)) {
+                actions.add(ac.leftClickAt(widget));
+            }
 
-			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false)) {
-				continue;
-			}
+            // only consider enabled and non-tabu widgets
+            if (!widget.get(Enabled, true) || blackListed(widget)) {
+                continue;
+            }
 
-			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-			}
+            // slides can happen, even though the widget might be blocked
+            //addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				if (!isLinkDenied(widget)) {
-					actions.add(ac.leftClickAt(widget));
-				}
-			}
+            // If the element is blocked, Testar can't click on or type in the widget
+            if (widget.get(Blocked, false)) {
+                continue;
+            }
 
-			// slider widgets
-			if (isAtBrowserCanvas(widget) && isSlider(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
-			}
-		}
+            // type into text boxes
+            if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+                actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+            }
 
-		return actions;
-	}
+            // left clicks, but ignore links outside domain
+            if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+                if (!isLinkDenied(widget)) {
+                    actions.add(ac.leftClickAt(widget));
+                }
+            }
 
-	@Override
-	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.clickableInputTypes().contains(type);
-			}
-			return true;
-		}
+            // slider widgets
+            if (isAtBrowserCanvas(widget) && isSlider(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+                addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+            }
+        }
 
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
+        return actions;
+    }
 
-		Set<String> clickSet = new HashSet<>(clickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
-	}
-	
-	protected boolean isAlwaysClickable(Widget widget) {
-		WdElement element = ((WdWidget) widget).element;
-		Set<String> clickSet = new HashSet<>(alwaysClickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
-	}
+    @Override
+    protected boolean isClickable(Widget widget) {
+        Role role = widget.get(Tags.Role, Roles.Widget);
+        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+            // Input type are special...
+            if (role.equals(WdRoles.WdINPUT)) {
+                String type = ((WdWidget) widget).element.type;
+                return WdRoles.clickableInputTypes().contains(type);
+            }
+            return true;
+        }
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		WdElement element = ((WdWidget) widget).element;
-		Set<String> clickSet = new HashSet<>(typeableClasses);
-		clickSet.retainAll(element.cssClasses);
-		if(clickSet.size() > 0)
-			return true;
+        WdElement element = ((WdWidget) widget).element;
+        if (element.isClickable) {
+            return true;
+        }
 
-		return false;
-	}
+        Set<String> clickSet = new HashSet<>(clickableClasses);
+        clickSet.retainAll(element.cssClasses);
+        return clickSet.size() > 0;
+    }
 
-	protected boolean isSlider(Widget widget) {
-		WdElement element = ((WdWidget) widget).element;
-		Set<String> clickSet = new HashSet<>(slidesClasses);
-		clickSet.retainAll(element.cssClasses);
-		if(clickSet.size() > 0)
-			return true;
+    protected boolean isAlwaysClickable(Widget widget) {
+        WdElement element = ((WdWidget) widget).element;
+        Set<String> clickSet = new HashSet<>(alwaysClickableClasses);
+        clickSet.retainAll(element.cssClasses);
+        return clickSet.size() > 0;
+    }
 
-		return false;
-	}
+    @Override
+    protected boolean isTypeable(Widget widget) {
+        WdElement element = ((WdWidget) widget).element;
+        Set<String> clickSet = new HashSet<>(typeableClasses);
+        clickSet.retainAll(element.cssClasses);
+        if(clickSet.size() > 0)
+            return true;
 
-	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+        return false;
+    }
 
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			//using the action selector of the state model:
-			retAction = stateModelManager.getAbstractActionToExecute(actions);
-		}
-		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
-		}
-		return retAction;
-	}
+    protected boolean isSlider(Widget widget) {
+        WdElement element = ((WdWidget) widget).element;
+        Set<String> clickSet = new HashSet<>(slidesClasses);
+        clickSet.retainAll(element.cssClasses);
+        if(clickSet.size() > 0)
+            return true;
 
-	//Method to customize login action
-	private void loginMyThaiStarAction(String username, String userPass, Set<Action> actions, State state, StdActionCompiler ac) {
-		Action typeUsername = new NOP();
-		Action typePassword = new NOP();
+        return false;
+    }
 
-		for(Widget w : state) {
-			if(w.get(WdTags.WebName,"").equals("username")) {
-				typeUsername = ac.clickTypeInto(w, username, true);
-			}
-			if(w.get(WdTags.WebName,"").equals("password")) {
-				typePassword = ac.clickTypeInto(w, userPass, true);
-			}
-		}
+    /**
+     * Select one of the available actions using an action selection algorithm (for example random action selection)
+     *
+     * @param state the SUT's current state
+     * @param actions the set of derived actions
+     * @return  the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions){
 
-		String NOP_ID = "No Operation";
+        //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+        //unwanted processes are killed and SUT is put into foreground.
+        Action retAction = preSelectAction(state, actions);
+        if (retAction== null) {
+            //if no preSelected actions are needed, then implement your own action selection strategy
+            //using the action selector of the state model:
+            retAction = stateModelManager.getAbstractActionToExecute(actions);
+        }
+        if(retAction==null) {
+            System.out.println("State model based action selection did not find an action. Using random action selection.");
+            // if state model fails, using random:
+            retAction = RandomActionSelector.selectAction(actions);
+        }
+        return retAction;
+    }
 
-		if(!typeUsername.toString().contains(NOP_ID) && !typePassword.toString().contains(NOP_ID)){
-			Action userLogin = new CompoundAction.Builder()
-					.add(typeUsername, 1)
-					.add(typePassword, 1)
-					.add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
-			userLogin.set(Tags.OriginWidget, typeUsername.get(Tags.OriginWidget));
-			actions.add(userLogin);
-		}
-	}
+    //Method to customize login action
+    private void loginMyThaiStarAction(String username, String userPass, Set<Action> actions, State state, StdActionCompiler ac) {
+        Action typeUsername = new NOP();
+        Action typePassword = new NOP();
 
-	//Method to customize register action
-	private void registerMyThaiStarAction(String email, String emailPass, Set<Action> actions, State state, StdActionCompiler ac) {
-		Action typeEmail = new NOP();
-		Action typePassword = new NOP();
-		Action typeConfirmPassword = new NOP();
-		Action clickAcceptTerms = new NOP();
+        for(Widget w : state) {
+            if(w.get(WdTags.WebName,"").equals("username")) {
+                typeUsername = ac.clickTypeInto(w, username, true);
+            }
+            if(w.get(WdTags.WebName,"").equals("password")) {
+                typePassword = ac.clickTypeInto(w, userPass, true);
+            }
+        }
 
-		for(Widget w : state) {
-			if(w.get(WdTags.WebName,"").equals("email")) {
-				typeEmail = ac.clickTypeInto(w, email, true);
-			}
-			if(w.get(WdTags.WebName,"").equals("password")) {
-				typePassword = ac.clickTypeInto(w, emailPass, true);
-			}
-			if(w.get(WdTags.WebName,"").equals("confirmPassword")) {
-				typeConfirmPassword = ac.clickTypeInto(w, emailPass, true);
-			}
-			if(w.get(WdTags.WebName,"").equals("registerTerms")) {
-				clickAcceptTerms = ac.leftClickAt(w);
-			}
-		}
+        String NOP_ID = "No Operation";
 
-		String NOP_ID = "No Operation";
+        if(!typeUsername.toString().contains(NOP_ID) && !typePassword.toString().contains(NOP_ID)){
+            Action userLogin = new CompoundAction.Builder()
+                    .add(typeUsername, 1)
+                    .add(typePassword, 1)
+                    .add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
+            userLogin.set(Tags.OriginWidget, typeUsername.get(Tags.OriginWidget));
+            actions.add(userLogin);
+        }
+    }
 
-		if(!typeEmail.toString().contains(NOP_ID) 
-				&& !typePassword.toString().contains(NOP_ID)&& !typeConfirmPassword.toString().contains(NOP_ID)
-				&& !clickAcceptTerms.toString().contains(NOP_ID)){
-			Action userRegister = new CompoundAction.Builder()
-					.add(typeEmail, 1)
-					.add(typePassword, 1)
-					.add(typeConfirmPassword, 1)
-					.add(clickAcceptTerms, 1)
-					.add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
-			userRegister.set(Tags.OriginWidget, typeEmail.get(Tags.OriginWidget));
-			actions.add(userRegister);
-		}
-	}
+    //Method to customize register action
+    private void registerMyThaiStarAction(String email, String emailPass, Set<Action> actions, State state, StdActionCompiler ac) {
+        Action typeEmail = new NOP();
+        Action typePassword = new NOP();
+        Action typeConfirmPassword = new NOP();
+        Action clickAcceptTerms = new NOP();
+
+        for(Widget w : state) {
+            if(w.get(WdTags.WebName,"").equals("email")) {
+                typeEmail = ac.clickTypeInto(w, email, true);
+            }
+            if(w.get(WdTags.WebName,"").equals("password")) {
+                typePassword = ac.clickTypeInto(w, emailPass, true);
+            }
+            if(w.get(WdTags.WebName,"").equals("confirmPassword")) {
+                typeConfirmPassword = ac.clickTypeInto(w, emailPass, true);
+            }
+            if(w.get(WdTags.WebName,"").equals("registerTerms")) {
+                clickAcceptTerms = ac.leftClickAt(w);
+            }
+        }
+
+        String NOP_ID = "No Operation";
+
+        if(!typeEmail.toString().contains(NOP_ID) 
+                && !typePassword.toString().contains(NOP_ID)&& !typeConfirmPassword.toString().contains(NOP_ID)
+                && !clickAcceptTerms.toString().contains(NOP_ID)){
+            Action userRegister = new CompoundAction.Builder()
+                    .add(typeEmail, 1)
+                    .add(typePassword, 1)
+                    .add(typeConfirmPassword, 1)
+                    .add(clickAcceptTerms, 1)
+                    .add(new KeyDown(KBKeys.VK_ENTER),0.5).build();
+            userRegister.set(Tags.OriginWidget, typeEmail.get(Tags.OriginWidget));
+            actions.add(userRegister);
+        }
+    }
 
 }
 
@@ -335,19 +334,19 @@ public class Protocol_webdriver_MyThaiStar extends WebdriverProtocol {
  *  Helper class to customize SUT License as desires
  */
 class MyThaiStarLicense {
-	
-	String sutTitle = "MyThaiStar";
-	String sutName = "My Thai Star reference application for devonfw";
-	String sutUrl = "https://github.com/devonfw/my-thai-star";
-	String product = "devonfw";
-	String licenseDetails = "https://devonfw.com/website/pages/docs/devonfw-ide-support.asciidoc.html";
-	boolean isOpenSource = true;
-	String sourceCodeLicense = "Apache Public License 2.0";
-	String sourceCodeLicenseUrl = "https://github.com/devonfw/ide/blob/master/LICENSE";
-	String documentationLicense = "Creative Commons License - Attribution-NoDerivatives 4.0 International";
-	String documentationLicenseUrl = "https://creativecommons.org/licenses/by-nd/4.0/";
 
-	public MyThaiStarLicense () { 
-		// Create object for JSON Artefact purposes
-	}
+    String sutTitle = "MyThaiStar";
+    String sutName = "My Thai Star reference application for devonfw";
+    String sutUrl = "https://github.com/devonfw/my-thai-star";
+    String product = "devonfw";
+    String licenseDetails = "https://devonfw.com/website/pages/docs/devonfw-ide-support.asciidoc.html";
+    boolean isOpenSource = true;
+    String sourceCodeLicense = "Apache Public License 2.0";
+    String sourceCodeLicenseUrl = "https://github.com/devonfw/ide/blob/master/LICENSE";
+    String documentationLicense = "Creative Commons License - Attribution-NoDerivatives 4.0 International";
+    String documentationLicenseUrl = "https://creativecommons.org/licenses/by-nd/4.0/";
+
+    public MyThaiStarLicense () { 
+        // Create object for JSON Artefact purposes
+    }
 }

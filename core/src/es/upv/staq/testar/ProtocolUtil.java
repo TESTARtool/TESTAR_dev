@@ -1,5 +1,4 @@
 /***************************************************************************************************
- *
  * Copyright (c) 2016 - 2021 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  * Redistribution and use in source and binary forms, with or without

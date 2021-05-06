@@ -1062,11 +1062,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while(mode() == Modes.Spy && system.isRunning()) {
 
 			State state = getState(system);
+			cv.begin(); Util.clear(cv);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
-			cv.begin(); Util.clear(cv);
 			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
@@ -1571,33 +1571,42 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
-		
-		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
-			
-			if(t != null && !w.get(t,"").isEmpty()) {
-				
-				//Ignore value ValuePattern for UIAEdit widgets
-				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-					continue;
-				}
-				
-				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
-					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
-				}
-				
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
-							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
-				}
-			} 
-		}
 
+		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
+			String tagValue = "";
+			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
+			for(Tag tag : w.tags()){
+				if(tag.name().equals(tagForSuspiciousOracle)){
+					tagValue = w.get(tag, "");
+					break;
+					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
+				}
+			}
+
+			//Check whether the Tag value is empty or null
+			if (tagValue == null || tagValue.isEmpty())
+				continue; //no action
+
+			//Ignore value ValuePattern for UIAEdit widgets
+			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+				continue;
+			}
+
+			m = this.suspiciousTitlesMatchers.get(tagValue);
+			if (m == null){
+				m = this.suspiciousTitlesPattern.matcher(tagValue);
+				this.suspiciousTitlesMatchers.put(tagValue, m);
+			}
+
+			if (m.matches()){
+				Visualizer visualizer = Util.NullVisualizer;
+				// visualize the problematic widget, by marking it with a red box
+				if(w.get(Tags.Shape, null) != null)
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
+			}
+		}
 		return Verdict.OK;
 	}
 
@@ -1698,7 +1707,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
-		
 	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
 	        WdProtocolUtil.getActionshot(state,action);
 	    } else {

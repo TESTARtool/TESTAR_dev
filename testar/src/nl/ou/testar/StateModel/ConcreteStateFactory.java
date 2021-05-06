@@ -34,7 +34,7 @@ public abstract class ConcreteStateFactory {
         ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
 
         AWTCanvas screenshot;
-        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
             screenshot = WdProtocolUtil.getStateshotBinary(newState);
         }
         else screenshot = ProtocolUtil.getStateshotBinary(newState);

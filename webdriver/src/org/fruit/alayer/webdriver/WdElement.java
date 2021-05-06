@@ -177,30 +177,29 @@ public class WdElement extends TaggableBase implements Serializable {
    * Check web element parameters and try to find an appropriate one to act as description
    */
   public String getElementDescription() {
-      if(name != null && !name.isEmpty()) {
-          return name;
-      }
-      else if(textContent != null && !textContent.isEmpty()) {
-          return textContent;
-      }
-      else if(href != null && !href.isEmpty()) {
-          return href;
-      }
-      else if(id != null && !id.isEmpty()) {
-          return id;
-      }
-      else if(value != null && !value.isEmpty()) {
-          return value;
-      }
-      else if(tagName != null && !tagName.isEmpty()) {
-          return tagName;
-      }
-      else if(title != null && !title.isEmpty()) {
-          return title;
-      }
+	  if(name != null && !name.isEmpty()) {
+		  return name;
+	  }
+	  else if(textContent != null && !textContent.isEmpty()) {
+		  return textContent;
+	  }
+	  else if(id != null && !id.isEmpty()) {
+		  return id;
+	  }
+	  else if(value != null && !value.isEmpty()) {
+		  return value;
+	  }
+	  else if(tagName != null && !tagName.isEmpty()) {
+		  return tagName;
+	  }
+	  else if(title != null && !title.isEmpty()) {
+		  return title;
+	  }
+	  else if(href != null && !href.isEmpty()) {
+		  return href;
+	  }
 
-
-      return String.join(",", cssClasses);
+	  return String.join(",", cssClasses);
   }
   
   private void setName() {

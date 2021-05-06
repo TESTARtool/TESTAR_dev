@@ -33,6 +33,8 @@
  */
 package org.fruit;
 
+import java.util.Collection;
+
 public final class Assert {
 	private Assert(){}
 	
@@ -79,5 +81,26 @@ public final class Assert {
 					+ "Please provide a correct string value using TESTAR GUI or test.setting file";
 			throw new IllegalArgumentException(message);
 		}
+	}
+
+	public static void collectionContains(Collection<String> collection, String value) {
+	    if(!collection.contains(value)) {
+	        String message = String.format("Collection %s doesn't contain desired value %s", collection.toString(), value);
+	        throw new IllegalArgumentException(message);
+	    }
+	}
+
+	public static void collectionNotContains(Collection<String> collection, String value) {
+	    if(collection.contains(value)) {
+	        String message = String.format("Collection %s contains undesired value %s", collection.toString(), value);
+	        throw new IllegalArgumentException(message);
+	    }
+	}
+	
+	public static void collectionSize(Collection<String> collection, int size) {
+	    if(collection.size() != size) {
+	        String message = String.format("Collection %s has undesired size %s", collection.toString(), size);
+	        throw new IllegalArgumentException(message);
+	    }
 	}
 }
