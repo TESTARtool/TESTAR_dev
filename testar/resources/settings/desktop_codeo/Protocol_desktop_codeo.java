@@ -29,6 +29,7 @@
  *******************************************************************************************************/
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -271,9 +272,13 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
             extractJacocoSequenceReport();
         }
 
-        // Update DECODER Coverage information
-        String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "jacoco_reports";
-        coverageDir.add(reportDir);
+        try {
+            // Update DECODER Coverage information
+            String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator + "jacoco_reports";
+            coverageDir.add(reportDir);
+        } catch (IOException e) {
+            coverageDir.add("ERROR: Addind Jacoco Coverage Directory");
+        }
 
         super.finishSequence();
     }
