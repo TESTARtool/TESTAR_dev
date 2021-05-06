@@ -88,8 +88,11 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    compile group: 'org.apache.maven', name: 'maven-core', version: '3.6.3'
+    compile group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.6'
+    compile group: 'com.opencsv', name: 'opencsv', version: '5.3'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')
