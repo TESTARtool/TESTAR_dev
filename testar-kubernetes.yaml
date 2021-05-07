@@ -42,20 +42,18 @@ spec:
        - name: http2
          containerPort: 2424
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: testar
 spec:
-  replicas: 0
-  selector:
-    matchLabels:
-      app: testar
+  parallelism: 5
   template:
     metadata:
       labels:
         app: testar
     spec:
+      restartPolicy: Never
       containers:
       - name: testar
         image: aslomp/testar
@@ -65,8 +63,7 @@ spec:
         - mountPath: /testar/bin/settings
           name: config
         - mountPath: /testar/bin/output
-          name: logs
-        imagePullPolicy: Always
+          name: logs           
       volumes:
       - name: config
         hostPath:
