@@ -1,0 +1,18 @@
+Hello,
+
+This is the Docker image of TESTAR. It is supposed to run headless.
+Mount /testar/bin/output to a central location to gather the log files.
+Mount /testar/bin/settings to a certal location to have the settings configuration
+
+Take care of setting ShowVisualSettingsDialog to False in the settings file as well.
+Take care of the following settings in the used settings file:
+- ShowSettingsAfterTest should be false
+- VisualizeSelectedAction should be false
+- ShowVisualSettingsDialogOnStartup should be false
+
+If NUNIT Output is desired set ReportingClass to NUNIT 3.0 Reporting
+
+Setup state model as required
+
+Furthermore place a .sse file in the settings root to run the specific implementation
+

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: orientservice
+spec:
+  selector:
+   app: orientservice
+   tier: orient
+  ports:
+  - name: porta
+    port: 2480
+    targetPort: http
+  - name: portb
+    port: 2424
+    targetPort: http2
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: orientservice
+spec:
+ replicas: 0
+ selector:
+   matchLabels:
+    app: orientservice
+    tier: orient
+    track: stable
+ template:
+   metadata:
+     labels:
+      app: orientservice
+      tier: orient
+      track: stable
+   spec:
+     containers:
+     - name: orientservice
+       image: orientdb:3.2.0
+       ports:
+       - name: http
+         containerPort: 2480
+       - name: http2
+         containerPort: 2424
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testar
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: testar
+  template:
+    metadata:
+      labels:
+        app: testar
+    spec:
+      containers:
+      - name: testar
+        image: aslomp/testar
+        volumeMounts:
+        - mountPath: /mnt
+          name: config
+        - mountPath: /testar/bin/settings
+          name: config
+        - mountPath: /testar/bin/output
+          name: logs
+        imagePullPolicy: Always
+      volumes:
+      - name: config
+        hostPath:
+          path: /data/settings
+          type: DirectoryOrCreate
+      - name: logs
+        hostPath:
+          path: /data/output
+          type: DirectoryOrCreate
