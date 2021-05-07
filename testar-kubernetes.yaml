@@ -42,6 +42,58 @@ spec:
        - name: http2
          containerPort: 2424
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: settings
+spec:
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.152.187.5
+    path: "/export/testar/settings"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: output
+spec:
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.152.187.5
+    path: "/export/testar/output"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: settings
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: settings
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: output
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: output
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Mi
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -63,13 +115,11 @@ spec:
         - mountPath: /testar/bin/settings
           name: config
         - mountPath: /testar/bin/output
-          name: logs           
+          name: logs
       volumes:
       - name: config
-        hostPath:
-          path: /data/settings
-          type: DirectoryOrCreate
+        persistentVolumeClaim:
+          claimName: settings
       - name: logs
-        hostPath:
-          path: /data/output
-          type: DirectoryOrCreate
+        persistentVolumeClaim:
+          claimName: output
