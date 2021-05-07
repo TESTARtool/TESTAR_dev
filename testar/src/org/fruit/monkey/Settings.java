@@ -313,10 +313,11 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Oracles based on suspicious titles\n"
 					+"#\n"
-					+"# Regular expression\n"
+					+"# Regular expression and Tags to apply them\n"
 					+"#################################################################\n"
 					+"\n"
 					+"SuspiciousTitles = " + Util.lineSep()
+					+"TagsForSuspiciousOracle = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
