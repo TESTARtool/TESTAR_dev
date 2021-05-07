@@ -49,13 +49,15 @@ public class WindowsCommandLineSutConnector implements SutConnector {
     private long maxEngageTime;
     private StateBuilder builder;
     private boolean tryToKillIfRunning = true; //set to false after 1st re-try
+    private boolean flashFeedback;
 
-    public WindowsCommandLineSutConnector(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder) {
+    public WindowsCommandLineSutConnector(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
         this.SUTConnectorValue = SUTConnectorValue;
         this.processListenerEnabled = processListenerEnabled;
         this.startupTime = startupTime;
         this.maxEngageTime = maxEngageTime;
         this.builder = builder;
+        this.flashFeedback = flashFeedback;
     }
 
     @Override
@@ -67,10 +69,12 @@ public class WindowsCommandLineSutConnector implements SutConnector {
         int timeFlash = (int)startupTime;
 
         //Refresh the flash information, to avoid that SUT hide the information
-        int countTimeFlash = 0;
-        while(countTimeFlash<timeFlash && !sut.isRunning()) {
-            FlashFeedback.flash(printSutInfo, 2000);
-            countTimeFlash += 2000;
+        if (flashFeedback) {
+            int countTimeFlash = 0;
+            while(countTimeFlash<timeFlash && !sut.isRunning()) {
+                FlashFeedback.flash(printSutInfo, 2000);
+                countTimeFlash += 2000;
+            }
         }
 
         final long now = System.currentTimeMillis(),
@@ -79,8 +83,10 @@ public class WindowsCommandLineSutConnector implements SutConnector {
         do{
             if (sut.isRunning()){
                 //Print info to the user to know that TESTAR is READY for its use :-)
-                printSutInfo = "SUT is READY";
-                FlashFeedback.flash(printSutInfo,2000);
+                if (flashFeedback) {
+                    printSutInfo = "SUT is READY";
+                    FlashFeedback.flash(printSutInfo,2000);
+                }
                 System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
                 if (state != null && state.childCount() > 0){
@@ -90,8 +96,10 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 }
             }else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
-                printSutInfo = "Waiting for the SUT to be accessible ...";
-                FlashFeedback.flash(printSutInfo, 500);
+                if (flashFeedback) {
+                    printSutInfo = "Waiting for the SUT to be accessible ...";
+                    FlashFeedback.flash(printSutInfo, 500);
+                }
             }
             Util.pauseMs(500);
         } while (System.currentTimeMillis() - now < ENGAGE_TIME); //TODO runtime controls QUIT does not work now: mode() != RuntimeControlsProtocol.Modes.Quit &&

@@ -9,6 +9,7 @@ Take care of the following settings in the used settings file:
 - ShowSettingsAfterTest should be false
 - VisualizeSelectedAction should be false
 - ShowVisualSettingsDialogOnStartup should be false
+- FlashFeedback should be false
 
 If NUNIT Output is desired set ReportingClass to NUNIT 3.0 Reporting
 

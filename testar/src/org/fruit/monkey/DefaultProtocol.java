@@ -1321,7 +1321,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
 			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
-					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
 		}

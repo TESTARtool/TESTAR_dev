@@ -51,6 +51,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
     protected boolean visualizationOn = false;
+    protected boolean flashFeedback = false;
 
     public enum Modes{
         Spy,
@@ -93,7 +94,9 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-    	FlashFeedback.flash(modeNfo, 1000);
+        if (flashFeedback) {
+    	    FlashFeedback.flash(modeNfo, 1000);
+        }
     	
     }
     
