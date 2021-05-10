@@ -1,6 +1,8 @@
 package org.fruit.monkey.dialog;
 
 import org.eclipse.jgit.lib.ProgressMonitor;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsPanel;
 import org.fruit.monkey.codeanalysis.CodeAnalysisService;
 import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
 import org.fruit.monkey.codeanalysis.RepositoryLanguage;
@@ -11,7 +13,6 @@ import org.fruit.monkey.vcs.GitServiceImpl;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
-
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
@@ -28,7 +29,7 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
 
-public class VCSPanel extends JPanel {
+public class VCSPanel extends SettingsPanel {
 
     private JTextField gitRepositoryUrlTextField;
     private JTextField gitUsernameTextField;
@@ -81,12 +82,11 @@ public class VCSPanel extends JPanel {
         initAuthorizationRequiredSection();
         initCloneSection();
         initLanguagesSection();
-        initLayout();
     }
 
     private void cloneFinished(PropertyChangeEvent evt) {
         Object cloneSuccessful = evt.getNewValue();
-        if(cloneSuccessful!=null) {
+        if (cloneSuccessful != null) {
             showCloneSuccessDialog();
         } else {
             showCloneErrorDialog();
@@ -142,7 +142,7 @@ public class VCSPanel extends JPanel {
         cloneButton.addActionListener(e -> {
             cloneButton.setEnabled(false);
             toggleLanguageSectionVisibility(false);
-            if(authorizationRequiredCheckBox.isSelected()) {
+            if (authorizationRequiredCheckBox.isSelected()) {
                 cloneRepositoryWithAuth();
             } else {
                 cloneRepository();
@@ -155,7 +155,7 @@ public class VCSPanel extends JPanel {
     }
 
     private void toggleLanguageSectionVisibility(boolean visible) {
-        for(int i=0; i<LANGUAGES_TO_DISPLAY; i++) {
+        for (int i = 0; i < LANGUAGES_TO_DISPLAY; i++) {
             toggleLanguageVisibility(visible, i);
         }
         this.fullScanningReportButton.setVisible(visible);
@@ -195,10 +195,10 @@ public class VCSPanel extends JPanel {
                 .stream()
                 .sorted(Comparator.comparing(RepositoryLanguage::getLinesOfCode, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
-        for(int i=0; (i<LANGUAGES_TO_DISPLAY) && (i<repositoryComposition.getRepositoryLanguages().size()); i++) {
+        for (int i = 0; (i < LANGUAGES_TO_DISPLAY) && (i < repositoryComposition.getRepositoryLanguages().size()); i++) {
             setLanguageValue(repositoryLanguages.get(i), i);
         }
-        if(repositoryComposition.getRepositoryLanguages().size()>LANGUAGES_TO_DISPLAY) {
+        if (repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY) {
             fullScanningReportButton.setVisible(true);
         }
     }
@@ -232,7 +232,7 @@ public class VCSPanel extends JPanel {
     }
 
     private void initLanguagesSection() {
-        for(int i=0; i<LANGUAGES_TO_DISPLAY; i++) {
+        for (int i = 0; i < LANGUAGES_TO_DISPLAY; i++) {
             languageContentLabels[i] = new JLabel();
             languageContentProgressBars[i] = new JProgressBar(LANGUAGE_CONTENT_BAR_MIN, LANGUAGE_CONTENT_BAR_MAX);
         }
@@ -247,7 +247,13 @@ public class VCSPanel extends JPanel {
         new ScanningReportDialog(repositoryComposition);
     }
 
-    private void initLayout() {
+    /**
+     * Populate the fields from Settings structure.
+     *
+     * @param settings The settings to load.
+     */
+    @Override
+    public void populateFrom(Settings settings) {
         GroupLayout groupLayout = new GroupLayout(this);
         this.setLayout(groupLayout);
         groupLayout.setHorizontalGroup(
@@ -350,10 +356,21 @@ public class VCSPanel extends JPanel {
                         ));
     }
 
+    /**
+     * Retrieve information from the GUI.
+     *
+     * @param settings reference to the object where the settings will be stored.
+     */
+    @Override
+    public void extractInformation(Settings settings) {
+        // TODO: Add information saving
+    }
+
     private class ProgressBarMonitor implements ProgressMonitor {
 
         @Override
-        public void start(int totalTasks) {}
+        public void start(int totalTasks) {
+        }
 
         @Override
         public void beginTask(String title, int totalWork) {
@@ -365,7 +382,7 @@ public class VCSPanel extends JPanel {
 
         @Override
         public void update(int completed) {
-            cloneProcessingProgressBar.setValue(cloneProcessingProgressBar.getValue()+completed);
+            cloneProcessingProgressBar.setValue(cloneProcessingProgressBar.getValue() + completed);
         }
 
         @Override
@@ -382,6 +399,7 @@ public class VCSPanel extends JPanel {
 
     class LanguageProgressBarUI extends BasicProgressBarUI {
         Rectangle r = new Rectangle();
+
         @Override
         protected void paintIndeterminate(Graphics g, JComponent c) {
             Graphics2D g2d = (Graphics2D) g;
