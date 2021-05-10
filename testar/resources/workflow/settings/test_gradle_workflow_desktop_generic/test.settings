@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.upv.es"
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -31,7 +31,7 @@ SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https:
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 8
 SequenceLength = 10
 
 #################################################################
@@ -93,29 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_orientdb/Protocol_web_orientdb
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################\n"
-# State model inference settings
-#################################################################\n"
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = instant
-ApplicationName = UPV web
-ApplicationVersion = 1.0.0
+ProtocolClass = test_gradle_workflow_desktop_generic/Protocol_test_gradle_workflow_desktop_generic
 
 #################################################################
 # State identifier attributes
@@ -147,7 +125,7 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.9
+TimeToWaitAfterAction = 0.1
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

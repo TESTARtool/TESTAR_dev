@@ -76,11 +76,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title;WebName;WebTagName
 
 #################################################################
 # Processfilter
@@ -98,14 +100,6 @@ SUTProcesses =
 #################################################################
 
 ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
 
 #################################################################
 # State model inference settings
@@ -130,8 +124,17 @@ StateModelStoreWidgets = true
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WebWidgetId
 
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png;pfx;xml
+DomainsAllowed = parabank.parasoft.com
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
 
 #################################################################
 # Override display scale
@@ -147,6 +150,15 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings

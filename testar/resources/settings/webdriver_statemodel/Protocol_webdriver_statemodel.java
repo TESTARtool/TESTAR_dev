@@ -1,7 +1,7 @@
 /**
  * 
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -65,39 +65,13 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
-
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.w3schools.com");
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = new HashMap<String, String>() {{ 
 			put("id", "sncmp-banner-btn-agree");
 		}};
-
-		WdDriver.fullScreen = true;
-		
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
 	}
 
 	/**

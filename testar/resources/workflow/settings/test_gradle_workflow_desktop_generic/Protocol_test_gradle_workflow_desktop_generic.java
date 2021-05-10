@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,38 +29,40 @@
  *******************************************************************************************************/
 
 
+import java.io.File;
 import java.util.Set;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
+
+import org.apache.commons.io.FileUtils;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
+import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
 
-public class Protocol_desktop_orientdb extends DesktopProtocol {
+/**
+ * This protocol is used to test TESTAR by executing a gradle CI workflow.
+ * 
+ * ".github/workflows/gradle.yml"
+ */
+public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtocol {
 
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	 * will stop generation of the current action and continue with the next one.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException{
+		State state = super.getState(system);
+
+		// DEBUG: That widgets have screen bounds in the GUI of the remote server
+		for(Widget w : state) {
+			String debug = String.format("Widget: '%s' ", w.get(Tags.Title, ""));
+			if(w.get(Tags.Shape, null) != null) {
+				debug = debug.concat(String.format("with Shape: %s", w.get(Tags.Shape, null)));
+			}
+			System.out.println(debug);
+		}
+
+		return state;
+	}
+
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
@@ -75,7 +78,6 @@ public class Protocol_desktop_orientdb extends DesktopProtocol {
 
 		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
@@ -84,27 +86,14 @@ public class Protocol_desktop_orientdb extends DesktopProtocol {
 		//return the set of derived actions
 		return actions;
 	}
-	
-	/**
-	 * Select one of the available actions (e.g. at random)
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			System.out.println("Asking state model manager for action");
-			Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
-			if (modelAction != null) return modelAction;
-			System.out.println("StateModelManager did not return an action. Returning random");
-			return RandomActionSelector.selectAction(actions);
-	}
 
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		try {
+			File originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalFile();
+			File artifactFolder = new File(Main.testarDir + settings.get(ConfigTags.ApplicationName,""));
+			FileUtils.copyDirectory(originalFolder, artifactFolder);
+		} catch(Exception e) {System.out.println("ERROR: Creating Artifact Folder");}
+	}
 }

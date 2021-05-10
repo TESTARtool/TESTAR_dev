@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,12 +59,16 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
-		ensureDomainsAllowed();
 
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList(
+		/**
+		 * Classes that are deemed clickable by the web framework
+		 */
+		// clickableClasses are initialized in the WebdriverProtocol with the test.settings file
+		//clickableClasses = settings.get(ConfigTags.ClickableClasses);
+
+		// User can also use this Java protocol to customize them (need code re-compilation)
+		/*clickableClasses = Arrays.asList(
 				// Dropdown op top right
 				"selectItemLiteText",
 				// Menu items on the left
@@ -76,33 +80,37 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 				// Scrolling stuff
 				"vScrollStart", "vScrollEnd"
 				);
+		 */
 
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
+		/**
+		 * Disallow links and pages with these extensions
+		 * Set to null to ignore this feature
+		 */
+		// deniedExtensions are initialized in the WebdriverProtocol with the test.settings file
+		//deniedExtensions = settings.get(ConfigTags.DeniedExtensions);
 
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.smartclient.com");
+		// User can also use this Java protocol to customize them (need code re-compilation)
+		//deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
 
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
+		/**
+		 * Define a whitelist of allowed domains for links and pages
+		 * An empty list will be filled with the domain from the sut connector
+		 * Set to null to ignore this feature
+		 */
+		// domainsAllowed are initialized in the WebdriverProtocol with the test.settings file 
+		//domainsAllowed = settings.get(ConfigTags.DomainsAllowed);
 
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
+		// User can also use this Java protocol to customize them (need code re-compilation)
+		//domainsAllowed = Arrays.asList("www.smartclient.com");
 
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
+		/**
+		 * List of attributes to identify and close policy popups
+		 * Set to null to disable this feature
+		 */
+		// Currently only at Java protocol level (need code re-compilation)
 		policyAttributes = new HashMap<String, String>() {{
-			put("class", "iAgreeButton");
+		    put("class", "iAgreeButton");
 		}};
-
-		WdDriver.fullScreen = true;
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
 	}
 
 	/**

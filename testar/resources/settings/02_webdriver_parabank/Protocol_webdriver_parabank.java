@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
+import nl.ou.testar.SutVisualization;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -58,37 +59,11 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected void initialize(Settings settings) {
-    NativeLinker.addWdDriverOS();
     super.initialize(settings);
-    ensureDomainsAllowed();
-    
-    // Classes that are deemed clickable by the web framework
-    clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-
-    // Don't allow links and pages with these extensions
-    // Set to null to ignore this feature
-    deniedExtensions = Arrays.asList("pdf", "jpg", "png","pfx", "xml");
-
-    // Define a whitelist of allowed domains for links and pages
-    // An empty list will be filled with the domain from the sut connector
-    // Set to null to ignore this feature
-    domainsAllowed = Arrays.asList("parabank.parasoft.com");
-
-    // If true, follow links opened in new tabs
-    // If false, stay with the original (ignore links opened in new tabs)
-    followLinks = false;
 
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
     policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
-
-    // Propagate followLinks setting
-    WdDriver.followLinks = followLinks;
-    
-    WdDriver.fullScreen = true;
-
-    // Override ProtocolUtil to allow WebDriver screenshots
-    protocolUtil = new WdProtocolUtil();
   }
 
   /**
@@ -162,7 +137,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   @Override
   protected Verdict getVerdict(State state) {
 
-    Verdict verdict = super.getVerdict(state); // by urueda
+    Verdict verdict = super.getVerdict(state);
     // system crashes, non-responsiveness and suspicious titles automatically detected!
 
     //-----------------------------------------------------------------------------
@@ -193,10 +168,10 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    * @return a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state)
-      throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
+    Set<Action> filteredActions = new HashSet<>();
 
     // create an action compiler, which helps us create actions
     // such as clicks, drag&drop, typing ...
@@ -204,9 +179,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // Check if forced actions are needed to stay within allowed domains
     Set<Action> forcedActions = detectForcedActions(state, ac);
-    if (forcedActions != null && forcedActions.size() > 0) {
-      return forcedActions;
-    }
 
     // iterate through all widgets
     for (Widget widget : state) {
@@ -218,12 +190,23 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     	}
 
       // only consider enabled and non-tabu widgets
-      if (!widget.get(Enabled, true) || blackListed(widget)) {
+      if (!widget.get(Enabled, true)) {
         continue;
       }
 
+      // The blackListed widgets are those that have been filtered during the SPY mode with the
+      //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+      if(blackListed(widget)){
+    	  if(isTypeable(widget)){
+    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  } else {
+    		  filteredActions.add(ac.leftClickAt(widget));
+    	  }
+    	  continue;
+      }
+
       // slides can happen, even though the widget might be blocked
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -231,21 +214,43 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
       }
 
       // type into text boxes
-      if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+      if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+    	  if(whiteListed(widget) || isUnfiltered(widget)){
+    		  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  }else{
+    		  // filtered and not white listed:
+    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    	  }
       }
 
       // left clicks, but ignore links outside domain
-      if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-    	  if (!isLinkDenied(widget)) {
-    		  actions.add(ac.leftClickAt(widget));
-    	  }
+      if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+          if(whiteListed(widget) || isUnfiltered(widget)){
+              if (!isLinkDenied(widget)) {
+                  actions.add(ac.leftClickAt(widget));
+              }else{
+                  // link denied:
+                  filteredActions.add(ac.leftClickAt(widget));
+              }
+          }else{
+              // filtered and not white listed:
+              filteredActions.add(ac.leftClickAt(widget));
+          }
       }
     }
 
 	if(actions.isEmpty()) {
 		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 	}
+	
+	// If we have forced actions, prioritize and filter the other ones
+	if (forcedActions != null && forcedActions.size() > 0) {
+		filteredActions = actions;
+		actions = forcedActions;
+	}
+
+	//Showing the grey dots for filtered actions if visualization is on:
+    if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
     
     return actions;
   }

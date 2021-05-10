@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,17 +29,13 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.SimilarityDetection;
@@ -53,59 +49,21 @@ import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
-
+/**
+ * Sample protocol that tries to detect similar Actions between previous and current State,
+ * to decrease the possibilities to select a static widget and previous executed Action.
+ * 
+ * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
+ * that allows TESTAR to identify web elements based on Abstract Properties.
+ * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
+ * 
+ * If some Action.OriginWidget still existing between previous and current State
+ * or if some Action.OriginWidget was executed previously,
+ * increase a numeric similarity weight that will reduce the % to be selected
+ */
 public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	
 	private SimilarityDetection similarActions;
-
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
-		super.initialize(settings);
-		ensureDomainsAllowed();
-
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = null;
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
-
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "lfr-btn-label");
-		}};
-
-		WdDriver.fullScreen = true;
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		protocolUtil = new WdProtocolUtil();
-
-	}
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -116,6 +74,8 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		// 5 is the default maximum numeric weight
+		// the more it is increased, the more the probability % of selecting "similar" actions is reduced
 		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
 	}
 
@@ -223,6 +183,12 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
+		
+		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
+		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
+		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
+		
 		actions = similarActions.modifySimilarActions(actions);
 
 		System.out.println("---------------------- DEBUG SIMILARITY VALUES ----------------------------------------");
@@ -271,6 +237,8 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		// Increase the similarity (weight value) of an executed action
+		// to reduce the % to be selected next iteration
 		similarActions.increaseSpecificExecutedAction(action);
 		return super.executeAction(system, state, action);
 	}

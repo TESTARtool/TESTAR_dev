@@ -4,37 +4,26 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Record
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
 #
 # Indicate how you want to connect to the SUT:
 #
-# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
 # starts the SUT.
 # It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
 # For web applications, follow the next format: web_browser_path SUT_URL.
 #
-# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
 # in the SUT main window. The SUT must be manually started and closed.
 #
-# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = C:\\Windows\\System32\\notepad.exe
-
-#################################################################
-# Java Swing applications & Access Bridge Enabled
-#
-# Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
-#
-# Enable the variable Access Bridge Enabled in TESTAR as true
-#################################################################
-
-AccessBridgeEnabled = false
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://onedrive.live.com/about/gb-en/signin/"
 
 #################################################################
 # Sequences
@@ -42,8 +31,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 30
+Sequences = 1
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious titles
@@ -83,11 +72,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title
 
 #################################################################
 # Processfilter
@@ -96,7 +87,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = 
+SUTProcesses =
 
 #################################################################
 # Protocolclass
@@ -104,30 +95,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_orientdb/Protocol_desktop_orientdb
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = true
-GraphDBUrl = remote:/localhost/testar
-GraphDBUser = testar
-GraphDBPassword = testar
-
-#################################################################
-# State model inference settings
-#################################################################
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = plocal
-DataStoreServer = localhost
-DataStoreDirectory = C:\\orientdb\\databases
-DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
-DataStoreMode = delayed
-ApplicationName = Buggy calculator
-ApplicationVersion = 1.0.0
+ProtocolClass = winapi_web_one_drive/Protocol_winapi_web_one_drive
 
 #################################################################
 # State identifier attributes
@@ -140,45 +108,33 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Other more advanced settings
 #################################################################
-TypingTextsForExecutedAction = 10
-Discount = 0.95
+
+ProcessesToKillDuringTest =
+OutputDir = ./output
+PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
-MaxTime = 3.1536E7
-StopGenerationOnFault = true
-ExecuteActions = true
-DrawWidgetTree = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
-AlgorithmFormsFilling = false
-FaultThreshold = 1.0E-9
-DrawWidgetInfo = false
-MaxReward = 9999999.0
 LogLevel = 1
-VisualizeSelectedAction = true
-Delete = 
-MyClassPath = ./settings
-ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
-ShowSettingsAfterTest = true
-ForceToSequenceLength = true
-OutputDir = ./output
-UnattendedTests = false
-TestGenerator = random
-StartupTime = 2.0
-ActionDuration = 0.1
-NonReactingUIThreshold = 100
-GraphsActivated = true
-GraphResuming = true
-CopyFromTo = 
-TimeToFreeze = 30.0
-StateScreenshotSimilarityThreshold = 1.4E-45
-ShowVisualSettingsDialogOnStartup = true
-ResetDataStore = false
-TimeToWaitAfterAction = 0.0
+ExecuteActions = true
+FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
-AlwaysCompile = true
-PathToReplaySequence = ./output/temp
-VisualizeActions = false
-ExplorationSampleInterval = 1
+MyClassPath = ./settings
 OnlySaveFaultySequences = false
-OfflineGraphConversion = true
+ActionDuration = 0.1
+ShowVisualSettingsDialogOnStartup = true
+ReplayRetryTime = 30.0
+Delete =
+MaxTime = 3.1536E7
+ShowSettingsAfterTest = true
+TimeToWaitAfterAction = 0.1
+StartupTime = 10.0
+DrawWidgetInfo = false
+TimeToFreeze = 30.0
+StopGenerationOnFault = true
+CopyFromTo =
+VisualizeActions = false
+VisualizeSelectedAction = true
+TestGenerator = random
+MaxReward = 9999999
+Discount = .95
