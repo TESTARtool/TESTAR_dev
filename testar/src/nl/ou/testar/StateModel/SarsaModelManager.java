@@ -91,14 +91,14 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         logger.info("Number of actions available={}", actions.size());
         if (selectedAction != null) {
             logger.info("Action selected shortString={}", selectedAction.toShortString());
-
-            // add counter
-            final int counterSelectedAction = selectedAction.get(RLTags.Counter, 0);
-            selectedAction.set(RLTags.Counter, counterSelectedAction + 1);
-            logger.info("Action selected counter={}", selectedAction.get(RLTags.Counter));
         }
         if(selectedAbstractAction != null) {
             logger.info("Abstract action selected abstractActionID={}, id={}", selectedAbstractAction.getActionId(), selectedAbstractAction.getId());
+
+            // add counter
+            final int counterSelectedAbstractAction = selectedAbstractAction.getAttributes().get(RLTags.ActionCounter, 0);
+            selectedAbstractAction.getAttributes().set(RLTags.ActionCounter, counterSelectedAbstractAction + 1);
+            logger.info("Action selected counter={}", selectedAbstractAction.getAttributes().get(RLTags.ActionCounter));
         }
         logger.info("SequenceID={}", getSequenceManager().getSequenceID());
     }
