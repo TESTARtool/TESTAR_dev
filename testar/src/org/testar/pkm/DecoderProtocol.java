@@ -76,7 +76,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected SortedSet<String> logsOutputDir = new TreeSet<>();
     protected SortedSet<String> sequencesVerdicts = new TreeSet<>();
 
-    protected SortedSet<String> coverageSummary = new TreeSet<>();
+    protected SortedSet<String> coverageInformation = new TreeSet<>();
     protected SortedSet<String> coverageDir = new TreeSet<>();
     
     protected LinkedList<String> sequenceInfo = new LinkedList<>();
@@ -125,8 +125,13 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         htmlReport.addSelectedAction(state, action);
 
         // Update sequence info for DECODER Test Results Artefact
-        String actionInfo = String.format("Executed action %s widget: %s", 
-                action.get(Tags.Role, ActionRoles.Action), action.get(Tags.OriginWidget).getAbstractRepresentation());
+        String actionInfo = String.format("Executed action %s", action.get(Tags.Desc, "NoDescription"));
+
+        if(action.get(Tags.OriginWidget) != null) {
+            actionInfo = String.format("Executed action %s in widget: %s", 
+                    action.get(Tags.Role, ActionRoles.Action), action.get(Tags.OriginWidget).getAbstractRepresentation());
+        }
+
         sequenceInfo.add(actionInfo);
 
         return super.executeAction(system, state, action);
@@ -171,7 +176,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
 
         if(!decoderExceptionThrown) {
             testResultsArtefactDirectory = JsonArtefactTestResults.createTestResultsArtefact(settings, licenseSUT,
-                    sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageSummary, coverageDir, runInfo);
+                    sequencesOutputDir, logsOutputDir, htmlOutputDir, sequencesVerdicts, coverageInformation, coverageDir, runInfo);
 
             if(settings.get(ConfigTags.StateModelEnabled, false)) {
                 JsonArtefactStateModel jsonArtefactStateModel = StateModelArtefactManager.createAutomaticArtefact(settings, licenseSUT);
