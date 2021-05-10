@@ -41,6 +41,8 @@ import org.testar.OutputStructure;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.io.*;
+import java.nio.file.Paths;
 import java.util.Set;
 
 public class HtmlSequenceReport {
@@ -60,7 +62,7 @@ public class HtmlSequenceReport {
     private PrintWriter out;
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
-    
+
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
@@ -70,7 +72,7 @@ public class HtmlSequenceReport {
             String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
             		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
             		+ REPORT_FILENAME_AFT;
-            
+
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
@@ -172,7 +174,7 @@ public class HtmlSequenceReport {
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
             for(Action action:actions){
                 write("<li>");
-                
+
                 try{
                 	if(action.get(Tags.Desc)!=null) {
                 		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -182,7 +184,7 @@ public class HtmlSequenceReport {
 
                 write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
-                
+
                 write("</li>");
             }
             write("</ul>");
@@ -229,28 +231,28 @@ public class HtmlSequenceReport {
     }
 
     public void addSelectedAction(State state, Action action){
-    	String screenshotDir = OutputStructure.screenshotsOutputDir;
+        String screenshotDir = OutputStructure.screenshotsOutputDir;
 //        System.out.println("path="+state_path);
-    	if(screenshotDir.contains("./output")){
-        	int indexStart = screenshotDir.indexOf("./output");
-        	int indexScrn = screenshotDir.indexOf("scrshots");
-        	String replaceString = screenshotDir.substring(indexStart,indexScrn);
-        	screenshotDir = screenshotDir.replace(replaceString,"../");
+        if(screenshotDir.contains("./output")){
+            int indexStart = screenshotDir.indexOf("./output");
+            int indexScrn = screenshotDir.indexOf("scrshots");
+            String replaceString = screenshotDir.substring(indexStart,indexScrn);
+            screenshotDir = screenshotDir.replace(replaceString,"../");
         }
 //        System.out.println("path="+actionPath);
-        String actionPath = screenshotDir + File.separator 
-        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
-        		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
-        		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
+        String actionPath = screenshotDir + File.separator
+                + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+                + "_sequence_" + OutputStructure.sequenceInnerLoopCount
+                + File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 
         try{
-        	if(action.get(Tags.Desc)!=null) {
-        		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-        		write(" || "+ escaped);
-        	}
+            if(action.get(Tags.Desc)!=null) {
+                String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
+                write(" || "+ escaped);
+            }
         }catch(Exception e){}
 
         write("</h4>");
@@ -261,15 +263,15 @@ public class HtmlSequenceReport {
     }
 
     public void addTestVerdict(Verdict verdict){
-    	String verdictInfo = verdict.info();
-    	if(verdict.severity() > Verdict.OK.severity())
-    		verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
-    	
+        String verdictInfo = verdict.info();
+        if(verdict.severity() > Verdict.OK.severity())
+            verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
+
         write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
 
-    
+
     public void close() {
         for(String s:HTMLReporter.FOOTER){
             write(s);

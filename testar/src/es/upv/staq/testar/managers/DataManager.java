@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
 public class DataManager {
 
 	public static final String XML_UI_FILTER_VERSION = "1.0.20170322";
-    public static final String DATA_FILE = "input_values.xml";	
+    public static final String DATA_FILE = "input_values.xml";
 	
 	// Widget filter types / data types
 	public static final int WIDGET_ACTION_TABU_FILTER =		Integer.MIN_VALUE,
@@ -207,7 +207,7 @@ public class DataManager {
 		        			typeS.length() > 0 && desc.length() > 0 && example.length() > 0){
 		        			DATA_TYPES.put(desc + "(" + example + ")", new Integer(typeS));
 		        		} else
-		        			System.out.println("DataManager: WRONG DATA TYPE");
+		        			System.out.println("DataManager: Wrong datatype.");
 		        	}
 				}
 		        		        
@@ -230,7 +230,7 @@ public class DataManager {
 		        			}
 		        			typeValues.add(valueS);
 		        		} else
-		        			System.out.println("DataManager: WRONG INPUT VALUE");
+		        			System.out.println("DataManager: Wrong input value");
 		        	}
 		        }
 				printData();		        

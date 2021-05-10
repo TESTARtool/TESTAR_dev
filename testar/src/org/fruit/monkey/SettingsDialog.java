@@ -250,6 +250,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("VCS Options", new VCSPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));

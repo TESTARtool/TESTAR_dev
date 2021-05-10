@@ -12,6 +12,12 @@ sourceSets {
         }
     }
 
+    test {
+        resources {
+            srcDirs = ['test_resources']
+        }
+    }
+
     oracle {
         java {
             srcDirs =['resources/settings']
@@ -88,7 +94,9 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
-    compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     runtime project(':windows')
 }
 evaluationDependsOn(':windows')
@@ -195,7 +203,7 @@ mainClassName='org.fruit.monkey.Main'
 /**
  * Tasks to test TESTAR using gradle
  */
- 
+
 task init_workflow_test(type: Copy) {
     group = 'test_testar_workflow'
     description ='init_workflow_test'
@@ -328,20 +336,20 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     }
 }
 
-// Download last win32 chromedriver 
+// Download last win32 chromedriver
 task downloadChromedriver(type: Download, dependsOn: installDist) {
     group = 'test_testar_workflow'
     description ='downloadChromedriver'
-    
+
     // Disable for non-Windows environments (Linux, osx)
     if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
         return;
     }
-    
+
     ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
     Process process = builder.start();
     process.waitFor()
-    
+
     src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
     dest 'target/install/testar/bin'
     overwrite false
@@ -351,12 +359,12 @@ task downloadChromedriver(type: Download, dependsOn: installDist) {
 task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
     group = 'test_testar_workflow'
     description ='downloadAndUnzipChromedriver'
-    
+
     // Disable for non-Windows environments (Linux, osx)
     if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
         return;
     }
-    
+
     from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
     into downloadChromedriver.dest
 }

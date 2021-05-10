@@ -75,14 +75,18 @@ import org.testar.OutputStructure;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.HtmlTestReport;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
     protected HtmlSequenceReport htmlReport;
+	protected HtmlTestReport htmlTestReport;
     protected State latestState;
-    
+
+    protected String firstNonNullUrl;
+
     protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
@@ -100,7 +104,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	@SuppressWarnings("serial")
 	protected Map<String, String> policyAttributes = new HashMap<String, String>()
 	{
-		{ 
+		{
 			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 		}
 	};
@@ -114,6 +118,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings){
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
+
+		// Initialize HTML Report (Dashboard)
+		this.htmlTestReport = new HtmlTestReport();
+		this.firstNonNullUrl = null; // FIXME: There should be a better way to find the URL right?
 
 		// reads the settings from file:
 		super.initialize(settings);
@@ -138,10 +146,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		WdDriver.fullScreen = settings.get(ConfigTags.BrowserFullScreen);
 
 		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
+		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 	}
-	
+
+	@Override
+	protected void onTestEndEvent() {
+		this.htmlTestReport.saveReport(
+				this.settings().get(ConfigTags.SequenceLength),
+				this.settings().get(ConfigTags.Sequences),
+				this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
+		);
+	}
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
      */
@@ -167,7 +183,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected SUT startSystem() throws SystemStartException {
     	// Add the domain from the SUTConnectorValue to domainsAllowed List
     	ensureDomainsAllowed();
-    	
+
     	SUT sut = super.startSystem();
 
     	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
@@ -261,11 +277,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
-    		
+
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
     		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
-    		
+
     	}
 
     	latestState = state;
@@ -285,9 +301,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
+        htmlTestReport.addState(latestState);
         return latestState;
     }
-    
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 *
@@ -304,7 +321,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
 			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 		}
-		
+
 		return super.selectAction(state, actions);
 	}
 
@@ -319,6 +336,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Action preSelectAction(State state, Set<Action> actions){
         // adding available actions into the HTML report:
         htmlReport.addActions(actions);
+        htmlTestReport.addActions(actions);
         return(super.preSelectAction(state, actions));
     }
 
@@ -333,6 +351,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected boolean executeAction(SUT system, State state, Action action){
         // adding the action that is going to be executed into HTML report:
         htmlReport.addSelectedAction(state, action);
+        htmlTestReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
 
@@ -342,6 +361,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
     	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+    	htmlTestReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
 
     	String sequencesPath = getGeneratedSequenceName();
     	try {
@@ -358,7 +378,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			+ " " + settings.get(ConfigTags.Mode, mode())
     			+ " " + sequencesPath
     			+ " " + status + " \"" + statusInfo + "\"" );
-    	
+
     	htmlReport.close();
     }
     
@@ -432,6 +452,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Check if the current page is a login page
 		String currentUrl = WdDriver.getCurrentUrl();
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		if (currentUrl.startsWith(login.left())) {
 			CompoundAction.Builder builder = new CompoundAction.Builder();
 			// Set username and password
@@ -496,6 +517,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	protected Set<Action> detectForcedDeniedUrl() {
 		String currentUrl = WdDriver.getCurrentUrl();
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
@@ -516,6 +538,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check if the current address has a denied extension (PDF etc.)
 	 */
 	protected boolean isExtensionDenied(String currentUrl) {
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		// If the current page doesn't have an extension, always allow
 		if (!currentUrl.contains(".")) {
 			return false;
@@ -535,6 +558,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check if the URL is denied
 	 */
 	protected boolean isUrlDenied(String currentUrl) {
+		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
 		if (currentUrl.startsWith("mailto:")) {
 			return true;
 		}

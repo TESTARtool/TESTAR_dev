@@ -744,11 +744,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
 
+		this.onTestEndEvent();
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
 
 		mode = Modes.Quit;
+	}
+
+	protected void onTestEndEvent() {
+		LogSerialiser.log("The test has ended...", LogSerialiser.LogLevel.Debug);
 	}
 
 	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
