@@ -93,7 +93,7 @@ public class JsonArtefactTestResults {
 			gson.toJson(resultsJson, fileWriter);
 			fileWriter.flush();
 			fileWriter.close();
-			System.out.println("Created JSON State Model artefact: " + outputFile);
+			System.out.println("Created JSON Test Results artefact: " + outputFile);
 		}catch(Exception e){
 			System.out.println("ERROR! Creating JSON ArtefactTestResults!");
 			return "";

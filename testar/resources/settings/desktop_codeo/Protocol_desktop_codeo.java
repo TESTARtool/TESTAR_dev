@@ -255,7 +255,7 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
         // Extract and create JaCoCo action coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
             String actionCoverageInfo = extractJacocoActionReport();
-            coverageSummary.add(actionCoverageInfo);
+            coverageInformation.add(actionCoverageInfo);
         }
         return actionExecuted;
     }
