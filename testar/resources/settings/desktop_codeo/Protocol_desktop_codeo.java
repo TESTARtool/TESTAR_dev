@@ -261,8 +261,7 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
 
         // Extract and create JaCoCo action coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-            String actionCoverageInfo = extractJacocoActionReport();
-            coverageSummary.add(actionCoverageInfo);
+            extractJacocoActionReport();
         }
         return actionExecuted;
     }
@@ -312,7 +311,9 @@ public class Protocol_desktop_codeo extends DesktopProtocol {
     protected void closeTestSession() {
         // Extract and create JaCoCo run coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-            extractJacocoRunReport();
+            copyJacocoBuildAllFile();
+            String runCoverageInfo = extractJacocoRunReport();
+            addRunJacocoCoverageDetails(runCoverageInfo);
         }
 
         // Execute DECODER PKM insertion

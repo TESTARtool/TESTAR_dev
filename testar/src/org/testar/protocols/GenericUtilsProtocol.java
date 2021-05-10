@@ -444,6 +444,32 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
+     * Copy settings protocolName build_all.xml file to jacoco directory
+     * Example: "bin/settings/protocolName/build_all.xml" file to "bin/jacoco/build.xml"
+     */
+    protected void copyJacocoBuildAllFile() {
+        // JaCoCo: Move settings protocolName build_all.xml file to jacoco directory
+        try {
+            // Copy "bin/settings/protocolName/build_all.xml" file to "bin/jacoco/build.xml"
+            String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
+            File originalBuildFile = new File(Main.settingsDir + File.separator + protocolName + File.separator + "build_all.xml").getCanonicalFile();
+            System.out.println("originalBuildFile: " + originalBuildFile);
+            if(originalBuildFile.exists()) {
+                File destbuildFile = new File(Main.testarDir + File.separator + "jacoco" + File.separator + "build.xml").getCanonicalFile();
+                System.out.println("destbuildFile: " + destbuildFile);
+                if(destbuildFile.exists()) {
+                    destbuildFile.delete();
+                }
+                FileUtils.copyFile(originalBuildFile, destbuildFile);
+            }
+        } catch (Exception e) {
+            LogSerialiser.log("ERROR Trying to move settings protocolName build_all.xml file to jacoco directory",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR Trying to move settings protocolName build_all.xml file to jacoco directory");
+        }
+    }
+
+    /**
      * Extract and create JaCoCo action coverage report.
      */
     protected String extractJacocoActionReport() {
@@ -527,7 +553,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     /**
      * Extract and create JaCoCo sequence coverage report.
      */
-    protected void extractJacocoSequenceReport() {
+    protected String extractJacocoSequenceReport() {
         // Dump the sequence JaCoCo report from the remote JVM
         // Example: jacoco-upm_sequence_1.exec
         String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
@@ -543,19 +569,23 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         // And get a string that represents obtained coverage
         String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
         long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
-        writeCoverageFile("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+
+        String coverageInfo = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
                 " | actionnr | " + actionCount +
                 " | time | " + sequenceTime +
-                " | " + sequenceCoverage);
+                " | " + sequenceCoverage;
+        writeCoverageFile(coverageInfo);
 
         // reset value
         lastCorrectJacocoCoverageFile = "";
+
+        return coverageInfo;
     }
 
     /**
      * Merge all JaCoCo sequences files and create a run coverage merged report
      */
-    protected void extractJacocoRunReport() {
+    protected String extractJacocoRunReport() {
         try {
             // Merge all jacoco.exec sequence files
             MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
@@ -566,13 +596,20 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             // And get a string that represents obtained coverage
             String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
             long  runTime = System.currentTimeMillis() - startRunTime;
-            writeCoverageFile("RunTotal | time | " + runTime + " | " + runCoverage);
+
+            String coverageInfo = "RunTotal | time | " + runTime + " | " + runCoverage;
+            writeCoverageFile(coverageInfo);
+
+            return coverageInfo;
+
         } catch (Exception e) {
             System.err.println(e.getMessage());
             LogSerialiser.log("ERROR: Trying to MergeMojo feature with JaCoCo Files",
                     LogSerialiser.LogLevel.Info);
             System.err.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
         }
+
+        return "ERROR: Trying to return JaCoCo Run Coverage Report";
     }
 
     /**

@@ -30,8 +30,12 @@
 
 package org.testar.pkm;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
@@ -376,6 +380,36 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         } catch(Exception e) {
             System.out.println("ERROR preparing JettyServer resources folder");
             JsonArtefactLogs.addWarning("ERROR preparing JettyServer resources folder");
+        }
+    }
+    
+    /**
+     * Add the Jacoco Coverage details of all TESTAR run inside DECODER TestResults Artefact. 
+     * This contains the general summary and the complete class and methods information. 
+     * 
+     * @param runCoverageInfo
+     */
+    protected void addRunJacocoCoverageDetails(String runCoverageInfo) {
+        coverageSummary.add(runCoverageInfo);
+        try {
+            // JaCoCo Merged CSV file report
+            String csvFileReport = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
+                    + File.separator + "jacoco_reports"
+                    + File.separator + OutputStructure.startInnerLoopDateString 
+                    + "_" + OutputStructure.executedSUTname
+                    + "_TOTAL_MERGED" + File.separator + "report_jacoco.csv";
+
+            // Add all csv coverage lines to the Artefact coverage object
+            Path path = Paths.get(csvFileReport);
+            BufferedReader reader = Files.newBufferedReader(path);
+            String line;
+            while( (line = reader.readLine()) != null) {
+                coverageSummary.add(line);
+            }
+
+        } catch(IOException e) {
+            System.err.println("ERROR! Trying to add JacocoCoverageDetails to TestResults Artefact");
+            JsonArtefactLogs.addWarning("ERROR! Trying to add JacocoCoverageDetails to TestResults Artefact");
         }
     }
 
