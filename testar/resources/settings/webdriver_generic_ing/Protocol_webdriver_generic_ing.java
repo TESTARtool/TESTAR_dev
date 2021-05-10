@@ -44,6 +44,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 import org.w3c.dom.Document;
@@ -111,9 +112,17 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		consumeRulesFile();
 	}
 
+	static String getSettingPath() {
+		String path = Settings.getSettingsPath();
+		if (path == null) {
+			path = Main.settingsDir + Main.SSE_ACTIVATED;
+		}
+		return path;
+	}
+	
 	static Xslt30Transformer compileTransformer(String file) {
 		try {
-			return xsltCompiler.compile(new StreamSource(new File(Settings.getSettingsPath(), file))).load30();
+			return xsltCompiler.compile(new StreamSource(new File(getSettingPath(), file))).load30();
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Could not compile" + file, e);
@@ -122,7 +131,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	static Document transformJson(String jsonFile, Xslt30Transformer template) {
 		try {
-			String modelFileName = (new File(Settings.getSettingsPath(), jsonFile)).toURI().toString();
+			String modelFileName = (new File(getSettingPath(), jsonFile)).toURI().toString();
 			Map<QName, XdmValue> parameters = new HashMap<>();
 			parameters.put(new QName("json-file"), XdmValue.makeValue(modelFileName));
 			
@@ -159,7 +168,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		printXML(result);
 		XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(result);
 		
-		List<FilterRule> filterRules = xmlToJava(_this, "//filter",
+		List<FilterRule> filterRules = xmlToJava(_this, "//ignore-filter",
 			node -> new FilterRule(node.attribute("xquery")));
 		
 		List<ActionRule> actionRules = xmlToJava(_this, "//action-priority",
