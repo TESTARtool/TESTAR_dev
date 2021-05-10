@@ -395,7 +395,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
      * @param runCoverageInfo
      */
     protected void addRunJacocoCoverageDetails(String runCoverageInfo) {
-        coverageSummary.add(runCoverageInfo);
+        coverageInformation.add(runCoverageInfo);
         try {
             // JaCoCo Merged CSV file report
             String csvFileReport = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -409,7 +409,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
             BufferedReader reader = Files.newBufferedReader(path);
             String line;
             while( (line = reader.readLine()) != null) {
-                coverageSummary.add(line);
+                coverageInformation.add(line);
             }
 
         } catch(IOException e) {
