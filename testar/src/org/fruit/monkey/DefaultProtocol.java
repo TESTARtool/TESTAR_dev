@@ -1429,33 +1429,42 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
-		
-		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
-			
-			if(t != null && !w.get(t,"").isEmpty()) {
-				
-				//Ignore value ValuePattern for UIAEdit widgets
-				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-					continue;
-				}
-				
-				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
-					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
-				}
-				
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
-							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
-				}
-			} 
-		}
 
+		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
+			String tagValue = "";
+			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
+			for(Tag tag : w.tags()){
+				if(tag.name().equals(tagForSuspiciousOracle)){
+					tagValue = w.get(tag, "");
+					break;
+					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
+				}
+			}
+
+			//Check whether the Tag value is empty or null
+			if (tagValue == null || tagValue.isEmpty())
+				continue; //no action
+
+			//Ignore value ValuePattern for UIAEdit widgets
+			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+				continue;
+			}
+
+			m = this.suspiciousTitlesMatchers.get(tagValue);
+			if (m == null){
+				m = this.suspiciousTitlesPattern.matcher(tagValue);
+				this.suspiciousTitlesMatchers.put(tagValue, m);
+			}
+
+			if (m.matches()){
+				Visualizer visualizer = Util.NullVisualizer;
+				// visualize the problematic widget, by marking it with a red box
+				if(w.get(Tags.Shape, null) != null)
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
+			}
+		}
 		return Verdict.OK;
 	}
 
