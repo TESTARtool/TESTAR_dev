@@ -291,7 +291,6 @@ public class VCSPanel extends SettingsPanel {
                     "Docker support is not implemented yet",
                     "Coming soon",
                     JOptionPane.PLAIN_MESSAGE);
-);
         }
     }
 
