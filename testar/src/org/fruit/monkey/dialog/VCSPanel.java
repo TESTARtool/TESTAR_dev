@@ -7,6 +7,8 @@ import org.fruit.monkey.codeanalysis.CodeAnalysisService;
 import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
 import org.fruit.monkey.codeanalysis.RepositoryLanguage;
 import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
+import org.fruit.monkey.sonarqube.SonarqubeService;
+import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;
 import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
@@ -18,6 +20,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -46,6 +50,7 @@ public class VCSPanel extends SettingsPanel {
     private final JProgressBar[] languageContentProgressBars = new JProgressBar[LANGUAGES_TO_DISPLAY];
     private final JLabel[] languageContentLabels = new JLabel[LANGUAGES_TO_DISPLAY];
     private JButton fullScanningReportButton;
+    private JButton sonarqubeButton;
     private final static int LANGUAGES_TO_DISPLAY = 3;
     private final static int LANGUAGE_CONTENT_BAR_MIN = 0;
     private final static int LANGUAGE_CONTENT_BAR_MAX = 100;
@@ -61,19 +66,28 @@ public class VCSPanel extends SettingsPanel {
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
     private final static String CLONE_PROCESSING_LABEL = "Cloning project...";
     private final static String FULL_REPORT_BUTTON = "Full report";
+    private final static String SONARQUBE_BUTTON = "Sonarqube";
     private final static String CLONING_PROPERTY = "cloning_property";
 
+    private final static String DOCKER_UNAVAILABLE_TITLE = "Docker not available";
+    private final static String DOCKER_UNAVAILABLE_MESSAGE = "Docker seems not to be up and running on your machine";
+    private final static String BTN_CANCEL = "Cancel";
+    private final static String BTN_INSTALL_DOCKER = "Install Docker >>";
+
+    private final static String DOCKER_LINK = "https://docs.docker.com/get-docker/";
 
     private PropertyChangeSupport propertyChangeSupport;
 
     private GitService gitService;
     private CodeAnalysisService codeAnalysisService;
+    private SonarqubeService sonarqubeService;
 
     private RepositoryLanguageComposition repositoryComposition;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
         codeAnalysisService = new CodeAnalysisServiceImpl();
+        sonarqubeService = new SonarqubeServiceImpl();
         propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(this::cloneFinished);
         initGitRepositoryUrlSection();
@@ -159,6 +173,7 @@ public class VCSPanel extends SettingsPanel {
             toggleLanguageVisibility(visible, i);
         }
         this.fullScanningReportButton.setVisible(visible);
+        this.sonarqubeButton.setVisible(visible);
     }
 
     private void toggleLanguageVisibility(boolean visible, int index) {
@@ -200,6 +215,7 @@ public class VCSPanel extends SettingsPanel {
         }
         if (repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY) {
             fullScanningReportButton.setVisible(true);
+            this.sonarqubeButton.setVisible(true);
         }
     }
 
@@ -240,11 +256,35 @@ public class VCSPanel extends SettingsPanel {
         this.fullScanningReportButton.addActionListener((event) -> {
             viewFullReport();
         });
+        this.sonarqubeButton = new JButton((SONARQUBE_BUTTON));
+        this.sonarqubeButton.addActionListener((event -> {
+            processWithSonarqube();
+        }));
         toggleLanguageSectionVisibility(false);
     }
 
     private void viewFullReport() {
         new ScanningReportDialog(repositoryComposition);
+    }
+
+    private void processWithSonarqube() {
+        if (!sonarqubeService.isAvailable()) {
+            Object[] options = {BTN_CANCEL, BTN_INSTALL_DOCKER};
+            int n = JOptionPane.showOptionDialog(this,
+                    DOCKER_UNAVAILABLE_MESSAGE,
+                    DOCKER_UNAVAILABLE_TITLE,
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+            if (n > 0) {
+                try {
+                    Desktop.getDesktop().browse(new URI(DOCKER_LINK));
+                }
+                catch (Exception e) {}
+            }
+        }
     }
 
     /**
@@ -305,7 +345,9 @@ public class VCSPanel extends SettingsPanel {
                                         .addComponent(languageContentLabels[2], 20, 60, 200))
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
-                                        .addComponent(fullScanningReportButton))
+                                        .addComponent(fullScanningReportButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(sonarqubeButton))
                         ));
 
         groupLayout.setVerticalGroup(
@@ -351,7 +393,9 @@ public class VCSPanel extends SettingsPanel {
                                         .addComponent(languageContentProgressBars[2])
                                         .addComponent(languageContentLabels[2]))
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(fullScanningReportButton))
+                                        .addComponent(fullScanningReportButton)//)
+//                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(sonarqubeButton))
                                 .addPreferredGap(UNRELATED)
                         ));
     }
