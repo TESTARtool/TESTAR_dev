@@ -285,6 +285,14 @@ public class VCSPanel extends SettingsPanel {
                 catch (Exception e) {}
             }
         }
+        else {
+            //TODO
+            JOptionPane.showMessageDialog(this,
+                    "Docker support is not implemented yet",
+                    "Coming soon",
+                    JOptionPane.PLAIN_MESSAGE);
+);
+        }
     }
 
     /**
