@@ -33,6 +33,7 @@ package org.testar;
 
 import java.io.File;
 
+import org.fruit.Environment;
 import org.fruit.Util;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
@@ -63,7 +64,12 @@ public class OutputStructure {
 		date = date + "s";
 		date = date.substring(0, 16) + "m" + date.substring(17);
 		date = date.substring(0, 13) + "h" + date.substring(14);
-		startOuterLoopDateString = date;
+		if (!System.getenv("HOSTNAME").isEmpty())
+		{
+			startOuterLoopDateString = System.getenv("HOSTNAME")+"_";
+
+		}
+		startOuterLoopDateString +=  date;
 	}
 
 	public static void calculateInnerLoopDateString() {
