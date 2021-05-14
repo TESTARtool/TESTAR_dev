@@ -349,7 +349,7 @@ public class Main {
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
 		}
 
 		URLClassLoader loader = null;
@@ -490,6 +490,7 @@ public class Main {
 			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
 			defaults.add(Pair.from(FlashFeedback, true));
+			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

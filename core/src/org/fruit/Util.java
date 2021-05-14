@@ -769,10 +769,11 @@ public final class Util {
     }
   }
 
-  public static void compileProtocol(String settingsDir, String protocolClass) {
+  public static void compileProtocol(String settingsDir, String protocolClass, String tmpCompileDir) {   
     File compileDir = new File(settingsDir +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
+    System.out.println("Used directory compileProtocol settingsDir = "+settingsDir+" compileDir = "+compileDir.getAbsolutePath());
 
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -790,7 +791,7 @@ public final class Util {
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
-        options.add(settingsDir);
+        options.add(tmpCompileDir);
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,
