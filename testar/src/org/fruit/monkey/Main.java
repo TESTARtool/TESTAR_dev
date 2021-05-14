@@ -351,11 +351,13 @@ public class Main {
 		if (settings.get(ConfigTags.AlwaysCompile)) {
 			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
 		}
+		
 
 		URLClassLoader loader = null;
 
 		try {
 			List<String> cp = settings.get(MyClassPath);
+			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
 
