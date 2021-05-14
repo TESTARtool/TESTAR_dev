@@ -1,6 +1,6 @@
 Hello,
 
-This is the Docker image of TESTAR. It is supposed to run headless.
+This is the Docker image of TESTAR. The image runs with its own Chrome on a framebuffer. There is an X-server in the image that is not accessible by default.
 Mount /testar/bin/output to a central location to gather the log files.
 Mount /testar/bin/settings to a certal location to have the settings configuration
 
@@ -10,6 +10,7 @@ Take care of the following settings in the used settings file:
 - VisualizeSelectedAction should be false
 - ShowVisualSettingsDialogOnStartup should be false
 - FlashFeedback should be false
+- ProtocolCompileDirectory should be set to a directory local to the image e.g. /tmp (this is where the compiled java files are written to)
 
 If NUNIT Output is desired set ReportingClass to NUNIT 3.0 Reporting
 

@@ -65,7 +65,7 @@ public class OutputStructure {
 		date = date + "s";
 		date = date.substring(0, 16) + "m" + date.substring(17);
 		date = date.substring(0, 13) + "h" + date.substring(14);
-		if (!System.getenv("HOSTNAME").isEmpty())
+		if (System.getenv("HOSTNAME") != null)
 		{
 			startOuterLoopDateString = System.getenv("HOSTNAME")+"_";
 
