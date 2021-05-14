@@ -60,6 +60,7 @@ public class OutputStructure {
 	public static String processListenerDir;
 
 	public static void calculateOuterLoopDateString() {
+		startOuterLoopDateString = "";
 		String date = Util.dateString(OutputStructure.DATE_FORMAT);
 		date = date + "s";
 		date = date.substring(0, 16) + "m" + date.substring(17);
