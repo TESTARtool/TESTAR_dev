@@ -130,12 +130,12 @@ AbstractStateAttributes = WidgetTitle,WidgetControlType
 #################################################################
 # Reinforcement learning settings
 #################################################################
-Alpha = 0.85
-Gamma = 0.85
-DefaultValue = 0.0
+Alpha = 0.95
+Gamma = 0.95
+DefaultValue = 50000.0
 DefaultReward = 0.0
-Epsilon = 0.7
-MaxQValue = 1.0
+Epsilon = 0.75
+MaxQValue = 50000.0
 DecayRate = 0.01
 Temperature = 1.0
 RewardFunction = CounterBasedRewardFunction

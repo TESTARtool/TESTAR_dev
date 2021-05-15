@@ -18,6 +18,7 @@ public class CounterBasedRewardFunction implements RewardFunction {
     private final float defaultReward;
 
     public CounterBasedRewardFunction(float defaultReward) {
+        logger.info("CounterBasedRewardFunction initialised with defaultReward={}", defaultReward);
         this.defaultReward = defaultReward;
     }
 

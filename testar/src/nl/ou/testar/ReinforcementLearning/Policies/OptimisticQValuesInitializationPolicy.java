@@ -2,16 +2,21 @@ package nl.ou.testar.ReinforcementLearning.Policies;
 
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
 import java.util.Set;
 
 public class OptimisticQValuesInitializationPolicy implements Policy {
+    private static final Logger logger = LogManager.getLogger(OptimisticQValuesInitializationPolicy.class);
+
     private final GreedyPolicy greedyPolicy;
     private final float maxQValue;
 
     public OptimisticQValuesInitializationPolicy(final GreedyPolicy greedyPolicy, final float maxQValue) {
+        logger.info("OptimisticQValuesInitializationPolicy initialised withmaxQValue={}", maxQValue);
         this.greedyPolicy = greedyPolicy;
         this.maxQValue = maxQValue;
     }
