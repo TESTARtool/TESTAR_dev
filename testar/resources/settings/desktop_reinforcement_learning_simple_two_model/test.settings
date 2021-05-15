@@ -138,8 +138,15 @@ Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.01
 Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
-Policy = EpsilonGreedyPolicy
+RewardFunction = CounterBasedRewardFunction
+Policy = OptimisticQValuesInitializationPolicy
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\desktop_reinforcement_learning_simple_two_model\\ExtendedSettings.xml
 
 #################################################################
 # Other more advanced settings
