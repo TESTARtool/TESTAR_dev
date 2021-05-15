@@ -16,7 +16,7 @@ public class OptimisticQValuesInitializationPolicy implements Policy {
     private final float maxQValue;
 
     public OptimisticQValuesInitializationPolicy(final GreedyPolicy greedyPolicy, final float maxQValue) {
-        logger.info("OptimisticQValuesInitializationPolicy initialised withmaxQValue={}", maxQValue);
+        logger.info("OptimisticQValuesInitializationPolicy initialised with maxQValue={}", maxQValue);
         this.greedyPolicy = greedyPolicy;
         this.maxQValue = maxQValue;
     }
