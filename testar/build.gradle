@@ -121,6 +121,11 @@ task prepareOutputFolder(type: Copy) {
     into 'target/scripts/output'
 }
 
+task prepareExtras(type: Copy) {
+    from 'resources/extras'
+    into 'target/scripts/extras'
+}
+
 /**
  * Copy existing testar/resources/windows10/windows.dll as temporally file
  */

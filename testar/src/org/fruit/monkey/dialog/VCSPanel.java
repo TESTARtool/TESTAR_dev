@@ -1,6 +1,7 @@
 package org.fruit.monkey.dialog;
 
 import org.eclipse.jgit.lib.ProgressMonitor;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.SettingsPanel;
 import org.fruit.monkey.codeanalysis.CodeAnalysisService;
@@ -18,6 +19,8 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -83,6 +86,7 @@ public class VCSPanel extends SettingsPanel {
     private SonarqubeService sonarqubeService;
 
     private RepositoryLanguageComposition repositoryComposition;
+    private String sonarqubeConfPath;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
@@ -215,8 +219,8 @@ public class VCSPanel extends SettingsPanel {
         }
         if (repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY) {
             fullScanningReportButton.setVisible(true);
-            this.sonarqubeButton.setVisible(true);
         }
+        this.sonarqubeButton.setVisible(true);
     }
 
     private void setLanguageValue(RepositoryLanguage repositoryLanguage, int index) {
@@ -257,9 +261,9 @@ public class VCSPanel extends SettingsPanel {
             viewFullReport();
         });
         this.sonarqubeButton = new JButton((SONARQUBE_BUTTON));
-        this.sonarqubeButton.addActionListener((event -> {
+        this.sonarqubeButton.addActionListener(event -> {
             processWithSonarqube();
-        }));
+        });
         toggleLanguageSectionVisibility(false);
     }
 
@@ -287,10 +291,25 @@ public class VCSPanel extends SettingsPanel {
         }
         else {
             //TODO
-            JOptionPane.showMessageDialog(this,
-                    "Docker support is not implemented yet",
-                    "Coming soon",
-                    JOptionPane.PLAIN_MESSAGE);
+            final SonarqubeDialog sonarqubeDialog = new SonarqubeDialog(
+                    (JFrame) SwingUtilities.getWindowAncestor(this),
+                    (projectName, projectKey) -> {
+                        try {
+                            sonarqubeService.createContainer(projectName, projectKey, sonarqubeConfPath);
+                            sonarqubeService.startContainer();
+                        }
+                        catch (IOException e) {
+                            System.out.println("Something went wrong: " + e.getLocalizedMessage());
+                        }
+                    });
+            sonarqubeDialog.pack();
+            sonarqubeDialog.setLocationRelativeTo(null);
+            sonarqubeDialog.setVisible(true);
+//            JOptionPane.showMessageDialog(this,
+//                    "Docker support is not implemented yet",
+//                    "Coming soon",
+//                    JOptionPane.PLAIN_MESSAGE);
+//            sonarqubeService.createDockerImage();
         }
     }
 
@@ -301,6 +320,12 @@ public class VCSPanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(Settings settings) {
+        sonarqubeConfPath = settings.get(ConfigTags.OutputDir);
+        if (!sonarqubeConfPath.substring(sonarqubeConfPath.length() - 1).equals(File.separator)) {
+            sonarqubeConfPath += File.separator;
+        }
+        sonarqubeConfPath = sonarqubeConfPath + "sonarqube" + File.separator;
+
         GroupLayout groupLayout = new GroupLayout(this);
         this.setLayout(groupLayout);
         groupLayout.setHorizontalGroup(

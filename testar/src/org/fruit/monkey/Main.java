@@ -67,6 +67,10 @@ public class Main {
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
 
+	//Extras
+	public static String extrasDir = testarDir + "extras" + File.separator;
+	public static String sonarqubeDir = extrasDir + "sonarqube";
+
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT

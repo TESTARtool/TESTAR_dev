@@ -295,6 +295,10 @@
     	<copy file="../suts/swtcalc/target/calc.jar" todir="${target}/suts"/>
     	<copy file="../suts/SwingSet2.jar" todir="${target}/suts"/> <!-- by urueda -->
 
+        <mkdir dir="${target}/extras"/>
+        <mkdir dir="${target}/extras/sonarqube"/>
+    	<copy file="../extras/sonarqube/Dockerfile" todir="${target}/extras/sonarqube"/>
+
     </target>
 
 	<!-- jar (by wcoux) -->
