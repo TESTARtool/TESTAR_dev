@@ -29,15 +29,17 @@
 *******************************************************************************************************/
 
 
-/**
- * @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
+
+import org.fruit.Pair;
 import org.fruit.Util;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
+import org.testar.settings.ExtendedSettingFile;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -48,6 +50,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.regex.Pattern;
@@ -68,8 +72,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.2.11 (27-Oct-2020)";
-
+  static final String TESTAR_VERSION = "2.2.17 (3-May-2021)";
 
   private String settingsFile;
   private Settings settings;
@@ -82,12 +85,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnView;
   private JButton btnRecord;
 
-  private GeneralPanel generalPanel;
-  private FilterPanel filterPanel;
-  private OraclePanel oraclePanel;
-  private TimingPanel timingPanel;
-  private MiscPanel miscPanel;
-  private StateModelPanel stateModelPanel;
+  private static final int GENERAL_TAB_INDEX = 1;
+  private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
    * Starts the settings Dialog.
@@ -129,8 +128,8 @@ public class SettingsDialog extends JFrame implements Observer {
     this.settings = settings;
     this.settingsFile = settingsFile;
     this.ret = null;
-    this.setVisible(true);
     populateInformation(settings);
+    this.setVisible(true);
 
     while (this.isShowing())
       Util.pause(0.1);
@@ -188,14 +187,15 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Temp Directory does not exist!");
     }
 
-    miscPanel.checkSettings();
+    settingPanels.forEach((k,v) -> v.right().checkSettings());
   }
 
   private void saveCurrentSettings() {
     extractInformation(settings);
+    ExtendedSettingsFactory.SaveAll();
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(Main.SETTINGS_FILE)-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
@@ -228,21 +228,11 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void populateInformation(Settings settings) {
-    generalPanel.populateFrom(settings);
-    filterPanel.populateFrom(settings);
-    oraclePanel.populateFrom(settings);
-    timingPanel.populateFrom(settings);
-    miscPanel.populateFrom(settings);
-    stateModelPanel.populateFrom(settings);
+    settingPanels.forEach((k,v) -> v.right().populateFrom(settings));
   }
 
   private void extractInformation(Settings settings) {
-    generalPanel.extractInformation(settings);
-    filterPanel.extractInformation(settings);
-    oraclePanel.extractInformation(settings);
-    timingPanel.extractInformation(settings);
-    miscPanel.extractInformation(settings);
-    stateModelPanel.extractInformation(settings);
+    settingPanels.forEach((k,v) -> v.right().extractInformation(settings));
   }
 
   private void initComponents() throws IOException {
@@ -253,21 +243,16 @@ public class SettingsDialog extends JFrame implements Observer {
     btnView = getBtnView();
     btnRecord = getBtnRecord();
 
-
     JTabbedPane jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
-    generalPanel = new GeneralPanel(this);
-    jTabsPane.addTab("General Settings", generalPanel);
-    filterPanel = new FilterPanel();
-    jTabsPane.addTab("Filters", filterPanel);
-    oraclePanel = new OraclePanel();
-    jTabsPane.addTab("Oracles", oraclePanel);
-    timingPanel = new TimingPanel();
-    jTabsPane.addTab("Time Settings", timingPanel);
-    miscPanel = new MiscPanel();
-    jTabsPane.addTab("Misc", miscPanel);
-    stateModelPanel = StateModelPanel.createStateModelPanel();
-    jTabsPane.addTab("State Model", stateModelPanel);
+    settingPanels.put(GENERAL_TAB_INDEX, new Pair<>("General Settings", new GeneralPanel(this)));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Filters", new FilterPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
+
+    settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
 
     setLayout(jTabsPane);
     pack();
@@ -290,7 +275,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void setLayout(JTabbedPane jTabsPane) {
-    jTabsPane.setSelectedComponent(generalPanel);
+    jTabsPane.setSelectedIndex(GENERAL_TAB_INDEX);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("TESTAR " + TESTAR_VERSION);

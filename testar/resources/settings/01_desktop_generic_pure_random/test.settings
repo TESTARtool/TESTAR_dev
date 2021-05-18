@@ -37,10 +37,11 @@ SequenceLength = 20
 #################################################################
 # Oracles based on suspicious titles
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
 SuspiciousTitles = 
+TagsForSuspiciousOracle = Title
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -72,11 +73,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = 
+TagsToFilter = Title
 
 #################################################################
 # Processfilter
@@ -102,6 +105,15 @@ ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_ran
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings

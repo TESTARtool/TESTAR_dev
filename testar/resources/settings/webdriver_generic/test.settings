@@ -41,10 +41,11 @@ SequenceLength = 100
 #################################################################
 # Oracles based on suspicious titles
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -76,11 +77,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title;WebName;WebTagName
 
 #################################################################
 # Processfilter
@@ -108,6 +111,16 @@ ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 
@@ -121,6 +134,15 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings

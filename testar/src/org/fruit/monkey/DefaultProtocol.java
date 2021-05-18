@@ -946,12 +946,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while(mode() == Modes.Spy && system.isRunning()) {
 
 			State state = getState(system);
+			cv.begin(); Util.clear(cv);
 
 			cv.begin(); Util.clear(cv);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
-			
+
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
 
@@ -1293,33 +1294,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 
-	// TODO mustContain is never used, maybe it was meant for something but not implemented?
-//	protected SUT startSystem() throws SystemStartException{
-//		return startSystem(null);
-//	}
-
-	protected SUT startSystem() throws SystemStartException{
-		//String mustContain = null; //TODO mustContain was never used?
+	protected SUT startSystem() throws SystemStartException {
 		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
-		try{// refactored from "protected SUT startSystem() throws SystemStartException"
+		try{
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
 			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo))
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 		}catch(IOException ioe){
 			throw new SystemStartException(ioe);
-		} // end refactoring
+		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
-		//if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-		//	return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
-		//else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-		//	return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
-		//else
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue),Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_DAEMON)) {
 			//TODO make a generic solution, this is F-Secure specific:
@@ -1336,7 +1326,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
-			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
+			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
 
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
@@ -1361,7 +1351,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @throws StateBuildException
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		Assert.notNull(system);
 		State state = builder.apply(system);
 
@@ -1453,33 +1443,42 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
-		
-		for(Tag<String> t : Tags.getGeneralStringVerdictTags()) {
-			
-			if(t != null && !w.get(t,"").isEmpty()) {
-				
-				//Ignore value ValuePattern for UIAEdit widgets
-				if(t.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-					continue;
-				}
-				
-				m = this.suspiciousTitlesMatchers.get(w.get(t,""));
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(w.get(t,""));
-					this.suspiciousTitlesMatchers.put(w.get(t,""), m);
-				}
-				
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, 
-							"Discovered suspicious widget '" + t.name() + "' : '" + w.get(t,"") + "'.", visualizer);
-				}
-			} 
-		}
 
+		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
+			String tagValue = "";
+			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
+			for(Tag tag : w.tags()){
+				if(tag.name().equals(tagForSuspiciousOracle)){
+					tagValue = w.get(tag, "");
+					break;
+					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
+				}
+			}
+
+			//Check whether the Tag value is empty or null
+			if (tagValue == null || tagValue.isEmpty())
+				continue; //no action
+
+			//Ignore value ValuePattern for UIAEdit widgets
+			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+				continue;
+			}
+
+			m = this.suspiciousTitlesMatchers.get(tagValue);
+			if (m == null){
+				m = this.suspiciousTitlesPattern.matcher(tagValue);
+				this.suspiciousTitlesMatchers.put(tagValue, m);
+			}
+
+			if (m.matches()){
+				Visualizer visualizer = Util.NullVisualizer;
+				// visualize the problematic widget, by marking it with a red box
+				if(w.get(Tags.Shape, null) != null)
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
+			}
+		}
 		return Verdict.OK;
 	}
 

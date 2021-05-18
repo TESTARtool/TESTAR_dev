@@ -41,7 +41,7 @@ import org.testar.protocols.DesktopProtocol;
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
  */
-public class Protocol_web_generic extends DesktopProtocol {
+public class Protocol_winapi_web_generic extends DesktopProtocol {
 	
 	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
 
