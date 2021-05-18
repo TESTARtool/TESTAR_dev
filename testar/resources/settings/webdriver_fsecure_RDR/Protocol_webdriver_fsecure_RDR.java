@@ -68,39 +68,15 @@ public class Protocol_webdriver_fsecure_RDR extends WebdriverProtocol {
 		super.initialize(settings);
 		ensureDomainsAllowed();
 
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption",
-				// F-Secure specific config:
-				"hds-scope-selector-button-company");
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("portal.business.f-secure.com", "emea.psb.f-secure.com", "accounts.f-secure.com", "portal.rdr.f-secure.com");
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
-
 		// URL + form name, username input id + value, password input id + value
 		// Set login to null to disable this feature
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
+		login = null;
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = new HashMap<String, String>() {{
 			put("class", "lfr-btn-label");
 		}};
-
-		WdDriver.fullScreen = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		//protocolUtil = new WdProtocolUtil();
@@ -132,9 +108,9 @@ public class Protocol_webdriver_fsecure_RDR extends WebdriverProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state) {
-		// F-secure specific login:
-		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebType,"email", "pekka.aho@ou.nl", state, system, 5,1.0);
-		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebType,"password", "Testar12345", state, system, 5,1.0);
+		// F-secure specific login, username and password is in test.settings -file, ProtocolSpecificSetting_1 and ProtocolSpecificSetting_2:
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebType,"email", settings.get(ConfigTags.ProtocolSpecificSetting_1), state, system, 5,1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebType,"password", settings.get(ConfigTags.ProtocolSpecificSetting_2), state, system, 5,1.0);
 		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebType,"submit", state, system, 5,1.0);
 		Util.pause(2);
 		state = getState(system);

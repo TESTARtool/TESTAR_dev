@@ -52,6 +52,7 @@ SequenceLength = 100
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -88,6 +89,7 @@ ProcessLogs = .*.*
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title;WebName;WebTagName
 
 #################################################################
 # Processfilter
@@ -131,6 +133,17 @@ StateModelStoreWidgets = false
 #################################################################
 AbstractStateAttributes = WidgetControlType
 
+
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption;hds-scope-selector-button-company
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = portal.business.f-secure.com;emea.psb.f-secure.com;accounts.f-secure.com;portal.rdr.f-secure.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
 #################################################################
 # Override display scale
 #
@@ -145,6 +158,16 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 
 OverrideWebDriverDisplayScale = 
+
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = pekka.aho@ou.nl
+ProtocolSpecificSetting_2 = Testar12345
+ProtocolSpecificSetting_3 =
+ProtocolSpecificSetting_4 =
+ProtocolSpecificSetting_5 =
 
 #################################################################
 # Other more advanced settings
