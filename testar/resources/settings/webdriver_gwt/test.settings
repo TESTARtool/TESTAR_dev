@@ -41,10 +41,11 @@ SequenceLength = 100
 #################################################################
 # Oracles based on suspicious titles
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -76,11 +77,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title;WebName;WebTagName
 
 #################################################################
 # Processfilter
@@ -100,12 +103,22 @@ SUTProcesses =
 ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
 
 #################################################################
-# Graphdatabase settings (experimental)
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+AbstractStateAttributes = WebWidgetId
+
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = selectItemLiteText;etreeCell;etreeCellSelected;etreeCellSelectedOver;checkboxFalse;checkboxFalseOver;checkboxTrue;checkboxTrueOver;showcaseTileIcon;vScrollStart;vScrollEnd
+DeniedExtensions = pdf;jpg;png;jsp
+DomainsAllowed = www.smartclient.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
 
 #################################################################
 # Override display scale
@@ -155,3 +168,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+RefreshSpyCanvas = 1.0

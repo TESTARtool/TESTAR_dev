@@ -20,3 +20,4 @@ build.bat
 /testar/testar.bat
 /testar/windows.dll
 /testar/index.log
+*.log

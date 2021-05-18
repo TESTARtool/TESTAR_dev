@@ -19,13 +19,15 @@ public class AbstractStateSettings extends JDialog {
     private Tag<?>[] currentlySelectedStateTags;
     private Tag<?>[] defaultTags;
 
-    private JLabel label1 = new JLabel("Please choose the widget attributes to use in " +
-                                            "creating the abstract state model.");
+    private JLabel label1 = new JLabel("Please choose the widget attributes to use in "
+    + "creating the abstract state model. Control + Left Click");
     private JLabel label2 = new JLabel("General attributes");
     private JLabel label3 = new JLabel("Control patterns");
+    private JLabel label4 = new JLabel("WebDrivers attributes");
 
     private JList generalList;
     private JList controlPatternList;
+    private JList webdriverList;
 
     private JButton confirmButton = new JButton("Confirm");
     private JButton resetToDefaultsButton = new JButton("Reset to defaults");
@@ -36,7 +38,7 @@ public class AbstractStateSettings extends JDialog {
         this.allStateTags = Arrays.stream(allStateTags).sorted(Comparator.comparing(Tag::name)).toArray(Tag<?>[]::new);
         this.currentlySelectedStateTags = currentlySelectedStateTags;
         this.defaultTags = defaultTags;
-        setSize(800, 600);
+        setSize(1000, 600);
         setLayout(null);
         setVisible(true);
         setLocationRelativeTo(null);
@@ -52,7 +54,7 @@ public class AbstractStateSettings extends JDialog {
     }
 
     private void init() {
-        label1.setBounds(10, 10, 400, 27);
+        label1.setBounds(10, 10, 600, 27);
         add(label1);
 
         /////// GENERAL STATE MANAGEMENT TAGS ////////
@@ -69,7 +71,7 @@ public class AbstractStateSettings extends JDialog {
         add(listScrollerGeneral);
 
         ///////// CONTROL PATTERN STATE MANAGEMENT TAGS /////////
-        label3.setBounds(450, 50, 250, 27);
+        label3.setBounds(360, 50, 250, 27);
 
         controlPatternList = new JList(Arrays.stream(allStateTags).filter(tag -> StateManagementTags.getTagGroup(tag).equals(StateManagementTags.Group.ControlPattern)).toArray()); //data has type Object[]
         controlPatternList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -78,8 +80,21 @@ public class AbstractStateSettings extends JDialog {
 
         JScrollPane listScrollerControlPattern = new JScrollPane(controlPatternList);
         listScrollerControlPattern.setPreferredSize(new Dimension(250, 350));
-        listScrollerControlPattern.setBounds(450, 80, 250, 350);
+        listScrollerControlPattern.setBounds(360, 80, 250, 350);
         add(listScrollerControlPattern);
+        
+        ///////// WEB DRIVER STATE MANAGEMENT TAGS /////////
+        label4.setBounds(710, 50, 250, 27);
+        
+        webdriverList = new JList(Arrays.stream(allStateTags).filter(tag -> StateManagementTags.getTagGroup(tag).equals(StateManagementTags.Group.WebDriver)).toArray()); //data has type Object[]
+        webdriverList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        webdriverList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        webdriverList.setVisibleRowCount(-1);
+
+        JScrollPane listScrollerWebdriver = new JScrollPane(webdriverList);
+        listScrollerWebdriver.setPreferredSize(new Dimension(250, 350));
+        listScrollerWebdriver.setBounds(710, 80, 250, 350);
+        add(listScrollerWebdriver);
 
         // init the selection based on the currently selected state management tags
         populateLists();
@@ -89,8 +104,12 @@ public class AbstractStateSettings extends JDialog {
         confirmButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentlySelectedStateTags = (Tag<?>[]) Stream.concat(generalList.getSelectedValuesList().stream(), controlPatternList.getSelectedValuesList().stream())
-                        .toArray(Tag<?>[]::new);
+            	
+            	Stream allListConcatenated = Stream.concat(
+            			Stream.concat(generalList.getSelectedValuesList().stream(),controlPatternList.getSelectedValuesList().stream()),
+            			webdriverList.getSelectedValuesList().stream());
+            	
+                currentlySelectedStateTags = (Tag<?>[]) allListConcatenated.toArray(Tag<?>[]::new);
 
 
                 dispatchEvent(new WindowEvent(window ,WindowEvent.WINDOW_CLOSING));
@@ -133,6 +152,16 @@ public class AbstractStateSettings extends JDialog {
         }
 
         controlPatternList.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
+        
+        listModel = webdriverList.getModel();
+        selectedIndices = new ArrayList<>();
+        for (int i=0; i < listModel.getSize(); i++) {
+            if (tagSet.contains(listModel.getElementAt(i))) {
+                selectedIndices.add(i);
+            }
+        }
+
+        webdriverList.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
     }
 
 }

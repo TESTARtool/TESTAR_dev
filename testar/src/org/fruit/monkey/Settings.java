@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,11 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import java.io.BufferedReader;
@@ -318,10 +313,11 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Oracles based on suspicious titles\n"
 					+"#\n"
-					+"# Regular expression\n"
+					+"# Regular expression and Tags to apply them\n"
 					+"#################################################################\n"
 					+"\n"
 					+"SuspiciousTitles = " + Util.lineSep()
+					+"TagsForSuspiciousOracle = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
@@ -353,11 +349,13 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Actionfilter\n"
 					+"#\n"
-					+"# Regular expression. More filters can be added in Spy mode,\n"
+					+"# Regular expression and Tags to apply them.\n"
+					+"# More filters can be added in Spy mode,\n"
 					+"# these will be added to the protocol_filter.xml file.\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ClickFilter = " + Util.lineSep()
+					+"TagsToFilter = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Processfilter\n"
@@ -366,7 +364,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# but that you do not want to test.\n"
 					+"#################################################################\n"
 					+"\n"
-					+"SUTProcesses =" + Util.lineSep()
+					+"SUTProcesses = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Protocolclass\n"
@@ -377,29 +375,21 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProtocolClass = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
-					+"# Graphdatabase settings (experimental)\n"
-					+"#################################################################\n"
-					+"GraphDBEnabled = false" + Util.lineSep()
-					+"GraphDBUrl =" + Util.lineSep()
-					+"GraphDBUser =" + Util.lineSep()
-					+"GraphDBPassword =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
 					+"# State model inference settings\n"
 					+"#################################################################\n"
-					+"StateModelEnabled = false" + Util.lineSep()
-					+"DataStore = OrientDB" + Util.lineSep()
-					+"DataStoreType = remote" + Util.lineSep()
-					+"DataStoreServer = localhost" + Util.lineSep()
-					+"DataStoreDirectory =" + Util.lineSep()
-					+"DataStoreDB =" + Util.lineSep()
-					+"DataStoreUser =" + Util.lineSep()
-					+"DataStorePassword =" + Util.lineSep()
-					+"DataStoreMode = instant" + Util.lineSep()
-					+"ApplicationName = Buggy calculator" + Util.lineSep()
-					+"ApplicationVersion = 1.0.0" + Util.lineSep()
-					+"ActionSelectionAlgorithm =" + Util.lineSep()
-					+"StateModelStoreWidgets =" + Util.lineSep()
+					+"StateModelEnabled = " + Util.lineSep()
+					+"DataStore = " + Util.lineSep()
+					+"DataStoreType = " + Util.lineSep()
+					+"DataStoreServer = " + Util.lineSep()
+					+"DataStoreDirectory = " + Util.lineSep()
+					+"DataStoreDB = " + Util.lineSep()
+					+"DataStoreUser = " + Util.lineSep()
+					+"DataStorePassword = " + Util.lineSep()
+					+"DataStoreMode = " + Util.lineSep()
+					+"ApplicationName = " + Util.lineSep()
+					+"ApplicationVersion = " + Util.lineSep()
+					+"ActionSelectionAlgorithm = " + Util.lineSep()
+					+"StateModelStoreWidgets = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
@@ -407,7 +397,18 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
 					+"#################################################################\n"
-					+"AbstractStateAttributes =" + Util.lineSep()
+					+"AbstractStateAttributes = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# WebDriver features\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ClickableClasses = " + Util.lineSep()
+					+"DeniedExtensions = " + Util.lineSep()
+					+"DomainsAllowed = " + Util.lineSep()
+					+"FollowLinks = " + Util.lineSep()
+					+"BrowserFullScreen = " + Util.lineSep()
+					+"SwitchNewTabs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Override display scale\n"
@@ -422,7 +423,24 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Values should be provided as doubles (1.5).\n"
 					+"#################################################################\n"
 					+"\n"
-					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
+					+"OverrideWebDriverDisplayScale = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Settings (string) that can be used for user specified protocols\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProtocolSpecificSetting_1 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_2 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_3 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_4 = " + Util.lineSep()
+					+"ProtocolSpecificSetting_5 = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Extended settings file\n"
+					+"#\n"
+					+"# Relative path to extended settings file.\n"
+					+"#################################################################\n"
+					+"ExtendedSettingsFile =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"
