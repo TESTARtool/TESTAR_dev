@@ -342,7 +342,7 @@ public class StdActionCompiler {
 		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing Cntr + A keys to select all text:
-		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
+		builder.add(new KeyDown(VK_CONTROL), 0.1).add(new KeyDown(VK_A), 0.1).add(new KeyUp(VK_A), 0.1).add(new KeyUp(VK_CONTROL), 0.1);
 
 		builder.add(new PasteText(text), 1);
 		return builder.build();
@@ -353,7 +353,7 @@ public class StdActionCompiler {
 		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing End key to append into the end of the text:
-		builder.add(new KeyDown(KBKeys.VK_END), 0.1).add(new KeyUp(KBKeys.VK_END), 0.1);
+		builder.add(new KeyDown(VK_END), 0.1).add(new KeyUp(VK_END), 0.1);
 
 		builder.add(new PasteText(text), 1);
 		return builder.build();

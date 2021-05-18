@@ -1554,7 +1554,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		else if (actions.isEmpty()){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
 			CodingManager.buildEnvironmentActionIDs(state, escAction);
 			return escAction;
 		}

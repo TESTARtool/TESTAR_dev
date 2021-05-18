@@ -2,13 +2,14 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     private int currentSequence = 0;
     private Verdict verdict;
     private final Map<Integer, Integer> actionResults = new TreeMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(StrategyActionSelector.class);
+    private static final Logger logger = LogManager.getLogger(StrategyActionSelector.class);
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
         logger.debug("creating genetic programming strategy");

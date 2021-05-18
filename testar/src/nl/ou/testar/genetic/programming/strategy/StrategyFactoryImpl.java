@@ -37,12 +37,13 @@ import nl.ou.testar.genetic.programming.strategy.actions.SnStateHasNotChanged;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeAction;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeActionsAvailable;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeOfActionOf;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -65,7 +66,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
     private StrategyActionSelector strategyActionSelector;
     private List<Metric> metrics = new ArrayList<>();
-    private static final Logger logger = LoggerFactory.getLogger(StrategyFactoryImpl.class);
+    private static final Logger logger = LogManager.getLogger(StrategyFactoryImpl.class);
 
     public StrategyFactoryImpl(final String strategy) {
         if (strategy.endsWith(".txt")) {

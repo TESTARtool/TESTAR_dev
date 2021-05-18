@@ -1,9 +1,9 @@
 package nl.ou.testar.genetic.programming.strategy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Tag<String> ACTION_ID = Tags.Desc;
     private Tag<String> STATE_ID;
 
-    private static final Logger logger = LoggerFactory.getLogger(StrategyGuiStateImpl.class);
+    private static final Logger logger = LogManager.getLogger(StrategyGuiStateImpl.class);
 
     StrategyGuiStateImpl() {
     }
