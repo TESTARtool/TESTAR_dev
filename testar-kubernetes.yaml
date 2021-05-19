@@ -35,7 +35,7 @@ spec:
    spec:
      containers:
      - name: orientservice
-       image: orientdb:3.2.0
+       image: orientdb:3.0.34
        ports:
        - name: http
          containerPort: 2480
@@ -99,6 +99,7 @@ kind: Job
 metadata:
   name: testar
 spec:
+  ttlSecondsAfterFinished: 100
   parallelism: 5
   template:
     metadata:
@@ -116,6 +117,8 @@ spec:
           name: config
         - mountPath: /testar/bin/output
           name: logs
+        - mountPath: /dev/shm
+          name: dshm
       volumes:
       - name: config
         persistentVolumeClaim:
@@ -123,3 +126,6 @@ spec:
       - name: logs
         persistentVolumeClaim:
           claimName: output
+      - name: dshm
+        emptyDir:
+          medium: Memory
