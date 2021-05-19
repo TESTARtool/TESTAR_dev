@@ -63,6 +63,7 @@ import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.HtmlReporting.Reporting;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.apache.logging.log4j.LogManager;
@@ -100,6 +101,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
 
+	protected Reporting htmlReport;
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}

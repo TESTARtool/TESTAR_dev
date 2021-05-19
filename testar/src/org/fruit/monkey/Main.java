@@ -493,6 +493,7 @@ public class Main {
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
 			defaults.add(Pair.from(FlashFeedback, true));
 			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
+			defaults.add(Pair.from(ReportingClass,"NUNIT 3.0 Reporting"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{

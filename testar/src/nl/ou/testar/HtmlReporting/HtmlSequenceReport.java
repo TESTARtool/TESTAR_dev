@@ -43,7 +43,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Set;
 
-public class HtmlSequenceReport {
+public class HtmlSequenceReport implements Reporting{
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
