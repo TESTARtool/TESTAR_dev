@@ -70,6 +70,7 @@ public class Main {
 	//Extras
 	public static String extrasDir = testarDir + "extras" + File.separator;
 	public static String sonarqubeDir = extrasDir + "sonarqube";
+	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
 
 	/**
@@ -337,6 +338,7 @@ public class Main {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 		return true;

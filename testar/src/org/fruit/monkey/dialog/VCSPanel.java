@@ -87,6 +87,7 @@ public class VCSPanel extends SettingsPanel {
 
     private RepositoryLanguageComposition repositoryComposition;
     private String sonarqubeConfPath;
+    private String sonarqubeClientConfPath;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
@@ -217,9 +218,8 @@ public class VCSPanel extends SettingsPanel {
         for (int i = 0; (i < LANGUAGES_TO_DISPLAY) && (i < repositoryComposition.getRepositoryLanguages().size()); i++) {
             setLanguageValue(repositoryLanguages.get(i), i);
         }
-        if (repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY) {
-            fullScanningReportButton.setVisible(true);
-        }
+        fullScanningReportButton.setEnabled(repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY);
+        fullScanningReportButton.setVisible(true);
         this.sonarqubeButton.setVisible(true);
     }
 
@@ -294,22 +294,17 @@ public class VCSPanel extends SettingsPanel {
             final SonarqubeDialog sonarqubeDialog = new SonarqubeDialog(
                     (JFrame) SwingUtilities.getWindowAncestor(this),
                     (projectName, projectKey) -> {
-                        try {
-                            sonarqubeService.createContainer(projectName, projectKey, sonarqubeConfPath);
-                            sonarqubeService.startContainer();
-                        }
-                        catch (IOException e) {
-                            System.out.println("Something went wrong: " + e.getLocalizedMessage());
-                        }
+                        new Thread(() -> {
+                            try {
+                                sonarqubeService.createContainer(projectName, projectKey, sonarqubeConfPath);
+                            } catch (IOException e) {
+                                System.out.println("Something went wrong: " + e.getLocalizedMessage());
+                            }
+                        }).start();
                     });
             sonarqubeDialog.pack();
             sonarqubeDialog.setLocationRelativeTo(null);
             sonarqubeDialog.setVisible(true);
-//            JOptionPane.showMessageDialog(this,
-//                    "Docker support is not implemented yet",
-//                    "Coming soon",
-//                    JOptionPane.PLAIN_MESSAGE);
-//            sonarqubeService.createDockerImage();
         }
     }
 
@@ -320,11 +315,12 @@ public class VCSPanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(Settings settings) {
-        sonarqubeConfPath = settings.get(ConfigTags.OutputDir);
-        if (!sonarqubeConfPath.substring(sonarqubeConfPath.length() - 1).equals(File.separator)) {
-            sonarqubeConfPath += File.separator;
+        String path = settings.get(ConfigTags.OutputDir);
+        if (!path.substring(path.length() - 1).equals(File.separator)) {
+            path += File.separator;
         }
-        sonarqubeConfPath = sonarqubeConfPath + "sonarqube" + File.separator;
+        sonarqubeConfPath = path + "sonarqube" + File.separator;
+        sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
 
         GroupLayout groupLayout = new GroupLayout(this);
         this.setLayout(groupLayout);
