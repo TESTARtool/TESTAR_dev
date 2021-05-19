@@ -177,15 +177,10 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         System.out.println("...done");
 
         form.clear();
-        System.out.println("(0)");
         form.add(new BasicNameValuePair("name", tokenName));
-        System.out.println("(1)");
         final HttpPost newTokenRequest = new HttpPost("http://localhost:9000/api/user_tokens/generate");
-        System.out.println("(2)");
         newTokenRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        System.out.println("(3)");
         newTokenRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
-        System.out.println("(4)");
 
         HttpResponse newTokenResponse = httpClient.execute(newTokenRequest);
         status = newTokenResponse.getStatusLine().getStatusCode();
