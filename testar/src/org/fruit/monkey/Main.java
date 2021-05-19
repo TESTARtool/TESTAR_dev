@@ -94,6 +94,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	//Extras
 	public static String extrasDir = testarDir + "extras" + File.separator;
 	public static String sonarqubeDir = extrasDir + "sonarqube";
+	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
