@@ -129,7 +129,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         dockerClient.stopContainerCmd(containerId).exec();
     }
 
-    public String createProjectAndGetToken(String projectKey, String projectName, String tokenName) throws IOException, JSONException {
+    private String createProjectAndGetToken(String projectKey, String projectName, String tokenName) throws IOException, JSONException {
 
         HttpClient httpClient = HttpClientBuilder.create()/*.setDefaultCredentialsProvider(credentialsProvider)*/.build();
 
