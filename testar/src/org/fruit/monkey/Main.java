@@ -65,6 +65,9 @@ public class Main {
 
     //public static String resourcesDir = "resources" + File.separator;
     //Default paths
+	// Main branch path
+	//public static String testarDir = "." + File.separator;
+	//ECJ path
 	public static String testarDir = FileSystems.getDefault().getPath("").toAbsolutePath() + File.separator; // + "testar" + File.separator + "resources" + File.separator;
     public static String settingsDir = testarDir + "settings" + File.separator;
     public static String outputDir = testarDir + "output" + File.separator;
