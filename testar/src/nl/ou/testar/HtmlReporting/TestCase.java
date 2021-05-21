@@ -42,7 +42,7 @@ public class TestCase {
         if (attachment.size() > 0)
         {
             result = "><attachments>";
-            for (var v :attachment.entrySet()){
+            for (Entry<String, String> v :attachment.entrySet()){
                 result += String.format("<attachment><filePath>{0}</filePath><description>{1}</description></attachment>",v.getKey(), v.getValue());
             }
             result += "</attachments>\n</test-case>";
