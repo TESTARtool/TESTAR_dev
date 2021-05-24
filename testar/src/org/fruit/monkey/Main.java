@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
@@ -47,7 +45,11 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.windows.Windows10;
+import org.testar.settings.ExtendedSettingFile;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
@@ -342,7 +344,6 @@ public class Main {
 	 * This method get the specific protocol class of the selected settings to run TESTAR
 	 * 
 	 * @param settings
-	 * @param testSettings
 	 */
 	private static void startTestar(Settings settings) {
 
@@ -489,12 +490,69 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
 					add("WidgetControlType");
 				}
 			}));
+
+			defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
+				{
+					add("v-menubar-menuitem");
+					add("v-menubar-menuitem-caption");
+				}
+			}));
+
+			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
+				{
+					add("pdf");
+					add("jpg");
+					add("png");
+				}
+			}));
+
+			defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+				{
+					add("www.ou.nl");
+					add("mijn.awo.ou.nl");
+					add("login.awo.ou.nl");
+				}
+			}));
+
+            defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
+                {
+                    add("Title");
+                    add("WebName");
+                    add("WebTagName");
+                }
+            }));
+
+
+			defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
+				{
+					add("Title");
+					add("WebName");
+					add("WebTagName");
+				}
+			}));
+
+			defaults.add(Pair.from(FollowLinks, true));
+			defaults.add(Pair.from(BrowserFullScreen, true));
+			defaults.add(Pair.from(SwitchNewTabs, true));
+
+			/*
+			//TODO web driver settings for login feature
+			defaults.add(Pair.from(Login, null)); // null = feature not enabled
+			// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+			defaults.add(Pair.from(Username, ""));
+			defaults.add(Pair.from(Password, ""));
+			*/
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
@@ -522,6 +580,13 @@ public class Main {
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
 				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
 			}
+
+			try{
+				settings.get(ConfigTags.ExtendedSettingsFile);
+			} catch (NoSuchTagException e){
+				settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
+			}
+			ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
 			return settings;
 		} catch (IOException ioe) {

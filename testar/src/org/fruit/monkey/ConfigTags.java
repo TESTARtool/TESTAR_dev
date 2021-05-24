@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -126,4 +126,35 @@ public final class ConfigTags {
   // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
   public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class);
 
+  public static final Tag<String> ExtendedSettingsFile = Tag.from("ExtendedSettingsFile", String.class);
+
+  // 5 settings that can be used in user specified TESTAR protocols for anything:
+  public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_2 = Tag.from("ProtocolSpecificSetting_2", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_3 = Tag.from("ProtocolSpecificSetting_3", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_4 = Tag.from("ProtocolSpecificSetting_4", String.class);
+  public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class);
+
+  // WebDriver specific settings:
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> ClickableClasses = Tag.from("ClickableClasses", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> DeniedExtensions = Tag.from("DeniedExtensions", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> TagsToFilter = Tag.from("TagsToFilter", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> TagsForSuspiciousOracle = Tag.from("TagsForSuspiciousOracle", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class);
+  public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
+  public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
+
+  /*
+  //TODO web driver settings for login feature
+  public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  // Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+  public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
+  */
 }
