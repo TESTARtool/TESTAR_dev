@@ -32,6 +32,8 @@
 import java.util.Set;
 
 import nl.ou.testar.DerivedActions;
+import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
 import nl.ou.testar.SutVisualization;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -105,7 +107,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+		State state = super.getState(system);
+		String screenshotPath = state.get(Tags.ScreenshotPath);
+		String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
+		JsonUtils.createFullWidgetTreeJsonFile(state, filePath);
+		return state;
 	}
 
 	/**

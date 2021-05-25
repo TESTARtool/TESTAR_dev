@@ -32,14 +32,12 @@ package nl.ou.testar.ScreenshotJsonFile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javafx.util.Pair;
 import nl.ou.testar.ScreenshotJsonFile.BoundingPoly;
 import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
 import nl.ou.testar.ScreenshotJsonFile.Vertice;
 import nl.ou.testar.ScreenshotJsonFile.WidgetJsonObject;
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.windows.UIATags;
 
 import java.io.FileWriter;
@@ -47,6 +45,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JsonUtils {
+
+    public static void createFullWidgetTreeJsonFile(State state, String fileNamePath){
+        Set<FullWidgetInfoJsonObject> widgetTreeObjects = new HashSet<FullWidgetInfoJsonObject>();
+        for(Widget widget:state){
+            Set<Pair<String, String>> widgetTags = new HashSet<javafx.util.Pair<String, String>>();
+            for(Tag tag:widget.tags()){
+                Pair<String, String> widgetTag = new Pair<String, String>(tag.name(), widget.get(tag).toString());
+                widgetTags.add(widgetTag);
+            }
+            widgetTreeObjects.add(new FullWidgetInfoJsonObject(widgetTags));
+        }
+        writeJsonToFile(widgetTreeObjects,fileNamePath);
+    }
 
     public static void createWidgetInfoJsonFile(State state){
     	
@@ -59,7 +70,6 @@ public class JsonUtils {
     	}
 //        System.out.println("DEBUG: SUT rect x="+sutRect.x()+", y="+sutRect.y()+", width="+sutRect.width()+", height="+sutRect.height());
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
         for(Widget widget:state){
             boolean enabled = widget.get(Tags.Enabled, null);
@@ -91,13 +101,21 @@ public class JsonUtils {
 //        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
 //        System.out.println("FilePath="+filePath);
+        writeJsonToFile(screenshotWidgetJsonObject, filePath);
+    }
+
+    private static void writeJsonToFile(Object objectToWrite, String fileNamePath){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try{
-            FileWriter fileWriter = new FileWriter(filePath);
-            gson.toJson(screenshotWidgetJsonObject, fileWriter);
+            FileWriter fileWriter = new FileWriter(fileNamePath);
+            gson.toJson(objectToWrite, fileWriter);
             fileWriter.flush(); //flush data to file   <---
             fileWriter.close(); //close write          <---
         }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
+            // Object="+objectToWrite+", filename="+fileNamePath);
+            e.printStackTrace();
         }
     }
+
 }
