@@ -633,9 +633,10 @@ public class Main {
 		}
 	}
 
-	//TODO: Understand what this exactly does?
 	/**
-	 * Override something. Not sure what
+	 * This method allow us to define and use settings as JVM arguments. 
+	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
+	 * 
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {
