@@ -2,8 +2,10 @@ package org.fruit.monkey.sonarqube;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.CreateNetworkResponse;
 import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -39,7 +41,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SonarqubeServiceImpl implements SonarqubeService {
     private DockerClientConfig dockerConfig;
@@ -48,6 +52,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     private String containerId;
 
     public static final String LOCAL_REPOSITORIES_PATH = "cloned";
+
+    private HttpClient httpClient = HttpClientBuilder.create()/*.setDefaultCredentialsProvider(credentialsProvider)*/.build();
+    private final static String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
     public SonarqubeServiceImpl() {
         dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
@@ -74,7 +81,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         }
     }
 
-    public void createContainer(String projectName, String projectKey, String sonarqubeDirPath) throws IOException {
+    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir) throws IOException {
 
         File confDir = new File(sonarqubeDirPath);
         if (!confDir.exists()) {
@@ -106,23 +113,66 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         final HostConfig hostConfig = HostConfig.newHostConfig()
                     .withPortBindings(PortBinding.parse("9000:9000"));
         System.out.println("Host configured");
-        CreateContainerResponse response = dockerClient.createContainerCmd(imageId)
+        CreateContainerResponse containerResponse = dockerClient.createContainerCmd(imageId)
             .withName("sonarqube")
+            .withHostName("sonarqube")
             .withHostConfig(hostConfig)
             .exec();
 
         System.out.println("Container created");
-        containerId = response.getId();
+        containerId = containerResponse.getId();
         System.out.println("Container ID: " + containerId);
 
+        CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName("sonar").withDriver("bridge").withAttachable(true).exec();
+        String networkId = networkResponse.getId();
+        dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
+
         dockerClient.startContainerCmd(containerId).exec();
+        String token = null;
         try {
-            final String token = createProjectAndGetToken(projectKey, projectName, "testar");
+            token = createProjectAndGetToken(projectKey, projectName, "testar");
             System.out.println("Sonarqube scan token: " + token);
         }
         catch (Exception e) {
             System.err.println("Something went wrong: " + e.getLocalizedMessage());
         }
+
+        if (token == null) {
+            //TODO: throw exception
+            return;
+        }
+        final String clientId = createClientContainer(networkId, projectSourceDir, projectKey, token);
+        dockerClient.waitContainerCmd(clientId).exec(new ResultCallback<WaitResponse>() {
+            @Override
+            public void onStart(Closeable closeable) {
+
+            }
+
+            @Override
+            public void onNext(WaitResponse object) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                //TODO: throe exception
+            }
+
+            @Override
+            public void onComplete() {
+                try {
+                    System.out.println(obtainIssuesReport(projectKey));
+                }
+                catch (Exception e) {
+                    System.out.println("No report available: " + e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void close() throws IOException {
+                System.out.println("Closing containers");
+            }
+        });
     }
 
     public void stopContainer() {
@@ -130,37 +180,68 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     }
 
     private String createProjectAndGetToken(String projectKey, String projectName, String tokenName) throws IOException, JSONException {
-
-        HttpClient httpClient = HttpClientBuilder.create()/*.setDefaultCredentialsProvider(credentialsProvider)*/.build();
-
-        int status = 0;
+        int status = HttpStatus.SC_NOT_FOUND;
 
         final HttpPost newProjectRequest = new HttpPost("http://localhost:9000/api/projects/create");
-        final String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("project", projectKey));
-        form.add(new BasicNameValuePair("name", projectName));
 
-        newProjectRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        newProjectRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
+//        form.add(new BasicNameValuePair("project", projectKey));
+//        form.add(new BasicNameValuePair("name", projectName));
+//
+//        newProjectRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+//        newProjectRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
+//
+//        System.out.println("Creating new project...");
+//        status = HttpStatus.SC_NOT_FOUND;
+//        HttpResponse newProjectResponse = null;
+//        while (status >= 400 && status < 500) {
+//            try {
+//                newProjectResponse = httpClient.execute(newProjectRequest);
+//                status = newProjectResponse.getStatusLine().getStatusCode();
+//                if (status != HttpStatus.SC_OK) {
+//                    System.out.println("Still " + status);
+//                }
+//            }
+//            catch (Exception e) {
+//                System.out.println("Not yet ready");
+//            }
+//            finally {
+//                newProjectRequest.releaseConnection();
+//            }
+//
+//            try {
+//                Thread.sleep(5000);
+//            }
+//            catch (Exception e) {}
+//        }
+//        System.out.println("Finished with status " + status);
+//
+//        if (status != HttpStatus.SC_OK) {
+//            System.out.println("Cannot create project: " + newProjectResponse.getStatusLine().getStatusCode());
+//            return null;
+//        }
+//        System.out.println("...done");
+//
+//        form.clear();
 
-        System.out.println("Creating new project...");
-        status = HttpStatus.SC_NOT_FOUND;
-        HttpResponse newProjectResponse = null;
+        form.add(new BasicNameValuePair("name", tokenName));
+        final HttpPost newTokenRequest = new HttpPost("http://localhost:9000/api/user_tokens/generate");
+        newTokenRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        newTokenRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
+        HttpResponse newTokenResponse = null;
+
         while (status >= 400 && status < 500) {
             try {
-                newProjectResponse = httpClient.execute(newProjectRequest);
-                status = newProjectResponse.getStatusLine().getStatusCode();
+                newTokenResponse = httpClient.execute(newTokenRequest);
+                status = newTokenResponse.getStatusLine().getStatusCode();
                 if (status != HttpStatus.SC_OK) {
                     System.out.println("Still " + status);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Not yet ready");
-            }
-            finally {
-                newProjectRequest.releaseConnection();
+            } finally {
+                newTokenRequest.releaseConnection();
             }
 
             try {
@@ -168,24 +249,6 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
             catch (Exception e) {}
         }
-        System.out.println("Finished with status " + status);
-
-        if (status != HttpStatus.SC_OK) {
-            System.out.println("Cannot create project: " + newProjectResponse.getStatusLine().getStatusCode());
-            return null;
-        }
-        System.out.println("...done");
-
-        form.clear();
-        form.add(new BasicNameValuePair("name", tokenName));
-        final HttpPost newTokenRequest = new HttpPost("http://localhost:9000/api/user_tokens/generate");
-        newTokenRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-        newTokenRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
-
-        HttpResponse newTokenResponse = httpClient.execute(newTokenRequest);
-        status = newTokenResponse.getStatusLine().getStatusCode();
-
-        newTokenRequest.releaseConnection();
 
         System.out.println("Token receiving status: " + status);
         if (status != HttpStatus.SC_OK) {
@@ -197,7 +260,108 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         return new JSONObject(EntityUtils.toString(newTokenResponse.getEntity())).getString("token");
     }
 
-    public void createClientContainer(String confPath, String sourcePath) {
-        //TODO
+    private String createClientContainer(String networkId, String sourcePath, String projectKey, String token) throws IOException {
+
+        File configFile = new File(sourcePath + "sonar-scanner.properties");
+        FileOutputStream configStream = new FileOutputStream(configFile);
+        configStream.write(("sonar.projectBaseDir=/usr/src\n").getBytes(StandardCharsets.UTF_8));
+        configStream.write(("sonar.sources=/usr/src\n").getBytes(StandardCharsets.UTF_8));
+        configStream.flush();
+        configStream.close();
+
+        File projectFile = new File(sourcePath + "sonar-project.properties");
+        FileOutputStream projectStream = new FileOutputStream(projectFile);
+
+        projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.projectName=Demo\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
+//        projectStream.write(("sonar.sources=\"sonarqube-scanner-gradle/gradle-basic\"\n").getBytes(StandardCharsets.UTF_8));
+
+        projectStream.flush();
+        projectStream.close();
+
+        File dockerFile = new File(sourcePath + "Dockerfile");
+        FileOutputStream dockerStream = new FileOutputStream(dockerFile);
+
+//        dockerStream.write("FROM ubuntu AS sonarqube_scan\n".getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("FROM lequal/sonar-scanner AS sonarqube_scan\n".getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("WORKDIR /app\n".getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("COPY . .\n".getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("RUN chmod -R a+w /app\n".getBytes(StandardCharsets.UTF_8));
+////        dockerStream.write("RUN apt-get update && apt-get install -y iputils-ping\n".getBytes(StandardCharsets.UTF_8));
+////        dockerStream.write("CMD ping sonarqube\n".getBytes(StandardCharsets.UTF_8));
+////        dockerStream.write(("CMD sonar-scanner" +
+////                " -Dsonar.host.url=\"http://sonarqube:9000\"" +
+////                " -Dsonar.projectKey=\"" + projectKey + "\"" +
+////                " -Dsonar.sources=\".\"\n").getBytes(StandardCharsets.UTF_8));
+//
+//        dockerStream.write(("CMD cd /app/sonarqube-scanner-gradle/gradle-basic && ./gradlew -Dsonar.host.url=http://sonarqube:9000 sonarqube").getBytes(StandardCharsets.UTF_8));
+
+        dockerStream.write("FROM sonarsource/sonar-scanner-cli AS sonarqube_scan\n".getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("COPY sonar-scanner.properties /opt/sonar-scanner/conf/sonar-scanner.properties\n".getBytes(StandardCharsets.UTF_8));
+        dockerStream.write("ENV SONAR_HOST_URL http://sonarqube:9000\n".getBytes(StandardCharsets.UTF_8));
+        dockerStream.write(("ENV SONAR_TOKEN " + token  + "\n").getBytes(StandardCharsets.UTF_8));
+//        dockerStream.write("CMD ping sonarqube".getBytes(StandardCharsets.UTF_8));
+
+        dockerStream.flush();
+        dockerStream.close();
+
+        String imageId = dockerClient.buildImageCmd(new File(sourcePath)).exec(new BuildImageResultCallback() {
+            @Override
+            public void onNext(BuildResponseItem item) {
+                System.out.println("Item: " + item);
+                super.onNext(item);
+            }
+        }).awaitImageId();
+
+//        Map<String, String> sourceVolumeMap = new HashMap<>();
+//        sourceVolumeMap.put("sonarqube-scanner-gradle/gradle-basic", "/usr/src");
+//        Volume sourceVolume = Volume.parse(sourceVolumeMap);
+        Volume sourceVolume = Volume.parse(".:/usr/src");
+        CreateContainerResponse response = dockerClient.createContainerCmd(imageId)
+                .withName("sonar-scanner")
+                .withHostName("scanner")
+//                .withEnv("SONAR_HOST_URL=http://sonarqube:9000")
+//                .withEnv("SONAR_LOGIN=" + token)
+//                .withVolumes(sourceVolume)
+                .withBinds(new Bind(sourcePath, new Volume("/usr/src")))
+                .exec();
+
+        containerId = response.getId();
+        dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
+        dockerClient.startContainerCmd(containerId).exec();
+
+        Network network = dockerClient.inspectNetworkCmd().withNetworkId(networkId).exec();
+        System.out.println(network.toString());
+
+        return containerId;
+    }
+
+    private String obtainIssuesReport(String projectKey) throws IOException, JSONException {
+        HttpGet issuesRequest = new HttpGet("http://localhost:9000/api/issues/search");
+        issuesRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+
+        int total = 0;
+        int tries = 0;
+        String report = null;
+        while (total == 0 && tries < 10) {
+            System.out.println("Try " + tries);
+            HttpResponse issuesResponse = httpClient.execute(issuesRequest);
+            if (issuesResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+//                System.out.println("Report obtained");
+                report = EntityUtils.toString(issuesResponse.getEntity());
+                total = new JSONObject(report).getInt("total");
+            }
+            if (total == 0) {
+                try {
+                    Thread.sleep(5000);
+                }
+                catch (Exception e) {}
+
+                tries++;
+            }
+            issuesRequest.releaseConnection();
+        }
+        return report;
     }
 }
