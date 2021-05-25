@@ -58,6 +58,10 @@ public class SonarqubeDialog extends JDialog {
         buttonPanel.add(buttonBox, BorderLayout.EAST);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
         getContentPane().add(projectPropertiesPanel, BorderLayout.CENTER);
+
+        //TEMP
+        projectNameField.setText("Demo");
+        projectKeyField.setText("demo");
     }
 
     private void initProjectPropertiesPanel() {

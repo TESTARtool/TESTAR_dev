@@ -7,6 +7,5 @@ import java.io.IOException;
 
 public interface SonarqubeService {
     boolean isAvailable();
-    void createContainer(String projectName, String projectKey, String sonarqubeDirPath)  throws IOException;
-    void createClientContainer(String confPath, String sourcePath);
+    void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir)  throws IOException;
 }

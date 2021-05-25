@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -88,6 +87,7 @@ public class VCSPanel extends SettingsPanel {
     private RepositoryLanguageComposition repositoryComposition;
     private String sonarqubeConfPath;
     private String sonarqubeClientConfPath;
+    private Path repositoryPath;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
@@ -170,6 +170,12 @@ public class VCSPanel extends SettingsPanel {
         cloneProcessingLabel = new JLabel(CLONE_PROCESSING_LABEL);
         cloneProcessingProgressBar = new JProgressBar();
         cloneTaskLabel = new JLabel();
+
+        //TEMP
+//        gitRepositoryUrlTextField.setText("https://github.com/SonarSource/sonar-scanning-examples");
+        gitRepositoryUrlTextField.setText("https://github.com/SeleniumHQ/selenium-ide");
+        authorizationRequiredCheckBox.setSelected(false);
+
         toggleCloneProcessingVisibility(false);
     }
 
@@ -190,8 +196,9 @@ public class VCSPanel extends SettingsPanel {
         toggleCloneProcessingVisibility(true);
         new Thread(() -> {
             GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
+            repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
             scanRepository(repositoryPath);
+            System.out.println("Repository path: " + (repositoryPath == null ? "N/A" : repositoryPath.toString()));
             toggleCloneProcessingVisibility(false);
             viewRepositoryComposition();
             propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, repositoryPath);
@@ -243,7 +250,7 @@ public class VCSPanel extends SettingsPanel {
     private void cloneRepository() {
         toggleCloneProcessingVisibility(true);
         new Thread(() -> {
-            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
+            repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
             scanRepository(repositoryPath);
             toggleCloneProcessingVisibility(false);
             viewRepositoryComposition();
@@ -291,12 +298,18 @@ public class VCSPanel extends SettingsPanel {
         }
         else {
             //TODO
+            String path = repositoryPath.toString();
+            if (!path.substring(path.length() - 1).equals(File.separator)) {
+                path += File.separator;
+            }
+            final String projectSourceDir = path;
+
             final SonarqubeDialog sonarqubeDialog = new SonarqubeDialog(
                     (JFrame) SwingUtilities.getWindowAncestor(this),
                     (projectName, projectKey) -> {
                         new Thread(() -> {
                             try {
-                                sonarqubeService.createContainer(projectName, projectKey, sonarqubeConfPath);
+                                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
                             } catch (IOException e) {
                                 System.out.println("Something went wrong: " + e.getLocalizedMessage());
                             }
