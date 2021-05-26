@@ -161,6 +161,9 @@ public class Protocol_spaghetti_prioritize_new_actions extends SpaghettiProtocol
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+	    // PrioritizeNewActionsSelector: add executed action, next iteration we will prioritize least executed actions
+	    selector.addExecutedAction(action);
+
 		boolean actionExecuted = super.executeAction(system, state, action);
 
 		// Write sequence duration to CLI and to file

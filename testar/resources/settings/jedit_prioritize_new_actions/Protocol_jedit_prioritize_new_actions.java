@@ -240,6 +240,9 @@ public class Protocol_jedit_prioritize_new_actions extends JavaSwingProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+	    // PrioritizeNewActionsSelector: add executed action, next iteration we will prioritize least executed actions
+	    selector.addExecutedAction(action);
+
 		boolean actionExecuted = super.executeAction(system, state, action);
 
 		// Write sequence duration to CLI and to file
