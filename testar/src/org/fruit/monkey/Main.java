@@ -356,7 +356,7 @@ public class Main {
 		URLClassLoader loader = null;
 
 		try {
-			List<String> cp = settings.get(MyClassPath);
+		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
 			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
@@ -633,9 +633,10 @@ public class Main {
 		}
 	}
 
-	//TODO: Understand what this exactly does?
 	/**
-	 * Override something. Not sure what
+	 * This method allow us to define and use settings as JVM arguments. 
+	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
+	 * 
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -662,6 +662,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
+			//reset the faulty variable because we started a new sequence
+			faultySequence = false;
+
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
 			system = startSutIfNotRunning(system);
 
@@ -1009,6 +1012,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			preSequencePreparations();
+			
+			//reset the faulty variable because we started a new execution
+			faultySequence = false;
 
 			system = startSystem();
 			startedRecordMode = true;
@@ -1148,6 +1154,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		preSequencePreparations();
+		
+		//reset the faulty variable because we started a new execution
+		faultySequence = false;
 
 		SUT system = startSystem();
 		try{
@@ -1286,7 +1295,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
 
