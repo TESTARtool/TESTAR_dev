@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -39,9 +40,6 @@ import javax.swing.JFrame;
 
 /**
  * Displays a short-time flash message for feedback.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class FlashFeedback  extends JDialog implements Runnable {
 

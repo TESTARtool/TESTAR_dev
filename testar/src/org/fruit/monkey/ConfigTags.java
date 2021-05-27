@@ -144,6 +144,9 @@ public final class ConfigTags {
   public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class);
   public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
   public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
+  public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class);
+  public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
+  public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
 
   /*
   //TODO web driver settings for login feature

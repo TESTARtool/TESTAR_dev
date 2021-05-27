@@ -36,7 +36,6 @@ import static org.fruit.alayer.Tags.Enabled;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -74,13 +73,13 @@ import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.Reporting;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected Reporting htmlReport;
     protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
@@ -148,7 +147,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+        htmlReport = getReporter();
     }
     
     /**

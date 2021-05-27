@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,10 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.Reporting;
+import nl.ou.testar.HtmlReporting.XMLSequenceReport;
+
 import java.util.Set;
 
 /**
@@ -68,6 +72,17 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected Settings settings;
 	protected Settings settings(){ return settings; }
 
+	protected Reporting getReporter()
+	{
+		switch (settings().get(ConfigTags.ReportingClass))
+		{
+			case "NUNIT 3.0 Reporting": return new XMLSequenceReport(); 
+			case "HTML Reporting": return new HtmlSequenceReport();
+		}
+		// In case not specified
+		return new HtmlSequenceReport();
+	}
+	
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
 	 *
