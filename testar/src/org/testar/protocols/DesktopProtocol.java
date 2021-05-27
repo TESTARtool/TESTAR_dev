@@ -145,8 +145,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         //unwanted processes are killed and SUT is put into foreground.
         Action retAction = preSelectAction(state, actions);
         if (retAction == null) {
-            //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
+            if(actions.size()>0){
+                //if no preSelected actions are needed, then implement your own strategy
+                retAction = RandomActionSelector.selectAction(actions);
+            }else{
+                System.out.println("ERROR: No actions found!");
+                return null;
+            }
         }
         return retAction;
     }
