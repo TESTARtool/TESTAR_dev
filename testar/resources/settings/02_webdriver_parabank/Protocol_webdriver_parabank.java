@@ -94,13 +94,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // Add your login sequence here
 
-    /*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
+/*
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
-    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
-    */
+    waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+*/
 	  
 	/*
 	 * If you have issues typing special characters
@@ -109,7 +109,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 	 * waitLeftClickAndPasteIntoWidgetWithMatchingTag
 	 */
 
-	// waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebName, "username", "john", state, system, 5,1.0);
+	// waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
   }
 
   /**

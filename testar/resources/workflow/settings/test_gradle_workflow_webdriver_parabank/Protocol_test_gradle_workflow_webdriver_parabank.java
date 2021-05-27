@@ -96,8 +96,8 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
 
         // Make a login inside parabank app
         waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName, "username", user, state, system, 5, 1.0);
-        waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName, "password", pass, state, system, 5, 1.0);
-        waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
+        waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "password", pass, state, system, 5, 1.0);
+        waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
 
         Util.pause(5);
 
