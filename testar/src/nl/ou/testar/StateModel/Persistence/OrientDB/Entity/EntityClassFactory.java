@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass.EntityType;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
 
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -22,6 +24,7 @@ public class EntityClassFactory {
 
     static {
         classNameMap = new HashMap<>();
+        classNameMap.put("BeingExecuted", EntityClassName.BeingExecuted);
         classNameMap.put("AbstractState", EntityClassName.AbstractState);
         classNameMap.put("AbstractAction", EntityClassName.AbstractAction);
         classNameMap.put("AbstractStateModel", EntityClassName.AbstractStateModel);
@@ -60,6 +63,8 @@ public class EntityClassFactory {
         }
 
         switch (className) {
+            case BeingExecuted:
+                return createBeingExecutedClass();
             case AbstractState:
                 return createAbstractStateClass();
 
@@ -111,6 +116,19 @@ public class EntityClassFactory {
             default:
                 return null;
         }
+    }
+
+    private static EntityClass createBeingExecutedClass() {
+        EntityClass beingExecuted = new EntityClass("BeingExecuted", EntityClass.EntityType.Vertex);
+        entityClasses.put(EntityClassName.BeingExecuted, beingExecuted);
+        Property nodeId = new Property("node", OType.STRING);
+
+        nodeId.setIdentifier(true);
+        nodeId.setMandatory(true);
+        nodeId.setNullable(false);
+        beingExecuted.addProperty(nodeId);
+        return beingExecuted;
+
     }
 
     private static EntityClass createAbstractStateClass() {
