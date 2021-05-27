@@ -30,6 +30,8 @@
 
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.SutVisualization;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -124,9 +126,15 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
+      // parabank wsdl pages have no widgets, we need to force a webdriver history back action
+      if(WdDriver.getCurrentUrl().contains("wsdl")) {
+          WdDriver.executeScript("window.history.back();");
+          Util.pause(1);
+      }
 
-    return state;
+      State state = super.getState(system);
+
+      return state;
   }
 
   /**
