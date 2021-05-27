@@ -91,6 +91,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
+      super.beginSequence(system, state);
 
     // Add your login sequence here
 
