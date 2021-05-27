@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@
 package org.testar.protocols;
 
 import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.Reporting;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.Environment;
@@ -53,7 +53,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected Reporting htmlReport;
     protected State latestState;
 
     /**
@@ -62,7 +62,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+        htmlReport = getReporter();
     }
     
     /**

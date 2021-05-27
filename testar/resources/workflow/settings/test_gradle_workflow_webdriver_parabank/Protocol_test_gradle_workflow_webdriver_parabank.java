@@ -75,7 +75,7 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         super.initialize(settings);
 
         //WebDriver settings and features verification
-        Assert.collectionContains(domainsAllowed, "parabank.parasoft.com");
+        Assert.collectionContains(domainsAllowed, "para.testar.org");
         Assert.collectionSize(deniedExtensions, 5);
     }
 

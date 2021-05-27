@@ -382,7 +382,7 @@ task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChro
     }
 }
 
-// Connect to parabank.parasoft.com and make a login
+// Connect to para.testar.org and make a login
 task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
