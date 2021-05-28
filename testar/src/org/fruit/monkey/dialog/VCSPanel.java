@@ -8,7 +8,10 @@ import org.fruit.monkey.codeanalysis.CodeAnalysisService;
 import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
 import org.fruit.monkey.codeanalysis.RepositoryLanguage;
 import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
+import org.fruit.monkey.docker.DockerPoolService;
+import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.fruit.monkey.sonarqube.SonarqubeService;
+import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
 import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;
 import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
@@ -82,6 +85,7 @@ public class VCSPanel extends SettingsPanel {
 
     private GitService gitService;
     private CodeAnalysisService codeAnalysisService;
+    private DockerPoolService dockerService;
     private SonarqubeService sonarqubeService;
 
     private RepositoryLanguageComposition repositoryComposition;
@@ -92,7 +96,8 @@ public class VCSPanel extends SettingsPanel {
     public VCSPanel() {
         gitService = new GitServiceImpl();
         codeAnalysisService = new CodeAnalysisServiceImpl();
-        sonarqubeService = new SonarqubeServiceImpl();
+        dockerService = new DockerPoolServiceImpl("sonarqube");
+        sonarqubeService = new SonarqubeServiceImpl(dockerService);
         propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(this::cloneFinished);
         initGitRepositoryUrlSection();
@@ -172,7 +177,6 @@ public class VCSPanel extends SettingsPanel {
         cloneTaskLabel = new JLabel();
 
         //TEMP
-//        gitRepositoryUrlTextField.setText("https://github.com/SonarSource/sonar-scanning-examples");
         gitRepositoryUrlTextField.setText("https://github.com/SeleniumHQ/selenium-ide");
         authorizationRequiredCheckBox.setSelected(false);
 
@@ -279,7 +283,7 @@ public class VCSPanel extends SettingsPanel {
     }
 
     private void processWithSonarqube() {
-        if (!sonarqubeService.isAvailable()) {
+        if (!dockerService.isDockerAvailable()) {
             Object[] options = {BTN_CANCEL, BTN_INSTALL_DOCKER};
             int n = JOptionPane.showOptionDialog(this,
                     DOCKER_UNAVAILABLE_MESSAGE,
@@ -305,16 +309,80 @@ public class VCSPanel extends SettingsPanel {
             final String projectSourceDir = path;
 
             final SonarqubeDialog sonarqubeDialog = new SonarqubeDialog(
-                    (JFrame) SwingUtilities.getWindowAncestor(this),
+                    (JFrame) SwingUtilities.getWindowAncestor(this));/*,
                     (projectName, projectKey) -> {
                         new Thread(() -> {
                             try {
-                                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
+                                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath,
+                                        projectSourceDir, null);
                             } catch (IOException e) {
                                 System.out.println("Something went wrong: " + e.getLocalizedMessage());
                             }
                         }).start();
-                    });
+                    });*.
+            sonarqubeDialog.pack();
+            sonarqubeDialog.setLocationRelativeTo(null);
+            sonarqubeDialog.setVisible(true);*/
+
+            final Thread mainThread = Thread.currentThread();
+            sonarqubeDialog.setDelegate((projectName, projectKey) -> {
+
+                new Thread(() -> {
+                    try {
+                        sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath,
+                                projectSourceDir, new SonarqubeServiceDelegate() {
+
+                                    private boolean isComplete = false;
+
+                                    @Override
+                                    public void onInfoMessage(InfoStatus status, String message) {
+                                        sonarqubeDialog.setStatus(message);
+                                    }
+
+                                    @Override
+                                    public void onError(ErrorCode errorCode, String message) {
+                                        if (isComplete) {
+                                            return;
+                                        }
+                                        isComplete = true;
+
+                                        String errorTitle;
+                                        switch (errorCode) {
+                                            case SERVICE_ERROR:
+                                                errorTitle = "Service Failure";
+                                                break;
+                                            case CONNECTION_ERROR:
+                                                errorTitle = "Connection Failure";
+                                                break;
+                                            case SCANNER_ERROR:
+                                                errorTitle = "Scanner Failure";
+                                                break;
+                                            case ANALYSING_ERROR:
+                                                errorTitle = "Analysis Failure";
+                                                break;
+                                            default: //REPORT_ERROR
+                                                errorTitle = "Report Failure";
+                                                break;
+                                        }
+                                        sonarqubeDialog.showError(errorTitle, message);
+                                    }
+
+                                    @Override
+                                    public void onComplete(String report) {
+                                        if (isComplete) {
+                                            return;
+                                        }
+                                        isComplete = true;
+
+                                        sonarqubeDialog.complete("http://localhost:9000/dashboard?id=" + projectKey, report);
+                                    }
+                                });
+                    } catch (IOException e) {
+                        sonarqubeDialog.showError("Unknown Error", e.getLocalizedMessage());
+                    }
+                }).start();
+            });
+
             sonarqubeDialog.pack();
             sonarqubeDialog.setLocationRelativeTo(null);
             sonarqubeDialog.setVisible(true);
