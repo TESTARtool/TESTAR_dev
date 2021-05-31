@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  public static final String TESTAR_VERSION = "DECODER version - master 2.2.17 (3-May-2021)";
+  public static final String TESTAR_VERSION = "DECODER version - 2.3.2 (27-May-2021)";
 
   private String settingsFile;
   private Settings settings;

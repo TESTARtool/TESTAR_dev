@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,12 @@ public class OutputStructure {
         date = date + "s";
         date = date.substring(0, 16) + "m" + date.substring(17);
         date = date.substring(0, 13) + "h" + date.substring(14);
-        startOuterLoopDateString = date;
+        if (System.getenv("HOSTNAME") != null)
+        {
+            startOuterLoopDateString = System.getenv("HOSTNAME")+"_";
+
+        }
+        startOuterLoopDateString +=  date;
     }
 
     public static void calculateInnerLoopDateString() {

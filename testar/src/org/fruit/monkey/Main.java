@@ -368,13 +368,15 @@ public class Main {
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
 		}
+		
 
 		URLClassLoader loader = null;
 
 		try {
-			List<String> cp = settings.get(MyClassPath);
+		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
+			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
 
@@ -517,6 +519,9 @@ public class Main {
 			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
+			defaults.add(Pair.from(FlashFeedback, true));
+			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
+			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
 
 			defaults.add(Pair.from(HTMLreportServerFile, outputDir));
 			defaults.add(Pair.from(PKMaddress, "127.0.0.1"));
@@ -667,9 +672,10 @@ public class Main {
 		}
 	}
 
-	//TODO: Understand what this exactly does?
 	/**
-	 * Override something. Not sure what
+	 * This method allow us to define and use settings as JVM arguments. 
+	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
+	 * 
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {

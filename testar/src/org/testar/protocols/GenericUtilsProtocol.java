@@ -31,6 +31,7 @@
 package org.testar.protocols;
 
 import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
@@ -70,6 +71,33 @@ import static org.fruit.alayer.Tags.Title;
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
     /**
+     * Allows using the function with a tag name,
+     * so the user does not need to know where in TESTAR package that specific tag is found.
+     *
+     * @param tagName
+     * @param value
+     * @param state
+     * @param system
+     * @param maxNumberOfRetries
+     * @param waitBetween
+     * @return
+     */
+    protected boolean waitAndLeftClickWidgetWithMatchingTag(String tagName, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+            if(!tagName.startsWith("Web")){
+                tagName = "Web"+tagName;
+            }
+        }
+        for(Tag tag:state.tags()){
+            if(tag.name().equalsIgnoreCase(tagName)){
+                return waitAndLeftClickWidgetWithMatchingTag(tag,value,state,system,maxNumberOfRetries,waitBetween);
+            }
+        }
+        System.out.println("Matching widget was not found, "+tagName+"=" + value);
+        return false;
+    }
+
+    /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
      * If a matching widget is found, left mouse button is clicked on it and return value is true.
      * Else returns false
@@ -104,6 +132,35 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         printTagValuesOfWidgets(tag,state);
         return false;
     }
+
+    /**
+     * Allows using the function with a tag name,
+     * so the user does not need to know where in TESTAR package that specific tag is found.
+     *
+     * @param tagName
+     * @param value
+     * @param textToType
+     * @param state
+     * @param system
+     * @param maxNumberOfRetries
+     * @param waitBetween
+     * @return
+     */
+    protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(String tagName, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+            if(!tagName.startsWith("Web")){
+                tagName = "Web"+tagName;
+            }
+        }
+        for(Tag tag:state.tags()){
+            if(tag.name().equalsIgnoreCase(tagName)){
+                return waitLeftClickAndTypeIntoWidgetWithMatchingTag(tag,value,textToType,state,system,maxNumberOfRetries,waitBetween);
+            }
+        }
+        System.out.println("Matching widget was not found, "+tagName+"=" + value);
+        return false;
+    }
+
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -142,6 +199,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
+     *
+     * Allows using the function with a tag name,
+     * so the user does not need to know where in TESTAR package that specific tag is found.
+     *
+     * @param tagName
+     * @param value
+     * @param textToPaste
+     * @param state
+     * @param system
+     * @param maxNumberOfRetries
+     * @param waitBetween
+     * @return
+     */
+    protected boolean waitLeftClickAndPasteIntoWidgetWithMatchingTag(String tagName, String value, String textToPaste, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+            if(!tagName.startsWith("Web")){
+                tagName = "Web"+tagName;
+            }
+        }
+        for(Tag tag:state.tags()){
+            if(tag.name().equalsIgnoreCase(tagName)){
+                return waitLeftClickAndPasteIntoWidgetWithMatchingTag(tag,value,textToPaste,state,system,maxNumberOfRetries,waitBetween);
+            }
+        }
+        System.out.println("Matching widget was not found, "+tagName+"=" + value);
+        return false;
+    }
+
+
+    /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
      * If a matching widget is found, left mouse button is clicked on it, the given text is pasted into it, and return value is true.
      * Else returns false
@@ -178,6 +265,29 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
+     * Allows using the function with a tag name,
+     * so the user does not need to know where in TESTAR package that specific tag is found.
+     *
+     * @param tagName
+     * @param value
+     * @param state
+     * @return
+     */
+    protected Widget getWidgetWithMatchingTag(String tagName, String value, State state){
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+            if(!tagName.startsWith("Web")){
+                tagName = "Web"+tagName;
+            }
+        }
+        for(Tag tag:state.tags()){
+            if(tag.name().equalsIgnoreCase(tagName)){
+                return getWidgetWithMatchingTag(tag, value, state);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Iterates the widgets of the state until a widget with matching tag value is found.
      * The value is case sensitive.
      *
@@ -201,7 +311,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return null;
     }
 
-
     /**
      * Prints to system out all the widgets that have some value in the given tag.
      *
@@ -218,7 +327,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             }
         }
     }
-
 
     /**
      * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
