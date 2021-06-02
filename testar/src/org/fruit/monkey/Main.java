@@ -93,6 +93,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 	//Extras
 	public static String extrasDir = testarDir + "extras" + File.separator;
+	public static String databaseDir = extrasDir + "database" + File.separator;
 	public static String sonarqubeDir = extrasDir + "sonarqube";
 	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
