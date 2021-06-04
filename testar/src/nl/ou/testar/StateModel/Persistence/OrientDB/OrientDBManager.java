@@ -16,6 +16,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
+import nl.ou.testar.StateModel.Persistence.ArendManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
@@ -30,7 +31,7 @@ import java.util.*;
 import static java.lang.System.exit;
 
 
-public class OrientDBManager implements PersistenceManager, StateModelEventListener {
+public class OrientDBManager extends ArendManager implements PersistenceManager, StateModelEventListener {
 
     /**
      * Helper class for dealing with events
@@ -40,13 +41,16 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     /**
      * Manager class that will handle the OrientDB specific communications with the database
      */
-    private EntityManager entityManager;
+    public EntityManager entityManager;
 
     /**
      * Is the manager listening to events?
      */
     private boolean listening = true;
 
+    
+
+    public ODatabaseSession dbSession;
     /**
      * A set of orientdb classes that this class needs to operate
      */
@@ -66,7 +70,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.SequenceNode,
             EntityClassFactory.EntityClassName.SequenceStep,
             EntityClassFactory.EntityClassName.Accessed,
-            EntityClassFactory.EntityClassName.FirstNode
+            EntityClassFactory.EntityClassName.FirstNode,
+            EntityClassFactory.EntityClassName.BeingExecuted
     ));
 
     /**
@@ -74,8 +79,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      * @param eventHelper
      */
     public OrientDBManager(EventHelper eventHelper, EntityManager entityManager) {
+        super(eventHelper, entityManager);
         this.eventHelper = eventHelper;
         this.entityManager = entityManager;
+        dbSession = entityManager.getConnection().getDatabaseSession();
         init();
     }
 
@@ -455,6 +462,17 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityManager.saveEntity(stateModelEntity);
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
+        Map<String, PropertyValue> entityProperties = retrieveAbstractStates(abstractStateModel, stateModelClass, stateModelEntity);
+
+        // step 3: fetch the transitions from the database
+        retrieveAbstractActions(abstractStateModel, entityProperties);
+
+        // enable the event listener again
+        setListening(true);
+    }
+
+    private Map<String, PropertyValue> retrieveAbstractStates(AbstractStateModel abstractStateModel, EntityClass stateModelClass,
+            VertexEntity stateModelEntity) {
         EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
 
@@ -480,8 +498,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 e.printStackTrace();
             }
         }
+        return entityProperties;
+    }
 
-        // step 3: fetch the transitions from the database
+    private void retrieveAbstractActions(AbstractStateModel abstractStateModel, Map<String, PropertyValue> entityProperties) {
+        Set<DocumentEntity> retrievedDocuments;
         EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
         if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
 
@@ -502,9 +523,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 e.printStackTrace();
             }
         }
-
-        // enable the event listener again
-        setListening(true);
     }
 
     public void persistSequence(Sequence sequence) {

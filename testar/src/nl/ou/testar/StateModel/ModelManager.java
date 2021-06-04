@@ -17,19 +17,19 @@ import java.util.*;
 public class ModelManager implements StateModelManager {
 
     // the abstract state model that this class is managing
-    private AbstractStateModel abstractStateModel;
+    public AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    public  AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
     private AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
-    private ActionSelector actionSelector;
+    public ActionSelector actionSelector;
 
     // persistence manager interface for persisting our model entities
-    private PersistenceManager persistenceManager;
+    public PersistenceManager persistenceManager;
 
     // tags containing the attributes that were used in creating the concrete state ID
     private Set<Tag<?>> concreteStateTags;
@@ -225,7 +225,7 @@ public class ModelManager implements StateModelManager {
         }
         try {
             String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
-            System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
+            System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);            
             for(Action action : actions) {
             	try {
                 if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
