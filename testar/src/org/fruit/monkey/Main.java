@@ -476,7 +476,7 @@ public class Main {
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));
 			defaults.add(Pair.from(DataStoreServer, ""));
-			defaults.add(Pair.from(DataStoreDirectory, ""));
+			defaults.add(Pair.from(DataStoreDirectory, Main.databaseDir + "data"));
 			defaults.add(Pair.from(DataStoreDB, ""));
 			defaults.add(Pair.from(DataStoreUser, ""));
 			defaults.add(Pair.from(DataStorePassword, ""));
