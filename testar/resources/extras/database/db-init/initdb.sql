@@ -2,9 +2,10 @@ USE testar;
 
 DROP TABLE IF EXISTS `reports`;
 CREATE TABLE `reports` (
-    `id` int NOT NULL AUTO INCREMENT,
+    `id` int NOT NULL AUTO_INCREMENT,
     `tag` varchar(255),
-    `time` datetime NOT NULL
+    `time` datetime NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 DROP TABLE IF EXISTS `iterations`;
