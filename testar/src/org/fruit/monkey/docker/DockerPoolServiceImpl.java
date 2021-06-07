@@ -31,9 +31,9 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private Set<String> imageIds;
     private String networkId;
 
-    public DockerPoolServiceImpl(String serviceId) {
-
-        this.serviceId = serviceId;
+    public DockerPoolServiceImpl() {
+        containerIds = new HashSet<>();
+        imageIds = new HashSet<>();
 
         final DockerClientConfig dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
         dockerHttpClient = new ApacheDockerHttpClient.Builder()
@@ -42,12 +42,13 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 .maxConnections(100)
                 .build();
         dockerClient = DockerClientImpl.getInstance(dockerConfig, dockerHttpClient);
+    }
+
+    public void start(String serviceId) {
+        this.serviceId = serviceId;
 
         CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName("testar_" + serviceId).withDriver("bridge").withAttachable(true).exec();
         networkId = networkResponse.getId();
-
-        containerIds = new HashSet<>();
-        imageIds = new HashSet<>();
     }
 
     public boolean isDockerAvailable() {
@@ -119,13 +120,21 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 }
                 final String imageId = container.getImageId();
                 dockerClient.removeContainerCmd(containerId).withForce(true).withRemoveVolumes(true).exec();
+                dockerClient.removeImageCmd(imageId);
             }
         }
+        containerIds.clear();
         if (alsoRemoveImages) {
             for (String imageId: imageIds) {
                 dockerClient.removeImageCmd(imageId).withForce(true).exec();
             }
+            imageIds.clear();
         }
         dockerClient.removeNetworkCmd(networkId).exec();
+        networkId = null;
+        try {
+            dockerClient.close();
+        }
+        catch (Exception e) {}
     }
 }

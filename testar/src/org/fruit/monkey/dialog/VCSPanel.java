@@ -96,8 +96,8 @@ public class VCSPanel extends SettingsPanel {
     public VCSPanel() {
         gitService = new GitServiceImpl();
         codeAnalysisService = new CodeAnalysisServiceImpl();
-        dockerService = new DockerPoolServiceImpl("sonarqube");
-        sonarqubeService = new SonarqubeServiceImpl(dockerService);
+        sonarqubeService = new SonarqubeServiceImpl("sonarqube");
+        dockerService = sonarqubeService.getDockerService();
         propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(this::cloneFinished);
         initGitRepositoryUrlSection();
