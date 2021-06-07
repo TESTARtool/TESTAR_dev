@@ -4,8 +4,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Verdict;
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
@@ -14,41 +13,62 @@ import org.fruit.monkey.docker.DockerPoolServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.sql.*;
-import java.util.Date;
 
 public class MySqlServiceImpl implements MySqlService {
 
     private static final String LOCAL_DATABASE_PATH = "bin" + File.separator + "db";
     private static final String LOCAL_DATABASE_INIT_PATH = "db-init";
-    private static final String LAST_ID_QUERY = "SELECT LAST_INSERT_ID";
+    private static final String LAST_ID_QUERY = "SELECT LAST_INSERT_ID()";
 
     private DockerPoolService dockerPoolService;
     private Settings settings;
-    private String jdbcURL;
     private Connection connection;
     private PreparedStatement lastIdStatement;
 
     public MySqlServiceImpl(Settings settings) {
         this.settings = settings;
+        dockerPoolService = new DockerPoolServiceImpl();
     }
 
     public void startLocalDatabase() throws IOException, ClassNotFoundException, SQLException {
-        dockerPoolService = new DockerPoolServiceImpl("mysql");
+        dockerPoolService.start("mysql");
         final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir), null);
-        final String databaseInitPath = Main.extrasDir + File.separator + LOCAL_DATABASE_INIT_PATH;
+        final File databaseDir = new File(settings.get(ConfigTags.DataStoreDirectory));
+        if (databaseDir.isDirectory()) {
+            System.out.println("Directory exists: " + databaseDir.getAbsolutePath());
+        }
+        else {
+            System.out.println("Directory does not exist: " + databaseDir.getAbsolutePath());
+        }
+        final File databaseInitDir = new File(Main.databaseDir + File.separator + LOCAL_DATABASE_INIT_PATH);
+        if (databaseInitDir.isDirectory()) {
+            System.out.println("Directory exists: " + databaseInitDir.getAbsolutePath());
+        }
+        else {
+            System.out.println("Directory does not exist: " + databaseInitDir.getAbsolutePath());
+        }
+//        final String databaseInitPath = Main.extrasDir + File.separator + LOCAL_DATABASE_INIT_PATH;
         final HostConfig hostConfig = HostConfig.newHostConfig()
                 .withPortBindings(PortBinding.parse("13306:3306"))
                 .withBinds(
-                        new Bind(settings.get(ConfigTags.DataStoreDirectory), new Volume("/var/lib/mysql")),
-                        new Bind(databaseInitPath, new Volume("/docker-entrypoint-initdb.d"))
+                        new Bind(databaseDir.getAbsolutePath(), new Volume("/var/lib/mysql")),
+                        new Bind(databaseInitDir.getAbsolutePath(), new Volume("/docker-entrypoint-initdb.d"))
                 );
         dockerPoolService.startWithImage(imageId, "mysql", hostConfig);
-
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:13306/testar?user=testar&password=testar");
+        while (connection == null) {
+            try {
+                connection = DriverManager.getConnection("jdbc:mysql://localhost:13306/testar?user=testar&password=testar");
+            }
+            catch (CommunicationsException e) {
+                System.out.println("Still not ready");
+                try {
+                    Thread.sleep(2000);
+                }
+                catch (Exception ex) {}
+            }
+        }
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
     }
 
@@ -64,6 +84,7 @@ public class MySqlServiceImpl implements MySqlService {
         addReportStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
         return resultSet.getInt(1);
     }
 
@@ -73,6 +94,7 @@ public class MySqlServiceImpl implements MySqlService {
         addSequenceStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
         return resultSet.getInt(1);
     }
 
@@ -84,8 +106,10 @@ public class MySqlServiceImpl implements MySqlService {
         addActionStatement.setString(4, status);
         addActionStatement.setString(5, screenshot);
         addActionStatement.setTimestamp(6, startTime);
+        addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
         return resultSet.getInt(1);
     }
 

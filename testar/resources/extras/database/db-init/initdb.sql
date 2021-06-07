@@ -20,7 +20,7 @@ CREATE TABLE `iterations` (
 
 DROP TABLE IF EXISTS `actions`;
 CREATE TABLE `actions` (
-    `id` int NOT NULL,
+    `id` int NOT NULL AUTO_INCREMENT,
     `iteration_id` int NOT NULL,
     `description` varchar(255),
     `name` varchar(255),
