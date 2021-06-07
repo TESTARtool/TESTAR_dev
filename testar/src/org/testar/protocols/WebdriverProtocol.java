@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,6 +72,8 @@ import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.mysql.MySqlService;
+import org.fruit.monkey.mysql.MySqlServiceImpl;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -99,6 +103,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Pair<String, String> username = Pair.from("username", "");
 	protected Pair<String, String> password = Pair.from("password", "");
 
+	private MySqlService sqlService;
+	private int reportId = -1;
+	private int iterationId = -1;
+
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
 	@SuppressWarnings("serial")
@@ -118,6 +126,17 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings){
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
+
+		sqlService = new MySqlServiceImpl(settings);
+
+		try {
+			sqlService.startLocalDatabase();
+			reportId = sqlService.registerReport("TestReport");
+		}
+		catch (Exception e) {
+			System.err.println("Cannot initialize a database");
+			e.printStackTrace();
+		}
 
 		// Initialize HTML Report (Dashboard)
 		this.htmlTestReport = new HtmlTestReport();
@@ -163,6 +182,15 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void preSequencePreparations() {
+
+		try {
+			iterationId = sqlService.registerIteration(reportId);
+		}
+		catch (Exception e) {
+			System.err.println("Cannot register an iteration");
+			e.printStackTrace();
+		}
+
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
@@ -208,6 +236,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// See remarks in WdMouse
         mouse = sut.get(Tags.StandardMouse);
         mouse.setCursorDisplayScale(displayScale);
+
+        // Start database service
+		// TODO: take from settings
 
     	return sut;
     }
@@ -334,6 +365,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected Action preSelectAction(State state, Set<Action> actions){
+
+    	for (Action action: actions) {
+    		//registerAction(int iterationId, String name, String description, String status, String screenshot, Timestamp startTime)
+			try {
+				exportAction(action);
+			}
+			catch (Exception e) {
+				System.out.println("Cannot export an action");
+				e.printStackTrace();
+			}
+		}
+
         // adding available actions into the HTML report:
         htmlReport.addActions(actions);
         htmlTestReport.addActions(actions);
@@ -360,6 +403,15 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void postSequenceProcessing() {
+
+    	try {
+			sqlService.storeVerdict(iterationId, processVerdict.info(), processVerdict.severity());
+		}
+    	catch (Exception e) {
+    		System.err.println("Cannot store a verdict");
+    		e.printStackTrace();
+		}
+
     	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
     	htmlTestReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
 
@@ -411,7 +463,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
             } catch (Exception e) {System.out.println(e.getMessage());}
         }
 
-        super.stopSystem(system);
+		System.out.println("Done exporting");
+		sqlService.stopLocalDatabase();
+
+		super.stopSystem(system);
     }
     
     @Override
@@ -662,5 +717,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	/*
+	 * Export action to the database
+	 */
+	private void exportAction(Action action) throws SQLException {
+		sqlService.registerAction(iterationId, action.toShortString(), action.toString(),
+				latestState.get(Tags.OracleVerdict).verdictSeverityTitle(), latestState.get(Tags.ScreenshotPath),
+				new Timestamp(latestState.get(Tags.TimeStamp)));
 	}
 }

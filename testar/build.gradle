@@ -85,6 +85,7 @@ dependencies {
     compile files('./lib/gson-2.8.5.jar')
     compile jnativehook
     compile 'com.google.guava:guava:26.0-jre'
+    compile 'mysql:mysql-connector-java:5.1.+'
     compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
