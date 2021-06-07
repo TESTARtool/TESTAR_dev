@@ -25,18 +25,26 @@ import java.util.List;
 
 public class SonarqubeServiceImpl implements SonarqubeService {
 
+    private final String serviceId;
     private HttpClient httpClient ;
     private DockerPoolService dockerPoolService;
 
     private final static String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
-    public SonarqubeServiceImpl(DockerPoolService dockerPoolService) {
-        this.dockerPoolService = dockerPoolService;
+    public SonarqubeServiceImpl(String serviceId) {
+        this.serviceId = serviceId;
+        this.dockerPoolService = new DockerPoolServiceImpl();
         httpClient = HttpClientBuilder.create().build();
+    }
+
+    public DockerPoolService getDockerService() {
+        return dockerPoolService;
     }
 
     @Override
     public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir, SonarqubeServiceDelegate delegate) {
+        System.out.println("Analysing a project " + projectName);
+        dockerPoolService.start(serviceId);
         boolean awaitingReport = false;
         try {
             // 1. Create and start a service

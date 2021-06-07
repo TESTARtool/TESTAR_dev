@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public interface DockerPoolService {
     boolean isDockerAvailable();
+    void start(String serviceId);
     DockerClient getClient();
     String buildImage(File destination, String dockerFileContent) throws IOException;
     String startWithImage(String imageId, String name, HostConfig hostConfig);
