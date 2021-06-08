@@ -1,7 +1,0 @@
-FROM mysql:latest
-
-ENV MYSQL_ROOT_PASSWORD=testar
-ENV MYSQL_DATABASE=testar
-ENV MYSQL_USER=testar
-ENV MYSQL_PASSWORD=testar
-

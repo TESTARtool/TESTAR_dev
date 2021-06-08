@@ -107,6 +107,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	private int reportId = -1;
 	private int iterationId = -1;
 
+	private boolean isLocalDatabaseActive = false;
+
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
 	@SuppressWarnings("serial")
@@ -127,15 +129,25 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
-		sqlService = new MySqlServiceImpl(settings);
-
-		try {
-			sqlService.startLocalDatabase();
-			reportId = sqlService.registerReport("TestReport");
-		}
-		catch (Exception e) {
-			System.err.println("Cannot initialize a database");
-			e.printStackTrace();
+		if (settings.get(ConfigTags.StateModelEnabled)) {
+			sqlService = new MySqlServiceImpl(settings);
+			final String databaseName = settings.get(ConfigTags.DataStoreDB);
+			final String userName = settings.get(ConfigTags.DataStoreUser);
+			final String userPassword = settings.get(ConfigTags.DataStorePassword);
+			try {
+				if (settings.get(ConfigTags.DataStoreType).equals("plocal")) {
+					sqlService.startLocalDatabase(databaseName, userName, userPassword);
+					isLocalDatabaseActive = true;
+				}
+				else {
+					sqlService.connectExternalDatabase(settings.get(ConfigTags.DataStoreServer),
+							databaseName, userName, userPassword);
+				}
+				reportId = sqlService.registerReport(settings.get(ConfigTags.DataStore));
+			} catch (Exception e) {
+				System.err.println("Cannot initialize a database");
+				e.printStackTrace();
+			}
 		}
 
 		// Initialize HTML Report (Dashboard)
@@ -183,12 +195,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
 
-		try {
-			iterationId = sqlService.registerIteration(reportId);
-		}
-		catch (Exception e) {
-			System.err.println("Cannot register an iteration");
-			e.printStackTrace();
+    	if (sqlService != null) {
+			try {
+				iterationId = sqlService.registerIteration(reportId);
+			} catch (Exception e) {
+				System.err.println("Cannot register an iteration");
+				e.printStackTrace();
+			}
 		}
 
         //initializing the HTML sequence report:
@@ -404,12 +417,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
 
-    	try {
-			sqlService.storeVerdict(iterationId, processVerdict.info(), processVerdict.severity());
-		}
-    	catch (Exception e) {
-    		System.err.println("Cannot store a verdict");
-    		e.printStackTrace();
+    	if (sqlService != null) {
+			try {
+				sqlService.storeVerdict(iterationId, processVerdict.info(), processVerdict.severity());
+			} catch (Exception e) {
+				System.err.println("Cannot store a verdict");
+				e.printStackTrace();
+			}
 		}
 
     	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
@@ -464,7 +478,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         }
 
 		System.out.println("Done exporting");
-		sqlService.stopLocalDatabase();
+
+        if (isLocalDatabaseActive) {
+			sqlService.stopLocalDatabase();
+		}
 
 		super.stopSystem(system);
     }

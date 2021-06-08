@@ -31,9 +31,14 @@ public class MySqlServiceImpl implements MySqlService {
         dockerPoolService = new DockerPoolServiceImpl();
     }
 
-    public void startLocalDatabase() throws IOException, ClassNotFoundException, SQLException {
+    public void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
         dockerPoolService.start("mysql");
-        final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir), null);
+        final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir),
+                "FROM mysql:latest\n" +
+                "ENV MYSQL_ROOT_PASSWORD=" + userPassword + "\n" +
+                "ENV MYSQL_DATABASE=" + databaseName + "\n" +
+                "ENV MYSQL_USER=" + userName + "\n" +
+                "ENV MYSQL_PASSWORD=" + userPassword);
         final File databaseDir = new File(settings.get(ConfigTags.DataStoreDirectory));
         if (databaseDir.isDirectory()) {
             System.out.println("Directory exists: " + databaseDir.getAbsolutePath());
@@ -59,7 +64,8 @@ public class MySqlServiceImpl implements MySqlService {
         Class.forName("com.mysql.jdbc.Driver");
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:mysql://localhost:13306/testar?user=testar&password=testar");
+                connection = DriverManager.getConnection("jdbc:mysql://localhost:13306/" + databaseName +
+                        "?user=" + userName + "&password=" + userPassword);
             }
             catch (CommunicationsException e) {
                 System.out.println("Still not ready");
@@ -72,9 +78,10 @@ public class MySqlServiceImpl implements MySqlService {
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
     }
 
-    public void connectExternalDatabase(String databaseURL) throws ClassNotFoundException, SQLException {
+    public void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection(databaseURL);
+        connection = DriverManager.getConnection("jdbc:mysql://" + hostname + "/" + databaseName +
+                "?user=" + userName + "&password=" + userPassword);
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
     }
 
