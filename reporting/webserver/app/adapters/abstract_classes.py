@@ -49,6 +49,10 @@ class AbstractSequence(ABC):
     def get_verdicts(self) -> List[AbstractVerdict]:
         pass
 
+    @abstractmethod
+    def get_id(self) -> int:
+        pass
+
     def action_count(self) -> int:
         return len(self.get_actions())
 
@@ -61,6 +65,10 @@ class AbstractSequence(ABC):
 class AbstractReport(ABC):
     @abstractmethod
     def get_sequences(self) -> List[AbstractSequence]:
+        pass
+
+    @abstractclassmethod
+    def get_id(self) -> int:
         pass
 
     @abstractmethod
