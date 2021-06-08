@@ -1,0 +1,297 @@
+/* Import Ubuntu font */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+/**************************************/
+/*    Global parameters and values
+/**************************************/
+
+* {
+    /********************/
+    /*      Colours
+    /********************/
+    --background: #EEE;
+
+    --card-background: #FFF;
+    --card-shadow: #CCCA;
+
+    --link-colour: #400;
+    --link-colour-visited: #600;
+    --link-colour-active: #800;
+    --link-colour-hover: #860;
+
+    /********************/
+    /* Iteration overview
+    /********************/
+    --overview-background: #F8F8F8;
+    --overview-background-header: #DADADA;
+    --overview-border: #E0E0E0;
+
+    --overview-detail-background: #EAEAEA;
+    --overview-detail-background-hover: #D0D0D0;
+    --overview-detail-background-active: #C0C0C0;
+
+    /********************/
+    /*      Wrapper
+    /********************/
+    --max-wrapper-width: 1280px;
+
+    /********************/
+    /*      Cards
+    /********************/
+    --card-template: "x x";
+
+    --min-card-width: 100px;
+    --min-card-height: calc(var(--min-card-width) / 2);
+
+    /********************/
+    /*      Charts
+    /********************/
+    --chart-margin-top: 10px;
+
+    --chart-height: 300px;
+
+    /********************/
+    /*      Lists
+    /********************/
+    --list-item-spacing: 5px;
+}
+
+/**************************************/
+/*          Default values
+/**************************************/
+
+* {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+a:link {
+    color: var(--link-colour);
+}
+
+a:visited {
+    color: var(--link-colour-visited);
+}
+
+a:active {
+    color: var(--link-colour-active);
+}
+
+a:hover {
+    color: var(--link-colour-hover);
+}
+
+body {
+    background: var(--background);
+
+    margin: 0;
+    padding: 0;
+}
+
+/**************************************/
+/*            Test Values
+/**************************************/
+
+span.test-value {
+    background: #F44; /* Highlight incomplete sections */
+}
+
+/**************************************/
+/*          Result sections
+/**************************************/
+
+section#results {
+    display: grid;
+    grid-template: var(--card-template);
+
+    margin: auto;
+
+    max-width: var(--max-wrapper-width);
+}
+
+section#results section.result {
+    margin: 10px auto;
+    padding: 10px;
+
+    min-width: var(--min-card-width);
+    min-height: var(--min-card-height);
+
+    width: 90%;
+    height: fit-content;
+
+    border-radius: 10px;
+
+    box-shadow: 2px 2px 1px 1px var(--card-shadow);
+
+    background: var(--card-background);
+}
+
+section#results section.result div.data-points {
+    padding: 10px;
+}
+
+section#results section.result div.data-points ul {
+    margin: 0;
+    padding: 5px;
+
+    list-style-type: square;
+}
+
+section#results section.result div.data-points ul li:not(:first-child) {
+    margin-top: var(--list-item-spacing);
+}
+
+section#results section.result div.data-points ul li p {
+    margin: 0;
+}
+
+section#results section.result h2 {
+    margin: 0;
+
+    font-weight: 500;
+}
+
+section#results section.iterations {
+    grid-column-start: 1;
+    grid-column-end: 3;
+
+    width: 95%;
+}
+
+/**************************************/
+/*              Charts
+/**************************************/
+
+canvas.chart {
+    margin-top: var(--chart-margin-top);
+
+    height: var(--chart-height);
+    max-height: var(--chart-height);
+}
+
+/**************************************/
+/*         Iteration Overview
+/**************************************/
+
+table.iteration-overview {
+    margin-top: 1em;
+
+    width: 100%;
+
+    background: var(--overview-background);
+
+    border-collapse: collapse;
+}
+
+table.iteration-overview tr th {
+    background: var(--overview-background-header);
+}
+
+table.iteration-overview tr.value:not(.arrows) td:not(:first-child) {
+    border-left: 1px solid var(--overview-border);
+}
+
+table.iteration-overview tr.value td {
+    text-align: center;
+
+    border-top: 1px solid var(--overview-border);
+}
+
+@keyframes overview-details-hover-effect {
+    from {
+        background: var(--overview-detail-background);
+    }
+
+    to {
+        background: var(--overview-detail-background-hover);
+    }
+}
+
+table.iteration-overview tr.value td button.show-details {
+    margin: 5px;
+    padding: 2px;
+
+    width: 80%;
+    height: 100%;
+
+    border: none;
+
+    background: var(--overview-detail-background);
+
+    transition: ease-in-out 0.5s;
+}
+
+table.iteration-overview tr.value td button.show-details:hover {
+    background: var(--overview-detail-background-hover);
+}
+
+table.iteration-overview tr.value td button.show-details:active {
+    background: var(--overview-detail-background-active);
+    transition-duration: 0.25s;
+}
+
+table.iteration-overview tr.value td button.show-details.arrow {
+    width: 50px;
+    border-radius: 5px;
+}
+
+/**************************************/
+/*         Sequence Overview
+/**************************************/
+
+table#sequenceOverviewTable {
+    margin-top: 1em;
+    margin-bottom: 10em;
+
+    width: 100%;
+
+    background: var(--overview-background);
+
+    border-collapse: collapse;
+}
+
+table#sequenceOverviewTable tr th {
+    height: 3em;
+    max-height: 3em;
+
+    background: var(--overview-background-header);
+}
+
+table#sequenceOverviewTable tr td:not(:first-child) {
+    border-left: 1px solid var(--overview-border);
+}
+
+table#sequenceOverviewTable tr td {
+    text-align: center;
+
+    height: 150px;
+    max-height: 3em;
+    text-overflow: fade;
+
+    border-collapse: collapse;
+    border-top: 1px solid var(--overview-border);
+}
+
+table#sequenceOverviewTable tr td img {
+    max-height: 10vh;
+    max-width: 10vw;
+
+    transition: all 0.75s ease-in-out 0.5s;
+}
+
+table#sequenceOverviewTable tr td img:hover {
+    max-height: 70vh;
+    max-width: 70vw;
+
+    transition: all 0.75s ease-in-out 0s;
+}
+
+table#sequenceOverviewTable tr td:first-child {
+    transition: all 1s ease-in-out 0.5s;
+    width: 25vw;
+}
+
+table#sequenceOverviewTable tr td:first-child:hover {
+    width: 50vw;
+    max-width: 50vw;
+    transition: all 0.5s ease-in-out 0s;
+}

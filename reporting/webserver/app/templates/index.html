@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sequence report sequenceid</title>
+    <link
+      href="{{ url_for('static', filename='css/report.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th id="report-id">Id</th>
+          <th id="report-url">Url</th>
+          <th id="report-sequences">Sequence count</th>
+          <th id="report-oracles">Oracles</th>
+          <th id="report-details">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          <td>{{ report.get_id() }}</td>
+          <td><a href="{{ report.get_url() }}" target="_blank" rel="noopener noreferrer">{{ report.get_url() }}</a></td>
+          <td>{{ report.sequence_count() }}</td>
+          <td>{{ report.get_oracle_sequences_count() }}</td>
+          <td>
+            <button
+              class="show-details"
+              onclick="location.href='/reports/{{report.get_id()}}/'"
+            >
+              Details
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
