@@ -108,7 +108,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
 
-	protected Reporting htmlReport;
+	protected Reporting htmlReporting;
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}
