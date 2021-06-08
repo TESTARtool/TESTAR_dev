@@ -62,7 +62,7 @@
             {% with sequences = report.get_sequences() %}
                 {% for i in range(report.sequence_count()) %}
                     //issueIndices[{{ i }}] = {{ sequences[i].verdict_count() }};
-                    issueValues.push({{ sequences[i].verdict_count() }})
+                    issueValues.push("{{ sequences[i].verdict_count() }}")
                 {% endfor %}
             {% endwith %}
             
@@ -93,6 +93,10 @@
                 <td>{{ sequence.get_id() }}</td>
                 <td>{{ sequence.verdict_count() }}</td>
                 <td>{{ sequence.has_verdicts() }}</td>  
+                <td><button class="show-details" onclick="location.href='/sequence/{{report.get_id()}}/{{ sequence.get_id() }}'"
+            >
+              Details
+            </button>
             </tr>
             {% endfor %}
             </tbody>
