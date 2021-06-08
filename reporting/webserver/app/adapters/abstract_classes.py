@@ -1,10 +1,8 @@
 from abc import ABC, abstractclassmethod, abstractmethod
+from datetime import datetime
 from typing import List
-from enum import Enum
+# TODO: Data model is probably going to look different
 
-class VerdictLevel(Enum):
-    OK = 0
-    SUSPICIOUS_TITLE = 1  
 
 class AbstractVerdict(ABC):
     @abstractmethod
@@ -18,6 +16,7 @@ class AbstractVerdict(ABC):
     @abstractmethod
     def get_severity(self) -> float:
         pass
+
 
 class AbstractAction(ABC):
     @abstractmethod
@@ -33,12 +32,13 @@ class AbstractAction(ABC):
         pass
 
     @abstractmethod
-    def get_start(self) -> str:
+    def get_started(self) -> datetime:
         pass
 
     @abstractmethod
     def get_id(self) -> int:
         pass
+
 
 class AbstractSequence(ABC):
     @abstractmethod
@@ -62,6 +62,7 @@ class AbstractSequence(ABC):
     def has_verdicts(self) -> bool:
         return bool(self.verdict_count())
 
+
 class AbstractReport(ABC):
     @abstractmethod
     def get_sequences(self) -> List[AbstractSequence]:
@@ -77,6 +78,10 @@ class AbstractReport(ABC):
 
     @abstractmethod
     def get_actions_per_sequence(self) -> int:
+        pass
+
+    @abstractmethod
+    def get_sequence_by_id(self, id: int) -> AbstractSequence:
         pass
 
     @abstractclassmethod
@@ -110,6 +115,4 @@ class AbstractReport(ABC):
         return output
 
     def get_oracle_sequences_count(self) -> int:
-        return self.sequence_count() - self.get_ok_sequence_count() 
-
-        
+        return self.sequence_count() - self.get_ok_sequence_count()
