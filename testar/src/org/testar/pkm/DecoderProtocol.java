@@ -367,7 +367,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         JsonArtefactLogs.addMessage("Preparing TestResult OutputResults folder with ArtefactId");
         
         try {
-            File artefactOutputFolder = new File(Main.outputDir + artefactIdTestResults + File.separator + "output" + File.separator);
+            File artefactOutputFolder = new File(Main.outputDir + File.separator + artefactIdTestResults + File.separator + "output" + File.separator);
             File outputRunFile = new File(OutputStructure.outerLoopOutputDir);
             FileUtils.moveDirectory(outputRunFile, artefactOutputFolder);
         } catch (IOException e) {
@@ -380,7 +380,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         try {
             String jettyPath = "JettyServer" + File.separator + "bin" + File.separator + "resources" + File.separator;
             if(new File(Main.testarDir + jettyPath).exists()) {
-                FileUtils.copyDirectory(new File(Main.outputDir + artefactIdTestResults), new File(Main.testarDir + jettyPath + File.separator + artefactIdTestResults + File.separator));
+                FileUtils.copyDirectory(new File(Main.outputDir + File.separator + artefactIdTestResults), new File(Main.testarDir + jettyPath + File.separator + artefactIdTestResults + File.separator));
             }
         } catch(Exception e) {
             System.out.println("ERROR preparing JettyServer resources folder");
