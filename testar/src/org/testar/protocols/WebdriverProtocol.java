@@ -72,14 +72,11 @@ import org.fruit.monkey.Settings;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.Reporting;
 
 public class WebdriverProtocol extends DecoderProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected Reporting htmlReport;
-    protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
@@ -138,15 +135,6 @@ public class WebdriverProtocol extends DecoderProtocol {
         //Force webdriver to switch to a new tab if opened
         //This feature can block the correct display of select dropdown elements 
         WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
-    }
-
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
     }
 
     /**

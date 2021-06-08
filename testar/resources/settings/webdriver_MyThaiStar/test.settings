@@ -164,7 +164,7 @@ SwitchNewTabs = true
 #################################################################
 
 OverrideWebDriverDisplayScale = 
-OverrideWebDriverScreenshotDisplay = 1.5
+OverrideWebDriverScreenshotDisplay = 1
 
 #################################################################
 # Other more advanced settings
@@ -187,7 +187,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
+ShowSettingsAfterTest = false
 TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
 DrawWidgetInfo = false
@@ -195,8 +195,9 @@ TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
+FlashFeedback = false

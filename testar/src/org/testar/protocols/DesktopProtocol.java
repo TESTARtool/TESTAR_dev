@@ -32,7 +32,6 @@
 package org.testar.protocols;
 
 import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.Reporting;
 import nl.ou.testar.RandomActionSelector;
 
 import org.fruit.Drag;
@@ -55,18 +54,6 @@ public class DesktopProtocol extends DecoderProtocol {
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
 
-    protected Reporting htmlReport;
-    protected State latestState;
-
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-    }
-    
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
      * This can be used for example for bypassing a login screen by filling the username and password
