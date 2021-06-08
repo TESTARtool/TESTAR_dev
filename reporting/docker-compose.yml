@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  app:
+    build: 
+      context: ./webserver
+    ports:
+      - "8080:80"
+    volumes:
+      - ./webserver:/app
+    environment:
+      FLASK_DEBUG: 1
+      ADAPTER: RANDOM
