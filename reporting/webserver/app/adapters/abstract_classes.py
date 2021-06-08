@@ -49,6 +49,15 @@ class AbstractSequence(ABC):
     def get_verdicts(self) -> List[AbstractVerdict]:
         pass
 
+    def action_count(self) -> int:
+        return len(self.get_actions())
+
+    def verdict_count(self) -> int:
+        return len(self.get_verdicts())
+
+    def has_verdicts(self) -> bool:
+        return bool(self.verdict_count())
+
 class AbstractReport(ABC):
     @abstractmethod
     def get_sequences(self) -> List[AbstractSequence]:
@@ -71,6 +80,28 @@ class AbstractReport(ABC):
         pass
 
     def verdict_count(self) -> int:
-        oracles = 0
+        verdict = 0
         for sequence in self.get_sequences():
-            oracles += len(sequence.get_verdicts())
+            verdict += sequence.verdict_count()
+        return verdict
+
+    def sequence_count(self) -> int:
+        return len(self.get_sequences())
+
+    def total_actions(self) -> int:
+        action_count = 0
+        for sequence in self.get_sequences():
+            action_count += sequence.action_count()
+        return action_count
+
+    def get_ok_sequence_count(self) -> int:
+        output = 0
+        for sequence in self.get_sequences():
+            if not sequence.has_verdicts():
+                output += 1
+        return output
+
+    def get_oracle_sequences_count(self) -> int:
+        return self.sequence_count() - self.get_ok_sequence_count() 
+
+        
