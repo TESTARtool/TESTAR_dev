@@ -138,7 +138,7 @@ public class HttpWebServer {
         try {
 
             String artefactId = settings.get(ConfigTags.HTMLreportServerFile);
-            File testarDirectory = new File(Main.testarDir);
+            File testarDirectory = new File(Main.outputDir);
             // Find Directory with ArtefactId name
             for(String foldersName : testarDirectory.list()) {
                 if(foldersName.contains(artefactId)) {
