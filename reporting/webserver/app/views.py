@@ -4,6 +4,8 @@ from flask import render_template
 
 if os.environ.get('ADAPTER') == 'RANDOM':
     from .adapters.random_classes import *
+elif os.environ.get('ADAPTER') == 'MYSQL':
+      from .adapters.mysql_classes import *
 else:
     raise Exception('No adapter set')
 
