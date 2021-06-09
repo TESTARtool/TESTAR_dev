@@ -13,7 +13,7 @@ def index():
     return render_template('index.html', reports=Report.get_reports())
 
 
-@app.route('/reports/<int:id>/')
+@app.route('/report/<int:id>/')
 def report_page(id):
     report = Report.get_report_by_id(id)
     return render_template('report.html', report=report)
