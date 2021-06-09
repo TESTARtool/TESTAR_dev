@@ -6,30 +6,30 @@
       rel="stylesheet"
     />
   </head>
-  <table id="sequenceOverviewTable">
   <body>
-    <thead>
-      <tr>
-        <th id="action-desc">Description</th>
-        <th id="action-name">Name</th>
-        <th id="action-id">Action ID</th>
-        <th id="action-status">Status</th>
-        <th id="action-screenshot">Screenshot</th>
-        <th id="action-start">Start</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for action in sequence.get_actions() %}
-      <tr>
-        <td>{{action.get_description()}}</td>
-        <td>No name in current data model</td>
-        <td>{{action.get_id()}}</td>
-        <td>{{action.get_status()}}</td>
-        <td><img src="{{action.get_screenshot()}}"></td>
-        <td>{{action.get_started()}}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
+    <table id="sequenceOverviewTable">
+      <thead>
+        <tr>
+          <th id="action-desc">Description</th>
+          <th id="action-name">Name</th>
+          <th id="action-id">Action ID</th>
+          <th id="action-status">Status</th>
+          <th id="action-screenshot">Screenshot</th>
+          <th id="action-start">Start</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for action in sequence.get_actions() %}
+        <tr>
+          <td>{{action.get_description()}}</td>
+          <td>No name in current data model</td>
+          <td>{{action.get_id()}}</td>
+          <td>{{action.get_status()}}</td>
+          <td><img src="{{action.get_screenshot()}}" /></td>
+          <td>{{action.get_started()}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </body>
 </html>
