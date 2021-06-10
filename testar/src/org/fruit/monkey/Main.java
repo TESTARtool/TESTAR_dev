@@ -151,6 +151,8 @@ public class Main {
 				startTestar(settings);
 			}
 		}
+		
+		saveCurrentSettings(settings, testSettingsFileName);
 
 		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
@@ -159,7 +161,18 @@ public class Main {
 		System.exit(0);
 
 	}
-	
+
+	private static void saveCurrentSettings(Settings settings, String settingsFile) {
+	    ExtendedSettingsFactory.SaveAll();
+	    try {
+	        Util.saveToFile(settings.toFileString(), settingsFile);
+	        Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(Main.SETTINGS_FILE)-1));
+	        System.out.println("Saved current settings to <" + settingsFile + ">");
+	    } catch (IOException e1) {
+	        LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
+	    }
+	}
+
 	/**
 	 * Check if TESTAR was launched to offer a Web Server feature
 	 */
