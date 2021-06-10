@@ -12,19 +12,27 @@ public class TesseractSettings extends ExtendedSettingBase<TesseractSettings> {
     public String dataPath;
     public String language;
     public int imageResolution;
+    public boolean loggingEnabled;
+    public boolean saveImageBufferToDisk;
 
     public static TesseractSettings CreateDefault() {
         TesseractSettings instance = new TesseractSettings();
         instance.dataPath = System.getenv("LOCALAPPDATA") + "\\Tesseract-OCR\\tessdata";
         instance.language = "eng";
-        instance.imageResolution = 160;
+        instance.imageResolution = 144;
+        instance.loggingEnabled = false;
+        instance.saveImageBufferToDisk = true;
         return instance;
     }
 
     @Override
     public int compareTo(TesseractSettings other) {
         int result = -1;
-        if ((language.contentEquals(other.language) && (dataPath.contentEquals(other.dataPath)))) {
+        if (language.contentEquals(other.language)
+                && (dataPath.contentEquals(other.dataPath))
+                && (imageResolution == other.imageResolution)
+                && (loggingEnabled == other.loggingEnabled)
+                && (saveImageBufferToDisk == other.saveImageBufferToDisk)) {
             result = 0;
         }
         return result;

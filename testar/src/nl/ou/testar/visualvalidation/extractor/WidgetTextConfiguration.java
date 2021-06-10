@@ -14,10 +14,12 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfiguration> {
     List<WidgetTextSetting> widget;
+    boolean loggingEnabled;
 
     public static WidgetTextConfiguration CreateDefault() {
         WidgetTextConfiguration instance = new WidgetTextConfiguration();
 
+        // Desktop protocol
         WidgetTextSetting scrollBar = WidgetTextSetting.CreateIgnore("UIAScrollBar");
         WidgetTextSetting menuBar = WidgetTextSetting.CreateIgnore("UIAMenuBar");
         WidgetTextSetting statusBar = WidgetTextSetting.CreateIgnore("UIAStatusBar");
@@ -29,7 +31,12 @@ public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfi
         WidgetTextSetting scrollBarButtons = WidgetTextSetting.CreateIgnoreAncestorBased("UIAButton",
                 Arrays.asList("UIAScrollBar", "UIAEdit", "UIAWindow", "Process"));
 
-        instance.widget = new ArrayList<>(Arrays.asList(scrollBar, statusBar, menuBar, textEdit, icon, toolBarButtons, scrollBarButtons));
+        // Webdriver protocol
+        WidgetTextSetting skipToContentWdou = WidgetTextSetting.CreateIgnoreAncestorBased("WdA",
+                Arrays.asList("WdDIV", "Process"));
+
+        instance.widget = new ArrayList<>(Arrays.asList(scrollBar, statusBar, menuBar, textEdit, icon, toolBarButtons, scrollBarButtons, skipToContentWdou));
+        instance.loggingEnabled = false;
         return instance;
     }
 
@@ -37,7 +44,7 @@ public class WidgetTextConfiguration extends ExtendedSettingBase<WidgetTextConfi
     public int compareTo(WidgetTextConfiguration other) {
         int result = -1;
 
-        if (widget.size() == other.widget.size()) {
+        if (widget.size() == other.widget.size() && loggingEnabled == other.loggingEnabled) {
             for (int i = 0; i < widget.size(); i++) {
                 int index = i;
                 if (other.widget.stream().noneMatch(it -> it.compareTo(widget.get(index)) == 0)) {

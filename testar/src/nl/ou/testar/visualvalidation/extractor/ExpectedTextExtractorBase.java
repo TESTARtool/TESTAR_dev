@@ -28,7 +28,6 @@ import static org.fruit.alayer.Tags.*;
 
 public class ExpectedTextExtractorBase extends Thread implements TextExtractorInterface {
     private static final String TAG = "ExpectedTextExtractor";
-    private final String rootElementPath = "[0]";
 
     AtomicBoolean running = new AtomicBoolean(true);
 
@@ -38,7 +37,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
 
     final private Tag<String> defaultTag;
 
-    private boolean _loggingEnabled;
+    private final boolean _loggingEnabled;
 
     /**
      * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because the don't contain
@@ -108,10 +107,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
                     extractText();
 
                 } catch (InterruptedException e) {
-                    // Happens if someone interrupts your thread.
-                    if (_loggingEnabled) {
-                        Logger.log(Level.INFO, TAG, "Wait interrupted");
-                    }
+                    Logger.log(Level.ERROR, TAG, "Wait interrupted");
                     e.printStackTrace();
                 }
             }
@@ -138,6 +134,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
         // Acquire the absolute location of the SUT on the screen.
         Rectangle applicationPosition = null;
         for (Widget widget : _state) {
+            String rootElementPath = "[0]";
             if (widget.get(Path).contentEquals(rootElementPath)) {
                 applicationPosition = getLocation(widget);
                 break;

@@ -4,6 +4,8 @@ import nl.ou.testar.visualvalidation.ocr.OcrEngineInterface;
 import nl.ou.testar.visualvalidation.ocr.OcrResultCallback;
 import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.apache.logging.log4j.Level;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.LeptonicaFrameConverter;
 import org.bytedeco.tesseract.ETEXT_DESC;
 import org.bytedeco.tesseract.ResultIterator;
 import org.bytedeco.tesseract.TessBaseAPI;
@@ -12,19 +14,27 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.testar.Logger;
 import org.testar.settings.ExtendedSettingsFactory;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferShort;
 import java.awt.image.DataBufferUShort;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
+import static java.awt.image.BufferedImage.TYPE_4BYTE_ABGR;
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
+import static org.bytedeco.leptonica.global.lept.pixRead;
+import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO_OSD;
 
 /**
  * OCR engine implementation dedicated for the Tesseract engine.
@@ -37,12 +47,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
     private static final String TAG = "Tesseract";
-
-    AtomicBoolean running = new AtomicBoolean(true);
-
     private final TessBaseAPI _engine;
     private final Boolean _scanSync = true;
     private final int _imageResolution;
+    private final boolean _loggingEnabled;
+    private final boolean _saveImageBufferToDisk;
+    AtomicBoolean running = new AtomicBoolean(true);
     private BufferedImage _image = null;
     private OcrResultCallback _callback = null;
 
@@ -50,13 +60,17 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
         _engine = new TessBaseAPI();
         TesseractSettings config = ExtendedSettingsFactory.createTesseractSetting();
         _imageResolution = config.imageResolution;
+        _loggingEnabled = config.loggingEnabled;
+        _saveImageBufferToDisk = config.saveImageBufferToDisk;
 
         if (_engine.Init(config.dataPath, config.language) != 0) {
             Logger.log(Level.ERROR, TAG, "Could not initialize tesseract.");
         }
 
-        Logger.log(Level.INFO, TAG, "Tesseract engine created; Language:{} Data path:{}",
-                config.language, config.dataPath);
+        if (_loggingEnabled) {
+            Logger.log(Level.INFO, TAG, "Tesseract engine created; Language:{} Data path:{}",
+                    config.language, config.dataPath);
+        }
 
         setName(TAG);
         start();
@@ -67,7 +81,9 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
         synchronized (_scanSync) {
             _image = image;
             _callback = callback;
-            Logger.log(Level.TRACE, TAG, "Queue new image scan.");
+            if (_loggingEnabled) {
+                Logger.log(Level.TRACE, TAG, "Queue new image scan.");
+            }
             _scanSync.notifyAll();
         }
     }
@@ -85,8 +101,7 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
                     recognizeText();
 
                 } catch (InterruptedException e) {
-                    // Happens if someone interrupts your thread.
-                    Logger.log(Level.INFO, TAG, "Wait interrupted");
+                    Logger.log(Level.ERROR, TAG, "Wait interrupted");
                     e.printStackTrace();
                 }
             }
@@ -98,7 +113,10 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
             Logger.log(Level.ERROR, TAG, "Should not try to detect text on empty image/callback");
             return;
         }
+
         List<RecognizedElement> recognizedWords = new ArrayList<>();
+
+        _engine.SetPageSegMode(PSM_AUTO_OSD);
 
         loadImageIntoEngine(_image);
 
@@ -113,11 +131,32 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
             }
         }
         _engine.Clear();
-        // Notify the callback with the discovered words.
-        _callback.reportResult(recognizedWords);
+
+        // Filter out the empty items and notify the callback with the discovered words.
+        _callback.reportResult(recognizedWords.stream()
+                .filter(recognizedElement -> !recognizedElement._text.isEmpty())
+                .collect(Collectors.toList())
+        );
     }
 
     private void loadImageIntoEngine(@NonNull BufferedImage image) {
+        // Ideally we use the raw data but unfortunately the webdriver screenshots have a different format which doesn't
+        // work with the current conversion for loading a raw buffer.
+        switch (image.getType()) {
+            case TYPE_INT_ARGB:
+                // Works for desktop protocol.
+                loadImageAsRawData(image);
+                break;
+            case TYPE_4BYTE_ABGR:
+                // Works for webdriver protocol.
+                loadImageAsPix(image);
+                break;
+            default:
+                throw new IllegalArgumentException("Loading OCR image not supported for image type:" + image.getType());
+        }
+    }
+
+    private void loadImageAsRawData(@NonNull BufferedImage image) {
         DataBuffer dataBuffer = image.getData().getDataBuffer();
 
         ByteBuffer byteBuffer;
@@ -148,12 +187,37 @@ public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
         _engine.SetSourceResolution(_imageResolution);
     }
 
+    private void loadImageAsPix(@NonNull BufferedImage image) {
+        // Works for web driver
+        if (_saveImageBufferToDisk) {
+            try {
+                File outputFile = File.createTempFile("testar", ".png");
+                outputFile.deleteOnExit();
+                ImageIO.write(_image, "png", outputFile);
+                _engine.SetImage(pixRead(outputFile.getAbsolutePath()));
+                _engine.SetSourceResolution(_imageResolution);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try (Java2DFrameConverter converter = new Java2DFrameConverter();
+                 LeptonicaFrameConverter converter2 = new LeptonicaFrameConverter()) {
+                // Convert the buffered image into a PIX.
+                _engine.SetImage(converter2.convert(converter.convert(image)));
+            } catch (Exception e) {
+                Logger.log(Level.ERROR, TAG, "Failed to convert buffered image into PIX");
+            }
+        }
+    }
+
     @Override
     public void Destroy() {
         stopAndJoinThread();
 
         _engine.End();
-        Logger.log(Level.DEBUG, TAG, "Engine destroyed.");
+        if (_loggingEnabled) {
+            Logger.log(Level.DEBUG, TAG, "Engine destroyed.");
+        }
     }
 
     private void stopAndJoinThread() {

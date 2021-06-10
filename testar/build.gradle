@@ -89,6 +89,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     compile group: 'org.bytedeco', name: 'tesseract-platform', version: '4.1.1-1.5.4'
+    compile group: 'org.bytedeco', name: 'javacv', version: '1.5.5'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     runtime project(':windows')
 }
