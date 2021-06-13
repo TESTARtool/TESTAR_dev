@@ -1,5 +1,6 @@
 package nl.ou.testar.HtmlReporting;
 
+import nl.ou.testar.TestReport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
@@ -21,7 +22,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class HtmlTestReport {
+public class HtmlTestReport implements TestReport {
 
     /**
      * Directory that is used to store our template in
