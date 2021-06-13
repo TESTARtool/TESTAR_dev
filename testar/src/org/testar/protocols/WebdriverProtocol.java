@@ -51,6 +51,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import nl.ou.testar.SequenceReport;
+import nl.ou.testar.TestReport;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
@@ -85,8 +87,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
-	protected HtmlTestReport htmlTestReport;
+    protected SequenceReport htmlReport;
+	protected TestReport htmlTestReport;
     protected State latestState;
 
     protected String firstNonNullUrl;

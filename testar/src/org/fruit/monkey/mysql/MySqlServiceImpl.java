@@ -105,6 +105,20 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
+    public int registerIteration(int reportId, String info, Double severity, int lastExecutedActionId, int lastStateId) throws SQLException {
+        PreparedStatement addSequenceStatement = connection.prepareStatement("INSERT INTO iterations (report_id, info, severity, last_executed_action_id, last_state_id) VALUES (?, ?, ?, ?, ?)");
+        addSequenceStatement.setInt(1, reportId);
+        addSequenceStatement.setString(2, info);
+        addSequenceStatement.setDouble(3, severity);
+        addSequenceStatement.setInt(4, lastExecutedActionId);
+        addSequenceStatement.setInt(5, lastStateId);
+        addSequenceStatement.executeUpdate();
+
+        final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
+        return resultSet.getInt(1);
+    }
+
     public int registerAction(int iterationId, String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException {
         PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (iteration_id, name, description, status, screenshot, start_time) VALUES (?, ?, ?, ?, ?, ?)");
         addActionStatement.setInt(1, iterationId);
@@ -120,11 +134,47 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
+    public int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException {
+        PreparedStatement addStateStatement = connection.prepareStatement("INSERT INTO states (concrete_id_custom, abstract_id, abstract_r_id, abstract_r_t_id, abstract_r_t_p_id VALUES (?, ?, ?, ?, ?)");
+        addStateStatement.setString(1, concreteIdCustom);
+        addStateStatement.setString(2, abstractId);
+        addStateStatement.setString(3, abstractRId);
+        addStateStatement.setString(4, abstractRTId);
+        addStateStatement.setString(5, abstractRTPId);
+
+        final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
+        return resultSet.getInt(1);
+    }
+
+    public int findState(String concreteIdCustom, String abstractId) throws SQLException {
+        PreparedStatement findStateStatement = connection.prepareStatement("SELECT id FROM states WHERE concrete_id_custom = ? AND abstract_id = ?");
+        findStateStatement.setString(1, concreteIdCustom);
+        findStateStatement.setString(2, abstractId);
+
+        final ResultSet resultSet = findStateStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
+    }
+
     public void storeVerdict(int iterationId, String info, Double severity) throws SQLException {
         PreparedStatement updateVerdictStatement = connection.prepareStatement("UPDATE iterations SET info=?, severity=? WHERE id=?");
         updateVerdictStatement.setString(1, info);
         updateVerdictStatement.setDouble(2, severity);
         updateVerdictStatement.setInt(3, iterationId);
+
+        updateVerdictStatement.executeUpdate();
+    }
+
+    public void finalizeReport(int reportId, int actionsPerSequence, int totalSequences, String url) throws SQLException {
+        PreparedStatement updateVerdictStatement = connection.prepareStatement("UPDATE reports SET actions_per_sequence=?, total_sequences=?, url=? WHERE id=?");
+        updateVerdictStatement.setInt(1, actionsPerSequence);
+        updateVerdictStatement.setInt(2, totalSequences);
+        updateVerdictStatement.setString(3, url);
+        updateVerdictStatement.setInt(4, reportId);
+
         updateVerdictStatement.executeUpdate();
     }
 
