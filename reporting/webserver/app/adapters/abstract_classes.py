@@ -1,21 +1,34 @@
 from abc import ABC, abstractclassmethod, abstractmethod
 from datetime import datetime
 from typing import List
+from enum import Enum
+
+from numpy import double
 # TODO: Data model is probably going to look different
 
+class Veredict(Enum):
+    SEVERITY_OK = 0
+    SEVERITY_FAIL = 1
+    SEVERITY_NOT_RESPONDING = 0.99999990
+    SEVERITY_NOT_RUNNING = 0.99999999
+    SEVERITY_SUSPICIOUS_TITLE = 0.00000009
+    SEVERITY_WARNING = 0.00000001
 
-class AbstractVerdict(ABC):
-    @abstractmethod
-    def get_id(self) -> int:
-        pass
+    def __str__(self):
+        return self.name
 
-    @abstractmethod
-    def get_tag(self) -> str:
-        pass
+    def is_oracle(self):
+        return self.value == 1 or 0.00000009
 
-    @abstractmethod
-    def get_severity(self) -> float:
-        pass
+    def is_issue(self):
+        return not self.is_oracle() and self.value > 0
+
+    @staticmethod
+    def from_float(real):
+        try:
+            return Veredict[real]
+        except KeyError:
+            raise ValueError()
 
 
 class AbstractAction(ABC):
@@ -39,14 +52,14 @@ class AbstractAction(ABC):
     def get_id(self) -> int:
         pass
 
-
 class AbstractSequence(ABC):
+
     @abstractmethod
     def get_actions(self) -> List[AbstractAction]:
         pass
 
     @abstractmethod
-    def get_verdicts(self) -> List[AbstractVerdict]:
+    def get_severity(self) -> float:
         pass
 
     @abstractmethod
