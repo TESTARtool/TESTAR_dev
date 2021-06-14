@@ -6,6 +6,7 @@ if os.environ.get('ADAPTER') == 'RANDOM':
     from .adapters.random_classes import *
 elif os.environ.get('ADAPTER') == 'MYSQL':
       from .adapters.mysql_classes import *
+      setup_db_connection()
 else:
     raise Exception('No adapter set')
 
@@ -17,7 +18,7 @@ def index():
 
 @app.route('/report/<int:id>/')
 def report_page(id):
-    report = Report.get_report_by_id(id)
+    report = Report(id)
     return render_template('report.html', report=report)
 
 
@@ -25,7 +26,7 @@ def report_page(id):
 def sequence(report_id, sequence_id):
 
     # Retrieve report
-    report = Report.get_report_by_id(report_id)
+    report = Report(report_id)
 
     # Retrieve given sequence
     sequence = report.get_sequence_by_id(sequence_id)
