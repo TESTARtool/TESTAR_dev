@@ -53,6 +53,10 @@ class AbstractAction(ABC):
     def get_id(self) -> int:
         pass
 
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
 
 class AbstractSequence(ABC):
 

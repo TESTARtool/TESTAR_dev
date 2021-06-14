@@ -74,8 +74,11 @@ class Action(AbstractAction):
     def get_status(self) -> str:
         return self._get_property('status')
 
-    def get_started(self) -> datetime:
-        return self._get_property('started')
+    def get_start_time(self) -> datetime:
+        return self._get_property('start_time')
+
+    def get_name(self) -> str:
+        return self._get_property('name')
 
     def get_id(self) -> int:
         return self._id
