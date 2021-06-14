@@ -6,6 +6,7 @@ from enum import Enum
 from numpy import double
 # TODO: Data model is probably going to look different
 
+
 class Veredict(Enum):
     SEVERITY_OK = 0
     SEVERITY_FAIL = 1
@@ -14,17 +15,17 @@ class Veredict(Enum):
     SEVERITY_SUSPICIOUS_TITLE = 0.00000009
     SEVERITY_WARNING = 0.00000001
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def is_oracle(self):
+    def is_oracle(self) -> bool:
         return self.value == 1 or 0.00000009
 
-    def is_issue(self):
+    def is_issue(self) -> bool:
         return not self.is_oracle() and self.value > 0
 
     @staticmethod
-    def from_float(real):
+    def from_float(real: float):
         try:
             return Veredict[real]
         except KeyError:
@@ -52,6 +53,7 @@ class AbstractAction(ABC):
     def get_id(self) -> int:
         pass
 
+
 class AbstractSequence(ABC):
 
     @abstractmethod
@@ -69,11 +71,39 @@ class AbstractSequence(ABC):
     def action_count(self) -> int:
         return len(self.get_actions())
 
-    def verdict_count(self) -> int:
-        return len(self.get_verdicts())
+    def issue_count(self) -> int:
 
-    def has_verdicts(self) -> bool:
-        return bool(self.verdict_count())
+        # Return zero when the severity is zero
+        if self.get_severity() == 0:
+            return 0
+
+        actions = self.get_actions()
+        issues = 0
+
+        # Don't check for issues in the last action
+        for i in range(len(actions) - 1):
+            action = actions[i]
+            if (action.get_status() != 'OK'):
+                issues += 1
+
+        return issues
+
+    def has_oracle(self) -> bool:
+        severity = self.get_severity()
+        veredict = Veredict(severity)
+        return veredict.is_oracle()
+
+    def verdict_count(self) -> int:
+        # Return zero when the severity is zero
+        if self.get_severity() == 0:
+            return 0
+
+        counter = 0
+        for action in self.get_actions():
+            if action.get_status() != 'OK':
+                counter += 1
+
+        return counter
 
 
 class AbstractReport(ABC):
@@ -81,7 +111,7 @@ class AbstractReport(ABC):
     def get_sequences(self) -> List[AbstractSequence]:
         pass
 
-    @abstractclassmethod
+    @abstractmethod
     def get_id(self) -> int:
         pass
 
@@ -99,10 +129,6 @@ class AbstractReport(ABC):
 
     @abstractclassmethod
     def get_reports(cls) -> List:
-        pass
-
-    @abstractclassmethod
-    def get_report_by_id(cls, id: int) -> List:
         pass
 
     def verdict_count(self) -> int:
@@ -123,7 +149,7 @@ class AbstractReport(ABC):
     def get_ok_sequence_count(self) -> int:
         output = 0
         for sequence in self.get_sequences():
-            if not sequence.has_verdicts():
+            if sequence.get_severity() == 0:
                 output += 1
         return output
 
