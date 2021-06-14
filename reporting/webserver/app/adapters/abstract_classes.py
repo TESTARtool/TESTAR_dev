@@ -19,7 +19,7 @@ class Veredict(Enum):
         return self.name
 
     def is_oracle(self) -> bool:
-        return self.value == 1 or 0.00000009
+        return self.value == 1 or self.value == 0.00000009
 
     def is_issue(self) -> bool:
         return not self.is_oracle() and self.value > 0
@@ -46,7 +46,7 @@ class AbstractAction(ABC):
         pass
 
     @abstractmethod
-    def get_started(self) -> datetime:
+    def get_start_time(self) -> datetime:
         pass
 
     @abstractmethod
@@ -93,7 +93,7 @@ class AbstractSequence(ABC):
         veredict = Veredict(severity)
         return veredict.is_oracle()
 
-    def verdict_count(self) -> int:
+    def veredict_count(self) -> int:
         # Return zero when the severity is zero
         if self.get_severity() == 0:
             return 0
@@ -104,6 +104,9 @@ class AbstractSequence(ABC):
                 counter += 1
 
         return counter
+
+    def get_veredict(self) -> Veredict:
+        return Veredict(self.get_severity())
 
 
 class AbstractReport(ABC):
@@ -131,11 +134,11 @@ class AbstractReport(ABC):
     def get_reports(cls) -> List:
         pass
 
-    def verdict_count(self) -> int:
-        verdict = 0
+    def veredict_count(self) -> int:
+        veredict = 0
         for sequence in self.get_sequences():
-            verdict += sequence.verdict_count()
-        return verdict
+            veredict += sequence.veredict_count()
+        return veredict
 
     def sequence_count(self) -> int:
         return len(self.get_sequences())
@@ -153,5 +156,9 @@ class AbstractReport(ABC):
                 output += 1
         return output
 
-    def get_oracle_sequences_count(self) -> int:
-        return self.sequence_count() - self.get_ok_sequence_count()
+    def oracle_count(self) -> int:
+        output = 0
+        for sequence in self.get_sequences():
+            if sequence.get_veredict().is_oracle():
+                output += 1
+        return output
