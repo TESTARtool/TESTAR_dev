@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 
 from .abstract_classes import (
-    AbstractAction, AbstractReport, AbstractSequence, AbstractVerdict)
+    AbstractAction, AbstractReport, AbstractSequence)
 
 # Example for fake data generation
 URLS = ['https://example.com', 'https://www.ou.nl/', 'https://testar.org/',
@@ -11,26 +11,6 @@ URLS = ['https://example.com', 'https://www.ou.nl/', 'https://testar.org/',
 SEED = 0
 WORDS = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed',
          'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua']
-
-
-class Verdict(AbstractVerdict):
-
-    def __init__(self, id: int):
-        super().__init__()
-        self._id = id
-        self._random = np.random.RandomState(id)
-
-        # Set internal variables
-        self._severity = self._random.random()
-
-    def get_id(self) -> int:
-        return self._id
-
-    def get_tag(self) -> str:
-        pass
-
-    def get_severity(self) -> float:
-        return self._severity
 
 
 class Action(AbstractAction):
@@ -41,7 +21,10 @@ class Action(AbstractAction):
         self._random = np.random.RandomState(id)
 
         # Generate random datetime
-        self._started = datetime.fromtimestamp(self._random.randint(20e7,20e8))
+        self._started = datetime.fromtimestamp(
+            self._random.randint(20e7, 20e8))
+
+        self._name = self._random.choice(WORDS)
 
         # Generate description
         temp = []
@@ -51,9 +34,12 @@ class Action(AbstractAction):
 
         # Generate status
         temp = []
-        for _ in range(self._random.randint(1, 5)):
-            temp.append(self._random.choice(WORDS))
-        self._status = ' '.join(temp)
+        if self._random.randint(1, 5) == 1:
+            for _ in range(self._random.randint(1, 5)):
+                temp.append(self._random.choice(WORDS))
+            self._status = ' '.join(temp)
+        else:
+            self._status = 'OK'
 
     def get_screenshot(self) -> str:
         return '/static/screenshot/test.png'
@@ -64,11 +50,14 @@ class Action(AbstractAction):
     def get_status(self) -> str:
         return self._status
 
-    def get_started(self) -> datetime:
+    def get_start_time(self) -> datetime:
         return self._started
 
     def get_id(self) -> int:
         return self._id
+
+    def get_name(self) -> str:
+        return self._name
 
 
 class Sequence(AbstractSequence):
@@ -84,23 +73,15 @@ class Sequence(AbstractSequence):
             action = Action(self._random.randint(0, 1e5))
             self._actions.append(action)
 
-        self._verdicts = []
-        # Random chance of generating no verdicts
-        if bool(self._random.rand(1) >= 0.75):
+        # Random severity
+        self._severity = self._random.choice(
+            [1, 0, 0.99999990, 0.99999999, 0.00000009, 0.00000001])
 
-            # Generate verdicts
-            for _ in range(self._random.randint(1, 3)):
-                verdict = Verdict(self._random.randint(0, 1e5))
-                self._verdicts.append(verdict)
+    def get_severity(self) -> float:
+        return self._severity
 
     def get_actions(self) -> List[Action]:
         return self._actions
-
-    def get_verdicts(self) -> List[Verdict]:
-        return self._verdicts
-
-    def has_verdicts(self) -> bool:
-        return bool(self._verdicts)
 
     def get_id(self) -> int:
         return self._id
