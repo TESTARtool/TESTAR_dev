@@ -47,6 +47,37 @@ def does_exist(name: str, id: int) -> bool:
         # Verify if it has been found
         return result[0] == 1
 
+class Action(AbstractAction):
+    # TODO: TEST EACH FEATURE
+    def __init__(self, action_id: int):
+        self._id = id
+
+        # Verify existance in the database
+        if not does_exist('actions', self._id):
+           raise ValueError('Report not found')
+
+    def _get_property(self, name):
+        query = f'SELECT {name} FROM actions WHERE id=%s;'
+        with db_connection.cursor() as cursor:
+            cursor.execute(query, (self._id,))
+            result = cursor.fetchone()
+
+            return result[0]
+
+    def get_description(self) -> str:
+        return self._get_property('description')
+
+    def get_screenshot(self) -> str:
+        return self._get_property('screenshot')
+    
+    def get_status(self) -> str:
+        return self._get_property('status')
+
+    def get_started(self) -> datetime:
+        return self._get_property('started')
+
+    def get_id(self) -> int:
+        return self._id
 
 class Sequence(AbstractSequence):
     # TODO: TEST EACH FEATURE
@@ -55,10 +86,18 @@ class Sequence(AbstractSequence):
 
         # Verify existance in the database
         if not does_exist('iterations', self._id):
-           raise ValueError('Report not found')
+           raise ValueError('sequence not found')
 
     def get_actions(self) -> List[AbstractAction]:
-        pass #TODO: Implement actions
+        query = 'SELECT id FROM actions WHERE iteration_id=%s'
+        actions = []
+
+        with db_connection.cursor() as cursor:
+            cursor.execute(query, (self._id,))
+            for row in cursor.fetchall():
+                actions.append(Sequence(row[0]))
+        return actions
+
 
     def get_severity(self) -> float:
         query = 'SELECT severity FROM reports WHERE id=%s;'
