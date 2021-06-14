@@ -5,35 +5,92 @@ from datetime import datetime
 from mysql.connector import connect, Error
 
 from .abstract_classes import (
-    AbstractReport, AbstractSequence)
+    AbstractReport, AbstractSequence, AbstractAction)
 
 db_connection = None
 
 
-class Report(AbstractReport):
+def setup_db_connection():
+    """Create database connection from enviroment variables"""
+    global db_connection
 
-    def __init__(self, id: int):
-        self._id = id
+    # TODO: Database takes time to start...
+    sleep(5)
+
+    # Extract settings
+    config = {
+        "host": os.environ.get("MYSQL_HOST", "localhost"),
+        "port": int(os.environ.get("MYSQL_PORT", 13306)),
+        "user": os.environ.get("MYSQL_USER", "testar"),
+        "password": os.environ.get("MYSQL_PASSWORD", "testar"),
+        "database": os.environ.get("MYSQL_DATABASE", "testar"),
+        "raise_on_warnings": True,
+    }
+
+    db_connection = connect(**config)
+
+
+def does_exist(name: str, id: int) -> bool:
+    global db_connection
+    query = f'SELECT EXISTS(SELECT * FROM {name} WHERE id=%s);'
+
+    # This is
+    if db_connection is None:
+        setup_db_connection()
+        #raise Error('Not connected to the database')
+    with db_connection.cursor() as cursor:
+
+        # Format own id into the string
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()
+
+        # Verify if it has been found
+        return result[0] == 1
+
+
+class Sequence(AbstractSequence):
+    # TODO: TEST EACH FEATURE
+    def __init__(self, sequence_id: int):
+        self._id = sequence_id
 
         # Verify existance in the database
-        if not self._does_exist():
-            raise ValueError('Report not found')
-        
+        if not does_exist('iterations', self._id):
+           raise ValueError('Report not found')
 
-    def _does_exist(self) -> bool:
-        query = 'SELECT EXISTS(SELECT * FROM reports WHERE id=%s);'
+    def get_actions(self) -> List[AbstractAction]:
+        pass #TODO: Implement actions
+
+    def get_severity(self) -> float:
+        query = 'SELECT severity FROM reports WHERE id=%s;'
         with db_connection.cursor() as cursor:
-
-            # Format own id into the string
             cursor.execute(query, (self._id,))
             result = cursor.fetchone()
 
-            # Verify if it has been found
-            return result[0] == 1
+            return result[0]
+
+    def get_id(self) -> int:
+        return self._id
+
+
+class Report(AbstractReport):
+    # TODO: TEST EACH FEATURE
+    def __init__(self, report_id: int):
+        self._id = report_id
+
+        # Verify existance in the database
+        if not does_exist('reports', self._id):
+            raise ValueError('Report not found')
 
     def get_sequences(self) -> List[AbstractSequence]:
+        query = 'SELECT id FROM iterations WHERE report_id=%s'
+        sequences = []
+
         with db_connection.cursor() as cursor:
-            cursor.execute('')
+            cursor.execute(query, (self._id,))
+            for row in cursor.fetchall():
+                sequences.append(Sequence(row[0]))
+        return sequences
+
 
     def get_id(self) -> int:
         return self._id
@@ -78,27 +135,6 @@ class Report(AbstractReport):
                 reports.append(Report(result[0]))
 
         return reports
-            
-
-
-def setup_db_connection():
-    """Create database connection from enviroment variables"""
-    global db_connection
-
-    # TODO: Database takes time to start...
-    sleep(5)
-
-    # Extract settings
-    config = {
-        "host": os.environ.get("MYSQL_HOST", "localhost"),
-        "port": int(os.environ.get("MYSQL_PORT", 13306)),
-        "user": os.environ.get("MYSQL_USER", "testar"),
-        "password": os.environ.get("MYSQL_PASSWORD", "testar"),
-        "database": os.environ.get("MYSQL_DATABASE", "testar"),
-        "raise_on_warnings": True,
-    }
-
-    db_connection = connect(**config)
 
 
 def test():
