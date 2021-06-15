@@ -14,8 +14,8 @@
         <h2>Test metrics</h2>
         <div class="data-points">
             <ul>
-                <li><p>Issues: ?</p></li> 
-                <li><p>Oracles: {{ report.verdict_count()  }}</p></li>
+                <li><p>Issues: {{ report.veredict_count() }}</p></li> 
+                <li><p>Oracles: {{ report.oracle_count()  }}</p></li>
             </ul>
         </div>
     </section>
@@ -44,7 +44,7 @@
         <canvas id="oracleMetricChart" class="chart"></canvas>
         <script>
             /** @type {number[]} */
-            let oracleValues = [{{ report.get_oracle_sequences_count() }} ,{{ report.get_ok_sequence_count() }}] //[0]//#[chart_oracles];
+            let oracleValues = [{{ report.oracle_count() }} ,{{ report.get_ok_sequence_count() }}] //[0]//#[chart_oracles];
             /**  @type {string[]} */
             let oracleIndices = ['Faults', 'Success'];
         </script>
@@ -61,8 +61,8 @@
 
             {% with sequences = report.get_sequences() %}
                 {% for i in range(report.sequence_count()) %}
-                    //issueIndices[{{ i }}] = {{ sequences[i].verdict_count() }};
-                    issueValues.push("{{ sequences[i].verdict_count() }}")
+                    //issueIndices[{{ i }}] = {{ sequences[i].veredict_count() }};
+                    issueValues.push("{{ sequences[i].veredict_count() }}")
                 {% endfor %}
             {% endwith %}
             
@@ -91,8 +91,8 @@
             {% for sequence in report.get_sequences() %}
             <tr>
                 <td>{{ sequence.get_id() }}</td>
-                <td>{{ sequence.verdict_count() }}</td>
-                <td>{{ sequence.has_verdicts() }}</td>  
+                <td>{{ sequence.veredict_count() }}</td>
+                <td>{{ sequence.has_oracle() }}</td>  
                 <td><button class="show-details" onclick="location.href='/sequence/{{report.get_id()}}/{{ sequence.get_id() }}'"
             >
               Details
