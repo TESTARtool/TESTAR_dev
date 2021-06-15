@@ -24,7 +24,7 @@
           <td>{{ report.get_id() }}</td>
           <td><a href="{{ report.get_url() }}" target="_blank" rel="noopener noreferrer">{{ report.get_url() }}</a></td>
           <td>{{ report.sequence_count() }}</td>
-          <td>{{ report.get_oracle_sequences_count() }}</td>
+          <td>{{ report.oracle_count() }}</td>
           <td>
             <button
               class="show-details"
