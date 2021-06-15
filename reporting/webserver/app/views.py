@@ -6,7 +6,7 @@ if os.environ.get('ADAPTER') == 'RANDOM':
     from .adapters.random_classes import *
 elif os.environ.get('ADAPTER') == 'MYSQL':
       from .adapters.mysql_classes import *
-      setup_db_connection()
+      setup_db_pool()
 else:
     raise Exception('No adapter set')
 
