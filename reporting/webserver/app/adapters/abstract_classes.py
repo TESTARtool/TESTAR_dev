@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import List
 from enum import Enum
 
-from numpy import double
 # TODO: Data model is probably going to look different
 
 

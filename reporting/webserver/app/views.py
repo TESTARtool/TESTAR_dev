@@ -3,10 +3,10 @@ from app import app
 from flask import render_template
 
 if os.environ.get('ADAPTER') == 'RANDOM':
-    from .adapters.random_classes import *
+    from .adapters.random_classes import Report
 elif os.environ.get('ADAPTER') == 'MYSQL':
-      from .adapters.mysql_classes import *
-      setup_db_pool()
+    from .adapters.mysql_classes import Report, setup_db_pool
+    setup_db_pool()
 else:
     raise Exception('No adapter set')
 
