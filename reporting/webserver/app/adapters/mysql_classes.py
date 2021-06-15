@@ -29,7 +29,7 @@ def setup_db_pool():
 
 
 def db_cursor(fn):
-    """A Decorator to create sub connections with sub cursors without adding redundant code everywhere
+    """A Decorator to create cursors without adding redundant code everywhere
 
     Args:
         fn (function): Function which need the decorator
@@ -100,7 +100,7 @@ class Sequence(AbstractSequence):
             raise ValueError('sequence not found')
 
     @db_cursor
-    def get_actions(self, cursor: MySQLConnectionPool) -> List[AbstractAction]:
+    def get_actions(self, cursor: MySQLConnectionPool) -> List[Action]:
         query = 'SELECT id FROM actions WHERE iteration_id=%s'
         actions = []
 
@@ -131,7 +131,7 @@ class Report(AbstractReport):
             raise ValueError('Report not found')
 
     @db_cursor
-    def get_sequences(self, cursor: MySQLConnectionPool) -> List[AbstractSequence]:
+    def get_sequences(self, cursor: MySQLConnectionPool) -> List[Sequence]:
         query = 'SELECT id FROM iterations WHERE report_id=%s'
         sequences = []
 
@@ -160,7 +160,7 @@ class Report(AbstractReport):
         return result[0]
 
     @db_cursor
-    def get_sequence_by_id(self, id: int, cursor: MySQLConnectionPool) -> AbstractSequence:
+    def get_sequence_by_id(self, id: int, cursor: MySQLConnectionPool) -> Sequence:
         query = 'SELECT EXISTS(SELECT * FROM iterations WHERE report_id=%s and id=%s);'
 
         # Format own id into the string
@@ -183,8 +183,6 @@ class Report(AbstractReport):
             reports.append(Report(result[0]))
 
         return reports
-
-
 
 
 if __name__ == "__main__":
