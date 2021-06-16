@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -48,13 +49,11 @@ import es.upv.staq.testar.managers.FilteringManager;
 /**
  * Testing protocol enhancements to ease tester work.
  * 
- * @author Urko Rueda Molina (alias: urueda)
  * To be developed: actions ordering
  *
  */
 
 public class ClickFilterLayerProtocol extends DefaultProtocol {
-
 
 	//The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
 	//pressing CAPS-LOCK + SHIFT and clicking on the widget
@@ -62,9 +61,12 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
     private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
-    private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
+    private boolean ctrlPressed = false;
+    private boolean altPressed = false;
+    private boolean shiftPressed = false;
 
-    private double mouseX = Double.MIN_VALUE, mouseY = Double.MIN_VALUE;
+    private double mouseX = Double.MIN_VALUE;
+    private double mouseY = Double.MIN_VALUE;
     private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
     
     private FilteringManager filteringManager;
@@ -102,9 +104,6 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    	}
 	    	else if (key == KBKeys.VK_ALT){
 	    		altPressed = true;
-			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
-//	    		if (!ctrlPressed && !shiftPressed)
-//	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
 	    	}
         }
     }
@@ -113,15 +112,17 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
         if (mode() == Modes.Spy){
-        	if (key == KBKeys.VK_SHIFT)
+        	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
-        	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
+        	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
-	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
+	    		ctrlPressed = false;
+	    		whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == KBKeys.VK_ALT)
+	    	} else if (key == KBKeys.VK_ALT) {
 	    		altPressed = false;
+	    	}
         }
     }
     	
@@ -134,8 +135,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		SutVisualization.visualizeActions(canvas, state, actions);
-    	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
+    	if(displayWhiteTabu && (mode() == Modes.Spy)) {
     		filteringManager.visualizeActions(canvas,state);
+    	}
 	}
 
     protected boolean blackListed(Widget w){
@@ -145,7 +147,8 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     protected boolean whiteListed(Widget w){
     	return filteringManager.whiteListed(w);
     }
-    
+
+    //TODO why is filteringManager having random text functions? also, the original one is in DefaultProtocol and this is the only usage?
     @Override
     protected String getRandomText(Widget w){
     	String randomText = filteringManager.getRandomText(w);
@@ -154,5 +157,4 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     	else
     		return randomText;
     }
-        
 }

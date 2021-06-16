@@ -1,13 +1,13 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.ConcreteAction;
+import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
 import nl.ou.testar.StateModel.Sequence.SequenceStep;
+import nl.ou.testar.StateModel.Util.HydrationHelper;
 
 import java.util.Date;
 
@@ -44,7 +44,40 @@ public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
         Date date = new Date(((SequenceStep) source).getTimestamp().toEpochMilli());
         edgeEntity.addPropertyValue("timestamp", new PropertyValue(OType.DATETIME, date));
 
+        ConcreteState concreteStateSource = ((SequenceStep) source).getSourceNode().getConcreteState();
+        ConcreteState concreteStateTarget = ((SequenceStep) source).getTargetNode().getConcreteState();
+        ConcreteAction concreteAction = ((SequenceStep) source).getConcreteAction();
+
+        // in order to obtain the unique identifier for the concrete state, we need to hydrate them.
+        // create entities for the target and source states
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
+        VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
+        VertexEntity targetVertexEntity = new VertexEntity(entityClass);
+
+        try {
+            EntityHydrator stateHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_CONCRETE_STATE);
+            stateHydrator.hydrate(sourceVertexEntity, concreteStateSource);
+            stateHydrator.hydrate(targetVertexEntity, concreteStateTarget);
+        } catch (HydrationException e) {
+            //@todo add some meaningful logging here
+            return;
+        }
+
+        Property ConcreteStateIdentifier = entityClass.getIdentifier();
+        String concreteStateSourceId = (String)sourceVertexEntity.getPropertyValue(ConcreteStateIdentifier.getPropertyName()).getValue();
+        String concreteStateTargetId = (String)targetVertexEntity.getPropertyValue(ConcreteStateIdentifier.getPropertyName()).getValue();
+
         // add the concrete action id
-        edgeEntity.addPropertyValue("concreteActionId", new PropertyValue(OType.STRING, ((SequenceStep) source).getConcreteAction().getActionId()));
+        edgeEntity.addPropertyValue("concreteActionId", new PropertyValue(OType.STRING, concreteAction.getActionId()));
+
+        // construct the unique action id
+        String concreteActionUid = HydrationHelper.createOrientDbActionId(concreteStateSourceId, concreteStateTargetId, concreteAction.getActionId(), null);
+        edgeEntity.addPropertyValue("concreteActionUid", new PropertyValue(OType.STRING, concreteActionUid));
+
+        // add the description of the action performed
+        edgeEntity.addPropertyValue("actionDescription", new PropertyValue(OType.STRING, ((SequenceStep) source).getActionDescription()));
+
+        // add whether the step introduced non-determinism
+        edgeEntity.addPropertyValue("nonDeterministic", new PropertyValue(OType.BOOLEAN, ((SequenceStep) source).isNonDeterministic()));
     }
 }

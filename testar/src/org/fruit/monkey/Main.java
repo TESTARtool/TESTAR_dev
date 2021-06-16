@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,21 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
+import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.UnProc;
-import org.fruit.Util;
+import org.fruit.*;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
@@ -51,7 +46,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-import static java.lang.System.exit;
+import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.fruit.alayer.windows.Windows10;
+import org.testar.settings.ExtendedSettingFile;
+import org.testar.settings.ExtendedSettingsFactory;
+
+import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -100,6 +100,8 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
+		
+		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
 
@@ -116,7 +118,9 @@ public class Main {
 
 			initCodingManager(settings);
 
-			startTestar(settings, testSettingsFileName);
+			initOperatingSystem();
+
+			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
@@ -130,7 +134,9 @@ public class Main {
 
 				initCodingManager(settings);
 
-				startTestar(settings, testSettingsFileName);
+				initOperatingSystem();
+
+				startTestar(settings);
 			}
 		}
 
@@ -148,13 +154,34 @@ public class Main {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			if(!System.getenv("JAVA_HOME").contains("1.8"))
+			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
+		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
 				+"Check if JAVA_HOME system variable is correctly defined \n \n"
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
 
 		return true;
+	}
+	
+	/**
+	 * Verify the initial directory of TESTAR
+	 * If this directory didn't contain testar.bat file inform the user
+	 */
+	private static void verifyTestarInitialDirectory() {
+		// Obtain Files name of current testarDir
+		Set<String> filesName = new HashSet<>();
+		File[] filesList = new File(testarDir).listFiles();
+        for(File file : filesList){
+        	filesName.add(file.getName());
+        }
+
+        // Verify if we are in the correct executable testar directory (contains testar.bat)
+		if(!filesName.contains("testar.bat")) {
+			System.out.println("WARNING: We cannot find testar.bat executable file.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			filesName.forEach(System.out::println);
+		}
 	}
 
 	/**
@@ -317,14 +344,20 @@ public class Main {
 	 * This method get the specific protocol class of the selected settings to run TESTAR
 	 * 
 	 * @param settings
-	 * @param testSettings
 	 */
-	private static void startTestar(Settings settings, String testSettings) {
+	private static void startTestar(Settings settings) {
+
+		// Compile the Java protocols if AlwaysCompile setting is true
+		if (settings.get(ConfigTags.AlwaysCompile)) {
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
+		}
+		
 
 		URLClassLoader loader = null;
 
 		try {
-			List<String> cp = settings.get(MyClassPath);
+		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
+			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
 
@@ -415,6 +448,7 @@ public class Main {
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
 			defaults.add(Pair.from(ShowSettingsAfterTest, true));
+			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -433,10 +467,6 @@ public class Main {
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
 			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));
@@ -449,17 +479,79 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
+			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
+			defaults.add(Pair.from(FlashFeedback, true));
+			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
+			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
 
-			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
-					add("Role");
+					add("WidgetControlType");
 				}
 			}));
+
+			defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
+				{
+					add("v-menubar-menuitem");
+					add("v-menubar-menuitem-caption");
+				}
+			}));
+
+			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
+				{
+					add("pdf");
+					add("jpg");
+					add("png");
+				}
+			}));
+
+			defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+				{
+					add("www.ou.nl");
+					add("mijn.awo.ou.nl");
+					add("login.awo.ou.nl");
+				}
+			}));
+
+            defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
+                {
+                    add("Title");
+                    add("WebName");
+                    add("WebTagName");
+                }
+            }));
+
+
+			defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
+				{
+					add("Title");
+					add("WebName");
+					add("WebTagName");
+				}
+			}));
+
+			defaults.add(Pair.from(FollowLinks, true));
+			defaults.add(Pair.from(BrowserFullScreen, true));
+			defaults.add(Pair.from(SwitchNewTabs, true));
+
+			/*
+			//TODO web driver settings for login feature
+			defaults.add(Pair.from(Login, null)); // null = feature not enabled
+			// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+			defaults.add(Pair.from(Username, ""));
+			defaults.add(Pair.from(Password, ""));
+			*/
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
@@ -484,14 +576,16 @@ public class Main {
 			settings.set(ConfigTags.PrologActivated, false);
 
 			// check that the abstract state properties and the abstract action properties have at least 1 value
-			if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
-			}
-
-			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
 				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
 			}
+
+			try{
+				settings.get(ConfigTags.ExtendedSettingsFile);
+			} catch (NoSuchTagException e){
+				settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
+			}
+			ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
 			return settings;
 		} catch (IOException ioe) {
@@ -539,9 +633,10 @@ public class Main {
 		}
 	}
 
-	//TODO: Understand what this exactly does?
 	/**
-	 * Override something. Not sure what
+	 * This method allow us to define and use settings as JVM arguments. 
+	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
+	 * 
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {
@@ -651,31 +746,29 @@ public class Main {
 	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
-		int i;
 
-		// first the attributes for the concrete state id
-		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-			i = 0;
-
-			Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
-			for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
-				concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
-			}
-
-			CodingManager.setCustomTagsForConcreteId(concreteTags);
+        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+        // for the concrete state tags we use all the state management tags that are available
+		if (!stateManagementTags.isEmpty()) {
+			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 		}
 
-		// then the attributes for the abstract state id
-		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-			i = 0;
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+    }
 
-			Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
-			for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
-				abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
-			}
-
-			CodingManager.setCustomTagsForAbstractId(abstractTags);
+	/**
+	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 */
+	private static void initOperatingSystem() {
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
+			Environment.setInstance(new Windows10());
+		} else {
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
-
 }

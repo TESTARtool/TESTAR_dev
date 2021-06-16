@@ -2,6 +2,12 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 public class Config {
 
+    // connection type used when connecting to a locally running OrientDB
+    public static final String CONNECTION_TYPE_LOCAL = "plocal";
+
+    // connection type used when connecting to OrientDB running in remote server mode
+    public static final String  CONNECTION_TYPE_REMOTE = "remote";
+
     // type of orientdb installation, could be remote, integrated, etc
     private String connectionType;
 

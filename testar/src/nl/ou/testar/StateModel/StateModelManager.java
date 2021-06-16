@@ -17,4 +17,8 @@ public interface StateModelManager {
     void notifyTestSequencedStarted();
 
     void notifyTestSequenceStopped();
+
+    void notifyTestSequenceInterruptedByUser();
+
+    void notifyTestSequenceInterruptedBySystem(String message);
 }

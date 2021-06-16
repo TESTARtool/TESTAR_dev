@@ -57,8 +57,8 @@ public final class Windows{
 	public static final long PixelFormatExtended     = 0x00100000; 
 	public static final long PixelFormatCanonical    = 0x00200000; 
 
-	public static final long PixelFormatUndefined = 0; 
-	public static final long PixelFormatDontCare  = 0; 
+	public static final long PixelFormatUndefined = 0;
+	public static final long PixelFormatDontCare  = 0;
 
 	public static final long PixelFormat1bppIndexed    =  (1 | ( 1 << 8) | PixelFormatIndexed | PixelFormatGDI);
 	public static final long PixelFormat4bppIndexed    =  (2 | ( 4 << 8) | PixelFormatIndexed | PixelFormatGDI);
@@ -95,7 +95,7 @@ public final class Windows{
 	public static final long WindowVisualState_Minimized = 2;
 
 
-	/* UIA element mode */	
+	/* UIA uiaElement mode */
 	public static final long AutomationElementMode_None = 0;
 	public static final long AutomationElementMode_Full = 1;
 
@@ -131,29 +131,39 @@ public final class Windows{
 	public static final long UIA_FlowsFromPropertyId	= 30148;
 	public static final long UIA_FlowsToPropertyId	= 30106;
 	public static final long UIA_FrameworkIdPropertyId	= 30024;
+	public static final long UIA_FullDescriptionPropertyId = 30159;
 	public static final long UIA_HasKeyboardFocusPropertyId	= 30008;
 	public static final long UIA_HelpTextPropertyId	= 30013;
 	public static final long UIA_IsContentElementPropertyId	= 30017;
 	public static final long UIA_IsControlElementPropertyId	= 30016;
 	public static final long UIA_IsDataValidForFormPropertyId	= 30103;
+	public static final long UIA_IsDialogPropertyId = 30174;
 	public static final long UIA_IsEnabledPropertyId	= 30010;
 	public static final long UIA_IsKeyboardFocusablePropertyId	= 30009;
 	public static final long UIA_IsOffscreenPropertyId	= 30022;
 	public static final long UIA_IsPasswordPropertyId	= 30019;
+	public static final long UIA_IsPeripheralPropertyId = 30150;
 	public static final long UIA_IsRequiredForFormPropertyId	= 30025;
 	public static final long UIA_ItemStatusPropertyId	= 30026;
 	public static final long UIA_ItemTypePropertyId	= 30021;
 	public static final long UIA_LabeledByPropertyId	= 30018;
+	public static final long UIA_LandmarkTypePropertyId = 30157;
+	public static final long UIA_LevelPropertyId = 30154;
+	public static final long UIA_LocalizedLandmarkTypePropertyId = 30158;
 	public static final long UIA_LiveSettingPropertyId = 30135;
 	public static final long UIA_LocalizedControlTypePropertyId = 30004;
 	public static final long UIA_NamePropertyId	= 30005;
 	public static final long UIA_NativeWindowHandlePropertyId	= 30020;
 	public static final long UIA_OrientationPropertyId	= 30023;
+	public static final long UIA_PositionInSetPropertyId = 30152;
 	public static final long UIA_ProcessIdPropertyId	= 30002;
 	public static final long UIA_RuntimeIdPropertyId = 30000;
 	public static final long UIA_ProviderDescriptionPropertyId = 30107;
+	public static final long UIA_RotationPropertyId = 30166;
+	public static final long UIA_SizeOfSetPropertyId = 30153;
+	public static final long UIA_VisualEffectsPropertyId = 30163;
 
-
+	// control pattern property ids
 	public static final long UIA_AnnotationAnnotationTypeIdPropertyId	= 30113;
 	public static final long UIA_AnnotationAnnotationTypeNamePropertyId	= 30114;
 	public static final long UIA_AnnotationAuthorPropertyId	= 30115;
@@ -568,12 +578,14 @@ public final class Windows{
 	public static final long ULW_ALPHA = 2;
 	public static final long HWND_TOPMOST = -1;
 	public static final long SW_SHOWNOACTIVATE = 4;
-	public static final long MONITOR_DEFAULTTOPRIMARY = 1;
 	public static final long PM_NOREMOVE = 0x0000;
 
 	public static final long STILL_ACTIVE = 259;
 
-
+	/* Possible dwFlags for MonitorFromWindow */
+	public static final long MONITOR_DEFAULTTONULL = 0x00000000;
+	public static final long MONITOR_DEFAULTTOPRIMARY = 0x00000001;
+	public static final long MONITOR_DEFAULTTONEAREST = 0x00000002;
 
 	/* COM Constants */
 	public static final long CLSCTX_INPROC_SERVER            = 0x1;
@@ -615,6 +627,7 @@ public final class Windows{
 	public static native boolean SetCursorPos(int x, int y);
 	public static native double[] GetCursorPos();
 	public static native long GetForegroundWindow();
+	public static native boolean SetForegroundWindow(long hwnd);
 	public static native int WindowFromPoint(int x, int y);
 	public static native int ChildWindowFromPoint(int parentHwnd, int x, int y);
 	public static native int GetWindowThreadId(int hwnd);
@@ -786,6 +799,29 @@ public final class Windows{
 	public static native long IUnknown_Release(long pIUnknown);
 	public static native void CoUninitialize();
 
+	/**
+	 * Gets the scale factor for the given monitor.
+	 * @param hMon The monitor handle.
+	 * @return The first element in the array indicates the result code, on success the second element contains the
+	 * scale factor.
+	 */
+	public static native long[] GetScaleFactorForMonitor(long hMon);
+
+	/**
+	 * Gets the Monitor handle based on the window handle.
+	 * @param hwnd	The window handle.
+	 * @param dwFlags
+	 * @return On success the monitor handle, on failure the defined value based on dwFlags.
+	 */
+	public static native long MonitorFromWindow(long hwnd, long dwFlags);
+
+	/**
+	 * Returns the dots per inch (dpi) value for the associated window.
+	 * @param hwnd The window you want to get information about.
+	 * @return The DPI for the window which depends on the DPI_AWARENESS of the window. See the Remarks for more
+	 * information. An invalid hwnd value will result in a return value of 0.
+	 */
+	public static native int GetDpiForWindow(long hwnd);
 
 	/* ApplicationActivationManager */
 	public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options) throws UIAException; // by wcoux

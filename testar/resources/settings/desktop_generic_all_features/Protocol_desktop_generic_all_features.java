@@ -34,7 +34,9 @@ import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -113,7 +115,9 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
-		JsonUtils.createWidgetInfoJsonFile(state);
+		if(settings.get(ConfigTags.Mode) == Modes.Generate)
+			JsonUtils.createWidgetInfoJsonFile(state);
+		
 		return state;
 	}
 
@@ -159,7 +163,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 		// top level (highest Z-index) widgets of the GUI:
 		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-		if(actions.size()==0){
+		if(actions.isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
 			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from

@@ -34,11 +34,11 @@ package nl.ou.testar;
 import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
-import com.tinkerpop.gremlin.groovy.Gremlin;
-import com.tinkerpop.pipes.Pipe;
+//import com.tinkerpop.gremlin.groovy.Gremlin;
+//import com.tinkerpop.pipes.Pipe;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ import java.util.NoSuchElementException;
  */
 class OrientDBRepository implements GraphDBRepository {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(OrientDBRepository.class);
+   private static final Logger LOGGER = LogManager.getLogger();
 
    private final OrientGraphFactory graphFactory;
 
@@ -206,7 +206,7 @@ class OrientDBRepository implements GraphDBRepository {
    @SuppressWarnings({"rawtypes", "unchecked"})
    @Override
    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
-      try {
+      /*try {
          Pipe pipe = Gremlin.compile(gremlin);
          OrientGraph graph = graphFactory.getTx();
          if (start.equals(GremlinStart.VERTICES))
@@ -221,7 +221,8 @@ class OrientDBRepository implements GraphDBRepository {
       } catch (Exception e) {
          LOGGER.error("Gremlin exception: {}", e.getMessage());
          return new ArrayList<Object>();
-      }
+      }*/
+	   return new ArrayList<Object>();
    }
 
    /**

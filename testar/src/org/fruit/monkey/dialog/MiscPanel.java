@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@ import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsPanel;
 
 import javax.swing.*;
 
@@ -51,7 +52,7 @@ import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
 import static org.fruit.monkey.dialog.ToolTipTexts.copyFilesTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.deleteFiles;
 
-public class MiscPanel extends JPanel {
+public class MiscPanel extends SettingsPanel {
 
   private static final long serialVersionUID = 8435304494218446662L;
 
@@ -243,6 +244,7 @@ public class MiscPanel extends JPanel {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     currentDirectory = new File(settings.get(ConfigTags.OutputDir)).getParentFile();
 
@@ -277,6 +279,7 @@ public class MiscPanel extends JPanel {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.OutputDir, txtOutputDir.getText());
     settings.set(ConfigTags.TempDir, txtTempDir.getText());
@@ -302,6 +305,7 @@ public class MiscPanel extends JPanel {
     settings.set(ConfigTags.Delete, delete);
   }
 
+  @Override
   public void checkSettings() throws IllegalStateException {
     for (int i = 0; i < tblCopyFromTo.getRowCount(); i++) {
       String left = (String) tblCopyFromTo.getValueAt(i, 0);

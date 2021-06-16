@@ -3,7 +3,7 @@
 This is the github development root folder for TESTAR development. 
 The software can be build with both ant and gradle.
 
-### Required tools to build the software
+### Required tools to create TESTAR executable distribution
 
 In order to build the native code, a view manual steps need to be executed;
 
@@ -16,16 +16,45 @@ and [clean_w10.bat](https://github.com/florendg/testar_floren/releases/download/
 5. Adapt compile.bat and clean.bat. Set *PATH* to the installation folder used in step 2.
 CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
 
+### Import Gradle project into Eclipse (similar for other IDEs with Gradle)
+
+1. Create a new empty workspace for Eclipse in a folder which is not the folder that contains the source
+code.
+2. Select File -> Import to open the import dialog
+3. Select Gradle -> Existing Gradle project to open te import dialog 
+4. Select the folder that contains the root of the source code and start the import
+
 It should be possible to build the project using the instructions provided in the next section
 
-### Gradle build
+### Gradle tasks
 
-To build the Gradle project and run it execute the following procedure;
+`gradlew` is the instruction to use the gradle wrapper. 
 
-1. Run `.\gradlew installDist` in the root of the project
-2. Change directory to testar/target/install/bin
+This basically means that TESTAR will download in the system, and will use to compile, 
+the gradle version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wrapper.properties`
+
+#### gradlew build (Files Compilation)
+`gradlew build` task : is configured to compile TESTAR project at Java level for error and warning checking. 
+NOTE that this task doesn't generate an executable distribution by default.
+
+#### windows.dll (Allows TESTAR execution on Windows)
+TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems.
+
+#### gradlew windowsDistribution (Allows TESTAR execution on Windows)
+`gradlew windowsDistribution` task : uses the `Required tools to build the software` (see above) to create a new file `windows.dll`, which has preference over the default one.
+
+NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
+ [link]( https://go.microsoft.com/fwlink/?LinkId=746572 ). Also a JAVA 1.8 JDK is required.
+
+#### gradlew installDist (Create TESTAR Distribution)
+`gradlew installDist` task : creates a runnable TESTAR distribution in the `\testar\target\install\testar\bin\` directory.
+By default, `windows.dll` should be copied from `\testar\resources\windows10\` directory and overwritten by the new dll file if the `gradlew windowsDistribution` task was executed.
+
+1. Run `.\gradlew installDist` in the root of the project, or `TESTAR_dev -> distribution -> installDist` with the IDE
+2. Change directory to `\testar\target\install\testar\bin\`
 3. Run testar.bat
 
+#### gradlew distZip (Creates a TESTAR Distribution)
 It is also possible to generate a zip file containing TESTAR. This zip can be extracted on any other machine
 that has a 64-bit Windows operating system and Visual Studio redistributable installed. A proper way of using
 TESTAR is to run the tool in a virtual-machine.
@@ -48,7 +77,9 @@ code.
 
 
 #### Running TESTAR from Gradle
-TESTAR can be started using a gradle command from the root of the project.
+`gradlew runTestar` task : creates a TESTAR distribution with `gradlew installDist` task, and executes TESTAR from the runnable file `\testar\target\install\testar\bin\testar.bat`
+
+TESTAR can be started using a gradlew command from the root of the project.
 1. .\gradlew runTestar
 
 ##### In Eclipse
@@ -63,7 +94,9 @@ Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the res
 the machine where you want to run TESTAR and run TESTAR on the target machine. This allows
 the user to debug TESTAR from a different machine. 
 
-#### Running TESTAR binaries (obtained with gradlew build) from command line
+### How to execute TESTAR distribution
+
+#### Running TESTAR binaries (obtained with gradlew installDist/distZip) from command line
 
 TESTAR allow its execution and settings configuration from the command line. By default is executed with the selected protocol (.sse file) and the test.settings values of that protocol.
 
@@ -90,69 +123,69 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 		SuspiciousTitles -> The errors that TESTAR will search in the execution
 
 Example: 
-testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"
 
+``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
-## Known issue
-- Currently, only the protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
-support the graph database. Other protocols need to be adapted  (see issue #52)
+## State Model / Graph database support
+TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.
+Detected Widget's, Actions, States and their respective relations are recorded to this graph database.
 
-## Graph database support
-This version of TESTAR supports the output of data to an http://orientdb.com database.
-Currently Widget's, Actions, States and there relation are recorded to the graph database.
+### Use of the State Mode and the graph database
+The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Sequence.
 
-### Restrictions on the use of the graph database
-The model currently implemented consists of States, Actions and Widgets. The widgets are stored from
-the method deriveActions. The protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict`` 
-contain an implementation which shows how the method storeWidget could be used.
-When the storeWidget method is not called, TESTAR will raise an exception and stop working.
+The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
 
-### using graphdb on the local filesystem
-The easiest way to use the graph database support is to write the database to the local file system
-After starting TESTAR, it's required to configure the database settings in the tab "GraphDB".
-- url : plocal:&lt;path&gt; (for instance plocal:output/testdb) 
-- user: admin
-- password: admin
-- Check the checkbox.
+### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
+https://www.orientdb.org/download
+https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip
 
-### using graphdb with orientdb server
-In order to use the graphdb feature it's advised to install a graph database on your machine  The current implementation 
-of TESTAR has a backend for Orientdb. You can download the
-community edition from [orientdb](orientdb.com). Follow the installation instructions to install
-the database on your machine. 
+``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
 
-When orientdb is started the first time. The root password needs to be configured. Make sure you remember thes password.
+### Install and configure OrientDB Server
+In order to use the graphdb feature it's advised to install a graph database on your machine or in a remote server.
 
-In order to use the graphdb feature. A database must be created in Orientdb. To do this follow the following procedure;
+Follow the installation instructions about how to configure TESTAR State Model on slide 28:
+https://testar.org/images/development/TESTAR_webdriver_state_model.pdf 
+
+Also TESTAR HandsOn (Section 6) contains more information about State Model settings: https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_October_14.pdf
+
+When orientdb is started the first time. The root password needs to be configured. Make sure you remember this password.
+
+In order to use the graphdb feature. A database must be created in OrientDB. To do this follow the following procedure:
 - Start the database server (ORIENTDB_HOME/bin/server.bat)
 - Start orientdb studio in a webbrowser [http://localhost:2480](http://localhost:2480)
-- Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/adimin 
-user/password).
+- Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/admin  user/password).
+- Go to Security tab and create a new user (testar/testar) with an active status and the admin role
 
-After starting TESTAR, it's required to configure the database settings in the tab "GraphDB".
-- url : remote:<hostname>/&lt;database name> (for instance remote:/localhost/demo)
-- user: admin
-- password: admin
-- Check the checkbox.
+### Using OrientDB graphdb on the local filesystem
+OrientDB graph database can be used remotely or locally.
+Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server:
 
-When TESTAR finishes, the data be inspected in the database. The easiest way to see the complete
-graph is to type the following query in the graph tab "Select * From E". This will display the complete
-graph.
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = remote
+		DataStoreServer = localhost
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
 
-### Requirements for a protocol when using GraphDB.
+Also is possible to connect at file level without deploy the OrientDB locally:
 
-A part of the interaction with the graph database occurs in the method *deriveActions*. In this method, the available 
-widgets are stored as they are derived within the protocol. When using the graph database extension, the user needs
-to be aware the widgets are stored. When this is not done, the model in the database is incomplete. A sample can be 
-found in the protocol *desktop_generic_graphdb.java*.
+		StateModelEnabled = true
+		DataStore = OrientDB
+		DataStoreType = plocal
+		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+		DataStoreDB = testar
+		DataStoreUser = testar
+		DataStorePassword = testar
+		
+## Docker chromedriver image
+https://hub.docker.com/u/testartool
 
-### Exploring the graph database with Gremlin.
+https://hub.docker.com/r/testartool/testar-chromedriver
 
-[Gremlin](http://tinkerpop.apache.org/docs/current/reference/#_tinkerpop3) is a graph traversel engine which can be used 
-to query a graph database. OrientDB supports Gremlin and provides an implementation of the traversal engine in it's 
-community release.
+## Known issues
+https://github.com/TESTARtool/TESTAR_dev/issues
 
-To start Gremlin run the following command; orientdb-gremlin. This command is delivered with the community 
-edition of Orientdb.
-
-See the manuals of orientdb to learn about the possibilities to query the model.
+## Release notes
+https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes

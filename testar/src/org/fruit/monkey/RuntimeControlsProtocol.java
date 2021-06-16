@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,9 +37,7 @@ import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -93,42 +91,11 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-    	FlashFeedback.flash(modeNfo, 1000);
+        if (settings.get(ConfigTags.FlashFeedback)) {
+    	    FlashFeedback.flash(modeNfo, 1000);
+        }
     	
     }
-    
-    //Old code to switch between modes
-    /*private synchronized void nextMode(boolean forward){
-        if(forward){
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }else{
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }
-
-        // Add some logging
-        // Add the FlashFeedback about the mode you are in in the upper left corner.
-        String modeParamS = "";
-        if (mode == Modes.Record)
-            modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
-
-        String modeNfo = "'" + mode + "' mode active." + modeParamS;
-        LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        FlashFeedback.flash(modeNfo);
-    }*/
 
     /**
      * Set the mode with the given parameter value
@@ -137,9 +104,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected synchronized void setMode(Modes mode){
         if (mode() == mode) return;
         else this.mode = mode;
-//        List<Modes> modesList = Arrays.asList(Modes.values());
-//        while (mode() != mode)
-//            nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
     }
 
 

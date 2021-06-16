@@ -22,6 +22,9 @@ public class Property {
     // is this property the identifying property for a given class?
     private boolean identifier = false;
 
+    // should the property be regarded as an autoincrement value?
+    private boolean autoIncrement = false;
+
     // is this property indexable?
     private boolean indexAble = false;
 
@@ -107,5 +110,13 @@ public class Property {
 
     public void setIndexAble(boolean indexAble) {
         this.indexAble = indexAble;
+    }
+
+    public boolean isAutoIncrement() {
+        return autoIncrement;
+    }
+
+    public void setAutoIncrement(boolean autoIncrement) {
+        this.autoIncrement = autoIncrement;
     }
 }

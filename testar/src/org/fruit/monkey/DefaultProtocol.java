@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,7 @@ import static org.fruit.alayer.Tags.ExecutedAction;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -56,7 +54,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -66,34 +63,15 @@ import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.HtmlReporting.Reporting;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
-import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
@@ -106,6 +84,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import org.fruit.alayer.windows.WinApiException;
 
 import es.upv.staq.testar.managers.DataManager;
@@ -114,7 +93,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
-import org.slf4j.LoggerFactory;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
@@ -122,6 +101,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
 
+	protected Reporting htmlReport;
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}
@@ -179,13 +159,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
 
 	protected long lastStamp = -1;
-	protected ProtocolUtil protocolUtil = new ProtocolUtil();
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
@@ -195,9 +174,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false;
-	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
+	
+	protected int escAttempts = 0;
+	protected static final int MAX_ESC_ATTEMPTS = 99;
+
+	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -292,17 +275,53 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
+			
+		}catch(SessionNotCreatedException e) {
+			
+    		if(e.getMessage().contains("Chrome version")) {
+    			
+    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
+    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
+    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "\n"
+    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
+    					+ "You can use Task Manager to finish it.";
+    			
+    			popupMessage(msg);
+    			
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
+    			
+    		}else {
+    			System.out.println("********** ERROR starting Selenium WebDriver ********");
+    			System.out.println(e.getMessage());
+    		}
+    		
+		}catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+				
+				String msg = "Exception: Check if chromedriver.exe path: \n"
+				+settings.get(ConfigTags.SUTConnectorValue)
+				+"\n exists or if is a correct definition";
 
+				popupMessage(msg);
+
+				System.out.println(msg);
+			
+			}else {
+				e.printStackTrace();
+			}
+		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			//INDEXLOG.error("Exception: ",SystemStartException);
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
 		}
 
+		//allowing close-up in the end of test session:
+		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
 	}
@@ -314,6 +333,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void initialize(Settings settings) {
 
+		visualizationOn = settings.get(ConfigTags.VisualizeActions);
+
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
@@ -321,7 +342,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
 
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -342,7 +362,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
 
@@ -386,9 +406,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
 
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-			//INDEXLOG.error("Exception: ",e);
 
-			return false;	
+			return false;
 		}
 
 		return true;
@@ -422,12 +441,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String path = settings.get(ConfigTags.PathToReplaySequence);
 		if(path.contains(".testar")) {
 			path = path.replace(".testar", ".html");
-			
+
 			int startIndex = path.indexOf(File.separator + "sequences");
 			int endIndex = path.indexOf(File.separator, startIndex+2);
-			
+
 			String replace = path.substring(startIndex, endIndex+1);
-			
+
 			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
@@ -468,7 +487,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-		String generatedSequenceName = OutputStructure.sequencesOutputDir 
+		String generatedSequenceName = OutputStructure.sequencesOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
@@ -484,7 +503,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
-			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
 
@@ -514,7 +532,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			//INDEXLOG.error("Exception: ",e);
 		}
 
 		return currentSeqObject;
@@ -547,7 +564,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private Taggable fragment; // Fragment is used for saving a replayable sequence:
+	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -558,7 +575,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -584,15 +600,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
 
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
-
 	}
 
 	/**
@@ -622,8 +636,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -637,17 +651,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
+
 		//method for defining other init actions, like setup of external environment
 		initTestSession();
 
 		//initializing TESTAR for generate mode:
-
 		initGenerateMode();
 
 		/*
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+			exceptionThrown = false;
 
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
@@ -656,6 +671,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
+
+			//reset the faulty variable because we started a new sequence
+			faultySequence = false;
 
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
 			system = startSutIfNotRunning(system);
@@ -677,6 +695,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
+				
+				//update state after begin sequence SUT modification
+				state = getState(system);
 
 				//initializing fragment for recording replayable test sequence:
 				initFragmentForReplayableSequence(state);
@@ -721,18 +742,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				sequenceCount++;
 
 			} catch (Exception e) {
-				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
+				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+				System.out.println(message);
+				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
+				stackTrace.add(message);
+				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
+				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+				exceptionThrown = true;
 				e.printStackTrace();
-				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
+		if (mode() == Modes.Quit && !exceptionThrown) {
+			// the user initiated the shutdown
+			stateModelManager.notifyTestSequenceInterruptedByUser();
+		}
+
+
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
-		//allowing close-up in the end of test session:
-		closeTestSession();
-		//Closing TESTAR internal test session:
-		closeTestarTestSession();
+
 		mode = Modes.Quit;
 	}
 
@@ -761,7 +791,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state = getState(system))) {
+		while (mode() != Modes.Quit && moreActions(state)) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
@@ -770,29 +800,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
-			//Not visualizing the widget info under cursor while in Generate-mode:
-			//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
+			for(Action a : actions)
+				if(a.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildEnvironmentActionIDs(state, a);
+			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
-			if(actions.isEmpty()){
-				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				}
-				//----------------------------------
-				// THERE MUST ALMOST BE ONE ACTION!
-				//----------------------------------
-				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildIDs(state, escAction);
-				actions.add(escAction);
-				escAttempts++;
-			} else
-				escAttempts = 0;
 			//Showing the green dots if visualization is on:
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
@@ -815,11 +833,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
+
+			// fetch the new state
+            state = getState(system);
 		}
 
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
+		for(Action a : actions)
+			if(a.get(Tags.AbstractIDCustom, null) == null)
+				CodingManager.buildEnvironmentActionIDs(state, a);
+		
 		stateModelManager.notifyNewStateReached(state, actions);
 
 		return getVerdict(state);
@@ -844,7 +869,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ExecutedAction,action);
+		fragment.set(ExecutedAction, action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
@@ -860,16 +885,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     				w = f.apply(state);
     				if (w != null){
     					widgetTitle = w.get(Tags.Title, "").replace("\n", "").replace("\r", "").trim();
-    					fragment.set(Title, w.get(Tags.Title, ""));
+    					fragment.set(Tags.Title, w.get(Tags.Title, ""));
     				}
     			}
     		}
     	}
 		
-		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
-		fragment =new TaggableBase();
+		fragment = new TaggableBase();
 	}
 
 
@@ -900,7 +925,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//Wait since TestSerialiser write all fragments on sequence File
 		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			//System.out.println("Saving sequences...");
 			synchronized (this) {
 				try {
 					this.wait(1000);
@@ -916,7 +940,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Saving the action information into the logs
-	 * 
+	 *
 	 * @param state
 	 * @param action
 	 * @param actionMode
@@ -940,12 +964,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
-
-		//bin folder 
-		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
-
-
 	}
 
 	/**
@@ -959,33 +977,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		while(mode() == Modes.Spy && system.isRunning()) {
 
-			//Instead of use getState(SUT system) method, build our own State into Spy Mode
-			//This will prevent issues with other protocols and reports
-			Assert.notNull(system);
-			State state = builder.apply(system);
-			CodingManager.buildIDs(state);
-			calculateZIndices(state);
-			setStateForClickFilterLayerProtocol(state);
-
+			State state = getState(system);
 			cv.begin(); Util.clear(cv);
-
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
+			
+			//in Spy-mode, always visualize the widget info under the mouse cursor:
+			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
+
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
+			
 			cv.end();
 
-			//TODO: Prepare Spy Mode refresh time on settings file
-			//Wait 500ms to show the actions
+			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
+			
 			synchronized (this) {
 				try {
-					this.wait(500);
+					this.wait(msRefresh);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -999,6 +1011,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
+		
+		//finishSequence() content, but SPY mode is not a sequence
+		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		}
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
@@ -1022,6 +1039,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			preSequencePreparations();
+			
+			//reset the faulty variable because we started a new execution
+			faultySequence = false;
 
 			system = startSystem();
 			startedRecordMode = true;
@@ -1071,7 +1091,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
 				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildIDs(state, escAction);
+				CodingManager.buildEnvironmentActionIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
 			} else
@@ -1144,230 +1164,234 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Method to run TESTAR on Replay Mode
-     * Read a replayable file, repeat saved actions and generate new sequences, oracles and logs
+	 * Method to run TESTAR in replay mode.
+	 * The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
+	 * Read the replayable file, repeat saved actions and generate new sequences, oracles and logs
 	 */
 	protected void runReplayLoop(){
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
-		ObjectInputStream ois = null;
-		
-		actionCount = 1;
-		boolean success = true;
-		faultySequence = false;
-		
-		//Reset LogSerialiser
-		LogSerialiser.finish();
-		LogSerialiser.exit();
+	    FileInputStream fis = null;
+	    BufferedInputStream bis = null;
+	    GZIPInputStream gis = null;
+	    ObjectInputStream ois = null;
+
+	    actionCount = 1;
+	    boolean success = true;
+	    faultySequence = false;
+
+	    //Reset LogSerialiser
+	    LogSerialiser.finish();
+	    LogSerialiser.exit();
 
 
-		synchronized(this){
-			OutputStructure.calculateInnerLoopDateString();
-			OutputStructure.sequenceInnerLoopCount++;
-		}
+	    synchronized(this){
+	        OutputStructure.calculateInnerLoopDateString();
+	        OutputStructure.sequenceInnerLoopCount++;
+	    }
 
-		preSequencePreparations();
-		
-		SUT system = startSystem();
-		
-		try{
-			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			
-			fis = new FileInputStream(seqFile);
-			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
-			
-			/**
-    		 * Initialize the fragment to create a new sequence and logs
-    		 */
+	    preSequencePreparations();
 
-    		//Generating the new sequence file that can be replayed:
-    		generatedSequence = getAndStoreGeneratedSequence();
-    		currentSeq = getAndStoreSequenceFile();
-    		
-    		Canvas canvas = buildCanvas();
-			State state = getState(system);
+	    //reset the faulty variable because we started a new execution
+	    faultySequence = false;
 
-			setReplayVerdict(getVerdict(state));
-    		
-    		//initializing new fragment for recording replayable test sequence:
-    		initFragmentForReplayableSequence(state);
+	    SUT system = startSystem();
 
-			double rrt = settings.get(ConfigTags.ReplayRetryTime);
+	    try{
+	        File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
 
-			while(success && !faultySequence && mode() == Modes.Replay){
-				
-    			//Initialize local fragment to read saved actions of PathToReplaySequence File
-				Taggable replayableFragment;
-				try{
-					replayableFragment = (Taggable) ois.readObject();
-				} catch(IOException ioe){
-					success = true;
-					break;
-				}
+	        fis = new FileInputStream(seqFile);
+	        bis = new BufferedInputStream(fis);
+	        gis = new GZIPInputStream(bis);
+	        ois = new ObjectInputStream(gis);
 
-				// Derive Actions of the current State
-				Set<Action> actions = deriveActions(system,state);
-    			CodingManager.buildIDs(state, actions);
-				
-				success = false;
-				int tries = 0;
-				double start = Util.time();
+	        /**
+	         * Initialize the fragment to create a new sequence and logs
+	         */
 
-				while(!success && (Util.time() - start < rrt)){
-					tries++;
-					canvas.begin(); Util.clear(canvas);
-					canvas.end();
-					
-					//Read saved action of PathToReplaySequence File
-    				Action action = replayableFragment.get(ExecutedAction, new NOP());
+	        //Generating the new sequence file that can be replayed:
+	        generatedSequence = getAndStoreGeneratedSequence();
+	        currentSeq = getAndStoreSequenceFile();
 
-    				/**
-    				 * Check if we are replaying the sequence correctly,
-    				 * comparing saved widgets with existing widgets in the current state
-    				 */
-    				
-    				//Obtain the widget Title of the repayable fragment
-    				String widgetStringToFind = replayableFragment.get(Title, "");
-    				//Could exist actions not associated with widgets
-    				boolean actionHasWidgetAssociated = false;
-    				//Check if we found the widget
-    				boolean widgetTitleFound = false;
+	        Canvas canvas = buildCanvas();
+	        State state = getState(system);
 
-    				if (state != null){
-    					List<Finder> targets = action.get(Tags.Targets, null);
-    					if (targets != null){
-    						actionHasWidgetAssociated = true;
-    						Widget w;
-    						for (Finder f : targets){
-    							w = f.apply(state);
-    							if (w != null){			
-    								//Can be this the widget the one that we want to find?
-    								if(widgetStringToFind.equals(w.get(Tags.Title, "")))
-    									widgetTitleFound=true;
-    							}
-    						}
-    					}
-    				}
+	        setReplayVerdict(getVerdict(state));
 
-    				//If action has an associated widget and we don't find it, we are not in the correct state
-    				if(actionHasWidgetAssociated && !widgetTitleFound){
-    					success = false;
-    					String msg = "The Action " + action.get(Tags.Desc, action.toString())
-    					+ " of the replayed sequence can not been replayed into "
-    					+ " the State " + state.get(Tags.ConcreteID, state.toString());
-    					
-    					setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
-    					
-    					break;
-    				}
-    				
-					// In Replay-mode, we only show the red dot if visualizationOn is true:
-					if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, canvas, state, action);
+	        //initializing new fragment for recording replayable test sequence:
+	        initFragmentForReplayableSequence(state);
 
-					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
-							? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-					double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
-							? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
+	        double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
-					try{
-						if(tries < 2){
-							String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
-									actionCount, action.get(Desc, action.toString()));
-							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-						}else{
-							if(tries % 50 == 0)
-								LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-							else
-								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
-						}
+	        while(success && !faultySequence && mode() == Modes.Replay){
 
-						preSelectAction(state, actions);
-						
-						replayAction(system, state, action, actionDelay, actionDuration);
-						
-						success = true;
-						actionCount++;
-						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
-					} catch(ActionFailedException afe){}
+	            //Initialize local fragment to read saved actions of PathToReplaySequence File
+	            Taggable replayableFragment;
+	            try{
+	                replayableFragment = (Taggable) ois.readObject();
+	            } catch(IOException ioe){
+	                success = true;
+	                break;
+	            }
 
-					Util.pause(actionDelay);
+	            // Derive Actions of the current State
+	            Set<Action> actions = deriveActions(system,state);
+	            CodingManager.buildIDs(state, actions);
 
-    				state = getState(system);
+	            success = false;
+	            int tries = 0;
+	            double start = Util.time();
 
-    				//Saving the actions and the executed action into replayable test sequence:
-    				saveActionIntoFragmentForReplayableSequence(action, state, actions);
-    				
-    				setReplayVerdict(getVerdict(state));
-				}
+	            while(!success && (Util.time() - start < rrt)){
+	                tries++;
+	                canvas.begin(); Util.clear(canvas);
+	                canvas.end();
 
-			}
+	                //Read saved action of PathToReplaySequence File
+	                Action action = replayableFragment.get(ExecutedAction, new NOP());
 
-			canvas.release();
+	                /**
+	                 * Check if we are replaying the sequence correctly,
+	                 * comparing saved widgets with existing widgets in the current state
+	                 */
 
-		} catch(IOException ioe){
-			throw new RuntimeException("Cannot read file.", ioe);
-		} catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException("Cannot read file.", cnfe);
-		} finally {
-			if (ois != null){
-				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (bis != null){
-				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (fis != null){
-				try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (cv != null)
-				cv.release();
-			if (system != null)
-				system.stop();
-		}
+	                //Obtain the widget Title of the repayable fragment
+	                String widgetStringToFind = replayableFragment.get(Tags.Title, "");
+	                //Could exist actions not associated with widgets
+	                boolean actionHasWidgetAssociated = false;
+	                //Check if we found the widget
+	                boolean widgetTitleFound = false;
 
-		if(faultySequence) {
-    		String msg = "Replayed Sequence contains Errors: "+ getReplayVerdict().info();
-    		System.out.println(msg);
-    		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
-    		
-    	}else if(success){
-    		String msg = "Sequence successfully replayed!\n";
-    		System.out.println(msg);
-    		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+	                if (state != null){
+	                    List<Finder> targets = action.get(Tags.Targets, null);
+	                    if (targets != null){
+	                        actionHasWidgetAssociated = true;
+	                        Widget w;
+	                        for (Finder f : targets){
+	                            w = f.apply(state);
+	                            if (w != null){			
+	                                //Can be this the widget the one that we want to find?
+	                                if(widgetStringToFind.equals(w.get(Tags.Title, "")))
+	                                    widgetTitleFound=true;
+	                            }
+	                        }
+	                    }
+	                }
 
-    	}else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
-			System.out.println(getReplayVerdict().info());
-			LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
-			
-    	}else{
-    		String msg = "Fail replaying sequence.\n";
-    		System.out.println(msg);
-    		LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
-    	}
+	                //If action has an associated widget and we don't find it, we are not in the correct state
+	                if(actionHasWidgetAssociated && !widgetTitleFound){
+	                    success = false;
+	                    String msg = "The Action " + action.get(Tags.Desc, action.toString())
+	                    + " of the replayed sequence can not been replayed into "
+	                    + " the State " + state.get(Tags.ConcreteID, state.toString());
 
-		//calling finishSequence() to allow scripting GUI interactions to close the SUT:
-    	finishSequence();
+	                    setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
 
-    	//Close and save the replayable fragment of the current sequence
-    	writeAndCloseFragmentForReplayableSequence();
+	                    break;
+	                }
 
-    	//Copy sequence file into proper directory:
-    	classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
+	                // In Replay-mode, we only show the red dot if visualizationOn is true:
+	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, canvas, state, action);
 
-    	LogSerialiser.finish();
-    	
-    	postSequenceProcessing();
+	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                        ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
+	                        double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
 
-    	//Stop system and close the SUT
-    	stopSystem(system);
+	                                try{
+	                                    if(tries < 2){
+	                                        String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
+	                                                actionCount, action.get(Desc, action.toString()));
+	                                        LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
+	                                    }else{
+	                                        if(tries % 50 == 0)
+	                                            LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
+	                                        else
+	                                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
+	                                    }
 
-    	// Going back to TESTAR settings dialog if it was used to start replay:
-    	mode = Modes.Quit;
+	                                    preSelectAction(state, actions);
+
+	                                    replayAction(system, state, action, actionDelay, actionDuration);
+
+	                                    success = true;
+	                                    actionCount++;
+	                                    LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
+	                                } catch(ActionFailedException afe){}
+
+	                                Util.pause(actionDelay);
+
+	                                state = getState(system);
+
+	                                //Saving the actions and the executed action into replayable test sequence:
+	                                saveActionIntoFragmentForReplayableSequence(action, state, actions);
+
+	                                setReplayVerdict(getVerdict(state));
+	            }
+
+	        }
+
+	        canvas.release();
+
+	    } catch(IOException ioe){
+	        throw new RuntimeException("Cannot read file.", ioe);
+	    } catch (ClassNotFoundException cnfe) {
+	        throw new RuntimeException("Cannot read file.", cnfe);
+	    } finally {
+	        if (ois != null){
+	            try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (gis != null){
+	            try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (bis != null){
+	            try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (fis != null){
+	            try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (cv != null)
+	            cv.release();
+	        if (system != null)
+	            system.stop();
+	    }
+
+	    if(faultySequence) {
+	        String msg = "Replayed Sequence contains Errors: "+ getReplayVerdict().info();
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+	    }else if(success){
+	        String msg = "Sequence successfully replayed!\n";
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+	        System.out.println(getReplayVerdict().info());
+	        LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
+
+	    }else{
+	        String msg = "Fail replaying sequence.\n";
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
+	    }
+
+	    //calling finishSequence() to allow scripting GUI interactions to close the SUT:
+	    finishSequence();
+
+	    //Close and save the replayable fragment of the current sequence
+	    writeAndCloseFragmentForReplayableSequence();
+
+	    //Copy sequence file into proper directory:
+	    classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
+
+	    LogSerialiser.finish();
+
+	    postSequenceProcessing();
+
+	    //Stop system and close the SUT
+	    stopSystem(system);
+
+	    // Going back to TESTAR settings dialog if it was used to start replay:
+	    mode = Modes.Quit;
 	}
 
 	/**
@@ -1387,13 +1411,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected Canvas buildCanvas() {
-		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
 
@@ -1402,179 +1424,40 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 
-	// refactored
-	protected SUT startSystem() throws SystemStartException{
-		return startSystem(null);
-	}
-
-	/**
-	 *
-	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
-	 * @return
-	 * @throws SystemStartException
-	 */
-	protected SUT startSystem(String mustContain) throws SystemStartException{
-		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
-	}
-
-
-	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
-		try{// refactored from "protected SUT startSystem() throws SystemStartException"
+		try{
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
 			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo))
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 		}catch(IOException ioe){
 			throw new SystemStartException(ioe);
-		} // end refactoring
-		String sutConnector = settings().get(ConfigTags.SUTConnector);
-		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
-		else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-			return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
-		else if (sutConnector.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
-		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
-			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
-		else{ // Settings.SUT_CONNECTOR_CMDLINE
-			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
+		}
+		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
+		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
+			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			return sutConnector.startOrConnectSut();
+		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			return sutConnector.startOrConnectSut();
+		}else{
+			// COMMANDLINE and WebDriver SUT CONNECTOR:
+			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
 
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
-
-			//Print info to the user to know that TESTAR is NOT READY for its use :-(
-			String printSutInfo = "Waiting for the SUT to be accessible ...";
-			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
-			int timeFlash = (int)startupTime;
-
-			//Refresh the flash information, to avoid that SUT hide the information
-			int countTimeFlash = 0;
-			while(countTimeFlash<timeFlash) {
-				FlashFeedback.flash(printSutInfo, 2000);
-				countTimeFlash += 2000;
-			}
-
-			final long now = System.currentTimeMillis(),
-					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
-					State state;
-					do{
-						if (sut.isRunning()){
-							//Print info to the user to know that TESTAR is READY for its use :-)
-							printSutInfo = "SUT is READY";
-							FlashFeedback.flash(printSutInfo,2000);
-							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
-							state = builder.apply(sut);
-							if (state != null && state.childCount() > 0){
-								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
-								return sut;
-							}
-						}else {
-							//Print info to the user to know that TESTAR is NOT READY for its use :-(
-							printSutInfo = "Waiting for the SUT to be accessible ...";
-							FlashFeedback.flash(printSutInfo, 500);
-						}
-						Util.pauseMs(500);				
-					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-					if (sut.isRunning())
-						sut.stop();
-
-					if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
-						throw new WinApiException("JAVA SUT PATH EXCEPTION");
-
-					// issue starting the SUT
-					if (tryToKillIfRunning){
-						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
-						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+			// for most windows applications and most jar files, this is where the SUT gets created!
+			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
+					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
+			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
+			return sutConnector.startOrConnectSut();
 		}
 	}
 
-	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
-		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
-		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
-			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
-			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
-		} else // unable to kill SUT
-			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
-	}
-
-	private SUT getSUTByProcessName(String processName) throws SystemStartException{
-		Assert.hasText(processName);
-		List<SUT> suts = null;
-		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
-		do{
-			Util.pauseMs(100);
-			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
-				String desc;
-				for (SUT theSUT : suts){
-					desc = theSUT.get(Tags.Desc, null);
-					if (desc != null && desc.contains(processName)){
-						System.out.println("SUT with Process Name -" + processName + "- DETECTED!");
-						return theSUT;
-					}
-				}
-			}
-		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
-	}
-
-	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
-		Assert.hasText(windowTitle);
-		List<SUT> suts = null;
-		State state; Role role; String title;
-		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
-		do{
-			Util.pauseMs(100);
-			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
-				for (SUT theSUT : suts){
-					state = getStateByWindowTitle(theSUT);
-					if (state.get(Tags.Foreground)){
-						for (Widget w : state){
-							role = w.get(Tags.Role, null);
-							if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
-								title = w.get(Tags.Title, null);
-								if (title != null && title.contains(windowTitle)){
-									System.out.println("SUT with Window Title -" + windowTitle + "- DETECTED!");
-									return theSUT;
-								}
-							}
-						}
-					}
-				}
-			}
-		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
-	}
-
-	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
-		Assert.notNull(system);
-		State state = builder.apply(system);
-
-		CodingManager.buildIDs(state);
-
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
-
-		calculateZIndices(state);
-
-		return state;
-	}
 
 	/**
 	 * This method gets the state of the SUT
@@ -1585,13 +1468,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @throws StateBuildException
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		Assert.notNull(system);
 		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
-		calculateZIndices(state);
+		state = ProtocolUtil.calculateZIndices(state);
+		
+		setStateForClickFilterLayerProtocol(state);
 
+		if(settings.get(ConfigTags.Mode) == Modes.Spy)
+			return state;
+		
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
@@ -1610,7 +1498,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		setStateForClickFilterLayerProtocol(state);
+		
 		return state;
 	}
 
@@ -1620,7 +1508,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+				//System.out.println("DEBUG: Using WebDriver specific state shot.");
+				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+			}else{
+				//System.out.println("DEBUG: normal state shot");
+				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+			}
 		}
 	}
 
@@ -1629,7 +1523,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Assert.notNull(state);
 		//-------------------
 		// ORACLES FOR FREE
-		//-------------------		
+		//-------------------
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
@@ -1645,24 +1539,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		if (this.suspiciousTitlesPattern == null)
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
-		Matcher m;
-		// search all widgets for suspicious titles
-		for(Widget w : state){
-			String title = w.get(Title, "");
-			if (title != null && !title.isEmpty()){
-				m = this.suspiciousTitlesMatchers.get(title);
-				if (m == null){
-					m = this.suspiciousTitlesPattern.matcher(title);
-					this.suspiciousTitlesMatchers.put(title, m);
-				}
-				if (m.matches()){
-					Visualizer visualizer = Util.NullVisualizer;
-					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
-						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
-				}
+
+		// search all widgets for suspicious String Values
+		Verdict suspiciousValueVerdict = Verdict.OK;
+		for(Widget w : state) {
+			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
+			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+				return suspiciousValueVerdict;
 			}
 		}
 
@@ -1672,6 +1555,47 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// if everything was OK ...
+		return Verdict.OK;
+	}
+	
+	private Verdict suspiciousStringValueMatcher(Widget w) {
+		Matcher m;
+
+		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
+			String tagValue = "";
+			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
+			for(Tag tag : w.tags()){
+				if(tag.name().equals(tagForSuspiciousOracle)){
+					tagValue = w.get(tag, "");
+					break;
+					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
+				}
+			}
+
+			//Check whether the Tag value is empty or null
+			if (tagValue == null || tagValue.isEmpty())
+				continue; //no action
+
+			//Ignore value ValuePattern for UIAEdit widgets
+			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+				continue;
+			}
+
+			m = this.suspiciousTitlesMatchers.get(tagValue);
+			if (m == null){
+				m = this.suspiciousTitlesPattern.matcher(tagValue);
+				this.suspiciousTitlesMatchers.put(tagValue, m);
+			}
+
+			if (m.matches()){
+				Visualizer visualizer = Util.NullVisualizer;
+				// visualize the problematic widget, by marking it with a red box
+				if(w.get(Tags.Shape, null) != null)
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
+			}
+		}
 		return Verdict.OK;
 	}
 
@@ -1686,10 +1610,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
-		Set<Action> actions = new HashSet<Action>();	
-
-		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+		Set<Action> actions = new HashSet<Action>();
 
 		// If there is an unwanted process running, we need to kill it.
 		// This is an unwanted process that is defined in the filter.
@@ -1701,7 +1622,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name
-					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
@@ -1713,7 +1633,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			//actions.add(ac.activateSystem());
 			this.forceToForeground = true;
 			return actions;
 		}
@@ -1734,49 +1653,60 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Action preSelectAction(State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
 
-		//If deriveActions indicated that there are processes that need to be killed
-		//because they are in the process filters
-		//Then here we will select the action to do that killing
+		// If deriveActions indicated that there are processes that need to be killed
+		// because they are in the process filters
+		// Then here we will select the action to do that killing
 
 		if (this.forceKillProcess != null){
 			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildIDs(state, a);
+			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
+			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildEnvironmentActionIDs(state, killProcessAction);
 			this.forceKillProcess = null;
-			return a;
+			return killProcessAction;
 		}
-		//If deriveActions indicated that the SUT should be put back in the foreground
-		//Then here we will select the action to do that
+
+		// If deriveActions indicated that the SUT should be put back in the foreground
+		// Then here we will select the action to do that
 
 		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
+			Action foregroundAction = new ActivateSystem();
+			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
 			this.forceToForeground = false;
-			return a;
+			return foregroundAction;
 		}
 
-		//TODO: This seems not to be used yet...
+		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (this.forceNextActionESC){
-			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
+		else if (actions.isEmpty()){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, a);
-			this.forceNextActionESC = false;
-			return a;
-		} else
-			return null;
+			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildEnvironmentActionIDs(state, escAction);
+			return escAction;
+		}
+
+		return null;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
+
+		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+			//System.out.println("DEBUG: Using WebDriver specific action shot.");
+			WdProtocolUtil.getActionshot(state,action);
+		}else{
+			//System.out.println("DEBUG: normal action shot");
+			ProtocolUtil.getActionshot(state,action);
+		}
+		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
+
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
 			Util.pause(halfWait); // help for a better match of the state' actions visualization
@@ -1790,8 +1720,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
-
-			protocolUtil.getActionshot(state,action);
 
 			//Save the executed action information into the logs
 			saveActionInfoInLogs(state, action, "ExecutedAction");
@@ -1817,7 +1745,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
 
-			protocolUtil.getActionshot(state, action);
+			ProtocolUtil.getActionshot(state, action);
 
 			//Save the replayed action information into the logs
 			saveActionInfoInLogs(state, action, "ReplayedAction");
@@ -1861,93 +1789,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return DataManager.getRandomData();
 	}
 
-	/**
-	 * Calculate the max and the min ZIndex of all the widgets in a state
-	 * @param state
-	 */
-	protected void calculateZIndices(State state) {
-		double minZIndex = Double.MAX_VALUE,
-				maxZIndex = Double.MIN_VALUE,
-				zindex;
-		for (Widget w : state){
-			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
-				minZIndex = zindex;
-			if (zindex > maxZIndex)
-				maxZIndex = zindex;
-		}
-		state.set(Tags.MinZIndex, minZIndex);
-		state.set(Tags.MaxZIndex, maxZIndex);
-	}
-
-	/**
-	 * Return a list of widgets that have the maximal Zindex
-	 * @param state
-	 * @return
-	 */
-	protected List<Widget> getTopWidgets(State state){
-		List<Widget> topWidgets = new ArrayList<>();
-		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
-			if (w.get(Tags.ZIndex) == maxZIndex)
-				topWidgets.add(w);
-		return topWidgets;
-	}
-
-	/**
-	 * Check whether widget w should be filtered based on
-	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
-	 * that is cannot be hit
-	 * @param w
-	 * @return
-	 */
-	protected boolean isUnfiltered(Widget w){
-		//Check whether the widget can be hit
-		// If not, it should be filtered
-		if(!Util.hitTest(w, 0.5, 0.5))
-			return false;
-
-		//Check whether the widget has an empty title or no title
-		//If it has, it is unfiltered
-		//Because it cannot match the regular expression of the Action Filter.
-		String title = w.get(Title, "");
-		if (title == null || title.isEmpty())
-			return true;
-
-		//If no clickFilterPattern exists, then create it
-		//Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
-		if (this.clickFilterPattern == null)
-			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-
-		//Check whether the title matches any of the clickFilterPatterns
-		Matcher m = this.clickFilterMatchers.get(title);
-		if (m == null){
-			m = this.clickFilterPattern.matcher(title);
-			this.clickFilterMatchers.put(title, m);
-		}
-		return !m.matches();
-	}
-
-	/**
-	 * Check whether a widget is clickable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isClickable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
-			return true;
-		return false;
-	}
-
-	/**
-	 * Check whether a widget is typeable
-	 * @param w
-	 * @return
-	 */
-	protected boolean isTypeable(Widget w){
-		return NativeLinker.isNativeTypeable(w);
-	}
 
 	/**
 	 * STOP criteria for selecting more actions for a sequence
@@ -1955,7 +1796,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
+		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&
@@ -1967,8 +1808,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreSequences() {
-		//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-		//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
@@ -2082,7 +1921,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
@@ -2093,50 +1932,4 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.end();
 		}
 	}
-
-	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-	protected boolean isNOP(Action action){
-		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID))
-			return true;
-		else
-			return false;
-	}
-
-	protected boolean isESC(Action action){
-		Role r = action.get(Tags.Role, null);
-		if (r != null && r.isA(ActionRoles.HitKey)){
-			String desc = action.get(Tags.Desc, null);
-			if (desc != null && desc.contains("VK_ESCAPE"))
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
-
-			}
-		}
-	}
-
 }
