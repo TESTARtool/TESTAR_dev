@@ -22,7 +22,7 @@
         {% for action in sequence.get_actions() %}
         <tr>
           <td>{{action.get_description()}}</td>
-          <td>No name in current data model</td>
+          <td>{{action.get_name()}}</td>
           <td>{{action.get_id()}}</td>
           <td>{{action.get_status()}}</td>
           <td><img src="{{action.get_screenshot()}}" /></td>

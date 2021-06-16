@@ -10,6 +10,7 @@ from .abstract_classes import (
 
 # TODO: The current state of this file has not been tested.
 
+
 def setup_db_pool():
     """Create pooled database connection from enviroment variables"""
     global db_pool
@@ -69,7 +70,7 @@ def does_exist(name: str, id: int, cursor: MySQLCursorBuffered) -> bool:
 
 
 @db_cursor
-def get_property(field: str, table: str, id: int, cursor: MySQLCursorBuffered) -> object:
+def get_property(field: str, table: str, object_id: int, cursor: MySQLCursorBuffered) -> object:
     """Retrieve a single property from a single row.
 
     Args:
@@ -83,7 +84,7 @@ def get_property(field: str, table: str, id: int, cursor: MySQLCursorBuffered) -
     """
 
     query = f'SELECT {field} FROM {table} WHERE id=%s'
-    cursor.execute(query, (id,))
+    cursor.execute(query, (object_id,))
     result = cursor.fetchone()
 
     return result[0]
@@ -92,7 +93,7 @@ def get_property(field: str, table: str, id: int, cursor: MySQLCursorBuffered) -
 class Action(AbstractAction):
     # TODO: TEST EACH FEATURE
     def __init__(self, action_id: int, check: bool = True):
-        self._id = id
+        self._id = action_id
 
         # Verify existance in the database
         if check and not does_exist('actions', self._id):
@@ -133,7 +134,7 @@ class Sequence(AbstractSequence):
 
         cursor.execute(query, (self._id,))
         for row in cursor.fetchall():
-            actions.append(Sequence(row[0], check=False))
+            actions.append(Action(row[0], check=False))
         return actions
 
     def get_severity(self) -> float:
@@ -178,7 +179,7 @@ class Report(AbstractReport):
         return get_property('tag', 'reports', self._id)
 
     def sequence_count(self) -> int:
-        return get_property('sequence_count', 'reports', self._id)
+        return get_property('total_sequences', 'reports', self._id)
 
     def get_start_time(self) -> int:
         return get_property('time', 'reports', self._id)
