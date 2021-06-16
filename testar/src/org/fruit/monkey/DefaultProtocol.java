@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,6 +63,7 @@ import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.HtmlReporting.Reporting;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.apache.logging.log4j.LogManager;
@@ -100,6 +101,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
 
+	protected Reporting htmlReport;
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}
@@ -659,6 +661,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
+			//reset the faulty variable because we started a new sequence
+			faultySequence = false;
+
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
 			system = startSutIfNotRunning(system);
 
@@ -1006,6 +1011,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			preSequencePreparations();
+			
+			//reset the faulty variable because we started a new execution
+			faultySequence = false;
 
 			system = startSystem();
 			startedRecordMode = true;
@@ -1145,6 +1153,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		preSequencePreparations();
+		
+		//reset the faulty variable because we started a new execution
+		faultySequence = false;
 
 		SUT system = startSystem();
 		try{
@@ -1283,7 +1294,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
 
@@ -1320,7 +1330,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
 			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
-					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
 		}
