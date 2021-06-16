@@ -174,25 +174,21 @@ canvas.chart {
 
 table.iteration-overview {
     margin-top: 1em;
-
+    text-align: center;
     width: 100%;
-
     background: var(--overview-background);
-
     border-collapse: collapse;
 }
 
-table.iteration-overview tr th {
+table.iteration-overview > tr, th {
     background: var(--overview-background-header);
 }
 
-table.iteration-overview tr.value:not(.arrows) td:not(:first-child) {
+table.iteration-overview > tr.value:not(.arrows), td:not(:first-child) {
     border-left: 1px solid var(--overview-border);
 }
 
-table.iteration-overview tr.value td {
-    text-align: center;
-
+table.iteration-overview > tr.value, td {  
     border-top: 1px solid var(--overview-border);
 }
 
