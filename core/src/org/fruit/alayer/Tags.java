@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,6 @@ import org.fruit.alayer.devices.ProcessHandle;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -216,7 +215,7 @@ public final class Tags extends TagsBase {
 	 * The original widget that can be attached to things like actions
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
-	
+
     public static final Tag<String> OriginStateAbstractId = Tag.from("OriginStateAbstractId", String.class);
     public static final Tag<String> OriginWidgetAbstractId = Tag.from("OriginWidgetAbstractId", String.class);
     public static final Tag<String> OriginWidgetPath = Tag.from("OriginWidgetPath", String.class);
@@ -224,16 +223,5 @@ public final class Tags extends TagsBase {
     public static final Tag<String> OriginWidgetTitle = Tag.from("OriginWidgetTitle", String.class);
     public static final Tag<String> OriginWidgetValuePattern = Tag.from("OriginWidgetValuePattern", String.class);
     public static final Tag<Integer> debugExecutedTimes = Tag.from("debugExecutedTimes", Integer.class);
-	
-	private static Set<Tag<String>> generalStringVerdictTags;
-	static {
-		generalStringVerdictTags = new HashSet<Tag<String>>();
-		generalStringVerdictTags.add(Title);
-		generalStringVerdictTags.add(ValuePattern);
-	}
 
-	public static Set<Tag<String>> getGeneralStringVerdictTags() {
-		return generalStringVerdictTags;
-	}
-	
 }

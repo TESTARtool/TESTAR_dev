@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- * @author Sebastian Bauersfeld
- */
 package org.fruit;
 
 import org.fruit.alayer.*;
@@ -769,10 +767,11 @@ public final class Util {
     }
   }
 
-  public static void compileProtocol(String settingsDir, String protocolClass) {
+  public static void compileProtocol(String settingsDir, String protocolClass, String tmpCompileDir) {
     File compileDir = new File(settingsDir +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
+    System.out.println("Used directory compileProtocol settingsDir = "+settingsDir+" compileDir = "+compileDir.getAbsolutePath());
 
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -790,7 +789,7 @@ public final class Util {
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
-        options.add(settingsDir);
+        options.add(tmpCompileDir);
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,

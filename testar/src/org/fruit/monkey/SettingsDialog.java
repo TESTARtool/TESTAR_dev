@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -36,9 +36,7 @@ import nl.ou.testar.StateModel.Settings.StateModelPanel;
 
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
-import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
@@ -72,7 +70,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.2.15 (13-April-2021)";
+  static final String TESTAR_VERSION = "2.3.2 (27-May-2021)";
 
   private String settingsFile;
   private Settings settings;

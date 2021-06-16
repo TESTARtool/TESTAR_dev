@@ -42,6 +42,13 @@ jobs:
       with:
         name: runTestDesktopGenericCommandLineSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+    - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_settings_filter_and_suspicious
     - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
       run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
     - name: Save runTestDesktopGenericProcessNameSuspiciousTitle HTML report artifact

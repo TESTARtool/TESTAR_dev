@@ -30,6 +30,8 @@
 
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.SutVisualization;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -91,16 +93,17 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
+      super.beginSequence(system, state);
 
     // Add your login sequence here
 
-    /*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
+/*
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
-    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
-    */
+    waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+*/
 	  
 	/*
 	 * If you have issues typing special characters
@@ -109,7 +112,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 	 * waitLeftClickAndPasteIntoWidgetWithMatchingTag
 	 */
 
-	// waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebName, "username", "john", state, system, 5,1.0);
+	// waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
   }
 
   /**
@@ -123,9 +126,15 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
+      // parabank wsdl pages have no widgets, we need to force a webdriver history back action
+      if(WdDriver.getCurrentUrl().contains("wsdl")) {
+          WdDriver.executeScript("window.history.back();");
+          Util.pause(1);
+      }
 
-    return state;
+      State state = super.getState(system);
+
+      return state;
   }
 
   /**
@@ -179,6 +188,49 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // Check if forced actions are needed to stay within allowed domains
     Set<Action> forcedActions = detectForcedActions(state, ac);
+
+    // Add triggered actions here, before deriving the actions in a normal way:
+      /*
+      //Check if the trigger element is found:
+      Widget triggerWidget = getWidgetWithMatchingTag("name","payee.name", state);
+      if(triggerWidget!=null){
+          // The element was found, create the triggered action and return it:
+          // Creating a builder for a compound action that includes multiple actions as one item:
+          CompoundAction.Builder multiAction = new CompoundAction.Builder();
+          // Creating an action to type text into the Payee Name field:
+          multiAction.add(ac.clickTypeInto(triggerWidget, "Triggered Payer Name", true),1.0);
+          // Creating an action to type text into name="payee.address.street":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.street", state),
+                  "Triggered Payer Street", true),1.0);
+          // Creating an action to type text into name="payee.address.city":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.city", state),
+                  "Triggered City", true),1.0);
+          // Creating an action to type text into name="payee.address.state":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.state", state),
+                  "Triggered State", true),1.0);
+          // Creating an action to type text into name="payee.zipCode":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.zipCode", state),
+                  "12345", true),1.0);
+          // Creating an action to type text into name="payee.phoneNumber":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.phoneNumber", state),
+                  "123456789", true),1.0);
+          // Creating an action to type text into name="payee.accountNumber":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.accountNumber", state),
+                  "12341234", true),1.0);
+          // Creating an action to type text into name="verifyAccount":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","verifyAccount", state),
+                  "12341234", true),1.0);
+          // Creating an action to type text into name="amount":
+          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","amount", state),
+                  "100", true),1.0);
+          // Creating a click action on Send Payment button, <input type="submit" class="button" value="Send Payment">
+          multiAction.add(ac.leftClickAt(getWidgetWithMatchingTag("value","Send Payment", state)),1.0);
+          // Adding the compound action into the actions that will be returned:
+          actions.add(multiAction.build());
+          // Returning actions having only the triggered action, before the normal derive actions:
+          return actions;
+      }
+*/
 
     // iterate through all widgets
     for (Widget widget : state) {
