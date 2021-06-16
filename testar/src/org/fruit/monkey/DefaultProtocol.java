@@ -1218,6 +1218,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	        //initializing new fragment for recording replayable test sequence:
 	        initFragmentForReplayableSequence(state);
 
+	        // notify the statemodelmanager
+	        stateModelManager.notifyTestSequencedStarted();
+
 	        double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
 	        while(success && !faultySequence && mode() == Modes.Replay){
@@ -1236,12 +1239,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                success = false;
 	                String msg = "Exception " + ioe.getMessage() + " reading TESTAR replayableFragment: " + seqFile;
 	                setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+	                stateModelManager.notifyTestSequenceInterruptedBySystem(ioe.toString());
 	                break;
 	            }
 
 	            // Derive Actions of the current State
 	            Set<Action> actions = deriveActions(system,state);
 	            CodingManager.buildIDs(state, actions);
+
+	            // notify to state model the current state
+	            stateModelManager.notifyNewStateReached(state, actions);
 
 	            success = false;
 	            int tries = 0;
@@ -1317,6 +1324,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	                    preSelectAction(state, actions);
 
+	                    //before action execution, pass it to the state model manager
+	                    stateModelManager.notifyActionExecution(action);
+
 	                    replayAction(system, state, action, actionDelay, actionDuration);
 
 	                    success = true;
@@ -1336,6 +1346,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	        }
 
 	        canvas.release();
+
+	        // notify to state model the last state
+	        Set<Action> actions = deriveActions(system, state);
+	        CodingManager.buildIDs(state, actions);
+	        for(Action a : actions)
+	            if(a.get(Tags.AbstractIDCustom, null) == null)
+	                CodingManager.buildEnvironmentActionIDs(state, a);
+
+	        stateModelManager.notifyNewStateReached(state, actions);
 
 	    } catch(IOException ioe){
 	        throw new RuntimeException("Cannot read file.", ioe);
@@ -1383,6 +1402,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    //calling finishSequence() to allow scripting GUI interactions to close the SUT:
 	    finishSequence();
 
+	    // notify the state model manager of the sequence end
+	    stateModelManager.notifyTestSequenceStopped();
+
 	    //Close and save the replayable fragment of the current sequence
 	    writeAndCloseFragmentForReplayableSequence();
 
@@ -1395,6 +1417,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	    //Stop system and close the SUT
 	    stopSystem(system);
+
+	    // notify the statemodelmanager that the testing has finished
+	    stateModelManager.notifyTestingEnded();
 
 	    // Going back to TESTAR settings dialog if it was used to start replay:
 	    mode = Modes.Quit;
