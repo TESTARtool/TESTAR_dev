@@ -1,4 +1,4 @@
-
+// Credits to Nigel
 document.addEventListener('DOMContentLoaded', function() {
     let ctx = document.getElementById('issueMetricChart').getContext('2d');
 

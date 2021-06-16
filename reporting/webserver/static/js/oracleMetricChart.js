@@ -1,4 +1,4 @@
-
+// Credits to Nigel
 document.addEventListener('DOMContentLoaded', function() {
     let ctx = document.getElementById('oracleMetricChart').getContext('2d');
 
