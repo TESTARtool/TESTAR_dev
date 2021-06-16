@@ -876,7 +876,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(SystemState, state);
 		
 		//Find the target widget of the current action, and save the title into the fragment
-    	String widgetTitle = "";
     	if (state != null){
     		List<Finder> targets = action.get(Tags.Targets, null);
     		if (targets != null){
@@ -884,7 +883,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			for (Finder f : targets){
     				w = f.apply(state);
     				if (w != null){
-    					widgetTitle = w.get(Tags.Title, "").replace("\n", "").replace("\r", "").trim();
     					fragment.set(Tags.Title, w.get(Tags.Title, ""));
     				}
     			}
@@ -893,6 +891,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
+		
 		//resetting the fragment:
 		fragment = new TaggableBase();
 	}
@@ -910,18 +909,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
+
 		//resetting the fragment:
-		fragment =new TaggableBase();
+		fragment = new TaggableBase();
 	}
 
 	/**
 	 * Writing the fragment into file and closing the test serialiser
 	 */
 	private void writeAndCloseFragmentForReplayableSequence() {
-		//closing ScreenshotSerialiser:
+		//closing ScreenshotSerialiser and TestSerialiser
 		ScreenshotSerialiser.finish();
+		TestSerialiser.finish();
 		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-		TestSerialiser.write(fragment);
 
 		//Wait since TestSerialiser write all fragments on sequence File
 		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
@@ -933,7 +933,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		}
-		TestSerialiser.finish();
+
 		LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
 		LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
 	}
@@ -1176,7 +1176,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	    actionCount = 1;
 	    boolean success = true;
-	    faultySequence = false;
 
 	    //Reset LogSerialiser
 	    LogSerialiser.finish();
@@ -1225,10 +1224,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	            //Initialize local fragment to read saved actions of PathToReplaySequence File
 	            Taggable replayableFragment;
-	            try{
-	                replayableFragment = (Taggable) ois.readObject();
+	            try {
+	                // Read data from replay file if available, if not we finished replaying data
+	                if(fis.available() > 0) {
+	                    replayableFragment = (Taggable) ois.readObject();
+	                } else {
+	                    success = true;
+	                    break;
+	                }
 	            } catch(IOException ioe){
-	                success = true;
+	                success = false;
+	                String msg = "Exception " + ioe.getMessage() + " reading TESTAR replayableFragment: " + seqFile;
+	                setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
 	                break;
 	            }
 
@@ -1270,7 +1277,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                            if (w != null){			
 	                                //Can be this the widget the one that we want to find?
 	                                if(widgetStringToFind.equals(w.get(Tags.Title, "")))
-	                                    widgetTitleFound=true;
+	                                    widgetTitleFound = true;
 	                            }
 	                        }
 	                    }
@@ -1292,41 +1299,40 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, canvas, state, action);
 
 	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
-	                        ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-	                        double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
-	                                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
+	                ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
+	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
 
-	                                try{
-	                                    if(tries < 2){
-	                                        String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
-	                                                actionCount, action.get(Desc, action.toString()));
-	                                        LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-	                                    }else{
-	                                        if(tries % 50 == 0)
-	                                            LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-	                                        else
-	                                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
-	                                    }
+	                try{
+	                    if(tries < 2) {
+	                        String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
+	                                actionCount, action.get(Desc, action.toString()));
+	                        LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
+	                    } else {
+	                        if(tries % 50 == 0)
+	                            LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
+	                        else
+	                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
+	                    }
 
-	                                    preSelectAction(state, actions);
+	                    preSelectAction(state, actions);
 
-	                                    replayAction(system, state, action, actionDelay, actionDuration);
+	                    replayAction(system, state, action, actionDelay, actionDuration);
 
-	                                    success = true;
-	                                    actionCount++;
-	                                    LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
-	                                } catch(ActionFailedException afe){}
+	                    success = true;
+	                    actionCount++;
+	                    LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
+	                } catch(ActionFailedException afe){}
 
-	                                Util.pause(actionDelay);
+	                Util.pause(actionDelay);
 
-	                                state = getState(system);
+	                state = getState(system);
 
-	                                //Saving the actions and the executed action into replayable test sequence:
-	                                saveActionIntoFragmentForReplayableSequence(action, state, actions);
+	                //Saving the actions and the executed action into replayable test sequence:
+	                saveActionIntoFragmentForReplayableSequence(action, state, actions);
 
-	                                setReplayVerdict(getVerdict(state));
+	                setReplayVerdict(getVerdict(state));
 	            }
-
 	        }
 
 	        canvas.release();
