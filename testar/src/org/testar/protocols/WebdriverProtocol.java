@@ -318,6 +318,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Action preSelectAction(State state, Set<Action> actions){
         // adding available actions into the HTML report:
         htmlReport.addActions(actions);
+		if (actions.size() == 0)
+		{			
+			return new WdHistoryBackAction();
+		}
         return(super.preSelectAction(state, actions));
     }
 
@@ -334,6 +338,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
+	
 
     /**
      * This methods is called after each test sequence, allowing for example using external profiling software on the SUT

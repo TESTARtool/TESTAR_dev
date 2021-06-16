@@ -52,6 +52,11 @@ import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Persistence.OrientDB.*;
 import java.util.*;
 import java.lang.Thread;
+import java.net.*;
+
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -82,12 +87,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	// Disallow links and pages with these extensions
 	// Set to null to ignore this feature
-	private static List<String> deniedExtensions = Arrays.asList("pdf", "jpg", "png");
+	private static List<String> deniedExtensions = Arrays.asList("pdf", "jpg", "png","wsdl","pfx");
 
 	// Define a whitelist of allowed domains for links and pages
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
-	private static List<String> domainsAllowed = Arrays.asList("www.w3schools.com");
+	private static List<String> domainsAllowed = Arrays.asList("para.testar.org");
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)
@@ -107,24 +112,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		}
 	};
 
-	public Action fillForm(State state, Map<String, String> fields) {
-		CompoundAction.Builder caB = new CompoundAction.Builder();
-		for (org.fruit.alayer.Widget w : state) {
-			WdWidget wdWidget = (WdWidget) w;
-
-			if (!w.get(Enabled, true) || w.get(Blocked, false)) {
-				continue;
-			}
-
-			if (fields.containsKey(wdWidget.getAttribute("id"))) {
-				// caB.add(new
-				// WdAttributeAction(wdWidget.getAttribute("name"),"value",fields.get(wdWidget.getAttribute("id"))));
-			}
-
-		}
-		CompoundAction ca = caB.build();
-		return ca;
-	}
 
 	/*
 	 * private void getLogin() { Form form = new Form(); form.add("x", "foo");
@@ -221,8 +208,13 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		// Check if forced actions are needed to stay within allowed domains
+        if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl"))
+        {
+            WdDriver.executeScript("window.history.back()");
+        }
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
+            System.out.println("Executing forced action");
 			return forcedActions;
 		}
 		System.out.println("Protocol file: deriveActions: Arend acties");
@@ -233,6 +225,17 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		// iterate through all widgets
 		for (org.fruit.alayer.Widget widget : state) {
 			// only consider enabled and non-tabu widgets
+
+            //System.out.println("DeriveAction widget = "+widget+" class = "+widget.getClass());
+            WdWidget wd = (WdWidget)widget;
+            WdElement element = wd.element;
+             //System.out.println("DeriveAction widget = "+widget+" class = "+widget.getClass()+" wd = "+wd+" elem= "+element.tagName);
+            if (isForm(widget))
+            {
+                System.out.println("Form gevonden");
+                fillForm(actions, ac, state, wd,null);
+                
+            }
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
@@ -261,21 +264,189 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		return actions;
 	}
 
-	/*
-	 * Check if the widget has a denied URL as hyperlink
-	 */
 
-	/*
-	 * Get the domain from a full URL
-	 */
+   public HashMap<String,String> readFormFile(String fileName)
+   {
+       try {
+       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new File( fileName ));
+        document.getDocumentElement().normalize();
+        Element root = document.getDocumentElement();
+        System.out.println("readFormFile");
+        NodeList items =  root.getChildNodes(); 
+        HashMap<String, String> result = new HashMap<String,String>();
+        for (int i=0; i<items.getLength(); i++)
+        {
+            
+            Node item = items.item(i);
+            Element node = (Element) item;
+            String value = node.getTextContent();            
+            System.out.println(node.getNodeName() +"=" +value);
+            result.put(node.getNodeName(), value);
+        }
+        System.out.println("Einde formfile");
+        return result;
+       }
+       catch (Exception e)
+       {}
+       return null;
+       
+   }
+   
+   public void storeToFile(String fileName, HashMap<String, String> data)
+   {
+       String result = "<form><performSubmit>true</performSubmit>";
+       
+       for (Map.Entry<String, String> entry : data.entrySet())
+       {
+           String key = entry.getKey();
+           String value = entry.getValue();
+           
+           result += "<"+key+">"+value+"</"+key+">";
+       }
+       result += "</form>";
+       try {
+       BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        writer.write(result);
+    
+       writer.close();
+       }
+       catch (Exception e)
+       {}
+       System.out.println(result);
+       
+   }
+   
+   boolean inForm = false;
+   @Override
+  protected boolean blackListed(org.fruit.alayer.Widget w){
+       if (inForm) return false;
+       
+    	return super.blackListed(w);
+    }
+   
 
-	/*
-	 * If domainsAllowed not set, allow the domain from the SUT Connector
-	 */
+    public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile)
+	{
+       int sum = 0;
+       WdElement element = widget.element;
+       if (isTypeable(widget))
+                {
+                    
+                    System.out.println("veld "+element.name+"  gevonden");
+                    if (storeFile)
+                    {
+                        
+                        fields.put(element.name,"xxx");
+                    }
+                    if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+                        caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
+                        sum += 2;
+                    }
+                    
+                }
+        String baseElem = element.tagName;
+        System.out.println("check children: huidig element "+element.tagName+" aantal childs: "+widget.childCount());
+		for (int i = 0; i< widget.childCount(); i++) {
+			WdWidget w = widget.child(i);
+            System.out.println("child "+i+"  van element "+baseElem);
+            //WdElement 
+            element = w.element;			
+            
+                System.out.println("buildForm :"+ element.tagName +" "+element.name);
+                if (isTypeable(w))
+                {
+                    System.out.println("veld "+element.name+"  gevonden");
+                    if (storeFile)
+                    {
+                        
+                        fields.put(element.name,"xxx");
+                    }
+                    if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+                        
+                        caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
+                        sum += 2;
+                        System.out.println("element.name in de fields; voeg toe aan caB som+2 som = "+sum);
+                    }
+                    
+                } else {
+                    System.out.println("Element "+element.tagName+"  is niet typeable");
+                    
+					 sum += buildForm(caB, widget.child(i), fields, storeFile);
+				}
+           
+		}
+System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
+       return sum;
 
-	/*
-	 * We need to check if click position is within the canvas
-	 */
+	}
+	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget, HashMap<String, String> fields) {
+    System.out.println("Url = "+WdDriver.getCurrentUrl());
+    inForm=true;
+    if (fields == null)
+    {
+        fields = new HashMap<String, String>();
+    }
+    URI uri = null;
+    try {
+     uri = new URI(WdDriver.getCurrentUrl());
+    }
+    catch (Exception e)
+    {}
+	String formId = widget.getAttribute("name");
+    if (formId == null)
+    {
+        formId = "";
+    }
+    String path = (uri.getPath()+"/"+formId).replace("/","_")+".xml";
+    System.out.println("Look for file "+path);
+    File f = new File(path);
+    Boolean storeFile = true;
+    if (f.exists())
+    {
+        storeFile = false;
+        fields = readFormFile(path);
+        System.out.println("Bestand bestaat, lees de data uit bestand");
+    }
+		CompoundAction.Builder caB = new CompoundAction.Builder();
+		int sum = buildForm(caB, widget, fields, storeFile);
+		
+		if (fields.containsKey("performSubmit"))
+		{
+			boolean submit = Boolean.getBoolean(fields.get("performSubmit"));
+			if (submit) {
+				caB.add(new WdSubmitAction("formId"),2);
+			}
+		}
+if (storeFile)
+{
+    storeToFile(path, fields);
+}
+      if (sum > 0){
+		CompoundAction ca = caB.build();
+
+        actions.add(ca);
+      }
+      inForm=false;
+      System.out.println("fillForm klaar");
+		//return ca;
+	}
+
+
+    boolean _moreActions = true;
+	 @Override
+	 protected boolean moreActions(State state) {
+		return _moreActions;
+	 }
+
+	 @Override
+	 protected boolean moreSequences()
+	 {
+		 return _moreActions;
+	 }
+
+	  
 
 	@Override
 	protected boolean isClickable(org.fruit.alayer.Widget widget) {
@@ -299,21 +470,34 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
+	boolean isForm(org.fruit.alayer.Widget widget)
+	{
+		Role r = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(r, new Role[] { WdRoles.WdFORM}))
+		{
+			return r.equals(WdRoles.WdFORM);
+		}
+		return false;
+	}
+
 	@Override
 	protected boolean isTypeable(org.fruit.alayer.Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
+				
+				String type = ((WdWidget) widget).element.type.toLowerCase();
+				System.out.println("isTypeable:" + widget+"  type = "+type+"  result = "+WdRoles.typeableInputTypes().contains(type));
 				return WdRoles.typeableInputTypes().contains(type);
 			}
+			System.out.println("true");
 			return true;
 		}
+		System.out.println("false");
 
 		return false;
 	}
-
 	/**
 	 * Select one of the available actions using an action selection algorithm (for
 	 * example random action selection)
@@ -390,6 +574,11 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		return ac;
 	}
 
+    int cyclesWaitBeforeNewAction = 0;
+
+	String lastState = "";
+	int sameState = 0;
+
 	private String getNewSelectedAction(State state, Set<Action> actions) {
 		String result = null;
 		Boolean ok = false;
@@ -405,15 +594,27 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 					// Visited all actions already from this point to blackHole
 					// Go up one state. Also possible there are no actions at all
 					// possibly all actions are executed by other nodes.
-					if (actions.size() > 1) // derived actions contains somethi
+					if (actions.size() >= 1) // derived actions contains somethi
 					{
+                        // A new action can be selected
+                        cyclesWaitBeforeNewAction = 0;
+						if (state.get(Tags.AbstractIDCustom).equals(lastState))
+						{
+							sameState++;
+
+						}
+						lastState = state.get(Tags.AbstractIDCustom);
 						ok = true;
 						// there actions but none are available for this node
 						return null;
 					} else {
-						System.out.println("I hope this doesn't trigger");
+                        // No new action can be selected and database does not contain anything
+						//System.out.println("I hope this doesn't trigger");
+                        cyclesWaitBeforeNewAction ++;
 
-						result = "GoHistoryBack";
+						WdDriver.executeScript("window.history.back();");
+						Thread.sleep(1000);
+						
 						ok = true;
 						
 					}
@@ -446,6 +647,13 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		return result;
 	}
 
+	public Action traversePath(State state, Set<Action> actions)
+	{
+    System.out.println("traversePath");
+		return super.selectAction(state, actions);
+	
+	}
+
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 
@@ -466,16 +674,18 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 			selectedAction = getNewSelectedAction(state, actions);
 			// After execution of getNewSelectedAction it is still possible no action is selected (empty database for example)
-			if (selectedAction == "GoHistoryBack")
-			{
-				// History back
-				// Created bug here: set selectedAction = null for simplicity reasons
-				System.out.println("Perform the bug");
-				selectedAction = null;
-			}
+
+			
 			if (selectedAction == null)
 			{
-				return super.selectAction(state, actions);
+                if (cyclesWaitBeforeNewAction < 3 && sameState < 3) {
+					System.out.println("selectAction: cyclesWaitBeforeNewAction = "+cyclesWaitBeforeNewAction+" sameState = "+sameState+" Wait 3000+Rnd(2000) ms then select action (hoping for newly discovered actions");
+                    try { Thread.sleep(3000+new Random().nextInt(2000)); } catch (Exception e){}
+                    // Wait 5 seconds before new action can be selected (even if it's a known one
+				   // return super.selectAction(state, actions);
+                } else {
+                    _moreActions = false;
+                }
 			}	
 		}
 				
@@ -495,7 +705,14 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 				  selectedAction = null; // Reset selectedAction so next time a new one will be choosen.
 				  return a;				  
 			  } else {
+				  if (sameState >3 )
+				  {
+					  System.out.println("Already more than three times in same state");
+					  _moreActions = false;
+				  }
 				  System.out.println("Needed action is unavailable, select from path to be followed; for now easy way out random select");
+				  Action a = traversePath(state, actions);
+				  return a;
 				  // Lookup database to perform the next action in the path (possible better to be cached)
 				  // Perform action to get closer to the selectedAction
 			  }
@@ -505,7 +722,11 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		System.out.println("Return a fallback action");
 			
 		retAction = super.selectAction(state, actions);
+		try {
 		UpdateAbstractActionInProgress(retAction.get(Tags.AbstractIDCustom));
+		}
+		catch (Exception e)
+		{}
 		return retAction;
 			
 		
