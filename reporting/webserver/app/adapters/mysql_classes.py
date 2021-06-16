@@ -8,7 +8,6 @@ from mysql.connector.cursor import MySQLCursorBuffered
 from .abstract_classes import (
     AbstractReport, AbstractSequence, AbstractAction)
 
-# TODO: The current state of this file has not been tested.
 
 
 def setup_db_pool():
@@ -16,7 +15,7 @@ def setup_db_pool():
     global db_pool
 
     # TODO: Database takes time to start...
-    sleep(5)
+    sleep(int(os.environ.get('MYSQL_WAIT', 5)))
 
     # Extract settings
     config = {
@@ -119,7 +118,6 @@ class Action(AbstractAction):
 
 
 class Sequence(AbstractSequence):
-    # TODO: TEST EACH FEATURE
     def __init__(self, sequence_id: int, check: bool = True):
         self._id = sequence_id
 
@@ -148,7 +146,6 @@ class Sequence(AbstractSequence):
 
 
 class Report(AbstractReport):
-    # TODO: TEST EACH FEATURE
     def __init__(self, report_id: int, check: bool = True):
         self._id = report_id
 

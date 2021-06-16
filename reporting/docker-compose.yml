@@ -26,6 +26,7 @@ services:
       MYSQL_USER: testar
       MYSQL_PASSWORD: testar
       MYSQL_DATABASE: testar
+      MYSQL_WAIT: 5
     depends_on:
       - database
     links:
