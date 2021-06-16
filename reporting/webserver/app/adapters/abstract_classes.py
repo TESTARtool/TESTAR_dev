@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from enum import Enum
 
-# TODO: Data model is probably going to look different
+# TODO: Implement states
 
 
 class Veredict(Enum):
@@ -71,6 +71,10 @@ class AbstractSequence(ABC):
     def get_id(self) -> int:
         pass
 
+    @abstractmethod
+    def get_info(self) -> int:
+        pass
+
     def action_count(self) -> int:
         return len(self.get_actions())
 
@@ -131,6 +135,19 @@ class AbstractReport(ABC):
 
     @abstractmethod
     def get_sequence_by_id(self, id: int) -> AbstractSequence:
+        pass
+
+    @abstractmethod
+    def get_start_time(self) -> int:
+        pass
+
+    @abstractmethod
+    def get_name(self) -> str:
+        """Retrieve a human readable report descriptor
+
+        Returns:
+            str: Report name
+        """
         pass
 
     @abstractclassmethod
