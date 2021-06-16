@@ -1,3 +1,4 @@
+// Credits to Nigel
 var testIterations = document.getElementsByClassName("iteration-overview")[0];
 
 var ti_maxElements = 10;
@@ -13,8 +14,6 @@ function renderTestIterations() {
     let show = [];
     for (let i = 0; i < ti_maxElements; i++)
         show.push(ti_index * ti_maxElements + i);
-
-    console.log(ti_index, ti_maxElements, show)
 
     values.forEach(it => {
         let found = false;
