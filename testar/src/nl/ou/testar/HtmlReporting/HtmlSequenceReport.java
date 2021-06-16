@@ -37,8 +37,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
-import org.fruit.monkey.RuntimeControlsProtocol;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 
 import java.io.File;
@@ -65,25 +63,46 @@ public class HtmlSequenceReport implements Reporting{
     
     private int innerLoopCounter = 0;
 
-    public HtmlSequenceReport(Modes mode, String pathReplayedSequence) {
+    public HtmlSequenceReport() {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
             String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
-            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
-            		+ REPORT_FILENAME_AFT;
-            
+                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+                    + REPORT_FILENAME_AFT;
+
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
             }
-            
-            if(mode == Modes.Replay)
-            	write("<h1>TESTAR replay sequence report for file " + pathReplayedSequence + "</h1>");
-            else
-            	write("<h1>TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount + "</h1>");
-            
+
+            write("<h1>TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount + "</h1>");
+
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Constructor for Replay mode. 
+     * 
+     * @param mode
+     * @param pathReplayedSequence
+     */
+    public HtmlSequenceReport(String pathReplayedSequence) {
+        try {
+            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+                    + REPORT_FILENAME_AFT;
+
+            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            for(String s:HEADER) {
+                write(s);
+            }
+
+            write("<h1>TESTAR replay sequence report for file " + pathReplayedSequence + "</h1>");
+
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
