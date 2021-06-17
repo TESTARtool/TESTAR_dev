@@ -60,6 +60,9 @@ public class Settings extends TaggableBase implements Serializable {
 	public static final String SUT_CONNECTOR_CMDLINE = "COMMAND_LINE";
 	public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
 
+	public static final String SUT_REPORT_HTML = "STATIC_HTML";
+	public static final String SUT_REPORT_DATABASE = "DATABASE";
+
 	private static String settingsPath;
 	
 	public static String getSettingsPath() {

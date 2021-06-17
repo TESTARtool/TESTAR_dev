@@ -31,7 +31,7 @@ public class MySqlServiceImpl implements MySqlService {
         dockerPoolService = new DockerPoolServiceImpl();
     }
 
-    public void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
+    public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
         dockerPoolService.start("mysql");
         final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir),
                 "FROM mysql:latest\n" +
@@ -78,14 +78,14 @@ public class MySqlServiceImpl implements MySqlService {
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
     }
 
-    public void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException {
+    public synchronized void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
         connection = DriverManager.getConnection("jdbc:mysql://" + hostname + "/" + databaseName +
                 "?user=" + userName + "&password=" + userPassword);
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
     }
 
-    public int registerReport(String tag) throws SQLException {
+    public synchronized int registerReport(String tag) throws SQLException {
         PreparedStatement addReportStatement = connection.prepareStatement("INSERT INTO reports (tag, time) VALUES (?, NOW())");
         addReportStatement.setString(1, tag);
         addReportStatement.executeUpdate();
@@ -95,7 +95,7 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public int registerIteration(int reportId) throws SQLException {
+    public synchronized int registerIteration(int reportId) throws SQLException {
         PreparedStatement addSequenceStatement = connection.prepareStatement("INSERT INTO iterations (report_id) VALUES (?)");
         addSequenceStatement.setInt(1, reportId);
         addSequenceStatement.executeUpdate();
@@ -105,13 +105,11 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public int registerIteration(int reportId, String info, Double severity, int lastExecutedActionId, int lastStateId) throws SQLException {
-        PreparedStatement addSequenceStatement = connection.prepareStatement("INSERT INTO iterations (report_id, info, severity, last_executed_action_id, last_state_id) VALUES (?, ?, ?, ?, ?)");
+    public synchronized int registerIteration(int reportId, String info, Double severity) throws SQLException {
+        PreparedStatement addSequenceStatement = connection.prepareStatement("INSERT INTO iterations (report_id, info, severity) VALUES (?, ?, ?)");
         addSequenceStatement.setInt(1, reportId);
         addSequenceStatement.setString(2, info);
         addSequenceStatement.setDouble(3, severity);
-        addSequenceStatement.setInt(4, lastExecutedActionId);
-        addSequenceStatement.setInt(5, lastStateId);
         addSequenceStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -119,14 +117,13 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public int registerAction(int iterationId, String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException {
-        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (iteration_id, name, description, status, screenshot, start_time) VALUES (?, ?, ?, ?, ?, ?)");
-        addActionStatement.setInt(1, iterationId);
-        addActionStatement.setString(2, name);
-        addActionStatement.setString(3, description);
-        addActionStatement.setString(4, status);
-        addActionStatement.setString(5, screenshot);
-        addActionStatement.setTimestamp(6, startTime);
+    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException {
+        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time) VALUES (?, ?, ?, ?, ?)");
+        addActionStatement.setString(1, name);
+        addActionStatement.setString(2, description);
+        addActionStatement.setString(3, status);
+        addActionStatement.setString(4, screenshot);
+        addActionStatement.setTimestamp(5, startTime);
         addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -134,21 +131,39 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException {
-        PreparedStatement addStateStatement = connection.prepareStatement("INSERT INTO states (concrete_id_custom, abstract_id, abstract_r_id, abstract_r_t_id, abstract_r_t_p_id VALUES (?, ?, ?, ?, ?)");
+    public synchronized void addActionToIteration(int actionId, int iterationId) throws SQLException {
+        PreparedStatement updateActionStatement = connection.prepareStatement("UPDATE actions SET iteration_id=? WHERE id=?");
+        updateActionStatement.setInt(1, iterationId);
+        updateActionStatement.setInt(2, actionId);
+
+        updateActionStatement.executeUpdate();
+    }
+
+    public synchronized void setSelectionInIteration(int iterationId, int lastExecutedActionId, int lastStateId) throws SQLException {
+        PreparedStatement setSelectionStatement = connection.prepareStatement("UPDATE iterations SET last_executed_action_id=?, last_state_id=? WHERE id=?");
+        setSelectionStatement.setInt(1, lastExecutedActionId);
+        setSelectionStatement.setInt(2, lastStateId);
+        setSelectionStatement.setInt(3, iterationId);
+
+        setSelectionStatement.executeUpdate();
+    }
+
+    public synchronized int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException {
+        PreparedStatement addStateStatement = connection.prepareStatement("INSERT INTO sequence_items (concrete_id, abstract_id, abstract_r_id, abstract_r_t_id, abstract_r_t_p_id) VALUES (?, ?, ?, ?, ?)");
         addStateStatement.setString(1, concreteIdCustom);
         addStateStatement.setString(2, abstractId);
         addStateStatement.setString(3, abstractRId);
         addStateStatement.setString(4, abstractRTId);
         addStateStatement.setString(5, abstractRTPId);
+        addStateStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
         resultSet.next();
         return resultSet.getInt(1);
     }
 
-    public int findState(String concreteIdCustom, String abstractId) throws SQLException {
-        PreparedStatement findStateStatement = connection.prepareStatement("SELECT id FROM states WHERE concrete_id_custom = ? AND abstract_id = ?");
+    public synchronized int findState(String concreteIdCustom, String abstractId) throws SQLException {
+        PreparedStatement findStateStatement = connection.prepareStatement("SELECT id FROM sequence_items WHERE concrete_id = ? AND abstract_id = ?");
         findStateStatement.setString(1, concreteIdCustom);
         findStateStatement.setString(2, abstractId);
 
@@ -159,7 +174,7 @@ public class MySqlServiceImpl implements MySqlService {
         return -1;
     }
 
-    public void storeVerdict(int iterationId, String info, Double severity) throws SQLException {
+    public synchronized void storeVerdict(int iterationId, String info, Double severity) throws SQLException {
         PreparedStatement updateVerdictStatement = connection.prepareStatement("UPDATE iterations SET info=?, severity=? WHERE id=?");
         updateVerdictStatement.setString(1, info);
         updateVerdictStatement.setDouble(2, severity);
@@ -168,7 +183,7 @@ public class MySqlServiceImpl implements MySqlService {
         updateVerdictStatement.executeUpdate();
     }
 
-    public void finalizeReport(int reportId, int actionsPerSequence, int totalSequences, String url) throws SQLException {
+    public synchronized void finalizeReport(int reportId, int actionsPerSequence, int totalSequences, String url) throws SQLException {
         PreparedStatement updateVerdictStatement = connection.prepareStatement("UPDATE reports SET actions_per_sequence=?, total_sequences=?, url=? WHERE id=?");
         updateVerdictStatement.setInt(1, actionsPerSequence);
         updateVerdictStatement.setInt(2, totalSequences);
@@ -178,7 +193,7 @@ public class MySqlServiceImpl implements MySqlService {
         updateVerdictStatement.executeUpdate();
     }
 
-    public void stopLocalDatabase() {
+    public synchronized void stopLocalDatabase() {
         dockerPoolService.dispose(false);
     }
 
