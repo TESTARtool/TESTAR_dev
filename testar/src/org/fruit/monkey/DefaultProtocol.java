@@ -793,10 +793,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
-			CodingManager.buildIDs(state, actions);
+			buildStateActionsIdentifiers(state, actions);
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
-					CodingManager.buildEnvironmentActionIDs(state, a);
+				    buildEnvironmentActionIdentifiers(state, a);
 			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
@@ -830,10 +830,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
-		CodingManager.buildIDs(state, actions);
+		buildStateActionsIdentifiers(state, actions);
 		for(Action a : actions)
 			if(a.get(Tags.AbstractIDCustom, null) == null)
-				CodingManager.buildEnvironmentActionIDs(state, a);
+			    buildEnvironmentActionIdentifiers(state, a);
 		
 		stateModelManager.notifyNewStateReached(state, actions);
 
@@ -954,7 +954,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
+			buildStateActionsIdentifiers(state, actions);
 
 			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
@@ -1050,7 +1050,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
+			buildStateActionsIdentifiers(state, actions);
 
 			//notify the state model manager of the new state
 			stateModelManager.notifyNewStateReached(state, actions);
@@ -1064,7 +1064,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
 				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildEnvironmentActionIDs(state, escAction);
+				buildEnvironmentActionIdentifiers(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
 			} else
@@ -1078,7 +1078,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
 
-				CodingManager.buildIDs(state, actionStatus.getAction());
+			    buildStateActionsIdentifiers(state, Collections.singleton(actionStatus.getAction()));
 
 				//notify the state model manager of the executed action
 				stateModelManager.notifyActionExecution(actionStatus.getAction());
@@ -1351,7 +1351,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Assert.notNull(system);
 		State state = builder.apply(system);
 
-		CodingManager.buildIDs(state);
+		buildStateIdentifiers(state);
 		state = ProtocolUtil.calculateZIndices(state);
 		
 		setStateForClickFilterLayerProtocol(state);
@@ -1541,7 +1541,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
 			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildEnvironmentActionIDs(state, killProcessAction);
+			buildEnvironmentActionIdentifiers(state, killProcessAction);
 			this.forceKillProcess = null;
 			return killProcessAction;
 		}
@@ -1553,7 +1553,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, foregroundAction);
+			buildEnvironmentActionIdentifiers(state, foregroundAction);
 			this.forceToForeground = false;
 			return foregroundAction;
 		}
@@ -1564,7 +1564,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildEnvironmentActionIDs(state, escAction);
+			buildEnvironmentActionIdentifiers(state, escAction);
 			return escAction;
 		}
 
@@ -1777,7 +1777,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
+			buildStateActionsIdentifiers(state, actions);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
 			if(visualizationOn) visualizeActions(cv, state, actions);
@@ -1785,4 +1785,38 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.end();
 		}
 	}
+
+	/**
+	 * Use CodingManager to create the Widget and State identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID 
+	 * 
+	 * @param state
+	 */
+	protected void buildStateIdentifiers(State state) {
+	    CodingManager.buildIDs(state);
+	}
+
+	/**
+	 * Use CodingManager to create the Actions identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
+	 * 
+	 * @param state
+	 * @param actions
+	 */
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+	    CodingManager.buildIDs(state, actions);
+	}
+
+	/**
+	 * Use CodingManager to create the specific environment Action identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
+	 * 
+	 * @param state
+	 * @param action
+	 */
+	protected void buildEnvironmentActionIdentifiers(State state, Action action) {
+	    CodingManager.buildEnvironmentActionIDs(state, action);
+	}
+
 }
