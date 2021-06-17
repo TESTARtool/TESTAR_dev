@@ -918,24 +918,28 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Writing the fragment into file and closing the test serialiser
 	 */
 	private void writeAndCloseFragmentForReplayableSequence() {
-		//closing ScreenshotSerialiser and TestSerialiser
-		ScreenshotSerialiser.finish();
-		TestSerialiser.finish();
-		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+	    LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+	    TestSerialiser.write(fragment);
 
-		//Wait since TestSerialiser write all fragments on sequence File
-		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			synchronized (this) {
-				try {
-					this.wait(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	    //Wait since TestSerialiser write all fragments on sequence File
+	    while(!TestSerialiser.isSavingQueueEmpty() || !ScreenshotSerialiser.isSavingQueueEmpty()) {
+	        synchronized (this) {
+	            try {
+	                this.wait(1000);
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    }
 
-		LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-		LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
+	    //closing ScreenshotSerialiser and TestSerialiser
+	    ScreenshotSerialiser.finish();
+	    ScreenshotSerialiser.exit();
+	    TestSerialiser.finish();
+	    TestSerialiser.exit();
+
+	    LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
+	    LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
 	}
 
 	/**
