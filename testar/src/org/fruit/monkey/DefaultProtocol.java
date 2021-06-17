@@ -1766,29 +1766,34 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 	
 	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-		try{
-			double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
-			Util.pause(halfWait); // help for a better match of the state' actions visualization
-			action.run(system, state, actionDuration);
-			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
-			long actionCPU;
-			do {
-				long CPU1[] = NativeLinker.getCPUsage(system);
-				Util.pause(halfWait);
-				long CPU2[] = NativeLinker.getCPUsage(system);
-				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
-				waitCycles--;
-			} while (actionCPU > 0 && waitCycles > 0);
+	    // Get an action screenshot based on the NativeLinker platform
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	        WdProtocolUtil.getActionshot(state,action);
+	    } else {
+	        ProtocolUtil.getActionshot(state,action);
+	    }
 
-			ProtocolUtil.getActionshot(state, action);
+	    try{
+	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
+	        Util.pause(halfWait); // help for a better match of the state' actions visualization
+	        action.run(system, state, actionDuration);
+	        int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
+	        long actionCPU;
+	        do {
+	            long CPU1[] = NativeLinker.getCPUsage(system);
+	            Util.pause(halfWait);
+	            long CPU2[] = NativeLinker.getCPUsage(system);
+	            actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
+	            waitCycles--;
+	        } while (actionCPU > 0 && waitCycles > 0);
 
-			//Save the replayed action information into the logs
-			saveActionInfoInLogs(state, action, "ReplayedAction");
+	        //Save the replayed action information into the logs
+	        saveActionInfoInLogs(state, action, "ReplayedAction");
 
-			return true;
-		}catch(ActionFailedException afe){
-			return false;
-		}
+	        return true;
+	    }catch(ActionFailedException afe){
+	        return false;
+	    }
 	}
 
 	/**
