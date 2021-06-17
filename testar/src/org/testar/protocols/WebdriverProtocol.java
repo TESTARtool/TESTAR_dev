@@ -36,7 +36,6 @@ import static org.fruit.alayer.Tags.Enabled;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -51,7 +50,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
+import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.HtmlTestReport;
 import nl.ou.testar.SequenceReport;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.TestReport;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
@@ -80,15 +84,13 @@ import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.HtmlReporting.HtmlTestReport;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected SequenceReport htmlReport;
-	protected TestReport htmlTestReport;
+    protected SequenceReport sequenceReport;
+	protected TestReport testReport;
     protected State latestState;
 
     protected String firstNonNullUrl;
@@ -131,7 +133,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
-		if (settings.get(ConfigTags.StateModelEnabled)) {
+		if (settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
+			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
 			sqlService = new MySqlServiceImpl(settings);
 			final String databaseName = settings.get(ConfigTags.DataStoreDB);
 			final String userName = settings.get(ConfigTags.DataStoreUser);
@@ -145,7 +148,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					sqlService.connectExternalDatabase(settings.get(ConfigTags.DataStoreServer),
 							databaseName, userName, userPassword);
 				}
-				reportId = sqlService.registerReport(settings.get(ConfigTags.DataStore));
 			} catch (Exception e) {
 				System.err.println("Cannot initialize a database");
 				e.printStackTrace();
@@ -153,7 +155,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 
 		// Initialize HTML Report (Dashboard)
-		this.htmlTestReport = new HtmlTestReport();
+		if (sqlService != null) {
+			this.testReport = new DatabaseTestReport(sqlService, settings.get(ConfigTags.DataStore));
+		}
+		else {
+			this.testReport = new HtmlTestReport();
+		}
 		this.firstNonNullUrl = null; // FIXME: There should be a better way to find the URL right?
 
 		// reads the settings from file:
@@ -185,11 +192,15 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	@Override
 	protected void onTestEndEvent() {
-		this.htmlTestReport.saveReport(
+		this.testReport.saveReport(
 				this.settings().get(ConfigTags.SequenceLength),
 				this.settings().get(ConfigTags.Sequences),
 				this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
 		);
+
+		if (sqlService != null && isLocalDatabaseActive) {
+			sqlService.stopLocalDatabase();
+		}
 	}
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -197,17 +208,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
 
-    	if (sqlService != null) {
-			try {
-				iterationId = sqlService.registerIteration(reportId);
-			} catch (Exception e) {
-				System.err.println("Cannot register an iteration");
-				e.printStackTrace();
-			}
-		}
-
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+		if (sqlService != null) {
+			sequenceReport = new DatabaseSequenceReport(sqlService);
+		}
+		else {
+			sequenceReport = new HtmlSequenceReport();
+		}
     }
     
     /**
@@ -346,8 +353,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	}
     	
         //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        htmlTestReport.addState(latestState);
+        sequenceReport.addState(latestState);
+        testReport.addState(latestState);
         return latestState;
     }
 
@@ -381,20 +388,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected Action preSelectAction(State state, Set<Action> actions){
 
-    	for (Action action: actions) {
-    		//registerAction(int iterationId, String name, String description, String status, String screenshot, Timestamp startTime)
-			try {
-				exportAction(action);
-			}
-			catch (Exception e) {
-				System.out.println("Cannot export an action");
-				e.printStackTrace();
-			}
-		}
-
         // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        htmlTestReport.addActions(actions);
+        sequenceReport.addActions(actions);
+        testReport.addActions(actions);
         return(super.preSelectAction(state, actions));
     }
 
@@ -408,8 +404,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected boolean executeAction(SUT system, State state, Action action){
         // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        htmlTestReport.addSelectedAction(state, action);
+        sequenceReport.addSelectedAction(state, action);
+        testReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
 
@@ -419,17 +415,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
 
-    	if (sqlService != null) {
-			try {
-				sqlService.storeVerdict(iterationId, processVerdict.info(), processVerdict.severity());
-			} catch (Exception e) {
-				System.err.println("Cannot store a verdict");
-				e.printStackTrace();
-			}
-		}
-
-    	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-    	htmlTestReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
+    	sequenceReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+    	testReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
 
     	String sequencesPath = getGeneratedSequenceName();
     	try {
@@ -447,7 +434,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			+ " " + sequencesPath
     			+ " " + status + " \"" + statusInfo + "\"" );
 
-    	htmlReport.close();
+    	sequenceReport.close();
     }
     
     @Override
@@ -480,10 +467,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         }
 
 		System.out.println("Done exporting");
-
-        if (isLocalDatabaseActive) {
-			sqlService.stopLocalDatabase();
-		}
 
 		super.stopSystem(system);
     }
@@ -736,14 +719,5 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
-	}
-
-	/*
-	 * Export action to the database
-	 */
-	private void exportAction(Action action) throws SQLException {
-		sqlService.registerAction(iterationId, action.toShortString(), action.toString(),
-				latestState.get(Tags.OracleVerdict).verdictSeverityTitle(), latestState.get(Tags.ScreenshotPath),
-				new Timestamp(latestState.get(Tags.TimeStamp)));
 	}
 }

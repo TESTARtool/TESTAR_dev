@@ -482,6 +482,7 @@ public class Main {
 			defaults.add(Pair.from(DataStorePassword, "testar"));
 			defaults.add(Pair.from(DataStoreMode, ""));
 			defaults.add(Pair.from(ResetDataStore, false));
+			defaults.add(Pair.from(ReportType, Settings.SUT_REPORT_HTML));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));

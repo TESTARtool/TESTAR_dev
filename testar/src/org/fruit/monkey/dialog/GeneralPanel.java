@@ -67,6 +67,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
 
+  private JComboBox<String> comboBoxReportType;
+
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
 
@@ -112,6 +114,16 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
+
+    comboBoxReportType = new JComboBox<>();
+    comboBoxReportType.setBounds(114, 320, 171, 25);
+    comboBoxReportType.setToolTipText(comboBoxReportTypeTTT);
+    comboBoxReportType.setModel(new DefaultComboBoxModel<>(new String[]{
+            Settings.SUT_REPORT_HTML,
+            Settings.SUT_REPORT_DATABASE
+    }));
+    add(comboBoxReportType);
+
     
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
@@ -213,6 +225,11 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     lblProtocol.setBounds(286, 164, 64, 14);
     lblProtocol.setToolTipText(comboBoxProtocolTTT);
     add(lblProtocol);
+
+    JLabel lblReportType = new JLabel("Report type: ");
+    lblReportType.setBounds(10, 320, 96, 14);
+    lblProtocol.setToolTipText(comboBoxReportTypeTTT);
+    add(lblReportType);
   }
 
   private void btnSutPathActionPerformed(ActionEvent evt) {
@@ -263,6 +280,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
+    comboBoxReportType.setSelectedItem(settings.get(ConfigTags.ReportType));
   }
 
   /**
@@ -283,6 +301,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
+    settings.set(ConfigTags.ReportType, (String) comboBoxReportType.getSelectedItem());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

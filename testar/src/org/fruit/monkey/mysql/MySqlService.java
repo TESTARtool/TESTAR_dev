@@ -13,10 +13,12 @@ public interface MySqlService {
 
     int registerReport(String tag) throws SQLException;
     int registerIteration(int reportId) throws SQLException;
-    int registerIteration(int reportId, String info, Double severity, int lastExecutedActionId, int lastStateId) throws SQLException;
-    int registerAction(int iterationId, String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException;
+    int registerIteration(int reportId, String info, Double severity) throws SQLException;
+    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException;
     int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException;
 
+    void addActionToIteration(int actionId, int iterationId) throws SQLException;
+    void setSelectionInIteration(int iterationId, int lastExecutedActionId, int lastStateId) throws SQLException;
     void storeVerdict(int iterationId, String info, Double severity) throws SQLException;
     void finalizeReport(int reportId, int actionsPerSequence, int totalSequences, String url) throws SQLException;
 

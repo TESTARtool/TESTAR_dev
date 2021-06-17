@@ -137,4 +137,9 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         }
         catch (Exception e) {}
     }
+
+    @Override
+    public void finalize() {
+        dispose(false);
+    }
 }
