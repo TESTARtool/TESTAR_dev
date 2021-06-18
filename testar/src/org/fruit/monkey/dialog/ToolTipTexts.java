@@ -73,6 +73,7 @@ public class ToolTipTexts {
   public static String intervalTTT = "Set the sampling interval";
   public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
   public static String comboBoxReportTypeTTT = "Select the type of report you want to generate";
+  public static String webPortTTT = "Select HTTP port for reporting services";
   public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
   public static String applicationNameTTT = "<html>" +
 		  "Use a name identifier to represent the current application.<br>" + 

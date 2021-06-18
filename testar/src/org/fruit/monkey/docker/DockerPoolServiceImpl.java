@@ -2,10 +2,12 @@ package org.fruit.monkey.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.BuildImageResultCallback;
+import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.CreateNetworkResponse;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.ContainerConfig;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -98,11 +100,16 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     }
 
     public String startWithImage(String imageId, String name, HostConfig hostConfig) {
-        final CreateContainerResponse containerResponse = dockerClient.createContainerCmd(imageId)
+        return startWithImage(imageId, name, hostConfig, null);
+    }
+
+    public String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env) {
+        final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
                 .withName(name)
                 .withHostName(name)
-                .withHostConfig(hostConfig)
-                .exec();
+                .withHostConfig(hostConfig);
+        final CreateContainerResponse containerResponse =
+                (env == null ? cmd.exec() : cmd.withEnv(env).exec());
         final String containerId = containerResponse.getId();
         containerIds.add(containerId);
         dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();

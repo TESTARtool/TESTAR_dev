@@ -94,6 +94,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	//Extras
 	public static String extrasDir = testarDir + "extras" + File.separator;
 	public static String databaseDir = extrasDir + "database" + File.separator;
+	public static String webserverDir = extrasDir + "webserver" + File.separator;
 	public static String sonarqubeDir = extrasDir + "sonarqube";
 	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
@@ -541,6 +542,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(DataStoreMode, ""));
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ReportType, Settings.SUT_REPORT_HTML));
+			defaults.add(Pair.from(ReportServicePort, 8080));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));

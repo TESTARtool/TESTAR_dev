@@ -110,6 +110,7 @@ public final class ConfigTags {
   public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
   public static final Tag<String> ReportType = Tag.from("ReportType", String.class);
+  public static final Tag<Integer> ReportServicePort = Tag.from("ReportServicePort", Integer.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 

@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 public interface MySqlService {
     void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException;
-    void stopLocalDatabase();
+//    void stopLocalDatabase();
     void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException;
 
     int registerReport(String tag) throws SQLException;
