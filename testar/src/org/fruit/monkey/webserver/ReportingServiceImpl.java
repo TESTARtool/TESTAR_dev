@@ -27,7 +27,7 @@ public class ReportingServiceImpl implements ReportingService {
                 .withPortBindings(PortBinding.parse(String.format("%d:80", port)))
                 .withBinds(
                         new Bind(webserverDir.getAbsolutePath(), new Volume("/app")),
-                        new Bind(outputDir.getAbsolutePath(), new Volume("/static/output"))
+                        new Bind(outputDir.getAbsolutePath(), new Volume("/static/out"))
                 );
         final String[] env = {"ADAPTER=MYSQL", "MYSQL_HOST=" + dbHostname, "MYSQL_PORT=" + dbPort,
             "MYSQL_DATABASE=" + dbName,  "MYSQL_USER=" + dbUsername, "MYSQL_PASSWORD=" + dbPassword,
