@@ -68,6 +68,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
 
   private JComboBox<String> comboBoxReportType;
+  private JSpinner spnWebPort;
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -116,7 +117,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
 
     comboBoxReportType = new JComboBox<>();
-    comboBoxReportType.setBounds(114, 320, 171, 25);
+    comboBoxReportType.setBounds(114, 280, 171, 25);
     comboBoxReportType.setToolTipText(comboBoxReportTypeTTT);
     comboBoxReportType.setModel(new DefaultComboBoxModel<>(new String[]{
             Settings.SUT_REPORT_HTML,
@@ -124,6 +125,11 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     }));
     add(comboBoxReportType);
 
+    spnWebPort = new JSpinner();
+    spnWebPort.setBounds(160, 320, 71, 25);
+    spnWebPort.setModel(new SpinnerNumberModel(80, 1, null, 1));
+    spnWebPort.setToolTipText(webPortTTT);
+    add(spnWebPort);
     
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
@@ -164,12 +170,22 @@ public class GeneralPanel extends SettingsPanel implements Observer {
 
     // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
     setOverrideWebDriverDisplayScaleVisibility(false);
+
     labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
     labelOverrideWebDriverDisplayScale.setToolTipText(overrideWebDriverDisplayScaleTTT);
     add(labelOverrideWebDriverDisplayScale);
     overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
     overrideWebDriverDisplayScaleField.setToolTipText(overrideWebDriverDisplayScaleTTT);
     add(overrideWebDriverDisplayScaleField);
+
+    labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
+    labelOverrideWebDriverDisplayScale.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(labelOverrideWebDriverDisplayScale);
+    overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
+    overrideWebDriverDisplayScaleField.setToolTipText(overrideWebDriverDisplayScaleTTT);
+    add(overrideWebDriverDisplayScaleField);
+
+
   }
 
   private void setOverrideWebDriverDisplayScaleVisibility(boolean isVisible){
@@ -227,9 +243,14 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     add(lblProtocol);
 
     JLabel lblReportType = new JLabel("Report type: ");
-    lblReportType.setBounds(10, 320, 96, 14);
+    lblReportType.setBounds(10, 280, 96, 14);
     lblProtocol.setToolTipText(comboBoxReportTypeTTT);
     add(lblReportType);
+
+    JLabel lblWebPort = new JLabel("Web service port: ");
+    lblWebPort.setBounds(10, 320, 135, 14);
+    lblWebPort.setToolTipText(webPortTTT);
+    add(lblWebPort);
   }
 
   private void btnSutPathActionPerformed(ActionEvent evt) {
@@ -281,6 +302,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
     comboBoxReportType.setSelectedItem(settings.get(ConfigTags.ReportType));
+    spnWebPort.setValue(settings.get(ConfigTags.ReportServicePort));
   }
 
   /**
@@ -302,6 +324,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
     settings.set(ConfigTags.ReportType, (String) comboBoxReportType.getSelectedItem());
+    settings.set(ConfigTags.ReportServicePort, (Integer) spnWebPort.getValue());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

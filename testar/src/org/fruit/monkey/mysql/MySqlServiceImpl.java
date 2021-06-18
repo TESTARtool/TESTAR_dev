@@ -26,9 +26,9 @@ public class MySqlServiceImpl implements MySqlService {
     private Connection connection;
     private PreparedStatement lastIdStatement;
 
-    public MySqlServiceImpl(Settings settings) {
+    public MySqlServiceImpl(DockerPoolService dockerPoolService, Settings settings) {
         this.settings = settings;
-        dockerPoolService = new DockerPoolServiceImpl();
+        this.dockerPoolService = dockerPoolService;
     }
 
     public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
@@ -193,9 +193,8 @@ public class MySqlServiceImpl implements MySqlService {
         updateVerdictStatement.executeUpdate();
     }
 
-    public synchronized void stopLocalDatabase() {
-        dockerPoolService.dispose(false);
-    }
+//    public synchronized void stopLocalDatabase() { dockerPoolService.dispose(false);
+//    }
 
     public DockerPoolService getDockerPoolService() {
         return dockerPoolService;
