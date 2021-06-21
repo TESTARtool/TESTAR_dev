@@ -35,6 +35,8 @@ import net.sf.saxon.s9api.*;
 import net.sf.saxon.value.BooleanValue;
 import nl.ou.testar.RandomActionSelector;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.*;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.actions.*;
@@ -71,10 +73,9 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
     protected VisitedActionsData visitedActionsData = new VisitedActionsData();
-	protected List<ActionRule> actionRules = actionRules();
-	protected List<GenRule> generatorRules = inputGenerators();
-	protected List<FilterRule> filterRules = filterRules();
-
+	
+	protected static final Logger logger = LogManager.getLogger();
+	
 	private static DocumentBuilder documentBuilder;
 	private static Processor saxonProcessor;
 	private static XQueryCompiler xqueryCompiler;
@@ -95,6 +96,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
 		xsltCompiler = saxonProcessor.newXsltCompiler();
+		
+		// declare testar specific namespaces
 		xqueryCompiler.declareNamespace("tst", testarNamespace);
 		xqueryCompiler.declareNamespace("h", "https://testar.org/html");
 
@@ -107,11 +110,12 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		abstractWidgetTemplate = compileTransformer("abstract-widget.xsl");
 		compileModelTemplate = compileTransformer("compile-model.xsl");
 		readRulesTemplate = compileTransformer("read-rules.xsl");
-	
-		consumeArcadeBuilderModel();
-		consumeRulesFile();
 	}
-
+	
+	protected List<ActionRule> actionRules = null;
+	protected List<GenRule> generatorRules = null;
+	protected List<FilterRule> filterRules = null;
+	
 	static String getSettingPath() {
 		String path = Settings.getSettingsPath();
 		if (path == null) {
@@ -151,9 +155,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 	}
 	
-	static void consumeArcadeBuilderModel() {
+	void consumeArcadeBuilderModel() {
 		Document result = transformJson("model.json", compileModelTemplate);
-		printXML(result);
+		//printXML(result);
 		XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(result);
 		
 		modelGenRules = xmlToJava(_this, "//input-rule",
@@ -163,40 +167,30 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 			"5"));
 	}
 	
-	static void consumeRulesFile() {
+	void consumeRulesFile() {
 		Document result = transformJson("rules.json", readRulesTemplate);
-		printXML(result);
+		//printXML(result);
 		XdmNode _this = saxonProcessor.newDocumentBuilder().wrap(result);
 		
-		List<FilterRule> filterRules = xmlToJava(_this, "//ignore-filter",
+		List<FilterRule> filterRules_ = xmlToJava(_this, "//ignore-filter",
 			node -> new FilterRule(node.attribute("xquery")));
 		
-		List<ActionRule> actionRules = xmlToJava(_this, "//action-priority",
+		List<ActionRule> actionRules_ = xmlToJava(_this, "//action-priority",
 			node -> new ActionRule(
 				node.attribute("xquery"),
 				node.attribute("priority")));
 		
-		List<GenRule> genericInput = xmlToJava(_this, "//generic-input",
+		List<GenRule> generatorRules_ = xmlToJava(_this, "//generic-input",
 			node -> new GenRule(
 				node.attribute("xquery"),
 				node.attribute("regexp"),
 				node.attribute("priority")));
 		
-		List<GenRule> fieldInput = xmlToJava(_this, "//field-input",
-			node -> inputRule(node.attribute("name"), node.attribute("regexp"), node.attribute("priority")));
+		logger.info("[RULES] Finished reading rules file");
 		
-		List<GenRule> formInput = xmlToJava(_this, "//form-input",
-			node -> formInputRule(
-				node.attribute("form"),
-				node.attribute("name"),
-				node.attribute("regexp"),
-				node.attribute("priority")));
-		
-		System.out.println(filterRules);
-		System.out.println(actionRules);
-		System.out.println(genericInput);
-		System.out.println(fieldInput);
-		System.out.println(formInput);
+		filterRules = filterRules_;
+		generatorRules = generatorRules_;
+		actionRules = actionRules_;
 	}
 	
 	static <R> List<R> xmlToJava(XdmNode _this, String query, Function<XdmNode, R> mapper) {
@@ -241,6 +235,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		ensureDomainsAllowed();
 		
 		WdDriver.followLinks = true;
+		consumeRulesFile();
 	}
 
 	protected void annotateWithXML(WdState s) {
@@ -409,25 +404,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		
 		return false;
 	}
-
-	List <ActionRule> actionsRules(ActionRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
-	List <FilterRule> filterRules(FilterRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
-	List<GenRule> inputGenerators(GenRule ... rules) { return new LinkedList<>(Arrays.asList(rules)); }
-
-	// Match the name of the element, all lower-case
-	static GenRule inputRule(String n, String g, String p) {
-		String xquery = String.format(".[contains(lower-case(@name), '%s')]", n.toLowerCase());
-		return new GenRule(xquery, g, p);
-	}
 	
-	// Match the name of the element and the name of its (parents), all lower-case
-	static GenRule formInputRule(String f, String n, String g, String p) {
-		String xquery = String.format(
-			".[contains(lower-case(@name), '%s')]/" +
-				"ancestor::*[contains(lower-case(@name), '%s')]", n.toLowerCase(), f.toLowerCase());
-		return new GenRule(xquery, g, p);
-	}
-
 	// Randomly pick a Rule (with a priority) from a list of Rules, based on absolute priorities
 	protected <R extends PrioRule> R prioritizedAbsolutePick(List<R> rules) {
 		double sum = rules.stream().map(r -> r.priority).reduce(0.0, Double::sum);
@@ -472,8 +449,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				filter(r -> match(r.expression, item)).
 			    map(r -> {
 			    	try {
-						r.prio.setContextItem(item);
-						r.prio.setExternalVariable(new QName("this"), item);
 						return new InputRule(r.generator, Double.parseDouble(r.prio.evaluateSingle().getStringValue()));
 					}
 			    	catch (Exception e) {
@@ -748,124 +723,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		String f15 = "declare function h:select-is-empty($n) { h:is-select($n) and (string-length($n/@value) = 0) };";
 		String f16 = "declare function h:text-is-empty($n) { h:is-text($n) and (string-length($n/@value) = 0) };";
 		String f17 = "declare function h:radiogroup-is-empty($n) { h:is-radiogroup($n) and $n//*[h:is-radio(.) and not(@checked = 'true')] };";
+		String f18 = "declare function h:inputRule($n, $i) { $n[contains(lower-case(@name), lower-case($i))] };";
+		String f19 = "declare function h:formInputRule($n, $f, $i) " +
+			"{ $n[contains(lower-case(@name), lower-case($i))]/ancestor::*[contains(lower-case(@name), lower-case($f))] };";
 		
-		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17;
-	}
-	
-	
-	List<ActionRule> actionRules() {
-		return actionsRules(
-			new ActionRule("'true'", "1"),                  // Default priority
-			new ActionRule(".[not(@type = 'submit')] and not(ancestor-or-self::*[h:is-invalid(.)]) and tst:visits[@count > 0]",
-				"1 div (1 + count(tst:visits))"),  // if action visited and not submit or invalid
-			new ActionRule(".[@type = 'submit']",
-				"1 + count(ancestor::form//*[(h:radiogroup-is-empty(.) or h:text-is-empty(.) or h:select-is-empty(.))" +
-					" and h:is-valid(.)])"),
-			new ActionRule("h:is-invalid(.)", "3.0"), // boost invalid
-			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and h:is-invalid(.)]", "3.0"), // boost invalid
-			new ActionRule("h:is-radio(.)",
-				"1 div count(h:sibling-radios(.))"), // weighted radio button
-			new ActionRule("h:is-option(.)",
-				"1 div count(h:sibling-options(.))"), // weighted option
-			new ActionRule("h:is-radio(.) and ancestor::*[h:is-radiogroup(.) and not(h:radiogroup-is-empty(.)) and h:is-valid(.)]", "0.3"),
-			new ActionRule("h:is-text(.) and not(h:text-is-empty(.)) and h:is-valid(.)", "0.3"),
-			new ActionRule("h:is-select(.) and not(h:select-is-empty(.)) and h:is-valid(.)", "0.3"),
-			
-			/***** ACTION RULES for ing-feat-mortgage-online-intake-request *****/
-		    new ActionRule("ancestor-or-self::*[@aria-label = 'Close']", "0.3") // de-prioritize close button
-		);
-	}
-	
-	List<GenRule> inputGenerators() {
-		List<GenRule> l = inputGenerators(
-			new GenRule("'true'", "([0-9]{5,10})|([0-9]{1,5})|([A-Za-z ]{5,20}|([A-Za-z0-9 ]{5,10})|([A-Za-z0-9 ]{10,20})", "1"),                        // Generic input
-			
-			inputRule("firstName", "(Robbert)|(Mark)", "5"),
-			inputRule("lastName", "(van Dalen)|(Bommel)", "5"),
-			inputRule("surName", "(van Dalen)|(Bommel)", "5"),
-			inputRule("email", "([a-z0-9._%+-]{4,15}@[a-z0-9.-]{5,10}\\.[a-z]{2,4})|(bla@company\\.com)|(sut@bla\\.nl)", "5"),
-			inputRule("enterpriseNumber", "(0415580365)|(0[0-9]{9})", "5"),
-			inputRule("age", "[1-8][0-9]", "5"),
-			inputRule("income", "[1-9][0-9]{4}", "5"),
-			inputRule("profit", "[1-9][0-9]{4}", "5"),
-			formInputRule("income", "years[]", "[1-9][0-9]{4}", "5"),
-			inputRule("monthlyIncome", "[1-7][0-9]{3}", "5"),
-			inputRule("studyLoan", "[1-3][0-9]{4}", "5"),
-			inputRule("liabilities", "[1-3][0-9]{4}", "5"),
-			inputRule("alimony", "[0-9]{3}", "5"),
-			inputRule("annualTurnover", "[1-9][0-9]{4,6}", "5"),
-			inputRule("endBalance", "[1-9][0-9]{4,6}", "5"),
-			inputRule("availableCash", "[1-9][0-9]{4,6}", "5"),
-			inputRule("shareholderSupport", "[1-9][0-9]{4,6}", "5"),
-			inputRule("newLoan", "[1-9][0-9]{4,6}", "5"),
-			inputRule("needAmount", "[1-9][0-9]{4,6}", "5"),
-			inputRule("needDuration", "[1-3]|[0-9]", "5"),
-			inputRule("numberEmployees", "[1-9]{2,4}", "5"),
-			
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedRevenue')]", "[1-9][0-9]{4}", "5"),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'expectedCosts')]", "[1-9][0-9]{4}", "5"),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'otherPaymentPostponement')]", "[1-9][0-9]{4}", "5"),
-			new GenRule("ancestor::ing-flow-form[contains(@name, 'ingLoanRepayment')]", "[1-9][0-9]{4,5}", "5"),
-			
-			/*****  RULES for ing-feat-mortgage-online-intake-request *****/
-			// Incomes
-			new GenRule("ancestor::*[contains(lower-case(@label), 'yearly amount')]", "[1-7][0-9]{4}", "5"),
-			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly amount')]", "[1-4][0-9]{3}", "5"),
-			inputRule("monthlyReimbursementInput", "[1-2][0-9]{2,3}", "5"),
-			
-			// Repayment
-			new GenRule("ancestor::*[contains(lower-case(@label), 'monthly repayment')]", "[1-9][0-9]{3}", "1"),
-			
-			inputRule("dependantsValue", "[1-6]", "5"), // dependants
-			inputRule("ownFundsInput", "[1-9][0-9]{4}", "5"), // own funds
-			inputRule("postalCode", "[1-9]{4}", "5"), // postal code
-			inputRule("street", "Fantasy Street", "5"), // street
-			inputRule("box", "[1-9]", "5"), // box number
-			inputRule("number", "[1-9][1-9]{1,2}", "5"), // (street) number
-			inputRule("ingId", "(0000000097)|(0144658019)", "5"), // ing Id
-			inputRule("phone", "0648949801","5"),  // phone
-			inputRule("transferabilityRegistrationFeesAmount", "[1-9]{3}", "5"), // registration fee
-			inputRule("birthdate", "[0-2][1-9]\\/[1-9]\\/19[1-9]{2}", "5"),  // birth date
-			inputRule("buildingPrice", "[1-9][0-9]{4,5}", "5"),     // building price
-			inputRule("homePrice", "[1-2][0-9]{5}", "5"),     // home price
-			inputRule("constructionLotPrice", "[1-9][0-9]{4,5}", "5") // construction price
-		);
-		l.addAll(modelGenRules);
-		return l;
-	}
-	
-	List<FilterRule> filterRules() {
-		return filterRules(
-			new FilterRule("@disabled"),
-			new FilterRule(".[name() = 'label']"),
-			new FilterRule(".[name() = 'select']"),  // we select options, not the select widget itself
-			new FilterRule("ancestor-or-self::*[@aria-hidden = 'true']"),  // ignore aria-hidden
-			new FilterRule(".[(name() = 'a') and (not(@href))]"), // ignore links without href
-			
-			new FilterRule("ancestor::header"), // ignore header
-			new FilterRule("ancestor::ing-feat-sc-house-next-step-based-on-house-card"), // ignore next step
-			new FilterRule("ancestor-or-self::ing-button[contains(@id, 'moreInfoButton')]"), // ignore more info
-			
-			new FilterRule(".[@id = 'action-stop']"), // ignore stop button
-			new FilterRule(".[@id = 'action-back']"), // ignore back button
-			
-			new FilterRule(".[name() = 'body']"), // ignore body
-			new FilterRule("ancestor::*[contains(@slot, 'progress')]"), // ignore progress section
-			new FilterRule("ancestor::*[contains(@class, 'progress')]"), // ignore progress section
-			new FilterRule("ancestor::section[@class = 'demo-menu']"), // ignore demo
-			
-			new FilterRule(".[contains(@href, 'bel-me-nu')]"), // ignore outside links
-			new FilterRule(".[ends-with(@href, 'hypotheek-berekenen/')]"),
-			new FilterRule(".[@target = '_blank']"),
-			
-			/***** FILTERS for ing-feat-mortgage-online-intake-request *****/
-			// don't login in
-			new FilterRule("ancestor::*[@data-tag-name = 'ing-feat-moir-intro'] and .[not(@id = 'startFlow')]"),
-			new FilterRule(".[@name = 'incomeWrapper']"),	// ignore income wrapper
-			new FilterRule(".[name() = 'form']"), 			// ignore form
-			new FilterRule("ancestor::*[@slot = 'details']"), 	// don't consider changing details
-			// don't confirm appointment
-			new FilterRule("ancestor-or-self::*[@name = 'ing-feat-moir-appointment-confirmation']")
-		);
+		return f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f15 + f16 + f17 + f18 + f19;
 	}
 }
