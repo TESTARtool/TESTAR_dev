@@ -166,7 +166,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
-    
+
     /**
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
      * take care of
@@ -246,7 +246,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
     }
-    
+
     /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
@@ -257,7 +257,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	
+
     	try {
     		WdDriver.waitDocumentReady();
     	} catch(org.openqa.selenium.WebDriverException wde) {
@@ -274,18 +274,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	if(settings.get(ConfigTags.ForceForeground)
     			&& System.getProperty("os.name").contains("Windows 10")
     			&& system.get(Tags.IsRunning, false) && !system.get(Tags.NotResponding, false)
-    			&& system.get(Tags.PID, (long)-1) != (long)-1 
-    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
+    			&& system.get(Tags.PID, (long)-1) != (long)-1
+    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome")
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
 
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
-    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
+    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... "
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
 
     	}
 
     	latestState = state;
-    	
+
     	//Spy mode didn't use the html report
     	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
@@ -295,10 +295,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				existingCssClasses.add(s);
     			}
     		}
-    		
+
         	return state;
     	}
-    	
+
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         htmlTestReport.addState(latestState);
@@ -381,7 +381,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     	htmlReport.close();
     }
-    
+
     @Override
 	protected void finishSequence(){
 		//With webdriver version we don't use the call SystemProcessHandling.killTestLaunchedProcesses

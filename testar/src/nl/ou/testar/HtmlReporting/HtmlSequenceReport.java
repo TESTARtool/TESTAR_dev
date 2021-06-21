@@ -31,6 +31,7 @@
 
 package nl.ou.testar.HtmlReporting;
 
+import nl.ou.testar.SequenceReport;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.fruit.alayer.Action;
@@ -45,7 +46,7 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.Set;
 
-public class HtmlSequenceReport {
+public class HtmlSequenceReport implements SequenceReport {
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
