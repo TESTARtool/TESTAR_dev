@@ -329,7 +329,7 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
 }
 
 // Download last win32 chromedriver 
-/*task downloadChromedriver(type: Download, dependsOn: installDist) {
+task downloadChromedriver(type: Download, dependsOn: installDist) {
     group = 'test_testar_workflow'
     description ='downloadChromedriver'
     
@@ -345,10 +345,10 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
     dest 'target/install/testar/bin'
     overwrite false
-} */
+}
 
 // Extract Chromedriver from downloaded file
-/*task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
+task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
     group = 'test_testar_workflow'
     description ='downloadAndUnzipChromedriver'
     
@@ -359,11 +359,11 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     
     from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
     into downloadChromedriver.dest
-} */
+}
 
 // Verify that TESTAR correctly executes chromedriver
 // To be sure, connect to ou.nl and detect Onderwijs suspicious title
-/*task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -380,10 +380,10 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
     }
-} */
+}
 
-// Connect to parabank.parasoft.com and make a login
-/*task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+// Connect to para.testar.org and make a login
+task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -400,4 +400,4 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
             throw new GradleException("\n${output} \nERROR: Executing TESTAR")
         }
     }
-} */
+}

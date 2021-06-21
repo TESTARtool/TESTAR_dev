@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: orientservice
+spec:
+  selector:
+   app: orientservice
+   tier: orient
+  ports:
+  - name: porta
+    port: 2480
+    targetPort: http
+  - name: portb
+    port: 2424
+    targetPort: http2
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: orientservice
+spec:
+ replicas: 0
+ selector:
+   matchLabels:
+    app: orientservice
+    tier: orient
+    track: stable
+ template:
+   metadata:
+     labels:
+      app: orientservice
+      tier: orient
+      track: stable
+   spec:
+     containers:
+     - name: orientservice
+       image: orientdb:3.0.34
+       ports:
+       - name: http
+         containerPort: 2480
+       - name: http2
+         containerPort: 2424
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: settings
+spec:
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.152.187.5
+    path: "/export/testar/settings"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: output
+spec:
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.152.187.5
+    path: "/export/testar/output"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: settings
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: settings
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: output
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: output
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: testar
+spec:
+  ttlSecondsAfterFinished: 100
+  parallelism: 5
+  template:
+    metadata:
+      labels:
+        app: testar
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: testar
+        image: aslomp/testar
+        volumeMounts:
+        - mountPath: /mnt
+          name: config
+        - mountPath: /testar/bin/settings
+          name: config
+        - mountPath: /testar/bin/output
+          name: logs
+        - mountPath: /dev/shm
+          name: dshm
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: settings
+      - name: logs
+        persistentVolumeClaim:
+          claimName: output
+      - name: dshm
+        emptyDir:
+          medium: Memory
