@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  database:
+    image: mysql:latest
+    ports:
+      - 13306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: testar
+      MYSQL_DATABASE: testar
+      MYSQL_USER: testar
+      MYSQL_PASSWORD: testar
+    volumes:
+      - ./testar-db/data:/var/lib/mysql
+  app:
+    build:
+      context: ./webserver
+    ports:
+      - "8080:80"
+    volumes:
+      - ./webserver:/app
+    environment:
+      FLASK_DEBUG: 1
+      ADAPTER: MYSQL
+      MYSQL_HOST: database
+      MYSQL_PORT: 3306
+      MYSQL_USER: testar
+      MYSQL_PASSWORD: testar
+      MYSQL_DATABASE: testar
+      MYSQL_WAIT: 5
+    depends_on:
+      - database
+    links:
+      - database
