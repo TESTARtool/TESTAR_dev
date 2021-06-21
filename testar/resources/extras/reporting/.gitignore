@@ -1,2 +1,3 @@
 output/
 testar-db/
+supervisord.pid
