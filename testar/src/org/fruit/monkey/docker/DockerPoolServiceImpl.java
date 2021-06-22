@@ -33,6 +33,8 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private Set<String> imageIds;
     private String networkId;
 
+    final static HashSet<DockerPoolService> registry = new HashSet<>();
+
     public DockerPoolServiceImpl() {
         containerIds = new HashSet<>();
         imageIds = new HashSet<>();
@@ -44,6 +46,8 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 .maxConnections(100)
                 .build();
         dockerClient = DockerClientImpl.getInstance(dockerConfig, dockerHttpClient);
+
+        registry.add(this);
     }
 
     public void start(String serviceId) {
@@ -143,6 +147,14 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             dockerClient.close();
         }
         catch (Exception e) {}
+
+        registry.remove(this);
+    }
+
+    public static void disposeAll(boolean alsoRemoveImages) {
+        for (DockerPoolService instance: registry) {
+            instance.dispose(alsoRemoveImages);
+        }
     }
 
     @Override

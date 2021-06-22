@@ -38,6 +38,7 @@ import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
+import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 
@@ -417,5 +418,11 @@ public class SettingsDialog extends JFrame implements Observer {
   @Override
   public void update(Observable o, Object arg) {
     switchSettings((String) arg);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    DockerPoolServiceImpl.disposeAll(false);
   }
 }
