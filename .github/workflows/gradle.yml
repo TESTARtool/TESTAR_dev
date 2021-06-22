@@ -63,6 +63,13 @@ jobs:
       with:
         name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
+    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
+      run: ./gradlew runTestDesktopGenericStateModel
+    - name: Save runTestDesktopGenericStateModel HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericStateModel-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model
     - name: Run webdriver protocol and detect SuspiciousTitle
       run: ./gradlew runTestWebdriverSuspiciousTitle
     - name: Save runTestWebdriverSuspiciousTitle HTML report artifact
