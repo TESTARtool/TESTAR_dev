@@ -102,7 +102,9 @@ class Action(AbstractAction):
         return get_property('description', 'actions', self._id)
 
     def get_screenshot(self) -> str:
-        return get_property('screenshot', 'actions', self._id)
+        normal_path = get_property('screenshot', 'actions', self._id)
+        web_path = '/static' + normal_path[1:]
+        return web_path
 
     def get_status(self) -> str:
         return get_property('status', 'actions', self._id)
