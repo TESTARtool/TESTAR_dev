@@ -856,6 +856,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionSet, actions);
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+	    fragment.set(SystemState, state);
+	    fragment.set(OracleVerdict, getVerdict(state));
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
