@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -21,13 +21,9 @@ Mode = Spy
 #
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
-#
-# SUTCONNECTOR = WEB_DRIVER: SUTConnectorValue property consists of webdriver path and web url
-# Format : <path of webdriver> [optional size/position] <url of web application>
-# Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
-SUTConnector = WEB_DRIVER
-SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -36,7 +32,7 @@ SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
 #################################################################
 
 Sequences = 1
-SequenceLength = 1
+SequenceLength = 2
 
 #################################################################
 # Oracles based on suspicious titles
@@ -80,7 +76,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -97,7 +93,24 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = test_gradle_workflow_webdriver_parabank/Protocol_test_gradle_workflow_webdriver_parabank
+ProtocolClass = test_gradle_workflow_desktop_generic_statemodel/Protocol_test_gradle_workflow_desktop_generic_statemodel
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = localhost
+DataStoreDirectory = orientdb-3.0.34\\databases
+DataStoreDB = testar
+DataStoreUser = admin
+DataStorePassword = admin
+DataStoreMode = instant
+ApplicationName = notepad
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
 
 #################################################################
 # State identifier attributes
@@ -105,41 +118,7 @@ ProtocolClass = test_gradle_workflow_webdriver_parabank/Protocol_test_gradle_wor
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
-
-#################################################################
-# WebDriver features
-#################################################################
-ClickableClasses = 
-DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = para.testar.org
-FollowLinks = true
-BrowserFullScreen = true
-SwitchNewTabs = true
-
-#################################################################
-# Override display scale
-#
-# Overrides the displayscale obtained from the system. 
-# Can solve problems when the mouse clicks are not aligned with 
-# the elements on the screen. This can easily be detected when
-# running the spy mode. For example hover over a text element and
-# the popup window should appear with information about the 
-# element, if the popup window is not shown or when the mouse is
-# located somewhere else you can try to override the displayscale
-# Values should be provided as doubles (1.5). 
-#################################################################
-
-OverrideWebDriverDisplayScale = 
-
-#################################################################
-# Settings (string) that can be used for user specified protocols
-#################################################################
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 
+AbstractStateAttributes = WidgetControlType
 
 #################################################################
 # Other more advanced settings
@@ -153,18 +132,18 @@ UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 ExecuteActions = true
-FaultThreshold = 1.0E-9
+FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 2.0
+TimeToWaitAfterAction = 0.5
+StartupTime = 20.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
@@ -174,4 +153,3 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
-RefreshSpyCanvas = 1.0
