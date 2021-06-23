@@ -47,6 +47,12 @@ public class HtmlSequenceReport implements Reporting{
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
+    
+    private String generatedHtml;
+
+    public String getGeneratedHTMLName() {
+    	return generatedHtml;
+    }
 
     private static final String[] HEADER = new String[] {
             "<!DOCTYPE html>",
@@ -68,8 +74,10 @@ public class HtmlSequenceReport implements Reporting{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
             String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
-                    + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
-                    + REPORT_FILENAME_AFT;
+            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+            		+ REPORT_FILENAME_AFT;
+
+            generatedHtml = filename;
 
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
@@ -115,8 +123,10 @@ public class HtmlSequenceReport implements Reporting{
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
     		// repairing the file paths:
-    		if(imagePath.contains("./output")){
-    			imagePath = imagePath.replace("./output","../");
+    		if(imagePath.contains("output\\")){
+    			int indexScrn = imagePath.indexOf("\\scrshots\\");
+    			String replaceString = imagePath.substring(0, indexScrn + 1);
+    			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h4>State:</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
@@ -144,21 +154,15 @@ public class HtmlSequenceReport implements Reporting{
     private void writeStateIntoReport(State state){
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
-    		if(imagePath.contains("./output")){
-    			int indexStart = imagePath.indexOf("./output");
-    			int indexScrn = imagePath.indexOf("scrshots");
-    			String replaceString = imagePath.substring(indexStart,indexScrn);
+    		if(imagePath.contains("output\\")){
+    			int indexScrn = imagePath.indexOf("\\scrshots\\");
+    			String replaceString = imagePath.substring(0, indexScrn + 1);
     			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h2>State "+innerLoopCounter+"</h2>");
     		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
     		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-    		//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
-    		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-    		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-    		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
+    		write("<p><img src=\""+imagePath+"\"></p>");
     	}catch(Exception e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
@@ -166,14 +170,11 @@ public class HtmlSequenceReport implements Reporting{
     	innerLoopCounter++;
     }
 
-
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
-//            try{if(action.get(Tags.Role)!=null) write("--Role="+action.get(Tags.Role));}catch(Exception e){}
-//            try{if(action.get(Tags.Targets)!=null) write("--Targets="+action.get(Tags.Targets));}catch(Exception e){}
             try{
             	if(action.get(Tags.Desc)!=null) {
             		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -256,19 +257,19 @@ public class HtmlSequenceReport implements Reporting{
 
     public void addSelectedAction(State state, Action action){
     	String screenshotDir = OutputStructure.screenshotsOutputDir;
-//        System.out.println("path="+state_path);
+
     	if(screenshotDir.contains("./output")){
         	int indexStart = screenshotDir.indexOf("./output");
         	int indexScrn = screenshotDir.indexOf("scrshots");
         	String replaceString = screenshotDir.substring(indexStart,indexScrn);
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
-//        System.out.println("path="+actionPath);
+
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
         		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
-//        System.out.println("path="+actionPath);
+
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 
@@ -280,8 +281,10 @@ public class HtmlSequenceReport implements Reporting{
         }catch(Exception e){}
 
         write("</h4>");
-        if(actionPath.contains("./output")){
-            actionPath = actionPath.replace("./output","..");
+        if(actionPath.contains("output\\")){
+        	int indexScrn = actionPath.indexOf("\\scrshots\\");
+        	String replaceString = actionPath.substring(0, indexScrn + 1);
+        	actionPath = actionPath.replace(replaceString,"../");
         }
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }

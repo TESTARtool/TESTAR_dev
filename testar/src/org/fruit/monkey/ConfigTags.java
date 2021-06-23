@@ -112,6 +112,11 @@ public final class ConfigTags {
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 
+  // state model difference
+  public static final Tag<String> PreviousApplicationName = Tag.from("PreviousApplicationName", String.class);
+  public static final Tag<String> PreviousApplicationVersion = Tag.from("PreviousApplicationVersion", String.class);
+  public static final Tag<Boolean> StateModelDifferenceAutomaticReport = Tag.from("StateModelDifferenceAutomaticReport", Boolean.class);
+  
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
 
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);

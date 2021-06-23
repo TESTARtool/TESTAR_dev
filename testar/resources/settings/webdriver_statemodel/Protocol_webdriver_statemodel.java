@@ -30,23 +30,23 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.StateModel.Difference.StateModelDifferenceManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.DesktopProtocol;
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.io.File;
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -192,6 +192,49 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			retAction = RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
+	}
+	
+	/**
+	 * All TESTAR test sequence sessions are closed (State Model + OrientDB included)
+	 * We can start other connection to create State Model Difference Report
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		
+		try {
+			if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.StateModelDifferenceAutomaticReport, false)) {
+				// Define State Model versions we want to compare
+				String currentApplicationName = settings.get(ConfigTags.ApplicationName,"");
+				String currentVersion = settings.get(ConfigTags.ApplicationVersion,"");
+				Pair<String,String> currentStateModel = new Pair<>(currentApplicationName, currentVersion);
+
+				String previousApplicationName = settings.get(ConfigTags.PreviousApplicationName,"");
+				String previousVersion = settings.get(ConfigTags.PreviousApplicationVersion,"");
+				Pair<String,String> previousStateModel = new Pair<>(previousApplicationName, previousVersion);
+
+				// Obtain Database Configuration, from Settings by default
+				Config config = new Config();
+				config.setConnectionType(settings.get(ConfigTags.DataStoreType,""));
+				config.setServer(settings.get(ConfigTags.DataStoreServer,""));
+				config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory,""));
+				config.setDatabase(settings.get(ConfigTags.DataStoreDB,""));
+				config.setUser(settings.get(ConfigTags.DataStoreUser,""));
+				config.setPassword(settings.get(ConfigTags.DataStorePassword,""));
+
+				// State Model Difference Report Directory Name
+				String dirName = OutputStructure.outerLoopOutputDir  + File.separator + "StateModelDifference_"
+						+ previousStateModel.left() + "_" + previousStateModel.right() + "_vs_"
+						+ currentStateModel.left() + "_" + currentStateModel.right();
+
+				// Execute the State Model Difference to create an HTML report
+				StateModelDifferenceManager modelDifferenceManager = new StateModelDifferenceManager(config, dirName);
+				modelDifferenceManager.calculateModelDifference(config, previousStateModel, currentStateModel);
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR: Trying to create an automatic State Model Difference");
+			e.printStackTrace();
+		}
 	}
 
 }

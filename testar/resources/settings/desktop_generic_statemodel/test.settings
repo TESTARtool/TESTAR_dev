@@ -119,6 +119,13 @@ DataStoreMode = instant
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Previous State model difference settings
+#################################################################
+PreviousApplicationName =
+PreviousApplicationVersion =
+StateModelDifferenceAutomaticReport = false
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

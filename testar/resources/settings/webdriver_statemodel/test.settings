@@ -123,6 +123,13 @@ DataStoreMode = instant
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# Previous State model difference settings
+#################################################################
+PreviousApplicationName =
+PreviousApplicationVersion =
+StateModelDifferenceAutomaticReport = false
+
+#################################################################
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption

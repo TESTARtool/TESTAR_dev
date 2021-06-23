@@ -87,9 +87,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**

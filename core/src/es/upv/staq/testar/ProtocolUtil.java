@@ -42,6 +42,7 @@ import org.fruit.alayer.Finder;
 import org.fruit.alayer.Pen;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
@@ -252,12 +253,20 @@ public class ProtocolUtil {
 		}
 		
 		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
-		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
+		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK)) {
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
+		}
 		
-		if (viewPort.width() <= 0 || viewPort.height() <= 0)
+		if (viewPort.width() <= 0 || viewPort.height() <= 0) {
 			return null;
-		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
+		}
+		
+		// This Rect contains the default State screen size
+		Rect viewPortRect = Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height());
+		// Iterate over all widgets to determine if State screen size needs to be modified
+		Rect rectSUT = calculateRectOfSUT(state, viewPortRect);
+		
+		AWTCanvas scrshot = AWTCanvas.fromScreenshot(rectSUT, getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
 		return scrshot;
 	}
 	
@@ -290,7 +299,29 @@ public class ProtocolUtil {
 		}
 		return windowHandle;
 	}
-
+	
+	/**
+	 * Iterate over all existing widgets of the SUT State
+	 * If some widget Shape extends default State size (viewPortRect),
+	 * create a Rect union with State and Widget bounds
+	 * 
+	 * @param state
+	 * @param viewPortRect
+	 * @return SUT Rect
+	 */
+	private static Rect calculateRectOfSUT(State state, Rect viewPortRect) {
+		Rect rectSUT = viewPortRect;
+		for (Widget w : state) {
+			if(w.get(Tags.Shape, null) != null && !w.get(Tags.Role, Roles.Process).equals(Roles.Process)) {
+				Rect widgetRect = Rect.from(w.get(Tags.Shape).x(), w.get(Tags.Shape).y(), w.get(Tags.Shape).width(), w.get(Tags.Shape).height());
+				if(!Rect.contains(rectSUT, widgetRect)) {
+					rectSUT = Rect.union(rectSUT, widgetRect);
+				}
+			}
+		}
+		
+		return rectSUT;
+	}
 
 	/**
 	 * Calculate the max and the min ZIndex of all the widgets in a state
@@ -311,5 +342,4 @@ public class ProtocolUtil {
 		state.set(Tags.MaxZIndex, maxZIndex);
 		return state;
 	}
-
 }

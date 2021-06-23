@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar "suts\\SimpleModelOne.jar"
 
 #################################################################
 # Sequences
@@ -31,7 +31,7 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
+Sequences = 1
 SequenceLength = 10
 
 #################################################################
@@ -40,7 +40,7 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 TagsForSuspiciousOracle = Title
 
 #################################################################
@@ -96,7 +96,27 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic/Protocol_desktop_generic
+ProtocolClass = desktop_swing_statemodel/Protocol_desktop_swing_statemodel
+
+#################################################################
+# Graphdatabase settings (experimental)
+#################################################################
+GraphDBEnabled = true
+GraphDBUrl = remote:/localhost/testar
+GraphDBUser = testar
+GraphDBPassword = testar
+
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
 
 #################################################################
 # State identifier attributes
@@ -104,16 +124,14 @@ ProtocolClass = desktop_generic/Protocol_desktop_generic
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetValueValue,WidgetControlType
+AbstractStateAttributes = WidgetControlType
 
 #################################################################
-# Settings (string) that can be used for user specified protocols
+# Previous State model difference settings
 #################################################################
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 
+PreviousApplicationName =
+PreviousApplicationVersion =
+StateModelDifferenceAutomaticReport = false
 
 #################################################################
 # Other more advanced settings
@@ -138,7 +156,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
