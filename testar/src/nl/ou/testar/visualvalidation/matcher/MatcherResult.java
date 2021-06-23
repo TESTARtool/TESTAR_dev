@@ -7,29 +7,39 @@ import java.util.Set;
 
 public class MatcherResult {
     private final Set<TextElement> noMatches = new HashSet<>();
-    private final Set<Match> matches = new HashSet<>();
+    private final Set<LocationMatch> locationMatches = new HashSet<>();
+    private final Set<ContentMatchResult> contentMatchResults = new HashSet<>();
 
-    public void addMatch(Match match) {
-        matches.add(match);
+    public void addContentMatchResult(ContentMatchResult result) {
+        contentMatchResults.add(result);
     }
 
-    public void addNoMatch(TextElement element) {
+    public void addLocationMatch(LocationMatch locationMatch) {
+        locationMatches.add(locationMatch);
+    }
+
+    public void addNoLocationMatch(TextElement element) {
         noMatches.add(element);
     }
 
-    public Set<TextElement> getNoMatches() {
+    public Set<TextElement> getNoLocationMatches() {
         return noMatches;
     }
 
-    public Set<Match> getMatches() {
-        return matches;
+    public Set<LocationMatch> getLocationMatches() {
+        return locationMatches;
+    }
+
+    public Set<ContentMatchResult> getResult() {
+        return contentMatchResults;
     }
 
     @Override
     public String toString() {
         return "MatcherResult{" +
-                "noMatches(" + noMatches.size() + ")=" + noMatches +
-                ", matches(" + matches.size() + ")=" + matches +
+                "noLocationMatches(" + noMatches.size() + ")=" + noMatches +
+                ", locationMatches(" + locationMatches.size() + ")=" + locationMatches +
+                ", contentMatches(" + contentMatchResults.size() + ")=" + contentMatchResults +
                 '}';
     }
 }

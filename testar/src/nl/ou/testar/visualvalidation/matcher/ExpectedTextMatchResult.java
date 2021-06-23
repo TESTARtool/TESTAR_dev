@@ -12,7 +12,7 @@ public class ExpectedTextMatchResult {
 
     /**
      * Constructor.
-     * @param expectedText The expected text that we are matchin.
+     * @param expectedText The expected text that we are matching.
      */
     public ExpectedTextMatchResult(String expectedText) {
         this.expectedText = new ArrayList<>(expectedText.length());

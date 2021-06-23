@@ -63,7 +63,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
             _extractor = ExtractorFactory.CreateExpectedTextExtractorDesktop();
         }
 
-        _matcher = VisualMatcherFactory.createLocationMatcher();
+        _matcher = VisualMatcherFactory.createLocationMatcher(settings.matcherConfiguration);
     }
 
     @Override
@@ -138,13 +138,16 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
 
         if (_matcherResult != null) {
             // Analysis the raw result and create a verdict.
-            _matcherResult.getMatches();
+            _matcherResult.getResult().forEach(result ->
+                    Logger.log(Level.INFO, TAG, "Content match result: {}", result)
+            );
 
             Verdict result = new Verdict(Verdict.SEVERITY_WARNING, "Not all texts has been recognized",
                     new TextVisualizer(new AbsolutePosition(10, 10), "->", RedPen));
 
         } else {
             // Set verdict to failure we should have a matcher result as minimal input.
+            Logger.log(Level.INFO, TAG, "No result");
         }
         Logger.log(Level.INFO, TAG, "Updating verdict {}");
     }

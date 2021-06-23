@@ -5,7 +5,7 @@ public class VisualMatcherFactory {
         return new VisualDummyMatcher();
     }
 
-    public static VisualMatcher createLocationMatcher() {
-        return new LocationMatcher();
+    public static VisualMatcher createLocationMatcher(MatcherConfiguration setting) {
+        return new LocationMatcher(setting);
     }
 }

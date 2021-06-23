@@ -6,13 +6,13 @@ import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Match {
+public class LocationMatch {
     final public MatchLocation location;
     final public ExpectedElement expectedElement;
 
     public Set<RecognizedElement> recognizedElements = new HashSet<>();
 
-    public Match(ExpectedElement expectedElement, int margin) {
+    public LocationMatch(ExpectedElement expectedElement, int margin) {
         this.location = new MatchLocation(margin, expectedElement._location);
         this.expectedElement = expectedElement;
     }
@@ -23,7 +23,7 @@ public class Match {
 
     @Override
     public String toString() {
-        return "Match{" +
+        return "LocationMatch{" +
                 "location=" + location +
                 ", expectedElement=" + expectedElement +
                 ", recognizedElements=" + recognizedElements +
