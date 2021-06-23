@@ -124,6 +124,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
+	
+	private Verdict replayVerdict;
+
+	public Verdict getReplayVerdict() {
+		return replayVerdict;
+	}
+
+	public void setReplayVerdict(Verdict replayVerdict) {
+		this.replayVerdict = replayVerdict;
+	}
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
@@ -688,9 +698,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//update state after begin sequence SUT modification
 				state = getState(system);
 
-				//initializing fragment for recording replayable test sequence:
-				initFragmentForReplayableSequence(state);
-
 				// notify the statemodelmanager
 				stateModelManager.notifyTestSequencedStarted();
 
@@ -698,9 +705,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 ***** starting the INNER LOOP:
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
-
-				//Saving the last state into replayable test sequence:
-				saveStateIntoFragmentForReplayableSequence(state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
 				finishSequence();
@@ -840,74 +844,52 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * This method initializes the fragment for replayable sequence
-	 *
-	 * @param state
-	 */
-	private void initFragmentForReplayableSequence(State state){
-		// Fragment is used for saving a replayable sequence:
-		fragment = new TaggableBase();
-		fragment.set(SystemState, state);
-		fragment.set(OracleVerdict, getVerdict(state));
-	}
-
-	/**
 	 * Saving the action into the fragment for replayable sequence
 	 *
 	 * @param action
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
-		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ExecutedAction, action);
-		fragment.set(ActionSet, actions);
-		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
-		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
-		fragment.set(SystemState, state);
-		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-		TestSerialiser.write(fragment);
-		//resetting the fragment:
-		fragment = new TaggableBase();
-	}
+	    // create fragment
+	    fragment = new TaggableBase();
+	    fragment.set(ExecutedAction, action);
+	    fragment.set(ActionSet, actions);
+	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+	    fragment.set(SystemState, state);
+	    fragment.set(OracleVerdict, getVerdict(state));
 
+	    //Find the target widget of the current action, and save the title into the fragment
+	    if (state != null && action.get(Tags.OriginWidget, null) != null){
+	        fragment.set(Tags.Title, action.get(Tags.OriginWidget).get(Tags.Title, ""));
+	    }
 
-	/**
-	 * Saving the action into the fragment for replayable sequence
-	 *
-	 * @param state
-	 */
-	private void saveStateIntoFragmentForReplayableSequence(State state) {
-		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
-		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
-		fragment.set(SystemState, state);
-		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
-		TestSerialiser.write(fragment);
-		//resetting the fragment:
-		fragment =new TaggableBase();
+	    LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+	    TestSerialiser.write(fragment);
 	}
 
 	/**
-	 * Writing the fragment into file and closing the test serialiser
+	 * Wait until fragments have been written then close the test serialiser
 	 */
 	private void writeAndCloseFragmentForReplayableSequence() {
-		//closing ScreenshotSerialiser:
-		ScreenshotSerialiser.finish();
-		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-		TestSerialiser.write(fragment);
+	    //Wait since TestSerialiser and ScreenshotSerialiser write all fragments/src on sequence File
+	    while(!TestSerialiser.isSavingQueueEmpty() || !ScreenshotSerialiser.isSavingQueueEmpty()) {
+	        synchronized (this) {
+	            try {
+	                this.wait(1000);
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    }
 
-		//Wait since TestSerialiser write all fragments on sequence File
-		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
-			synchronized (this) {
-				try {
-					this.wait(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		TestSerialiser.finish();
-		LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-		LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
+	    //closing ScreenshotSerialiser and TestSerialiser
+	    ScreenshotSerialiser.finish();
+	    ScreenshotSerialiser.exit();
+	    TestSerialiser.finish();
+	    TestSerialiser.exit();
+
+	    LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
+	    LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
 	}
 
 	/**
@@ -1032,9 +1014,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(enabledProcessListener)
 				processListener.startListeners(system, settings);
 
-			//initializing fragment for recording replayable test sequence:
-			initFragmentForReplayableSequence(getState(system));
-
 			// notify the statemodelmanager
 			stateModelManager.notifyTestSequencedStarted();
 		}
@@ -1138,138 +1117,264 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	/**
 	 * Method to run TESTAR in replay mode.
 	 * The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
+	 * Read the replayable file, repeat saved actions and generate new sequences, oracles and logs
 	 */
 	protected void runReplayLoop(){
-		actionCount = 1;
-		boolean success = true;
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
-		ObjectInputStream ois = null;
+	    FileInputStream fis = null;
+	    BufferedInputStream bis = null;
+	    GZIPInputStream gis = null;
+	    ObjectInputStream ois = null;
 
-		synchronized(this){
-			OutputStructure.calculateInnerLoopDateString();
-			OutputStructure.sequenceInnerLoopCount++;
-		}
+	    actionCount = 1;
+	    boolean success = true;
 
-		preSequencePreparations();
-		
-		//reset the faulty variable because we started a new execution
-		faultySequence = false;
+	    //Reset LogSerialiser
+	    LogSerialiser.finish();
+	    LogSerialiser.exit();
 
-		SUT system = startSystem();
-		try{
-			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			fis = new FileInputStream(seqFile);
-			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
+	    synchronized(this){
+	        OutputStructure.calculateInnerLoopDateString();
+	        OutputStructure.sequenceInnerLoopCount++;
+	    }
 
-			Canvas cv = buildCanvas();
-			State state = getState(system);
+	    preSequencePreparations();
 
-			String replayMessage;
+	    //reset the faulty variable because we started a new execution
+	    faultySequence = false;
 
-			double rrt = settings.get(ConfigTags.ReplayRetryTime);
+	    SUT system = startSystem();
 
-			while(success && mode() != Modes.Quit){
-				TaggableBase fragment;
-				try{
-					fragment = (TaggableBase) ois.readObject();
-				} catch(IOException ioe){
-					success = true;
-					break;
-				}
+	    try{
+	        File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
 
-				success = false;
-				int tries = 0;
-				double start = Util.time();
+	        fis = new FileInputStream(seqFile);
+	        bis = new BufferedInputStream(fis);
+	        gis = new GZIPInputStream(bis);
+	        ois = new ObjectInputStream(gis);
 
-				while(!success && (Util.time() - start < rrt)){
-					tries++;
-					cv.begin(); Util.clear(cv);
-					cv.end();
+	        /**
+	         * Initialize the fragment to create a new sequence and logs
+	         */
 
-					if(mode() == Modes.Quit) break;
-					Action action = fragment.get(ExecutedAction, new NOP());
-					// In Replay-mode, we only show the red dot if visualizationOn is true:
-					if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
-					if(mode() == Modes.Quit) break;
+	        //Generating the new sequence file that can be replayed:
+	        generatedSequence = getAndStoreGeneratedSequence();
+	        currentSeq = getAndStoreSequenceFile();
 
-					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-					double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
+	        Canvas canvas = buildCanvas();
+	        State state = getState(system);
 
-					try{
-						if(tries < 2){
-							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-						}else{
-							if(tries % 50 == 0)
-								LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-							else
-								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
-						}
+	        setReplayVerdict(getVerdict(state));
 
-						action.run(system, state, actionDuration);
-						success = true;
-						actionCount++;
-						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
-					} catch(ActionFailedException afe){}
+	        // notify the statemodelmanager
+	        stateModelManager.notifyTestSequencedStarted();
 
-					Util.pause(actionDelay);
+	        double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
-					if(mode() == Modes.Quit) break;
-					state = getState(system);
-				}
+	        while(success && !faultySequence && mode() == Modes.Replay){
 
-			}
+	            //Initialize local fragment and read saved action of PathToReplaySequence File
+	            Taggable replayableFragment;
+	            Action actionToReplay;
+	            try {
+	                replayableFragment = (Taggable) ois.readObject();
+	                actionToReplay = replayableFragment.get(ExecutedAction); 
+	            } catch(IOException ioe){
+	                // Check if exception thrown because we finished replaying data
+	                if(fis.available() <= 0) {
+	                    success = true;
+	                    break;
+	                } else {
+	                    success = false;
+	                    String msg = "Exception " + ioe.getMessage() + " reading TESTAR replayableFragment: " + seqFile;
+	                    setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+	                    stateModelManager.notifyTestSequenceInterruptedBySystem(ioe.toString());
+	                    break;
+	                }
+	            } catch(NullPointerException npe) {
+	                success = false;
+	                String msg = "Null exception replaying TESTAR action";
+	                setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+	                stateModelManager.notifyTestSequenceInterruptedBySystem(npe.toString());
+	                break;
+	            }
 
-			cv.release();
-			//ois.close();
-			stopSystem(system);
-			if (system != null && system.isRunning())
-				system.stop();
+	            // Derive Actions of the current State
+	            Set<Action> actions = deriveActions(system,state);
+	            CodingManager.buildIDs(state, actions);
 
+	            // notify to state model the current state
+	            stateModelManager.notifyNewStateReached(state, actions);
 
-		} catch(IOException ioe){
-			throw new RuntimeException("Cannot read file.", ioe);
-		} catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException("Cannot read file.", cnfe);
-		} finally {
-			if (ois != null){
-				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (bis != null){
-				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (fis != null){
-				try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (cv != null)
-				cv.release();
-			if (system != null)
-				system.stop();
-		}
+	            success = false;
+	            int tries = 0;
+	            double start = Util.time();
 
-		if(success){
-			String msg = "Sequence successfully replayed!\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+	            while(!success && (Util.time() - start < rrt)){       
+	                tries++;
+	                canvas.begin(); Util.clear(canvas);
+	                canvas.end();
 
-		} else{
-			String msg = "Failed to replay sequence.\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
-		}
+	                /**
+	                 * Check if we are replaying the sequence correctly,
+	                 * comparing saved widgets with existing widgets in the current state
+	                 */
 
-		LogSerialiser.finish();
-		postSequenceProcessing();
+	                //Obtain the widget Title of the repayable fragment
+	                String widgetStringToFind = replayableFragment.get(Tags.Title, "");
+	                //Could exist actions not associated with widgets
+	                boolean actionHasWidgetAssociated = false;
+	                //Check if we found the widget
+	                boolean widgetTitleFound = false;
 
-		// Going back to TESTAR settings dialog if it was used to start replay:
-		mode = Modes.Quit;
+	                if (state != null){
+	                    List<Finder> targets = actionToReplay.get(Tags.Targets, null);
+	                    if (targets != null){
+	                        actionHasWidgetAssociated = true;
+	                        Widget w;
+	                        for (Finder f : targets){
+	                            w = f.apply(state);
+	                            if (w != null){			
+	                                //Can be this the widget the one that we want to find?
+	                                if(widgetStringToFind.equals(w.get(Tags.Title, "")))
+	                                    widgetTitleFound = true;
+	                            }
+	                        }
+	                    }
+	                }
+
+	                //If action has an associated widget and we don't find it, we are not in the correct state
+	                if(actionHasWidgetAssociated && !widgetTitleFound){
+	                    success = false;
+	                    String msg = "The Action " + actionToReplay.get(Tags.Desc, actionToReplay.toString())
+	                    + " of the replayed sequence can not been replayed into "
+	                    + " the State " + state.get(Tags.ConcreteID, state.toString());
+
+	                    setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+
+	                    break;
+	                }
+
+	                // In Replay-mode, we only show the red dot if visualizationOn is true:
+	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, canvas, state, actionToReplay);
+
+	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
+	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
+
+	                try{
+	                    if(tries < 2) {
+	                        String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
+	                                actionCount, actionToReplay.get(Desc, actionToReplay.toString()));
+	                        LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
+	                    } else {
+	                        if(tries % 50 == 0)
+	                            LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
+	                        else
+	                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
+	                    }
+
+	                    preSelectAction(state, actions);
+
+	                    //before action execution, pass it to the state model manager
+	                    stateModelManager.notifyActionExecution(actionToReplay);
+
+	                    replayAction(system, state, actionToReplay, actionDelay, actionDuration);
+
+	                    success = true;
+	                    actionCount++;
+	                    LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
+	                } catch(ActionFailedException afe){}
+
+	                Util.pause(actionDelay);
+
+	                state = getState(system);
+
+	                //Saving the actions and the executed action into replayable test sequence:
+	                saveActionIntoFragmentForReplayableSequence(actionToReplay, state, actions);
+
+	                setReplayVerdict(getVerdict(state));
+	            }
+	        }
+
+	        canvas.release();
+
+	        // notify to state model the last state
+	        Set<Action> actions = deriveActions(system, state);
+	        CodingManager.buildIDs(state, actions);
+	        for(Action a : actions)
+	            if(a.get(Tags.AbstractIDCustom, null) == null)
+	                CodingManager.buildEnvironmentActionIDs(state, a);
+
+	        stateModelManager.notifyNewStateReached(state, actions);
+
+	    } catch(IOException ioe){
+	        throw new RuntimeException("Cannot read file.", ioe);
+	    } catch (ClassNotFoundException cnfe) {
+	        throw new RuntimeException("Cannot read file.", cnfe);
+	    } finally {
+	        if (ois != null){
+	            try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (gis != null){
+	            try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (bis != null){
+	            try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (fis != null){
+	            try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
+	        }
+	        if (cv != null)
+	            cv.release();
+	        if (system != null)
+	            system.stop();
+	    }
+
+	    if(faultySequence) {
+	        String msg = "Replayed Sequence contains Errors: "+ getReplayVerdict().info();
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+	    }else if(success){
+	        String msg = "Sequence successfully replayed!\n";
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+	        System.out.println(getReplayVerdict().info());
+	        LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
+
+	    }else{
+	        String msg = "Fail replaying sequence.\n";
+	        System.out.println(msg);
+	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
+	    }
+
+	    //calling finishSequence() to allow scripting GUI interactions to close the SUT:
+	    finishSequence();
+
+	    // notify the state model manager of the sequence end
+	    stateModelManager.notifyTestSequenceStopped();
+
+	    //Close and save the replayable fragment of the current sequence
+	    writeAndCloseFragmentForReplayableSequence();
+
+	    //Copy sequence file into proper directory:
+	    classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
+
+	    LogSerialiser.finish();
+
+	    postSequenceProcessing();
+
+	    //Stop system and close the SUT
+	    stopSystem(system);
+
+	    // notify the statemodelmanager that the testing has finished
+	    stateModelManager.notifyTestingEnded();
+
+	    // Going back to TESTAR settings dialog if it was used to start replay:
+	    mode = Modes.Quit;
 	}
 
 	/**
@@ -1606,6 +1711,37 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}catch(ActionFailedException afe){
 			return false;
 		}
+	}
+	
+	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+	    // Get an action screenshot based on the NativeLinker platform
+	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+	        WdProtocolUtil.getActionshot(state,action);
+	    } else {
+	        ProtocolUtil.getActionshot(state,action);
+	    }
+
+	    try{
+	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
+	        Util.pause(halfWait); // help for a better match of the state' actions visualization
+	        action.run(system, state, actionDuration);
+	        int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
+	        long actionCPU;
+	        do {
+	            long CPU1[] = NativeLinker.getCPUsage(system);
+	            Util.pause(halfWait);
+	            long CPU2[] = NativeLinker.getCPUsage(system);
+	            actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
+	            waitCycles--;
+	        } while (actionCPU > 0 && waitCycles > 0);
+
+	        //Save the replayed action information into the logs
+	        saveActionInfoInLogs(state, action, "ReplayedAction");
+
+	        return true;
+	    }catch(ActionFailedException afe){
+	        return false;
+	    }
 	}
 
 	/**
