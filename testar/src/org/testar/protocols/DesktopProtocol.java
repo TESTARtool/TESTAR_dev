@@ -184,14 +184,14 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         String statusInfo = "";
 
         if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+            htmlReport.addTestVerdict(getReplayVerdict().join(getProcessVerdict()));
+            status = (getReplayVerdict().join(getProcessVerdict())).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(getProcessVerdict())).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getVerdict(latestState).join(getProcessVerdict()));
+            status = (getVerdict(latestState).join(getProcessVerdict())).verdictSeverityTitle();
+            statusInfo = (getVerdict(latestState).join(getProcessVerdict())).info();
         }
 
         String sequencesPath = getGeneratedSequenceName();

@@ -66,6 +66,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     	return new EventHandler(this);
     }
 
+    //TODO: create Logger or other nice way for debug printing etc logging
+    protected void debugPrint(String msg){
+        System.out.println("DEBUG: "+msg);
+    }
 
     //TODO think how the modes should be implemented
     /**

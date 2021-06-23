@@ -298,7 +298,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Action selectAction(State state, Set<Action> actions) {
 		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
 		if(actions == null || actions.isEmpty()) {
-			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", getActionCount()));
 			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
 			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
 			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
@@ -354,14 +354,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         String statusInfo = "";
 
         if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+            htmlReport.addTestVerdict(getReplayVerdict().join(getProcessVerdict()));
+            status = (getReplayVerdict().join(getProcessVerdict())).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(getProcessVerdict())).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getVerdict(latestState).join(getProcessVerdict()));
+            status = (getVerdict(latestState).join(getProcessVerdict())).verdictSeverityTitle();
+            statusInfo = (getVerdict(latestState).join(getProcessVerdict())).info();
         }
 
         String sequencesPath = getGeneratedSequenceName();

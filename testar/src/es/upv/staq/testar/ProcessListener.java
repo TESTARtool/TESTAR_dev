@@ -134,16 +134,15 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {		
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+							if(DefaultProtocol.getLastExecutedAction()!=null)
+								actionId=DefaultProtocol.getLastExecutedAction().get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
-							DefaultProtocol.processVerdict = verdict;
-
-							DefaultProtocol.faultySequence = true;
+							DefaultProtocol.setProcessVerdict(verdict);
+							DefaultProtocol.setFaultySequence(true);
 
 							//Prepare Log report
 							String DateString = Util.dateString(DATE_FORMAT);
@@ -165,8 +164,8 @@ public class ProcessListener{
 
 							writerError = new PrintWriter(new FileWriter(logProcessListenerName + "_StdErr.log", true));
 
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+							if(DefaultProtocol.getLastExecutedAction()!=null)
+								actionId=DefaultProtocol.getLastExecutedAction().get(Tags.ConcreteID);
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -206,16 +205,15 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {	
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+							if(DefaultProtocol.getLastExecutedAction()!=null)
+								actionId=DefaultProtocol.getLastExecutedAction().get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
-							DefaultProtocol.processVerdict = verdict;
-
-							DefaultProtocol.faultySequence = true;
+							DefaultProtocol.setProcessVerdict(verdict);
+							DefaultProtocol.setFaultySequence(true);
 
 							//Prepare Log report
 							String DateString = Util.dateString(DATE_FORMAT);
@@ -236,8 +234,8 @@ public class ProcessListener{
 
 							writerOut = new PrintWriter(new FileWriter(logProcessListenerName + "_StdOut.log", true));
 
-							if(DefaultProtocol.lastExecutedAction!=null)
-								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
+							if(DefaultProtocol.getLastExecutedAction()!=null)
+								actionId=DefaultProtocol.getLastExecutedAction().get(Tags.ConcreteID);
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();
