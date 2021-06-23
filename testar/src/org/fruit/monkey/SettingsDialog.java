@@ -38,6 +38,7 @@ import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
+import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
@@ -190,7 +191,7 @@ public class SettingsDialog extends JFrame implements Observer {
     try{
       settings.get(ConfigTags.ExtendedSettingsFile);
     } catch (NoSuchTagException e){
-      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettings.FileName));
+      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettingFile.FileName));
     }
 
     settingPanels.forEach((k,v) -> v.right().checkSettings());
