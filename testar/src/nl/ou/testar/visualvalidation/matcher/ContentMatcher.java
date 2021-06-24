@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ContentMatcher {
+class ContentMatcher {
     static final String TAG = "ContentMatcher";
 
     /**
@@ -73,7 +73,7 @@ public class ContentMatcher {
     }
 
     @NonNull
-    private static List<RecognizedElement> sortRecognizedElements(LocationMatch locationMatch) {
+    static List<RecognizedElement> sortRecognizedElements(LocationMatch locationMatch) {
         Map<Integer, List<RecognizedElement>> lineBucket = sortRecognizedElementsPerTextLine(locationMatch);
 
         // Get the sorted Y-axe coordinates for the identified lines.
@@ -93,7 +93,7 @@ public class ContentMatcher {
     }
 
     @NonNull
-    private static Map<Integer, List<RecognizedElement>> sortRecognizedElementsPerTextLine(LocationMatch locationMatch) {
+    static Map<Integer, List<RecognizedElement>> sortRecognizedElementsPerTextLine(LocationMatch locationMatch) {
         // Determine the average height of the recognized text elements.
         double lineHeight = locationMatch.recognizedElements.stream()
                 .mapToInt(e -> e._location.height)
@@ -132,7 +132,7 @@ public class ContentMatcher {
         return lineBucket;
     }
 
-    private static void correctWhitespaces(ExpectedTextMatchResult expectedResult) {
+    static void correctWhitespaces(ExpectedTextMatchResult expectedResult) {
         // Whitespaces are automatically corrected.
         for (CharacterMatch res : expectedResult.expectedText) {
             if (res.result == CharacterMatchResult.NO_MATCH && Character.isWhitespace(res.character.character)) {

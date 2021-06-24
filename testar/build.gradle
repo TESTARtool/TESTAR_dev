@@ -92,6 +92,8 @@ dependencies {
     compile group: 'org.bytedeco', name: 'javacv', version: '1.5.5'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     runtime project(':windows')
+
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 }
 evaluationDependsOn(':windows')
 

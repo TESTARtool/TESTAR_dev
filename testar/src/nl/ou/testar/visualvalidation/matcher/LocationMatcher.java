@@ -69,14 +69,14 @@ public class LocationMatcher implements VisualMatcher {
         });
 
         // Compose the final matching result.
-        SetUnmatchedElements(_matchResult, _recognizedElements);
+        setUnmatchedElements(_matchResult, _recognizedElements);
         return _matchResult;
     }
 
     /**
      * Find all unmatched elements and update the matcher result.
      */
-    private void SetUnmatchedElements(MatcherResult matcherResult, List<RecognizedElement> recognizedElements) {
+    void setUnmatchedElements(MatcherResult matcherResult, List<RecognizedElement> recognizedElements) {
         Set<RecognizedElement> removeRecognizedList = new HashSet<>();
         matcherResult.getLocationMatches().forEach(it -> removeRecognizedList.addAll(it.recognizedElements));
 
@@ -95,7 +95,7 @@ public class LocationMatcher implements VisualMatcher {
      * Find all recognized text elements which intersect with the expected text element.
      */
     @Nullable
-    private LocationMatch getIntersectedElements(List<RecognizedElement> recognizedElements, ExpectedElement expectedElement) {
+    LocationMatch getIntersectedElements(List<RecognizedElement> recognizedElements, ExpectedElement expectedElement) {
         final LocationMatch[] locationMatches = {null};
         recognizedElements.forEach(it -> {
             final int margin = config.locationMatchMargin;
