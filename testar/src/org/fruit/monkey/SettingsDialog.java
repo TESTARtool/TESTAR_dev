@@ -419,10 +419,4 @@ public class SettingsDialog extends JFrame implements Observer {
   public void update(Observable o, Object arg) {
     switchSettings((String) arg);
   }
-
-  @Override
-  public void dispose() {
-    super.dispose();
-    DockerPoolServiceImpl.disposeAll(false);
-  }
 }
