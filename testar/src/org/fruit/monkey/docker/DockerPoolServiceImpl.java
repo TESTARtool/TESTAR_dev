@@ -1,10 +1,7 @@
 package org.fruit.monkey.docker;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.BuildImageResultCallback;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.CreateNetworkResponse;
+import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ContainerConfig;
@@ -33,7 +30,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private Set<String> imageIds;
     private String networkId;
 
-    final static HashSet<DockerPoolService> registry = new HashSet<>();
+    final static HashSet<DockerPoolServiceImpl> registry = new HashSet<>();
 
     public DockerPoolServiceImpl() {
         containerIds = new HashSet<>();
@@ -122,43 +119,54 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         return containerId;
     }
 
-    public void dispose(boolean alsoRemoveImages) {
-        for (Container container: dockerClient.listContainersCmd().withShowAll(true).exec()) {
+    private void disposeInternal(boolean alsoRemoveImages) {
+        for (Container container : dockerClient.listContainersCmd().withShowAll(true).exec()) {
             final String containerId = container.getId();
             if (containerIds.contains(containerId)) {
+                System.out.println("Container ID: " + containerId);
                 if (container.getState().toLowerCase(Locale.ROOT).contains("running")) {
                     dockerClient.killContainerCmd(containerId).exec();
                 }
                 final String imageId = container.getImageId();
-                dockerClient.removeContainerCmd(containerId).withForce(true).withRemoveVolumes(true).exec();
-                dockerClient.removeImageCmd(imageId);
+                System.out.println("Image ID: " + imageId);
+                final RemoveContainerCmd removeContainerCmd = dockerClient.removeContainerCmd(containerId).withForce(true).withRemoveVolumes(true);
+                removeContainerCmd.exec();
+                try {
+                    removeContainerCmd.wait();
+                }
+                catch(InterruptedException e) {}
+                finally {
+                    dockerClient.removeImageCmd(imageId).withForce(true).exec();
+                }
             }
         }
         containerIds.clear();
         if (alsoRemoveImages) {
-            for (String imageId: imageIds) {
+            for (String imageId : imageIds) {
                 dockerClient.removeImageCmd(imageId).withForce(true).exec();
             }
             imageIds.clear();
         }
-        dockerClient.removeNetworkCmd(networkId).exec();
-        networkId = null;
+        if (networkId != null) {
+            dockerClient.removeNetworkCmd(networkId).exec();
+            networkId = null;
+        }
+
         try {
             dockerClient.close();
+        } catch (Exception e) {
         }
-        catch (Exception e) {}
+    }
 
+    public void dispose(boolean alsoRemoveImages) {
+        disposeInternal(alsoRemoveImages);
         registry.remove(this);
     }
 
     public static void disposeAll(boolean alsoRemoveImages) {
-        for (DockerPoolService instance: registry) {
-            instance.dispose(alsoRemoveImages);
+        for (DockerPoolServiceImpl instance: registry) {
+            instance.disposeInternal(alsoRemoveImages);
         }
-    }
-
-    @Override
-    public void finalize() {
-        dispose(false);
+        registry.clear();
     }
 }

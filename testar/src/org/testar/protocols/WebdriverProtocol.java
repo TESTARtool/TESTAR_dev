@@ -78,9 +78,8 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
-import org.fruit.monkey.docker.DockerPoolService;
-import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
 import org.fruit.monkey.webserver.ReportingService;
@@ -116,7 +115,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	private int reportId = -1;
 	private int iterationId = -1;
 
-	private DockerPoolService dockerPoolService;
 	private boolean isLocalDatabaseActive = false;
 
 	// List of atributes to identify and close policy popups
@@ -139,11 +137,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
-		dockerPoolService = new DockerPoolServiceImpl();
-
 		if (settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
-			sqlService = new MySqlServiceImpl(dockerPoolService, settings);
+			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
 			final String databaseName = settings.get(ConfigTags.DataStoreDB);
 			final String userName = settings.get(ConfigTags.DataStoreUser);
 			final String userPassword = settings.get(ConfigTags.DataStorePassword);
@@ -214,7 +210,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			final String dbPassword = settings.get(ConfigTags.DataStorePassword);
 
 			try {
-				final ReportingService reportingService = new ReportingServiceImpl(dockerPoolService);
+				final ReportingService reportingService = new ReportingServiceImpl(Main.getReportingService());
 				reportingService.start(port, dbHostname, 3306, dbName, dbUsername, dbPassword);
 			}
 			catch (IOException e) {

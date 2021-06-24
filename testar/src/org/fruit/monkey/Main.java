@@ -70,6 +70,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.windows.Windows10;
+import org.fruit.monkey.docker.DockerPoolService;
+import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 
@@ -97,6 +99,12 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	public static String webserverDir = extrasDir + "reporting" + File.separator + "webserver" + File.separator;
 	public static String sonarqubeDir = extrasDir + "sonarqube";
 	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
+
+	private static DockerPoolService reportingDockerService = new DockerPoolServiceImpl();
+
+	public static DockerPoolService getReportingService() {
+		return reportingDockerService;
+	}
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
@@ -140,6 +148,14 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			@Override
 			public void run() {
 				shutdown();
+			}
+		});
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				DockerPoolServiceImpl.disposeAll(false);
 			}
 		});
 
@@ -190,6 +206,8 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	private static void shutdown() {
+		DockerPoolServiceImpl.disposeAll(false);
+
 		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
