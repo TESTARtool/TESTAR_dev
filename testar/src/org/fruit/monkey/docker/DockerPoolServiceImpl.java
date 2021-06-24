@@ -127,17 +127,20 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 if (container.getState().toLowerCase(Locale.ROOT).contains("running")) {
                     dockerClient.killContainerCmd(containerId).exec();
                 }
-                final String imageId = container.getImageId();
+                String imageId = container.getImageId();
                 System.out.println("Image ID: " + imageId);
+                if (imageId.contains(":")) {
+                    imageId = imageId.substring(imageId.indexOf(':') + 1);
+                }
                 final RemoveContainerCmd removeContainerCmd = dockerClient.removeContainerCmd(containerId).withForce(true).withRemoveVolumes(true);
                 removeContainerCmd.exec();
-                try {
-                    removeContainerCmd.wait();
-                }
-                catch(InterruptedException e) {}
-                finally {
+//                try {
+//                    removeContainerCmd.wait();
+//                }
+//                catch(InterruptedException e) {}
+//                finally {
                     dockerClient.removeImageCmd(imageId).withForce(true).exec();
-                }
+//                }
             }
         }
         containerIds.clear();
@@ -147,6 +150,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             }
             imageIds.clear();
         }
+        
         if (networkId != null) {
             dockerClient.removeNetworkCmd(networkId).exec();
             networkId = null;
