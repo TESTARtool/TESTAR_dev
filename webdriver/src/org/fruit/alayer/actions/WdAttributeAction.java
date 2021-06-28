@@ -42,6 +42,7 @@ public class WdAttributeAction extends TaggableBase implements Action {
   public WdAttributeAction(String elementId, String key, String value) {
     this.elementId = elementId;
     this.key = key;
+   
     this.value = value;
     this.set(Tags.Role, WdActionRoles.SetAttributeScript);
     this.set(Tags.Desc, "Execute Webdriver script to set into " + elementId + " " + key + " " + value);
@@ -50,9 +51,11 @@ public class WdAttributeAction extends TaggableBase implements Action {
   @Override
   public void run(SUT system, State state, double duration)
       throws ActionFailedException {
+    String setAttribute = String.format("setAttribute('%s','%s')", key, value);
+    // TODO: Selecting by ID is not enough... Give possibility to define the needed element.
     WdDriver.executeScript(String.format(
-        "document.getElementById('%s').setAttribute('%s', '%s');",
-        elementId, key, value));
+        "var s = document.getElementById('%s'); if (s !=null) { document.getElementById('%s').%s; } else { document.getElementsByName('%s').value = '%s'; }",
+        elementId, elementId, setAttribute, elementId, value));
   }
 
   @Override

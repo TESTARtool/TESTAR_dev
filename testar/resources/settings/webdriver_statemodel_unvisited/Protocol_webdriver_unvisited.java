@@ -201,6 +201,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
+        System.out.println("Protocol file: deriveActions: Arend acties");
 		Set<Action> actions = super.deriveActions(system, state);
 
 		// create an action compiler, which helps us create actions
@@ -210,14 +211,15 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		// Check if forced actions are needed to stay within allowed domains
         if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl"))
         {
-            WdDriver.executeScript("window.history.back()");
+            return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));      
+            
         }
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
             System.out.println("Executing forced action");
 			return forcedActions;
 		}
-		System.out.println("Protocol file: deriveActions: Arend acties");
+		
 		if (m.currentAbstractState != null) {
 			AbstractState abstr = m.currentAbstractState;
 			System.out.println("Protocol file(184):" + abstr.getClass() + "  state id = " + abstr.getStateId());
@@ -260,6 +262,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 				}
 			}
 		}
+        System.out.println("Done with DeriveActions");
 
 		return actions;
 	}
@@ -282,7 +285,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
             Node item = items.item(i);
             Element node = (Element) item;
             String value = node.getTextContent();            
-            System.out.println(node.getNodeName() +"=" +value);
+           // System.out.println(node.getNodeName() +"=" +value);
             result.put(node.getNodeName(), value);
         }
         System.out.println("Einde formfile");
@@ -314,7 +317,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
        }
        catch (Exception e)
        {}
-       System.out.println(result);
+      // System.out.println(result);
        
    }
    
@@ -331,14 +334,16 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	{
        int sum = 0;
        WdElement element = widget.element;
+	   String defaultValue = "write-random-genenerated-value";
        if (isTypeable(widget))
                 {
+					
                     
-                    System.out.println("veld "+element.name+"  gevonden");
+         //           System.out.println("veld "+element.name+"  gevonden");
                     if (storeFile)
                     {
                         
-                        fields.put(element.name,"xxx");
+                        fields.put(element.name,defaultValue);
                     }
                     if (fields.containsKey(element.name) && fields.get(element.name) != null) {
                         caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
@@ -347,31 +352,31 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
                     
                 }
         String baseElem = element.tagName;
-        System.out.println("check children: huidig element "+element.tagName+" aantal childs: "+widget.childCount());
+       // System.out.println("check children: huidig element "+element.tagName+" aantal childs: "+widget.childCount());
 		for (int i = 0; i< widget.childCount(); i++) {
 			WdWidget w = widget.child(i);
-            System.out.println("child "+i+"  van element "+baseElem);
+            //System.out.println("child "+i+"  van element "+baseElem);
             //WdElement 
             element = w.element;			
             
-                System.out.println("buildForm :"+ element.tagName +" "+element.name);
+           //     System.out.println("buildForm :"+ element.tagName +" "+element.name);
                 if (isTypeable(w))
                 {
-                    System.out.println("veld "+element.name+"  gevonden");
+             //       System.out.println("veld "+element.name+"  gevonden");
                     if (storeFile)
                     {
                         
-                        fields.put(element.name,"xxx");
+                        fields.put(element.name,defaultValue);
                     }
                     if (fields.containsKey(element.name) && fields.get(element.name) != null) {
                         
                         caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
                         sum += 2;
-                        System.out.println("element.name in de fields; voeg toe aan caB som+2 som = "+sum);
+                       // System.out.println("element.name in de fields; voeg toe aan caB som+2 som = "+sum);
                     }
                     
                 } else {
-                    System.out.println("Element "+element.tagName+"  is niet typeable");
+               //     System.out.println("Element "+element.tagName+"  is niet typeable");
                     
 					 sum += buildForm(caB, widget.child(i), fields, storeFile);
 				}
@@ -382,7 +387,7 @@ System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
 
 	}
 	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget, HashMap<String, String> fields) {
-    System.out.println("Url = "+WdDriver.getCurrentUrl());
+    //System.out.println("Url = "+WdDriver.getCurrentUrl());
     inForm=true;
     if (fields == null)
     {
@@ -415,8 +420,9 @@ System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
 		if (fields.containsKey("performSubmit"))
 		{
 			boolean submit = Boolean.getBoolean(fields.get("performSubmit"));
-			if (submit) {
-				caB.add(new WdSubmitAction("formId"),2);
+			if (submit && formId != "") {
+              
+				caB.add(new WdSubmitAction(formId),2);
 			}
 		}
 if (storeFile)
@@ -488,13 +494,13 @@ if (storeFile)
 			if (role.equals(WdRoles.WdINPUT)) {
 				
 				String type = ((WdWidget) widget).element.type.toLowerCase();
-				System.out.println("isTypeable:" + widget+"  type = "+type+"  result = "+WdRoles.typeableInputTypes().contains(type));
+				//System.out.println("isTypeable:" + widget+"  type = "+type+"  result = "+WdRoles.typeableInputTypes().contains(type));
 				return WdRoles.typeableInputTypes().contains(type);
 			}
-			System.out.println("true");
+			//System.out.println("true");
 			return true;
 		}
-		System.out.println("false");
+		//System.out.println("false");
 
 		return false;
 	}
@@ -707,7 +713,7 @@ if (storeFile)
 			  } else {
 				  if (sameState >3 )
 				  {
-					  System.out.println("Already more than three times in same state");
+					  System.out.println("Already more than three times in same state; Put back in blackhole");
 					  _moreActions = false;
 				  }
 				  System.out.println("Needed action is unavailable, select from path to be followed; for now easy way out random select");

@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.fruit.alayer.Tags;
+
 public class AbstractState extends AbstractEntity implements Persistable {
 
     // list of possible actions that can be executed from this state
@@ -34,6 +36,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
         if (actions != null) {
             for(AbstractAction action:actions) {
                 this.actions.put(action.getActionId(), action);
+                System.out.println("AbstractState.java(37): SHOULD: Retrieve action "+action.getActionId()+"  from database before putting into unvisitedActions");
                 unvisitedActions.put(action.getActionId(), action);
             }
         }
@@ -107,6 +110,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getUnvisitedActions() {
+        String myId = this.getId();
+        System.out.println("AbstractState(111): Retrieve unvisitedactions; my id = "+myId);
         return new HashSet<>(unvisitedActions.values());
     }
 
