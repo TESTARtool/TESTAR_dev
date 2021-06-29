@@ -9,7 +9,6 @@ import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
 import org.fruit.monkey.codeanalysis.RepositoryLanguage;
 import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
 import org.fruit.monkey.docker.DockerPoolService;
-import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.fruit.monkey.sonarqube.SonarqubeService;
 import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
 import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;

@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public interface MySqlService {
+    MySqlServiceDelegate getDelegate();
+    void setDelegate(MySqlServiceDelegate delegate);
+
     void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException;
 //    void stopLocalDatabase();
     void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException;

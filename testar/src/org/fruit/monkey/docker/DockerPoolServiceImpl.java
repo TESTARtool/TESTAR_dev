@@ -150,7 +150,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             }
             imageIds.clear();
         }
-        
+
         if (networkId != null) {
             dockerClient.removeNetworkCmd(networkId).exec();
             networkId = null;

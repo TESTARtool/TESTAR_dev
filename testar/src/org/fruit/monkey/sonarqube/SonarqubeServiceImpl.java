@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
+import org.fruit.monkey.webserver.ReportingServiceDelegate;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +29,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     private final String serviceId;
     private HttpClient httpClient ;
     private DockerPoolService dockerPoolService;
+    private SonarqubeServiceDelegate delegate;
 
     private final static String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
@@ -35,6 +37,14 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         this.serviceId = serviceId;
         this.dockerPoolService = new DockerPoolServiceImpl();
         httpClient = HttpClientBuilder.create().build();
+    }
+
+    public SonarqubeServiceDelegate getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(SonarqubeServiceDelegate delegate) {
+        this.delegate = delegate;
     }
 
     public DockerPoolService getDockerService() {
