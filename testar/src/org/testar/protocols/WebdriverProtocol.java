@@ -34,14 +34,15 @@ package org.testar.protocols;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,7 +57,6 @@ import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.HtmlReporting.HtmlTestReport;
 import nl.ou.testar.SequenceReport;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.TestReport;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
@@ -80,9 +80,12 @@ import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.dialog.ProgressDialog;
 import org.fruit.monkey.mysql.MySqlService;
+import org.fruit.monkey.mysql.MySqlServiceDelegate;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
 import org.fruit.monkey.webserver.ReportingService;
+import org.fruit.monkey.webserver.ReportingServiceDelegate;
 import org.fruit.monkey.webserver.ReportingServiceImpl;
 import org.testar.OutputStructure;
 
@@ -143,19 +146,45 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			final String databaseName = settings.get(ConfigTags.DataStoreDB);
 			final String userName = settings.get(ConfigTags.DataStoreUser);
 			final String userPassword = settings.get(ConfigTags.DataStorePassword);
-			try {
-				if (settings.get(ConfigTags.DataStoreType).equals("plocal")) {
-					sqlService.startLocalDatabase(databaseName, userName, userPassword);
-					isLocalDatabaseActive = true;
+
+			ProgressDialog progressDialog = new ProgressDialog();
+			progressDialog.setStatusString("Starting database connection");
+			
+			sqlService.setDelegate(new MySqlServiceDelegate() {
+				@Override
+				public void onStateChanged(State state, String description) {
+					progressDialog.setStatusString(description);
 				}
-				else {
-					sqlService.connectExternalDatabase(settings.get(ConfigTags.DataStoreServer),
-							databaseName, userName, userPassword);
+
+				@Override
+				public void onServiceReady(String url) {
+					progressDialog.endProgress(null, true);
 				}
-			} catch (Exception e) {
-				System.err.println("Cannot initialize a database");
-				e.printStackTrace();
-			}
+			});
+
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						if (settings.get(ConfigTags.DataStoreType).equals("plocal")) {
+							sqlService.startLocalDatabase(databaseName, userName, userPassword);
+							isLocalDatabaseActive = true;
+						}
+						else {
+							sqlService.connectExternalDatabase(settings.get(ConfigTags.DataStoreServer),
+									databaseName, userName, userPassword);
+						}
+					} catch (Exception e) {
+						System.err.println("Cannot initialize a database");
+						e.printStackTrace();
+					}
+				}
+			}.start();
+
+
+			progressDialog.pack();
+			progressDialog.setLocationRelativeTo(null);
+			progressDialog.setVisible(true);
 		}
 
 		// Initialize HTML Report (Dashboard)
@@ -209,12 +238,47 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			final String dbUsername = settings.get(ConfigTags.DataStoreUser);
 			final String dbPassword = settings.get(ConfigTags.DataStorePassword);
 
+			ProgressDialog progressDialog = new ProgressDialog();
+			progressDialog.setStatusString("Preparing report");
+
 			try {
 				final ReportingService reportingService = new ReportingServiceImpl(Main.getReportingService());
-				reportingService.start(port, dbHostname, 3306, dbName, dbUsername, dbPassword);
+				reportingService.setDelegate(new ReportingServiceDelegate() {
+					@Override
+					public void onStateChanged(State state, String description) {
+						progressDialog.setStatusString(description);
+					}
+
+					@Override
+					public void onServiceReady(String url) {
+						progressDialog.endProgress(null, true);
+						try {
+							Desktop.getDesktop().browse(new URI("http://localhost:" + port));
+						}
+						catch (Exception e) {
+							System.err.println("Cannot browse report: " + e.getMessage());
+							e.printStackTrace();
+						}
+					}
+				});
+				new Thread() {
+					@Override
+					public void run() {
+						try {
+							reportingService.start(port, dbHostname, 3306, dbName, dbUsername, dbPassword);
+						} catch (IOException e) {
+							System.err.println("Cannot start web service: " + e.getMessage());
+							e.printStackTrace();
+						}
+					}
+				}.start();
+
+				progressDialog.pack();
+				progressDialog.setLocationRelativeTo(null);
+				progressDialog.setVisible(true);
 			}
 			catch (IOException e) {
-				System.err.println("Cannot start web service: " + e.getMessage());
+				System.err.println("Cannot init web service: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

@@ -9,7 +9,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.docker.DockerPoolService;
-import org.fruit.monkey.docker.DockerPoolServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,19 +25,38 @@ public class MySqlServiceImpl implements MySqlService {
     private Connection connection;
     private PreparedStatement lastIdStatement;
 
+    private MySqlServiceDelegate delegate;
+
     public MySqlServiceImpl(DockerPoolService dockerPoolService, Settings settings) {
         this.settings = settings;
         this.dockerPoolService = dockerPoolService;
     }
 
+    public MySqlServiceDelegate getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(MySqlServiceDelegate delegate) {
+        this.delegate = delegate;
+    }
+
     public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
         dockerPoolService.start("mysql");
+
+        if (delegate != null) {
+            delegate.onStateChanged(MySqlServiceDelegate.State.BUILDING_IMAGE, "Building database image");
+        }
         final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir),
                 "FROM mysql:latest\n" +
                 "ENV MYSQL_ROOT_PASSWORD=" + userPassword + "\n" +
                 "ENV MYSQL_DATABASE=" + databaseName + "\n" +
                 "ENV MYSQL_USER=" + userName + "\n" +
                 "ENV MYSQL_PASSWORD=" + userPassword);
+
+        if (delegate != null) {
+            delegate.onStateChanged(MySqlServiceDelegate.State.STARTING_SERVICE, "Starting local database");
+        }
+
         final File databaseDir = new File(settings.get(ConfigTags.DataStoreDirectory));
         if (databaseDir.isDirectory()) {
             System.out.println("Directory exists: " + databaseDir.getAbsolutePath());
@@ -61,11 +79,17 @@ public class MySqlServiceImpl implements MySqlService {
                         new Bind(databaseInitDir.getAbsolutePath(), new Volume("/docker-entrypoint-initdb.d"))
                 );
         dockerPoolService.startWithImage(imageId, "mysql", hostConfig);
+
+        if (delegate != null) {
+            delegate.onStateChanged(MySqlServiceDelegate.State.CONNECTING, "Connecting local database");
+        }
+
         Class.forName("com.mysql.jdbc.Driver");
+        final String url = "jdbc:mysql://localhost:13306/" + databaseName +
+                "?user=" + userName + "&password=" + userPassword;
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:mysql://localhost:13306/" + databaseName +
-                        "?user=" + userName + "&password=" + userPassword);
+                connection = DriverManager.getConnection(url);
             }
             catch (CommunicationsException e) {
                 System.out.println("Still not ready");
@@ -76,6 +100,9 @@ public class MySqlServiceImpl implements MySqlService {
             }
         }
         lastIdStatement = connection.prepareStatement(LAST_ID_QUERY);
+        if (delegate != null) {
+            delegate.onServiceReady(url);
+        }
     }
 
     public synchronized void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException {
