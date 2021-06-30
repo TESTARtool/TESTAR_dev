@@ -30,8 +30,11 @@
 
 package org.testar.jacoco;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -199,6 +202,13 @@ public class JacocoFilesCreator {
 
             ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
             Process p = builder.start();
+
+            // Read process buffer to empty the process buffer and avoid waiting issues
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((reader.readLine()) != null) {
+                //TODO: Read jacoco ant messages if necessary
+            }
+
             p.waitFor();
 
             if(!new File(reportDir + File.separator + "report_jacoco.csv").exists()) {
