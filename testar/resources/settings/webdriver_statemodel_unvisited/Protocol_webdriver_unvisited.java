@@ -220,10 +220,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			return forcedActions;
 		}
 		
-		if (m.currentAbstractState != null) {
-			AbstractState abstr = m.currentAbstractState;
-			System.out.println("Protocol file(184):" + abstr.getClass() + "  state id = " + abstr.getStateId());
-		}
+		
 		// iterate through all widgets
 		for (org.fruit.alayer.Widget widget : state) {
 			// only consider enabled and non-tabu widgets
@@ -330,7 +327,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
     }
    
 
-    public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile)
+    public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile, StdActionCompiler ac)
 	{
        int sum = 0;
        WdElement element = widget.element;
@@ -346,7 +343,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
                         fields.put(element.name,defaultValue);
                     }
                     if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-                        caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
+                        caB.add(ac.clickTypeInto(widget, fields.get(element.name),true),2);
                         sum += 2;
                     }
                     
@@ -378,7 +375,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
                 } else {
                //     System.out.println("Element "+element.tagName+"  is niet typeable");
                     
-					 sum += buildForm(caB, widget.child(i), fields, storeFile);
+					 sum += buildForm(caB, widget.child(i), fields, storeFile, ac);
 				}
            
 		}
@@ -386,6 +383,8 @@ System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
        return sum;
 
 	}
+	
+	
 	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget, HashMap<String, String> fields) {
     //System.out.println("Url = "+WdDriver.getCurrentUrl());
     inForm=true;
@@ -415,7 +414,7 @@ System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
         System.out.println("Bestand bestaat, lees de data uit bestand");
     }
 		CompoundAction.Builder caB = new CompoundAction.Builder();
-		int sum = buildForm(caB, widget, fields, storeFile);
+		int sum = buildForm(caB, widget, fields, storeFile, ac);
 		
 		if (fields.containsKey("performSubmit"))
 		{
@@ -494,14 +493,10 @@ if (storeFile)
 			if (role.equals(WdRoles.WdINPUT)) {
 				
 				String type = ((WdWidget) widget).element.type.toLowerCase();
-				//System.out.println("isTypeable:" + widget+"  type = "+type+"  result = "+WdRoles.typeableInputTypes().contains(type));
 				return WdRoles.typeableInputTypes().contains(type);
 			}
-			//System.out.println("true");
 			return true;
 		}
-		//System.out.println("false");
-
 		return false;
 	}
 	/**
@@ -513,7 +508,7 @@ if (storeFile)
 	 * @return the selected action (non-null!)
 	 */
 
-	private AbstractState currentState;
+	// private AbstractState currentState;
 
 	// private Action selectedAction; // destination action to perform
 	private Boolean finishedAction = false;
@@ -618,10 +613,11 @@ if (storeFile)
 						//System.out.println("I hope this doesn't trigger");
                         cyclesWaitBeforeNewAction ++;
 
-						WdDriver.executeScript("window.history.back();");
+						
 						Thread.sleep(1000);
 						
 						ok = true;
+						return "HistoryBack";
 						
 					}
 				} else {
@@ -655,7 +651,7 @@ if (storeFile)
 
 	public Action traversePath(State state, Set<Action> actions)
 	{
-    System.out.println("traversePath");
+    System.out.println("traversePath from currentState = "+state.get(Tags.AbstractIDCustom)+"  naar unvisitedAction "+selectedAction+"\nSTILL NOT IMPLEMENTED");
 		return super.selectAction(state, actions);
 	
 	}
@@ -663,8 +659,6 @@ if (storeFile)
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 
-		//currentState = m.currentAbstractState; // initialize currentState
-		
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
@@ -673,16 +667,17 @@ if (storeFile)
 			return retAction;
 		}
 		
-		// First check wheter the selectedAction is still not visited or visited by this node
-		
-				
+		// First check whether we do have a selected action; if not select one		
 		if (selectedAction == null) {
 
 			selectedAction = getNewSelectedAction(state, actions);
 			// After execution of getNewSelectedAction it is still possible no action is selected (empty database for example)
-
+			if (selectedAction == "HistoryBack")
+			{
+				return new WdHistoryBackAction();
+			}
 			
-			if (selectedAction == null)
+			if (selectedAction == null) // Still no selected action
 			{
                 if (cyclesWaitBeforeNewAction < 3 && sameState < 3) {
 					System.out.println("selectAction: cyclesWaitBeforeNewAction = "+cyclesWaitBeforeNewAction+" sameState = "+sameState+" Wait 3000+Rnd(2000) ms then select action (hoping for newly discovered actions");
@@ -695,14 +690,13 @@ if (storeFile)
 			}	
 		}
 				
-			
-		
 		// Prepare SQL statement to retrieve path to the action
 		// Check whether we have an selectedAction we want to perform (and if it's possible to execute it now.
 		
 		if (selectedAction != null) {
-			System.out.println("selectedAction != null");
+			System.out.println("selectedAction != null actions.length = "+actions.size());
 			HashMap<String, Action> actionMap = ConvertActionSetToDictionary(actions);
+			System.out.println("actionMap.size() = "+ actionMap.size());
 			// select path towards the selected action
 			  if (actionMap.containsKey(selectedAction)) {
 				  System.out.println("Needed action is currently available, so select this action");
