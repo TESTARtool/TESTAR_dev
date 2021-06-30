@@ -54,6 +54,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -138,7 +140,7 @@ public class WdDriver extends SUTBase {
     	
       throw new SystemStartException("Not a valid webdriver");
     }
-
+    
     if (screenDimensions != null) {
       webDriver.manage().window().setSize(screenDimensions);
     }
@@ -169,7 +171,7 @@ public class WdDriver extends SUTBase {
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }
-
+    
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);
     options.setExperimentalOption("prefs", prefs);
@@ -177,6 +179,11 @@ public class WdDriver extends SUTBase {
     return new ChromeDriver(service, options);
   }
 
+  static public LogEntries getLog() {
+    LogEntries logs = webDriver.manage().logs().get(LogType.BROWSER);
+    return logs;
+  }
+  
   private static RemoteWebDriver startGeckoDriver(String geckoDriverPath,
                                                   String extensionPath) {
     String nullPath = "/dev/null";

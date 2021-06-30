@@ -176,7 +176,12 @@ public class WdElement extends TaggableBase implements Serializable {
 
   private boolean asBool(Object o) {
     if (o == null) return false;
-    else return (Boolean)o;
+    else if (o instanceof Boolean) return (Boolean)o;
+    else if (o instanceof Long) {
+      Long oo = (Long)o;
+      if (oo == 1) return true;
+    }
+    return false;
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
