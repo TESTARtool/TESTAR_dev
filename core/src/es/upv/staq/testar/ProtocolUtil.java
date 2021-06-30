@@ -260,8 +260,8 @@ public class ProtocolUtil {
 		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
 		return scrshot;
 	}
-	
-	public static String getActionshot(State state, Action action){
+
+	public static AWTCanvas getActionshot(State state, Action action){
 		List<Finder> targets = action.get(Tags.Targets, null);
 		if (targets != null){
 			Widget w;
@@ -274,14 +274,14 @@ public class ProtocolUtil {
 				r = new Rectangle((int)s.x(), (int)s.y(), (int)s.width(), (int)s.height());
 				actionArea = actionArea.union(r);
 			}
-			if (actionArea.isEmpty())
+			if (actionArea.isEmpty()) {
 				return null;
-			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
+			}
+			return AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
 														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
 		}
 		return null;
-	}	
+	}
 
 	private static long getRootWindowHandle(State state) {
 		long windowHandle = 0;

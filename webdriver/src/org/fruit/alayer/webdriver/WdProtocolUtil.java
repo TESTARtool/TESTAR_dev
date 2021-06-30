@@ -54,7 +54,7 @@ public class WdProtocolUtil extends ProtocolUtil {
     return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
   }
 
-  public static String getActionshot(State state, Action action) {
+  public static AWTCanvas getActionshot(State state, Action action) {
     List<Finder> targets = action.get(Tags.Targets, null);
     if (targets == null) {
       return null;
@@ -81,8 +81,7 @@ public class WdProtocolUtil extends ProtocolUtil {
 
     Rect rect = Rect.from(
         actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
-    AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+    return WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
   }
   
   public static AWTCanvas getStateshotBinary(State state) {
@@ -91,9 +90,8 @@ public class WdProtocolUtil extends ProtocolUtil {
 			  && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
 		  //Get a screenshot of all the screen, because SUT ended and we can't obtain the size
 		  Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		  AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(screenRect.getX(), screenRect.getY(),
+		  return AWTCanvas.fromScreenshot(Rect.from(screenRect.getX(), screenRect.getY(),
 				  screenRect.getWidth(), screenRect.getHeight()), state.get(Tags.HWND, (long)0), AWTCanvas.StorageFormat.PNG, 1);
-		  return scrshot;
 	  }
 	  
 	  double width = CanvasDimensions.getCanvasWidth() + (
@@ -101,7 +99,6 @@ public class WdProtocolUtil extends ProtocolUtil {
 	  double height = CanvasDimensions.getCanvasHeight() + (
 			  state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
 	  Rect rect = Rect.from(0, 0, width, height);
-	  AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-	  return screenshot;
+	  return WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
   }
 }

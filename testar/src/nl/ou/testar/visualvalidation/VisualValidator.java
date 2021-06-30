@@ -23,6 +23,7 @@ import org.fruit.alayer.Pen;
 import org.fruit.alayer.State;
 import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.visualizers.TextVisualizer;
 import org.testar.Logger;
 
@@ -68,6 +69,11 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
 
     @Override
     public void AnalyzeImage(State state, @Nullable AWTCanvas screenshot) {
+        AnalyzeImage(state, screenshot, null);
+    }
+
+    @Override
+    public void AnalyzeImage(State state, @Nullable AWTCanvas screenshot, @Nullable Widget widget) {
         // Create new session
         startNewAnalysis();
 
@@ -75,7 +81,7 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         parseScreenshot(screenshot);
 
         // Start extracting text, provide callback once finished.
-        extractExpectedText(state);
+        extractExpectedText(state, widget);
 
         // Match the expected text with the detected text.
         matchText();
@@ -106,8 +112,8 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         }
     }
 
-    private void extractExpectedText(State state) {
-        _extractor.ExtractExpectedText(state, this);
+    private void extractExpectedText(State state, @Nullable Widget widget) {
+        _extractor.ExtractExpectedText(state, widget, this);
     }
 
     private void matchText() {

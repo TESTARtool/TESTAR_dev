@@ -38,6 +38,7 @@ import static org.fruit.alayer.Tags.Desc;
 import static org.fruit.alayer.Tags.ExecutedAction;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.OriginWidget;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.ProtocolClass;
@@ -1735,13 +1736,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
-
+		AWTCanvas screenshot = null;
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			WdProtocolUtil.getActionshot(state,action);
+			screenshot = WdProtocolUtil.getActionshot(state,action);
 		}else{
-			ProtocolUtil.getActionshot(state,action);
+			screenshot = ProtocolUtil.getActionshot(state,action);
 		}
-		
+		ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), screenshot);
+
+		visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null));
+
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
 		try{

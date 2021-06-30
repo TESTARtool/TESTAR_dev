@@ -2,6 +2,7 @@ package nl.ou.testar.visualvalidation.extractor;
 
 
 import org.apache.logging.log4j.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.Environment;
 import org.fruit.Util;
 import org.fruit.alayer.Roles;
@@ -28,29 +29,6 @@ import static org.fruit.alayer.Tags.*;
 
 public class ExpectedTextExtractorBase extends Thread implements TextExtractorInterface {
     private static final String TAG = "ExpectedTextExtractor";
-
-    AtomicBoolean running = new AtomicBoolean(true);
-
-    private final Boolean _threadSync = true;
-    private org.fruit.alayer.State _state = null;
-    private ExpectedTextCallback _callback = null;
-
-    final private Tag<String> defaultTag;
-
-    private final boolean _loggingEnabled;
-
-    /**
-     * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because the don't contain
-     * readable text. Optional when the value (which represents the ancestor path) is set, the {@link Widget} should
-     * only be ignored when the ancestor path is equal with the {@link Widget} under investigation.
-     */
-    private final Map<String, List<String>> _blacklist = new HashMap<>();
-
-    /**
-     * A lookup table which indicates based on the {@code Role} which {@link Tag} should be used to extract the text.
-     */
-    private final Map<String, String> _lookupTable = new HashMap<>();
-
     /**
      * Lookup table to map the name of the name of a {@link Tag}, to the actual {@link Tag}.
      * Holds all the available tag's which could hold text (String types, only). The key represents the {@link Tag} in String type, value
@@ -59,6 +37,23 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
     private static final Map<String, Tag<String>> _tag = TagsBase.tagSet().stream()
             .filter(tag -> tag.type().equals(String.class))
             .collect(Collectors.toMap(Tag::name, tag -> (Tag<String>) tag));
+    private final Boolean _threadSync = true;
+    final private Tag<String> defaultTag;
+    private final boolean _loggingEnabled;
+    /**
+     * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because the don't contain
+     * readable text. Optional when the value (which represents the ancestor path) is set, the {@link Widget} should
+     * only be ignored when the ancestor path is equal with the {@link Widget} under investigation.
+     */
+    private final Map<String, List<String>> _blacklist = new HashMap<>();
+    /**
+     * A lookup table which indicates based on the {@code Role} which {@link Tag} should be used to extract the text.
+     */
+    private final Map<String, String> _lookupTable = new HashMap<>();
+    AtomicBoolean running = new AtomicBoolean(true);
+    private org.fruit.alayer.State _state = null;
+    private ExpectedTextCallback _callback = null;
+    private Widget _widget = null;
 
     ExpectedTextExtractorBase(Tag<String> defaultTag) {
         WidgetTextConfiguration config = ExtendedSettingsFactory.createWidgetTextConfiguration();
@@ -82,10 +77,22 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
         start();
     }
 
+    static Rectangle getLocation(Widget widget) {
+        Shape dimension = widget.get(Shape, null);
+
+        int x = dimension != null ? (int) dimension.x() : 0;
+        int y = dimension != null ? (int) dimension.y() : 0;
+        int width = dimension != null ? (int) dimension.width() : 0;
+        int height = dimension != null ? (int) dimension.height() : 0;
+
+        return new Rectangle(x, y, width, height);
+    }
+
     @Override
-    public void ExtractExpectedText(org.fruit.alayer.State state, ExpectedTextCallback callback) {
+    public void ExtractExpectedText(org.fruit.alayer.State state, @Nullable Widget widget, ExpectedTextCallback callback) {
         synchronized (_threadSync) {
             _state = state;
+            _widget = widget;
             _callback = callback;
             if (_loggingEnabled) {
                 Logger.log(Level.TRACE, TAG, "Queue new text extract.");
@@ -114,17 +121,6 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
         }
     }
 
-    static Rectangle getLocation(Widget widget) {
-        Shape dimension = widget.get(Shape, null);
-
-        int x = dimension != null ? (int) dimension.x() : 0;
-        int y = dimension != null ? (int) dimension.y() : 0;
-        int width = dimension != null ? (int) dimension.width() : 0;
-        int height = dimension != null ? (int) dimension.height() : 0;
-
-        return new Rectangle(x, y, width, height);
-    }
-
     private void extractText() {
         if (_state == null || _callback == null) {
             Logger.log(Level.ERROR, TAG, "Should not try to extract text on empty state/callback");
@@ -144,28 +140,35 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
 
         double displayScale = Environment.getInstance().getDisplayScale(_state.get(Tags.HWND, (long) 0));
         List<ExpectedElement> expectedElements = new ArrayList<>();
-        for (Widget widget : _state) {
-            String widgetRole = widget.get(Role).name();
-            String text = widget.get(getVisualTextTag(widgetRole), "");
-
-            if (widgetIsIncluded(widget, widgetRole)) {
-                if (text != null && !text.isEmpty()) {
-                    Rectangle absoluteLocation = getLocation(widget);
-                    Rectangle relativeLocation = new Rectangle(
-                            (int) ((absoluteLocation.x - applicationPosition.x) * displayScale),
-                            (int) ((absoluteLocation.y - applicationPosition.y) * displayScale),
-                            (int) (absoluteLocation.width * displayScale),
-                            (int) (absoluteLocation.height * displayScale));
-                    expectedElements.add(new ExpectedElement(relativeLocation, text));
-                }
-            } else {
-                if (_loggingEnabled) {
-                    Logger.log(Level.DEBUG, TAG, "Widget {} with role {} is ignored", text, widgetRole);
-                }
-            }
+        if (_widget != null) {
+            extractedText(getLocation(_widget), displayScale, expectedElements, _widget);
+        } else {
+            Rectangle finalApplicationPosition = applicationPosition;
+            _state.forEach(widget -> extractedText(finalApplicationPosition, displayScale, expectedElements, widget));
         }
 
         _callback.ReportExtractedText(expectedElements);
+    }
+
+    private void extractedText(Rectangle applicationPosition, double displayScale, List<ExpectedElement> expectedElements, Widget widget) {
+        String widgetRole = widget.get(Role).name();
+        String text = widget.get(getVisualTextTag(widgetRole), "");
+
+        if (widgetIsIncluded(widget, widgetRole)) {
+            if (text != null && !text.isEmpty()) {
+                Rectangle absoluteLocation = getLocation(widget);
+                Rectangle relativeLocation = new Rectangle(
+                        (int) ((absoluteLocation.x - applicationPosition.x) * displayScale),
+                        (int) ((absoluteLocation.y - applicationPosition.y) * displayScale),
+                        (int) (absoluteLocation.width * displayScale),
+                        (int) (absoluteLocation.height * displayScale));
+                expectedElements.add(new ExpectedElement(relativeLocation, text));
+            }
+        } else {
+            if (_loggingEnabled) {
+                Logger.log(Level.DEBUG, TAG, "Widget {} with role {} is ignored", text, widgetRole);
+            }
+        }
     }
 
     protected boolean widgetIsIncluded(Widget widget, String role) {
