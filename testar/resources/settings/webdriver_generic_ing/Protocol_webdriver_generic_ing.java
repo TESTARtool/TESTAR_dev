@@ -48,6 +48,7 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
+import org.openqa.selenium.logging.LogEntry;
 import org.testar.protocols.WebdriverProtocol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -90,6 +91,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private static List<GenRule> modelGenRules;
 
 	private int nr_no_actions = 0;
+	private boolean first_action = true;
 	
 	static {
 		WdDriver.forceActivateTab = false;
@@ -115,6 +117,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected List<ActionRule> actionRules = null;
 	protected List<GenRule> generatorRules = null;
 	protected List<FilterRule> filterRules = null;
+	protected List<OracleRule> oracleRules = null;
 	
 	static String getSettingPath() {
 		String path = Settings.getSettingsPath();
@@ -186,11 +189,18 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				node.attribute("regexp"),
 				node.attribute("priority")));
 		
+		List<OracleRule> oracleRules_ = xmlToJava(_this, "//oracle",
+			node -> new OracleRule(
+				node.attribute("xquery"),
+				node.attribute("doc"),
+				Double.parseDouble(node.attribute("severity"))));
+		
 		logger.info("[RULES] Finished reading rules file");
 		
 		filterRules = filterRules_;
 		generatorRules = generatorRules_;
 		actionRules = actionRules_;
+		oracleRules = oracleRules_;
 	}
 	
 	static <R> List<R> xmlToJava(XdmNode _this, String query, Function<XdmNode, R> mapper) {
@@ -246,7 +256,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				// recursive through all widgets
 				Node n = toNode(d, s);
 				d.appendChild(n);
-				s.set(MyTags.XML, d);
+				s.set(MyTags.XML, n);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException("Cannot create XML representation", e);
@@ -256,14 +266,14 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 	protected Node toNode(Document d, WdWidget w) {
 		WdElement el = w.element;
-		Element e = d.createElement(el.tagName);
 		
+		Element e =  d.createElement(escape(el.tagName));
 		Map <String, String> map = el.attributeMap;
 
-		for (String key: map.keySet()) { e.setAttribute(key, map.get(key)); }
+		for (String key: map.keySet()) { e.setAttribute(escape(key), map.get(key)); }
 
 		if (el.textContent != null) { e.setTextContent(el.textContent); }
-		if (el.value != null) { e.setAttribute("value", el.value.toString()); }
+		if (el.value != null) { e.setAttribute("value", escape(el.value.toString())); }
 		if (el.checked) { e.setAttribute("checked", "true"); }
 		if (el.selected) { e.setAttribute("selected", "true"); }
 
@@ -272,6 +282,17 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		w.set(MyTags.XML, e);
 
 		return e;
+	}
+	
+	/* TODO: correct tag-name, attribute-name escaping, for now we just replace with '-' */
+	private String escape(String in) {
+		final StringBuilder out = new StringBuilder();
+		for (int i = 0; i < in.length(); i++) {
+			final char ch = in.charAt(i);
+			if (ch >= 32 && ch <= 127) out.append(ch);
+			else out.append("-");
+		}
+		return out.toString();
 	}
 	
 	private String hashString(String message, String algorithm) {
@@ -288,7 +309,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		
 		// Additionally annotate XML with previously visited Actions
 		Node d = state.get(MyTags.XML);
-		visitedActionsData.annotateVisits((Document)d, (WdState)state);
+		visitedActionsData.annotateVisits(d.getOwnerDocument(), (WdState)state);
 	}
 
 	public void buildActionsIds(Action action) {
@@ -316,7 +337,8 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
-		nr_no_actions = 0;
+		first_action = true;        // we are starting to take a first action
+		nr_no_actions = 0;          // and we start counting states where there are no actions
 	}
 
 	private boolean match(XQueryEvaluator comp, XdmItem item) {
@@ -335,17 +357,60 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		catch (Exception e) { throw new RuntimeException("Cannot evaluate", e); }
 	}
 	
+	@Override  // Hack to inject XML state BEFORE getVerdict is called: we need XML state to calculate a verdict
+	public void setStateForClickFilterLayerProtocol(State state) {
+		super.setStateForClickFilterLayerProtocol(state);
+		
+		annotateWithXML((WdState)state); // annotate the Widget Tree with XML nodes
+		
+		// Append log
+		List<LogEntry> entries = WdDriver.getLog().getAll();
+		if (entries.size() > 0) {
+			logger.info("[WebBrowser LOG] " + entries);
+		}
+		Node s = state.get(MyTags.XML);
+		Document doc = s.getOwnerDocument();
+		
+		Node log = doc.createElementNS(testarNamespace, "log");
+		s.appendChild(log);
+		
+		for (LogEntry e: entries) {
+			Element entry = doc.createElement("entry");
+			entry.setAttribute("timestamp", "" + e.getTimestamp());
+			entry.setAttribute("level", e.getLevel().toString());
+			entry.setAttribute("message", e.getMessage());
+			log.appendChild(entry);
+		}
+	}
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		WdState state = (WdState)super.getState(system);
-		annotateWithXML(state); // annotate the Widget Tree with XML nodes
-		return state;                                                                        
+		
+		return state;
 	}
-
 
 	@Override
 	protected Verdict getVerdict(State state) {
 		Verdict verdict = super.getVerdict(state);
+		
+		Verdict cachedVerdict = state.get(Tags.OracleVerdict, null);
+		if (cachedVerdict == null) {
+			if (state.get(MyTags.XML, null) != null) {
+				for (Widget w : state) {
+					Node n = w.get(MyTags.XML);
+					XdmItem item = saxonProcessor.newDocumentBuilder().wrap(n);
+					for (OracleRule r : oracleRules) {
+						if (match(r.expression, item)) {
+							logger.info("oracle rule match " + r.doc + ": " + r.sexpr);
+							verdict = verdict.join(new Verdict(r.severity, r.doc));
+						}
+					}
+				}
+			}
+		}
+		else {
+			return cachedVerdict;
+		}
 
 		return verdict;
 	}
@@ -516,6 +581,30 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		}
 		
 	}
+	
+	static class OracleRule {
+		protected String sexpr;
+		protected String doc;
+		protected double severity;
+		
+		protected XQueryEvaluator expression;
+		
+		public OracleRule(String e, String d, double s) {
+			sexpr = e;
+			doc = d;
+			severity = s;
+		
+			try {
+				expression = xqueryCompiler.compile(xqueryLibrary() + e).load();
+			}
+			catch (Exception ex) {
+				throw new RuntimeException("Invalid oracle rule", ex);
+			}
+		}
+		
+		public String toString() { return "OracleRule(" +  sexpr + ", " + doc + "," + severity + ");"; }
+	}
+	
 	static class GenRule  {
 		protected String sexpr;
 		protected String gexpr;
@@ -625,6 +714,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected boolean executeAction(SUT system, State state, Action action) {
 		boolean success = super.executeAction(system, state, action);
 		if (success) visitedActionsData.addAction((WdState)state, action);
+		first_action = false;
 		return success;
 	}
 
@@ -650,7 +740,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 
 				}
 				catch (Exception e) {
-					throw new RuntimeException("Cannot evaluate xquery", e);
+					throw new RuntimeException("Cannot evaluate xquery " + r.sexpr, e);
 				}
 			}
 		}
@@ -663,7 +753,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	@Override
 	protected boolean moreActions(State state) {
-		return super.moreActions(state) && (nr_no_actions < 3);
+		return (super.moreActions(state) && (nr_no_actions < 3)) || (!first_action);
 	}
 
 	@Override

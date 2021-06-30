@@ -1,4 +1,16 @@
 {
+  "oracle": [
+    {
+      "doc": [ "any SEVERE log message is a failure" ],
+      "xquery": [ "ancestor::form[@name = 'bla']//tst:log/entry[@level = 'SEVERE' and contains(@msg, 'reference missing')]" ],
+      "severity": [ "1.0" ]
+    },
+    {
+      "doc": [ "any SEVERE log message is a failure" ],
+      "xquery": [ "tst:log/entry[@level = 'WARNING' and contains(@msg, 'dfhdfiog')]" ],
+      "severity": [ "0.3" ]
+    }
+  ],
   "ignore-filter": [
     {
       "doc": [ "" ],
@@ -442,12 +454,12 @@
     {
       "doc": [ "weighted exclusive radio button" ],
       "xquery": [ "h:is-radio(.)" ],
-      "priority": [ "1 div count(h:sibling-radios(.))" ]
+      "priority": [ "1.0 div (max ((1.0, count(h:sibling-radios(.)))))" ]
     },
     {
       "doc": [ "weighted exclusive option button" ],
       "xquery": [ "h:is-option(.)" ],
-      "priority": [ "1 div count(h:sibling-options(.))" ]
+      "priority": [ "1.0 div (max((1.0, count(h:sibling-options(.)))))" ]
     },
     {
       "doc": [ "radio button in same group already selected" ],

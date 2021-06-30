@@ -14,9 +14,9 @@
         <root>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'ignore-filter']/*" mode="ignore-filter"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'generic-input']/*" mode="generic-input"/>
-            <xsl:apply-templates select="$x/*:map/*:array[@key = 'field-input']/*" mode="field-input"/>
-            <xsl:apply-templates select="$x/*:map/*:array[@key = 'form-input']/*" mode="form-input"/>
             <xsl:apply-templates select="$x/*:map/*:array[@key = 'action-priority']/*" mode="action-priority"/>
+            <xsl:apply-templates select="$x/*:map/*:array[@key = 'oracle']/*" mode="oracle"/>
+
         </root>
     </xsl:template>
 
@@ -36,30 +36,19 @@
         />
     </xsl:template>
 
-    <xsl:template match="*:map" mode="field-input">
-        <field-input
-                doc="{*:array[@key = 'doc']/*:string}"
-                name="{*:string[@key = 'name']}"
-                regexp="{*:array[@key = 'regexp']/*:string}"
-                priority="{*:array[@key = 'priority']/*:string}"
-        />
-    </xsl:template>
-
-    <xsl:template match="*:map" mode="form-input">
-        <form-input
-                doc="{*:array[@key = 'doc']/*:string}"
-                form="{*:string[@key = 'form']}"
-                name="{*:string[@key = 'name']}"
-                regexp="{*:array[@key = 'regexp']/*:string}"
-                priority="{*:array[@key = 'priority']/*:string}"
-        />
-    </xsl:template>
-
     <xsl:template match="*:map" mode="action-priority">
         <action-priority
                 doc="{*:array[@key = 'doc']/*:string}"
                 xquery="{*:array[@key = 'xquery']/*:string}"
                 priority="{*:array[@key = 'priority']/*:string}"
+        />
+    </xsl:template>
+
+    <xsl:template match="*:map" mode="oracle">
+        <oracle
+                xquery="{*:array[@key = 'xquery']/*:string}"
+                doc="{*:array[@key = 'doc']/*:string}"
+                severity="{*:array[@key = 'severity']/*:string}"
         />
     </xsl:template>
 </xsl:stylesheet>

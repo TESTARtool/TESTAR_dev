@@ -62,7 +62,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
 
     @Override
     public SUT startOrConnectSut() {
-
+        
         SUT sut = NativeLinker.getNativeSUT(SUTConnectorValue, processListenerEnabled);
         //Print info to the user to know that TESTAR is NOT READY for its use :-(
         String printSutInfo = "Waiting for the SUT to be accessible ...";
