@@ -39,6 +39,8 @@ import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.protocols.DesktopProtocol;
 
+import es.upv.staq.testar.CodingManager;
+
 /**
  * This protocol combines different functionalities of TESTAR for testing Windows desktop applications
  * into one protocol.
@@ -259,5 +261,48 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	@Override
 	protected void postSequenceProcessing() {
 		super.postSequenceProcessing();
+	}
+
+	/**
+	 * This method allow users to customize the Widget and State identifiers. 
+	 * 
+	 * By default TESTAR uses the CodingManager to create the Widget and State identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID 
+	 * 
+	 * @param state
+	 */
+	@Override
+	protected void buildStateIdentifiers(State state) {
+	    CodingManager.buildIDs(state);
+	}
+
+	/**
+	 * This method allow users to customize the Actions identifiers. 
+	 * 
+	 * By default TESTAR uses the CodingManager to create the Actions identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
+	 * 
+	 * @param state
+	 * @param actions
+	 */
+	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+	    CodingManager.buildIDs(state, actions);
+	}
+
+	/**
+	 * This method allow users to customize the environment Action identifiers. 
+	 * These are Actions not related to a Widget (ForceToForeground, Keyboard, KillProcess, etc...) 
+	 * 
+	 * By default TESTAR uses the CodingManager to create the specific environment Action identifiers: 
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
+	 * 
+	 * @param state
+	 * @param action
+	 */
+	@Override
+	protected void buildEnvironmentActionIdentifiers(State state, Action action) {
+	    CodingManager.buildEnvironmentActionIDs(state, action);
 	}
 }
