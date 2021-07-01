@@ -34,10 +34,7 @@ import org.fruit.alayer.Rect;
 import org.fruit.alayer.TaggableBase;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
@@ -84,6 +81,8 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
+
+  public String xPath;
 
   public transient Map<String, String> attributeMap;
 
@@ -162,6 +161,19 @@ public class WdElement extends TaggableBase implements Serializable {
     if (valuePattern == null || valuePattern.equals("")) {
       valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
     }*/
+  }
+
+  void setupXPaths(String xPath) {
+      System.out.println("XPath: " + xPath);
+      this.xPath = xPath;
+      HashMap<String, Integer> childTagsCount = new HashMap<>();
+      for (WdElement child: children) {
+          final String tag = child.tagName;
+          Integer tagsCount = childTagsCount.get(tag);
+          tagsCount = (tagsCount == null ? 1 : tagsCount + 1);
+          childTagsCount.put(tag, tagsCount);
+          child.setupXPaths(xPath + "/" + tag + "[" + tagsCount  + "]");
+      }
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {

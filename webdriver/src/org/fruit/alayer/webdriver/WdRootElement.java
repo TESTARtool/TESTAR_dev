@@ -50,6 +50,8 @@ public class WdRootElement extends WdElement {
     isForeground = (Boolean) packedbody.get("documentHasFocus");
     documentTitle = (String) packedbody.get("documentTitle");
     blocked = false;
+
+    setupXPaths("/html[1]/body[1]");
   }
 
   public WdElement at(double x, double y) {
