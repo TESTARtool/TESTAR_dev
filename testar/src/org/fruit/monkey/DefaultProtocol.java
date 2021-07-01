@@ -1201,7 +1201,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	            // Derive Actions of the current State
 	            Set<Action> actions = deriveActions(system,state);
-	            CodingManager.buildIDs(state, actions);
+	            buildStateActionsIdentifiers(state, actions);
 
 	            // notify to state model the current state
 	            stateModelManager.notifyNewStateReached(state, actions);
@@ -1302,10 +1302,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	        // notify to state model the last state
 	        Set<Action> actions = deriveActions(system, state);
-	        CodingManager.buildIDs(state, actions);
+	        buildStateActionsIdentifiers(state, actions);
 	        for(Action a : actions)
 	            if(a.get(Tags.AbstractIDCustom, null) == null)
-	                CodingManager.buildEnvironmentActionIDs(state, a);
+	                buildEnvironmentActionIdentifiers(state, a);
 
 	        stateModelManager.notifyNewStateReached(state, actions);
 
