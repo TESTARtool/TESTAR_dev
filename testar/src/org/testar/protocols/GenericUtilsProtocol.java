@@ -458,6 +458,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                LogSerialiser.LogLevel.Info);
 	        System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
 	    }
+	    extractStateModelMetrics();
 	}
 
 	/**
@@ -650,6 +651,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	    }
 
 	    copyCoverageMetricsToFolder(destFolder, ipAddress);
+	    copyStateModelMetricsToFolder(destFolder, ipAddress);
 	}
 
 	/**
@@ -692,6 +694,86 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics,
 	                LogSerialiser.LogLevel.Info);
 	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics);
+	        e.printStackTrace();
+	    }
+	}
+
+	protected void extractStateModelMetrics() {
+	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
+	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
+	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
+	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
+	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+	    writeStateModelMetrics("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+	            " | actionnr | " + actionCount +
+	            " | " + resultAbstractStates +
+	            " | " + resultAbstractActions +
+	            " | " + resultUnvisitedActions +
+	            " | " + resultConcreteStates +
+	            " | " + resultConcreteActions
+	            );
+	}
+
+	/**
+	 * Write the state model metrics inside a StateModelMetrics text file
+	 * 
+	 * @param coverageInformation
+	 */
+	private void writeStateModelMetrics(String statemodelInformation) {
+	    try {
+	        String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
+	                + OutputStructure.outerLoopName + "_stateModelMetrics.txt";
+	        FileWriter myWriter = new FileWriter(reportCoverageFile, true);
+	        myWriter.write(statemodelInformation + "\r\n");
+	        myWriter.close();
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR: Writing StateModel Metrics inside stateModelMetrics text file",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR: Writing StateModel Metrics inside stateModelMetrics text file");
+	        e.printStackTrace();
+	    }
+	}
+
+	/**
+	 * Copy StateModel Metrics file inside the destination Folder. 
+	 * 
+	 * @param destFolder
+	 * @param ipAddress
+	 */
+	private void copyStateModelMetricsToFolder(String destFolder, String ipAddress) {
+	    // Create a new directory inside desired destination to store all metrics
+	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(metricsFolder));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: Creating new folder for metrics : " + metricsFolder,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyStateModelMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
+	        e.printStackTrace();
+	        return;
+	    }
+
+	    File srcMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
+	    File destMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
+	    try {
+	        FileUtils.copyFile(srcMetrics, destMetrics);
+	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: ERROR Metrics : " + destMetrics,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyStateModelMetricsToFolder: ERROR Metrics : " + destMetrics);
+	        e.printStackTrace();
+	    }
+
+	    File srcMergedMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
+	    File destMergedMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
+	    try {
+	        FileUtils.copyFile(srcMergedMetrics, destMergedMetrics);
+	        System.out.println(String.format("Sucessfull copy %s to %s", srcMergedMetrics, destMergedMetrics));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyStateModelMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics);
 	        e.printStackTrace();
 	    }
 	}

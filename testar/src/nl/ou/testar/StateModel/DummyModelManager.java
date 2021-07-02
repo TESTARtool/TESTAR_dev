@@ -46,4 +46,9 @@ public class DummyModelManager implements StateModelManager{
     public void notifyTestSequenceInterruptedBySystem(String message) {
 
     }
+
+    @Override
+    public String queryStateModel(String query) {
+        return "";
+    }
 }

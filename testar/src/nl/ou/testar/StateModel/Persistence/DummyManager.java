@@ -4,6 +4,7 @@ package nl.ou.testar.StateModel.Persistence;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
@@ -92,5 +93,10 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     @Override
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
         return 0;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return null;
     }
 }
