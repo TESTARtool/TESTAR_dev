@@ -23,6 +23,8 @@ public class ContentMatcherTest {
     private static final RecognizedElement thirdLineSecond = new RecognizedElement(new Rectangle(10, 25, 20, 5), 100, "?");
     private static final ExpectedElement expectedElement = new ExpectedElement(new Rectangle(0, 0, 20, 30), "1K\n\r2w\n\r3");
 
+    private static final MatcherConfiguration config = MatcherConfiguration.CreateDefault();
+
     private LocationMatch prepareExpectedTextWith3Lines() {
         LocationMatch locationMatch = new LocationMatch(expectedElement, 0);
         // Shuffled input so we can test the algorithm.
@@ -40,7 +42,7 @@ public class ContentMatcherTest {
         LocationMatch input = prepareExpectedTextWith3Lines();
 
         // WHEN we run the algorithm.
-        ContentMatchResult result = ContentMatcher.Match(input);
+        ContentMatchResult result = ContentMatcher.Match(input, config);
 
         // THEN the result must be:
         assertEquals(9, result.totalExpected);
@@ -92,7 +94,7 @@ public class ContentMatcherTest {
         LocationMatch input = prepareExpectedTextWith3Lines();
 
         // WHEN we sort the recognized elements.
-        List<RecognizedElement> result = ContentMatcher.sortRecognizedElements(input);
+        List<RecognizedElement> result = ContentMatcher.sortRecognizedElements(input, config);
 
         // THEN the recognized elements should be sorted correctly.
         assertEquals(Arrays.asList(firstLine, secondLine, thirdLineFirst, thirdLineSecond), result);
@@ -104,13 +106,13 @@ public class ContentMatcherTest {
         LocationMatch input = prepareExpectedTextWith3Lines();
 
         // WHEN we sort the recognized elements only on their y coordinate.
-        Map<Integer, List<RecognizedElement>> result = ContentMatcher.sortRecognizedElementsPerTextLine(input);
+        Map<Integer, List<RecognizedElement>> result = ContentMatcher.sortRecognizedElementsPerTextLine(input, config);
 
         // THEN the recognized elements should be sorted correctly.
         Map<Integer, List<RecognizedElement>> expectedResult = Stream.of(
                 new AbstractMap.SimpleEntry<>(5, Collections.singletonList(firstLine)),
                 new AbstractMap.SimpleEntry<>(15, Collections.singletonList(secondLine)),
-                new AbstractMap.SimpleEntry<>(25, Arrays.asList(thirdLineFirst, thirdLineSecond)))
+                new AbstractMap.SimpleEntry<>(27, Arrays.asList(thirdLineFirst, thirdLineSecond)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         expectedResult.keySet().forEach(expectedKey ->
                 {

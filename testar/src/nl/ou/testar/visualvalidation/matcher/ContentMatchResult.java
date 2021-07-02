@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 /**
  * Holds the matching result for the content of the expected text.
  */
-public class ContentMatchResult {
+public class ContentMatchResult implements Comparable<ContentMatchResult> {
     public final ExpectedTextMatchResult expectedResult;
     public final RecognizedTextMatchResult recognizedResult;
+    public final String expectedText;
     public final long totalMatched;
     public final long totalExpected;
 
@@ -20,6 +21,12 @@ public class ContentMatchResult {
                 .filter(e -> e.result != CharacterMatchResult.NO_MATCH)
                 .count();
         totalExpected = expectedResult.expectedText.size();
+        expectedText = expectedResult.expectedText.stream().
+                map(e -> e.character.character).collect(Collector.of(
+                StringBuilder::new,
+                StringBuilder::append,
+                StringBuilder::append,
+                StringBuilder::toString));
     }
 
     @Override
@@ -27,12 +34,7 @@ public class ContentMatchResult {
         StringBuilder str = new StringBuilder()
                 .append("\n")
 
-                .append("Matched \"").append(expectedResult.expectedText.stream().
-                        map(e -> e.character.character).collect(Collector.of(
-                        StringBuilder::new,
-                        StringBuilder::append,
-                        StringBuilder::append,
-                        StringBuilder::toString)))
+                .append("Matched \"").append(expectedText)
                 .append("\"\n")
 
                 .append("Result: ")
@@ -79,5 +81,16 @@ public class ContentMatchResult {
         }
 
         return str.toString();
+    }
+
+    @Override
+    public int compareTo(ContentMatchResult other) {
+        int result = -1;
+        if (expectedText.equals(other.expectedText) &&
+                (totalExpected == other.totalExpected) &&
+                (totalMatched == other.totalMatched)) {
+            result = 0;
+        }
+        return result;
     }
 }

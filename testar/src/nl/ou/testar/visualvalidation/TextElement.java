@@ -2,7 +2,7 @@ package nl.ou.testar.visualvalidation;
 
 import java.awt.Rectangle;
 
-public class TextElement {
+public class TextElement implements Comparable<TextElement> {
     public final Rectangle _location;
     public final String _text;
 
@@ -23,5 +23,14 @@ public class TextElement {
                 "_location=" + _location +
                 ", _text='" + _text + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(TextElement other) {
+        int result = -1;
+        if (_text.equals(other._text) && _location.equals(other._location)) {
+            result = 0;
+        }
+        return result;
     }
 }

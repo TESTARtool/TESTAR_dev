@@ -2,13 +2,13 @@ package nl.ou.testar.visualvalidation.matcher;
 
 import nl.ou.testar.visualvalidation.TextElement;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class MatcherResult {
-    private final Set<TextElement> noMatches = new HashSet<>();
-    private final Set<LocationMatch> locationMatches = new HashSet<>();
-    private final Set<ContentMatchResult> contentMatchResults = new HashSet<>();
+    private final Set<TextElement> noMatches = new TreeSet<>();
+    private final Set<LocationMatch> locationMatches = new TreeSet<>();
+    private final Set<ContentMatchResult> contentMatchResults = new TreeSet<>();
 
     public void addContentMatchResult(ContentMatchResult result) {
         contentMatchResults.add(result);

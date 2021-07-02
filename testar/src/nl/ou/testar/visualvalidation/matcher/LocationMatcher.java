@@ -9,9 +9,9 @@ import org.testar.Logger;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class LocationMatcher implements VisualMatcher {
@@ -58,7 +58,7 @@ public class LocationMatcher implements VisualMatcher {
                 _matchResult.addLocationMatch(locationMatch);
 
                 // 3) Now that we have collected all the recognized elements, try to match the content.
-                _matchResult.addContentMatchResult(ContentMatcher.Match(locationMatch));
+                _matchResult.addContentMatchResult(ContentMatcher.Match(locationMatch, config));
 
                 // Remove all the recognized items that have been linked to this match from the list with items which
                 // we still need to match based on their location
@@ -77,7 +77,7 @@ public class LocationMatcher implements VisualMatcher {
      * Find all unmatched elements and update the matcher result.
      */
     void setUnmatchedElements(MatcherResult matcherResult, List<RecognizedElement> recognizedElements) {
-        Set<RecognizedElement> removeRecognizedList = new HashSet<>();
+        Set<RecognizedElement> removeRecognizedList = new TreeSet<>();
         matcherResult.getLocationMatches().forEach(it -> removeRecognizedList.addAll(it.recognizedElements));
 
         // Remove the elements which have been matched with expected elements.
@@ -86,9 +86,11 @@ public class LocationMatcher implements VisualMatcher {
         // The remainder of the recognized elements can be considered to be unmatched.
         recognizedElements.forEach(matcherResult::addNoLocationMatch);
 
-        Logger.log(Level.INFO, TAG, "No location match for the following detected text elements:\n {}", matcherResult.getNoLocationMatches().stream()
-                .map(e -> e._text + " " + e._location + "\n")
-                .collect(Collectors.joining()));
+        if (config.loggingEnabled) {
+            Logger.log(Level.INFO, TAG, "No location match for the following detected text elements:\n {}", matcherResult.getNoLocationMatches().stream()
+                    .map(e -> e._text + " " + e._location + "\n")
+                    .collect(Collectors.joining()));
+        }
     }
 
     /**

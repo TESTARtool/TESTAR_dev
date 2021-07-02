@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MatcherConfiguration extends ExtendedSettingBase<MatcherConfiguration> {
     public Integer locationMatchMargin;
+    boolean loggingEnabled;
 
     @Override
     public String toString() {
@@ -19,13 +20,14 @@ public class MatcherConfiguration extends ExtendedSettingBase<MatcherConfigurati
     public static MatcherConfiguration CreateDefault() {
         MatcherConfiguration instance = new MatcherConfiguration();
         instance.locationMatchMargin = 0;
+        instance.loggingEnabled = false;
         return instance;
     }
 
     @Override
     public int compareTo(MatcherConfiguration other) {
         int result = -1;
-        if (locationMatchMargin.equals(other.locationMatchMargin)) {
+        if (locationMatchMargin.equals(other.locationMatchMargin) && (loggingEnabled == other.loggingEnabled)) {
             result = 0;
         }
         return result;

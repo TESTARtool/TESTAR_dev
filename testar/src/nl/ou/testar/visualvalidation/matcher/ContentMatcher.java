@@ -24,15 +24,22 @@ class ContentMatcher {
      * mechanism is a grid from left to right and top to bottom. The algorithm tries to find a matching character from
      * the grid, once found the index is stored and will be used as the starting position for the next iteration.
      */
-    public static ContentMatchResult Match(LocationMatch locationMatch) {
+    public static ContentMatchResult Match(LocationMatch locationMatch, MatcherConfiguration configuration) {
         String expectedText = locationMatch.expectedElement._text;
         ExpectedTextMatchResult expectedResult = new ExpectedTextMatchResult(expectedText);
-        Logger.log(Level.INFO, TAG, "Expected text @{} : {}", locationMatch.expectedElement._location, expectedResult);
+        if (configuration.loggingEnabled) {
+            Logger.log(Level.INFO, TAG,
+                    "Expected text @{} : {}",
+                    locationMatch.expectedElement._location,
+                    expectedResult);
+        }
 
         // Sort the recognized elements.
-        List<RecognizedElement> sorted = sortRecognizedElements(locationMatch);
+        List<RecognizedElement> sorted = sortRecognizedElements(locationMatch, configuration);
         RecognizedTextMatchResult recognizedResult = new RecognizedTextMatchResult(sorted);
-        Logger.log(Level.INFO, TAG, "Recognized text: {}", recognizedResult);
+        if (configuration.loggingEnabled) {
+            Logger.log(Level.INFO, TAG, "Recognized text: {}", recognizedResult);
+        }
 
         // Iterate over the expected text and try to match with a recognized element character.
         int unMatchedSize = recognizedResult.recognized.size();
@@ -73,8 +80,10 @@ class ContentMatcher {
     }
 
     @NonNull
-    static List<RecognizedElement> sortRecognizedElements(LocationMatch locationMatch) {
-        Map<Integer, List<RecognizedElement>> lineBucket = sortRecognizedElementsPerTextLine(locationMatch);
+    static List<RecognizedElement> sortRecognizedElements(LocationMatch locationMatch,
+                                                          MatcherConfiguration configuration) {
+        Map<Integer, List<RecognizedElement>> lineBucket =
+                sortRecognizedElementsPerTextLine(locationMatch, configuration);
 
         // Get the sorted Y-axe coordinates for the identified lines.
         List<Integer> bucketSorted = lineBucket.keySet().stream().sorted().collect(Collectors.toList());
@@ -93,7 +102,8 @@ class ContentMatcher {
     }
 
     @NonNull
-    static Map<Integer, List<RecognizedElement>> sortRecognizedElementsPerTextLine(LocationMatch locationMatch) {
+    static Map<Integer, List<RecognizedElement>> sortRecognizedElementsPerTextLine(LocationMatch locationMatch,
+                                                                                   MatcherConfiguration configuration) {
         // Determine the average height of the recognized text elements.
         double lineHeight = locationMatch.recognizedElements.stream()
                 .mapToInt(e -> e._location.height)
@@ -115,16 +125,26 @@ class ContentMatcher {
                 if (IntStream.rangeClosed(c - margin, c + margin)
                         .boxed()
                         .collect(Collectors.toList())
-                        .contains(line.left()))
-                {
-                    Logger.log(Level.DEBUG, TAG, "Line {} {} in range of bucket {}", line.left(), line.right(), c);
+                        .contains(line.left())) {
+                    if (configuration.loggingEnabled) {
+                        Logger.log(Level.DEBUG, TAG,
+                                "Line {} {} in range of bucket {}",
+                                line.left(),
+                                line.right(),
+                                c);
+                    }
                     lineBucket.get(c).add(line.right());
                     foundBucket = true;
                     break;
                 }
             }
             if (!foundBucket) {
-                Logger.log(Level.DEBUG, TAG, "No bucket found creating new one for {} {}", line.left(), line.right());
+                if (configuration.loggingEnabled) {
+                    Logger.log(Level.DEBUG, TAG,
+                            "No bucket found creating new one for {} {}",
+                            line.left(),
+                            line.right());
+                }
                 lineBucket.put(line.left(), new ArrayList<>());
                 lineBucket.get(line.left()).add(line.right());
             }
