@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.*;
@@ -31,7 +32,7 @@ import java.util.*;
 import static java.lang.System.exit;
 
 
-public class OrientDBManager extends ArendManager implements PersistenceManager, StateModelEventListener {
+public class OrientDBManager implements PersistenceManager, StateModelEventListener {
 
     /**
      * Helper class for dealing with events
@@ -79,7 +80,7 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
      * @param eventHelper
      */
     public OrientDBManager(EventHelper eventHelper, EntityManager entityManager) {
-        super(eventHelper, entityManager);
+        //super(eventHelper, entityManager);
         this.eventHelper = eventHelper;
         this.entityManager = entityManager;
         dbSession = entityManager.getConnection().getDatabaseSession();
@@ -132,6 +133,31 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
         persistUnvisitedActions(abstractState, abstractStateEntity);
     }
 
+    public OResultSet ExecuteCommand(String actie) {
+        System.out.println("ExecuteCommand " + actie);
+        boolean repeat = false;
+        do {
+            try {
+                return entityManager.getConnection().getDatabaseSession().command(actie);
+            } catch (OConcurrentModificationException ex) {
+                repeat = true;
+                try {
+                    Thread.sleep(2000);
+                }
+                catch (Exception e){}
+
+            }
+        } while (repeat);
+        return null;
+
+    }
+
+    public OResultSet ExecuteQuery(String actie) {
+        System.out.println("ExecuteQuery " + actie);
+
+        return entityManager.getConnection().getDatabaseSession().query(actie);
+    }
+
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
         abstractStateEntity.enableUpdate(false);
 
@@ -158,11 +184,18 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
         // we need to prepare the unique action id's that are used in orientdb, so that we can delete them.
         Set<Object> visitedActionIds = new HashSet<>();
         for (AbstractAction action : visitedActions) {
+            try {
             String sourceId = (String)abstractStateEntity.getPropertyValue("uid").getValue();
             String targetId = (String)blackHole.getPropertyValue("blackHoleId").getValue();
             String actionId = action.getActionId();
             String modelIdentifier = abstractState.getModelIdentifier();
+           
             visitedActionIds.add(HydrationHelper.createOrientDbActionId(sourceId, targetId, actionId, modelIdentifier));
+            }
+            catch (Exception e)
+            {
+                System.out.println("update visited action exception "+e);
+            }
         }
         // then do a batch delete from the database
         EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
@@ -174,9 +207,15 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
                 EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, abstractStateEntity, blackHole);
+                try {
                 actionEntity.enableUpdate(false);
                 actionHydrator.hydrate(actionEntity, unvisitedAction);
                 entityManager.saveEntity(actionEntity);
+                }
+                catch (Exception e)
+                {
+                    System.out.println("update visited action exception "+e);
+                }
             }
         }
         catch (HydrationException ex) {
@@ -212,8 +251,14 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
             return;
         }
 
+        try {
         // save the entity!
         entityManager.saveEntity(concreteStateEntity);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error saving entity "+e);
+        }
 
         // store the widgettree attached to this concrete state
         persistWidgetTree(concreteState, concreteStateEntity);
@@ -250,7 +295,13 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
         catch (HydrationException ex) {
             //@todo add some meaningful logging here as well
         }
+        try {
         entityManager.saveEntity(edgeEntity);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error saving entity "+e);
+        }
     }
 
     /**
@@ -662,6 +713,8 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
             return;
         }
 
+        try {
+
         switch (event.getEventType()) {
             case ABSTRACT_STATE_ADDED:
             case ABSTRACT_STATE_CHANGED:
@@ -696,6 +749,11 @@ public class OrientDBManager extends ArendManager implements PersistenceManager,
                 persistSequenceStep((SequenceStep) event.getPayload());
 
         }
+    }
+    catch (Exception e)
+    {
+        System.out.println("Exception during event received: "+e);
+    }
 
     }
 

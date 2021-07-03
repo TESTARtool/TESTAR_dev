@@ -55,6 +55,8 @@ import java.lang.Thread;
 import java.net.*;
 
 import org.w3c.dom.*;
+
+import javax.swing.text.html.Option;
 import javax.xml.parsers.*;
 import java.io.*;
 
@@ -65,6 +67,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 import nl.ou.testar.StateModel.Persistence.*;
 import org.fruit.alayer.actions.CompoundAction.*;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.db.*;
 import com.orientechnologies.orient.core.sql.executor.*;
 import com.orientechnologies.orient.core.record.*;
@@ -72,7 +75,7 @@ import com.orientechnologies.orient.core.record.*;
 public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	// Classes that are deemed clickable by the web framework
 
-	ArendManager odb;
+	OrientDBManager odb;
 	ModelManager m;
 	String nodeName = "";
 	OrientDBManager odb1;
@@ -83,20 +86,20 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	}
 
-	private static List<String> clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
+	// private static List<String>
 
 	// Disallow links and pages with these extensions
 	// Set to null to ignore this feature
-	private static List<String> deniedExtensions = Arrays.asList("pdf", "jpg", "png","wsdl","pfx");
+	// private static List<String>
 
 	// Define a whitelist of allowed domains for links and pages
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
-	private static List<String> domainsAllowed = Arrays.asList("para.testar.org");
+	// private static List<String>
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)
-	private static boolean followLinks = true;
+	// private static boolean followLinks = true;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
@@ -111,7 +114,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			put("id", "sncmp-banner-btn-agree");
 		}
 	};
-
 
 	/*
 	 * private void getLogin() { Form form = new Form(); form.add("x", "foo");
@@ -137,11 +139,15 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		NativeLinker.addWdDriverOS();
+		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "wsdl", "pfx");
+
+		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
 		super.initialize(settings);
+		// domainsAllowed = Arrays.asList("https://para.testar.org");
 		ensureDomainsAllowed();
 
 		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
+		WdDriver.followLinks = true;
 
 		// Override ProtocolUtil to allow WebDriver screenshots
 		// protocolUtil = new WdProtocolUtil();
@@ -201,7 +207,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
-        System.out.println("Protocol file: deriveActions: Arend acties");
+		System.out.println("Protocol file: deriveActions: Arend acties");
 		Set<Action> actions = super.deriveActions(system, state);
 
 		// create an action compiler, which helps us create actions
@@ -209,38 +215,38 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		// Check if forced actions are needed to stay within allowed domains
-        if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl"))
-        {
-            return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));      
-            
-        }
+		if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+
+		}
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
-            System.out.println("Executing forced action");
+			System.out.println("Executing forced action");
 			return forcedActions;
 		}
-		
-		
+
 		// iterate through all widgets
 		for (org.fruit.alayer.Widget widget : state) {
 			// only consider enabled and non-tabu widgets
 
-            //System.out.println("DeriveAction widget = "+widget+" class = "+widget.getClass());
-            WdWidget wd = (WdWidget)widget;
-            WdElement element = wd.element;
-             //System.out.println("DeriveAction widget = "+widget+" class = "+widget.getClass()+" wd = "+wd+" elem= "+element.tagName);
-            if (isForm(widget))
-            {
-                System.out.println("Form gevonden");
-                fillForm(actions, ac, state, wd,null);
-                
-            }
+			// System.out.println("DeriveAction widget = "+widget+" class =
+			// "+widget.getClass());
+			WdWidget wd = (WdWidget) widget;
+			WdElement element = wd.element;
+			// System.out.println("DeriveAction widget = "+widget+" class =
+			// "+widget.getClass()+" wd = "+wd+" elem= "+element.tagName);
+			// if (isForm(widget))
+			// {
+			// System.out.println("Form gevonden");
+			// fillForm(actions, ac, state, wd,null);
+
+			// }
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
@@ -248,210 +254,209 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			}
 
 			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-			}
+			// if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget)
+			// || isUnfiltered(widget))) {
+			// actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+			// }
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				if (!isLinkDenied(widget)) {
+				if (!isLinkDenied(widget) && !mijnIgnore(widget)) {
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
-        System.out.println("Done with DeriveActions");
+		if (actions.size() == 0) {
+			System.out.println("Actions.size == 0; Return historyback and done with DeriveActions");
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+		System.out.println("Done with DeriveActions");
 
 		return actions;
 	}
 
+	public boolean mijnIgnore(org.fruit.alayer.Widget widget) {
+		String linkUrl = widget.get(Tags.ValuePattern, "");
 
-   public HashMap<String,String> readFormFile(String fileName)
-   {
-       try {
-       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new File( fileName ));
-        document.getDocumentElement().normalize();
-        Element root = document.getDocumentElement();
-        System.out.println("readFormFile");
-        NodeList items =  root.getChildNodes(); 
-        HashMap<String, String> result = new HashMap<String,String>();
-        for (int i=0; i<items.getLength(); i++)
-        {
-            
-            Node item = items.item(i);
-            Element node = (Element) item;
-            String value = node.getTextContent();            
-           // System.out.println(node.getNodeName() +"=" +value);
-            result.put(node.getNodeName(), value);
-        }
-        System.out.println("Einde formfile");
-        return result;
-       }
-       catch (Exception e)
-       {}
-       return null;
-       
-   }
-   
-   public void storeToFile(String fileName, HashMap<String, String> data)
-   {
-       String result = "<form><performSubmit>true</performSubmit>";
-       
-       for (Map.Entry<String, String> entry : data.entrySet())
-       {
-           String key = entry.getKey();
-           String value = entry.getValue();
-           
-           result += "<"+key+">"+value+"</"+key+">";
-       }
-       result += "</form>";
-       try {
-       BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-        writer.write(result);
-    
-       writer.close();
-       }
-       catch (Exception e)
-       {}
-      // System.out.println(result);
-       
-   }
-   
-   boolean inForm = false;
-   @Override
-  protected boolean blackListed(org.fruit.alayer.Widget w){
-       if (inForm) return false;
-       
-    	return super.blackListed(w);
-    }
-   
-
-    public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile, StdActionCompiler ac)
-	{
-       int sum = 0;
-       WdElement element = widget.element;
-	   String defaultValue = "write-random-genenerated-value";
-       if (isTypeable(widget))
-                {
-					
-                    
-         //           System.out.println("veld "+element.name+"  gevonden");
-                    if (storeFile)
-                    {
-                        
-                        fields.put(element.name,defaultValue);
-                    }
-                    if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-                        caB.add(ac.clickTypeInto(widget, fields.get(element.name),true),2);
-                        sum += 2;
-                    }
-                    
-                }
-        String baseElem = element.tagName;
-       // System.out.println("check children: huidig element "+element.tagName+" aantal childs: "+widget.childCount());
-		for (int i = 0; i< widget.childCount(); i++) {
-			WdWidget w = widget.child(i);
-            //System.out.println("child "+i+"  van element "+baseElem);
-            //WdElement 
-            element = w.element;			
-            
-           //     System.out.println("buildForm :"+ element.tagName +" "+element.name);
-                if (isTypeable(w))
-                {
-             //       System.out.println("veld "+element.name+"  gevonden");
-                    if (storeFile)
-                    {
-                        
-                        fields.put(element.name,defaultValue);
-                    }
-                    if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-                        
-                        caB.add(new WdAttributeAction(element.name,"value",fields.get(element.name)),2);
-                        sum += 2;
-                       // System.out.println("element.name in de fields; voeg toe aan caB som+2 som = "+sum);
-                    }
-                    
-                } else {
-               //     System.out.println("Element "+element.tagName+"  is niet typeable");
-                    
-					 sum += buildForm(caB, widget.child(i), fields, storeFile, ac);
-				}
-           
+		if (linkUrl.contains("wsdl") || linkUrl.contains("www.parasoft.com") || linkUrl.contains("/services/")
+				|| linkUrl.contains("api-docs")) {
+			System.out.println("negeer " + linkUrl);
+			return true;
 		}
-System.out.println("klaar met baseElem "+baseElem+"  sum = "+sum);
-       return sum;
+		System.out.println("accepteer " + linkUrl);
+		return false;
+	}
+
+	public HashMap<String, String> readFormFile(String fileName) {
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.parse(new File(fileName));
+			document.getDocumentElement().normalize();
+			Element root = document.getDocumentElement();
+			System.out.println("readFormFile");
+			NodeList items = root.getChildNodes();
+			HashMap<String, String> result = new HashMap<String, String>();
+			for (int i = 0; i < items.getLength(); i++) {
+
+				Node item = items.item(i);
+				Element node = (Element) item;
+				String value = node.getTextContent();
+				// System.out.println(node.getNodeName() +"=" +value);
+				result.put(node.getNodeName(), value);
+			}
+			System.out.println("Einde formfile");
+			return result;
+		} catch (Exception e) {
+		}
+		return null;
 
 	}
-	
-	
-	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget, HashMap<String, String> fields) {
-    //System.out.println("Url = "+WdDriver.getCurrentUrl());
-    inForm=true;
-    if (fields == null)
-    {
-        fields = new HashMap<String, String>();
-    }
-    URI uri = null;
-    try {
-     uri = new URI(WdDriver.getCurrentUrl());
-    }
-    catch (Exception e)
-    {}
-	String formId = widget.getAttribute("name");
-    if (formId == null)
-    {
-        formId = "";
-    }
-    String path = (uri.getPath()+"/"+formId).replace("/","_")+".xml";
-    System.out.println("Look for file "+path);
-    File f = new File(path);
-    Boolean storeFile = true;
-    if (f.exists())
-    {
-        storeFile = false;
-        fields = readFormFile(path);
-        System.out.println("Bestand bestaat, lees de data uit bestand");
-    }
+
+	public void storeToFile(String fileName, HashMap<String, String> data) {
+		String result = "<form><performSubmit>true</performSubmit>";
+
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+
+			result += "<" + key + ">" + value + "</" + key + ">";
+		}
+		result += "</form>";
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+			writer.write(result);
+
+			writer.close();
+		} catch (Exception e) {
+		}
+		// System.out.println(result);
+
+	}
+
+	boolean inForm = false;
+
+	@Override
+	protected boolean blackListed(org.fruit.alayer.Widget w) {
+		if (inForm)
+			return false;
+
+		return super.blackListed(w);
+	}
+
+	public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile,
+			StdActionCompiler ac) {
+		int sum = 0;
+		WdElement element = widget.element;
+		String defaultValue = "write-random-genenerated-value";
+		if (isTypeable(widget)) {
+
+			// System.out.println("veld "+element.name+" gevonden");
+			if (storeFile) {
+
+				fields.put(element.name, defaultValue);
+			}
+			if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+				caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
+				sum += 2;
+			}
+
+		}
+		String baseElem = element.tagName;
+		// System.out.println("check children: huidig element "+element.tagName+" aantal
+		// childs: "+widget.childCount());
+		for (int i = 0; i < widget.childCount(); i++) {
+			WdWidget w = widget.child(i);
+			// System.out.println("child "+i+" van element "+baseElem);
+			// WdElement
+			element = w.element;
+
+			// System.out.println("buildForm :"+ element.tagName +" "+element.name);
+			if (isTypeable(w)) {
+				// System.out.println("veld "+element.name+" gevonden");
+				if (storeFile) {
+
+					fields.put(element.name, defaultValue);
+				}
+				if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+
+					caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
+					sum += 2;
+					// System.out.println("element.name in de fields; voeg toe aan caB som+2 som =
+					// "+sum);
+				}
+
+			} else {
+				// System.out.println("Element "+element.tagName+" is niet typeable");
+
+				sum += buildForm(caB, widget.child(i), fields, storeFile, ac);
+			}
+
+		}
+		// System.out.println("klaar met baseElem "+baseElem+" sum = "+sum);
+		return sum;
+
+	}
+
+	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget,
+			HashMap<String, String> fields) {
+		// System.out.println("Url = "+WdDriver.getCurrentUrl());
+		inForm = true;
+		if (fields == null) {
+			fields = new HashMap<String, String>();
+		}
+		URI uri = null;
+		try {
+			uri = new URI(WdDriver.getCurrentUrl());
+		} catch (Exception e) {
+		}
+		String formId = widget.getAttribute("name");
+		if (formId == null) {
+			formId = "";
+		}
+		String path = (uri.getPath() + "/" + formId).replace("/", "_") + ".xml";
+		System.out.println("Look for file " + path);
+		File f = new File(path);
+		Boolean storeFile = true;
+		if (f.exists()) {
+			storeFile = false;
+			fields = readFormFile(path);
+			System.out.println("Bestand bestaat, lees de data uit bestand");
+		}
 		CompoundAction.Builder caB = new CompoundAction.Builder();
 		int sum = buildForm(caB, widget, fields, storeFile, ac);
-		
-		if (fields.containsKey("performSubmit"))
-		{
+
+		if (fields.containsKey("performSubmit")) {
 			boolean submit = Boolean.getBoolean(fields.get("performSubmit"));
 			if (submit && formId != "") {
-              
-				caB.add(new WdSubmitAction(formId),2);
+
+				caB.add(new WdSubmitAction(formId), 2);
 			}
 		}
-if (storeFile)
-{
-    storeToFile(path, fields);
-}
-      if (sum > 0){
-		CompoundAction ca = caB.build();
+		if (storeFile) {
+			storeToFile(path, fields);
+		}
+		if (sum > 0) {
+			CompoundAction ca = caB.build();
 
-        actions.add(ca);
-      }
-      inForm=false;
-      System.out.println("fillForm klaar");
-		//return ca;
+			actions.add(ca);
+		}
+		inForm = false;
+		System.out.println("fillForm klaar");
+		// return ca;
 	}
 
+	boolean _moreActions = true;
 
-    boolean _moreActions = true;
-	 @Override
-	 protected boolean moreActions(State state) {
+	@Override
+	protected boolean moreActions(State state) {
 		return _moreActions;
-	 }
+	}
 
-	 @Override
-	 protected boolean moreSequences()
-	 {
-		 return _moreActions;
-	 }
-
-	  
+	@Override
+	protected boolean moreSequences() {
+		return _moreActions;
+	}
 
 	@Override
 	protected boolean isClickable(org.fruit.alayer.Widget widget) {
@@ -475,11 +480,9 @@ if (storeFile)
 		return clickSet.size() > 0;
 	}
 
-	boolean isForm(org.fruit.alayer.Widget widget)
-	{
+	boolean isForm(org.fruit.alayer.Widget widget) {
 		Role r = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(r, new Role[] { WdRoles.WdFORM}))
-		{
+		if (Role.isOneOf(r, new Role[] { WdRoles.WdFORM })) {
 			return r.equals(WdRoles.WdFORM);
 		}
 		return false;
@@ -491,7 +494,7 @@ if (storeFile)
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
-				
+
 				String type = ((WdWidget) widget).element.type.toLowerCase();
 				return WdRoles.typeableInputTypes().contains(type);
 			}
@@ -499,6 +502,7 @@ if (storeFile)
 		}
 		return false;
 	}
+
 	/**
 	 * Select one of the available actions using an action selection algorithm (for
 	 * example random action selection)
@@ -508,9 +512,6 @@ if (storeFile)
 	 * @return the selected action (non-null!)
 	 */
 
-	// private AbstractState currentState;
-
-	// private Action selectedAction; // destination action to perform
 	private Boolean finishedAction = false;
 
 	public ArrayList<String> GetUnvisitedActionsFromDatabase(String currentAbstractState) {
@@ -542,13 +543,19 @@ if (storeFile)
 	}
 
 	public void UpdateAbstractActionInProgress(String actionId) {
-		System.out.println("actie  AbstractID = " + actionId);
+		try {
+			System.out.println("actie  AbstractID = " + actionId);
 
-		String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='" + nodeName
-				+ "') where actionId='" + actionId + "'";
-		System.out.println("Execute" + sql);
+			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='"
+					+ nodeName + "') where actionId='" + actionId + "'";
+			System.out.println("Execute" + sql);
 
-		odb.ExecuteCommand(sql);
+			odb.ExecuteCommand(sql);
+
+		} catch (Exception e) {
+			System.out.println("Can not update unvisitedAbstractAction; set selectedAction to null");
+			selectedAction = null;
+		}
 
 	}
 
@@ -557,7 +564,8 @@ if (storeFile)
 		HashMap<String, Action> actionMap = new HashMap<String, Action>();
 		ArrayList<Action> actionList = new ArrayList<Action>(actions);
 		for (Action a : actionList) {
-			System.out.println("Add action " + a.get(Tags.AbstractIDCustom) + "  to actionMap");
+			System.out.println(
+					"Add action " + a.get(Tags.AbstractIDCustom) + "  to actionMap; description = " + a.get(Tags.Desc));
 			actionMap.put(a.get(Tags.AbstractIDCustom), a);
 		}
 		System.out.println("ActionMap initialized");
@@ -575,7 +583,7 @@ if (storeFile)
 		return ac;
 	}
 
-    int cyclesWaitBeforeNewAction = 0;
+	int cyclesWaitBeforeNewAction = 0;
 
 	String lastState = "";
 	int sameState = 0;
@@ -583,11 +591,11 @@ if (storeFile)
 	private String getNewSelectedAction(State state, Set<Action> actions) {
 		String result = null;
 		Boolean ok = false;
-		do {			
+		do {
 			try {
 				ArrayList<String> availableActionsFromDb = GetUnvisitedActionsFromDatabase(
 						state.get(Tags.AbstractIDCustom));
-				
+
 				System.out.println(
 						"Number of shortest path actions available in database: " + availableActionsFromDb.size());
 				if (availableActionsFromDb.size() == 0) {
@@ -595,12 +603,11 @@ if (storeFile)
 					// Visited all actions already from this point to blackHole
 					// Go up one state. Also possible there are no actions at all
 					// possibly all actions are executed by other nodes.
-					if (actions.size() >= 1) // derived actions contains somethi
+					if (actions.size() >= 1) // derived actions contains something
 					{
-                        // A new action can be selected
-                        cyclesWaitBeforeNewAction = 0;
-						if (state.get(Tags.AbstractIDCustom).equals(lastState))
-						{
+						// A new action can be selected
+						cyclesWaitBeforeNewAction = 0;
+						if (state.get(Tags.AbstractIDCustom).equals(lastState)) {
 							sameState++;
 
 						}
@@ -609,16 +616,15 @@ if (storeFile)
 						// there actions but none are available for this node
 						return null;
 					} else {
-                        // No new action can be selected and database does not contain anything
-						//System.out.println("I hope this doesn't trigger");
-                        cyclesWaitBeforeNewAction ++;
+						// No new action can be selected and database does not contain anything
+						// System.out.println("I hope this doesn't trigger");
+						cyclesWaitBeforeNewAction++;
 
-						
 						Thread.sleep(1000);
-						
+
 						ok = true;
 						return "HistoryBack";
-						
+
 					}
 				} else {
 					System.out.println("Use availableactions from statemodel");
@@ -630,7 +636,6 @@ if (storeFile)
 					result = selectRandomAction(availableActionsFromDb);
 					ok = true;
 					return result;
-					
 
 				}
 			} catch (Exception e) {
@@ -639,9 +644,8 @@ if (storeFile)
 
 				ok = false;
 				try {
-				Thread.sleep(sleepTime);
-				}
-				catch (Exception th){
+					Thread.sleep(sleepTime);
+				} catch (Exception th) {
 
 				}
 			}
@@ -649,87 +653,178 @@ if (storeFile)
 		return result;
 	}
 
-	public Action traversePath(State state, Set<Action> actions)
-	{
-    System.out.println("traversePath from currentState = "+state.get(Tags.AbstractIDCustom)+"  naar unvisitedAction "+selectedAction+"\nSTILL NOT IMPLEMENTED");
-		return super.selectAction(state, actions);
-	
+	class TmpData {
+		public TmpData(ORecordId rid, String stateId) {
+			this.stateId = stateId;
+			this.rid = rid.toString();
+			System.out.println("TmpData " + stateId + "  " + rid);
+		}
+
+		public String stateId;
+		public String rid;
+	}
+
+	public Action traversePath(State state, Set<Action> actions) {
+
+		String q1 = "select stateId from abstractstate where @rid in (select outV() from UnvisitedAbstractAction where actionId = '"
+				+ selectedAction + "')";
+
+		String destinationStateId = "";
+		OResultSet destinationStatResultSet = odb.ExecuteQuery(q1);
+		if (destinationStatResultSet.hasNext()) {
+			OResult item = destinationStatResultSet.next();
+			System.out.println("destinationResultSet item = " + item);
+			// Optional<OVertex> optionalVertex = item.getProperty("stateId");
+			destinationStateId = item.getProperty("stateId");
+			System.out.println("traversePath: onderweg naar " + destinationStateId);
+		} else {
+			System.out.println(
+					"State die vastzit aan de unvisitedaction niet gevonden; zet selectedAction op null; voer nu historyback uit");
+			selectedAction = null;
+			return new WdHistoryBackAction();
+		}
+
+		// haal stateId op van q1
+
+		// SELECT @rid, stateId from (
+		// SELECT expand(path) FROM ( SELECT shortestPath($from,
+		// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
+		// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
+		// Where stateId='SACwpszr27b61710690312') UNWIND path))
+		String q2 = "SELECT @rid, stateId from (SELECT expand(path) FROM (  SELECT shortestPath($from, $to,'OUT','AbstractAction') AS path   LET     $from = (SELECT FROM abstractstate WHERE stateId='"
+				+ state.get(Tags.AbstractIDCustom) + "'),     $to = (SELECT FROM abstractstate Where stateId='"
+				+ destinationStateId + "')   UNWIND path))";
+		OResultSet pathResultSet = odb.ExecuteQuery(q2);
+		Vector<TmpData> v = new Vector<TmpData>();
+
+		// OVertex
+		/// if (pathResultSet.si)
+
+		while (pathResultSet.hasNext()) {
+			OResult item = pathResultSet.next();
+			// if (item.isVertex()) {
+			System.out.println("Item is a vertex");
+			// Optional<OVertex> optionalVertex = item.getVertex();
+
+			// OVertex nodeVertex = optionalVertex.get();
+			v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
+
+		}
+
+		if (v.size() < 2) {
+			System.out.println("Er bestaat geen pad!");
+			selectedAction = null;
+			return new WdHistoryBackAction();
+			// Er bestaat geen pad
+		}
+
+		// Zoek uit te voeren abstractaction
+		String q3 = "select from abstractaction where in = " + v.get(0).rid + " and out = " + v.get(1).rid;
+
+		String abstractActionId = "";
+		OResultSet abstractActionResultSet = odb.ExecuteQuery(q3);
+		while (abstractActionResultSet.hasNext()) {
+			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
+			System.out.println("traversePath: gebruik hiervoor action " + abstractActionId);
+			var beschikbareActions = ConvertActionSetToDictionary(actions);
+			System.out.println("Check of " + abstractActionId + "  beschikbaar is");
+			if (beschikbareActions.containsKey(abstractActionId)) {
+				System.out.println(
+						"Actie " + abstractActionId + "  is beschikbaar is beschikbareActions; deze wordt uitgevoerd ");
+				return beschikbareActions.get(abstractActionId);
+			}
+		}
+
+		System.out.println(
+				"State die vastzit aan de unvisitedaction niet gevonden; zet selectedAction op null; voer nu historyback uit");
+		selectedAction = null;
+
+		return new WdHistoryBackAction();
+
 	}
 
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(State state, Set<Action> actions) {
 
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
+		// Call the preSelectAction method from the AbstractProtocol so that, if
+		// necessary,
+		// unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
-		
+
 		if (retAction != null) {
 			return retAction;
 		}
-		
-		// First check whether we do have a selected action; if not select one		
+
+		// First check whether we do have a selected action; if not select one
 		if (selectedAction == null) {
 
 			selectedAction = getNewSelectedAction(state, actions);
-			// After execution of getNewSelectedAction it is still possible no action is selected (empty database for example)
-			if (selectedAction == "HistoryBack")
-			{
+			// After execution of getNewSelectedAction it is still possible no action is
+			// selected (empty database for example)
+			if (selectedAction == "HistoryBack") {
 				return new WdHistoryBackAction();
 			}
-			
+
 			if (selectedAction == null) // Still no selected action
 			{
-                if (cyclesWaitBeforeNewAction < 3 && sameState < 3) {
-					System.out.println("selectAction: cyclesWaitBeforeNewAction = "+cyclesWaitBeforeNewAction+" sameState = "+sameState+" Wait 3000+Rnd(2000) ms then select action (hoping for newly discovered actions");
-                    try { Thread.sleep(3000+new Random().nextInt(2000)); } catch (Exception e){}
-                    // Wait 5 seconds before new action can be selected (even if it's a known one
-				   // return super.selectAction(state, actions);
-                } else {
-                    _moreActions = false;
-                }
-			}	
+				if (cyclesWaitBeforeNewAction < 3 && sameState < 3) {
+					System.out.println("selectAction: cyclesWaitBeforeNewAction = " + cyclesWaitBeforeNewAction
+							+ " sameState = " + sameState
+							+ " Wait 3000+Rnd(2000) ms then select action (hoping for newly discovered actions");
+					try {
+						Thread.sleep(3000 + new Random().nextInt(2000));
+					} catch (Exception e) {
+					}
+					// Wait 5 seconds before new action can be selected (even if it's a known one
+					// return super.selectAction(state, actions);
+				} else {
+					_moreActions = false;
+				}
+			}
 		}
-				
+
 		// Prepare SQL statement to retrieve path to the action
-		// Check whether we have an selectedAction we want to perform (and if it's possible to execute it now.
-		
+		// Check whether we have an selectedAction we want to perform (and if it's
+		// possible to execute it now.
+
 		if (selectedAction != null) {
-			System.out.println("selectedAction != null actions.length = "+actions.size());
+			System.out.println("selectedAction != null actions.length = " + actions.size() + " state id = "
+					+ state.get(Tags.AbstractIDCustom));
 			HashMap<String, Action> actionMap = ConvertActionSetToDictionary(actions);
-			System.out.println("actionMap.size() = "+ actionMap.size());
+			System.out.println("actionMap.size() = " + actionMap.size());
 			// select path towards the selected action
-			  if (actionMap.containsKey(selectedAction)) {
-				  System.out.println("Needed action is currently available, so select this action");
-				  // Perform desired action since it's available from this point
-				  Action a =  actionMap.get(selectedAction); // Get the ConcreteAction matching the selectedAction
-				  selectedAction = null; // Reset selectedAction so next time a new one will be choosen.
-				  return a;				  
-			  } else {
-				  if (sameState >3 )
-				  {
-					  System.out.println("Already more than three times in same state; Put back in blackhole");
-					  _moreActions = false;
-				  }
-				  System.out.println("Needed action is unavailable, select from path to be followed; for now easy way out random select");
-				  Action a = traversePath(state, actions);
-				  return a;
-				  // Lookup database to perform the next action in the path (possible better to be cached)
-				  // Perform action to get closer to the selectedAction
-			  }
-		} 		
-		
-		if (retAction != null) return retAction;
+			if (actionMap.containsKey(selectedAction)) {
+				System.out.println("Needed action is currently available, so select this action");
+				// Perform desired action since it's available from this point
+				Action a = actionMap.get(selectedAction); // Get the AbstractAction matching the selectedAction
+				selectedAction = null; // Reset selectedAction so next time a new one will be choosen.
+				return a;
+			} else {
+				if (sameState > 3) {
+					System.out.println("Already more than three times in same state; Put back in blackhole");
+					_moreActions = false;
+				}
+				System.out.println(
+						"Needed action is unavailable, select from path to be followed; for now easy way out random select");
+				Action a = traversePath(state, actions);
+				return a;
+				// Lookup database to perform the next action in the path (possible better to be
+				// cached)
+				// Perform action to get closer to the selectedAction
+			}
+		}
+
+		if (retAction != null)
+			return retAction;
 		System.out.println("Return a fallback action");
-			
+
 		retAction = super.selectAction(state, actions);
 		try {
-		UpdateAbstractActionInProgress(retAction.get(Tags.AbstractIDCustom));
+			UpdateAbstractActionInProgress(retAction.get(Tags.AbstractIDCustom));
+		} catch (Exception e) {
 		}
-		catch (Exception e)
-		{}
 		return retAction;
-			
-		
+
 	}
 
 }
