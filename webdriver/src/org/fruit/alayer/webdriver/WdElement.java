@@ -164,7 +164,6 @@ public class WdElement extends TaggableBase implements Serializable {
   }
 
   void setupXPaths(String xPath) {
-      System.out.println("XPath: " + xPath);
       this.xPath = xPath;
       HashMap<String, Integer> childTagsCount = new HashMap<>();
       for (WdElement child: children) {
