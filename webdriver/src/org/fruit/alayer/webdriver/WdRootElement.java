@@ -45,6 +45,7 @@ public class WdRootElement extends WdElement {
 
   public WdRootElement(Map<String, Object> packedbody) {
     super(packedbody, null, null);
+
     root = this;
     parent = this;
     isForeground = (Boolean) packedbody.get("documentHasFocus");
