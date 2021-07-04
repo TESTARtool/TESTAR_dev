@@ -12,11 +12,9 @@ import org.fruit.monkey.Settings;
 
 public class OrientDBManagerFactory implements PersistenceManagerFactory {
 
-    @Override
-    public PersistenceManager getPersistenceManager(Settings settings) {
-        EventHelper eventHelper = new EventHelper();
 
-        // create a config object for the orientdb database connection info
+    public static Config getDatabaseConfig(Settings settings)
+    {
         Config config = new Config();
         config.setConnectionType(settings.get(ConfigTags.DataStoreType));
         config.setServer(settings.get(ConfigTags.DataStoreServer));
@@ -25,7 +23,15 @@ public class OrientDBManagerFactory implements PersistenceManagerFactory {
         config.setPassword(settings.get(ConfigTags.DataStorePassword));
         config.setResetDataStore(settings.get(ConfigTags.ResetDataStore));
         config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory));
-        EntityManager entityManager = new EntityManager(config);
+        return config;
+    }
+    @Override
+    public PersistenceManager getPersistenceManager(Settings settings) {
+        EventHelper eventHelper = new EventHelper();
+
+        // create a config object for the orientdb database connection info
+       
+        EntityManager entityManager = new EntityManager(OrientDBManagerFactory.getDatabaseConfig(settings));
 
         // check if the data needs to be stored instantaneously or delayed (after sequence).
         PersistenceManager persistenceManager;

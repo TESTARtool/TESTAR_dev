@@ -35,8 +35,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
         visitedActions = new HashMap<>();
         if (actions != null) {
             for(AbstractAction action:actions) {
-                this.actions.put(action.getActionId(), action);
-                System.out.println("AbstractState.java(37): SHOULD: Retrieve action "+action.getActionId()+"  from database before putting into unvisitedActions");
+                this.actions.put(action.getActionId(), action);                
                 unvisitedActions.put(action.getActionId(), action);
             }
         }
@@ -110,8 +109,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getUnvisitedActions() {
-        String myId = this.getId();
-        System.out.println("AbstractState(111): Retrieve unvisitedactions; my id = "+myId);
+        String myId = this.getId();        
         return new HashSet<>(unvisitedActions.values());
     }
 

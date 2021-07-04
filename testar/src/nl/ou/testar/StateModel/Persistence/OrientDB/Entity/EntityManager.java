@@ -46,15 +46,36 @@ public class EntityManager {
      * 
      * @param config
      */
+    private static String connectionString;
+
+    private Config config;
+
+    public static String getConnectionString() {
+        return connectionString;
+
+    }
     public EntityManager(Config config) {
-        String connectionString = config.getConnectionType() + ":"
-                + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
-                + "/";
-        OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-        connection = new Connection(orientDB, config);
+        this.config = config;
+
+
+        //connectionString = config.getConnectionType() + ":"
+         //       + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
+         //       + "/";
+        
+        //OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+        connection = getNewConnection(); //new Connection(orientDB, config);
         init();
     }
 
+    public Connection getNewConnection()
+    {
+        connectionString = config.getConnectionType() + ":"
+        + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
+        + "/";
+
+       OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+       return  new Connection(orientDB, config);
+    }
     /**
      * This method tells the Entity Manager to close its connection. Should be
      * called before the entity manager itself becomes unused.

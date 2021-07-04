@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
+import com.orientechnologies.orient.core.db.ODatabase;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.sql.executor.OResult;
@@ -17,7 +18,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
-import nl.ou.testar.StateModel.Persistence.ArendManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
@@ -83,7 +83,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         //super(eventHelper, entityManager);
         this.eventHelper = eventHelper;
         this.entityManager = entityManager;
-        dbSession = entityManager.getConnection().getDatabaseSession();
         init();
     }
 
@@ -133,12 +132,14 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         persistUnvisitedActions(abstractState, abstractStateEntity);
     }
 
-    public OResultSet ExecuteCommand(String actie) {
+    public OResultSet ExecuteCommand(Connection connection, String actie) {
         System.out.println("ExecuteCommand " + actie);
         boolean repeat = false;
         do {
-            try {
-                return entityManager.getConnection().getDatabaseSession().command(actie);
+            repeat= false;
+            try (ODatabaseSession db = connection.getDatabaseSession()) {
+               
+                return db.command(actie);
             } catch (OConcurrentModificationException ex) {
                 repeat = true;
                 try {
@@ -152,10 +153,26 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     }
 
-    public OResultSet ExecuteQuery(String actie) {
+    public OResultSet ExecuteQuery(Connection connection, String actie) {
         System.out.println("ExecuteQuery " + actie);
+        boolean repeat = false;
+        do {
+            repeat = false;
+            try(ODatabaseSession db = connection.getDatabaseSession()) {              
+                
+                return db.query(actie);
+            } catch (OConcurrentModificationException ex) {
+                repeat = true;
+                try {
+                    Thread.sleep(2000);
+                }
+                catch (Exception e){}
 
-        return entityManager.getConnection().getDatabaseSession().query(actie);
+            }
+        } while (repeat);
+
+        return null;
+        
     }
 
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
