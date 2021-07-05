@@ -86,13 +86,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	String nodeName = "";
 	EntityManager em;
 	String selectedAction = null;
-	//Connection connection;
+	// Connection connection;
 	OrientDB database;
-	
+
 	Settings settings;
 
 	public Protocol_webdriver_unvisited() {
-		
 
 	}
 
@@ -147,8 +146,9 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	 * @param settings the current TESTAR settings as specified by the user.
 	 */
 	ODatabaseSession CreateDatabaseConnection() {
-		
-		//connection = new Connection(database, OrientDBManagerFactory.getDatabaseConfig(settings));
+
+		// connection = new Connection(database,
+		// OrientDBManagerFactory.getDatabaseConfig(settings));
 		Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
 		ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
 		System.out.println("Own database connection created");
@@ -156,10 +156,21 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	}
 
 	@Override
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
+		System.out.println("BeginSequence");
+		_moreActions = true;
+		stopSequences = false;
+	}
+
+	boolean hasHadActionsInDb = false;
+
+	boolean stopSequences = false;
+
+	@Override
 	protected void initialize(Settings settings) {
 		NativeLinker.addWdDriverOS();
 		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "wsdl", "pfx");
-		
 
 		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
 		super.initialize(settings);
@@ -171,7 +182,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 		System.out.println("Constructor van statemodel");
 
-
 		// Override ProtocolUtil to allow WebDriver screenshots
 		// protocolUtil = new WdProtocolUtil();
 		m = (ModelManager) stateModelManager;
@@ -180,13 +190,13 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			odb = (OrientDBManager) m.persistenceManager;
 			em = odb.entityManager;
 			database = new OrientDB(EntityManager.getConnectionString(), OrientDBConfig.defaultConfig());
-			
+
 			System.out.println("dbSession initialized");
 			Random r = new Random();
 			nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
 			System.out.println("nodeName = " + nodeName);
 			ODatabaseSession dbSession = CreateDatabaseConnection();
-			ExecuteCommand(dbSession,"create vertex BeingExecuted set node = '" + nodeName + "'").close();
+			ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
 			dbSession.close();
 
 		}
@@ -194,50 +204,48 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	}
 
 	public OResultSet ExecuteCommand(ODatabaseSession db, String actie) {
-        System.out.println("ExecuteCommand " + actie);
-        boolean repeat = false;
-        do {
+		System.out.println("ExecuteCommand " + actie);
+		boolean repeat = false;
+		do {
 			repeat = false;
-            try  {
-				System.out.println("dbSession = "+ db);
-                return db.command(actie);
-            } catch (OConcurrentModificationException ex) {
-                repeat = true;
-                try {
-                    Thread.sleep(2000);
-                }
-                catch (Exception e){}
-				
+			try {
+				System.out.println("dbSession = " + db);
+				return db.command(actie);
+			} catch (OConcurrentModificationException ex) {
+				repeat = true;
+				try {
+					Thread.sleep(2000);
+				} catch (Exception e) {
+				}
 
-            }
-        } while (repeat);
-        return null;
+			}
+		} while (repeat);
+		return null;
 
-    }
+	}
 
-    public OResultSet ExecuteQuery(ODatabaseSession db, String actie) {
-        System.out.println("ExecuteQuery " + actie);
-        boolean repeat = false;
-        do {
+	public OResultSet ExecuteQuery(ODatabaseSession db, String actie) {
+		System.out.println("ExecuteQuery " + actie);
+		boolean repeat = false;
+		do {
 			repeat = false;
-            try {              
-                System.out.println("dbSession = "+ db);
-				
-                return db.query(actie);
-            } catch (OConcurrentModificationException ex) {
-                repeat = true;
-                try {
-                    Thread.sleep(2000);
-                }
-                catch (Exception e){}
+			try {
+				System.out.println("dbSession = " + db);
 
+				return db.query(actie);
+			} catch (OConcurrentModificationException ex) {
+				repeat = true;
+				try {
+					Thread.sleep(2000);
+				} catch (Exception e) {
+				}
 
-            }			
-        } while (repeat);
+			}
+		} while (repeat);
 
-        return null;
-        
-    }
+		return null;
+
+	}
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The
@@ -352,8 +360,9 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	public boolean mijnIgnore(org.fruit.alayer.Widget widget) {
 		String linkUrl = widget.get(Tags.ValuePattern, "");
 
-		if (linkUrl.contains("wsdl") || linkUrl.contains("www.parasoft.com") || linkUrl.contains("/services/")
-				|| linkUrl.contains("api-docs")) {
+		if (linkUrl.contains("wsdl") || linkUrl.contains("parasoft.com") || linkUrl.contains("/services/")
+				|| linkUrl.contains("api-docs") || linkUrl == "" || linkUrl.contains(".pfx") || linkUrl.contains("wadl")
+				|| linkUrl.contains("xml")) {
 			System.out.println("negeer " + linkUrl);
 			return true;
 		}
@@ -524,13 +533,18 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	@Override
 	protected boolean moreActions(State state) {
+		System.out.println("MoreActions: _moreActions = " + _moreActions);
 		return _moreActions;
 	}
 
 	boolean stop = false;
+
 	@Override
 	protected boolean moreSequences() {
-		return (CountUnvisitedActionsInDb() > 0) || !stop;
+		boolean result = (CountInDb("unvisitedabstractaction") > 0) || !stop;
+
+		System.out.println("moreSequences: " + result);
+		return result;
 	}
 
 	@Override
@@ -599,7 +613,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		ODatabaseSession db = CreateDatabaseConnection();
 		try {
 			rs = ExecuteQuery(db, sql);
-			
 
 			while (rs.hasNext()) {
 				OResult item = rs.next();
@@ -617,35 +630,36 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 				System.out.println("friend: " + item);
 			}
-			
-		} catch (Exception e)
-		{
-			System.out.println("Exception during GetUnvisitedActionsFromDatabase "+e);
+
+		} catch (Exception e) {
+			System.out.println("Exception during GetUnvisitedActionsFromDatabase " + e);
 			e.printStackTrace();
 
 		} finally {
 			rs.close();
 			db.close();
-			
+
 		}
 		System.out.println("Klaar met ophalen acties");
 		return result;
 	}
 
-	public long CountUnvisitedActionsInDb() {
+	public long CountInDb(String table) {
 		long aantal = 0;
-		String sql = "SELECT count(*) as aantal from unvisitedabstractaction";
+		String sql = "SELECT count(*) as aantal from " + table;
 		ODatabaseSession db = CreateDatabaseConnection();
-		try{
-		OResultSet rs = ExecuteQuery(db, sql);
-		OResult item = rs.next();
-		aantal = item.getProperty("aantal");
-		rs.close();
-		System.out.println("Aantal nog niet uitgevoerde acties in de database: " + aantal);
-		}
-		finally {
-			
+		try {
+			OResultSet rs = ExecuteQuery(db, sql);
+			OResult item = rs.next();
+			aantal = item.getProperty("aantal");
+			rs.close();
+			System.out.println(sql + "  aantal =  " + aantal);
+		} finally {
+
 			db.close();
+		}
+		if (aantal > 0) {
+			hasHadActionsInDb = true;
 		}
 
 		return aantal;
@@ -661,7 +675,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 					+ nodeName + "') where actionId='" + actionId + "'";
 			System.out.println("Execute" + sql);
 
-			ExecuteCommand( db, sql);
+			ExecuteCommand(db, sql);
 
 		} catch (Exception e) {
 			System.out.println("Can not update unvisitedAbstractAction; set selectedAction to null");
@@ -703,6 +717,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	private String getNewSelectedAction(State state, Set<Action> actions) {
 		String result = null;
+		System.out.println("getNewSelectedAction state = " + state.get(Tags.AbstractIDCustom));
 		Boolean ok = false;
 		do {
 			try {
@@ -711,46 +726,36 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 				System.out.println(
 						"Number of shortest path actions available in database: " + availableActionsFromDb.size());
-				if (availableActionsFromDb.size() == 0) {
 
-					// Visited all actions already from this point to blackHole
-					// Go up one state. Also possible there are no actions at all
-					// possibly all actions are executed by other nodes.
-					if (actions.size() >= 1) // derived actions contains something
-					{
-						// A new action can be selected
-						cyclesWaitBeforeNewAction = 0;
-						if (state.get(Tags.AbstractIDCustom).equals(lastState)) {
-							sameState++;
-
-						}
-						lastState = state.get(Tags.AbstractIDCustom);
-						ok = true;
-						// there actions but none are available for this node
-						return null;
-					} else {
-						// No new action can be selected and database does not contain anything
-						// System.out.println("I hope this doesn't trigger");
-						cyclesWaitBeforeNewAction++;
-
-						Thread.sleep(1000);
-
-						ok = true;
-						return "HistoryBack";
-
-					}
-				} else {
-					System.out.println("Use availableactions from statemodel");
-					for (String a : availableActionsFromDb) {
-						System.out.println("Actie with id " + a);
-					}
-					System.out.println("Done printing available actions");
-
-					result = selectRandomAction(availableActionsFromDb);
+				if (availableActionsFromDb.size() >= 1) {
 					ok = true;
-					return result;
-
+					String action = selectRandomAction(availableActionsFromDb);
+					System.out.println("Action from database selected: action = " + action);
+					return action;
 				}
+
+				long aantalAbstractActions = CountInDb("abstractstate");
+
+				System.out.println(
+						"No actions available in database; abstract states in database = " + aantalAbstractActions);
+
+				if (aantalAbstractActions == 0) {
+					Action a = super.selectAction(state, actions);
+					String action = a.get(Tags.AbstractIDCustom);
+					System.out.println(
+							"Since this is the first run and no abstractactions exists take a random action; statemodel is probably lagging action = "
+									+ action);
+					return action;
+				}
+
+				// System.out.println("Not allowed to be here! or really done");
+				_moreActions = false;
+				stop = true;
+				Action a = super.selectAction(state, actions);
+				String action = a.get(Tags.AbstractIDCustom);
+				System.out.println("Just return random action and stop; action = " + action);
+				return action;
+
 			} catch (Exception e) {
 				int sleepTime = new Random(System.currentTimeMillis()).nextInt(5000);
 				System.out.println("Exception while getting action; Wait " + sleepTime + " ms " + e);
@@ -762,6 +767,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 				}
 			}
+
 		} while (!ok);
 		return result;
 	}
@@ -780,12 +786,13 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	public void ReturnActionToBlackHole() {
 		ODatabaseSession db = CreateDatabaseConnection();
 		try {
-		String sql = "update unvisitedabstractaction set in = (select from blackhole) where actionId='" + selectedAction
-				+ "'";
-		System.out.println("Return action to blackhole from beingexecuted: " + selectedAction + " sql = " + sql);
-		ExecuteCommand( db,sql);
-		}
-		finally {
+			String sql = "update unvisitedabstractaction set in = (select from blackhole) where actionId='"
+					+ selectedAction + "'";
+			System.out.println("Return action to blackhole from beingexecuted: " + selectedAction + " sql = " + sql);
+			ExecuteCommand(db, sql);
+		} catch (Exception e) {
+			System.out.println("Not possible to return selectedAction " + selectedAction + "  to blackhole" + e);
+		} finally {
 			db.close();
 		}
 	}
@@ -797,7 +804,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 		String destinationStateId = "";
 		ODatabaseSession db = CreateDatabaseConnection();
-		
+
 		OResultSet destinationStatResultSet = ExecuteQuery(db, q1);
 		if (destinationStatResultSet.hasNext()) {
 			OResult item = destinationStatResultSet.next();
@@ -850,16 +857,16 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		}
 
 		// Zoek uit te voeren abstractaction
-		String q3 = "select from abstractaction where in = " + v.get(0).rid + " and out = " + v.get(1).rid;
+		String q3 = "select from abstractaction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
 
 		String abstractActionId = "";
 		var beschikbareActions = ConvertActionSetToDictionary(actions);
 		db = CreateDatabaseConnection();
-		OResultSet abstractActionResultSet = ExecuteQuery(db,q3);
+		OResultSet abstractActionResultSet = ExecuteQuery(db, q3);
 		while (abstractActionResultSet.hasNext()) {
 			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
 			System.out.println("traversePath: gebruik hiervoor action " + abstractActionId);
-			
+
 			System.out.println("Check of " + abstractActionId + "  beschikbaar is");
 			if (beschikbareActions.containsKey(abstractActionId)) {
 				System.out.println(
@@ -896,49 +903,8 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		if (selectedAction == null) {
 
 			selectedAction = getNewSelectedAction(state, actions);
-			// After execution of getNewSelectedAction it is still possible no action is
-			// selected (empty database for example)
-			if (selectedAction == "HistoryBack") {
-				return new WdHistoryBackAction();
-			}
 
-			if (selectedAction == null && CountUnvisitedActionsInDb() > 0) {
-				System.out.println("selectedAction = null; but there exists other unvisited actions");
-				selectedAction = getRandomUnvisitedActionFromDb();
-				try {
-
-					return super.selectAction(state, actions);
-					// return new WdHistoryBackAction();
-				} catch (NoSuchTagException e) {
-					System.out.println("History back failed, select a real random action");
-					return super.selectAction(state, actions);
-				}
-			}
-
-			if (selectedAction == null) // Still no selected action
-			{
-				if (cyclesWaitBeforeNewAction < 3 && sameState < 3) {
-					System.out.println("selectAction: cyclesWaitBeforeNewAction = " + cyclesWaitBeforeNewAction
-							+ " sameState = " + sameState
-							+ " Wait 3000+Rnd(2000) ms then select action (hoping for newly discovered actions");
-							
-					try {
-						Thread.sleep(3000 + new Random().nextInt(2000));
-					} catch (Exception e) {
-					}
-					return super.selectAction(state, actions);
-					// Wait 5 seconds before new action can be selected (even if it's a known one
-					 
-				} else {
-					return super.selectAction(state, actions);
-					//_moreActions = false;
-				}
-			}
 		}
-
-		// Prepare SQL statement to retrieve path to the action
-		// Check whether we have an selectedAction we want to perform (and if it's
-		// possible to execute it now.
 
 		if (selectedAction != null) {
 			System.out.println("selectedAction != null actions.length = " + actions.size() + " state id = "
@@ -953,24 +919,9 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 				selectedAction = null; // Reset selectedAction so next time a new one will be choosen.
 				return a;
 			} else {
-				if (sameState > 3) {
-
-					System.out.println("Already more than three times in same state; Put back in blackhole");
-					ReturnActionToBlackHole();
-					selectedAction = null;
-					if (CountUnvisitedActionsInDb() == 0) {
-						System.out.println("Really no actions more in database; really done");
-						_moreActions = false;
-						stop = true;
-					}
-				} else {
-					System.out.println("Needed action is unavailable, select from path to be followed");
-					Action a = traversePath(state, actions);
-					return a;
-				}
-				// Lookup database to perform the next action in the path (possible better to be
-				// cached)
-				// Perform action to get closer to the selectedAction
+				System.out.println("Needed action is unavailable, select from path to be followed");
+				Action a = traversePath(state, actions);
+				return a;
 			}
 		}
 
@@ -982,31 +933,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 		return retAction;
 
-	}
-
-	private String getRandomUnvisitedActionFromDb() {
-		String sql = "SELECT * FROM unvisitedabstractaction";
-		String ac="";
-		ODatabaseSession db = CreateDatabaseConnection();
-		try {
-			
-		OResultSet availableActions = ExecuteQuery(db, sql);
-		List<String> actions = new LinkedList<String>();
-
-		while (availableActions.hasNext()) {
-			OResult item = availableActions.next();
-			actions.add(item.getProperty("actionId"));
-		}
-		availableActions.close();
-
-		ac = actions.get(new Random(System.currentTimeMillis()).nextInt(actions.size()));
-		System.out.println(
-				"Random action chosen from database " + ac + " however since there do not exist paths go history back");
-		} 
-		finally {
-			db.close();
-		}
-		return ac;
 	}
 
 }
