@@ -118,4 +118,15 @@ public class SequenceManager {
     public String getSequenceID() {
         return currentSequence.getCurrentSequenceId();
     }
+
+    /**
+     * Returns for the current abstraction level the number Testar has run or is running.
+     */
+    public int getCurrentSequenceNr() {
+        return currentSequenceNr;
+    }
+
+    public Sequence getCurrentSequence() {
+        return currentSequence;
+    }
 }

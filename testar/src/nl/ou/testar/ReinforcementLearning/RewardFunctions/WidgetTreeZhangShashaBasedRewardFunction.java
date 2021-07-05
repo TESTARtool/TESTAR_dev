@@ -80,6 +80,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         previousState = state;
         treeDist.clear();
 
+        logger.info("ID={} reward={}", executedAction.getId(), reward);
         return reward;
     }
 
