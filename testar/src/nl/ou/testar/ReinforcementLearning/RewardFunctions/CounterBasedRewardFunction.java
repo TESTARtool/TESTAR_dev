@@ -24,9 +24,9 @@ public class CounterBasedRewardFunction implements RewardFunction {
         int executionCounter = executedAction.getAttributes().get(RLTags.Counter, 0) + 1;
         executedAction.getAttributes().set(RLTags.Counter, executionCounter);
 
-        logger.info("executionCounter={}", executionCounter);
+        logger.info("ID={} executionCounter={}", executedAction.getId(), executionCounter);
         float reward = 1.0f / (float) executionCounter;
-        logger.info("reward={}", reward);
+        logger.info("ID={} reward={}", executedAction.getId(), reward);
 
         return reward;
     }

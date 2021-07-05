@@ -77,6 +77,9 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         final Action selectedAction = super.getAbstractActionToExecute(actions);
         final AbstractAction selectedAbstractAction = getAbstractAction(currentAbstractState, selectedAction);
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+        logger.info("reward={} found for sequenceNumber={} and actionNumber={}", reward,
+                getSequenceManager().getCurrentSequence().getNodes().size(),
+                getSequenceManager().getCurrentSequenceNr());
         final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
 
         updateQValue(previouslySelectedAbstractAction, sarsaQValue);

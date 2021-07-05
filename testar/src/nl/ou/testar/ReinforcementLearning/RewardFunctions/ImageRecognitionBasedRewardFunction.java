@@ -47,10 +47,13 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
             logger.debug("Match found between screenshots with " + (1 - match.getScore()));
             screenImagePreviouslyExecutedAction = screenshot;
             finder.destroy();
-            return (float) (1d - match.getScore());
+            final float reward = (float) (1d - match.getScore());
+            logger.info("ID={} reward={}", executedAction.getId(), reward);
+            return reward;
         } catch (final IllegalArgumentException e) {
             logger.debug(e.getMessage());
             screenImagePreviouslyExecutedAction = takeScreenshot();
+            logger.info("ID={} reward={}", executedAction.getId(), defaultReward);
             return defaultReward;
         }
     }
