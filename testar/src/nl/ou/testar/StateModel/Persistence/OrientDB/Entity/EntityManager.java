@@ -48,14 +48,14 @@ public class EntityManager {
      */
     private static String connectionString;
 
-    private Config config;
+    private static Config config;
 
     public static String getConnectionString() {
         return connectionString;
 
     }
     public EntityManager(Config config) {
-        this.config = config;
+        EntityManager.config = config;
 
 
         //connectionString = config.getConnectionType() + ":"
@@ -65,6 +65,14 @@ public class EntityManager {
         //OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         connection = getNewConnection(); //new Connection(orientDB, config);
         init();
+    }
+
+    public static Connection getNewConnection(OrientDB orientDB)
+    {
+        
+       orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+       System.out.println("orientDB = "+orientDB);
+       return new Connection(orientDB, EntityManager.config);
     }
 
     public Connection getNewConnection()
@@ -140,6 +148,8 @@ public class EntityManager {
      * @throws EntityNotFoundException
      */
     private OVertex retrieveVertex(VertexEntity vertexEntity, ODatabaseSession db) throws EntityNotFoundException {
+        //System.out.println("retrieveVertext: state id = "+vertexEntity.getPropertyValue("stateId"));
+        
         Property identifier = vertexEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
             // cannot retrieve a vertex without identifier
@@ -398,6 +408,7 @@ public class EntityManager {
         do {
             repeat = false;
             try (ODatabaseSession db = connection.getDatabaseSession()) {
+               
                 if (entity.getEntityClass().isVertex()) {
                     saveVertexEntity((VertexEntity) entity, db);
                 } else if (entity.getEntityClass().isEdge()) {
@@ -409,6 +420,9 @@ public class EntityManager {
                 System.out.println("saveEntity concurrency exception " + cme);
                 backOff++;
                 randomSleep(baseSleep, randSleep);
+                
+
+
             } catch (ORecordDuplicatedException dupl)
             {
                 System.out.println("DuplicateException "+dupl);
@@ -435,9 +449,11 @@ public class EntityManager {
                     // check to see if the vertex already exists in the database
 
                     oVertex = retrieveVertex(entity, db);
+                    
                 } catch (EntityNotFoundException e) {
                     // vertex doesn't exist yet. No problemo. We'll create one.
                     oVertex = db.newVertex(entity.getEntityClass().getClassName());
+                   // System.out.println("Create new vertex");
                     newVertex = true;
                 }
 

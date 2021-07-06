@@ -8,6 +8,8 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
+
+import org.fruit.Environment;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
@@ -54,6 +56,13 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         String uniqueId = HydrationHelper.lowCollisionID(modelIdentifier + "--" + stateId);
         target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
+        String nodeName = "unknown";
+        try {
+          nodeName = System.getenv("HOSTNAME");
+        }
+        catch (Exception e){}
+        target.addPropertyValue("discoveredBy", new PropertyValue(OType.STRING, nodeName));
+
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((AbstractState) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
@@ -73,6 +82,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         if (concreteStateIds == null) {
             throw new HydrationException();
         }
+        
         if (!((AbstractState) source).getConcreteStateIds().isEmpty()) {
             target.addPropertyValue(concreteStateIds.getPropertyName(), new PropertyValue(concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds()));
         }

@@ -161,7 +161,13 @@ public class EntityClassFactory {
         counter.setNullable(false);
         counter.setAutoIncrement(true);
         abstractStateClass.addProperty(counter);
+        Property nodeId = new Property("discoveredBy", OType.STRING);
+        nodeId.setIdentifier(false);
+        nodeId.setMandatory(false);
+        nodeId.setNullable(true);
+        abstractStateClass.addProperty(nodeId);
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
+
         return abstractStateClass;
     }
 
@@ -191,7 +197,19 @@ public class EntityClassFactory {
         counter.setMandatory(true);
         counter.setNullable(false);
         counter.setAutoIncrement(true);
+
+        
         abstractActionClass.addProperty(counter);
+        Property node = new Property("discoveredBy", OType.STRING);
+        node.setMandatory(false);
+        node.setNullable(true);
+        node.setIndexAble(false);
+        abstractActionClass.addProperty(node);
+        Property createdOn = new Property("createOn", OType.DATETIME);
+        createdOn.setMandatory(false);
+        createdOn.setNullable(true);
+        createdOn.setIndexAble(false);
+        abstractActionClass.addProperty(createdOn);
         entityClasses.put(EntityClassName.AbstractAction, abstractActionClass);
         return abstractActionClass;
     }

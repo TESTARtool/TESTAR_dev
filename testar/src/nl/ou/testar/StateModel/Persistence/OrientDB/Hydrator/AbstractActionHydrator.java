@@ -1,5 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
+import java.util.Date;
+
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.Exception.HydrationException;
@@ -48,6 +50,14 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
 
         // add the action id
         edgeEntity.addPropertyValue("actionId", new PropertyValue(OType.STRING, ((AbstractAction) source).getActionId()));
+        String nodeName = "unknown";
+        try {
+          nodeName = System.getenv("HOSTNAME");
+        }
+        catch (Exception e){}
+        edgeEntity.addPropertyValue("discoveredBy", new PropertyValue(OType.STRING, nodeName));
+
+        edgeEntity.addPropertyValue("createdOn", new PropertyValue(OType.DATETIME, new Date(System.currentTimeMillis())));
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((AbstractAction) source).getAttributes();

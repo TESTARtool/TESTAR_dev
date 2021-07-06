@@ -2,11 +2,15 @@ package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.Persistable;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Connection;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.orientechnologies.orient.core.db.OrientDB;
 
 import org.fruit.alayer.Tags;
 
@@ -23,20 +27,48 @@ public class AbstractState extends AbstractEntity implements Persistable {
     // is this an initial state?
     private boolean isInitial = false;
 
+    OrientDB database;
+    Connection connection;
+
     /**
      * Constructor
      * @param stateId
      * @param actions
      */
+
+     private boolean ActionExistsInDatabase(AbstractAction action)
+     {
+        
+        try (var db = connection.getDatabaseSession()){
+            // first check if they're in the databse              
+        
+            var result = db.query("select from abstractaction where actionId = '"+action.getActionId()+"'");
+            return result.hasNext();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception during databse");
+        }
+        return false;
+     }
     public AbstractState(String stateId, Set<AbstractAction> actions) {
         super(stateId);
+        
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
+        connection = EntityManager.getNewConnection(database); 
+        System.out.println("AbstractState: database = "+database+"  connection = "+connection);   
         if (actions != null) {
             for(AbstractAction action:actions) {
-                this.actions.put(action.getActionId(), action);                
-                unvisitedActions.put(action.getActionId(), action);
+                this.actions.put(action.getActionId(), action);
+                if (!ActionExistsInDatabase(action)){
+                    
+                    unvisitedActions.put(action.getActionId(), action);
+                } else {
+                    System.out.println(action.getActionId()+" alreaady existed in abstract state; do not add to unvisited");
+                }
+                
             }
         }
         concreteStateIds = new HashSet<>();
@@ -110,6 +142,41 @@ public class AbstractState extends AbstractEntity implements Persistable {
      */
     public Set<AbstractAction> getUnvisitedActions() {
         String myId = this.getId();        
+        String sql = "select from abstractaction where out in (select @rid from abstractstate where stateId = '"
+                + myId + "')";
+        System.out.println("Update visited actions of this node by adding database values  sql = " + sql);
+        
+        try(var db = connection.getDatabaseSession()) {
+            var results = db.query(sql);
+            while (results.hasNext()) {
+                String actionId = results.next().getProperty("actionId");
+                System.out.println("ActionId " + actionId + "  was ook al gevonden volgens de database");
+                try {
+                    unvisitedActions.remove(actionId);
+                    
+                } catch (Exception e) {
+                    System.out.println("Duplicaat? " + e);
+                }
+
+            }
+        } 
+        sql = "select from unvisitedabstractaction where in in (select from BeingExecuted)";
+                
+        try(var db = connection.getDatabaseSession()) {
+            var results = db.query(sql);
+            while (results.hasNext()) {
+                String actionId = results.next().getProperty("actionId");
+                System.out.println("ActionId " + actionId + "  is in BeingExecuted; remove as well from unvisited");
+                try {
+                    unvisitedActions.remove(actionId);
+                    
+                } catch (Exception e) {
+                    System.out.println("Duplicaat? " + e);
+                }
+
+            }
+        } 
+
         return new HashSet<>(unvisitedActions.values());
     }
 

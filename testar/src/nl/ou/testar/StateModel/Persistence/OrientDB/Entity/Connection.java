@@ -25,7 +25,8 @@ public class Connection {
      * @return
      */
     public ODatabaseSession getDatabaseSession() {
-        return orientDB.open(config.getDatabase(), config.getUser(), config.getPassword());
+        ODatabaseSession dbSession = orientDB.open(config.getDatabase(), config.getUser(), config.getPassword());
+        return dbSession;
     }
 
     /**
