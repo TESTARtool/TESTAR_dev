@@ -1,0 +1,248 @@
+#################################################################
+# TESTAR mode
+#
+# Set the mode you want TESTAR to start in: Spy, Generate, Replay
+#################################################################
+
+Mode = Generate
+
+#################################################################
+# Connect to the System Under Test (SUT)
+#
+# Indicate how you want to connect to the SUT:
+#
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# starts the SUT.
+# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
+# For web applications, follow the next format: web_browser_path SUT_URL.
+#
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# in the SUT main window. The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# The SUT must be manually started and closed.
+#################################################################
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = "C:\\Program Files\\Java\\jdk1.8.0_291\\bin\\java.exe" -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:jacoco\\\\lib\\\\jacocoagent.jar=jmx=true "C:\\Users\\testar\\Downloads\\eclipse\\plugins\\org.eclipse.equinox.launcher_1.4.0.v20161219-1356.jar" -vmargs --add-modules=ALL-SYSTEM -Dosgi.requiredJavaVersion=1.8 -Xms256m -Xmx1024m
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = false
+
+#################################################################
+# Sequences
+#
+# Number of sequences and the length of these sequences
+#################################################################
+
+Sequences = 1
+SequenceLength = 300
+
+#################################################################
+# Oracles based on suspicious titles
+#
+# Regular expression and Tags to apply them
+#################################################################
+
+SuspiciousTitles = .*[eE]xcep[ct]i[o?]n.*
+TagsForSuspiciousOracle = Title
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# Requires ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression SuspiciousProcessOutput contains the specification
+# of what is considered to be suspicious output.
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store execution logs coming from the processes.
+# You can use the regular expression ProcessLogs below to filter
+# the logs. Use .*.* if you want to store all the outputs of the 
+# process.
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
+# Actionfilter
+#
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
+# these will be added to the protocol_filter.xml file.
+#################################################################
+
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+TagsToFilter = Title
+
+#################################################################
+# Processfilter
+#
+# Regular expression. Kill the processes that your SUT can start up
+# but that you do not want to test.
+#################################################################
+
+SUTProcesses = 
+
+#################################################################
+# Protocolclass
+#
+# Indicate the location of the protocol class for your specific SUT.
+#################################################################
+
+ProtocolClass = desktop_eclipse/Protocol_desktop_eclipse
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = 10.102.0.244
+DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = eclipse
+ApplicationVersion = 2
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# WebDriver features
+#################################################################
+
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# PKM address
+#################################################################
+PKMaddress = 10.101.0.224
+PKMport = 8080
+PKMdatabase = myproject
+PKMusername = demo
+PKMkey = admin
+
+#################################################################
+# Previous State model difference settings
+#################################################################
+PreviousApplicationName = 
+PreviousApplicationVersion = 
+StateModelDifferenceAutomaticReport = true
+
+#################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system.
+# Can solve problems when the mouse clicks are not aligned with
+# the elements on the screen. This can easily be detected when
+# running the spy mode. For example hover over a text element and
+# the popup window should appear with information about the
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5).
+#################################################################
+
+OverrideWebDriverDisplayScale = 
+OverrideWebDriverScreenshotDisplay = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\desktop_eclipse\\ExtendedSettings.xml
+
+#################################################################
+# Other more advanced settings
+#################################################################
+TypingTextsForExecutedAction = 10
+Discount = 0.95
+GraphDBUrl = remote:/localhost/testar
+GraphDBUser = testar
+ExecuteActions = true
+DrawWidgetTree = false
+ForceForeground = true
+FaultThreshold = 1.0E-9
+MaxReward = 9999999.0
+VisualizeSelectedAction = true
+Delete = 
+MyClassPath = ./settings
+ReplayRetryTime = 30.0
+ProcessesToKillDuringTest = 
+OutputDir = ./output
+UnattendedTests = false
+TestGenerator = random
+NonReactingUIThreshold = 100
+ResetDataStore = false
+VisualizeActions = false
+OfflineGraphConversion = true
+RefreshSpyCanvas = 0.5
+ListeningMode = false
+TempDir = ./output/temp
+MaxTime = 3.1536E7
+StopGenerationOnFault = true
+GraphDBEnabled = true
+UseRecordedActionDurationAndWaitTimeDuringReplay = false
+AlgorithmFormsFilling = false
+DrawWidgetInfo = false
+LogLevel = 1
+ShowSettingsAfterTest = true
+ForceToSequenceLength = true
+HTMLreportServerFile = .\\output\\
+StartupTime = 2.0
+ActionDuration = 0.5
+GraphsActivated = true
+GraphResuming = true
+GraphDBPassword = testar
+CopyFromTo = 
+TimeToFreeze = 30.0
+StateScreenshotSimilarityThreshold = 1.4E-45
+ShowVisualSettingsDialogOnStartup = true
+TimeToWaitAfterAction = 0.5
+DrawWidgetUnderCursor = true
+AlwaysCompile = true
+PathToReplaySequence = ./output/temp
+ExplorationSampleInterval = 1
+OnlySaveFaultySequences = false
