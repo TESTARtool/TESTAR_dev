@@ -34,7 +34,6 @@ package org.fruit.alayer.windows;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Util;
 import org.fruit.alayer.*;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
@@ -567,10 +566,13 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	private void createWidgetTree(UIAWidget parent, UIAElement element){
-		UIAWidget w = parent.root().addChild(parent, element);
-		element.backRef = w;
-		for(UIAElement child : element.children)
-			createWidgetTree(w, child);
+	    UIAWidget w = parent.root().addChild(parent, element);
+	    element.backRef = w;
+	    for(UIAElement child : element.children) {
+	        if(!child.ignore) {
+	            createWidgetTree(w, child);
+	        }
+	    }
 	}
 
 	@SuppressWarnings("unchecked")
