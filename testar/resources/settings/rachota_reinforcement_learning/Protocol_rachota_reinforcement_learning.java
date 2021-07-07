@@ -63,8 +63,6 @@ import org.fruit.alayer.*;
  */
 public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 
-	private String reportTimeDir;
-	
     private ActionSelector actionSelector = null;
     private Policy policy = null;
 
@@ -118,12 +116,6 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state){
 		startSequenceTime = System.currentTimeMillis();
-		try{
-			reportTimeDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();
-		} catch (Exception e) {
-			System.out.println("sequenceTimeUntilActions.txt can not be created " );
-			e.printStackTrace();
-		}
 
 		// wait 10 seconds, give time to rachota to start
 		Util.pause(10);
@@ -220,26 +212,6 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
 
-		// Write sequence duration to CLI and to file
-		long  sequenceDurationSoFar = System.currentTimeMillis() - startSequenceTime;
-		System.out.println();
-		System.out.println("Elapsed time until action " + actionCount + ": " + sequenceDurationSoFar);
-
-		long minutes = (sequenceDurationSoFar / 1000)  / 60;
-		int seconds = (int)((sequenceDurationSoFar / 1000) % 60);
-		System.out.println("Elapsed time until action " + actionCount + ": " + + minutes + " minutes, "+ seconds + " seconds.");
-		System.out.println();
-		// Write sequence duration to file
-		try {
-			FileWriter myWriter = new FileWriter(reportTimeDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_actionTimeStamps.txt", true);
-			myWriter.write(sequenceDurationSoFar + "\r\n");
-			myWriter.close();
-			System.out.println("Wrote time so far to file." + reportTimeDir + "/_sequenceTimeUntilAction.txt");
-		} catch (IOException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
-
 		// Extract and create JaCoCo action coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoActionReport();
@@ -254,32 +226,12 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 	 */
 	@Override
 	protected void finishSequence() {
-
 		// Extract and create JaCoCo sequence coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoSequenceReport();
 		}
 
 		super.finishSequence();
-
-		// Write sequence duration to CLI and to file
-		long  sequenceDuration = System.currentTimeMillis() - startSequenceTime;
-		System.out.println();
-		System.out.println("Sequence duration: " + sequenceDuration);
-		long minutes = (sequenceDuration / 1000)  / 60;
-		int seconds = (int)((sequenceDuration / 1000) % 60);
-		System.out.println("Sequence duration: " + minutes + " minutes, "+ seconds + " seconds.");
-		System.out.println();
-		try {
-			String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();//  + File.separator;
-			FileWriter myWriter = new FileWriter(reportDir + "/" + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_sequenceDuration.txt");
-			myWriter.write("Sequence duration: " + minutes + " minutes, " + seconds + " seconds.   (" + sequenceDuration + " mili)");
-			myWriter.close();
-			System.out.println("Wrote time to file." + reportDir + "/_sequenceDuration.txt");
-		} catch (IOException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
 	}
 
 	/**

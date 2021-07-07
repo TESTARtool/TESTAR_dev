@@ -49,9 +49,9 @@ import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.MergeJacocoFiles;
+import org.testar.protocols.experiments.WriterExperiments;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -396,7 +396,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
 	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
 	private Set<String> jacocoFiles = new HashSet<>();
-	
+
 	protected long startSequenceTime;
 	protected long startRunTime;
 	
@@ -446,10 +446,13 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        // And get a string that represents obtained coverage
 	        String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFileAction, Integer.toString(actionCount));
 	        long  actionTime = System.currentTimeMillis() - startSequenceTime;
-	        writeCoverageFile("Sequence | " + OutputStructure.sequenceInnerLoopCount +
+
+	        // Prepare and write the coverage metrics information
+	        String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
 	                " | actionnr | " + actionCount +
 	                " | time | " + actionTime +
-	                " | " + actionCoverage);
+	                " | " + actionCoverage;
+	        WriterExperiments.writeMetrics("coverageMetrics", information);
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
 
@@ -458,7 +461,34 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                LogSerialiser.LogLevel.Info);
 	        System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
 	    }
-	    extractStateModelMetrics();
+	    
+	    try {
+	        extractStateModelMetrics();
+	    } catch(Exception e) {
+	        LogSerialiser.log("ERROR Extracting state model metrics: " + actionCount, LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Extracting state model metrics: " + actionCount);
+	    }
+	}
+
+	/**
+	 * Execute a State Model query to extract information about number of states and actions. 
+	 */
+	private void extractStateModelMetrics() {
+	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
+	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
+	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
+	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
+	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+
+	    // Prepare and write the state model metrics information
+	    String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+	            " | actionnr | " + actionCount +
+	            " | " + resultAbstractStates +
+	            " | " + resultAbstractActions +
+	            " | " + resultUnvisitedActions +
+	            " | " + resultConcreteStates +
+	            " | " + resultConcreteActions;
+	    WriterExperiments.writeMetrics("stateModelMetrics", information);
 	}
 
 	/**
@@ -488,10 +518,13 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
 	            long  runTime = System.currentTimeMillis() - startRunTime;
 	            String iterativeActionMerge = JacocoFilesCreator.createJacocoActionMergedReport(actionMergedJacocoFile.getCanonicalPath(), Integer.toString(actionCount));
-	            writeMergedCoverageFile("Merged Sequence | " + OutputStructure.sequenceInnerLoopCount +
+
+	            // Prepare and write the merged coverage metrics information
+	            String information = "Merged Sequence | " + OutputStructure.sequenceInnerLoopCount +
 	                    " | actionnr | " + actionCount +
 	                    " | time | " + runTime +
-	                    " | " + iterativeActionMerge);
+	                    " | " + iterativeActionMerge;
+	            WriterExperiments.writeMetrics("coverageMetricsMerged", information);
 
 	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
 	        }
@@ -521,11 +554,14 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		// And get a string that represents obtained coverage
 		String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
 		long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
-		writeCoverageFile("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+
+		// Prepare and write the coverage metrics information
+		String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
 		        " | actionnr | " + actionCount +
 		        " | time | " + sequenceTime +
-		        " | " + sequenceCoverage);
-		
+		        " | " + sequenceCoverage;
+		WriterExperiments.writeMetrics("coverageMetrics", information);
+
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
 	}
@@ -544,53 +580,17 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			// And get a string that represents obtained coverage
 			String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
 			long  runTime = System.currentTimeMillis() - startRunTime;
-			writeCoverageFile("RunTotal | time | " + runTime + " | " + runCoverage);
+
+			// Prepare and write the coverage metrics information
+			String information = "RunTotal | time | " + runTime + " | " + runCoverage;
+			WriterExperiments.writeMetrics("coverageMetrics", information);
+
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 	        LogSerialiser.log("ERROR: Trying to MergeMojo feature with JaCoCo Files",
 	                    LogSerialiser.LogLevel.Info);
 			System.err.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
 		}
-	}
-	
-	/**
-	 * Write the action coverage inside a coverage text file
-	 * 
-	 * @param coverageInformation
-	 */
-	private void writeCoverageFile(String coverageInformation) {
-	    try {
-	        String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
-	                + OutputStructure.outerLoopName + "_coverageMetrics.txt";
-	        FileWriter myWriter = new FileWriter(reportCoverageFile, true);
-	        myWriter.write(coverageInformation + "\r\n");
-	        myWriter.close();
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR: Writing Coverage Metrics inside coverageMetrics text file",
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR: Writing Coverage Metrics inside coverageMetrics text file");
-	        e.printStackTrace();
-	    }
-	}
-
-	/**
-	 * Write the action merged coverage inside a coverage text file
-	 * 
-	 * @param coverageMergedInformation
-	 */
-	private void writeMergedCoverageFile(String coverageMergedInformation) {
-	    try {
-	        String reportMergedCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
-	                + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt";
-	        FileWriter myWriter = new FileWriter(reportMergedCoverageFile, true);
-	        myWriter.write(coverageMergedInformation + "\r\n");
-	        myWriter.close();
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR: Writing Merged Coverage Metrics inside coverageMetrics text file",
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR: Writing Merged Coverage Metrics inside coverageMetrics text file");
-	        e.printStackTrace();
-	    }
 	}
 	
 	/**
@@ -650,131 +650,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	        e.printStackTrace();
 	    }
 
-	    copyCoverageMetricsToFolder(destFolder, ipAddress);
-	    copyStateModelMetricsToFolder(destFolder, ipAddress);
-	}
-
-	/**
-	 * Copy Coverage Metrics file inside the destination Folder. 
-	 * 
-	 * @param destFolder
-	 * @param ipAddress
-	 */
-	private void copyCoverageMetricsToFolder(String destFolder, String ipAddress) {
-	    // Create a new directory inside desired destination to store all metrics
-	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
-	    try {
-	        Files.createDirectories(Paths.get(metricsFolder));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyCoverageMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
-	        e.printStackTrace();
-	        return;
-	    }
-
-	    File srcMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt");
-	    File destMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_coverageMetrics.txt");
-	    try {
-	        FileUtils.copyFile(srcMetrics, destMetrics);
-	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Metrics : " + destMetrics);
-	        e.printStackTrace();
-	    }
-
-	    File srcMergedMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt");
-	    File destMergedMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_coverageMetricsMerged.txt");
-	    try {
-	        FileUtils.copyFile(srcMergedMetrics, destMergedMetrics);
-	        System.out.println(String.format("Sucessfull copy %s to %s", srcMergedMetrics, destMergedMetrics));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyCoverageMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics);
-	        e.printStackTrace();
-	    }
-	}
-
-	protected void extractStateModelMetrics() {
-	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
-	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
-	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
-	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
-	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
-	    writeStateModelMetrics("SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
-	            " | actionnr | " + actionCount +
-	            " | " + resultAbstractStates +
-	            " | " + resultAbstractActions +
-	            " | " + resultUnvisitedActions +
-	            " | " + resultConcreteStates +
-	            " | " + resultConcreteActions
-	            );
-	}
-
-	/**
-	 * Write the state model metrics inside a StateModelMetrics text file
-	 * 
-	 * @param coverageInformation
-	 */
-	private void writeStateModelMetrics(String statemodelInformation) {
-	    try {
-	        String reportCoverageFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
-	                + OutputStructure.outerLoopName + "_stateModelMetrics.txt";
-	        FileWriter myWriter = new FileWriter(reportCoverageFile, true);
-	        myWriter.write(statemodelInformation + "\r\n");
-	        myWriter.close();
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR: Writing StateModel Metrics inside stateModelMetrics text file",
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR: Writing StateModel Metrics inside stateModelMetrics text file");
-	        e.printStackTrace();
-	    }
-	}
-
-	/**
-	 * Copy StateModel Metrics file inside the destination Folder. 
-	 * 
-	 * @param destFolder
-	 * @param ipAddress
-	 */
-	private void copyStateModelMetricsToFolder(String destFolder, String ipAddress) {
-	    // Create a new directory inside desired destination to store all metrics
-	    String metricsFolder = destFolder + File.separator + "metrics" + File.separator + settings.get(ConfigTags.ApplicationName, "");
-	    try {
-	        Files.createDirectories(Paths.get(metricsFolder));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: Creating new folder for metrics : " + metricsFolder,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyStateModelMetricsToFolder: Creating new folder for metrics : " + metricsFolder);
-	        e.printStackTrace();
-	        return;
-	    }
-
-	    File srcMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
-	    File destMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
-	    try {
-	        FileUtils.copyFile(srcMetrics, destMetrics);
-	        System.out.println(String.format("Sucessfull copy %s to %s", srcMetrics, destMetrics));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: ERROR Metrics : " + destMetrics,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyStateModelMetricsToFolder: ERROR Metrics : " + destMetrics);
-	        e.printStackTrace();
-	    }
-
-	    File srcMergedMetrics = new File(OutputStructure.outerLoopOutputDir + File.separator + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
-	    File destMergedMetrics = new File(metricsFolder + File.separator + ipAddress + "_" + OutputStructure.outerLoopName + "_stateModelMetrics.txt");
-	    try {
-	        FileUtils.copyFile(srcMergedMetrics, destMergedMetrics);
-	        System.out.println(String.format("Sucessfull copy %s to %s", srcMergedMetrics, destMergedMetrics));
-	    } catch (IOException e) {
-	        LogSerialiser.log("ERROR copyStateModelMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics,
-	                LogSerialiser.LogLevel.Info);
-	        System.err.println("ERROR copyStateModelMetricsToFolder: ERROR Merged Metrics : " + destMergedMetrics);
-	        e.printStackTrace();
-	    }
+	    // Create a folder inside the centralized file server and copy the metrics results
+	    WriterExperiments.copyMetricsToFolder(settings, destFolder, ipAddress);
 	}
 }
