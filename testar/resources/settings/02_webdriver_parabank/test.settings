@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://parabank.parasoft.com/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -41,10 +41,11 @@ SequenceLength = 100
 #################################################################
 # Oracles based on suspicious titles
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -131,7 +132,7 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = parabank.parasoft.com
+DomainsAllowed = para.testar.org
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true

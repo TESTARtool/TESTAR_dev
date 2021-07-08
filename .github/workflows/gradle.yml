@@ -20,14 +20,19 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    
     - name: Prepare TESTAR protocols
       run: ./gradlew init_workflow_test
+    
     - name: Build TESTAR with Gradle
       run: ./gradlew build
+    
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
+    
     - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
@@ -35,6 +40,7 @@ jobs:
       with:
         name: runTestDesktopGenericCommandLineOk-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_ok
+    
     - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
     - name: Save runTestDesktopGenericCommandLineSuspiciousTitle HTML report artifact
@@ -42,6 +48,7 @@ jobs:
       with:
         name: runTestDesktopGenericCommandLineSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
+    
     - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
     - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle HTML report artifact
@@ -49,6 +56,7 @@ jobs:
       with:
         name: runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_settings_filter_and_suspicious
+    
     - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
       run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
     - name: Save runTestDesktopGenericProcessNameSuspiciousTitle HTML report artifact
@@ -56,6 +64,7 @@ jobs:
       with:
         name: runTestDesktopGenericProcessNameSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_process_and_suspicious
+    
     - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
       run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
     - name: Save runTestDesktopGenericTitleNameSuspiciousTitle HTML report artifact
@@ -63,6 +72,23 @@ jobs:
       with:
         name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
+    
+    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
+      run: ./gradlew runTestDesktopGenericStateModel
+    - name: Save runTestDesktopGenericStateModel HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericStateModel-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model
+    
+    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
+    - name: Save runTestDesktopGenericStateModelCustomAbstraction HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestDesktopGenericStateModelCustomAbstraction-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model_custom
+    
     - name: Run webdriver protocol and detect SuspiciousTitle
       run: ./gradlew runTestWebdriverSuspiciousTitle
     - name: Save runTestWebdriverSuspiciousTitle HTML report artifact
@@ -70,6 +96,7 @@ jobs:
       with:
         name: runTestWebdriverSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
+    
     - name: Run webdriver to login in parabank app
       run: ./gradlew runTestWebdriverParabankLogin
     - name: Save runTestWebdriverParabankLogin HTML report artifact
@@ -77,6 +104,22 @@ jobs:
       with:
         name: runTestWebdriverParabankLogin-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login
+    
+    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
+      run: ./gradlew runTestWebdriverCorrectReplay
+    - name: Save runTestWebdriverCorrectReplay HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverCorrectReplay-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_replay
+    
+    - name: Run TESTAR Replay mode to detect a not replayable button
+      run: ./gradlew runTestWebdriverUnreplayable
+    - name: Save runTestWebdriverUnreplayable HTML report artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: runTestWebdriverUnreplayable-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
 
   linux:
     runs-on: ubuntu-latest
@@ -88,10 +131,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    
     - name: Build TESTAR with Gradle
       run: ./gradlew build
+    
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
 
@@ -105,9 +151,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    
     - name: Build TESTAR with Gradle
       run: ./gradlew build
+    
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
