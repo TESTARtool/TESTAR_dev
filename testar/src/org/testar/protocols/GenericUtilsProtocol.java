@@ -452,7 +452,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                " | actionnr | " + actionCount +
 	                " | time | " + actionTime +
 	                " | " + actionCoverage;
-	        WriterExperiments.writeMetrics("coverageMetrics", information);
+	        WriterExperiments.writeMetrics("coverageMetrics", information, true);
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
 
@@ -488,7 +488,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	            " | " + resultUnvisitedActions +
 	            " | " + resultConcreteStates +
 	            " | " + resultConcreteActions;
-	    WriterExperiments.writeMetrics("stateModelMetrics", information);
+	    WriterExperiments.writeMetrics("stateModelMetrics", information, true);
 	}
 
 	/**
@@ -524,7 +524,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                    " | actionnr | " + actionCount +
 	                    " | time | " + runTime +
 	                    " | " + iterativeActionMerge;
-	            WriterExperiments.writeMetrics("coverageMetricsMerged", information);
+	            WriterExperiments.writeMetrics("coverageMetricsMerged", information, true);
 
 	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
 	        }
@@ -560,7 +560,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		        " | actionnr | " + actionCount +
 		        " | time | " + sequenceTime +
 		        " | " + sequenceCoverage;
-		WriterExperiments.writeMetrics("coverageMetrics", information);
+		WriterExperiments.writeMetrics("coverageMetrics", information, true);
 
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
@@ -583,7 +583,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
 			// Prepare and write the coverage metrics information
 			String information = "RunTotal | time | " + runTime + " | " + runCoverage;
-			WriterExperiments.writeMetrics("coverageMetrics", information);
+			WriterExperiments.writeMetrics("coverageMetrics", information, true);
 
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

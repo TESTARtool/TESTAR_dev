@@ -13,6 +13,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.testar.protocols.experiments.WriterExperiments;
 
 import java.util.Set;
 
@@ -80,6 +81,14 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         logger.info("reward={} found for sequenceNumber={} and actionNumber={}", reward,
                 getSequenceManager().getCurrentSequence().getNodes().size(),
                 getSequenceManager().getCurrentSequenceNr());
+
+        // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
+        String information = String.format("sequenceNumber | %s | actionNumber | %s | reward | %s | ", 
+                getSequenceManager().getCurrentSequence().getNodes().size(),
+                getSequenceManager().getCurrentSequenceNr(),
+                reward);
+        WriterExperiments.writeMetrics("rlRewardMetrics", information, false);
+
         final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
 
         updateQValue(previouslySelectedAbstractAction, sarsaQValue);

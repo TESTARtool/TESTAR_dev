@@ -11,6 +11,7 @@ import org.sikuli.script.Finder;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Screen;
+import org.testar.protocols.experiments.WriterExperiments;
 
 import java.awt.image.BufferedImage;
 
@@ -49,11 +50,23 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
             finder.destroy();
             final float reward = (float) (1d - match.getScore());
             logger.info("ID={} reward={}", executedAction.getId(), reward);
+
+            // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
+            String information = String.format("ID | %s | reward | %s ", 
+                    executedAction.getId(), reward);
+            WriterExperiments.writeMetrics("rlRewardMetrics", information, true);
+
             return reward;
         } catch (final IllegalArgumentException e) {
             logger.debug(e.getMessage());
             screenImagePreviouslyExecutedAction = takeScreenshot();
             logger.info("ID={} reward={}", executedAction.getId(), defaultReward);
+
+            // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
+            String information = String.format("ID | %s | reward | %s ", 
+                    executedAction.getId(), defaultReward);
+            WriterExperiments.writeMetrics("rlRewardMetrics", information, true);
+
             return defaultReward;
         }
     }

@@ -55,12 +55,13 @@ public class WriterExperiments {
      * @param filename
      * @param information
      */
-    public static void writeMetrics(String filename, String information) {
+    public static void writeMetrics(String filename, String information, boolean newLine) {
         try {
             String metricsFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
                     + OutputStructure.outerLoopName + "_" + filename + ".txt";
             FileWriter myWriter = new FileWriter(metricsFile, true);
-            myWriter.write(information + "\r\n");
+            if(newLine) myWriter.write(information + "\r\n");
+            else myWriter.write(information);
             myWriter.close();
         } catch (IOException e) {
             LogSerialiser.log("ERROR: Writing Metrics inside " + filename + " text file", LogSerialiser.LogLevel.Info);

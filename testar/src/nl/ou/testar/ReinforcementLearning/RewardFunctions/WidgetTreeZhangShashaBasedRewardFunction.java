@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
+import org.testar.protocols.experiments.WriterExperiments;
 
 import java.util.Deque;
 
@@ -81,6 +82,12 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         treeDist.clear();
 
         logger.info("ID={} reward={}", executedAction.getId(), reward);
+
+        // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
+        String information = String.format("ID | %s | reward | %s ", 
+                executedAction.getId(), reward);
+        WriterExperiments.writeMetrics("rlRewardMetrics", information, true);
+
         return reward;
     }
 

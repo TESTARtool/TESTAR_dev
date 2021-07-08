@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
+import org.testar.protocols.experiments.WriterExperiments;
 
 /**
  * Implementation of the reward function based on a counter
@@ -27,6 +28,11 @@ public class CounterBasedRewardFunction implements RewardFunction {
         logger.info("ID={} executionCounter={}", executedAction.getId(), executionCounter);
         float reward = 1.0f / (float) executionCounter;
         logger.info("ID={} reward={}", executedAction.getId(), reward);
+
+        // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
+        String information = String.format("ID | %s | executionCounter | %s | reward | %s ", 
+                executedAction.getId(), executionCounter, reward);
+        WriterExperiments.writeMetrics("rlRewardMetrics", information, true);
 
         return reward;
     }
