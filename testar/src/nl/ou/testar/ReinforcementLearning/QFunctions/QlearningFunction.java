@@ -32,6 +32,7 @@ public class QlearningFunction implements QFunction {
         this.gammaDiscount = gammaDiscount;
         this.defaultQValue = defaultQValue;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -57,6 +58,13 @@ public class QlearningFunction implements QFunction {
         }
 
         return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
+    }
+
+    @Override
+    public float getQValue(final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward) {
+        String message = "QlearningFunction class have not defined the getQValue(previousActionUnderExecution, actionUnderExecution, reward) method, \n"
+                + "Check the nl.ou.testar.ReinforcementLearning.QFunctions.QlearningFunction implementation";
+        throw new UnsupportedOperationException(message);
     }
 }
 

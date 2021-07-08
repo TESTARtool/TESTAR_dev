@@ -130,4 +130,9 @@ public class ABTBasedRewardFunction implements RewardFunction {
 
         return 1;
     }
+
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+    }
 }

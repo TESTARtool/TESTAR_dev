@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.ou.testar.StateModel.AbstractAction;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -18,6 +20,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
     final StateStub previousState = new StateStub();
 
     final StateStub state = new StateStub();
+
+    final AbstractAction abstractAction = new AbstractAction("AAC1");
 
     private final LRKeyrootsHelper lrKeyrootsHelper = new LRKeyrootsHelper();
 
@@ -93,7 +97,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         WidgetTreeZhangShashaBasedRewardFunction.previousState = previousState;
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, abstractAction);
 
         // then
         assertEquals(2f, reward, 0.00001);
