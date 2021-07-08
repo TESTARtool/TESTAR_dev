@@ -95,19 +95,20 @@ SUTProcesses =
 #
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
-
 ProtocolClass = desktop_reinforcement_learning/Protocol_desktop_reinforcement_learning
 
+#################################################################
+# State model inference settings
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = D:\\orientdb-3.1.8\\databases
-DataStoreDB = testarDB
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = delayed
+DataStoreDirectory = 
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
 ApplicationName = Notepad
 ApplicationVersion = 1.0.0
 
@@ -130,8 +131,10 @@ Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.01
 Temperature = 1.0
-RewardFunction = WidgetTreeBasedRewardFunction
+RewardFunction = ABTBasedRewardFunction
 Policy = EpsilonGreedyPolicy
+TagName = qvalue
+QFunction = QlearningFunction
 
 #################################################################
 # Other more advanced settings

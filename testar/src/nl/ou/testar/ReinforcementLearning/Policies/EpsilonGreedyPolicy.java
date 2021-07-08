@@ -12,10 +12,11 @@ public class EpsilonGreedyPolicy implements Policy {
 
     private final float epsilon; //The epsilon parameter should be between 0 and 1
 
-    private final GreedyPolicy greedyPolicy;
+    private final GreedyPolicy<?> greedyPolicy;
 
-    public EpsilonGreedyPolicy(final GreedyPolicy greedyPolicy, final float epsilon) {
+    public EpsilonGreedyPolicy(final GreedyPolicy<?> greedyPolicy, final float epsilon) {
         logger.info("EpsilonGreedyPolicy initialized with epsilon='{}'", epsilon);
+
         this.greedyPolicy = greedyPolicy;
         this.epsilon = epsilon;
     }

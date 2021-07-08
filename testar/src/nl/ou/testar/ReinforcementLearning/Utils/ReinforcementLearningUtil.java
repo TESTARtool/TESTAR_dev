@@ -1,7 +1,11 @@
 package nl.ou.testar.ReinforcementLearning.Utils;
 
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import org.fruit.alayer.Tag;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,6 +18,7 @@ public class ReinforcementLearningUtil {
      * If the provided collection is emtpy a null value is provided.
      * If one action is provided than this action is returned
      * If multiple actions are provided a random action is returns
+     *
      * @param actionsSelected A collection of actions selected by a {@link nl.ou.testar.ReinforcementLearning.Policies.Policy}, is never {@code null}
      * @return An {@link AbstractAction}
      */
@@ -26,5 +31,11 @@ public class ReinforcementLearningUtil {
             final Set<AbstractAction> actionSetMaxValues = new HashSet<>(actionsSelected);
             return RandomActionSelector.selectAbstractAction(actionSetMaxValues);
         }
+    }
+
+    public static <T> Tag<T> getTag(final Settings settings) {
+
+        String tagName = settings.get(ConfigTags.TagName);
+        return (Tag<T>) RLTags.getTag(tagName);
     }
 }

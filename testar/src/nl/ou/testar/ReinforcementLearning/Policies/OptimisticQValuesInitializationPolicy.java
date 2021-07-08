@@ -10,12 +10,13 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 import java.util.Set;
 
 public class OptimisticQValuesInitializationPolicy implements Policy {
+
     private static final Logger logger = LogManager.getLogger(OptimisticQValuesInitializationPolicy.class);
 
-    private final GreedyPolicy greedyPolicy;
+    private final GreedyPolicy<?> greedyPolicy;
     private final float maxQValue;
 
-    public OptimisticQValuesInitializationPolicy(final GreedyPolicy greedyPolicy, final float maxQValue) {
+    public OptimisticQValuesInitializationPolicy(final GreedyPolicy<?> greedyPolicy, final float maxQValue) {
         logger.info("OptimisticQValuesInitializationPolicy initialised with maxQValue={}", maxQValue);
         this.greedyPolicy = greedyPolicy;
         this.maxQValue = maxQValue;

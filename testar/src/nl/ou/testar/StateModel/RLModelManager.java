@@ -21,16 +21,16 @@ import java.util.Set;
  * Sarsa is a reinforcement learning (Artificial Intelligence) algorithm
  * for (sequential) action selection.
  */
-public class SarsaModelManager extends ModelManager implements StateModelManager {
+public class RLModelManager extends ModelManager implements StateModelManager {
 
-    private static final Logger logger = LogManager.getLogger(SarsaModelManager.class);
+    private static final Logger logger = LogManager.getLogger(RLModelManager.class);
 
     /** The previously executed {@link AbstractAction} */
     private AbstractAction previouslySelectedAbstractAction = null;
 
     /**  The {@link RewardFunction} determines the reward or penalty for executing an {@link AbstractAction}
-    *  The reward is used in the {@link QFunction}
-    */
+     *  The reward is used in the {@link QFunction}
+     */
     private final RewardFunction rewardFunction;
 
     /**
@@ -40,21 +40,25 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
 
     private State state = null;
 
+    private final Tag<?> tag;
+
     /**
      * Constructor
      *
      */
-    public SarsaModelManager(final AbstractStateModel abstractStateModel,
-                             final ActionSelector actionSelector,
-                             final PersistenceManager persistenceManager,
-                             final Set<Tag<?>> concreteStateTags,
-                             final SequenceManager sequenceManager,
-                             final boolean storeWidgets,
-                             final RewardFunction rewardFunction,
-                             final QFunction qFunction) {
+    public RLModelManager(final AbstractStateModel abstractStateModel,
+            final ActionSelector actionSelector,
+            final PersistenceManager persistenceManager,
+            final Set<Tag<?>> concreteStateTags,
+            final SequenceManager sequenceManager,
+            final boolean storeWidgets,
+            final RewardFunction rewardFunction,
+            final QFunction qFunction,
+            final Tag<?> tag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
+        this.tag = tag;
     }
 
     @Override
@@ -77,46 +81,19 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         final Action selectedAction = super.getAbstractActionToExecute(actions);
         final AbstractAction selectedAbstractAction = getAbstractAction(currentAbstractState, selectedAction);
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
+
         logger.info("reward={} found for sequenceNumber={} and actionNumber={}", reward,
                 getSequenceManager().getCurrentSequence().getNodes().size(),
                 getSequenceManager().getCurrentSequenceNr());
-        final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
 
-        updateQValue(previouslySelectedAbstractAction, sarsaQValue);
+        final double rlQValue = getQValue(previouslySelectedAbstractAction, reward, actions);
+
+        updateQValue(previouslySelectedAbstractAction, rlQValue);
         previouslySelectedAbstractAction = selectedAbstractAction;
 
         log(actions, selectedAction, selectedAbstractAction);
 
         return selectedAction;
-    }
-
-    private void log(final Set<Action> actions, final Action selectedAction,final AbstractAction selectedAbstractAction) {
-        logger.info("Number of actions available={}", actions.size());
-        if (selectedAction != null) {
-            logger.info("Action selected shortString={}", selectedAction.toShortString());
-        }
-        if(selectedAbstractAction != null) {
-            logger.info("Abstract action selected abstractActionID={}, id={}", selectedAbstractAction.getActionId(), selectedAbstractAction.getId());
-
-            // add counter
-            final int counterSelectedAbstractAction = selectedAbstractAction.getAttributes().get(RLTags.ActionCounter, 0);
-            selectedAbstractAction.getAttributes().set(RLTags.ActionCounter, counterSelectedAbstractAction + 1);
-            logger.info("Action selected counter={}", selectedAbstractAction.getAttributes().get(RLTags.ActionCounter));
-        }
-        logger.info("SequenceID={}", getSequenceManager().getSequenceID());
-    }
-
-    /**
-     * Get the Q-value for an {@link Action}
-     *
-     * @param selectedAbstractAction, can be null
-     * @param reward
-     */
-    private double getQValue(final AbstractAction selectedAbstractAction, final float reward) {
-        if (selectedAbstractAction == null) {
-            logger.info("Update of Q-value failed because no action was found to execute");
-        }
-        return qFunction.getQValue(previouslySelectedAbstractAction, selectedAbstractAction, reward);
     }
 
     /**
@@ -135,6 +112,35 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         } catch (final ActionNotFoundException e) {
             return null;
         }
+    }
+
+    /**
+     * Get the Q-value for an {@link Action}
+     *
+     * @param selectedAbstractAction, can be null
+     * @param reward
+     */
+    private double getQValue(final AbstractAction selectedAbstractAction, final float reward, final Set<Action> actions) {
+        if (selectedAbstractAction == null) {
+            logger.info("Update of Q-value failed because no action was found to execute");
+        }
+        return qFunction.getQValue(previouslySelectedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions);
+    }
+
+    private void log(final Set<Action> actions, final Action selectedAction,final AbstractAction selectedAbstractAction) {
+        logger.info("Number of actions available={}", actions.size());
+        if (selectedAction != null) {
+            logger.info("Action selected shortString={}", selectedAction.toShortString());
+        }
+        if(selectedAbstractAction != null) {
+            logger.info("Abstract action selected abstractActionID={}, id={}", selectedAbstractAction.getActionId(), selectedAbstractAction.getId());
+
+            // add counter
+            final int counterSelectedAbstractAction = selectedAbstractAction.getAttributes().get(RLTags.ActionCounter, 0);
+            selectedAbstractAction.getAttributes().set(RLTags.ActionCounter, counterSelectedAbstractAction + 1);
+            logger.info("Action selected counter={}", selectedAbstractAction.getAttributes().get(RLTags.ActionCounter));
+        }
+        logger.info("SequenceID={}", getSequenceManager().getSequenceID());
     }
 
     /**

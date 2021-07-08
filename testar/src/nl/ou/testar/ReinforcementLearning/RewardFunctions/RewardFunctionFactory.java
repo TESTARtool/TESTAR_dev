@@ -21,6 +21,9 @@ public class RewardFunctionFactory {
             case "ImageRecognitionBasedRewardFunction":
                 selectedRewardFunction = new ImageRecognitionBasedRewardFunction(defaultReward);
                 break;
+            case "ABTBasedRewardFunction":
+                selectedRewardFunction = new ABTBasedRewardFunction();
+                break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction(defaultReward);
         }

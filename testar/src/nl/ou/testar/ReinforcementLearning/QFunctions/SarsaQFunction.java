@@ -4,6 +4,10 @@ import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import nl.ou.testar.StateModel.AbstractState;
+import org.fruit.alayer.Action;
+
+import java.util.Set;
 
 /**
  * Implements the default Q-function of Sarsa
@@ -46,5 +50,11 @@ public class SarsaQFunction implements QFunction {
         logger.info("For abstract action with abstractID={} q-value={} was found", previouslyExecutedAction == null? null : previouslyExecutedAction.getId(), qValue);
         return qValue;
     }
+
+    @Override
+    public float getQValue(final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+        return getQValue(previousActionUnderExecution, actionUnderExecution, reward);
+    }
+
 }
 

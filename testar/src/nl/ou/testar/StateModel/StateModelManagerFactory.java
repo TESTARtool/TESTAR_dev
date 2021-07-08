@@ -7,6 +7,7 @@ import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunctionFactory;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
+import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -76,21 +77,23 @@ public class StateModelManagerFactory {
                 persistenceManager != null ? (StateModelEventListener) persistenceManager : null);
 
         if (settings.get(ConfigTags.StateModelReinforcementLearningEnabled, false)) {
+            Tag<?> tag = ReinforcementLearningUtil.getTag(settings);
             final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
-            logger.info("State model with sarsaModelManager selected");
-            return new SarsaModelManager(abstractStateModel,
+            logger.info("State model with RLModelManager selected");
+            return new RLModelManager(abstractStateModel,
                     actionSelector,
                     persistenceManager,
                     concreteStateTags,
                     sequenceManager,
                     storeWidgets,
                     rewardFunction,
-                    qFunction);
+                    qFunction,
+                    tag);
         }
-        
+
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
 
         logger.info("State model with modelManager selected");
