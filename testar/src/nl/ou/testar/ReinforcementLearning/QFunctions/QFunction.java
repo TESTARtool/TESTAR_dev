@@ -19,6 +19,6 @@ public interface QFunction {
      * @param actionUnderExecution, is not null
      * @param reward
      */
-    float getQValue(Tag<Float> rl_tag, final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions, final float VValue);
+    float getQValue(Tag<Float> rl_tag, final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions, final float vValue);
 
 }
