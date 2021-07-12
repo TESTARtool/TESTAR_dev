@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
+import nl.ou.testar.ReinforcementLearning.QFunctions.VFunction;
 import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
@@ -42,9 +43,15 @@ public class RLModelManager extends ModelManager implements StateModelManager {
      */
     protected final QFunction qFunction;
 
+    /**
+     * The {@link VFunction} determines the VValue of an {@link AbstractAction}
+     */
+    protected final VFunction vFunction;
+
     protected State state = null;
 
     protected final Tag<?> tag;
+    protected final Tag<?> vtag;
     
     protected AbstractState previousAbstractState = null;
     
@@ -66,11 +73,15 @@ public class RLModelManager extends ModelManager implements StateModelManager {
                              final boolean storeWidgets,
                              final RewardFunction rewardFunction,
                              final QFunction qFunction,
-                             final Tag<?> tag) {
+                             final Tag<?> tag,
+                             final VFunction vFunction,
+                             final Tag<?> vtag) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
+        this.vFunction = vFunction;
         this.tag = tag;
+        this.vtag = vtag;
     }
 
     @Override
@@ -101,7 +112,15 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         System.out.println("UpdateQValue RLModelManager");
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, previouslyExecutedTestarAction, previouslyExecutedAbstractAction, selectedAbstractAction, actions);
         System.out.println("REWARD: " + Float.toString(reward));
-        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previouslyExecutedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions);
+
+        // Update and use the VValue
+        float vValue = 0f;
+        if (qFunction.getClass().getName().contains("QVLearningFunction")) {
+            vValue = vFunction.getVValue((Tag<Float>)this.vtag, previouslyExecutedAbstractAction, selectedAbstractAction, reward);
+            previouslyExecutedAbstractAction.addAttribute(vtag, vValue);
+        }
+
+        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previouslyExecutedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions, vValue);
 
         // set attribute for saving in the graph database
         if(previouslyExecutedAbstractAction != null) {

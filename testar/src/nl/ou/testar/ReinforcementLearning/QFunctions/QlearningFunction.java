@@ -37,7 +37,7 @@ public class QlearningFunction implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions, float vValue) {
         float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
             oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);

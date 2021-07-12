@@ -14,7 +14,7 @@ import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 public class QBorjaFunction2 implements QFunction {
 	
 	@Override
-	public float getQValue(Tag<Float> rl_tag, AbstractAction previouslyExecutedAction, AbstractAction selectedAbstractAction, float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+	public float getQValue(Tag<Float> rl_tag, AbstractAction previouslyExecutedAction, AbstractAction selectedAbstractAction, float reward, final AbstractState currentAbstractState, final Set<Action> actions, float vValue) {
         
 	    // selectedAbstractAction will be null because BorjaModelManager is sending a null selectedAction
 	    

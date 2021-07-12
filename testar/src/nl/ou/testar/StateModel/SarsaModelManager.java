@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel;
 
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
+import nl.ou.testar.ReinforcementLearning.QFunctions.VFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
@@ -15,8 +16,8 @@ import java.util.Set;
 
 public class SarsaModelManager extends RLModelManager implements StateModelManager {
 
-    public SarsaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag) {
-        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag);
+    public SarsaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag, VFunction vFunction, Tag<?> vtag) {
+        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag, vFunction, vtag);
     }
 
     @Override

@@ -12,7 +12,7 @@ import org.fruit.alayer.Tag;
 public class QBorjaFunction3 implements QFunction {
 
     @Override
-    public float getQValue(Tag<Float> rl_tag, AbstractAction previouslyExecutedAction, AbstractAction selectedAbstractAction, float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
+    public float getQValue(Tag<Float> rl_tag, AbstractAction previouslyExecutedAction, AbstractAction selectedAbstractAction, float reward, final AbstractState currentAbstractState, final Set<Action> actions, float vValue) {
         if(previouslyExecutedAction == null) {
             return 0f;
         }

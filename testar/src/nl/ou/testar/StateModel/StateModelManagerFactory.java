@@ -5,6 +5,8 @@ import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningA
 import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunction;
 import nl.ou.testar.ReinforcementLearning.QFunctions.QFunctionFactory;
+import nl.ou.testar.ReinforcementLearning.QFunctions.VFunction;
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.RewardFunctionFactory;
 import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
@@ -82,6 +84,8 @@ public class StateModelManagerFactory {
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+            final VFunction vFunction = new VFunction(settings);
+            Tag<?> vtag = RLTags.getTag("vvalue");
 
             logger.info("State model with Reinforcement Learning Model Manager selected");
             switch (stateModelRL){
@@ -95,7 +99,9 @@ public class StateModelManagerFactory {
                         storeWidgets,
                         rewardFunction,
                         qFunction,
-                        tag);
+                        tag,
+                        vFunction,
+                        vtag);
             case "BorjaModelManager":
                 logger.info("State model with BorjaModelManager selected");
                 return new BorjaModelManager(abstractStateModel,
@@ -106,7 +112,9 @@ public class StateModelManagerFactory {
                         storeWidgets,
                         rewardFunction,
                         qFunction,
-                        tag);
+                        tag,
+                        vFunction,
+                        vtag);
             default:
                 logger.info("State model with sarsaModelManager selected");
                 return new SarsaModelManager(abstractStateModel,
@@ -117,7 +125,9 @@ public class StateModelManagerFactory {
                         storeWidgets,
                         rewardFunction,
                         qFunction,
-                        tag);
+                        tag,
+                        vFunction,
+                        vtag);
             }
         }
         
