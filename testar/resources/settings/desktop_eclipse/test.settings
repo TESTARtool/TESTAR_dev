@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 1
-SequenceLength = 300
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,7 +51,7 @@ SequenceLength = 300
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = 
 TagsForSuspiciousOracle = Title
 
 #################################################################
@@ -65,7 +65,7 @@ TagsForSuspiciousOracle = Title
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -121,8 +121,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = eclipse
-ApplicationVersion = 2
+ApplicationName = desktop_eclipse
+ApplicationVersion = 1
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 
