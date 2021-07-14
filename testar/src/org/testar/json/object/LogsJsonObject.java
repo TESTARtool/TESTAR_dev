@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.action.priorization;
+package org.testar.json.object;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+public class LogsJsonObject {
 
-public class ActionTags extends TagsBase  {
+    String tool;
+    String natureOfReport;
+    String startRunningTime;
+    String endRunningTime;
+    LinkedList<String> messages = new LinkedList<>();
+    LinkedList<String> warnings = new LinkedList<>();
+    boolean status;
 
-	private ActionTags() {}
-
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
-
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
-
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
-	}
+    @JsonCreator
+    public LogsJsonObject(String tool, String natureOfReport, String startRunningTime, String endRunningTime, 
+            LinkedList<String> messages, LinkedList<String> warnings, boolean status) {
+        this.tool = tool;
+        this.natureOfReport = natureOfReport;
+        this.startRunningTime = startRunningTime;
+        this.endRunningTime = endRunningTime;
+        this.messages = messages;
+        this.warnings = warnings;
+        this.status = status;
+    }
 
 }

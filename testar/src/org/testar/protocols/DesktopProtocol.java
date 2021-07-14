@@ -31,9 +31,9 @@
 
 package org.testar.protocols;
 
-import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
+
+import nl.ou.testar.DerivedActions;
 import org.fruit.Drag;
 import org.fruit.Environment;
 import org.fruit.alayer.*;
@@ -42,29 +42,18 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
-import org.testar.OutputStructure;
-import java.io.File;
+import org.testar.pkm.DecoderProtocol;
+
 import java.util.HashSet;
 import java.util.Set;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class DesktopProtocol extends GenericUtilsProtocol {
+public class DesktopProtocol extends DecoderProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
-    protected State latestState;
 
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
-    }
-    
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
      * This can be used for example for bypassing a login screen by filling the username and password
@@ -73,11 +62,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void beginSequence(SUT system, State state) {
-    	super.beginSequence(system, state);
-    	
-    	double displayScale = Environment.getInstance().getDisplayScale(state.child(0).get(Tags.HWND, (long)0));
-    	
-    	mouse.setCursorDisplayScale(displayScale);
+        super.beginSequence(system, state);
+
+        double displayScale = Environment.getInstance().getDisplayScale(state.child(0).get(Tags.HWND, (long)0));
+
+        mouse.setCursorDisplayScale(displayScale);
     }
 
     /**
@@ -91,10 +80,10 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
         //Spy mode didn't use the html report
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
-        	return super.getState(system);
-    	
-    	latestState = super.getState(system);
+        if(settings.get(ConfigTags.Mode) == Modes.Spy)
+            return super.getState(system);
+
+        latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
@@ -120,20 +109,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * Overwriting to add HTML report writing into it
-     *
-     * @param state
-     * @param actions
-     * @return
-     */
-    @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
-
-    /**
      * Select one of the available actions (e.g. at random)
      * @param state the SUT's current state
      * @param actions the set of derived actions
@@ -149,46 +124,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             retAction = RandomActionSelector.selectAction(actions);
         }
         return retAction;
-    }
-
-    /**
-     * Execute the selected action.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @param action the action to execute
-     * @return whether or not the execution succeeded
-     */
-    @Override
-    protected boolean executeAction(SUT system, State state, Action action){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
-    }
-
-    /**
-     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void postSequenceProcessing() {
-        htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-        
-        String sequencesPath = getGeneratedSequenceName();
-        try {
-        	sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
-        		
-        String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
-		
-		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-		
-		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-		INDEXLOG.info(OutputStructure.executedSUTname
-				+ " " + settings.get(ConfigTags.Mode, mode())
-				+ " " + sequencesPath
-				+ " " + status + " \"" + statusInfo + "\"" );
-		
-		htmlReport.close();
     }
 
     /**
@@ -262,11 +197,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             // The blackListed widgets are those that have been filtered during the SPY mode with the
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
-            	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
-            	} else {
-            		derived.addFilteredAction(ac.leftClickAt(w));
-            	}
+                if(isTypeable(w)) {
+                    derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                } else {
+                    derived.addFilteredAction(ac.leftClickAt(w));
+                }
                 return derived;
             }else{
 
@@ -318,7 +253,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         }
         return derived;
     }
-    
+
     /**
      * Given a widget, check if it is possible to derive an available or filter multiple actions on it. 
      * If widget is enabled and unfiltered, derive all possible actions.
@@ -346,11 +281,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             // The blackListed widgets are those that have been filtered during the SPY mode with the
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
-            	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
-            	} else {
-            		derived.addFilteredAction(ac.leftClickAt(w));
-            	}
+                if(isTypeable(w)) {
+                    derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                } else {
+                    derived.addFilteredAction(ac.leftClickAt(w));
+                }
                 return derived;
             }else{
 
@@ -450,7 +385,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
                 }
             }
         }
@@ -470,7 +405,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
-        // iterate through top level widgets based on Z-index:
+        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
         for(Widget w : getTopWidgets(state)){
 
             if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
@@ -509,7 +444,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
                 }
             }
         }

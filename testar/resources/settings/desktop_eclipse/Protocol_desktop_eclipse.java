@@ -81,7 +81,8 @@ public class Protocol_desktop_eclipse extends DesktopProtocol {
         }
 
         // Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
-        copyJacocoBuildFile();
+        copyJacocoBuildFile();	//DEBUG
+        System.out.println(". . . initialize -> copyJacocoBuildFile() DONE");
     }
 
     /**
@@ -267,7 +268,8 @@ public class Protocol_desktop_eclipse extends DesktopProtocol {
 
         // Extract and create JaCoCo action coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-            extractJacocoActionReport();
+            extractJacocoActionReport();	//DEBUG
+            System.out.println(". . . executeAction -> extractJacocoActionReport DONE");
         }
         return actionExecuted;
     }
@@ -280,7 +282,8 @@ public class Protocol_desktop_eclipse extends DesktopProtocol {
     protected void finishSequence() {
         // Extract and create JaCoCo sequence coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-            extractJacocoSequenceReport();
+            extractJacocoSequenceReport();	//DEBUG
+            System.out.println(". . . finishSequence -> extractJacocoSequenceReport DONE");
         }
 
         try {
@@ -317,8 +320,10 @@ public class Protocol_desktop_eclipse extends DesktopProtocol {
     protected void closeTestSession() {
         // Extract and create JaCoCo run coverage report for Generate Mode
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-            copyJacocoBuildAllFile();
+            copyJacocoBuildAllFile();	//DEBUG
+            System.out.println(". . . closeTestSession -> copyJacocoBuildAllFile DONE");
             String runCoverageInfo = extractJacocoRunReport();
+            System.out.println(". . . closeTestSession -> extractJacocoRunReport DONE");
             addRunJacocoCoverageDetails(runCoverageInfo);
         }
 

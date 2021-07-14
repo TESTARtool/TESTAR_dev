@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.action.priorization;
+package org.testar.json;
 
-import java.util.HashSet;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+import org.fruit.Pair;
+import org.testar.json.object.StateModelDifferenceJsonObject;
 
-public class ActionTags extends TagsBase  {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-	private ActionTags() {}
+/**
+ * OLD implementation
+ */
+public class JsonArtefactStateModelDifference {
 
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
+	private JsonArtefactStateModelDifference() {}
 
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
+	/*@JsonCreator
+	public static void createModelDifferenceArtefact(List<String> stateModelOne, List<String> stateModelTwo,
+			String directory, Set<String> disappearedAbstractStates, Set<String> newAbstractStates,
+			Map<String, Set<Pair<String,String>>> disappearedActions, Map<String, Set<Pair<String,String>>> newActions) {
 
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
-	}
+		StateModelDifferenceJsonObject modelDiff = new StateModelDifferenceJsonObject(
+				stateModelOne, stateModelTwo,
+				disappearedAbstractStates, newAbstractStates,
+				disappearedActions, newActions);
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+		String outputFile = directory + "ArtefactStateModelDifference.json";
+
+		try{
+			FileWriter fileWriter = new FileWriter(outputFile);
+			gson.toJson(modelDiff, fileWriter);
+			fileWriter.flush();
+			fileWriter.close();
+			System.out.println("Created JSON Model Difference artefact: " + outputFile);
+		}catch(Exception e){
+			System.out.println("ERROR! Creating JSON ArtefactModelSifference!");
+		}
+
+	}*/
 
 }

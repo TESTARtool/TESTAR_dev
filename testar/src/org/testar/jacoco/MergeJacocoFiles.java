@@ -31,73 +31,73 @@ import org.jacoco.maven.AbstractJacocoMojo;
  */
 public class MergeJacocoFiles extends AbstractJacocoMojo {
 
-	/**
-	 * Path to the output file for execution data.
-	 */
-	private File destFile;
+    /**
+     * Path to the output file for execution data.
+     */
+    private File destFile;
 
-	/**
-	 * This mojo accepts any number of execution data file sets.
-	 */
-	private List<String> jacocoFiles;
+    /**
+     * This mojo accepts any number of execution data file sets.
+     */
+    private List<String> jacocoFiles;
 
-	/**
-	 * Indicate the list of existing jacoco.exec files and the desired output merged file
-	 * 
-	 * @param jacocoFiles
-	 * @param destFile
-	 */
-	public void testarExecuteMojo(List<String> jacocoFiles, File destFile) {
-		this.jacocoFiles = jacocoFiles;
-		this.destFile = destFile;
-		if (!canMergeReports()) {
-			return;
-		}
-		executeMerge();
-	}
+    /**
+     * Indicate the list of existing jacoco.exec files and the desired output merged file
+     * 
+     * @param jacocoFiles
+     * @param destFile
+     */
+    public void testarExecuteMojo(List<String> jacocoFiles, File destFile) {
+        this.jacocoFiles = jacocoFiles;
+        this.destFile = destFile;
+        if (!canMergeReports()) {
+            return;
+        }
+        executeMerge();
+    }
 
-	private boolean canMergeReports() {
-		if (jacocoFiles == null || jacocoFiles.isEmpty()) {
-			System.out.println("ERROR: jacocoFiles are null or empty");
-			return false;
-		}
-		return true;
-	}
+    private boolean canMergeReports() {
+        if (jacocoFiles == null || jacocoFiles.isEmpty()) {
+            System.out.println("ERROR: jacocoFiles are null or empty");
+            return false;
+        }
+        return true;
+    }
 
-	private void executeMerge() {
-		final ExecFileLoader loader = new ExecFileLoader();
+    private void executeMerge() {
+        final ExecFileLoader loader = new ExecFileLoader();
 
-		load(loader);
-		save(loader);
-	}
+        load(loader);
+        save(loader);
+    }
 
-	private void load(final ExecFileLoader loader) {
-		for(final String file : jacocoFiles) {
-			final File inputFile = new File(file);
-			try {
-				System.out.println("Loading execution data file " + inputFile.getAbsolutePath());
-				loader.load(inputFile);
-			} catch (final IOException e) {
-				System.out.println("Unable to read " + inputFile.getAbsolutePath());
-			}
-		}
-	}
+    private void load(final ExecFileLoader loader) {
+        for(final String file : jacocoFiles) {
+            final File inputFile = new File(file);
+            try {
+                System.out.println("Loading execution data file " + inputFile.getAbsolutePath());
+                loader.load(inputFile);
+            } catch (final IOException e) {
+                System.out.println("Unable to read " + inputFile.getAbsolutePath());
+            }
+        }
+    }
 
-	private void save(final ExecFileLoader loader) {
-		if (loader.getExecutionDataStore().getContents().isEmpty()) {
-			System.out.println("MergeJacocoFiles save : getExecutionDataStore().getContents().isEmpty()");
-			return;
-		}
-		System.out.println("Writing merged execution data to " + destFile.getAbsolutePath());
-		try {
-			loader.save(destFile, false);
-		} catch (final IOException e) {
-			System.out.println("Unable to write merged file " + destFile.getAbsolutePath());
-		}
-	}
+    private void save(final ExecFileLoader loader) {
+        if (loader.getExecutionDataStore().getContents().isEmpty()) {
+            System.out.println("MergeJacocoFiles save : getExecutionDataStore().getContents().isEmpty()");
+            return;
+        }
+        System.out.println("Writing merged execution data to " + destFile.getAbsolutePath());
+        try {
+            loader.save(destFile, false);
+        } catch (final IOException e) {
+            System.out.println("Unable to write merged file " + destFile.getAbsolutePath());
+        }
+    }
 
-	@Override
-	protected void executeMojo() throws MojoExecutionException, MojoFailureException {
-		// Nothing, customized behavior testarExecuteMojo()
-	}
+    @Override
+    protected void executeMojo() throws MojoExecutionException, MojoFailureException {
+        // Nothing, customized behavior testarExecuteMojo()
+    }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.action.priorization;
+package org.testar.json.object;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.commons.codec.binary.Base64;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class ActionTags extends TagsBase  {
+public class StateModelTestSequenceStepJsonObject implements Comparable<StateModelTestSequenceStepJsonObject> {
 
-	private ActionTags() {}
+	//String concreteActionId;
+	//String stateScreenshot;
+	String actionDescription;
+	String timestamp;
 
-	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
-
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
+	@JsonCreator
+	public StateModelTestSequenceStepJsonObject(/*String concreteActionId, byte[] stateScreenshot,*/
+			String actionDescription, String timestamp) {
+		//this.concreteActionId = concreteActionId;
+		//this.stateScreenshot =  Base64.encodeBase64String(stateScreenshot);
+		this.actionDescription = actionDescription;
+		this.timestamp = timestamp;
 	}
 
-	public static Set<Tag<Integer>> getActionTags() {
-		return actionTags;
+	@Override
+	public int compareTo(StateModelTestSequenceStepJsonObject o) {
+        if ((this.timestamp.compareTo(o.timestamp)) >0) return 1;
+        else return 0;
 	}
 
 }
