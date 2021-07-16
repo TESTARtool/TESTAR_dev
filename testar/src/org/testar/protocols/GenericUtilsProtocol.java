@@ -421,7 +421,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * Copy settings protocolName build.xml file to jacoco directory
      * Example: "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
      */
-    protected void copyJacocoBuildFile() {	//DEBUG
+    protected void copyJacocoBuildFile() {
         // JaCoCo: Move settings protocolName build.xml file to jacoco directory
         try {
             // Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
@@ -447,7 +447,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * Copy settings protocolName build_all.xml file to jacoco directory
      * Example: "bin/settings/protocolName/build_all.xml" file to "bin/jacoco/build.xml"
      */
-    protected void copyJacocoBuildAllFile() {	//DEBUG
+    protected void copyJacocoBuildAllFile() {
         // JaCoCo: Move settings protocolName build_all.xml file to jacoco directory
         try {
             // Copy "bin/settings/protocolName/build_all.xml" file to "bin/jacoco/build.xml"
@@ -472,14 +472,13 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     /**
      * Extract and create JaCoCo action coverage report.
      */
-    protected String extractJacocoActionReport() {	//DEBUG
+    protected String extractJacocoActionReport() {
         try {
             System.out.println("Extracting JaCoCo report for Action number: " + actionCount);
 
             // Dump the JaCoCo Action report from the remote JVM
             // Example: jacoco-upm_sequence_1_action_3.exec
-            String jacocoFileAction = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));	//DEBUG
-            System.out.println(". . . extractJacocoActionReport -> dumpAndGetJacocoActionFileName DONE");
+            String jacocoFileAction = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
 
             // If is not empty, save as last correct file in case the SUT crashes executing next actions
             if(!jacocoFileAction.isEmpty() && new File(jacocoFileAction).exists()) {
@@ -488,7 +487,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             // Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
             // And get a string that represents obtained coverage
-            String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFileAction, Integer.toString(actionCount));	//DEBUG
+            String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFileAction, Integer.toString(actionCount));
             long  actionTime = System.currentTimeMillis() - startSequenceTime;
 
             String coverageInfo = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
@@ -496,9 +495,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                     " | time | " + actionTime +
                     " | " + actionCoverage;
             writeCoverageFile(coverageInfo);
-
             extractJacocoActionMergedReport(jacocoFileAction);
-            System.out.println(". . . extractJacocoActionReport -> extractJacocoActionMergedReport DONE");
 
             return coverageInfo;
 
@@ -542,7 +539,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                         " | actionnr | " + actionCount +
                         " | time | " + runTime +
                         " | " + iterativeActionMerge);
-                System.out.println(". . . extractJacocoActionMergedReport -> writeMergedCoverageFile DONE");
 
                 lastActionMergedCoverageFile = actionMergedJacocoFilename;
             }
@@ -560,7 +556,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         // Dump the sequence JaCoCo report from the remote JVM
         // Example: jacoco-upm_sequence_1.exec
         String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
-        System.out.println(". . . extractJacocoSequenceReport -> dumpAndGetJacocoSequenceFileName DONE");
         if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
             lastCorrectJacocoCoverageFile = jacocoFile;
         }
@@ -572,7 +567,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         // Create the output JaCoCo report (Ex: "jacoco_reports/upm_sequence_1/report_jacoco.csv")
         // And get a string that represents obtained coverage
         String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
-        System.out.println(". . . extractJacocoSequenceReport -> createJacocoSequenceReport DONE");
         long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
 
         String coverageInfo = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +

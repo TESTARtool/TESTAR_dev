@@ -151,7 +151,7 @@ public class JacocoFilesCreator {
      * 
      * @param jacocoFile
      */
-    public static String createJacocoSequenceReport(String jacocoFile) {	//DEBUG
+    public static String createJacocoSequenceReport(String jacocoFile) {
         try {
             // JaCoCo Sequence report inside output\SUTexecuted folder
             String reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() 
@@ -201,7 +201,7 @@ public class JacocoFilesCreator {
      * @param jacocoFile
      * @param reportDir
      */
-    private static String createJacocoReport(String jacocoFile, String reportDir) {	//DEBUG
+    private static String createJacocoReport(String jacocoFile, String reportDir) {
         try {
             // Using "HTML destdir" inside build.xml -> Creates the directory automatically
             // But using only "CSV destfile" needs to create this directory first
@@ -215,50 +215,22 @@ public class JacocoFilesCreator {
             String antCommand = "cd jacoco && ant report"
                     + " -DjacocoFile=" + new File(jacocoFile).getCanonicalPath()
                     + " -DreportCoverageDir=" + reportDir;
-            
-            System.out.println(". . . createJacocoReport -> CP1");
 
             ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", antCommand);
-            
-            System.out.println(". . . createJacocoReport -> CP2");
-
             Process p = builder.start();
-            
-            System.out.println(". . . createJacocoReport -> CP3");
-
 
             // Read process buffer to empty the process buffer and avoid waiting issues
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             
-            System.out.println(". . . createJacocoReport -> CP4");
-
-            int count = 1;
             while ((reader.readLine()) != null) {
                 //TODO: Read jacoco ant messages if necessary
-                System.out.println("......... reader line " + count + ":");
-                System.out.println(reader.readLine());
-                count ++;
             }
-
-            System.out.println(". . . createJacocoReport -> CP5");
-
+            
             p.waitFor();
             
-            System.out.println(". . . createJacocoReport -> CP6");
-            
             File csvFile = new File(reportDir + File.separator + "report_jacoco.csv");
-            //File csvFile = new File(reportDir, "report_jacoco.csv");
-            System.out.println(". . . . csvFile.toString():");
-            System.out.println(csvFile.toString());
-            System.out.println(". . . . csvFile.getName():");
-            System.out.println(csvFile.getName());
-            System.out.println(". . . . csvFile.exists():");
-            System.out.println(csvFile.exists());
-            System.out.println(". . . . csvFile.isFile():");
-            System.out.println(csvFile.isFile());
                         
             if(!csvFile.exists()) {
-            //if(!new File(reportDir + File.separator + "report_jacoco.csv").exists()) {
                 System.out.println("************************************************");
                 System.out.println("ERROR creating JaCoCo report");
                 System.out.println("Check: If ant library is installed in the system");
@@ -268,26 +240,16 @@ public class JacocoFilesCreator {
                 System.out.println("JaCoCo report created : " + reportDir);
                 LogSerialiser.log("JaCoCo report created : " + reportDir, LogSerialiser.LogLevel.Info);
             }
-            
-            System.out.println(". . . createJacocoReport -> CP7");
 
             String coverageInfoCSV = JacocoReportReader.obtainCSVSummary(reportDir);
-            
-            System.out.println(". . . createJacocoReport -> CP8");
 
             System.out.println(coverageInfoCSV);
-            
-            System.out.println(". . . createJacocoReport -> CP9");
 
             LogSerialiser.log(coverageInfoCSV, LogSerialiser.LogLevel.Info);
-            
-            System.out.println(". . . createJacocoReport -> CP10");
 
             return coverageInfoCSV;
 
         } catch (IOException | InterruptedException e) {
-            System.out.println(". . . createJacocoReport -> CPE1");
-
             System.err.println("ERROR creating JaCoCo coverage report");
             e.printStackTrace();
         }
