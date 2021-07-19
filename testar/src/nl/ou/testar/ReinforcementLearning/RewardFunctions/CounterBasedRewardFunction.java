@@ -8,11 +8,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
 import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
+
+import java.util.function.Consumer;
 
 /**
  * Implementation of the reward function based on a counter
  */
 public class CounterBasedRewardFunction implements RewardFunction {
+
+    public static Consumer<WriterExperimentsParams> WRITER_EXPERIMENTS_CONSUMER = WriterExperiments::writeMetrics;
 
     private static final Logger logger = LogManager.getLogger(CounterBasedRewardFunction.class);
 
@@ -32,7 +37,11 @@ public class CounterBasedRewardFunction implements RewardFunction {
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
         String information = String.format("ID | %s | executionCounter | %s | reward | %s ", 
                 executedAction.getId(), executionCounter, reward);
-        WriterExperiments.writeMetrics("rlRewardMetrics", information, true);
+        WRITER_EXPERIMENTS_CONSUMER.accept(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+                .setFilename("rlRewardMetrics")
+                .setInformation(information)
+                .setNewLine(true)
+                .build());
 
         return reward;
     }

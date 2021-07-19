@@ -14,6 +14,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.util.Set;
 
@@ -87,7 +88,11 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
                 getSequenceManager().getCurrentSequence().getNodes().size(),
                 getSequenceManager().getCurrentSequenceNr(),
                 reward);
-        WriterExperiments.writeMetrics("rlRewardMetrics", information, false);
+        WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+                .setFilename("rlRewardMetrics")
+                .setInformation(information)
+                .setNewLine(false)
+                .build());
 
         final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);
 

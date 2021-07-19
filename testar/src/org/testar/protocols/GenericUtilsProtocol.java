@@ -50,6 +50,7 @@ import org.testar.OutputStructure;
 import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.MergeJacocoFiles;
 import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.io.File;
 import java.io.IOException;
@@ -452,7 +453,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                " | actionnr | " + actionCount +
 	                " | time | " + actionTime +
 	                " | " + actionCoverage;
-	        WriterExperiments.writeMetrics("coverageMetrics", information, true);
+			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+					.setFilename("coverageMetrics")
+					.setInformation(information)
+					.setNewLine(true)
+					.build());
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
 
@@ -488,7 +493,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	            " | " + resultUnvisitedActions +
 	            " | " + resultConcreteStates +
 	            " | " + resultConcreteActions;
-	    WriterExperiments.writeMetrics("stateModelMetrics", information, true);
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("stateModelMetrics")
+				.setInformation(information)
+				.setNewLine(true)
+				.build());
 	}
 
 	/**
@@ -524,7 +533,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	                    " | actionnr | " + actionCount +
 	                    " | time | " + runTime +
 	                    " | " + iterativeActionMerge;
-	            WriterExperiments.writeMetrics("coverageMetricsMerged", information, true);
+				WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+						.setFilename("coverageMetricsMerged")
+						.setInformation(information)
+						.setNewLine(true)
+						.build());
 
 	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
 	        }
@@ -560,7 +573,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		        " | actionnr | " + actionCount +
 		        " | time | " + sequenceTime +
 		        " | " + sequenceCoverage;
-		WriterExperiments.writeMetrics("coverageMetrics", information, true);
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("coverageMetricsMerged")
+				.setInformation(information)
+				.setNewLine(true)
+				.build());
 
 		// reset value
 		lastCorrectJacocoCoverageFile = "";
@@ -583,7 +600,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
 			// Prepare and write the coverage metrics information
 			String information = "RunTotal | time | " + runTime + " | " + runCoverage;
-			WriterExperiments.writeMetrics("coverageMetrics", information, true);
+			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+					.setFilename("coverageMetrics")
+					.setInformation(information)
+					.setNewLine(true)
+					.build());
 
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

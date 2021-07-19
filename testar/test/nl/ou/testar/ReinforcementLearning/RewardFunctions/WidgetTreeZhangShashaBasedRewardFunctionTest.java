@@ -45,6 +45,8 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
 
     @Before
     public void setup() {
+        WidgetTreeZhangShashaBasedRewardFunction.WRITER_EXPERIMENTS_CONSUMER = x -> {};
+
         // tree 1
         widgetT1A.set(Tags.AbstractIDCustom, "a");
         widgetT1B.set(Tags.AbstractIDCustom, "b");

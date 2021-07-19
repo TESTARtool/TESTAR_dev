@@ -40,6 +40,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
 
     @Before
     public void setup () {
+        ImageRecognitionBasedRewardFunction.WRITER_EXPERIMENTS_CONSUMER = x -> {};
         MockitoAnnotations.initMocks(this);
     }
 

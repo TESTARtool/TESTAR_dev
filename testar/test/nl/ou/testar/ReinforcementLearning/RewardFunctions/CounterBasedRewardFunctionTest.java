@@ -32,6 +32,7 @@ public class CounterBasedRewardFunctionTest {
 
     @Before
     public void setup () {
+        CounterBasedRewardFunction.WRITER_EXPERIMENTS_CONSUMER = x -> {};
         MockitoAnnotations.initMocks(this);
     }
 

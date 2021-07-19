@@ -51,21 +51,19 @@ public class WriterExperiments {
 
     /**
      * Write the information metrics in the desired filename. 
-     * 
-     * @param filename
-     * @param information
+     *
      */
-    public static void writeMetrics(String filename, String information, boolean newLine) {
+    public static void writeMetrics(WriterExperimentsParams params) {
         try {
             String metricsFile = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath() + File.separator 
-                    + OutputStructure.outerLoopName + "_" + filename + ".txt";
+                    + OutputStructure.outerLoopName + "_" + params.getFilename() + ".txt";
             FileWriter myWriter = new FileWriter(metricsFile, true);
-            if(newLine) myWriter.write(information + "\r\n");
-            else myWriter.write(information);
+            if(params.isNewLine()) myWriter.write(params.getInformation() + "\r\n");
+            else myWriter.write(params.getInformation());
             myWriter.close();
         } catch (IOException e) {
-            LogSerialiser.log("ERROR: Writing Metrics inside " + filename + " text file", LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR: Writing Metrics inside " + filename + " text file");
+            LogSerialiser.log("ERROR: Writing Metrics inside " + params.getFilename() + " text file", LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR: Writing Metrics inside " + params.getFilename() + " text file");
             e.printStackTrace();
         }
     }
