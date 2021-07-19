@@ -56,6 +56,8 @@ public final class Verdict implements Serializable {
 
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
 	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
+	
+	public static final double SEVERITY_UNREPLAYABLE = 0.1;
 
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
@@ -101,6 +103,8 @@ public final class Verdict implements Serializable {
 			return "NOT_RESPONDING";
 		if(severity == Verdict.SEVERITY_NOT_RUNNING)
 			return "NOT_RUNNING";
+		if(severity == Verdict.SEVERITY_UNREPLAYABLE)
+			return "NOT_REPLAYABLE";
 
 		return "ERROR";
 	}
