@@ -80,18 +80,18 @@ public class SarsaModelManager extends ModelManager implements StateModelManager
         final AbstractAction selectedAbstractAction = getAbstractAction(currentAbstractState, selectedAction);
         float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, selectedAbstractAction);
         logger.info("reward={} found for sequenceNumber={} and actionNumber={}", reward,
-                getSequenceManager().getCurrentSequence().getNodes().size(),
-                getSequenceManager().getCurrentSequenceNr());
+                getSequenceManager().getCurrentSequenceNr(),
+                getSequenceManager().getCurrentSequence().getNodes().size());
 
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
-        String information = String.format("sequenceNumber | %s | actionNumber | %s | reward | %s | ", 
-                getSequenceManager().getCurrentSequence().getNodes().size(),
+        final String information = String.format("sequenceNumber | %s | actionNumber | %s | reward | %s | ID | %s",
                 getSequenceManager().getCurrentSequenceNr(),
-                reward);
+                getSequenceManager().getCurrentSequence().getNodes().size(),
+                reward,
+                selectedAbstractAction == null ? null : selectedAbstractAction.getId());
         WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
                 .setFilename("rlRewardMetrics")
                 .setInformation(information)
-                .setNewLine(false)
                 .build());
 
         final double sarsaQValue = getQValue(previouslySelectedAbstractAction, reward);

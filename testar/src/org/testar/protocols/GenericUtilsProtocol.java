@@ -456,7 +456,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
 					.setFilename("coverageMetrics")
 					.setInformation(information)
-					.setNewLine(true)
 					.build());
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
@@ -496,7 +495,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
 				.setFilename("stateModelMetrics")
 				.setInformation(information)
-				.setNewLine(true)
 				.build());
 	}
 
@@ -536,7 +534,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 				WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
 						.setFilename("coverageMetricsMerged")
 						.setInformation(information)
-						.setNewLine(true)
 						.build());
 
 	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
@@ -576,7 +573,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
 				.setFilename("coverageMetricsMerged")
 				.setInformation(information)
-				.setNewLine(true)
 				.build());
 
 		// reset value
@@ -603,7 +599,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
 					.setFilename("coverageMetrics")
 					.setInformation(information)
-					.setNewLine(true)
 					.build());
 
 		} catch (Exception e) {

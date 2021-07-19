@@ -7,10 +7,10 @@ public class WriterExperimentsParams {
 
         String information = "";
 
-        boolean newLine = false;
+        boolean newLine = true;
 
         public WriterExperimentsParamsBuilder setFilename(String filename) {
-            filename = filename;
+            this.filename = filename;
             return this;
         }
 

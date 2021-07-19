@@ -91,11 +91,11 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
         String information = String.format("ID | %s | reward | %s ",
                 id, reward);
-        WRITER_EXPERIMENTS_CONSUMER.accept(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
-                .setFilename("rlRewardMetrics")
-                .setInformation(information)
-                .setNewLine(true)
-                .build());
+//        WRITER_EXPERIMENTS_CONSUMER.accept(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+//                .setFilename("rlRewardMetrics")
+//                .setInformation(information)
+//                .setNewLine(true)
+//                .build());
 
         return reward;
     }
