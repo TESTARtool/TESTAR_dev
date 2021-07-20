@@ -571,7 +571,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 		        " | time | " + sequenceTime +
 		        " | " + sequenceCoverage;
 		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
-				.setFilename("coverageMetricsMerged")
+				.setFilename("coverageMetrics")
 				.setInformation(information)
 				.build());
 
