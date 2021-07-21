@@ -112,7 +112,7 @@ ProtocolClass = swingset2_reinforcement_learning/Protocol_swingset2_reinforcemen
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
-DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+DataStoreDirectory = E:\\orientdb-3.0.4\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -134,6 +134,8 @@ AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 #################################################################
 Alpha = 1.0
 Gamma = 0.99
+Beta = 1.0
+DefaultVValue = 0.0
 DefaultValue = 0.0
 DefaultReward = 0.0
 Epsilon = 0.7
@@ -142,15 +144,15 @@ DecayRate = 0.0001
 Temperature = 1.0
 RewardFunction = BorjaReward2
 Policy = GreedyPolicy
-TagName = qborja
-QFunction = QBorjaFunction2
+TagName = qvlearning
+QFunction = QVFunction
 
 #################################################################
 # Extended settings file
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLBorjaActionGroup.xml
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLQVLearning.xml
 
 #################################################################
 # Other more advanced settings
