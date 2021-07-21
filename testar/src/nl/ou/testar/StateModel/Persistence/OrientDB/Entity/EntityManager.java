@@ -33,7 +33,7 @@ public class EntityManager {
      * @param config
      */
     public EntityManager(Config config) {
-        String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
+        String connectionString = (config.getConnectionType().equals("plocal") ? "plocal" : "remote") + ":" + (config.getConnectionType().equals("remote") || config.getConnectionType().equals("docker") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
         OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         connection = new Connection(orientDB, config);
@@ -513,7 +513,7 @@ public class EntityManager {
                 return;
             }
 
-            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
+            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " = :" + identifier.getPropertyName();
             Map<String, Object> params = new HashMap<>();
             params.put(identifier.getPropertyName(), idValues);
             db.command(stmt, params);
