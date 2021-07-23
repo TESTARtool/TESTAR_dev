@@ -47,7 +47,9 @@ public class AndroidTags extends TagsBase {
 	public static final Tag<String> AndroidText = from("AndroidText", String.class);
 	
 	public static final Tag<String> AndroidResourceId = from("AndroidResourceId", String.class);
-	
+
+	public static final Tag<String> AndroidAccessibilityId = from("AndroidAccessibilityId", String.class);
+
 	public static final Tag<String> AndroidClassName = from("AndroidClassName", String.class);
 	
 	public static final Tag<String> AndroidPackageName = from("AndroidPackageName", String.class);

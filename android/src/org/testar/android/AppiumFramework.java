@@ -54,6 +54,9 @@ import org.fruit.alayer.exceptions.SystemStopException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -96,6 +99,26 @@ public class AppiumFramework extends SUTBase {
 		return driver.findElements(by);
 	}
 	
+
+	//GetLogs
+	public static String getLogs(String type){
+		LogEntries entries = driver.manage().logs().get(type);
+		String logs = "";
+
+		for (LogEntry entry : entries) {
+        	//System.out.println(new Date(entry.getTimestamp()) + " " + entry.getMessage());
+			logs = logs + entry.getMessage() + "\n";
+    	}
+
+		return logs;
+	}
+
+	public static String getLogsTypes(){
+		Set<String> logtypes = driver.manage().logs().getAvailableLogTypes();
+
+		return logtypes.toString();
+	}
+
 	// Send Click Action
 	
 	public static void clickElementById(String id){

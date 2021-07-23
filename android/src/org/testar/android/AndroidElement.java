@@ -61,6 +61,7 @@ public class AndroidElement extends TaggableBase implements Serializable {
 	int nodeIndex;
 	String text;
 	String resourceId;
+	String accessibilityId;
 	String className;
 	String packageName;
 	

@@ -34,6 +34,7 @@ import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -47,6 +48,9 @@ import es.upv.staq.testar.NativeLinker;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Protocol_android_generic extends DesktopProtocol {
@@ -73,6 +77,9 @@ public class Protocol_android_generic extends DesktopProtocol {
 	protected void beginSequence(SUT system, State state){
 	 	super.beginSequence(system, state);
 	 	
+		system.set(Tags.StandardMouse,mouse);
+		system.set(Tags.StandardKeyboard, AWTKeyboard.build());
+
 	 	// Android Action Type example
 	 	for(Widget w : state) {
 	 		if(w.get(AndroidTags.AndroidClassName, "").equals("android.widget.EditText")) {
@@ -82,6 +89,8 @@ public class Protocol_android_generic extends DesktopProtocol {
 	 	}
 	}
 	
+	private String suspiciousLogMessage = "";
+
 	/**
 	 * The getVerdict methods implements the online state oracles that
 	 * examine the SUT's current state and returns an oracle verdict.
@@ -94,13 +103,44 @@ public class Protocol_android_generic extends DesktopProtocol {
 		// non-responsiveness
 		// suspicious titles
 		Verdict verdict = super.getVerdict(state);
+		String packageName = "com.andres.sen.dev.my_notes";
+		boolean appStopped = true;
 
+
+
+
+		String actualLog = AppiumFramework.getLogs("logcat");
+		String logTypes = AppiumFramework.getLogsTypes();
+
+		System.out.println("======== APPIUM SERVER LOGS TYPES ========");
+		System.out.println(logTypes);
+		System.out.println("======== APPIUM SERVER LOGS ========");
+		System.out.println(actualLog);
+		if(!actualLog.isEmpty()){
+			suspiciousLogMessage = actualLog;
+		}
+
+		Pattern patterSuspicious = Pattern.compile(settings.get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+		Matcher match = patterSuspicious.matcher(suspiciousLogMessage);
+		if(!suspiciousLogMessage.isEmpty() && match.matches()) {
 		
+			return (new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Detected suspicious text on log: "+suspiciousLogMessage));
+
+		}
+		
+
 		for(Widget w : state) {
-			if(w.get(AndroidTags.AndroidText, "").toLowerCase().contains("error")
-					|| w.get(AndroidTags.AndroidText, "").toLowerCase().contains("exception")) {
-				return (new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, w.get(AndroidTags.AndroidText, "")));
+			if(w.get(AndroidTags.AndroidPackageName, "").contains(packageName)){
+				appStopped = false;
 			}
+			if(w.get(AndroidTags.AndroidAccessibilityId, "").toLowerCase().contains("error")
+					|| w.get(AndroidTags.AndroidAccessibilityId, "").toLowerCase().contains("exception")) {
+				return (new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Detected suspicious text: "+w.get(AndroidTags.AndroidAccessibilityId, "")));
+			}
+		}
+
+		if(appStopped){
+			return (new Verdict(Verdict.SEVERITY_NOT_RUNNING, "Aplication stopped"));
 		}
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
@@ -144,21 +184,25 @@ public class Protocol_android_generic extends DesktopProtocol {
 			}*/
 
 			// type into text boxes
-			if (isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(
+			if (isTypeable(widget) /*&& (whiteListed(widget) || isUnfiltered(widget))*/) {
+				/*actions.add(
 						new AndroidActionType(state, widget,
 						this.getRandomText(widget),
 						widget.get(AndroidTags.AndroidResourceId,""))
-						);
+						);*/
+				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)/* && (whiteListed(widget) || isUnfiltered(widget))*/) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-						widget.get(AndroidTags.AndroidText,""), 
-						widget.get(AndroidTags.AndroidResourceId,""))
-						);
+				//actions.add(
+				//		new AndroidActionClick(state, widget,
+				//		widget.get(AndroidTags.AndroidText,""), 
+				//		widget.get(AndroidTags.AndroidResourceId,""))
+				//		);
+
+				actions.add(ac.leftClickAt(widget));
 			}
 			
 			// Spy mode debugging purposes
@@ -171,7 +215,7 @@ public class Protocol_android_generic extends DesktopProtocol {
 	@Override
 	protected boolean isClickable(Widget w) {
 		return (w.get(AndroidTags.AndroidClassName, "").equals("android.widget.ImageButton")
-		|| w.get(AndroidTags.AndroidClassName, "").equals("android.widget.Button"));
+		|| w.get(AndroidTags.AndroidClassName, "").equals("android.widget.Button") || w.get(AndroidTags.AndroidClickable,false));
 	}
 	
 	@Override

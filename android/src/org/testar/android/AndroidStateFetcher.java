@@ -189,6 +189,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		childElement.nodeIndex = AndroidNodeParser.getIntegerAttribute(xmlNode, "index");
 		childElement.text = AndroidNodeParser.getStringAttribute(xmlNode, "text");
 		childElement.resourceId = AndroidNodeParser.getStringAttribute(xmlNode, "resource-id");
+		childElement.accessibilityId = AndroidNodeParser.getStringAttribute(xmlNode, "content-desc");
 		childElement.className = AndroidNodeParser.getStringAttribute(xmlNode, "class");
 		childElement.packageName = AndroidNodeParser.getStringAttribute(xmlNode, "package");
 		childElement.checkable = AndroidNodeParser.getBooleanAttribute(xmlNode, "checkable");

@@ -191,6 +191,9 @@ public class AndroidState extends AndroidWidget implements State {
 		else if (t.equals(AndroidTags.AndroidResourceId)) {
 			ret = w.element.resourceId;
 		}
+		else if (t.equals(AndroidTags.AndroidAccessibilityId)) {
+			ret = w.element.accessibilityId;
+		}
 		else if (t.equals(AndroidTags.AndroidClassName)) {
 			ret = w.element.className;
 		}
