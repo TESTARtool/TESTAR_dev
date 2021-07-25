@@ -1,5 +1,6 @@
 package nl.ou.testar.visualvalidation.matcher;
 
+import nl.ou.testar.visualvalidation.Location;
 import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
 import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.junit.Test;
@@ -8,7 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,15 +23,15 @@ import static org.mockito.Mockito.verify;
 public class LocationMatcherTest {
 
     private static final RecognizedElement recognizedElementOne =
-            new RecognizedElement(new Rectangle(0, 15, 36, 1), 0, "r");
+            new RecognizedElement(new Location(0, 15, 36, 1), 0, "r");
     private static final RecognizedElement recognizedElementTwo =
-            new RecognizedElement(new Rectangle(40, 16, 26, 45), 23, "df");
+            new RecognizedElement(new Location(40, 16, 26, 45), 23, "df");
     private static final RecognizedElement recognizedElementThree =
-            new RecognizedElement(new Rectangle(5, 10, 26, 45), 23, "aa");
+            new RecognizedElement(new Location(5, 10, 26, 45), 23, "aa");
     private static final RecognizedElement recognizedElementFour =
-            new RecognizedElement(new Rectangle(12, 16, 10, 20), 23, "Open");
+            new RecognizedElement(new Location(12, 16, 10, 20), 23, "Open");
     private static final ExpectedElement expectedElement =
-            new ExpectedElement(new Rectangle(10, 15, 15, 23), "open");
+            new ExpectedElement(new Location(10, 15, 15, 23), "open");
 
     @Test
     public void successfulMatch() {

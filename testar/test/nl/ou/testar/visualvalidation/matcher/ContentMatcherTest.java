@@ -1,10 +1,10 @@
 package nl.ou.testar.visualvalidation.matcher;
 
+import nl.ou.testar.visualvalidation.Location;
 import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
 import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.junit.Test;
 
-import java.awt.Rectangle;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,11 +17,11 @@ import static org.junit.Assert.*;
 
 public class ContentMatcherTest {
 
-    private static final RecognizedElement firstLine = new RecognizedElement(new Rectangle(0, 0, 20, 10), 100, "1");
-    private static final RecognizedElement secondLine = new RecognizedElement(new Rectangle(0, 10, 20, 10), 100, "2W");
-    private static final RecognizedElement thirdLineFirst = new RecognizedElement(new Rectangle(0, 20, 20, 10), 100, "3 ");
-    private static final RecognizedElement thirdLineSecond = new RecognizedElement(new Rectangle(10, 25, 20, 5), 100, "?");
-    private static final ExpectedElement expectedElement = new ExpectedElement(new Rectangle(0, 0, 20, 30), "1K\n\r2w\n\r3");
+    private static final RecognizedElement firstLine = new RecognizedElement(new Location(0, 0, 20, 10), 100, "1");
+    private static final RecognizedElement secondLine = new RecognizedElement(new Location(0, 10, 20, 10), 100, "2W");
+    private static final RecognizedElement thirdLineFirst = new RecognizedElement(new Location(0, 20, 20, 10), 100, "3 ");
+    private static final RecognizedElement thirdLineSecond = new RecognizedElement(new Location(10, 25, 20, 5), 100, "?");
+    private static final ExpectedElement expectedElement = new ExpectedElement(new Location(0, 0, 20, 30), "1K\n\r2w\n\r3");
 
     private static final MatcherConfiguration config = MatcherConfiguration.CreateDefault();
 

@@ -1,6 +1,7 @@
 package nl.ou.testar.visualvalidation.extractor;
 
 
+import nl.ou.testar.visualvalidation.Location;
 import org.apache.logging.log4j.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.Environment;
@@ -157,7 +158,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
         if (widgetIsIncluded(widget, widgetRole)) {
             if (text != null && !text.isEmpty()) {
                 Rectangle absoluteLocation = getLocation(widget);
-                Rectangle relativeLocation = new Rectangle(
+                Location relativeLocation = new Location(
                         (int) ((absoluteLocation.x - applicationPosition.x) * displayScale),
                         (int) ((absoluteLocation.y - applicationPosition.y) * displayScale),
                         (int) (absoluteLocation.width * displayScale),

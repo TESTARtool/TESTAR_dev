@@ -1,5 +1,6 @@
 package nl.ou.testar.visualvalidation.ocr.tesseract;
 
+import nl.ou.testar.visualvalidation.Location;
 import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 import org.apache.logging.log4j.Level;
 import org.bytedeco.javacpp.BytePointer;
@@ -7,7 +8,6 @@ import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.tesseract.ResultIterator;
 import org.testar.Logger;
 
-import java.awt.Rectangle;
 import java.util.function.Supplier;
 
 /**
@@ -27,9 +27,9 @@ public class TesseractResult {
         Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
 
         BytePointer ocrResult = recognizedElement.GetUTF8Text(granularity);
-        if (ocrResult == null){
+        if (ocrResult == null) {
             Logger.log(Level.ERROR, "OCR", "Results is null");
-            return new RecognizedElement(new Rectangle(), 0, "");
+            return new RecognizedElement(new Location(), 0, "");
         }
         String recognizedText = ocrResult.getString().trim();
 
@@ -47,7 +47,7 @@ public class TesseractResult {
         // Upper left coordinate = 0,0
         int width = right.get() - left.get();
         int height = bottom.get() - top.get();
-        Rectangle location = new Rectangle(left.get(), top.get(), width, height);
+        Location location = new Location(left.get(), top.get(), width, height);
         RecognizedElement result = new RecognizedElement(location, confidence, recognizedText);
 
         left.deallocate();

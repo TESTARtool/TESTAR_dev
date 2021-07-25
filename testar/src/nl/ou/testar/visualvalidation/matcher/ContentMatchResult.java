@@ -1,5 +1,7 @@
 package nl.ou.testar.visualvalidation.matcher;
 
+import nl.ou.testar.visualvalidation.Location;
+
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -11,12 +13,14 @@ public class ContentMatchResult implements Comparable<ContentMatchResult> {
     public final ExpectedTextMatchResult expectedResult;
     public final RecognizedTextMatchResult recognizedResult;
     public final String expectedText;
+    public final Location foundLocation;
     public final long totalMatched;
     public final long totalExpected;
 
-    public ContentMatchResult(ExpectedTextMatchResult expectedResult, RecognizedTextMatchResult recognizedResult) {
+    public ContentMatchResult(ExpectedTextMatchResult expectedResult, RecognizedTextMatchResult recognizedResult, Location foundLocation) {
         this.expectedResult = expectedResult;
         this.recognizedResult = recognizedResult;
+        this.foundLocation = foundLocation;
         totalMatched = expectedResult.expectedText.stream()
                 .filter(e -> e.result != CharacterMatchResult.NO_MATCH)
                 .count();

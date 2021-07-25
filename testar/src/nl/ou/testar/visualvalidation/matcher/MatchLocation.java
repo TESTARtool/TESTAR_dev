@@ -1,12 +1,12 @@
 package nl.ou.testar.visualvalidation.matcher;
 
-import java.awt.Rectangle;
+import nl.ou.testar.visualvalidation.Location;
 
 public class MatchLocation {
     final public int margin;
-    final public Rectangle location;
+    final public Location location;
 
-    public MatchLocation(int margin, Rectangle location) {
+    public MatchLocation(int margin, Location location) {
         this.margin = margin;
         this.location = location;
     }

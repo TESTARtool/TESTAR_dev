@@ -1,5 +1,6 @@
 package nl.ou.testar.visualvalidation.ocr;
 
+import nl.ou.testar.visualvalidation.Location;
 import nl.ou.testar.visualvalidation.TextElement;
 
 import java.awt.Rectangle;
@@ -17,7 +18,7 @@ public class RecognizedElement extends TextElement {
      * @param confidence The confidence level of the discovered text.
      * @param text       The discovered text.
      */
-    public RecognizedElement(Rectangle location, float confidence, String text) {
+    public RecognizedElement(Location location, float confidence, String text) {
         super(location, text);
         _confidence = confidence;
     }

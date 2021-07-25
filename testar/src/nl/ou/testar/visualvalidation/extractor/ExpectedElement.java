@@ -1,8 +1,7 @@
 package nl.ou.testar.visualvalidation.extractor;
 
+import nl.ou.testar.visualvalidation.Location;
 import nl.ou.testar.visualvalidation.TextElement;
-
-import java.awt.Rectangle;
 
 public class ExpectedElement extends TextElement {
 
@@ -12,7 +11,7 @@ public class ExpectedElement extends TextElement {
      * @param location The relative location of the text inside the application.
      * @param text     The text.
      */
-    public ExpectedElement(Rectangle location, String text) {
+    public ExpectedElement(Location location, String text) {
         super(location, text);
     }
 }
