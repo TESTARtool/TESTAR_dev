@@ -22,7 +22,7 @@ public class SeleniumActionFactory {
             return new SeleniumSendKeysAction(target, argument);
         }
         if (SUBMIT.equals(type)) {
-            return new SeleniumSubmitAction(target);
+            return new SeleniumSubmitAction();
         }
         return null;
     }
