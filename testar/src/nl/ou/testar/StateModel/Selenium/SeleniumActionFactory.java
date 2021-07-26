@@ -10,8 +10,7 @@ public class SeleniumActionFactory {
     public static final String KEYS = "KEYS";
     public static final String SUBMIT = "SUBMIT";
 
-    public static SeleniumAction createAction(String type, String targetXPath, String argument) {
-        WebElement target = WdDriver.getRemoteWebDriver().findElementByXPath(targetXPath);
+    public static SeleniumAction createAction(String type, String target, String argument, boolean replaceText) {
         if (CLEAR.equals(type)) {
             return new SeleniumClearAction(target);
         }
@@ -19,7 +18,7 @@ public class SeleniumActionFactory {
             return new SeleniumClickAction(target);
         }
         if (KEYS.equals(type)) {
-            return new SeleniumSendKeysAction(target, argument);
+            return new SeleniumSendKeysAction(target, argument, replaceText);
         }
         if (SUBMIT.equals(type)) {
             return new SeleniumSubmitAction();

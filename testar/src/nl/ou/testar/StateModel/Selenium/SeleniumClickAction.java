@@ -5,11 +5,12 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.openqa.selenium.WebElement;
 
 public class SeleniumClickAction extends SeleniumAction {
 
-    public SeleniumClickAction(WebElement target) {
+    public SeleniumClickAction(String target) {
         super(target);
     }
 
@@ -20,7 +21,8 @@ public class SeleniumClickAction extends SeleniumAction {
 
     @Override
     protected void performAction() {
-        target.click();
+        final WebElement element = WdDriver.getRemoteWebDriver().findElementByXPath(target);
+        element.click();
     }
 
     @Override
@@ -30,7 +32,7 @@ public class SeleniumClickAction extends SeleniumAction {
 
     @Override
     public String toString() {
-        return "Click Element\t" + target.getAttribute("xpath");
+        return "Click Element\t" + target;
     }
 
     @Override

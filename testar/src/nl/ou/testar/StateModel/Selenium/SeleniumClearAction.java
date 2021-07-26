@@ -2,10 +2,11 @@ package nl.ou.testar.StateModel.Selenium;
 
 import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.openqa.selenium.WebElement;
 
 public class SeleniumClearAction extends SeleniumAction {
-    public SeleniumClearAction(WebElement target) {
+    public SeleniumClearAction(String target) {
         super(target);
     }
 
@@ -16,7 +17,8 @@ public class SeleniumClearAction extends SeleniumAction {
 
     @Override
     protected void performAction() {
-        target.clear();
+        final WebElement element = WdDriver.getRemoteWebDriver().findElementByXPath(target);
+        element.clear();
     }
 
     @Override
@@ -31,7 +33,7 @@ public class SeleniumClearAction extends SeleniumAction {
 
     @Override
     public String toString() {
-        return "Clear Element Text\t" + target.getAttribute("xpath");
+        return "Clear Element Text\t" + target;
     }
 
     @Override
