@@ -2,15 +2,18 @@ package nl.ou.testar.StateModel.Selenium;
 
 import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.openqa.selenium.WebElement;
 
 public class SeleniumSendKeysAction extends SeleniumAction {
 
     private CharSequence argument;
+    private boolean replaceText;
 
-    public SeleniumSendKeysAction(WebElement target, CharSequence argument) {
+    public SeleniumSendKeysAction(String target, CharSequence argument, boolean replaceText) {
         super(target);
         this.argument = argument;
+        this.replaceText = replaceText;
     }
 
     @Override
@@ -25,7 +28,11 @@ public class SeleniumSendKeysAction extends SeleniumAction {
 
     @Override
     protected void performAction() {
-        target.sendKeys(argument);
+        final WebElement element = WdDriver.getRemoteWebDriver().findElementByXPath(target);
+        if (replaceText) {
+            element.clear();
+        }
+        element.sendKeys(argument);
     }
 
     @Override
@@ -40,7 +47,7 @@ public class SeleniumSendKeysAction extends SeleniumAction {
 
     @Override
     public String toString() {
-        return "Input Text\t" + target.getAttribute("xpath") + "\t" + argument + "\nFalse";
+        return "Input Text\t" + target + "\t" + argument + "\nFalse";
     }
 
     @Override

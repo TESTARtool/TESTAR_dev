@@ -7,9 +7,9 @@ import org.openqa.selenium.WebElement;
 
 public abstract class SeleniumAction extends TaggableBase implements Action {
 
-    protected WebElement target;
+    protected String target;
 
-    public SeleniumAction(WebElement target) {
+    public SeleniumAction(String target) {
         this.target = target;
     }
 

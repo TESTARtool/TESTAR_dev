@@ -2,6 +2,7 @@ package nl.ou.testar.StateModel.Selenium;
 
 import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.openqa.selenium.WebElement;
 
 public class SeleniumSubmitAction extends SeleniumAction {
@@ -17,7 +18,8 @@ public class SeleniumSubmitAction extends SeleniumAction {
 
     @Override
     protected void performAction() {
-        target.submit();
+        final WebElement element = WdDriver.getRemoteWebDriver().findElementByXPath(target);
+        element.submit();
     }
 
     @Override
