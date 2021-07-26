@@ -561,7 +561,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	/*
 	 * Check the state if we need to force an action
 	 */
-	protected Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
+	protected Set<Action> detectForcedActions(State state, WidgetActionCompiler ac) {
 		Set<Action> actions = detectForcedDeniedUrl();
 		if (actions != null && actions.size() > 0) {
 			return actions;
@@ -625,7 +625,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Force closing of Policies Popup
 	 */
 	protected Set<Action> detectForcedPopupClick(State state,
-			StdActionCompiler ac) {
+			WidgetActionCompiler ac) {
 		if (policyAttributes == null || policyAttributes.size() == 0) {
 			return null;
 		}
