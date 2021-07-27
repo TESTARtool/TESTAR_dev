@@ -328,6 +328,104 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     }
 }
 
+// Download OrientDB 3.0.34 from the official wep page
+task downloadOrientDB(type: Download, dependsOn: installDist) {
+    src 'https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip'
+    dest 'target/install/testar/bin'
+    overwrite false
+}
+// Verify that we downloaded the correct OrientDB file
+task verifyOrientDB(type: Verify, dependsOn: downloadOrientDB) {
+    src new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip')
+    algorithm 'MD5'
+    checksum 'a0619e5522e7d849d4f1067bf08e3857'
+}
+// Extract OrientDB binary files
+task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
+    group = 'test_testar_workflow'
+    description ='downloadAndUnzipOrientDB'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    
+    from zipTree(new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip'))
+    into downloadOrientDB.dest
+}
+// Execute a command line to create a testar OrientDB database with admin admin credentials
+task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
+    group = 'test_testar_workflow'
+    description ='createDatabaseOrientDB'
+    
+    // Disable for non-Windows environments (Linux, osx)
+    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+        return;
+    }
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
+    workingDir 'target/install/testar/bin/orientdb-3.0.34/bin'
+    commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
+    // Ignore errors creating the database because we check the output buffer message
+    ignoreExitValue true
+    doLast {
+        String output = standardOutput.toString()
+        
+        // If error creating database because already exists is ok
+        if (execResult.getExitValue()==1 && errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
+            println "\n${output} \ntestar OrientDB database already exists"
+        }
+        // Check if testar database created sucessfully
+        else if(output.readLines().any{line->line.contains("Database created successfully.")}) {
+            println "\n${output} \ntestar OrientDB database created successfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Creating testar OrientDB database")
+        }
+    }
+}
+// Verify that TESTAR infers a State Model with Notepad
+// Filter lot of actions and detect Font action inference
+task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericStateModel'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 TimeToWaitAfterAction=2.0 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that output contains 3 abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("3 abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}
+
+// Verify that TESTAR can custom the widget and actions identifiers 
+// Infer a State Model modifying the state and action identifiers
+task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: createDatabaseOrientDB) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericStateModelCustomAbstraction'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_custom_abstraction AlwaysCompile=true ApplicationName="notepad_state_model_custom" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=1'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains 0 unvisited actions left
+        if(output.contains("0 unvisited actions left")) {
+            println "\n${output} \nTESTAR Action AbstractIDCustom has been customized sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: with Action AbstractIDCustom custom identifier")
+        }
+    }
+}
+
 // Download last win32 chromedriver 
 task downloadChromedriver(type: Download, dependsOn: installDist) {
     group = 'test_testar_workflow'
@@ -398,6 +496,46 @@ task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChrome
             println "\n${output} \nTESTAR has been executed sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Verify that TESTAR correctly replays a sequence
+task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverCorrectReplay'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that output contains Sequence successfully replayed message to verify the correct replay execution
+        if(output.readLines().any{line->line.contains("Sequence successfully replayed")}) {
+            println "\n${output} \nTESTAR sequence has been sucessfully replayed"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR Replay mode")
+        }
+    }
+}
+
+// Verify that TESTAR correctly detects a not replayable sequence
+task runTestWebdriverUnreplayable(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverUnreplayable'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that TESTAR detects not replayable button
+        if(output.readLines().any{line->line.contains("Left Click at 'ParisThree' of the replayed sequence can not been replayed")}) {
+            println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")
         }
     }
 }

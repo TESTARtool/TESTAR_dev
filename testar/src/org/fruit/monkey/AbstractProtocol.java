@@ -38,6 +38,7 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.HtmlReporting.Reporting;
@@ -74,6 +75,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 
 	protected Reporting getReporter()
 	{
+	    // Replay mode only works with the specific HTML replay report
+	    if(settings.get(ConfigTags.Mode).equals(Modes.Replay)) {
+	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
+	    }
+
 		switch (settings().get(ConfigTags.ReportingClass))
 		{
 			case "NUNIT 3.0 Reporting": return new XMLSequenceReport(); 

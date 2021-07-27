@@ -106,6 +106,8 @@ public class FileHandling {
             targetFolder = "sequences_unexpectedclose";
         else if (sev == Verdict.SEVERITY_FAIL)
             targetFolder = "sequences_fail";
+        else if (sev == Verdict.SEVERITY_UNREPLAYABLE)
+            targetFolder = "sequences_unreplayable";
         else
             targetFolder = "sequences_other";
         LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
