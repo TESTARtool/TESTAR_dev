@@ -2,13 +2,8 @@
   "oracle": [
     {
       "doc": [ "any SEVERE log message is a failure" ],
-      "xquery": [ "ancestor::form[@name = 'bla']//tst:log/entry[@level = 'SEVERE' and contains(@msg, 'reference missing')]" ],
+      "xquery": [ "tst:log/entry[@level = 'SEVERE']" ],
       "severity": [ "1.0" ]
-    },
-    {
-      "doc": [ "any SEVERE log message is a failure" ],
-      "xquery": [ "tst:log/entry[@level = 'WARNING' and contains(@msg, 'dfhdfiog')]" ],
-      "severity": [ "0.3" ]
     }
   ],
   "ignore-filter": [
