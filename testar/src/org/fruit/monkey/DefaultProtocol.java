@@ -1161,7 +1161,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	        generatedSequence = getAndStoreGeneratedSequence();
 	        currentSeq = getAndStoreSequenceFile();
 
-	        Canvas canvas = buildCanvas();
+	        this.cv = buildCanvas();
 	        State state = getState(system);
 
 	        setReplayVerdict(getVerdict(state));
@@ -1212,8 +1212,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	            while(!success && (Util.time() - start < rrt)){       
 	                tries++;
-	                canvas.begin(); Util.clear(canvas);
-	                canvas.end();
+	                cv.begin(); Util.clear(cv);
+	                cv.end();
 
 	                /**
 	                 * Check if we are replaying the sequence correctly,
@@ -1256,7 +1256,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                }
 
 	                // In Replay-mode, we only show the red dot if visualizationOn is true:
-	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, canvas, state, actionToReplay);
+	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, actionToReplay);
 
 	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
 	                ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
@@ -1298,7 +1298,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            }
 	        }
 
-	        canvas.release();
+	        cv.release();
 
 	        // notify to state model the last state
 	        Set<Action> actions = deriveActions(system, state);
