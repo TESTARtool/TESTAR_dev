@@ -54,7 +54,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
@@ -65,15 +64,15 @@ import java.util.zip.GZIPInputStream;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.HtmlReporting.Reporting;
-import nl.ou.testar.visualvalidation.VisualValidationFactory;
-import nl.ou.testar.visualvalidation.VisualValidationManager;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.visualvalidation.VisualValidationFactory;
+import nl.ou.testar.visualvalidation.VisualValidationManager;
+import nl.ou.testar.visualvalidation.VisualValidationTag;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -1552,15 +1551,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				screenshot = ProtocolUtil.getStateshotBinary(state);
 			}
 			String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom,
-					"NoConcreteIdAvailable"), screenshot);
-			state.set(Tags.ScreenshotPath, screenshotPath);
-		}
-		visualValidationManager.AnalyzeImage(state, screenshot);
-	}
+                    "NoConcreteIdAvailable"), screenshot);
+            state.set(Tags.ScreenshotPath, screenshotPath);
+        }
 
-	@Override
+        htmlReport.addVisualValidationResult(
+                visualValidationManager.AnalyzeImage(state, screenshot), state, null
+        );
+        Logger.log(org.apache.logging.log4j.Level.DEBUG, "TESTING", "Continued");
+    }
+
+    @Override
 	protected Verdict getVerdict(State state){
 		Assert.notNull(state);
+		Verdict visualValidationVerdict = state.get(VisualValidationTag.VisualValidationVerdict, Verdict.OK);
 		//-------------------
 		// ORACLES FOR FREE
 		//-------------------
@@ -1581,21 +1585,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
-		Verdict suspiciousValueVerdict = Verdict.OK;
+		Verdict suspiciousValueVerdict;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
 			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
-				return suspiciousValueVerdict;
+				return suspiciousValueVerdict.join(visualValidationVerdict);
 			}
 		}
 
 		if (this.nonSuitableAction){
 			this.nonSuitableAction = false;
-			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
+			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state")
+					.join(visualValidationVerdict);
 		}
 
 		// if everything was OK ...
-		return Verdict.OK;
+		return Verdict.OK.join(visualValidationVerdict);
 	}
 
 	private Verdict suspiciousStringValueMatcher(Widget w) {
@@ -1736,15 +1741,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
-		AWTCanvas screenshot = null;
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			screenshot = WdProtocolUtil.getActionshot(state,action);
-		}else{
-			screenshot = ProtocolUtil.getActionshot(state,action);
-		}
-		ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), screenshot);
+        AWTCanvas screenshot;
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+            screenshot = WdProtocolUtil.getActionshot(state, action);
+        } else {
+            screenshot = ProtocolUtil.getActionshot(state, action);
+        }
+        state.set(ExecutedAction, action);
+        ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), screenshot);
 
-		visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null));
+        htmlReport.addVisualValidationResult(
+                visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null)),
+                state, action
+        );
+        Logger.log(org.apache.logging.log4j.Level.DEBUG, "TESTING", "Continued action");
 
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 

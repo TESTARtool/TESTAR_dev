@@ -10,6 +10,12 @@ public class MatcherResult {
     private final Set<LocationMatch> locationMatches = new TreeSet<>();
     private final Set<ContentMatchResult> contentMatchResults = new TreeSet<>();
 
+    /**
+     * Postfix for the screenshots created by the visual validation module.
+     * Should be added to the end of normal action and state screenshots. E.g. "filename+postfix.extension"
+     */
+    public static final String ScreenshotPostFix = "_vv";
+
     public void addContentMatchResult(ContentMatchResult result) {
         contentMatchResults.add(result);
     }

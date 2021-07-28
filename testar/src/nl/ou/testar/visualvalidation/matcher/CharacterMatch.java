@@ -16,6 +16,20 @@ public class CharacterMatch {
         this.character = new CharacterMatchEntry(character);
     }
 
+    /**
+     * @return Get the result of the character match.
+     */
+    public CharacterMatchResult getMatchResult(){
+        return result;
+    }
+
+    /**
+     * @return Get the character match.
+     */
+    public CharacterMatchEntry getCharacterMatch(){
+        return character;
+    }
+
     @Override
     public String toString() {
         return "CharacterMatch{" +

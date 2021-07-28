@@ -1,9 +1,11 @@
 package nl.ou.testar.visualvalidation;
 
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
 import nl.ou.testar.visualvalidation.extractor.ExpectedTextCallback;
 import nl.ou.testar.visualvalidation.extractor.ExtractorFactory;
 import nl.ou.testar.visualvalidation.extractor.TextExtractorInterface;
+import nl.ou.testar.visualvalidation.matcher.ContentMatchResult;
 import nl.ou.testar.visualvalidation.matcher.MatcherResult;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcher;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcherFactory;
@@ -16,39 +18,36 @@ import org.apache.logging.log4j.Level;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.alayer.AWTCanvas;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.visualizers.TextVisualizer;
 import org.testar.Logger;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nl.ou.testar.visualvalidation.VisualValidationTag.VisualValidationVerdict;
+import static nl.ou.testar.visualvalidation.VisualValidationVerdict.*;
+
 public class VisualValidator implements VisualValidationManager, OcrResultCallback, ExpectedTextCallback {
+    static final Color darkOrange = new Color(255, 128, 0);
     private final String TAG = "VisualValidator";
-    private int analysisId = 0;
-
     private final VisualMatcher _matcher;
-    private MatcherResult _matcherResult = null;
-
     private final OcrEngineInterface _ocrEngine;
     private final Object _ocrResultSync = new Object();
     private final AtomicBoolean _ocrResultReceived = new AtomicBoolean();
-    private List<RecognizedElement> _ocrItems = null;
-
     private final TextExtractorInterface _extractor;
     private final Object _expectedTextSync = new Object();
     private final AtomicBoolean _expectedTextReceived = new AtomicBoolean();
+    private int analysisId = 0;
+    private MatcherResult _matcherResult = null;
+    private List<RecognizedElement> _ocrItems = null;
     private List<ExpectedElement> _expectedText = null;
-
-    protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
-            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
     public VisualValidator(@NonNull VisualValidationSettings settings) {
         OcrConfiguration ocrConfig = settings.ocrConfiguration;
@@ -67,28 +66,36 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         _matcher = VisualMatcherFactory.createLocationMatcher(settings.matcherConfiguration);
     }
 
-    @Override
-    public void AnalyzeImage(State state, @Nullable AWTCanvas screenshot) {
-        AnalyzeImage(state, screenshot, null);
+    public static boolean isBetween(int x, int lower, int upper) {
+        return lower <= x && x <= upper;
     }
 
     @Override
-    public void AnalyzeImage(State state, @Nullable AWTCanvas screenshot, @Nullable Widget widget) {
+    public MatcherResult AnalyzeImage(State state, @Nullable AWTCanvas screenshot) {
+        return AnalyzeImage(state, screenshot, null);
+    }
+
+    @Override
+    public MatcherResult AnalyzeImage(State state, @Nullable AWTCanvas screenshot, @Nullable Widget widget) {
         // Create new session
         startNewAnalysis();
 
-        // Start ocr analysis, provide callback once finished.
-        parseScreenshot(screenshot);
+        if (screenshot != null) {
+            // Start ocr analysis, provide callback once finished.
+            parseScreenshot(screenshot);
 
-        // Start extracting text, provide callback once finished.
-        extractExpectedText(state, widget);
+            // Start extracting text, provide callback once finished.
+            extractExpectedText(state, widget);
 
-        // Match the expected text with the detected text.
-        matchText();
+            // Match the expected text with the detected text.
+            matchText();
 
-        updateVerdict(state);
-
-        storeAnalysis();
+            // Calculate the verdict and create a screenshot with annotations which can be used by the HTML reporter.
+            processMatchResult(state, screenshot);
+        } else {
+            Logger.log(Level.ERROR, TAG, "No screenshot for current state, skipping visual validation");
+        }
+        return _matcherResult;
     }
 
     private void startNewAnalysis() {
@@ -103,13 +110,8 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         Logger.log(Level.INFO, TAG, "Starting new analysis {}", analysisId);
     }
 
-    private void parseScreenshot(@Nullable AWTCanvas screenshot) {
-        if (screenshot != null) {
-            _ocrEngine.AnalyzeImage(screenshot.image(), this);
-
-        } else {
-            Logger.log(Level.ERROR, TAG, "No screenshot for current state");
-        }
+    private void parseScreenshot(AWTCanvas screenshot) {
+        _ocrEngine.AnalyzeImage(screenshot.image(), this);
     }
 
     private void extractExpectedText(State state, @Nullable Widget widget) {
@@ -140,26 +142,72 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
         waitForResult(_expectedTextReceived, _expectedTextSync);
     }
 
-    private void updateVerdict(State state) {
+    private void processMatchResult(State state, AWTCanvas screenshot) {
+        // Create a copy, so we can annotate the results without modifying the original one.
+        final AWTCanvas copy = new AWTCanvas(
+                screenshot.width(),
+                screenshot.height(),
+                screenshot.deepCopyImage(),
+                AWTCanvas.StorageFormat.PNG,
+                1.0);
 
+        final Verdict[] validationVerdict = {Verdict.OK};
         if (_matcherResult != null) {
-            // Analysis the raw result and create a verdict.
-            _matcherResult.getResult().forEach(result ->
-                    Logger.log(Level.INFO, TAG, "Content match result: {}", result)
+            // Draw a rectangle on each expected text element that has been recognized.
+            final ContentMatchResult[] lowestMatch = {null};
+            _matcherResult.getResult().forEach(result -> {
+                        java.awt.Color penColor;
+                        Verdict verdict;
+                        if (result.matchedPercentage == 100) {
+                            penColor = java.awt.Color.green;
+                            verdict = createSuccessVerdict(result);
+                        } else if (isBetween(result.matchedPercentage, 75, 99)) {
+                            penColor = java.awt.Color.yellow;
+                            verdict = createAlmostMatchedVerdict(result);
+                        } else {
+                            penColor = darkOrange;
+                            verdict = createHardlyMatchedVerdict(result);
+                        }
+
+                        // Store the result with the lowest percentage including the corresponding verdict.
+                        if ((lowestMatch[0] == null) ||
+                                (lowestMatch[0].matchedPercentage > result.matchedPercentage)) {
+                            lowestMatch[0] = result;
+                            validationVerdict[0] = verdict;
+                        }
+
+                        drawRectangle(copy, result.foundLocation, penColor);
+                    }
             );
-
-            Verdict result = new Verdict(Verdict.SEVERITY_WARNING, "Not all texts has been recognized",
-                    new TextVisualizer(new AbsolutePosition(10, 10), "->", RedPen));
-
-        } else {
-            // Set verdict to failure we should have a matcher result as minimal input.
-            Logger.log(Level.INFO, TAG, "No result");
+            _matcherResult.getNoLocationMatches().forEach(result ->
+                    {
+                        drawRectangle(copy, result._location, java.awt.Color.red);
+                        // Overwrite the verdict if we couldn't find a location match for expected text.
+                        validationVerdict[0] = createFailedToMatchVerdict(result);
+                    }
+            );
         }
-        Logger.log(Level.INFO, TAG, "Updating verdict {}");
+        // Store the validation verdict for this run.
+        state.set(VisualValidationVerdict, validationVerdict[0]);
+
+        // Store the annotated screenshot, so they can be used by the HTML report generator.
+        String stateId = state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable");
+        Action action = state.get(Tags.ExecutedAction, null);
+        if (action != null) {
+            String actionID = action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable");
+            ScreenshotSerialiser.saveActionshot(stateId, actionID + MatcherResult.ScreenshotPostFix, copy);
+        } else {
+            ScreenshotSerialiser.saveStateshot(stateId + MatcherResult.ScreenshotPostFix, copy);
+        }
+
+        Logger.log(Level.INFO, TAG, "Processed match results");
     }
 
-    private void storeAnalysis() {
-        Logger.log(Level.INFO, TAG, "Storing analysis");
+    private void drawRectangle(AWTCanvas screenshot, Rectangle location, java.awt.Color color) {
+        Graphics2D graphics = screenshot.image().createGraphics();
+        graphics.setColor(color);
+        graphics.drawRect(location.x, location.y, location.width - 1, location.height - 1);
+        graphics.dispose();
     }
 
     @Override

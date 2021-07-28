@@ -3,7 +3,7 @@ package nl.ou.testar.visualvalidation.matcher;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Container to store the matched counter part of the expected character.
+ * Container to store the matched counterpart of the expected character.
  */
 public class CharacterMatchEntry {
     final Character character;
@@ -27,6 +27,20 @@ public class CharacterMatchEntry {
     public void Match(@NonNull CharacterMatchEntry matchedCharacter) {
         match = matchedCharacter;
         matchedCharacter.match = this;
+    }
+
+    /**
+     * @return Get the character.
+     */
+    public Character getCharacter() {
+        return character;
+    }
+
+    /**
+     * @return Get the matched counterpart of this character.
+     */
+    public CharacterMatchEntry getCounterPart(){
+        return match;
     }
 
     /**

@@ -12,13 +12,21 @@ public class ExpectedTextMatchResult {
 
     /**
      * Constructor.
+     *
      * @param expectedText The expected text that we are matching.
      */
     public ExpectedTextMatchResult(String expectedText) {
         this.expectedText = new ArrayList<>(expectedText.length());
-        for (char ch: expectedText.toCharArray()) {
+        for (char ch : expectedText.toCharArray()) {
             this.expectedText.add(new CharacterMatch(ch));
         }
+    }
+
+    /**
+     * @return The matching result of the expected text characters.
+     */
+    public ArrayList<CharacterMatch> getResult() {
+        return expectedText;
     }
 
     @Override

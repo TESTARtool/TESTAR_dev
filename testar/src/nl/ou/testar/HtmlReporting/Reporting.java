@@ -30,6 +30,8 @@
 
 package nl.ou.testar.HtmlReporting;
 
+import nl.ou.testar.visualvalidation.matcher.MatcherResult;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.alayer.State;
 import java.util.Set;
 import org.fruit.alayer.Action;
@@ -42,5 +44,6 @@ public interface Reporting {
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
     public void addTestVerdict(Verdict verdict);
+    void addVisualValidationResult(MatcherResult result, State state, @Nullable Action action);
     public void close();
 }

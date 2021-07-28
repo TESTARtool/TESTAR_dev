@@ -23,6 +23,13 @@ public class RecognizedTextMatchResult {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @return The matching result of the recognized text characters.
+     */
+    public List<CharacterMatchEntry> getResult() {
+        return recognized;
+    }
+
     @Override
     public String toString() {
         return "RecognizedTextMatchResult{" +

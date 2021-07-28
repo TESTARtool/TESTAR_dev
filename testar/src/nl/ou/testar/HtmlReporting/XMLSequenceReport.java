@@ -35,6 +35,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import nl.ou.testar.visualvalidation.matcher.MatcherResult;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
@@ -152,6 +154,11 @@ public class XMLSequenceReport implements Reporting {
         System.out.println("addTestVerdict "+verdict);
         out.write(testRun.toString());
         out.flush();
+    }
+
+    @Override
+    public void addVisualValidationResult(MatcherResult result, State state, @Nullable Action action) {
+
     }
 
     private TestRun testRun = new TestRun();

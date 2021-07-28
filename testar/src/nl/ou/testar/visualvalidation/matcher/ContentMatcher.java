@@ -51,7 +51,7 @@ class ContentMatcher {
             for (int k = indexCounter; k < unMatchedSize; k++) {
                 CharacterMatchEntry item = recognizedResult.recognized.get(k);
 
-                // Try to match the actual char case sensitive:
+                // Try to match the actual char case-sensitive:
                 if (item.character == actual && item.isNotMatched()) {
                     expectedChar.character.Match(item);
                     expectedChar.result = CharacterMatchResult.MATCHED;
@@ -60,7 +60,7 @@ class ContentMatcher {
                     break;
                 }
 
-                // Try to match the actual char as case insensitive:
+                // Try to match the actual char as case-insensitive:
                 if (Character.isLetter(actual)) {
                     int CASING = 32;
                     if (Math.abs(item.character.compareTo(actual)) == CASING && item.isNotMatched()) {
@@ -76,7 +76,7 @@ class ContentMatcher {
 
         correctWhitespaces(expectedResult);
 
-        return new ContentMatchResult(expectedResult, recognizedResult);
+        return new ContentMatchResult(expectedResult, recognizedResult, locationMatch.expectedElement._location);
     }
 
     @NonNull
@@ -88,7 +88,7 @@ class ContentMatcher {
         // Get the sorted Y-axe coordinates for the identified lines.
         List<Integer> bucketSorted = lineBucket.keySet().stream().sorted().collect(Collectors.toList());
 
-        // For each line sort the elements based on their X-axis coordinate and add the to the result.
+        // For each line sort the elements based on their X-axis coordinate and add to the result.
         List<RecognizedElement> sorted = new ArrayList<>();
         bucketSorted.forEach(line ->
                 {
@@ -110,7 +110,7 @@ class ContentMatcher {
                 .average()
                 .orElse(Double.NaN);
 
-        // Create a overview of pairs reflecting the center line of the text and the recognized element.
+        // Create an overview of pairs reflecting the center line of the text and the recognized element.
         List<Pair<Integer, RecognizedElement>> lines = locationMatch.recognizedElements.stream()
                 .map(e -> new Pair<>(e._location.y + (e._location.height / 2), e))
                 .collect(Collectors.toList());

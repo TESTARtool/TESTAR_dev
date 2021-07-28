@@ -16,6 +16,7 @@ public class ContentMatchResult implements Comparable<ContentMatchResult> {
     public final Location foundLocation;
     public final long totalMatched;
     public final long totalExpected;
+    public final int matchedPercentage;
 
     public ContentMatchResult(ExpectedTextMatchResult expectedResult, RecognizedTextMatchResult recognizedResult, Location foundLocation) {
         this.expectedResult = expectedResult;
@@ -25,6 +26,7 @@ public class ContentMatchResult implements Comparable<ContentMatchResult> {
                 .filter(e -> e.result != CharacterMatchResult.NO_MATCH)
                 .count();
         totalExpected = expectedResult.expectedText.size();
+        matchedPercentage = Math.round((float) totalMatched * 100 / totalExpected);
         expectedText = expectedResult.expectedText.stream().
                 map(e -> e.character.character).collect(Collector.of(
                 StringBuilder::new,
@@ -42,18 +44,7 @@ public class ContentMatchResult implements Comparable<ContentMatchResult> {
                 .append("\"\n")
 
                 .append("Result: ")
-                .append(expectedResult.expectedText.stream().map(it -> {
-                    switch (it.result) {
-                        case WHITESPACE_CORRECTED:
-                            return "W";
-                        case CASE_MISMATCH:
-                            return "C";
-                        case MATCHED:
-                            return "V";
-                        default:
-                            return "X";
-                    }
-                }).collect(Collectors.toList()))
+                .append(expectedResult.expectedText.stream().map(it -> it.result).collect(Collectors.toList()))
                 .append(" [").append(totalMatched).append("/").append(totalExpected).append("]\n")
 
                 .append("Expect: ").append(expectedResult.expectedText.stream()
