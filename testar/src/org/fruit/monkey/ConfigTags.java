@@ -97,7 +97,7 @@ public final class ConfigTags {
 
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
-  public static final Tag<Boolean> StateModelReinforcementLearningEnabled = Tag.from("StateModelReinforcementLearningEnabled", Boolean.class);
+  public static final Tag<String> StateModelReinforcementLearningEnabled = Tag.from("StateModelReinforcementLearningEnabled", String.class);
   public static final Tag<String> DataStore = Tag.from("DataStore", String.class);
   public static final Tag<String> DataStoreType = Tag.from("DataStoreType", String.class);
   public static final Tag<String> DataStoreServer = Tag.from("DataStoreServer", String.class);
@@ -123,6 +123,8 @@ public final class ConfigTags {
   public static final Tag<Float> DecayRate = Tag.from("DecayRate", Float.class);
   public static final Tag<Float> Temperature = Tag.from("Temperature", Float.class);
   public static final Tag<Float> MaxQValue = Tag.from("MaxQValue", Float.class);
+  public static final Tag<String> TagName = Tag.from("TagName", String.class);
+  public static final Tag<String> QFunction = Tag.from("QFunction", String.class);
 
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);

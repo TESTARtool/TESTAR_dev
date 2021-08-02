@@ -2,6 +2,8 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
+
+import org.fruit.alayer.Action;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -12,6 +14,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -53,8 +57,11 @@ public class ImageRecognitionBasedRewardFunctionTest {
         rewardFunction.screenImagePreviouslyExecutedAction = mockedScreenshotPreviouslyExecutedAction;
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshotPreviouslyExecutedAction);
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,  null, executedAction, null, actions);
 
         // then
         assertEquals(0f, reward, 0);
@@ -72,8 +79,11 @@ public class ImageRecognitionBasedRewardFunctionTest {
         rewardFunction.screenImagePreviouslyExecutedAction = mockedScreenshotPreviouslyExecutedAction;
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions);
 
         // then
         assertEquals(0.25f, reward, 0.05f);
@@ -91,8 +101,11 @@ public class ImageRecognitionBasedRewardFunctionTest {
         rewardFunction.screenImagePreviouslyExecutedAction = mockedScreenshotPreviouslyExecutedAction;
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions);
 
         // then
         assertEquals(0.50f, reward, 0.05f);
@@ -110,8 +123,11 @@ public class ImageRecognitionBasedRewardFunctionTest {
         rewardFunction.screenImagePreviouslyExecutedAction = mockedScreenshotPreviouslyExecutedAction;
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions);
 
         // then
         assertEquals(0.75f, reward, 0.05f);
@@ -129,8 +145,11 @@ public class ImageRecognitionBasedRewardFunctionTest {
         rewardFunction.screenImagePreviouslyExecutedAction = mockedScreenshotPreviouslyExecutedAction;
         when(rewardFunction.takeScreenshot()).thenReturn(mockedScreenshot);
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions);
 
         // then
         assertEquals(1.00f, reward, 0.05f);

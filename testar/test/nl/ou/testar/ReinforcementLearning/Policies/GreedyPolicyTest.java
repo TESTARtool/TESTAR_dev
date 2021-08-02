@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class GreedyPolicyTest {
 
-    final private Policy policy = new GreedyPolicy(0f);
+    final private Policy policy = new GreedyPolicy(0f, RLTags.SarsaValue);
 
     @Test
     public void applyPolicy_returnsAnAction_whenASetWithOneActionIsProvided () {

@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
 import org.apache.commons.collections.map.MultiKeyMap;
+import org.fruit.alayer.Action;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
@@ -13,6 +14,7 @@ import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.util.Deque;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -42,7 +44,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
     }
 
     @Override
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final AbstractAction executedAction) {
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
         if (state == null) {
             return 0f;
         }
@@ -85,7 +87,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         previousState = state;
         treeDist.clear();
 
-        final String id = executedAction==null ? null : executedAction.getId();
+        final String id = executedAbstractAction==null ? null : executedAbstractAction.getId();
         logger.info("ID={} reward={}", id, reward);
 
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server

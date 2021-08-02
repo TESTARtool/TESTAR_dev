@@ -1,7 +1,11 @@
 package nl.ou.testar.ReinforcementLearning.Utils;
 
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import org.fruit.alayer.Tag;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,5 +30,11 @@ public class ReinforcementLearningUtil {
             final Set<AbstractAction> actionSetMaxValues = new HashSet<>(actionsSelected);
             return RandomActionSelector.selectAbstractAction(actionSetMaxValues);
         }
+    }
+
+    public static Tag<Float> getTag(final Settings settings) {
+
+        String tagName = settings.get(ConfigTags.TagName);
+        return (Tag<Float>) RLTags.getTag(tagName);
     }
 }

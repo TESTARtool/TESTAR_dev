@@ -2,6 +2,11 @@ package nl.ou.testar.ReinforcementLearning.QFunctions;
 
 
 import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractState;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Tag;
+
+import java.util.Set;
 
 /**
  * Interface for a Q-function
@@ -14,5 +19,5 @@ public interface QFunction {
      * @param actionUnderExecution, is not null
      * @param reward
      */
-    float getQValue(final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward);
+    float getQValue(Tag<Float> rl_tag, final AbstractAction previousActionUnderExecution, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions);
 }

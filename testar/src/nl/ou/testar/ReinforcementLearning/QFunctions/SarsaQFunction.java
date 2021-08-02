@@ -1,7 +1,11 @@
 package nl.ou.testar.ReinforcementLearning.QFunctions;
 
-import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.AbstractState;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Tag;
+
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,14 +37,15 @@ public class SarsaQFunction implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction actionUnderExecution, final float reward, final AbstractState currentAbstractState, final Set<Action> actions) {
         float oldQValue = 0f;
         if (previouslyExecutedAction != null) {
-            oldQValue = previouslyExecutedAction.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+            oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
         }
+
         float newQValue = defaultQValue;
         if (actionUnderExecution != null) {
-            newQValue = actionUnderExecution.getAttributes().get(RLTags.SarsaValue, defaultQValue);
+            newQValue = actionUnderExecution.getAttributes().get(rl_tag, defaultQValue);
         }
         final float qValue = oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
         logger.info("For abstract action with abstractID={} q-value={} was found", previouslyExecutedAction == null? null : previouslyExecutedAction.getId(), qValue);

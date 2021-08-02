@@ -49,14 +49,28 @@ public class RLTags extends TagsBase  {
 	public static final Tag<Integer> Counter = from("counter", Integer.class);
 
 	public static final Tag<Integer> ActionCounter = from("actionCounter", Integer.class);
+
+	public static final Tag<Float> QLearningValue = from("qvalue", Float.class);
 	
 	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
 		{
 			add(SarsaValue);
 			add(Counter);
 			add(ActionCounter);
+			add(QLearningValue);
 		}
 	};
+
+	public static Tag<?> getTag(String tagName){
+		for(Tag<?> tag: reinforcementLearningTags){
+			if(tag.name().equals(tagName)){
+				System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*");
+				System.out.println(tag);
+				return tag;
+			}
+		}
+		return SarsaValue;
+	}
 
 	public static Set<Tag<?>> getReinforcementLearningTags() {
 		return reinforcementLearningTags;

@@ -76,7 +76,7 @@ public class Protocol_desktop_reinforcement_learning_simple_two_model extends De
         //disconnectRDP();
 
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
 
         // Extended settings framework, set ConfigTags settings with XML framework values
         // test.setting -> ExtendedSettingsFile
