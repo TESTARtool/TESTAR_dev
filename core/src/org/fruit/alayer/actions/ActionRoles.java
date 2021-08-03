@@ -75,6 +75,10 @@ public final class ActionRoles {
 	Selenium = Role.from("Selenium"),
 	SeleniumClear = Role.from("Clear", Selenium),
 	SeleniumClick = Role.from("Click", Selenium),
+	SeleniumDrag = Role.from("Drag", Selenium),
 	SeleniumSendKeys = Role.from("SendKeys", Selenium),
-	SeleniumSubmit = Role.from("Submit", Selenium);
+	SeleniumSubmit = Role.from("Submit", Selenium),
+
+	SeleniumDoubleClick = Role.from("DoubleClick", SeleniumClick),
+	SeleniumTripleClick = Role.from("TripleClick", SeleniumClick);
 }

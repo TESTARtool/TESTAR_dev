@@ -20,7 +20,7 @@ public class SeleniumClickAction extends SeleniumAction {
     }
 
     @Override
-    protected void performAction() {
+    protected void performAction(State state) {
         final WebElement element = WdDriver.getRemoteWebDriver().findElementByXPath(target);
         element.click();
     }
