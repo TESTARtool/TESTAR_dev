@@ -109,7 +109,7 @@ public class Protocol_test_gradle_workflow_webdriver_selenium extends WebdriverP
 
         // create an action compiler, which helps us create actions
         // such as clicks, clear, typing ...
-        SeleniumActionCompiler ac = new SeleniumActionCompiler();
+        SeleniumActionCompiler ac = new SeleniumActionCompiler(state);
 
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
