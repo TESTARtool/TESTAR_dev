@@ -83,7 +83,7 @@ public class StateModelPanel extends SettingsPanel {
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
     private JComboBox<String> actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first"});
-    private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
+    private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal","docker"});
     private Set<JComponent> components;
     private JCheckBox accessBridgeEnabledBox = new JCheckBox();
     private JTextField dataStoreDirectoryField = new JTextField();
@@ -351,9 +351,12 @@ public class StateModelPanel extends SettingsPanel {
 
     // make sure the right text fields are enabled based on the selected data store type (remote or local)
     private void checkDataType() {
-        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote") && stateModelEnabledChkBox.isSelected());
-        dataStoreDirectoryField.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
-        dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
+        boolean docker = dataStoreTypeBox.getSelectedItem().equals("docker");
+        boolean plocal = dataStoreTypeBox.getSelectedItem().equals("plocal");
+        boolean remote = dataStoreTypeBox.getSelectedItem().equals("remote");
+        dataStoreServerTextfield.setEnabled(remote && stateModelEnabledChkBox.isSelected() && !docker);
+        dataStoreDirectoryField.setEnabled(plocal && !docker);
+        dirButton.setEnabled(plocal && !docker);
     }
 
     // helper method to ensure that the state model enabled box is selected

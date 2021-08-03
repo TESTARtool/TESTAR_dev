@@ -84,6 +84,9 @@ import org.fruit.monkey.dialog.ProgressDialog;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceDelegate;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
+import org.fruit.monkey.orientdb.OrientDBService;
+import org.fruit.monkey.orientdb.OrientDBServiceDelegate;
+import org.fruit.monkey.orientdb.OrientDbServiceImpl;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
 import org.fruit.monkey.webserver.ReportingServiceImpl;
@@ -118,6 +121,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	private int reportId = -1;
 	private int iterationId = -1;
 
+	private OrientDBService orientService;
+
 	private boolean isLocalDatabaseActive = false;
 
 	// List of atributes to identify and close policy popups
@@ -140,6 +145,41 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
+		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
+			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
+			ProgressDialog progressDialog = new ProgressDialog();
+			progressDialog.setStatusString("Preparing OrientDB");
+
+			orientService.setDelegate(new OrientDBServiceDelegate() {
+				@Override
+				public void onStateChanged(State state, String description) {
+					progressDialog.setStatusString(description);
+				}
+
+				@Override
+				public void onServiceReady() {
+					progressDialog.endProgress(null, true);
+				}
+			});
+
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						orientService.startLocalDatabase();
+					} catch (Exception e) {
+						System.err.println("Cannot initialize OrientDB");
+						e.printStackTrace();
+					}
+				}
+			}.start();
+			progressDialog.pack();
+			progressDialog.setLocationRelativeTo(null);
+			progressDialog.setVisible(true);
+
+
+		}
+
 		if (settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
 			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
@@ -157,7 +197,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 
 				@Override
-				public void onServiceReady(String url) {
+				public void onServiceReady(String str) {
 					progressDialog.endProgress(null, true);
 				}
 			});
@@ -166,7 +206,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				@Override
 				public void run() {
 					try {
-						if (settings.get(ConfigTags.DataStoreType).equals("plocal")) {
+						if (settings.get(ConfigTags.DataStoreType).equals("plocal") || settings.get(ConfigTags.DataStoreType).equals("docker")) {
 							sqlService.startLocalDatabase(databaseName, userName, userPassword);
 							isLocalDatabaseActive = true;
 						}
