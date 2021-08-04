@@ -37,6 +37,16 @@ import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import org.fruit.*;
 import org.fruit.alayer.Tag;
 
@@ -54,7 +64,7 @@ import org.testar.settings.ExtendedSettingsFactory;
 import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.ConfigTags.*;
 
-public class Main {
+public class Main extends Application {
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -93,58 +103,83 @@ public class Main {
 
 	/**
 	 * Main method to run TESTAR
-	 * 
+	 *
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
 
+	public static void main(String args[]) {
+		launch(args);
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+
+		System.out.println("(0)");
 		isValidJavaEnvironment();
-		
+
+		System.out.println("(1)");
 		verifyTestarInitialDirectory();
 
-		initTestarSSE(args);
+		System.out.println("(2)");
+		initTestarSSE(getParameters());
 
+		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
-		Settings settings = loadTestarSettings(args, testSettingsFileName);
+		System.out.println("(4)");
+		Settings settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
+			System.out.println("(5)");
 			setTestarDirectory(settings);
 
+			System.out.println("(6)");
 			initCodingManager(settings);
 
+			System.out.println("(7)");
 			initOperatingSystem();
 
+			System.out.println("(8)");
 			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
-			while(startTestarDialog(settings, testSettingsFileName)) {
+			System.out.println("(9)");
+			while(startTestarDialog(primaryStage, settings, testSettingsFileName)) {
 
+				System.out.println("(10)");
 				testSettingsFileName = getTestSettingsFile();
-				settings = loadTestarSettings(args, testSettingsFileName);
+				settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
+				System.out.println("(11)");
 				setTestarDirectory(settings);
 
+				System.out.println("(12)");
 				initCodingManager(settings);
 
+				System.out.println("(13)");
 				initOperatingSystem();
 
+				System.out.println("(14)");
 				startTestar(settings);
 			}
 		}
 
+		System.out.println("(15)");
 		TestSerialiser.exit();
+		System.out.println("(16)");
 		ScreenshotSerialiser.exit();
+		System.out.println("(17)");
 		LogSerialiser.exit();
 
-		System.exit(0);
+//		System.out.println("(18)");
+//		System.exit(0);
 
 	}
 
@@ -203,10 +238,10 @@ public class Main {
 
 	/**
 	 * Find or create the .sse file, to known with what settings and protocol start TESTAR
-	 * 
-	 * @param args
+	 *
+	 * @param parameters
 	 */
-	private static void initTestarSSE(String[] args){
+	private static void initTestarSSE(Parameters parameters){
 
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -215,16 +250,19 @@ public class Main {
 		// and that there is exactly one.
 
 		//Allow users to use command line to choose a protocol modifying sse file
-		for(String sett : args) {
+		System.out.println("[0]");
+		for(String sett : parameters.getRaw()) {
 			if(sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
 				}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
 		}
 
+		System.out.println("[1]");
 		String[] files = getSSE();
 
 		// If there is more than 1, then delete them all
+		System.out.println("[2]");
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
@@ -234,14 +272,18 @@ public class Main {
 		}
 
 		//If there is none, then start up a selection menu
+		System.out.println("[3]");
 		if (files == null || files.length == 0) {
+			System.out.println("[4]");
 			settingsSelection();
+			System.out.println("[5]");
 			if (SSE_ACTIVATED == null) {
 				System.exit(-1);
 			}
 		}
 		else {
 			//Use the only file that was found
+			System.out.println("[6]");
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
 	}
@@ -265,22 +307,23 @@ public class Main {
 		else {
 			Object[] options = sutSettings.toArray();
 			Arrays.sort(options);
-			JFrame settingsSelectorDialog = new JFrame();
-			settingsSelectorDialog.setAlwaysOnTop(true);
-			String sseSelected = (String) JOptionPane.showInputDialog(settingsSelectorDialog,
-					"Select the desired setting:", "TESTAR settings", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-			if (sseSelected == null) {
+			ChoiceDialog settingsSelectorDialog = new ChoiceDialog(options[0], options);
+			settingsSelectorDialog.setTitle("TESTAR settings");
+			settingsSelectorDialog.setContentText("Select the desired setting:");
+			Optional<String> sseSelected = settingsSelectorDialog.showAndWait();
+
+			if (!sseSelected.isPresent()) {
 				SSE_ACTIVATED = null;
 				return;
 			}
 
-			final String sseFile = sseSelected + SUT_SETTINGS_EXT;
+			final String sseFile = sseSelected.get() + SUT_SETTINGS_EXT;
 
 			try {
 				File f = new File(settingsDir + File.separator + sseFile);
 				if (f.createNewFile()) {
-					SSE_ACTIVATED = sseSelected;
+					SSE_ACTIVATED = sseSelected.get();
 					return;
 				}
 			} catch (IOException e) {
@@ -299,7 +342,7 @@ public class Main {
 	 * @param testSettingsFileName
 	 * @return settings
 	 */
-	private static Settings loadTestarSettings(String[] args, String testSettingsFileName){
+	private static Settings loadTestarSettings(List<String> args, String testSettingsFileName){
 
 		Settings settings = null;
 		try {
@@ -325,7 +368,25 @@ public class Main {
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
 	 */
-	public static boolean startTestarDialog(Settings settings, String testSettingsFileName) {
+	public static boolean startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+
+		FXMLLoader loader = new FXMLLoader(Main.class.getClassLoader().getResource("jfx/dashboard.fxml"));
+		try {
+			Parent root = loader.load();
+			//TODO: set controller
+			Scene scene = new Scene(root);
+
+			stage.setTitle("Testar");
+			stage.setWidth(1024);
+			stage.setHeight(720);
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (true) return false;
+
 		// Start up the TESTAR Dialog
 		try {
 			if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
@@ -346,6 +407,9 @@ public class Main {
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
+
+		launch();
+		if (true) return;
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
@@ -404,12 +468,12 @@ public class Main {
 	/**
 	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
 	 * This is needed because the user might not have set all the possible settings in the test.settings file.
-	 * @param argv
+	 * @param args
 	 * @param file
 	 * @return An instance of Settings
 	 * @throws ConfigException
 	 */
-	public static Settings loadSettings(String[] argv, String file) throws ConfigException {
+	public static Settings loadSettings(List<String> args, String file) throws ConfigException {
 		Assert.notNull(file);
 		try {
 			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
@@ -552,9 +616,12 @@ public class Main {
 			Settings settings = Settings.fromFile(defaults, file);
 
 			//If user use command line to input properties, mix file settings with cmd properties
-			if(argv.length>0) {
+
+			int size = args.size();
+			if(size>0) {
+				String argArray[] = new String[size];
 				try {
-					settings = Settings.fromFileCmd(defaults, file, argv);
+					settings = Settings.fromFileCmd(defaults, file, args.toArray(argArray));
 				}catch(Exception e) {
 					System.out.println("Error with command line properties. Examples:");
 					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
@@ -765,4 +832,25 @@ public class Main {
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
+
+//	@Override
+//	public void start(Stage primaryStage) throws Exception {
+//		Button btn = new Button();
+//		btn.setText("Say 'Preved'");
+//		btn.setOnAction(new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent event) {
+//				System.out.println("Preved Medved!");
+//			}
+//		});
+//
+//		StackPane root = new StackPane();
+//		root.getChildren().add(btn);
+//
+//		Scene scene = new Scene(root, 300, 250);
+//
+//		primaryStage.setTitle("Preved Medved!");
+//		primaryStage.setScene(scene);
+//		primaryStage.show();
+//	}
 }

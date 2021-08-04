@@ -50,10 +50,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -217,7 +214,7 @@ public class SettingsDialog extends JFrame implements Observer {
     new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
       settingsFile = settingsDir + sutSettings + File.separator + Main.SETTINGS_FILE;
-      settings = Main.loadSettings(new String[0], settingsFile);
+      settings = Main.loadSettings(new ArrayList<>(), settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
       Main.SSE_ACTIVATED = sutSettings;
