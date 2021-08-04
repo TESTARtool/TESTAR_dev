@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox>
+         <children>
+            <Label prefHeight="64.0" text="Dashboard" textFill="WHITE">
+               <font>
+                  <Font name="Arial Black" size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 24;">
+         <children>
+            <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="SPY Mode" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/spy.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnAutoTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius-fx-background-radius: 12;" text="Start automated test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/auto.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnRecTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Record test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/rec.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnReplayTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Replay test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/replay.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnViewReports" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="View reports" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/view.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="100.0" style="-fx-spacing: 40;">
+         <children>
+            <JFXButton id="btnDownloads" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: a8cbe8; -fx-background-radius: 18;" text="Visit downloads" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton id="btnUpdate" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Update software">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton id="btnManual" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="User manual">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="BOTTOM_CENTER" prefHeight="42.0">
+         <children>
+            <Label text="Our partners" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="80.0">
+         <children>
+            <ImageView scaleX="0.75" scaleY="0.75">
+               <image>
+                  <Image url="@logos/ing.png" />
+               </image>
+            </ImageView>
+            <ImageView scaleX="0.75" scaleY="0.75">
+               <image>
+                  <Image url="@logos/marviq.png" />
+               </image>
+            </ImageView>
+            <ImageView scaleX="0.75" scaleY="0.75">
+               <image>
+                  <Image url="@logos/open_university.png" />
+               </image>
+            </ImageView>
+            <ImageView scaleX="0.75" scaleY="0.75">
+               <image>
+                  <Image url="@logos/philips.png" />
+               </image>
+            </ImageView>
+            <ImageView scaleX="0.75" scaleY="0.75">
+               <image>
+                  <Image url="@logos/sogeti.png" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
+   </children>
+</VBox>

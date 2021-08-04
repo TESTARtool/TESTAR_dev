@@ -95,6 +95,7 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
     compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+    compile 'com.jfoenix:jfoenix:8.0.10'
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     runtime project(':windows')

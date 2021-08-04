@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane id="main" prefHeight="500.0" prefWidth="920.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <Label text="TEST*" textFill="WHITE" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="Arial Bold" size="24.0" />
+         </font>
+      </Label>
+   </top>
+   <left>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox alignment="TOP_CENTER" prefWidth="64.0" style="-fx-spacing: 28;">
+               <children>
+                  <JFXButton id="btnHome" contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView>
+                           <image>
+                              <Image url="@icons/home.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView id="btnSettings">
+                           <image>
+                              <Image url="@icons/settings.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="4.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" height="476.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="4.0" VBox.vgrow="ALWAYS">
+                     <fill>
+                        <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="0.3019607961177826" green="0.5411764979362488" blue="0.7960784435272217" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </RadialGradient>
+                     </fill>
+                  </Rectangle>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </left>
+</BorderPane>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane>
+         <left>
+            <Label prefHeight="64.0" text="Settings" textFill="WHITE" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial Black" size="18.0" />
+               </font>
+            </Label>
+         </left>
+         <right>
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="100.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Back" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+               <graphic>
+                  <ImageView>
+                     <image>
+                        <Image url="@icons/back.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </right>
+      </BorderPane>
+      <HBox />
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 24;">
+         <children>
+            <JFXButton id="btnFilters" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Filters &amp; oracles" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/filter.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnTime" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius-fx-background-radius: 12;" text="Time settings" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/time.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnMisc" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Misc" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/misc.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnState" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="State model" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/state.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </children>
+      </HBox>
+   </children>
+</VBox>
