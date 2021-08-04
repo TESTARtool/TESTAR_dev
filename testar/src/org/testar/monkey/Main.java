@@ -47,6 +47,7 @@ import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
 
+import javafx.fxml.FXMLLoader;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -115,12 +116,16 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
+		System.out.println("(0)");
 		isValidJavaEnvironment();
 
+		System.out.println("(1)");
 		verifyTestarInitialDirectory();
 
+		System.out.println("(2)");
 		initTestarSSE(getParameters());
 
+		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
@@ -131,34 +136,47 @@ public class Main extends Application {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
+			System.out.println("(5)");
 			setTestarDirectory(settings);
 
+			System.out.println("(6)");
 			initCodingManager(settings);
 
+			System.out.println("(7)");
 			initOperatingSystem();
 
+			System.out.println("(8)");
 			startTestar(settings);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
+			System.out.println("(9)");
 			while(startTestarDialog(primaryStage, settings, testSettingsFileName)) {
 
+				System.out.println("(10)");
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
+				System.out.println("(11)");
 				setTestarDirectory(settings);
 
+				System.out.println("(12)");
 				initCodingManager(settings);
 
+				System.out.println("(13)");
 				initOperatingSystem();
 
+				System.out.println("(14)");
 				startTestar(settings);
 			}
 		}
 
+		System.out.println("(15)");
 		TestSerialiser.exit();
+		System.out.println("(16)");
 		ScreenshotSerialiser.exit();
+		System.out.println("(17)");
 		LogSerialiser.exit();
 
 //		System.out.println("(18)");
@@ -234,6 +252,7 @@ public class Main extends Application {
 		// and that there is exactly one.
 
 		//Allow users to use command line to choose a protocol modifying sse file
+		System.out.println("[0]");
 		for(String sett : parameters.getRaw()) {
 			if(sett.toString().contains("sse="))
 				try {
@@ -241,9 +260,11 @@ public class Main extends Application {
 				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");}
 		}
 
+		System.out.println("[1]");
 		String[] files = getSSE();
 
 		// If there is more than 1, then delete them all
+		System.out.println("[2]");
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
@@ -253,14 +274,18 @@ public class Main extends Application {
 		}
 
 		//If there is none, then start up a selection menu
+		System.out.println("[3]");
 		if (files == null || files.length == 0) {
+			System.out.println("[4]");
 			settingsSelection();
+			System.out.println("[5]");
 			if (SSE_ACTIVATED == null) {
 				System.exit(-1);
 			}
 		}
 		else {
 			//Use the only file that was found
+			System.out.println("[6]");
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
 	}
@@ -817,4 +842,25 @@ public class Main extends Application {
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
+
+//	@Override
+//	public void start(Stage primaryStage) throws Exception {
+//		Button btn = new Button();
+//		btn.setText("Say 'Preved'");
+//		btn.setOnAction(new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent event) {
+//				System.out.println("Preved Medved!");
+//			}
+//		});
+//
+//		StackPane root = new StackPane();
+//		root.getChildren().add(btn);
+//
+//		Scene scene = new Scene(root, 300, 250);
+//
+//		primaryStage.setTitle("Preved Medved!");
+//		primaryStage.setScene(scene);
+//		primaryStage.show();
+//	}
 }
