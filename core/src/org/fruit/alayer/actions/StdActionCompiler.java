@@ -48,7 +48,7 @@ import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 
-public class StdActionCompiler {
+public class StdActionCompiler implements WidgetActionCompiler<Widget> {
 	Abstractor abstractor;
 	private final Action LMouseDown = new MouseDown(MouseButtons.BUTTON1);
 	private final Action RMouseDown = new MouseDown(MouseButtons.BUTTON3);
