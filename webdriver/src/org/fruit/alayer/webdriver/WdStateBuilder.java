@@ -54,13 +54,6 @@ public class WdStateBuilder implements StateBuilder {
 
   @Override
   public WdState apply(SUT system) throws StateBuildException {
-
-    System.out.println("=======");
-    for (StackTraceElement stackTraceElement: Thread.currentThread().getStackTrace()) {
-      System.out.println(stackTraceElement.toString());
-    }
-    System.out.println("=======");
-
     try {
       Future<WdState> future = executor.submit(new WdStateFetcher(system));
       WdState state = future.get((long) (timeOut), TimeUnit.SECONDS);
