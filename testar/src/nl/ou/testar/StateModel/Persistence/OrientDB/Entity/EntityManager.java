@@ -513,7 +513,7 @@ public class EntityManager {
                 return;
             }
 
-            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " = :" + identifier.getPropertyName();
+            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
             Map<String, Object> params = new HashMap<>();
             params.put(identifier.getPropertyName(), idValues);
             db.command(stmt, params);
