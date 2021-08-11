@@ -49,7 +49,7 @@ public class OrientDbServiceImpl implements OrientDBService {
         if (delegate != null)
             delegate.onStateChanged(OrientDBServiceDelegate.State.BUILDING_IMAGE, "Building the orientdb database image");
         final String imageId = dockerPoolService.buildImage(new File(Main.orientDBDir),
-                "FROM orientdb:3.0.0\n" +
+                "FROM orientdb:3.0.34\n" +
                         "ENV ORIENTDB_ROOT_PASSWORD=testar\n" +
                         "CMD sh ./db-init/init.sh & ./bin/server.sh\n"
 
@@ -80,7 +80,7 @@ public class OrientDbServiceImpl implements OrientDBService {
 
         try {
             //TODO: Implement a better way to test the connection.
-            Thread.sleep(10000);
+            Thread.sleep(15000);
         } catch (Exception ex) {
             // Ignore
         }
