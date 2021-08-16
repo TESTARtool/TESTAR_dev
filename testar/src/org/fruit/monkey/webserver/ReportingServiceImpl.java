@@ -40,6 +40,7 @@ public class ReportingServiceImpl implements ReportingService {
 
     @Override
     public void start(int port, String dbHostname, int dbPort, String dbName, String dbUsername, String dbPassword) throws IOException {
+        dockerPoolService.start("reporting");
         if (delegate != null) {
             delegate.onStateChanged(ReportingServiceDelegate.State.BUILDING_IMAGE, "Building report service image");
         }

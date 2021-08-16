@@ -171,6 +171,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						System.err.println("Cannot initialize OrientDB");
 						e.printStackTrace();
 					}
+					System.out.println("OrientDB docker image finished.");
 				}
 			}.start();
 			progressDialog.pack();
@@ -180,12 +181,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		}
 
-		if (settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
+		if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
 			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
-			final String databaseName = settings.get(ConfigTags.DataStoreDB);
-			final String userName = settings.get(ConfigTags.DataStoreUser);
-			final String userPassword = settings.get(ConfigTags.DataStorePassword);
+			final String databaseName = settings.get(ConfigTags.SQLReporting);
+			final String userName = settings.get(ConfigTags.SQLReportingUser);
+			final String userPassword = settings.get(ConfigTags.SQLReportingPassword);
 
 			ProgressDialog progressDialog = new ProgressDialog();
 			progressDialog.setStatusString("Starting database connection");
@@ -206,12 +207,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				@Override
 				public void run() {
 					try {
-						if (settings.get(ConfigTags.DataStoreType).equals("plocal") || settings.get(ConfigTags.DataStoreType).equals("docker")) {
+						if (settings.get(ConfigTags.SQLReportingType).equals("local")) {
 							sqlService.startLocalDatabase(databaseName, userName, userPassword);
 							isLocalDatabaseActive = true;
 						}
 						else {
-							sqlService.connectExternalDatabase(settings.get(ConfigTags.DataStoreServer),
+							sqlService.connectExternalDatabase(settings.get(ConfigTags.SQLReportingServer),
 									databaseName, userName, userPassword);
 						}
 					} catch (Exception e) {
@@ -229,7 +230,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Initialize HTML Report (Dashboard)
 		if (sqlService != null) {
-			this.testReport = new DatabaseTestReport(sqlService, settings.get(ConfigTags.DataStore));
+			this.testReport = new DatabaseTestReport(sqlService, settings.get(ConfigTags.SQLReporting));
 		}
 		else {
 			this.testReport = new HtmlTestReport();
@@ -273,10 +274,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		if (sqlService != null) {
 			final int port = settings.get(ConfigTags.ReportServicePort);
-			final String dbHostname = (isLocalDatabaseActive ? "mysql" : settings.get(ConfigTags.DataStoreServer));
-			final String dbName = settings.get(ConfigTags.DataStoreDB);
-			final String dbUsername = settings.get(ConfigTags.DataStoreUser);
-			final String dbPassword = settings.get(ConfigTags.DataStorePassword);
+			final String dbHostname = (isLocalDatabaseActive ? "mysql" : settings.get(ConfigTags.SQLReportingServer));
+			final String dbName = settings.get(ConfigTags.SQLReportingDB);
+			final String dbUsername = settings.get(ConfigTags.SQLReportingUser);
+			final String dbPassword = settings.get(ConfigTags.SQLReportingPassword);
 
 			ProgressDialog progressDialog = new ProgressDialog();
 			progressDialog.setStatusString("Preparing report");

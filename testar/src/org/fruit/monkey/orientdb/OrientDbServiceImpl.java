@@ -43,7 +43,7 @@ public class OrientDbServiceImpl implements OrientDBService {
 
     @Override
     public void startLocalDatabase() throws IOException {
-        dockerPoolService.start("orientdb");
+        dockerPoolService.start("reporting");
 
 
         if (delegate != null)
