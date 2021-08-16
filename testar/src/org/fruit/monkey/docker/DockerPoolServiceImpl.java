@@ -2,10 +2,7 @@ package org.fruit.monkey.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.*;
-import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.ContainerConfig;
-import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -17,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -49,9 +47,14 @@ public class DockerPoolServiceImpl implements DockerPoolService {
 
     public void start(String serviceId) {
         this.serviceId = serviceId;
-
-        CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName("testar_" + serviceId).withDriver("bridge").withAttachable(true).exec();
-        networkId = networkResponse.getId();
+        final String networkName = "testar_" + serviceId;
+        List<Network> dockerNetworks = dockerClient.listNetworksCmd().withNameFilter(networkName).exec();
+        if(dockerNetworks.size() > 0) {
+            this.networkId = dockerNetworks.get(0).getId();
+        } else {
+            CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName(networkName).withDriver("bridge").withAttachable(true).exec();
+            this.networkId = networkResponse.getId();
+        }
     }
 
     public boolean isDockerAvailable() {
@@ -88,6 +91,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             dockerFileStream.close();
         }
 
+        System.out.println("OUT"+destination);
         final String imageId = dockerClient.buildImageCmd(destination).exec(new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
