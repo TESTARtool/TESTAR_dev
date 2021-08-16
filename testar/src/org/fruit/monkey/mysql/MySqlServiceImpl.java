@@ -41,7 +41,9 @@ public class MySqlServiceImpl implements MySqlService {
     }
 
     public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
-        dockerPoolService.start("mysql");
+        System.out.println("Creating MYSQL docker image");
+        dockerPoolService.start("reporting");
+
 
         if (delegate != null) {
             delegate.onStateChanged(MySqlServiceDelegate.State.BUILDING_IMAGE, "Building database image");
@@ -57,7 +59,7 @@ public class MySqlServiceImpl implements MySqlService {
             delegate.onStateChanged(MySqlServiceDelegate.State.STARTING_SERVICE, "Starting local database");
         }
 
-        final File databaseDir = new File(settings.get(ConfigTags.DataStoreDirectory));
+        final File databaseDir = new File(settings.get(ConfigTags.SQLReportingDirectory));
         if (databaseDir.isDirectory()) {
             System.out.println("Directory exists: " + databaseDir.getAbsolutePath());
         }
