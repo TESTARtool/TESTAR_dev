@@ -15,6 +15,7 @@ public class NavigationController {
     public NavigationController(ViewController rootViewController) {
         this.currentViewController = rootViewController;
         this.rootViewController = rootViewController;
+        rootViewController.setNavigationController(this);
     }
 
     public NavigationDelegate getDelegate() {
@@ -55,6 +56,7 @@ public class NavigationController {
                 viewControllerStack.push(currentViewController);
             }
             currentViewController = viewController;
+            viewController.setNavigationController(this);
 
             currentViewController.viewWillAppear(view);
             delegate.onViewControllerActivated(currentViewController, view);
@@ -65,17 +67,22 @@ public class NavigationController {
         }
     }
 
+    public boolean isBackAvailable() {
+        return !currentViewController.equals(rootViewController);
+    }
+
     public ViewController navigateBack() throws UnsupportedOperationException {
         if (currentViewController.equals(rootViewController)) {
             throw new UnsupportedOperationException("No way back from the root view controller");
         }
 
         try {
-            Parent view = currentViewController.obtainView();
             ViewController redundantViewController = currentViewController;
             redundantViewController.viewWillDisappear();
+
             currentViewController = viewControllerStack.pop();
 
+            Parent view = currentViewController.obtainView();
             currentViewController.viewWillAppear(view);
             delegate.onViewControllerActivated(currentViewController, view);
             redundantViewController.viewDidDisappear();
