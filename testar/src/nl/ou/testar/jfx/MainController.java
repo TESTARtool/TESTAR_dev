@@ -3,6 +3,7 @@ package nl.ou.testar.jfx;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.dashboard.DashboardController;
@@ -25,6 +26,8 @@ public class MainController extends ViewController {
     private void setupMode(Parent view, Mode mode) {
         if (mode != this.mode) {
             final Label titleLabel = (Label) view.lookup("#titleLabel");
+            final Button btnBack = (Button) view.lookup("#btnBack");
+
             final BorderPane contentPane = (BorderPane) view.lookup("#contentPane");
             ViewController targetController;
             switch (mode) {
@@ -35,15 +38,22 @@ public class MainController extends ViewController {
                     targetController = new DashboardController();
                     break;
             }
-            addChild(targetController, new NavigationDelegate() {
+            final NavigationController navigationController = new NavigationController(targetController);
+            navigationController.startWithDelegate(new NavigationDelegate() {
                 @Override
                 public void onViewControllerActivated(ViewController viewController, Parent view) {
                     titleLabel.setText(viewController.getTitle());
                     contentPane.setCenter(view);
+                    btnBack.setVisible(navigationController.isBackAvailable());
 //                    contentPane.getChildren().removeAll();
 //                    contentPane.getChildren().add(view);
                 }
             });
+
+            btnBack.setOnAction(event -> {
+                navigationController.navigateBack();
+            });
+
             this.mode = mode;
         }
     }

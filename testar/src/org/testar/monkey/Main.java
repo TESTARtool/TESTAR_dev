@@ -47,7 +47,6 @@ import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
 
-import javafx.fxml.FXMLLoader;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -95,7 +94,7 @@ public class Main extends Application {
 	/**
 	 * According to the TESTAR directory and SSE file (settings and protocol to run)
 	 * return the path of the selected settings
-	 * 
+	 *
 	 * @return test.settings path
 	 */
 	public static String getTestSettingsFile() {
@@ -136,16 +135,12 @@ public class Main extends Application {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
-			System.out.println("(5)");
 			setTestarDirectory(settings);
 
-			System.out.println("(6)");
 			initCodingManager(settings);
 
-			System.out.println("(7)");
 			initOperatingSystem();
 
-			System.out.println("(8)");
 			startTestar(settings);
 		}
 
@@ -154,29 +149,21 @@ public class Main extends Application {
 			System.out.println("(9)");
 			while(startTestarDialog(primaryStage, settings, testSettingsFileName)) {
 
-				System.out.println("(10)");
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
-				System.out.println("(11)");
 				setTestarDirectory(settings);
 
-				System.out.println("(12)");
 				initCodingManager(settings);
 
-				System.out.println("(13)");
 				initOperatingSystem();
 
-				System.out.println("(14)");
 				startTestar(settings);
 			}
 		}
 
-		System.out.println("(15)");
 		TestSerialiser.exit();
-		System.out.println("(16)");
 		ScreenshotSerialiser.exit();
-		System.out.println("(17)");
 		LogSerialiser.exit();
 
 //		System.out.println("(18)");
@@ -199,7 +186,7 @@ public class Main extends Application {
 
 		return true;
 	}
-	
+
 	/**
 	 * Verify the initial directory of TESTAR
 	 * If this directory didn't contain testar.bat file inform the user
@@ -260,11 +247,9 @@ public class Main extends Application {
 				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");}
 		}
 
-		System.out.println("[1]");
 		String[] files = getSSE();
 
 		// If there is more than 1, then delete them all
-		System.out.println("[2]");
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
@@ -274,18 +259,14 @@ public class Main extends Application {
 		}
 
 		//If there is none, then start up a selection menu
-		System.out.println("[3]");
 		if (files == null || files.length == 0) {
-			System.out.println("[4]");
 			settingsSelection();
-			System.out.println("[5]");
 			if (SSE_ACTIVATED == null) {
 				System.exit(-1);
 			}
 		}
 		else {
 			//Use the only file that was found
-			System.out.println("[6]");
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
 	}
@@ -339,7 +320,7 @@ public class Main extends Application {
 	//TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
 	/**
 	 * Load the settings of the selected test.settings file
-	 * 
+	 *
 	 * @param args
 	 * @param testSettingsFileName
 	 * @return settings
@@ -365,7 +346,7 @@ public class Main extends Application {
 
 	/**
 	 * Open TESTAR GUI to allow the users modify the settings and the protocol with which the want run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
@@ -398,9 +379,9 @@ public class Main extends Application {
 
 	/**
 	 * Start TESTAR protocol with the selected settings
-	 * 
+	 *
 	 * This method get the specific protocol class of the selected settings to run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
@@ -677,7 +658,7 @@ public class Main extends Application {
 	/**
 	 * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
 	 * @param sett
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
 		String sseName = sett.substring(sett.indexOf("=")+1);
@@ -698,7 +679,7 @@ public class Main extends Application {
 			//Obtain previous sse file and delete it (if exist)
 			String[] files = getSSE();
 			if (files != null) {
-				for (String f : files) 
+				for (String f : files)
 					new File(settingsDir+f).delete();
 
 			}
@@ -842,25 +823,4 @@ public class Main extends Application {
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
-
-//	@Override
-//	public void start(Stage primaryStage) throws Exception {
-//		Button btn = new Button();
-//		btn.setText("Say 'Preved'");
-//		btn.setOnAction(new EventHandler<ActionEvent>() {
-//			@Override
-//			public void handle(ActionEvent event) {
-//				System.out.println("Preved Medved!");
-//			}
-//		});
-//
-//		StackPane root = new StackPane();
-//		root.getChildren().add(btn);
-//
-//		Scene scene = new Scene(root, 300, 250);
-//
-//		primaryStage.setTitle("Preved Medved!");
-//		primaryStage.setScene(scene);
-//		primaryStage.show();
-//	}
 }

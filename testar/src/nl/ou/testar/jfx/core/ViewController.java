@@ -12,8 +12,18 @@ public abstract class ViewController {
     private String title;
     private String resourcePath;
 
+    private NavigationController navigationController;
+
     public String getTitle() {
         return title;
+    }
+
+    public NavigationController getNavigationController() {
+        return navigationController;
+    }
+
+    public void setNavigationController(NavigationController navigationController) {
+        this.navigationController = navigationController;
     }
 
     public ViewController(String title, String resourcePath) {
@@ -50,11 +60,5 @@ public abstract class ViewController {
 
     public void viewDidDisappear() {
         // to be overridden
-    }
-
-    public NavigationController addChild(ViewController child, NavigationDelegate delegate) {
-        NavigationController navigationController = new NavigationController(child);
-        navigationController.startWithDelegate(delegate);
-        return navigationController;
     }
 }
