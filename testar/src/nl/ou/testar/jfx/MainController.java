@@ -1,0 +1,66 @@
+package nl.ou.testar.jfx;
+
+import javafx.scene.Parent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import nl.ou.testar.jfx.core.NavigationDelegate;
+import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.dashboard.DashboardController;
+import nl.ou.testar.jfx.settings.SettingsController;
+
+import javafx.scene.control.*;
+
+public class MainController extends ViewController {
+
+    enum Mode {
+        HOME, SETTINGS
+    }
+
+    private Mode mode;
+
+    public MainController() {
+        super("Testar", "jfx/main.fxml");
+    }
+
+    private void setupMode(Parent view, Mode mode) {
+        if (mode != this.mode) {
+            final Label titleLabel = (Label) view.lookup("#titleLabel");
+            final BorderPane contentPane = (BorderPane) view.lookup("#contentPane");
+            ViewController targetController;
+            switch (mode) {
+                case SETTINGS:
+                    targetController = new SettingsController();
+                    break;
+                default: //HOME
+                    targetController = new DashboardController();
+                    break;
+            }
+            addChild(targetController, new NavigationDelegate() {
+                @Override
+                public void onViewControllerActivated(ViewController viewController, Parent view) {
+                    titleLabel.setText(viewController.getTitle());
+                    contentPane.setCenter(view);
+//                    contentPane.getChildren().removeAll();
+//                    contentPane.getChildren().add(view);
+                }
+            });
+            this.mode = mode;
+        }
+    }
+
+    @Override
+    public void viewDidLoad(Parent view) {
+        Button btnHome = (Button) view.lookup("#btnHome");
+        Button btnSettings = (Button) view.lookup("#btnSettings");
+
+        btnHome.setOnAction(event -> {
+            setupMode(view, Mode.HOME);
+        });
+
+        btnSettings.setOnAction(event -> {
+            setupMode(view, Mode.SETTINGS);
+        });
+
+        setupMode(view, Mode.HOME);
+    }
+}

@@ -5,9 +5,18 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox alignment="CENTER" minHeight="128.0" prefHeight="350.0" style="-fx-spacing: 24; -fx-background-color: #4d8acb#4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<HBox alignment="CENTER" style="-fx-spacing: 24; -fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <JFXButton id="btnSpyMode" alignment="CENTER" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Filters &amp; oracles" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+      <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="General" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <graphic>
+            <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/general.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+      <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Filters &amp; oracles" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <graphic>
             <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
                <image>

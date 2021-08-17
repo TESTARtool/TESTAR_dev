@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,7 +17,7 @@
 
 <BorderPane id="main" prefHeight="500.0" prefWidth="920.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <top>
-      <Label text="TEST*" textFill="WHITE" BorderPane.alignment="CENTER">
+      <Label prefHeight="42.0" text="TEST*" textFill="WHITE" BorderPane.alignment="CENTER">
          <font>
             <Font name="Arial Bold" size="24.0" />
          </font>
@@ -36,7 +37,7 @@
                         </ImageView>
                      </graphic>
                   </JFXButton>
-                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY">
                      <graphic>
                         <ImageView id="btnSettings">
                            <image>
@@ -72,4 +73,25 @@
          </children>
       </HBox>
    </left>
+   <center>
+      <BorderPane id="contentPane" BorderPane.alignment="CENTER">
+         <top>
+            <BorderPane BorderPane.alignment="CENTER">
+               <center>
+                  <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="46.0" text="Title" textFill="WHITE" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="Arial Black" size="18.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <BorderPane.margin>
+                        <Insets left="32.0" />
+                     </BorderPane.margin>
+                  </Label>
+               </center>
+            </BorderPane>
+         </top>
+      </BorderPane>
+   </center>
 </BorderPane>

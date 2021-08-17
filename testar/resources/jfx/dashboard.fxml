@@ -8,19 +8,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox>
-         <children>
-            <Label prefHeight="64.0" text="Dashboard" textFill="WHITE">
-               <font>
-                  <Font name="Arial Black" size="18.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 24;">
+      <HBox alignment="CENTER" style="-fx-spacing: 24;">
          <children>
             <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="SPY Mode" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <graphic>
@@ -69,7 +59,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="100.0" style="-fx-spacing: 40;">
+      <HBox alignment="CENTER" minHeight="36.0" prefHeight="100.0" style="-fx-spacing: 40;">
          <children>
             <JFXButton id="btnDownloads" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: a8cbe8; -fx-background-radius: 18;" text="Visit downloads" textFill="WHITE">
                <font>
@@ -88,7 +78,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="BOTTOM_CENTER" prefHeight="42.0">
+      <HBox alignment="BOTTOM_CENTER" minHeight="24.0" prefHeight="42.0">
          <children>
             <Label text="Our partners" textFill="WHITE">
                <font>
@@ -97,7 +87,7 @@
             </Label>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="80.0">
+      <HBox alignment="CENTER" minHeight="60.0" prefHeight="80.0">
          <children>
             <ImageView scaleX="0.75" scaleY="0.75">
                <image>
