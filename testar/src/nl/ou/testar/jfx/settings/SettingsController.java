@@ -3,6 +3,7 @@ package nl.ou.testar.jfx.settings;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.settings.child.FilterSettingsController;
 
 public class SettingsController extends ViewController {
     public SettingsController() {
