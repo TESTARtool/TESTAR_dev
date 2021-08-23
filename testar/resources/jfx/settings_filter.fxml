@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="605.0" style="-fx-background-color: #4d8acb #4d8acb #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <Label text="Some filter" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="14.0" />
+               </font>
+            </Label>
+            <JFXButton contentDisplay="GRAPHIC_ONLY" />
+         </children>
+      </HBox>
+      <JFXTextArea prefHeight="191.0" prefWidth="605.0" style="-fx-border-color: ffffff; -fx-border-radius: 5; -fx-text-fill: ffffff;">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </JFXTextArea>
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="610.0">
+         <children>
+            <Label text="Add filter" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="14.0" />
+               </font>
+            </Label>
+            <JFXButton contentDisplay="GRAPHIC_ONLY">
+               <graphic>
+                  <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/add.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 12;">
+         <children>
+            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
+               <graphic>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/close.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </graphic>
+               <padding>
+                  <Insets left="8.0" />
+               </padding>
+            </JFXButton>
+            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
+               <graphic>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/close.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </graphic>
+               <padding>
+                  <Insets left="8.0" />
+               </padding>
+            </JFXButton>
+            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
+               <graphic>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/close.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </graphic>
+               <padding>
+                  <Insets left="8.0" />
+               </padding>
+            </JFXButton>
+         </children>
+      </HBox>
+   </children>
+</VBox>
