@@ -31,7 +31,7 @@ public abstract class ViewController {
         this.resourcePath = resourcePath;
     }
 
-    Parent obtainView() throws IOException {
+    public Parent obtainView() throws IOException {
         Parent view = viewReference.get();
         if (view == null) {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(resourcePath));
