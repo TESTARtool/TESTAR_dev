@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.settings.child.FilterSettingsController;
 import nl.ou.testar.jfx.settings.child.GeneralSettingsController;
+import nl.ou.testar.jfx.settings.child.TimeSettingsController;
 
 public class SettingsController extends ViewController {
     public SettingsController() {
