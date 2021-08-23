@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="605.0" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane alignment="CENTER_LEFT">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="264.0" minWidth="10.0" prefWidth="251.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="144.0" minWidth="10.0" prefWidth="49.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="149.0" prefHeight="64.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="160.0" prefHeight="64.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label text="SUT Connector" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="1">
+               <children>
+                  <Label text="Webdriver" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="2">
+               <children>
+                  <Label text="Resolution" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="3">
+               <children>
+                  <Label text="Location" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="4">
+               <children>
+                  <Label text="Action selection" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <JFXComboBox focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" />
+            <JFXComboBox focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <JFXComboBox focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="147.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <graphic>
+                  <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/attach.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <TextField promptText="URL" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="3">
+               <graphic>
+                  <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/attach.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <Label text="Or" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select SUT" GridPane.columnIndex="3" />
+         </children>
+      </GridPane>
+   </children>
+</VBox>

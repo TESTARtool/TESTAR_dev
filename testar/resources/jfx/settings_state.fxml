@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="403.0" prefWidth="605.0" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308">
+         <children>
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="80.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Save" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
