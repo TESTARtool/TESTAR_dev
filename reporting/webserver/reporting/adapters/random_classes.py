@@ -2,27 +2,49 @@ from datetime import datetime
 from typing import List
 import numpy as np
 
-from .abstract_classes import (
-    AbstractAction, AbstractReport, AbstractSequence)
+from .abstract_classes import AbstractAction, AbstractReport, AbstractSequence
 
 # Example for fake data generation
-URLS = ['https://example.com', 'https://www.ou.nl/', 'https://testar.org/',
-        'https://duckduckgo.com/', 'http://github.com/', 'https://marviq.com/']
+URLS = [
+    "https://example.com",
+    "https://www.ou.nl/",
+    "https://testar.org/",
+    "https://duckduckgo.com/",
+    "http://github.com/",
+    "https://marviq.com/",
+]
 SEED = 0
-WORDS = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed',
-         'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua']
+WORDS = [
+    "lorem",
+    "ipsum",
+    "dolor",
+    "sit",
+    "amet",
+    "consectetur",
+    "adipiscing",
+    "elit",
+    "sed",
+    "do",
+    "eiusmod",
+    "tempor",
+    "incididunt",
+    "ut",
+    "labore",
+    "et",
+    "dolore",
+    "magna",
+    "aliqua",
+]
 
 
 class Action(AbstractAction):
-
     def __init__(self, id: int):
         super().__init__()
         self._id = id
         self._random = np.random.RandomState(id)
 
         # Generate random datetime
-        self._started = datetime.fromtimestamp(
-            self._random.randint(20e7, 20e8))
+        self._started = datetime.fromtimestamp(self._random.randint(20e7, 20e8))
 
         self._name = self._random.choice(WORDS)
 
@@ -30,19 +52,19 @@ class Action(AbstractAction):
         temp = []
         for _ in range(self._random.randint(3, 15)):
             temp.append(self._random.choice(WORDS))
-        self._description = ' '.join(temp)
+        self._description = " ".join(temp)
 
         # Generate status
         temp = []
         if self._random.randint(1, 5) == 1:
             for _ in range(self._random.randint(1, 5)):
                 temp.append(self._random.choice(WORDS))
-            self._status = ' '.join(temp)
+            self._status = " ".join(temp)
         else:
-            self._status = 'OK'
+            self._status = "OK"
 
     def get_screenshot(self) -> str:
-        return '/static/screenshot/test.png'
+        return "/static/screenshot/test.png"
 
     def get_description(self) -> str:
         return self._description
@@ -61,7 +83,6 @@ class Action(AbstractAction):
 
 
 class Sequence(AbstractSequence):
-
     def __init__(self, id: int, max_actions: int):
         super().__init__()
         self._random = np.random.RandomState(id)
@@ -75,7 +96,8 @@ class Sequence(AbstractSequence):
 
         # Random severity
         self._severity = self._random.choice(
-            [1, 0, 0.99999990, 0.99999999, 0.00000009, 0.00000001])
+            [1, 0, 0.99999990, 0.99999999, 0.00000009, 0.00000001]
+        )
 
     def get_severity(self) -> float:
         return self._severity
@@ -88,7 +110,6 @@ class Sequence(AbstractSequence):
 
 
 class Report(AbstractReport):
-
     def __init__(self, id: int):
         super().__init__()
         self._id = id
@@ -99,8 +120,9 @@ class Report(AbstractReport):
 
         # Generate a random amount of sequences
         for _ in range(self._random.randint(0, 25)):
-            sequence = Sequence(self._random.randint(
-                0, 1e5), self._actions_per_sequence)
+            sequence = Sequence(
+                self._random.randint(0, 1e5), self._actions_per_sequence
+            )
             self._sequences.append(sequence)
 
     def get_sequences(self) -> List[Sequence]:

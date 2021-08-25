@@ -5,9 +5,7 @@ from datetime import datetime
 from mysql.connector.pooling import MySQLConnectionPool
 from mysql.connector.cursor import MySQLCursorBuffered
 
-from .abstract_classes import (
-    AbstractReport, AbstractSequence, AbstractAction)
-
+from .abstract_classes import AbstractReport, AbstractSequence, AbstractAction
 
 
 def setup_db_pool():
@@ -15,7 +13,7 @@ def setup_db_pool():
     global db_pool
 
     # TODO: Database takes time to start...
-    sleep(int(os.environ.get('MYSQL_WAIT', 5)))
+    sleep(int(os.environ.get("MYSQL_WAIT", 5)))
 
     # Extract settings
     config = {
@@ -36,10 +34,12 @@ def db_cursor(fn):
     Args:
         fn (function): Function which need to access a cursor.
     """
+
     def inner(*args, **kwargs):
         with db_pool.get_connection() as connection:
             with connection.cursor(buffered=True) as cursor:
                 return fn(*args, cursor=cursor, **kwargs)
+
     return inner
 
 
@@ -58,7 +58,7 @@ def does_exist(name: str, id: int, cursor: MySQLCursorBuffered) -> bool:
     global db_connection
 
     # Name is not injectable by the user.
-    query = f'SELECT EXISTS(SELECT * FROM {name} WHERE id=%s);'
+    query = f"SELECT EXISTS(SELECT * FROM {name} WHERE id=%s);"
 
     # Format object id into the string
     cursor.execute(query, (id,))
@@ -69,7 +69,9 @@ def does_exist(name: str, id: int, cursor: MySQLCursorBuffered) -> bool:
 
 
 @db_cursor
-def get_property(field: str, table: str, object_id: int, cursor: MySQLCursorBuffered) -> object:
+def get_property(
+    field: str, table: str, object_id: int, cursor: MySQLCursorBuffered
+) -> object:
     """Retrieve a single property from a single row.
 
     Args:
@@ -82,7 +84,7 @@ def get_property(field: str, table: str, object_id: int, cursor: MySQLCursorBuff
         object: Any kind of data returned by the database
     """
 
-    query = f'SELECT {field} FROM {table} WHERE id=%s'
+    query = f"SELECT {field} FROM {table} WHERE id=%s"
     cursor.execute(query, (object_id,))
     result = cursor.fetchone()
 
@@ -95,23 +97,25 @@ class Action(AbstractAction):
         self._id = action_id
 
         # Verify existance in the database
-        if check and not does_exist('actions', self._id):
-            raise ValueError('Report not found')
+        if check and not does_exist("actions", self._id):
+            raise ValueError("Report not found")
 
     def get_description(self) -> str:
-        return get_property('description', 'actions', self._id)
+        return get_property("description", "actions", self._id)
 
     def get_screenshot(self) -> str:
-        return get_property('screenshot', 'actions', self._id)
+        normal_path = get_property("screenshot", "actions", self._id)
+        web_path = "/static" + normal_path[1:]
+        return web_path
 
     def get_status(self) -> str:
-        return get_property('status', 'actions', self._id)
+        return get_property("status", "actions", self._id)
 
     def get_start_time(self) -> datetime:
-        return get_property('start_time', 'actions', self._id)
+        return get_property("start_time", "actions", self._id)
 
     def get_name(self) -> str:
-        return get_property('name', 'actions', self._id)
+        return get_property("name", "actions", self._id)
 
     def get_id(self) -> int:
         return self._id
@@ -122,12 +126,12 @@ class Sequence(AbstractSequence):
         self._id = sequence_id
 
         # Verify existance in the database
-        if check and not does_exist('iterations', self._id):
-            raise ValueError('sequence not found')
+        if check and not does_exist("iterations", self._id):
+            raise ValueError("sequence not found")
 
     @db_cursor
     def get_actions(self, cursor: MySQLCursorBuffered) -> List[Action]:
-        query = 'SELECT id FROM actions WHERE iteration_id=%s'
+        query = "SELECT id FROM actions WHERE iteration_id=%s"
         actions = []
 
         cursor.execute(query, (self._id,))
@@ -136,10 +140,10 @@ class Sequence(AbstractSequence):
         return actions
 
     def get_severity(self) -> float:
-        return get_property('severity', 'iterations', self._id)
+        return get_property("severity", "iterations", self._id)
 
     def get_info(self) -> str:
-        return get_property('info', 'iterations', self._id)
+        return get_property("info", "iterations", self._id)
 
     def get_id(self) -> int:
         return self._id
@@ -150,12 +154,12 @@ class Report(AbstractReport):
         self._id = report_id
 
         # Verify existance in the database
-        if check and not does_exist('reports', self._id):
-            raise ValueError('Report not found')
+        if check and not does_exist("reports", self._id):
+            raise ValueError("Report not found")
 
     @db_cursor
     def get_sequences(self, cursor: MySQLCursorBuffered) -> List[Sequence]:
-        query = 'SELECT id FROM iterations WHERE report_id=%s'
+        query = "SELECT id FROM iterations WHERE report_id=%s"
         sequences = []
 
         cursor.execute(query, (self._id,))
@@ -167,37 +171,43 @@ class Report(AbstractReport):
         return self._id
 
     def get_url(self) -> str:
-        return get_property('url', 'reports', self._id)
+        return get_property("url", "reports", self._id)
 
     def get_actions_per_sequence(self) -> int:
-        return get_property('actions_per_sequence', 'reports', self._id)
+        return get_property("actions_per_sequence", "reports", self._id)
 
     def get_name(self) -> str:
-        return get_property('tag', 'reports', self._id)
+        return get_property("tag", "reports", self._id)
 
     def sequence_count(self) -> int:
-        return get_property('total_sequences', 'reports', self._id)
+        return get_property("total_sequences", "reports", self._id)
 
     def get_start_time(self) -> int:
-        return get_property('time', 'reports', self._id)
+        return get_property("time", "reports", self._id)
 
     @db_cursor
     def get_sequence_by_id(self, id: int, cursor: MySQLCursorBuffered) -> Sequence:
-        query = 'SELECT EXISTS(SELECT * FROM iterations WHERE report_id=%s and id=%s);'
+        query = "SELECT EXISTS(SELECT * FROM iterations WHERE report_id=%s and id=%s);"
 
         # Format own id into the string
-        cursor.execute(query, (self._id, id,))
+        cursor.execute(
+            query,
+            (
+                self._id,
+                id,
+            ),
+        )
         result = cursor.fetchone()
 
         # Verify if it has been found
         if result[0] == 1:
             return Sequence(id)
-        raise Exception(f'No child sequence found with id: {id}')
+        raise Exception(f"No child sequence found with id: {id}")
 
     @classmethod
     @db_cursor
     def get_reports(cls, cursor: MySQLCursorBuffered) -> List:
-        query = 'SELECT id FROM reports'
+        query = "SELECT id FROM reports"
         reports = []
 
         cursor.execute(query)
@@ -209,5 +219,5 @@ class Report(AbstractReport):
 
 if __name__ == "__main__":
     setup_db_pool()
-    print('Successfully connected')
+    print("Successfully connected")
     db_pool.close()
