@@ -58,7 +58,6 @@ class AbstractAction(ABC):
 
 
 class AbstractSequence(ABC):
-
     @abstractmethod
     def get_actions(self) -> List[AbstractAction]:
         pass
@@ -90,7 +89,7 @@ class AbstractSequence(ABC):
         # Don't check for issues in the last action
         for i in range(len(actions) - 1):
             action = actions[i]
-            if (action.get_status() != 'OK'):
+            if action.get_status() != "OK":
                 issues += 1
 
         return issues
@@ -107,7 +106,7 @@ class AbstractSequence(ABC):
 
         counter = 0
         for action in self.get_actions():
-            if action.get_status() != 'OK':
+            if action.get_status() != "OK":
                 counter += 1
 
         return counter
@@ -155,6 +154,7 @@ class AbstractReport(ABC):
         pass
 
     def veredict_count(self) -> int:
+        print("--" * 1000)
         veredict = 0
         for sequence in self.get_sequences():
             veredict += sequence.veredict_count()
