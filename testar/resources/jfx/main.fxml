@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -13,7 +12,6 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
-
 
 <BorderPane id="main" prefHeight="500.0" prefWidth="920.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <top>
@@ -74,38 +72,6 @@
       </HBox>
    </left>
    <center>
-      <BorderPane id="contentPane" BorderPane.alignment="CENTER">
-         <top>
-            <BorderPane BorderPane.alignment="CENTER">
-               <center>
-                  <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Title" textFill="WHITE" BorderPane.alignment="CENTER">
-                     <font>
-                        <Font name="Arial Black" size="18.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <BorderPane.margin>
-                        <Insets left="32.0" />
-                     </BorderPane.margin>
-                  </Label>
-               </center>
-               <right>
-                  <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="80.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Back" BorderPane.alignment="CENTER">
-                     <graphic>
-                        <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@icons/back.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <BorderPane.margin>
-                        <Insets right="32.0" />
-                     </BorderPane.margin>
-                  </JFXButton>
-               </right>
-            </BorderPane>
-         </top>
-      </BorderPane>
+      <BorderPane id="contentPane" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

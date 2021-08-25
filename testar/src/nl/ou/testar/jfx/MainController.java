@@ -25,8 +25,8 @@ public class MainController extends ViewController {
 
     private void setupMode(Parent view, Mode mode) {
         if (mode != this.mode) {
-            final Label titleLabel = (Label) view.lookup("#titleLabel");
-            final Button btnBack = (Button) view.lookup("#btnBack");
+//            final Label titleLabel = (Label) view.lookup("#titleLabel");
+//            final Button btnBack = (Button) view.lookup("#btnBack");
 
             final BorderPane contentPane = (BorderPane) view.lookup("#contentPane");
             ViewController targetController;
@@ -42,17 +42,17 @@ public class MainController extends ViewController {
             navigationController.startWithDelegate(new NavigationDelegate() {
                 @Override
                 public void onViewControllerActivated(ViewController viewController, Parent view) {
-                    titleLabel.setText(viewController.getTitle());
+//                    titleLabel.setText(viewController.getTitle());
                     contentPane.setCenter(view);
-                    btnBack.setVisible(navigationController.isBackAvailable());
+//                    btnBack.setVisible(navigationController.isBackAvailable());
 //                    contentPane.getChildren().removeAll();
 //                    contentPane.getChildren().add(view);
                 }
             });
 
-            btnBack.setOnAction(event -> {
-                navigationController.navigateBack();
-            });
+//            btnBack.setOnAction(event -> {
+//                navigationController.navigateBack();
+//            });
 
             this.mode = mode;
         }
