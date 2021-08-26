@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ state['cid'] }}</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='statemodel/css/core.css') }}"
+    />
+    <script>
+      window.addEventListener("load", () => {
+        // Set global variables
+        canvas = document.getElementById("screen");
+        ctx = canvas.getContext("2d");
+        registerClickEvent();
+
+        // Dislay given state
+        requestState("{{ state['cid'] }}");
+      });
+    </script>
+    <script
+      type="text/javascript"
+      src="{{ url_for('static', filename='statemodel/js/concrete.js') }}"
+    ></script>
+  </head>
+  <body>
+    <div class="content">
+      <span class="text-h2">{{ state['cid'] }}</span>
+      <span id="options-menu" style="display: none"
+        >Select one of the following actions: <b id="options"></b
+      ></span>
+    </div>
+
+    <canvas
+      id="screen"
+      width="{{ state['shape'][2] }}"
+      height="{{ state['shape'][3] }}"
+    ></canvas>
+  </body>
+</html>
