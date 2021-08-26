@@ -10,6 +10,12 @@ if os.environ.get("ADAPTER") in ["RANDOM", "MYSQL"]:
 
     app.register_blueprint(reporting)
 
+# Register statemodel previewer
+if bool(os.environ.get("ORIENTDB_ENABLED", "0")):
+    from statemodel.views import statemodel
+
+    app.register_blueprint(statemodel)
+
 if __name__ == "__main__":
     print(" * Running without UWSGI")
 
