@@ -1,12 +1,13 @@
 package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
+import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 
 public class MiscSettingsController extends ChildSettingsController {
-    public MiscSettingsController() {
-        super("");
+    public MiscSettingsController(Settings settings) {
+        super("", settings);
     }
 
     @Override

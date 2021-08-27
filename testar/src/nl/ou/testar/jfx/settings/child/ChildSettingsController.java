@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
 import org.fruit.Pair;
+import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 
@@ -16,8 +17,8 @@ public class ChildSettingsController extends ViewController {
 
 //    private String contentResourcePath;
 
-    public ChildSettingsController(String title) {
-        super(title, "jfx/settings_child.fxml");
+    public ChildSettingsController(String title, Settings settings) {
+        super(title, "jfx/settings_child.fxml", settings);
 //        this.contentResourcePath = resourcePath;
     }
 

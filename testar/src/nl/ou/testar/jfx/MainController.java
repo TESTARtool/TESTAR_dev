@@ -10,6 +10,7 @@ import nl.ou.testar.jfx.dashboard.DashboardController;
 import nl.ou.testar.jfx.settings.SettingsController;
 
 import javafx.scene.control.*;
+import org.fruit.monkey.Settings;
 
 public class MainController extends ViewController {
 
@@ -19,8 +20,8 @@ public class MainController extends ViewController {
 
     private Mode mode;
 
-    public MainController() {
-        super("Testar", "jfx/main.fxml");
+    public MainController(Settings settings) {
+        super("Testar", "jfx/main.fxml", settings);
     }
 
     private void setupMode(Parent view, Mode mode) {
@@ -32,10 +33,10 @@ public class MainController extends ViewController {
             ViewController targetController;
             switch (mode) {
                 case SETTINGS:
-                    targetController = new SettingsController();
+                    targetController = new SettingsController(settings);
                     break;
                 default: //HOME
-                    targetController = new DashboardController();
+                    targetController = new DashboardController(settings);
                     break;
             }
             final NavigationController navigationController = new NavigationController(targetController);

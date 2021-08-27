@@ -1,12 +1,13 @@
 package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
+import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 
 public class TimeSettingsController extends ChildSettingsController {
-    public TimeSettingsController() {
-        super("Time settings");
+    public TimeSettingsController(Settings settings) {
+        super("Time settings", settings);
     }
 
     @Override
