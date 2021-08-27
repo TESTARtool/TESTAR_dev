@@ -351,7 +351,7 @@ public class Main extends Application {
 	 */
 	public static boolean startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
 
-		NavigationController navigationController = new NavigationController(new MainController());
+		NavigationController navigationController = new NavigationController(new MainController(settings));
 		navigationController.startWithDelegate(new NavigationDelegate() {
 			@Override
 			public void onViewControllerActivated(ViewController viewController, Parent view) {

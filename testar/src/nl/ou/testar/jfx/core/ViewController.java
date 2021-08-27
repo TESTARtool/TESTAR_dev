@@ -2,6 +2,7 @@ package nl.ou.testar.jfx.core;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -11,6 +12,7 @@ public abstract class ViewController {
     private WeakReference<Parent> viewReference = new WeakReference<>(null);
     private String title;
     private String resourcePath;
+    protected Settings settings;
 
     private NavigationController navigationController;
 
@@ -26,9 +28,10 @@ public abstract class ViewController {
         this.navigationController = navigationController;
     }
 
-    public ViewController(String title, String resourcePath) {
+    public ViewController(String title, String resourcePath, Settings settings) {
         this.title = title;
         this.resourcePath = resourcePath;
+        this.settings = settings;
     }
 
     public Parent obtainView() throws IOException {
