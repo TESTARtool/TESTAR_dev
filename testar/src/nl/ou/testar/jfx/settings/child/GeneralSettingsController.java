@@ -2,13 +2,17 @@ package nl.ou.testar.jfx.settings.child;
 
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import nl.ou.testar.jfx.utils.DisplayModeWrapper;
+import nl.ou.testar.jfx.utils.GeneralSettings;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.awt.*;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -58,22 +62,43 @@ public class GeneralSettingsController extends ChildSettingsController {
 //        };
 //        resolutionComboBox.setSelectionModel(resolutionSelectionModel);
         resolutionComboBox.setItems(FXCollections.observableArrayList(
-                Arrays.stream(availableDisplayModes).map(DisplayModeWrapper::new).collect(Collectors.toList())
+                Arrays.stream(availableDisplayModes).map(mode -> new DisplayModeWrapper(mode, true))
+                        .collect(Collectors.toList())
         ));
         DisplayMode currentDisplayMode = dev.getDisplayMode();
+        System.out.println(String.format("Current dislpay mode: %dx%d+%d+%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight(), currentDisplayMode.getBitDepth(), currentDisplayMode.getRefreshRate()));
         int index = 0;
         displayModeSelectedIndex = 0;
-        for (DisplayMode displayMode : availableDisplayModes) {
-//            resolutionComboBox.getItems().add(String.format("%dx%d", displayMode.getWidth(), displayMode.getHeight()));
-            if (displayMode.equals(currentDisplayMode)) {
-                resolutionComboBox.getSelectionModel().select(index);
-//                resolutionComboBox.setValue("Skunk");
-//                displayModeSelectedIndex = index;
-            }
-            index++;
-        }
+//        for (DisplayMode displayMode : availableDisplayModes) {
+////            resolutionComboBox.getItems().add(String.format("%dx%d", displayMode.getWidth(), displayMode.getHeight()));
+//            if (displayMode.equals(currentDisplayMode)) {
+//                resolutionComboBox.getSelectionModel().select(index);
+////                resolutionComboBox.setValue("Skunk");
+////                displayModeSelectedIndex = index;
+//            }
+//            index++;
+//        }
         System.out.println(String.format("Current display mode: %dx%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
-        System.out.println("General settings: " + settings.get(ConfigTags.OverrideWebDriverDisplayScale));
+        System.out.println("SUT connector value: " + settings.get(ConfigTags.SUTConnectorValue));
+        GeneralSettings generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue));
+
+        sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
+
+        DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
+        int selectedWidth = selectedDisplayMode.getWidth();
+        int selectedHeight = selectedDisplayMode.getHeight();
+        int displayModeIndex = 0;
+        for (DisplayMode displayMode : availableDisplayModes) {
+            if (displayMode.getWidth() == selectedWidth && displayMode.getHeight() == selectedHeight) {
+                break;
+            }
+            displayModeIndex++;
+        }
+        if (displayModeIndex == availableDisplayModes.length) {
+            resolutionComboBox.getItems().add(new DisplayModeWrapper(selectedDisplayMode, false));
+        }
+        resolutionComboBox.getSelectionModel().select(displayModeIndex);
+//        resolutionComboBox.setValue(new DisplayModeWrapper(generalSettings.getDisplayMode()));
 //        resolutionComboBox.setId(String.format("%dx%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
 
 //        GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -87,5 +112,27 @@ public class GeneralSettingsController extends ChildSettingsController {
 //                System.out.println(" " + j + ": " + m.getWidth() + " x " + m.getHeight());
 //            }
 //        }
+
+        TextField webDriverPathField = (TextField) view.lookup("#driverPath");
+        webDriverPathField.setText(generalSettings.getDriver());
+
+        TextField locationInputField = (TextField) view.lookup("#locationInput");
+        locationInputField.setText(generalSettings.getLocation());
+
+        FileChooser driverChooser = new FileChooser();
+        FileChooser locationChooser = new FileChooser();
+
+        Button btnSelectDriver = (Button) view.lookup("#btnSelectDriver");
+        Button btnSelectLocation = (Button) view.lookup("#btnSelectLocation");
+
+        btnSelectDriver.setOnAction(event -> {
+            File driverFile = driverChooser.showOpenDialog(view.getScene().getWindow());
+            webDriverPathField.setText(driverFile.getAbsolutePath());
+        });
+
+        btnSelectLocation.setOnAction(event -> {
+            File locationFile = locationChooser.showOpenDialog(view.getScene().getWindow());
+            locationInputField.setText(locationFile.toURI().toString());
+        });
     }
 }

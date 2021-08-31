@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="605.0" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="605.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <GridPane alignment="CENTER_LEFT">
         <columnConstraints>
@@ -39,7 +39,7 @@
                   </Label>
                   <JFXButton contentDisplay="GRAPHIC_ONLY">
                      <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/info.png" />
                            </image>
@@ -57,7 +57,7 @@
                   </Label>
                   <JFXButton contentDisplay="GRAPHIC_ONLY">
                      <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/info.png" />
                            </image>
@@ -75,7 +75,7 @@
                   </Label>
                   <JFXButton contentDisplay="GRAPHIC_ONLY">
                      <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/info.png" />
                            </image>
@@ -93,7 +93,7 @@
                   </Label>
                   <JFXButton contentDisplay="GRAPHIC_ONLY">
                      <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/info.png" />
                            </image>
@@ -111,7 +111,7 @@
                   </Label>
                   <JFXButton contentDisplay="GRAPHIC_ONLY">
                      <graphic>
-                        <ImageView fitHeight="19.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/info.png" />
                            </image>
@@ -120,10 +120,10 @@
                   </JFXButton>
                </children>
             </HBox>
-            <JFXComboBox id="sutConnectorSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" />
-            <JFXComboBox id="resolutionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <JFXComboBox id="actionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-border-color: ffffff; -fx-border-radius: 5;" unFocusColor="#bfbfbf" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="147.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <JFXComboBox id="sutConnectorSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" />
+            <JFXComboBox id="resolutionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: #bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <JFXComboBox id="actionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <JFXButton id="btnSelectDriver" buttonType="RAISED" prefHeight="36.0" prefWidth="147.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="1">
                <graphic>
                   <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -132,8 +132,8 @@
                   </ImageView>
                </graphic>
             </JFXButton>
-            <TextField promptText="URL" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="3">
+            <TextField id="locationInput" promptText="URL" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <JFXButton id="btnSelectLocation" buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="3">
                <graphic>
                   <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -147,7 +147,8 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select SUT" GridPane.columnIndex="3" />
+            <JFXButton buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select SUT" visible="false" GridPane.columnIndex="3" />
+            <TextField id="driverPath" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </children>
