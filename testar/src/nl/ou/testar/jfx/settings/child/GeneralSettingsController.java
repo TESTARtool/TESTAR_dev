@@ -134,5 +134,19 @@ public class GeneralSettingsController extends ChildSettingsController {
             File locationFile = locationChooser.showOpenDialog(view.getScene().getWindow());
             locationInputField.setText(locationFile.toURI().toString());
         });
+
+        Spinner numSequencesSpinner = (Spinner) view.lookup("#numSequences");
+        SpinnerValueFactory<Integer> numSequencesValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
+        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences));
+        numSequencesSpinner.setValueFactory(numSequencesValueFactory);
+        Spinner numActionsSpinner = (Spinner) view.lookup("#numActions");
+        SpinnerValueFactory<Integer> numActionsValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
+        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength));
+        numActionsSpinner.setValueFactory(numActionsValueFactory);
+//        numActionsSpinner.getValueFactory().setValue(settings.get(ConfigTags.SequenceLength));
+//        numActionsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(settings.
+//                get(ConfigTags.SequenceLength), 1));
+        CheckBox alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
+        alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     }
 }

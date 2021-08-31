@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -26,7 +29,6 @@
           <RowConstraints maxHeight="149.0" prefHeight="64.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="160.0" prefHeight="64.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -102,27 +104,8 @@
                   </JFXButton>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="4">
-               <children>
-                  <Label text="Action selection" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <JFXButton contentDisplay="GRAPHIC_ONLY">
-                     <graphic>
-                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@icons/info.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </JFXButton>
-               </children>
-            </HBox>
             <JFXComboBox id="sutConnectorSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" />
             <JFXComboBox id="resolutionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: #bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <JFXComboBox id="actionSelection" focusColor="WHITE" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <JFXButton id="btnSelectDriver" buttonType="RAISED" prefHeight="36.0" prefWidth="147.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="1">
                <graphic>
                   <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
@@ -151,5 +134,35 @@
             <TextField id="driverPath" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 8;">
+         <children>
+            <Label text="Number of sequences" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Spinner id="numSequences" prefHeight="26.0" prefWidth="94.0" />
+            <Label text="Sequence actions" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="32.0" />
+               </HBox.margin>
+            </Label>
+            <Spinner id="numActions" prefHeight="26.0" prefWidth="94.0" />
+         </children>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </HBox>
+      <JFXCheckBox id="alwaysCompile" text="Always compile protocol" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </JFXCheckBox>
    </children>
 </VBox>

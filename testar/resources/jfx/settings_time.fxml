@@ -29,7 +29,7 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner GridPane.columnIndex="1" />
+      <Spinner id="actionDuration" GridPane.columnIndex="1" />
       <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -43,7 +43,7 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Spinner id="startupTime" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <Label text="Action wait time" textFill="WHITE" GridPane.columnIndex="3">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -54,8 +54,8 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner GridPane.columnIndex="4" />
-      <Spinner GridPane.columnIndex="4" GridPane.rowIndex="1" />
+      <Spinner id="waitTime" GridPane.columnIndex="4" />
+      <Spinner id="maxTestTime" GridPane.columnIndex="4" GridPane.rowIndex="1" />
       <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -80,7 +80,7 @@
             <Insets left="2.0" />
          </padding>
       </Label>
-      <JFXCheckBox text="Use recording action timing during replay" textFill="WHITE" unCheckedColor="WHITE" GridPane.rowIndex="2">
+      <JFXCheckBox id="useRecordTiming" text="Use recording action timing during replay" textFill="WHITE" unCheckedColor="WHITE" GridPane.rowIndex="2">
          <font>
             <Font name="Arial Bold" size="14.0" />
          </font>
