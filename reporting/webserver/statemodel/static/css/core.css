@@ -21,10 +21,35 @@ body {
 }
 table, th, td {
     border-bottom: 1px solid white;
-    border-top: 1px solid white;
+    text-align: center;
   }
 
 .text-h2 {
     font-size: x-large;
     font-weight: bold;
+}
+.oracle-link {
+    color: white;
+    text-decoration: none;
+}
+.oracle-link::before {
+    content: "[";
+    color: red; 
+
+}
+.oracle-link::after {
+    content: "]";
+    color: red; 
+}
+
+.no-oracle-link {
+    color: white;
+    text-decoration: none;
+}
+.no-oracle-link::after {
+    content: "]";
+}
+
+.no-oracle-link::before {
+    content: "[";
 }
