@@ -13,12 +13,12 @@
     <script>
       window.addEventListener("load", () => {
         // Set global variables
-        canvas = document.getElementById("screen");
-        ctx = canvas.getContext("2d");
-        registerClickEvent();
+        let canvas = document.getElementById("screen");
+        let stateviewer = new StateViewer(canvas);
 
         // Dislay given state
-        requestState("{{ state['cid'] }}");
+        stateviewer.requestState("{{ state['cid'] }}");
+        stateviewer.registerClickEvent();
       });
     </script>
     <script
@@ -34,10 +34,6 @@
       ></span>
     </div>
 
-    <canvas
-      id="screen"
-      width="{{ state['shape'][2] }}"
-      height="{{ state['shape'][3] }}"
-    ></canvas>
+    <canvas id="screen"></canvas>
   </body>
 </html>
