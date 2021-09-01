@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='statemodel/css/core.css') }}"
+    />
+    <script>
+      let stepCount = 0;
+      let nextState = "";
+      let stateCollection = [];
+      let stateviewer;
+
+      function setStep() {
+        stepCount++;
+        if (stateCollection.length > stepCount) {
+          targetState = stateCollection[stepCount].cid;
+          setTimeout(drawNextState, 2500);
+        } else {
+            console.log("Finished")
+        }
+        
+      }
+
+      function drawNextState() {
+        stateviewer.drawState(stateCollection[stepCount]);
+        setStep();
+      }
+
+      function drawFirstState() {
+        stateviewer.drawState(stateCollection[stepCount]);
+        setStep()
+      }
+      function parseTraverse(states) {
+        stateCollection = states;
+        stateviewer.drawState(stateCollection[0]);
+
+        stepCount = 0;
+        setStep();
+      }
+
+      window.addEventListener("load", () => {
+        // Set global variables
+        canvas = document.getElementById("screen");
+        stateviewer = new StateViewer(canvas);
+
+        const fromState = "{{ from_cid }}";
+        const toState = "{{ to_cid }}";
+
+        // Dislay given state
+
+        stateviewer.getJSON(
+          `/api/concrete/traverse/${fromState}/${toState}`, parseTraverse);
+      });
+    </script>
+    <script
+      type="text/javascript"
+      src="{{ url_for('static', filename='statemodel/js/concrete.js') }}"
+    ></script>
+  </head>
+  <body>
+    <div class="content">
+      <span class="text-h2"></span>
+      <span id="options-menu" style="display: none"
+        >Select one of the following actions: <b id="options"></b
+      ></span>
+    </div>
+
+    <canvas
+      id="screen"
+      width=""
+      height=""
+    ></canvas>
+  </body>
+</html>
