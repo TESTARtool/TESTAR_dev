@@ -39,15 +39,14 @@ class OrientDB:
         state_to = self.concrete_state_from_cid(cid_to)
 
         # Returns none when one of the given states is not found.
-        if state_from is not None and state_to is not None:
+        if state_from is None or state_to is None:
             return None
 
         rid_from = state_from['rid']
         rid_to = state_to['rid']
 
-        query = f"SELECT format(\"%s\", @rid), * FROM (SELECT flatten(ASTAR) FROM (SELECT ASTAR({rid_from}, {rid_to}, 'ConcreteAction', {{'direction': 'IN', 'parallel' : 1 }}) FROM ConcreteState LIMIT 1))"
+        query = f"SELECT format(\"%s\", @rid), * FROM (SELECT flatten(ASTAR) FROM (SELECT ASTAR({rid_from}, {rid_to}, 'ConcreteAction', {{'direction': 'OUT', 'parallel' : 1 }}) FROM ConcreteState LIMIT 1))"
         vertex_traversed = self.query(query)
-        print(query, vertex_traversed)
         return [self._state_to_object(x) for x in vertex_traversed]
 
     def _edge_to_object(self, uid):
