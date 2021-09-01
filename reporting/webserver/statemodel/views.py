@@ -24,7 +24,7 @@ async def concrete_state_details(cid):
 
 @statemodel.route('/concrete/traverse/<string:from_cid>/<string:to_cid>')
 async def concrete_state_traverse(from_cid, to_cid):
-    pass # TODO: Implement this
+    return render_template("concrete_state_traverse.html", from_cid=from_cid, to_cid=to_cid)
 
 ############## API #############
 
