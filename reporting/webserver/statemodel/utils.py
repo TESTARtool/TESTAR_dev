@@ -51,7 +51,13 @@ class OrientDB:
         return [self._state_to_object(x) for x in vertex_traversed]
 
     def _edge_to_object(self, uid):
-        edge = self.query(f'SELECT format("%s", @rid), out.ConcreteID, in.ConcreteID, in.oracleVerdictCode , Shape, ConcreteID, `Desc`, ValuePattern FROM ConcreteAction WHERE uid="{uid}";')[0]
+        edge = self.query(f'SELECT format("%s", @rid), out.ConcreteID, in.ConcreteID, in.oracleVerdictCode , Shape, ConcreteID, `Desc`, ValuePattern FROM ConcreteAction WHERE uid="{uid}";')
+
+        # Select first if it exists or return nothing
+        if edge:
+            edge = edge[0]
+        else:
+            return
 
         if not 'Shape' in edge.oRecordData:
             return
@@ -71,6 +77,29 @@ class OrientDB:
 
         }
 
+    def _edges_to_object(self, edges):
+        """Convert a list of edges uids to a list of edge objects.
+
+        Args:
+            edges (list<uid>): A list with edge uids
+        """
+        output = []
+        for edge in edges:
+
+            # Extract uid from OrientRecord
+            if hasattr(edge, 'oRecordData'):
+                edge = edge.oRecordData['uid']
+
+            edge_object = self._edge_to_object(edge)
+
+            # Ignore empty edges
+            if edge_object is None:
+                continue
+
+            output.append(edge_object)
+        return output
+
+
     def _state_to_object(self, state):
         rid = state.format
 
@@ -83,8 +112,8 @@ class OrientDB:
             )
 
         # Convert to dicts
-        edges_in = [self._edge_to_object(x.oRecordData['uid']) for x in edges_in]
-        edges_out = [self._edge_to_object(x.oRecordData['uid']) for x in edges_out]
+        edges_in = self._edges_to_object(edges_in)
+        edges_out = self._edges_to_object(edges_out)
         
         # Extract shape
         shape_source = state.Shape
