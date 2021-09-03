@@ -78,7 +78,7 @@ import com.orientechnologies.orient.core.db.*;
 import com.orientechnologies.orient.core.sql.executor.*;
 import com.orientechnologies.orient.core.record.*;
 
-public class Protocol_webdriver_unvisited extends WebdriverProtocol {
+public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 	// Classes that are deemed clickable by the web framework
 
 	OrientDBManager odb;
