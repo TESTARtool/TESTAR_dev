@@ -1,8 +1,7 @@
-
 /**
  * 
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,28 +30,16 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
-import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.DesktopProtocol;
 import org.testar.protocols.WebdriverProtocol;
-import org.fruit.alayer.webdriver.WdProtocolUtil;
-import nl.ou.testar.StateModel.Persistence.*;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Persistence.OrientDB.*;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Connection;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 
 import java.util.*;
@@ -61,16 +48,11 @@ import java.net.*;
 
 import org.w3c.dom.*;
 
-import javax.swing.text.html.Option;
 import javax.xml.parsers.*;
 import java.io.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
-import nl.ou.testar.StateModel.Persistence.*;
-import org.fruit.alayer.actions.CompoundAction.*;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -79,8 +61,6 @@ import com.orientechnologies.orient.core.sql.executor.*;
 import com.orientechnologies.orient.core.record.*;
 
 public class Protocol_webdriver_unvisited extends WebdriverProtocol {
-	// Classes that are deemed clickable by the web framework
-
 	OrientDBManager odb;
 	ModelManager m;
 	String nodeName = "";
@@ -89,40 +69,36 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	// Connection connection;
 	OrientDB database;
 
-	Settings settings;
+    // List of atributes to identify and close policy popups
+    // Set to null to disable this feature
+    private static Map<String, String> policyAttributes = new HashMap<String, String>() {
+        {
+            put("id", "sncmp-banner-btn-agree");
+        }
+    };
 
-	public Protocol_webdriver_unvisited() {
+	@Override
+	protected void initialize(Settings settings) {
+	    super.initialize(settings);
 
+	    System.out.println("State model constructor");
+
+	    m = (ModelManager) stateModelManager;
+	    if (m.persistenceManager != null) {
+	        System.out.println("PersistenceManager != null type = " + m.persistenceManager.getClass());
+	        odb = (OrientDBManager) m.persistenceManager;
+	        em = odb.entityManager;
+	        database = new OrientDB(EntityManager.getConnectionString(), OrientDBConfig.defaultConfig());
+
+	        System.out.println("dbSession initialized");
+	        Random r = new Random();
+	        nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
+	        System.out.println("nodeName = " + nodeName);
+	        ODatabaseSession dbSession = createDatabaseConnection();
+	        ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
+	        dbSession.close();
+	    }
 	}
-
-	// private static List<String>
-
-	// Disallow links and pages with these extensions
-	// Set to null to ignore this feature
-	// private static List<String>
-
-	// Define a whitelist of allowed domains for links and pages
-	// An empty list will be filled with the domain from the sut connector
-	// Set to null to ignore this feature
-	// private static List<String>
-
-	// If true, follow links opened in new tabs
-	// If false, stay with the original (ignore links opened in new tabs)
-	// private static boolean followLinks = true;
-
-	// URL + form name, username input id + value, password input id + value
-	// Set login to null to disable this feature
-	private static Pair<String, String> login = null;
-	private static Pair<String, String> username = Pair.from("username", "");
-	private static Pair<String, String> password = Pair.from("password", "");
-
-	// List of atributes to identify and close policy popups
-	// Set to null to disable this feature
-	private static Map<String, String> policyAttributes = new HashMap<String, String>() {
-		{
-			put("id", "sncmp-banner-btn-agree");
-		}
-	};
 
 	/*
 	 * private void getLogin() { Form form = new Form(); form.add("x", "foo");
@@ -145,10 +121,8 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	 *
 	 * @param settings the current TESTAR settings as specified by the user.
 	 */
-	ODatabaseSession CreateDatabaseConnection() {
-
-		// connection = new Connection(database,
-		// OrientDBManagerFactory.getDatabaseConfig(settings));
+	ODatabaseSession createDatabaseConnection() {
+		// connection = new Connection(database, OrientDBManagerFactory.getDatabaseConfig(settings));
 		Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
 		ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
 		System.out.println("Own database connection created");
@@ -164,44 +138,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	}
 
 	boolean hasHadActionsInDb = false;
-
 	boolean stopSequences = false;
-
-	@Override
-	protected void initialize(Settings settings) {
-		NativeLinker.addWdDriverOS();
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "wsdl", "pfx");
-
-		clickableClasses = Arrays.asList("v-menubar-menuitem", "v-menubar-menuitem-caption");
-		super.initialize(settings);
-		// domainsAllowed = Arrays.asList("https://para.testar.org");
-		ensureDomainsAllowed();
-		this.settings = settings;
-		// Propagate followLinks setting
-		WdDriver.followLinks = true;
-
-		System.out.println("Constructor van statemodel");
-
-		// Override ProtocolUtil to allow WebDriver screenshots
-		// protocolUtil = new WdProtocolUtil();
-		m = (ModelManager) stateModelManager;
-		if (m.persistenceManager != null) {
-			System.out.println("PersistenceManager != null type = " + m.persistenceManager.getClass());
-			odb = (OrientDBManager) m.persistenceManager;
-			em = odb.entityManager;
-			database = new OrientDB(EntityManager.getConnectionString(), OrientDBConfig.defaultConfig());
-
-			System.out.println("dbSession initialized");
-			Random r = new Random();
-			nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
-			System.out.println("nodeName = " + nodeName);
-			ODatabaseSession dbSession = CreateDatabaseConnection();
-			ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
-			dbSession.close();
-
-		}
-
-	}
 
 	public OResultSet ExecuteCommand(ODatabaseSession db, String actie) {
 		System.out.println("ExecuteCommand " + actie);
@@ -221,7 +158,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			}
 		} while (repeat);
 		return null;
-
 	}
 
 	public OResultSet ExecuteQuery(ODatabaseSession db, String actie) {
@@ -244,24 +180,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		} while (repeat);
 
 		return null;
-
-	}
-
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The
-	 * method should take care of 1) starting the SUT (you can use TESTAR's settings
-	 * obtainable from <code>settings()</code> to find out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each
-	 * start (e.g. one has to delete or restore the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with
-	 * large systems, you might have to wait several seconds until they have
-	 * finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
 	}
 
 	/**
@@ -289,7 +207,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
-		System.out.println("Protocol file: deriveActions: Arend acties");
+		System.out.println("Protocol file: deriveActions: unvisited actions");
 		Set<Action> actions = super.deriveActions(system, state);
 
 		// create an action compiler, which helps us create actions
@@ -299,8 +217,8 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		// Check if forced actions are needed to stay within allowed domains
 		if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
 			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-
 		}
+
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
 			System.out.println("Executing forced action");
@@ -348,10 +266,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 				}
 			}
 		}
+
 		if (actions.size() == 0) {
 			System.out.println("Actions.size == 0; Return historyback and done with DeriveActions");
 			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 		}
+
 		System.out.println("Done with DeriveActions");
 
 		return actions;
@@ -363,10 +283,11 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		if (linkUrl.contains("wsdl") || linkUrl.contains("parasoft.com") || linkUrl.contains("/services/")
 				|| linkUrl.contains("api-docs") || linkUrl == "" || linkUrl.contains(".pfx") || linkUrl.contains("wadl")
 				|| linkUrl.contains("xml")) {
-			System.out.println("negeer " + linkUrl);
+			System.out.println("ignore " + linkUrl);
 			return true;
 		}
-		System.out.println("accepteer " + linkUrl);
+
+		System.out.println("accept " + linkUrl);
 		return false;
 	}
 
@@ -379,21 +300,21 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			Element root = document.getDocumentElement();
 			System.out.println("readFormFile");
 			NodeList items = root.getChildNodes();
-			HashMap<String, String> result = new HashMap<String, String>();
-			for (int i = 0; i < items.getLength(); i++) {
+			HashMap<String, String> result = new HashMap<>();
 
+			for (int i = 0; i < items.getLength(); i++) {
 				Node item = items.item(i);
 				Element node = (Element) item;
 				String value = node.getTextContent();
 				// System.out.println(node.getNodeName() +"=" +value);
 				result.put(node.getNodeName(), value);
 			}
-			System.out.println("Einde formfile");
+
+			System.out.println("End form files");
 			return result;
 		} catch (Exception e) {
 		}
 		return null;
-
 	}
 
 	public void storeToFile(String fileName, HashMap<String, String> data) {
@@ -414,7 +335,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		} catch (Exception e) {
 		}
 		// System.out.println(result);
-
 	}
 
 	boolean inForm = false;
@@ -433,52 +353,44 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		WdElement element = widget.element;
 		String defaultValue = "write-random-genenerated-value";
 		if (isTypeable(widget)) {
-
-			// System.out.println("veld "+element.name+" gevonden");
+			// System.out.println("field "+element.name+" found it");
 			if (storeFile) {
-
 				fields.put(element.name, defaultValue);
 			}
 			if (fields.containsKey(element.name) && fields.get(element.name) != null) {
 				caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
 				sum += 2;
 			}
-
 		}
+
 		String baseElem = element.tagName;
-		// System.out.println("check children: huidig element "+element.tagName+" aantal
+		// System.out.println("check children: current element "+element.tagName+" number
 		// childs: "+widget.childCount());
 		for (int i = 0; i < widget.childCount(); i++) {
 			WdWidget w = widget.child(i);
-			// System.out.println("child "+i+" van element "+baseElem);
+			// System.out.println("child "+i+" of element "+baseElem);
 			// WdElement
 			element = w.element;
 
 			// System.out.println("buildForm :"+ element.tagName +" "+element.name);
 			if (isTypeable(w)) {
-				// System.out.println("veld "+element.name+" gevonden");
+				// System.out.println("field "+element.name+" found it");
 				if (storeFile) {
-
 					fields.put(element.name, defaultValue);
 				}
 				if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-
 					caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
 					sum += 2;
-					// System.out.println("element.name in de fields; voeg toe aan caB som+2 som =
+					// System.out.println("element.name in the fields; add to caB som+2 som =
 					// "+sum);
 				}
-
 			} else {
-				// System.out.println("Element "+element.tagName+" is niet typeable");
-
+				// System.out.println("Element "+element.tagName+" is not typeable");
 				sum += buildForm(caB, widget.child(i), fields, storeFile, ac);
 			}
-
 		}
-		// System.out.println("klaar met baseElem "+baseElem+" sum = "+sum);
+		// System.out.println("done with baseElem "+baseElem+" sum = "+sum);
 		return sum;
-
 	}
 
 	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget,
@@ -488,15 +400,18 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		if (fields == null) {
 			fields = new HashMap<String, String>();
 		}
+
 		URI uri = null;
 		try {
 			uri = new URI(WdDriver.getCurrentUrl());
 		} catch (Exception e) {
 		}
+
 		String formId = widget.getAttribute("name");
 		if (formId == null) {
 			formId = "";
 		}
+
 		String path = (uri.getPath() + "/" + formId).replace("/", "_") + ".xml";
 		System.out.println("Look for file " + path);
 		File f = new File(path);
@@ -504,15 +419,15 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		if (f.exists()) {
 			storeFile = false;
 			fields = readFormFile(path);
-			System.out.println("Bestand bestaat, lees de data uit bestand");
+			System.out.println("File exists, read the data from file");
 		}
+
 		CompoundAction.Builder caB = new CompoundAction.Builder();
 		int sum = buildForm(caB, widget, fields, storeFile, ac);
 
 		if (fields.containsKey("performSubmit")) {
 			boolean submit = Boolean.getBoolean(fields.get("performSubmit"));
 			if (submit && formId != "") {
-
 				caB.add(new WdSubmitAction(formId), 2);
 			}
 		}
@@ -521,12 +436,10 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		}
 		if (sum > 0) {
 			CompoundAction ca = caB.build();
-
 			actions.add(ca);
 		}
 		inForm = false;
-		System.out.println("fillForm klaar");
-		// return ca;
+		System.out.println("fillForm ready");
 	}
 
 	boolean _moreActions = true;
@@ -583,7 +496,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
-
 				String type = ((WdWidget) widget).element.type.toLowerCase();
 				return WdRoles.typeableInputTypes().contains(type);
 			}
@@ -605,12 +517,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	public ArrayList<String> GetUnvisitedActionsFromDatabase(String currentAbstractState) {
 		System.out.println("GetUnvisitedActionsFromDatabase");
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		String sql = "SELECT expand(path) FROM (  SELECT shortestPath($from, $to) AS path   LET     $from = (SELECT FROM abstractstate WHERE stateId='"
 				+ currentAbstractState + "'),     $to = (SELECT FROM BlackHole)   UNWIND path)";
 		System.out.println(sql);
 		OResultSet rs = null;
-		ODatabaseSession db = CreateDatabaseConnection();
+		ODatabaseSession db = createDatabaseConnection();
 		try {
 			rs = ExecuteQuery(db, sql);
 
@@ -623,31 +535,30 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 					OVertex nodeVertex = optionalVertex.get();
 					for (OEdge edge : nodeVertex.getEdges(ODirection.OUT, "UnvisitedAbstractAction")) {
 						result.add(edge.getProperty("actionId"));
-						System.out.println("Edge " + edge + " gevonden ID = " + edge.getProperty("actionId"));
+						System.out.println("Edge " + edge + " found with ID = " + edge.getProperty("actionId"));
 					}
 
 				}
 
 				System.out.println("friend: " + item);
 			}
-
 		} catch (Exception e) {
 			System.out.println("Exception during GetUnvisitedActionsFromDatabase " + e);
 			e.printStackTrace();
-
 		} finally {
 			rs.close();
 			db.close();
-
 		}
-		System.out.println("Klaar met ophalen acties");
+
+		System.out.println("Ready with pick up actions");
 		return result;
 	}
 
+	// TODO: Check if rename aantal to number affects the sql query
 	public long CountInDb(String table) {
 		long aantal = 0;
 		String sql = "SELECT count(*) as aantal from " + table;
-		ODatabaseSession db = CreateDatabaseConnection();
+		ODatabaseSession db = createDatabaseConnection();
 		try {
 			OResultSet rs = ExecuteQuery(db, sql);
 			OResult item = rs.next();
@@ -655,7 +566,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			rs.close();
 			System.out.println(sql + "  aantal =  " + aantal);
 		} finally {
-
 			db.close();
 		}
 		if (aantal > 0) {
@@ -663,33 +573,30 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		}
 
 		return aantal;
-
 	}
 
 	public void UpdateAbstractActionInProgress(String actionId) {
-		ODatabaseSession db = CreateDatabaseConnection();
+		ODatabaseSession db = createDatabaseConnection();
 		try {
-			System.out.println("actie  AbstractID = " + actionId);
+			System.out.println("action AbstractID = " + actionId);
 
 			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='"
 					+ nodeName + "') where actionId='" + actionId + "'";
 			System.out.println("Execute" + sql);
 
 			ExecuteCommand(db, sql);
-
 		} catch (Exception e) {
 			System.out.println("Can not update unvisitedAbstractAction; set selectedAction to null");
 			selectedAction = null;
 		} finally {
 			db.close();
 		}
-
 	}
 
 	public HashMap<String, Action> ConvertActionSetToDictionary(Set<Action> actions) {
 		System.out.println("Convert Set<Action> to HashMap containing actionIds as keys");
-		HashMap<String, Action> actionMap = new HashMap<String, Action>();
-		ArrayList<Action> actionList = new ArrayList<Action>(actions);
+		HashMap<String, Action> actionMap = new HashMap<>();
+		ArrayList<Action> actionList = new ArrayList<>(actions);
 		for (Action a : actionList) {
 			System.out.println(
 					"Add action " + a.get(Tags.AbstractIDCustom) + "  to actionMap; description = " + a.get(Tags.Desc));
@@ -700,7 +607,6 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	}
 
 	public String selectRandomAction(ArrayList<String> actions) {
-
 		long graphTime = System.currentTimeMillis();
 		Random rnd = new Random(graphTime);
 
@@ -734,12 +640,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 					return action;
 				}
 
-				long aantalAbstractActions = CountInDb("abstractstate");
+				long numberAbstractActions = CountInDb("abstractstate");
 
 				System.out.println(
-						"No actions available in database; abstract states in database = " + aantalAbstractActions);
+						"No actions available in database; abstract states in database = " + numberAbstractActions);
 
-				if (aantalAbstractActions == 0) {
+				if (numberAbstractActions == 0) {
 					Action a = super.selectAction(state, actions);
 					String action = a.get(Tags.AbstractIDCustom);
 					System.out.println(
@@ -784,7 +690,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 	}
 
 	public void ReturnActionToBlackHole() {
-		ODatabaseSession db = CreateDatabaseConnection();
+		ODatabaseSession db = createDatabaseConnection();
 		try {
 			String sql = "update unvisitedabstractaction set in = (select from blackhole) where actionId='"
 					+ selectedAction + "'";
@@ -803,7 +709,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 				+ selectedAction + "')";
 
 		String destinationStateId = "";
-		ODatabaseSession db = CreateDatabaseConnection();
+		ODatabaseSession db = createDatabaseConnection();
 
 		OResultSet destinationStatResultSet = ExecuteQuery(db, q1);
 		if (destinationStatResultSet.hasNext()) {
@@ -816,26 +722,26 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 			db.close();
 		} else {
 			System.out.println(
-					"State die vastzit aan de unvisitedaction niet gevonden; zet selectedAction op null; voer nu historyback uit");
+					"State is stuck beacuse the unvisitedaction not found; set selectedAction to null; run historyback now");
 			destinationStatResultSet.close();
 			ReturnActionToBlackHole();
 			selectedAction = null;
 			return new WdHistoryBackAction();
 		}
 
-		// haal stateId op van q1
+		// get stateId from q1
 
 		// SELECT @rid, stateId from (
 		// SELECT expand(path) FROM ( SELECT shortestPath($from,
 		// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
 		// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
 		// Where stateId='SACwpszr27b61710690312') UNWIND path))
-		String q2 = "SELECT @rid, stateId from (SELECT expand(path) FROM (  SELECT shortestPath($from, $to,'OUT','AbstractAction') AS path   LET     $from = (SELECT FROM abstractstate WHERE stateId='"
-				+ state.get(Tags.AbstractIDCustom) + "'),     $to = (SELECT FROM abstractstate Where stateId='"
-				+ destinationStateId + "')   UNWIND path))";
-		db = CreateDatabaseConnection();
+		String q2 = "SELECT @rid, stateId from (SELECT expand(path) FROM (  SELECT shortestPath($from, $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate WHERE stateId='"
+				+ state.get(Tags.AbstractIDCustom) + "'), $to = (SELECT FROM abstractstate Where stateId='"
+				+ destinationStateId + "') UNWIND path))";
+		db = createDatabaseConnection();
 		OResultSet pathResultSet = ExecuteQuery(db, q2);
-		Vector<TmpData> v = new Vector<TmpData>();
+		Vector<TmpData> v = new Vector<>();
 
 		while (pathResultSet.hasNext()) {
 			OResult item = pathResultSet.next();
@@ -847,33 +753,31 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 		if (v.size() < 2) {
 			System.out.println(
-					"Er bestaat geen pad! Uitvoeren super.selectAction; Eindig sequence ook door _moreActions = false te zetten");
+					"There is no path! Execute super.selectAction; Also end sequence by setting _moreActions=false");
 			ReturnActionToBlackHole();
 			selectedAction = null;
 			_moreActions = false;
 			return super.selectAction(state, actions);
-
-			// Er bestaat geen pad
 		}
 
-		// Zoek uit te voeren abstractaction
+		// Find an abstractaction to perform
 		String q3 = "select from abstractaction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
 
 		String abstractActionId = "";
-		var beschikbareActions = ConvertActionSetToDictionary(actions);
-		db = CreateDatabaseConnection();
+		HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
+		db = createDatabaseConnection();
 		OResultSet abstractActionResultSet = ExecuteQuery(db, q3);
 		while (abstractActionResultSet.hasNext()) {
 			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
-			System.out.println("traversePath: gebruik hiervoor action " + abstractActionId);
+			System.out.println("traversePath: use action " + abstractActionId);
 
-			System.out.println("Check of " + abstractActionId + "  beschikbaar is");
-			if (beschikbareActions.containsKey(abstractActionId)) {
+			System.out.println("Check if " + abstractActionId + " is available");
+			if (availableActions.containsKey(abstractActionId)) {
 				System.out.println(
-						"Actie " + abstractActionId + "  is beschikbaar is beschikbareActions; deze wordt uitgevoerd ");
+						"Action " + abstractActionId + " is available in the avilableActions; this is being executed");
 				abstractActionResultSet.close();
 				db.close();
-				return beschikbareActions.get(abstractActionId);
+				return availableActions.get(abstractActionId);
 			}
 		}
 		abstractActionResultSet.close();
@@ -884,12 +788,10 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		selectedAction = null;
 
 		return super.selectAction(state, actions);
-
 	}
 
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-
 		// Call the preSelectAction method from the AbstractProtocol so that, if
 		// necessary,
 		// unwanted processes are killed and SUT is put into foreground.
@@ -901,9 +803,7 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 		// First check whether we do have a selected action; if not select one
 		if (selectedAction == null) {
-
 			selectedAction = getNewSelectedAction(state, actions);
-
 		}
 
 		if (selectedAction != null) {
@@ -932,7 +832,5 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		retAction = super.selectAction(state, actions);
 
 		return retAction;
-
 	}
-
 }

@@ -126,8 +126,8 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.w3schools.com
+DeniedExtensions = pdf;jpg;png;wsdl;pfx
+DomainsAllowed = para.testar.org
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
