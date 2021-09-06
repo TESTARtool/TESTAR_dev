@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-TagsToFilter = Title;WebName;WebTagName
+ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*admin.*|.*logout.*|.*parasoft.com.*|.*api-docs.*
+TagsToFilter = ValuePattern
 
 #################################################################
 # Processfilter
@@ -134,7 +134,7 @@ DeniedExtensions = pdf;jpg;png;wsdl;pfx
 DomainsAllowed = para.testar.org
 FollowLinks = true
 BrowserFullScreen = true
-SwitchNewTabs = true
+SwitchNewTabs = false
 
 #################################################################
 # Override display scale
@@ -167,13 +167,13 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = false
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

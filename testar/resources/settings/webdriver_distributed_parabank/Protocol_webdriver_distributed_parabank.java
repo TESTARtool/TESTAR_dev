@@ -30,9 +30,12 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
+
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.monkey.Settings;
@@ -183,6 +186,26 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 	}
 
 	/**
+	 * This method is called when TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 *
+	 * @return the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+	    // parabank wsdl pages have no widgets, we need to force a webdriver history back action
+	    if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
+	        WdDriver.executeScript("window.history.back();");
+	        Util.pause(1);
+	    }
+
+	    return super.getState(system);
+	}
+
+	/**
 	 * This method is used by TESTAR to determine the set of currently available
 	 * actions. You can use the SUT's current state, analyze the widgets and their
 	 * properties to create a set of sensible actions, such as: "Click every Button
@@ -213,11 +236,6 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		// Check if forced actions are needed to stay within allowed domains
-		if (WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
-			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		}
 
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
@@ -261,7 +279,7 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				if (!isLinkDenied(widget) && !mijnIgnore(widget)) {
+				if (!isLinkDenied(widget)) {
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
@@ -275,20 +293,6 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 		System.out.println("Done with DeriveActions");
 
 		return actions;
-	}
-
-	public boolean mijnIgnore(org.fruit.alayer.Widget widget) {
-		String linkUrl = widget.get(Tags.ValuePattern, "");
-
-		if (linkUrl.contains("wsdl") || linkUrl.contains("parasoft.com") || linkUrl.contains("/services/")
-				|| linkUrl.contains("api-docs") || linkUrl == "" || linkUrl.contains(".pfx") || linkUrl.contains("wadl")
-				|| linkUrl.contains("xml")) {
-			System.out.println("ignore " + linkUrl);
-			return true;
-		}
-
-		System.out.println("accept " + linkUrl);
-		return false;
 	}
 
 	public HashMap<String, String> readFormFile(String fileName) {

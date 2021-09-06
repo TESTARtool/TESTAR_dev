@@ -111,6 +111,14 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
         // iterate through all widgets
         for (Widget widget : state) {
+
+            if(widget.get(WdTags.WebId, "").contains("customerForm")) {
+                actions.add(customerFormFill(state));
+            }
+            if(widget.get(Tags.Title, "").toLowerCase().trim().contains("billpaymentservice")) {
+                actions.add(paymentService(state, widget));
+            }
+
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true) || blackListed(widget)) {
                 continue;
@@ -131,7 +139,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
             // left clicks, but ignore links outside domain
             if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-                actions.add(ac.leftClickAt(widget));
+                // Click on select web items opens the menu but does not allow TESTAR to select an item,
+                // thats why we need a custom action selection
+                if(widget.get(Tags.Role).equals(WdRoles.WdSELECT)) {
+                    actions.add(randomFromSelectList(widget));
+                } else {
+                    actions.add(ac.leftClickAt(widget));
+                }
             }
         }
 
@@ -157,33 +171,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         if(w.get(WdTags.WebId, "").toLowerCase().contains("date")) {
             return dates[new Random().nextInt(dates.length)];
         }
-    }
-
-    /*
-     * Check if the widget has a denied URL as hyperlink
-     */
-    @Override
-    protected boolean isLinkDenied(Widget widget) {
-        return (super.isLinkDenied(widget) && parabankLinkDenied(widget));
-    }
-
-    /**
-     * Specific denied links for parabank web app
-     * @param widget
-     * @return
-     */
-    private boolean parabankLinkDenied(Widget widget) {
-        String linkUrl = widget.get(Tags.ValuePattern, "");
-        if (linkUrl.contains("parasoft.com")
-                || linkUrl.contains("api-docs") 
-                || linkUrl == "admin.htm" 
-                || linkUrl == "logout.htm" 
-                || linkUrl.contains(".pfx")
-                || linkUrl.contains("xml")) {
-            return true;
-        }
-
-        return false;
+        return this.getRandomText(w);
     }
 
     @Override
@@ -226,5 +214,85 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         }
 
         return false;
+    }
+
+    /**
+     * Create a specific action to fill the register user form. 
+     * This only works if we are not logged all the sequence. 
+     * 
+     * @param state
+     * @return
+     */
+    private Action customerFormFill(State state) {
+        String username = "testar" + new Random().nextInt(999);
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        return new CompoundAction.Builder()
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.firstName", state), "testar", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.lastName", state), "testar", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.street", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.city", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.state", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.zipCode", state), "12345", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.phoneNumber", state), "123456789", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.ssn", state), "123456789", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.username", state), username, true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.password", state), "testar", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "repeatedPassword", state), "testar", true), 0.5)
+                .add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Register", state)), 0.5)
+                .build();
+    }
+    
+    /**
+     * Create a specific action to fill the register user form. 
+     * This only works if we are not logged all the sequence. 
+     * 
+     * @param state
+     * @return
+     */
+    private Action paymentService(State state, Widget w) {
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+        return new CompoundAction.Builder()
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.name", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.street", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.city", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.state", state), "a", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.zipCode", state), "12345", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.phoneNumber", state), "123456789", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.accountNumber", state), "54321", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "verifyAccount", state), "54321", true), 0.5)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "amount", state), "111", true), 0.5)
+                .add(randomFromSelectList(w), 0.5)
+                .build();
+    }
+
+    /**
+     * Randomly select one item from the select list widget. 
+     * 
+     * @param w
+     * @return
+     */
+    private Action randomFromSelectList(Widget w) {
+        int selectLength = 0;
+        String elementId = w.get(WdTags.WebId, "noIdDetected");
+        // Get the number of values of the specific select list item
+        try {
+            String query = String.format("document.getElementById('%s').length;", elementId);
+            Object response = WdDriver.executeScript(query);
+            selectLength = Integer.parseInt(response.toString());
+        } catch (Exception e) {
+            System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
+        }
+
+        // Select one of the values randomly, or the first one if previous length failed
+        try {
+            String query = String.format("document.getElementById('%s').item(%s).value;", elementId, new Random().nextInt(selectLength));
+            Object response = WdDriver.executeScript(query);
+            String selectValue = response.toString();
+            return new WdSelectListAction(elementId, selectValue);
+        } catch (Exception e) {
+            System.out.println("*** ACTION WARNING: problems trying randomly select a list value: " + elementId);
+        }
+
+        return new NOP();
     }
 }
