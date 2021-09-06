@@ -44,8 +44,8 @@ SequenceLength = 100
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title;WebName;WebTagName
+SuspiciousTitles = 
+TagsForSuspiciousOracle = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -100,24 +100,24 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
+ProtocolClass = webdriver_parabank/Protocol_webdriver_parabank
 
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
-DataStore =
+StateModelEnabled = true
+DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer =
 DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
-DataStoreMode = none
-ApplicationName = Parabank
-ApplicationVersion =
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = parabank
+ApplicationVersion = 1.0
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -131,9 +131,9 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png;pfx;xml
+DeniedExtensions = pdf;jpg;png;wsdl;pfx
 DomainsAllowed = para.testar.org
-FollowLinks = false
+FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
 

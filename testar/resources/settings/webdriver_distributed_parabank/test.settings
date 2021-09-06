@@ -27,7 +27,7 @@ Mode = Generate
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\temp\\chromedriver.exe" "1920x900+0+0" "http://localhost:8001/form.html"
+SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://10.102.0.41:8080/parabank"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\temp\\chromedriver.exe" "1920x900+0+0" "http://localhos
 #################################################################
 
 Sequences = 1
-SequenceLength = 20
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -44,8 +44,8 @@ SequenceLength = 20
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title;WebName;WebTagName
+SuspiciousTitles = 
+TagsForSuspiciousOracle = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -108,11 +108,15 @@ ProtocolClass = webdriver_distributed_parabank/Protocol_webdriver_distributed_pa
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = 192.168.178.17
+DataStoreServer = host.docker.internal
 DataStoreDB = testar
-DataStoreUser = root
-DataStorePassword = P@ssw0rd
-DataStoreMode = instant
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = none
+ApplicationName = parabank
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -164,11 +168,11 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
-ShowVisualSettingsDialogOnStartup = true
+ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
+ShowSettingsAfterTest = false
 TimeToWaitAfterAction = 0.1
 StartupTime = 2.0
 DrawWidgetInfo = false
@@ -176,8 +180,10 @@ TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
+FlashFeedback = false
+ProtocolCompileDirectory = /tmp

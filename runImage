@@ -4,5 +4,6 @@ echo "Start Xvfb"
 /opt/bin/start-xvfb.sh &
 sleep 2
 cd /testar/bin
-./testar
+#./testar
+./testar sse=webdriver_parabank
 #sh -c "while true; do sleep 1; done"
