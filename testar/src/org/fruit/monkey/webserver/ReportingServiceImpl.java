@@ -21,11 +21,17 @@ public class ReportingServiceImpl implements ReportingService {
     private DockerPoolService dockerPoolService;
     private String imageId;
     private final File webserverDir;
+    private final int port;
+    private final String[] environmentVariables;
     private final File outputDir;
+    private boolean orientdb = false;
     private ReportingServiceDelegate delegate;
 
-    public ReportingServiceImpl(DockerPoolService dockerPoolService) throws IOException {
+    public ReportingServiceImpl(int port, String[] env, DockerPoolService dockerPoolService) throws IOException {
         this.dockerPoolService = dockerPoolService;
+        this.port = port;
+        this.environmentVariables = env;
+
         webserverDir = new File(Main.webserverDir);
         outputDir = new File(Main.outputDir);
     }
@@ -39,7 +45,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void start(int port, String dbHostname, int dbPort, String dbName, String dbUsername, String dbPassword) throws IOException {
+    public void start() throws IOException {
         dockerPoolService.start("reporting");
         if (delegate != null) {
             delegate.onStateChanged(ReportingServiceDelegate.State.BUILDING_IMAGE, "Building report service image");
@@ -52,14 +58,11 @@ public class ReportingServiceImpl implements ReportingService {
         final HostConfig hostConfig = HostConfig.newHostConfig()
                 .withPortBindings(PortBinding.parse(String.format("%d:80", port)))
                 .withBinds(
-                        new Bind(webserverDir.getAbsolutePath(), new Volume("/app")),
-                        new Bind(outputDir.getAbsolutePath(), new Volume("/static/output"))
+                        new Bind(webserverDir.getAbsolutePath(), new Volume("/usr/app")),
+                        new Bind(outputDir.getAbsolutePath(), new Volume("/usr/app/static/output"))
                 );
-        final String[] env = {"ADAPTER=MYSQL", "MYSQL_HOST=" + dbHostname, "MYSQL_PORT=" + dbPort,
-            "MYSQL_DATABASE=" + dbName,  "MYSQL_USER=" + dbUsername, "MYSQL_PASSWORD=" + dbPassword,
-            "MYSQL_WAIT=5"};
 
-        dockerPoolService.startWithImage(imageId, "webservice", hostConfig, env);
+        dockerPoolService.startWithImage(imageId, "webservice", hostConfig, environmentVariables);
 
         if (delegate != null) {
             delegate.onStateChanged(ReportingServiceDelegate.State.CONNECTING, "Connecting to report service");

@@ -40,7 +40,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -87,6 +86,7 @@ import org.fruit.monkey.mysql.MySqlServiceImpl;
 import org.fruit.monkey.orientdb.OrientDBService;
 import org.fruit.monkey.orientdb.OrientDBServiceDelegate;
 import org.fruit.monkey.orientdb.OrientDbServiceImpl;
+import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
 import org.fruit.monkey.webserver.ReportingServiceImpl;
@@ -166,6 +166,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				@Override
 				public void run() {
 					try {
+						// There is no other user which can be used
+						// There should be a better way to implement this.
+						settings.set(ConfigTags.DataStoreUser, "root");
+						settings.set(ConfigTags.DataStoreServer, "orientdb");
 						orientService.startLocalDatabase(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword));
 					} catch (Exception e) {
 						System.err.println("Cannot initialize OrientDB");
@@ -273,17 +277,29 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		);
 
 		if (sqlService != null) {
+			final boolean dbEnabled = settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE);
 			final int port = settings.get(ConfigTags.ReportServicePort);
 			final String dbHostname = (isLocalDatabaseActive ? "mysql" : settings.get(ConfigTags.SQLReportingServer));
 			final String dbName = settings.get(ConfigTags.SQLReportingDB);
 			final String dbUsername = settings.get(ConfigTags.SQLReportingUser);
 			final String dbPassword = settings.get(ConfigTags.SQLReportingPassword);
 
+			final String oHostname = settings.get(ConfigTags.DataStoreServer);
+			final String oDatabase = settings.get(ConfigTags.DataStoreDB);
+			final String oUsername = settings.get(ConfigTags.DataStoreUser);
+			final String oPassword = settings.get(ConfigTags.DataStorePassword);
+
 			ProgressDialog progressDialog = new ProgressDialog();
 			progressDialog.setStatusString("Preparing report");
 
 			try {
-				final ReportingService reportingService = new ReportingServiceImpl(Main.getReportingService());
+				ReportingBuilder reportingBuilder = new ReportingBuilder(port, Main.getReportingService(), dbEnabled, settings.get(ConfigTags.StateModelEnabled));
+
+				reportingBuilder.setMysqlDBConfiguraton(dbHostname, dbUsername, dbPassword, dbName, 3306);
+				reportingBuilder.setOrientDBConfiguraton(oHostname, oUsername, oPassword, oDatabase, 2424);
+
+				final ReportingService reportingService = reportingBuilder.build();
+
 				reportingService.setDelegate(new ReportingServiceDelegate() {
 					@Override
 					public void onStateChanged(State state, String description) {
@@ -306,7 +322,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					@Override
 					public void run() {
 						try {
-							reportingService.start(port, dbHostname, 3306, dbName, dbUsername, dbPassword);
+							reportingService.start();
 						} catch (IOException e) {
 							System.err.println("Cannot start web service: " + e.getMessage());
 							e.printStackTrace();
