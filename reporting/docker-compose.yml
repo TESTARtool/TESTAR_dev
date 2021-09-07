@@ -3,8 +3,8 @@ services:
   app:
     build:
       context: ./webserver
-    expose:
-      - "8000"
+    ports:
+      - "8000:80"
     volumes:
       - ./webserver:/usr/app
       - /home/anon/Projects/TESTAR_dev/testar/target/install/testar/bin/output:/usr/app/static/output/
