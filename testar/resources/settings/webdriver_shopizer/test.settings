@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://aws-demo.shopizer.com:8080/"
 
 #################################################################
 # Sequences
@@ -82,7 +82,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*admin.*|.*logout.*|.*parasoft.com.*|.*api-docs.*
+ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*
 TagsToFilter = ValuePattern
 
 #################################################################
@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_parabank/Protocol_webdriver_parabank
+ProtocolClass = webdriver_shopizer/Protocol_webdriver_shopizer
 
 #################################################################
 # State model inference settings
@@ -114,7 +114,7 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = parabank
+ApplicationName = shopizer
 ApplicationVersion = 1.0
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
@@ -131,8 +131,8 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
-DeniedExtensions = pdf;jpg;png;wsdl;pfx
-DomainsAllowed = para.testar.org
+DeniedExtensions = pdf;jpg;png
+DomainsAllowed = aws-demo.shopizer.com
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = false

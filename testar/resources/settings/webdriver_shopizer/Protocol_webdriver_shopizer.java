@@ -37,6 +37,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
@@ -46,7 +47,24 @@ import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_parabank extends WebdriverProtocol {
+public class Protocol_webdriver_shopizer extends WebdriverProtocol {
+
+    /**
+     * Called once during the life time of TESTAR
+     * This method can be used to perform initial setup work
+     *
+     * @param settings the current TESTAR settings as specified by the user.
+     */
+    @Override
+    protected void initialize(Settings settings) {
+        super.initialize(settings);
+
+        // List of attributes to identify and close policy popups
+        // Set to null to disable this feature
+        policyAttributes = new HashMap<String, String>() {{
+            put("class", "cc-dismiss");
+        }};
+    }
 
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -58,37 +76,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
 
-        // GUI login sequence 
-        //waitLeftClickAndTypeIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5, 1.0);
-        //waitLeftClickAndTypeIntoWidgetWithMatchingTag("name", "password", "demo", state, system, 5, 1.0);
-        //waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-        //Util.pause(1);
-
-        // Script login sequence
-        WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
-        WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
-        WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
-        Util.pause(1);
-    }
-
-    /**
-     * This method is called when TESTAR requests the state of the SUT.
-     * Here you can add additional information to the SUT's state or write your
-     * own state fetching routine. The state should have attached an oracle
-     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-     * state is erroneous and if so why.
-     *
-     * @return the current state of the SUT with attached oracle.
-     */
-    @Override
-    protected State getState(SUT system) throws StateBuildException {
-        // parabank wsdl pages have no widgets, we need to force a webdriver history back action
-        if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
-            WdDriver.executeScript("window.history.back();");
-            Util.pause(1);
-        }
-
-        return super.getState(system);
+        // TODO: prepare Shopizer login
     }
 
     /**
@@ -119,11 +107,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         // iterate through all widgets
         for (Widget widget : state) {
 
-            if(widget.get(WdTags.WebId, "").contains("customerForm")) {
-                actions.add(customerFormFill(state));
-            }
-            if(widget.get(WdTags.WebName, "").contains("payee.name")) {
-                actions.add(paymentService(state));
+            if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
+                actions.add(registrationFormFill(state));
             }
 
             // only consider enabled and non-tabu widgets
@@ -141,7 +126,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-                actions.add(ac.clickTypeInto(widget, getRandomParabankData(widget), true));
+                actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
             }
 
             // left clicks, but ignore links outside domain
@@ -164,23 +149,15 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     }
 
     /**
-     * Get specific text data for parabank text fields
+     * Get specific text data for shopizer text fields
      * 
      * @param w
      * @return
      */
-    private String getRandomParabankData(Widget w) {
-        String[] dates = {"12-12-2020", "08-19-2021", "08-26-2021"};
-        String[] amounts = {"100", "1000"};
-        String[] transactions = {"12145", "14143", "13255", "12478", "13366", "12700"};
-        if(w.get(WdTags.WebId, "").toLowerCase().contains("amount") || w.get(WdTags.WebId, "").toLowerCase().contains("pay")) {
-            return amounts[new Random().nextInt(amounts.length)];
-        }
-        if(w.get(WdTags.WebId, "").toLowerCase().contains("date")) {
-            return dates[new Random().nextInt(dates.length)];
-        }
-        if(w.get(WdTags.WebId, "").toLowerCase().contains("transaction")) {
-            return transactions[new Random().nextInt(transactions.length)];
+    private String getRandomShopizerData(Widget w) {
+        String[] example = {"aaaa", "1234", "01-01-2021"};
+        if(w.get(WdTags.WebId, "").toLowerCase().contains("example")) {
+            return example[new Random().nextInt(example.length)];
         }
         return this.getRandomText(w);
     }
@@ -192,46 +169,18 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
      * @param state
      * @return
      */
-    private Action customerFormFill(State state) {
-        // https://para.testar.org/parabank/register.htm
-        String username = "testar" + new Random().nextInt(999);
+    private Action registrationFormFill(State state) {
+        // http://aws-demo.shopizer.com:8080/shop/customer/registration.html
+        String email = "testar" + new Random().nextInt(999) + "@testar.com";
         StdActionCompiler ac = new AnnotatingActionCompiler();
         return new CompoundAction.Builder()
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.firstName", state), "testar", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.lastName", state), "testar", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.street", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.city", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.state", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.zipCode", state), "12345", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.phoneNumber", state), "123456789", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.ssn", state), "123456789", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.username", state), username, true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.password", state), "testar", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "repeatedPassword", state), "testar", true), 50)
-                .add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Register", state)), 50)
-                .build();
-    }
-
-    /**
-     * Create a specific action to fill the register user form. 
-     * This only works if we are not logged all the sequence. 
-     * 
-     * @param state
-     * @return
-     */
-    private Action paymentService(State state) {
-        StdActionCompiler ac = new AnnotatingActionCompiler();
-        return new CompoundAction.Builder()
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.name", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.street", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.city", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.state", state), "a", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.zipCode", state), "12345", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.phoneNumber", state), "123456789", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.accountNumber", state), "54321", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "verifyAccount", state), "54321", true), 50)
-                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "amount", state), "111", true), 50)
-                .add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Send Payment", state)), 50)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.firstName", state), "testar", true), 50)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.lastName", state), "testar", true), 50)
+                // Ignore country and state, use default values
+                .add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "emailAddress", state), email, true), 50)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "password", state), "testar", true), 50)
+                .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "checkPassword", state), "testar", true), 50)
+                .add(ac.leftClickAt(getWidgetWithMatchingTag("class", "login-btn", state)), 50)
                 .build();
     }
 
