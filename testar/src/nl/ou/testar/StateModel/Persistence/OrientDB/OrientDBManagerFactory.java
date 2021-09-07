@@ -19,7 +19,7 @@ public class OrientDBManagerFactory implements PersistenceManagerFactory {
         // create a config object for the orientdb database connection info
         Config config = new Config();
         config.setConnectionType(settings.get(ConfigTags.DataStoreType));
-        config.setServer(settings.get(ConfigTags.DataStoreServer));
+        config.setServer((settings.get(ConfigTags.DataStoreType).equals("docker")) ? "localhost" : settings.get(ConfigTags.DataStoreServer));
         config.setDatabase(settings.get(ConfigTags.DataStoreDB));
         config.setUser(settings.get(ConfigTags.DataStoreUser));
         config.setPassword(settings.get(ConfigTags.DataStorePassword));

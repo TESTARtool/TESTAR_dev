@@ -13,6 +13,6 @@ public interface OrientDBService {
     void setDelegate(OrientDBServiceDelegate delegate);
 
 
-    void startLocalDatabase() throws IOException;
+    void startLocalDatabase(String database, String username, String password) throws IOException;
 
 }

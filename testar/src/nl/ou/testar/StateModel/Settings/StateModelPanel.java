@@ -357,6 +357,8 @@ public class StateModelPanel extends SettingsPanel {
         dataStoreServerTextfield.setEnabled(remote && stateModelEnabledChkBox.isSelected() && !docker);
         dataStoreDirectoryField.setEnabled(plocal && !docker);
         dirButton.setEnabled(plocal && !docker);
+        dataStoreUserTextfield.setEnabled(!docker); // Disable username field
+
     }
 
     // helper method to ensure that the state model enabled box is selected
