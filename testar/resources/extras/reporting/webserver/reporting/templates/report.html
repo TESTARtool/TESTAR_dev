@@ -59,12 +59,9 @@
             let issueValues = []//#[chart_issues];
             /**  @type {number[]} */
 
-            {% with sequences = report.get_sequences() %}
-                {% for i in range(report.sequence_count()) %}
-                    //issueIndices[{{ i }}] = {{ sequences[i].veredict_count() }};
-                    issueValues.push("{{ sequences[i].veredict_count() }}")
+                {% for sequence in  report.get_sequences() %}
+                    issueValues.push("{{ sequence.veredict_count() }}")
                 {% endfor %}
-            {% endwith %}
             
             let issueIndices = new Array(iterations);
             for (let index = 0; index < iterations; index++) {
