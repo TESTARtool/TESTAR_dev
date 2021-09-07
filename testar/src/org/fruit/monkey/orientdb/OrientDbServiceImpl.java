@@ -42,7 +42,7 @@ public class OrientDbServiceImpl implements OrientDBService {
     }
 
     @Override
-    public void startLocalDatabase() throws IOException {
+    public void startLocalDatabase(String database, String username, String password) throws IOException {
         dockerPoolService.start("reporting");
 
 
@@ -50,8 +50,10 @@ public class OrientDbServiceImpl implements OrientDBService {
             delegate.onStateChanged(OrientDBServiceDelegate.State.BUILDING_IMAGE, "Building the orientdb database image");
         final String imageId = dockerPoolService.buildImage(new File(Main.orientDBDir),
                 "FROM orientdb:3.0.34\n" +
-                        "ENV ORIENTDB_ROOT_PASSWORD=testar\n" +
-                        "CMD sh ./db-init/init.sh & ./bin/server.sh\n"
+                        "ENV ORIENTDB_DATABASE="+database+"\n" +
+                        "ENV ORIENTDB_USERNAME="+username+"\n" +
+                        "ENV ORIENTDB_PASSWORD="+password+"\n" +
+                        "CMD sh ./db-init/init.sh\n"
 
         );
         if (delegate != null) {

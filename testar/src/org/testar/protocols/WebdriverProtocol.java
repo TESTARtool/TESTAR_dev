@@ -166,7 +166,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				@Override
 				public void run() {
 					try {
-						orientService.startLocalDatabase();
+						orientService.startLocalDatabase(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword));
 					} catch (Exception e) {
 						System.err.println("Cannot initialize OrientDB");
 						e.printStackTrace();
