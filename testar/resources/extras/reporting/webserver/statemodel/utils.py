@@ -13,7 +13,7 @@ class OrientDB:
     def concrete_states(self) -> list:
         states = self.query('SELECT format("%s", @rid), * FROM ConcreteState')
         
-        return [self._state_to_object(x) for x in states]
+        return self._states_to_object(states)
 
     def concrete_state_from_cid(self, cid):
         states = self.query(f'SELECT format("%s", @rid), * FROM ConcreteState WHERE ConcreteID="{cid}"')
@@ -98,6 +98,24 @@ class OrientDB:
             output.append(edge_object)
         return output
 
+    def _states_to_object(self, states):
+        """Convert a list of oRecord states to a list of state objects.
+
+        Args:
+           states (list<oRecordData>): A list with edge uids
+        """
+        output = []
+        for state in states:
+
+            state_object = self._state_to_object(state)
+
+            # Ignore empty edges
+            if state_object is None:
+                continue
+
+            output.append(state_object)
+        return output
+
 
     def _state_to_object(self, state):
         rid = state.format
@@ -115,8 +133,10 @@ class OrientDB:
         edges_out = self._edges_to_object(edges_out)
         
         # Extract shape
-        shape_source = state.Shape
-        shape = [int(float(x.group())) for x in re.finditer(r"\d*\.0", shape_source)]
+        if not hasattr(state,'Shape'):
+            return 
+        
+        shape = [int(float(x.group())) for x in re.finditer(r"\d*\.0", state.Shape)]
 
         return {
             "cid": state.ConcreteID,
