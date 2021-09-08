@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: ./webserver
-    expose:
+    ports:
       - "80:8000"
     volumes:
       - ./webserver:/usr/app
