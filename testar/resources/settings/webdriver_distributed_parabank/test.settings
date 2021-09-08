@@ -35,8 +35,8 @@ SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://10.102.0.41:8
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 20
+SequenceLength = 200
 
 #################################################################
 # Oracles based on suspicious titles
@@ -114,7 +114,7 @@ DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = none
 ApplicationName = parabank
-ApplicationVersion = 1
+ApplicationVersion = 1.0
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
@@ -167,13 +167,13 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.5
+ActionDuration = 1
 ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
+MaxTime = 3600
 ShowSettingsAfterTest = false
-TimeToWaitAfterAction = 0.5
+TimeToWaitAfterAction = 1
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

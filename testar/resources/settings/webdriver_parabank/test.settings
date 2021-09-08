@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
+SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://localhost:8080/parabank"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 100
+Sequences = 20
+SequenceLength = 200
 
 #################################################################
 # Oracles based on suspicious titles
@@ -108,7 +108,7 @@ ProtocolClass = webdriver_parabank/Protocol_webdriver_parabank
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer =
+DataStoreServer = host.docker.internal
 DataStoreDirectory =
 DataStoreDB = testar
 DataStoreUser = testar
@@ -178,11 +178,11 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
-ShowVisualSettingsDialogOnStartup = true
+ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
+MaxTime = 3600
+ShowSettingsAfterTest = false
 TimeToWaitAfterAction = 1
 StartupTime = 2.0
 DrawWidgetInfo = false
@@ -190,7 +190,9 @@ TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+FlashFeedback = false
+ProtocolCompileDirectory = /tmp
