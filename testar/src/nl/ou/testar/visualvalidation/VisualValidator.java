@@ -44,26 +44,28 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
     private final TextExtractorInterface _extractor;
     private final Object _expectedTextSync = new Object();
     private final AtomicBoolean _expectedTextReceived = new AtomicBoolean();
+    private final VisualValidationSettings _settings;
     private int analysisId = 0;
     private MatcherResult _matcherResult = null;
     private List<RecognizedElement> _ocrItems = null;
     private List<ExpectedElement> _expectedText = null;
 
     public VisualValidator(@NonNull VisualValidationSettings settings) {
-        OcrConfiguration ocrConfig = settings.ocrConfiguration;
+        _settings = settings;
+        OcrConfiguration ocrConfig = _settings.ocrConfiguration;
         if (ocrConfig.enabled) {
             _ocrEngine = OcrEngineFactory.createOcrEngine(ocrConfig);
         } else {
             _ocrEngine = null;
         }
 
-        if (settings.protocol.contains("webdriver_generic")) {
+        if (_settings.protocol.contains("webdriver_generic")) {
             _extractor = ExtractorFactory.CreateExpectedTextExtractorWebdriver();
         } else {
             _extractor = ExtractorFactory.CreateExpectedTextExtractorDesktop();
         }
 
-        _matcher = VisualMatcherFactory.createLocationMatcher(settings.matcherConfiguration);
+        _matcher = VisualMatcherFactory.createLocationMatcher(_settings.matcherConfiguration);
     }
 
     public static boolean isBetween(int x, int lower, int upper) {
@@ -161,7 +163,9 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
                         if (result.matchedPercentage == 100) {
                             penColor = java.awt.Color.green;
                             verdict = createSuccessVerdict(result);
-                        } else if (isBetween(result.matchedPercentage, 75, 99)) {
+                        } else if (isBetween(result.matchedPercentage,
+                                _settings.matcherConfiguration.failedToMatchPercentageThreshold,
+                                99)) {
                             penColor = java.awt.Color.yellow;
                             verdict = createAlmostMatchedVerdict(result);
                         } else {

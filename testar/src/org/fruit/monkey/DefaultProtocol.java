@@ -105,6 +105,7 @@ import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.Logger;
 import org.testar.OutputStructure;
+import org.testar.settings.ExtendedSettingsFactory;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -1558,7 +1559,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         htmlReport.addVisualValidationResult(
                 visualValidationManager.AnalyzeImage(state, screenshot), state, null
         );
-        Logger.log(org.apache.logging.log4j.Level.DEBUG, "TESTING", "Continued");
     }
 
     @Override
@@ -1754,7 +1754,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null)),
                 state, action
         );
-        Logger.log(org.apache.logging.log4j.Level.DEBUG, "TESTING", "Continued action");
 
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
@@ -1852,7 +1851,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
+		// When visual validation module is enabled continue even when faults are detected.
+		boolean suppressFaultySequence = ExtendedSettingsFactory.createVisualValidationSettings().enabled ||
+				(!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence);
+		return suppressFaultySequence &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&

@@ -372,7 +372,7 @@ public class HtmlSequenceReport implements Reporting {
 
             // Write content match result.
             write("<table><caption>\"" + contentResult.expectedText + "\" " +
-                    "[" + contentResult.totalMatched + "/" + contentResult.totalExpected + "]</caption>"
+                    "[" + contentResult.totalMatched + "/" + contentResult.totalExpected + "] " + contentResult.matchedPercentage +"%</caption>"
             );
             writeTableRow(() -> {
                 writeTableHeader("Result:");
