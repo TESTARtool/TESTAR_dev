@@ -32,6 +32,7 @@ import es.upv.staq.testar.NativeLinker;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
@@ -119,11 +120,118 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         // iterate through all widgets
         for (Widget widget : state) {
 
+            // Triggered action for register if user is not logged
             if(widget.get(WdTags.WebId, "").contains("customerForm")) {
                 actions.add(customerFormFill(state));
             }
+
+            // Triggered action https://para.testar.org/parabank/transfer.htm
+            if(widget.get(WdTags.WebTextContent, "").contains("Transfer Funds")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "100", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "string", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+
+            // Triggered action https://para.testar.org/parabank/billpay.htm
             if(widget.get(WdTags.WebName, "").contains("payee.name")) {
                 actions.add(paymentService(state));
+            }
+
+            // Triggered action https://para.testar.org/parabank/findtrans.htm
+            if(widget.get(WdTags.WebId, "").contains("criteria.transactionId")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "12145", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "1", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+            if(widget.get(WdTags.WebId, "").contains("criteria.onDate")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.onDate", state), "12-12-2020", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.onDate", state), "1", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+            if(widget.get(WdTags.WebId, "").contains("criteria.fromDate")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.fromDate", state), "01-01-2020", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.toDate", state), "09-09-2021", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.fromDate", state), "01-01-2020", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.toDate", state), "1", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+            if(widget.get(WdTags.WebId, "").contains("criteria.amount")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "100", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "a", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_TAB), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+
+            //Triggered action https://para.testar.org/parabank/updateprofile.htm
+            if(widget.get(WdTags.WebId, "").contains("customer.lastName")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "customer.lastName", state), "testar", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.pasteTextInto(getWidgetWithMatchingTag("webid", "customer.lastName", state), "1234567890123456789012345678901234567890", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+            }
+
+            //Triggered action https://para.testar.org/parabank/requestloan.htm
+            if(widget.get(WdTags.WebTextContent, "").contains("Apply for a Loan")) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "111", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "downPayment", state), "222", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "aaa", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "downPayment", state), "bbb", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build());
             }
 
             // only consider enabled and non-tabu widgets
@@ -244,18 +352,21 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     private Action randomFromSelectList(Widget w) {
         int selectLength = 1;
         String elementId = w.get(WdTags.WebId, "noIdDetected");
+
         // Get the number of values of the specific select list item
-        try {
+        // Comment out because we are going to select always the first value of the select list
+        /*try {
             String query = String.format("return document.getElementById('%s').length", elementId);
             Object response = WdDriver.executeScript(query);
             selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
         } catch (Exception e) {
             System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
-        }
+        }*/
 
         // Select one of the values randomly, or the first one if previous length failed
         try {
-            String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
+            //String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
+            String query = String.format("return document.getElementById('%s').item(%s).value", elementId, selectLength);
             Object response = WdDriver.executeScript(query);
             return (response != null ?  new WdSelectListAction(elementId, response.toString()) : new AnnotatingActionCompiler().leftClickAt(w) );
         } catch (Exception e) {

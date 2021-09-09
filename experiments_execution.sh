@@ -1,9 +1,8 @@
 #!/bin/bash
 
 ### install java and ant
-yes | apt-get update && upgrade
-yes | apt-get install openjdk-11-jdk
-yes | apt-get install ant
+#yes | apt-get install openjdk-11-jdk
+#yes | apt-get install ant
 
 ### prepare and run the jacoco dumper application
 rm -r -f /home/testar/dumper_parabank/
@@ -57,6 +56,7 @@ fi
 until [ -z "$(docker ps -a -q --filter "status=running")" ]
 do
   sleep 10
+  echo "Waiting for TESTAR docker containers to finish the GUI exploration..."
 done
 
 ### Stop apache server, jacoco dumper will end automatically
