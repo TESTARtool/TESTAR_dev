@@ -4,17 +4,18 @@
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="605.0" style="-fx-background-color: #4d8acb #4d8acb #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="700.0" style="-fx-background-color: #4d8acb #4d8acb #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="CENTER_LEFT">
          <children>
-            <Label text="Some filter" textFill="WHITE">
+            <Label id="descriptionLabel" textFill="WHITE">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
@@ -22,80 +23,76 @@
             <JFXButton contentDisplay="GRAPHIC_ONLY" />
          </children>
       </HBox>
-      <JFXTextArea prefHeight="191.0" prefWidth="605.0" style="-fx-border-color: ffffff; -fx-border-radius: 5; -fx-text-fill: ffffff;">
+      <JFXTextArea id="textArea" prefHeight="191.0" prefWidth="605.0" style="-fx-border-color: ffffff; -fx-border-radius: 5; -fx-text-fill: ffffff;">
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </JFXTextArea>
-      <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="610.0">
+      <GridPane alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <Label text="Add filter" textFill="WHITE">
+            <Label text="Filters" textFill="WHITE">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
             </Label>
-            <JFXButton contentDisplay="GRAPHIC_ONLY">
-               <graphic>
-                  <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@icons/add.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </JFXButton>
+            <Label text="Oracles" textFill="WHITE" GridPane.columnIndex="1">
+               <font>
+                  <Font name="Arial Bold" size="14.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-spacing: 8;" GridPane.rowIndex="1">
+               <children>
+                  <JFXButton id="btnFilterClick" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Click">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton id="btnFilterTags" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Tags">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton id="btnFilterProcess" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Process">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-spacing: 8;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <JFXButton id="btnOracleTitles" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Titles">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton id="btnOracleTags" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Tags">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton id="btnOracleProcess" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Process">
+                     <padding>
+                        <Insets left="18.0" right="18.0" />
+                     </padding>
+                  </JFXButton>
+               </children>
+            </HBox>
          </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 12;">
-         <children>
-            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
-               <graphic>
-                  <JFXButton contentDisplay="GRAPHIC_ONLY">
-                     <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@icons/close.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </JFXButton>
-               </graphic>
-               <padding>
-                  <Insets left="8.0" />
-               </padding>
-            </JFXButton>
-            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
-               <graphic>
-                  <JFXButton contentDisplay="GRAPHIC_ONLY">
-                     <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@icons/close.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </JFXButton>
-               </graphic>
-               <padding>
-                  <Insets left="8.0" />
-               </padding>
-            </JFXButton>
-            <JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter">
-               <graphic>
-                  <JFXButton contentDisplay="GRAPHIC_ONLY">
-                     <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@icons/close.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </JFXButton>
-               </graphic>
-               <padding>
-                  <Insets left="8.0" />
-               </padding>
-            </JFXButton>
-         </children>
-      </HBox>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <VBox.margin>
+            <Insets top="24.0" />
+         </VBox.margin>
+      </GridPane>
    </children>
 </VBox>

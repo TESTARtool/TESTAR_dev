@@ -10,6 +10,12 @@ import org.fruit.monkey.Settings;
 import java.io.IOException;
 
 public class TimeSettingsController extends ChildSettingsController {
+    private SpinnerValueFactory<Double> actionDurationValueFactory;
+    private SpinnerValueFactory<Double> waitTimeValueFactory;
+    private SpinnerValueFactory<Double> startupTimeValueFactory;
+    private SpinnerValueFactory<Double> maxTestTimeValueFactory;
+    private CheckBox useRecordTimingCheckbox;
+
     public TimeSettingsController(Settings settings) {
         super("Time settings", settings);
     }
@@ -24,23 +30,33 @@ public class TimeSettingsController extends ChildSettingsController {
         }
 
         Spinner actionDurationSpinner = (Spinner) view.lookup("#actionDuration");
-        SpinnerValueFactory<Double> actionDurationValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
+        actionDurationValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
         actionDurationValueFactory.setValue(settings.get(ConfigTags.ActionDuration));
         actionDurationSpinner.setValueFactory(actionDurationValueFactory);
         Spinner waitTimeSpinner = (Spinner) view.lookup("#waitTime");
-        SpinnerValueFactory<Double> waitTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
+        waitTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
         waitTimeValueFactory.setValue(settings.get(ConfigTags.TimeToWaitAfterAction));
         waitTimeSpinner.setValueFactory(waitTimeValueFactory);
         Spinner startupTimeSpinner = (Spinner) view.lookup("#startupTime");
-        SpinnerValueFactory<Double> startupTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
+        startupTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
         startupTimeValueFactory.setValue(settings.get(ConfigTags.StartupTime));
         startupTimeSpinner.setValueFactory(startupTimeValueFactory);
         Spinner maxTestTimeSpinner = (Spinner) view.lookup("#maxTestTime");
-        SpinnerValueFactory<Double> maxTestTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
+        maxTestTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
         maxTestTimeValueFactory.setValue(settings.get(ConfigTags.MaxTime));
         maxTestTimeSpinner.setValueFactory(maxTestTimeValueFactory);
 
-        CheckBox useRecordTimingCheckbox = (CheckBox) view.lookup("#useRecordTiming");
+        useRecordTimingCheckbox = (CheckBox) view.lookup("#useRecordTiming");
         useRecordTimingCheckbox.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay));
+    }
+
+    @Override
+    protected void save(Settings settings) {
+        settings.set(ConfigTags.ActionDuration, actionDurationValueFactory.getValue());
+        settings.set(ConfigTags.TimeToWaitAfterAction, waitTimeValueFactory.getValue());
+        settings.set(ConfigTags.StartupTime, startupTimeValueFactory.getValue());
+        settings.set(ConfigTags.MaxTime, maxTestTimeValueFactory.getValue());
+
+        settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, useRecordTimingCheckbox.isSelected());
     }
 }

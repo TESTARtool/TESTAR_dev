@@ -10,8 +10,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane maxWidth="1.7976931348623157E308">
          <center>
@@ -28,7 +27,7 @@
             </Label>
          </center>
       </BorderPane>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" height="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="600.0">
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="700.0">
          <fill>
             <LinearGradient endX="1.0" endY="1.0">
                <stops>

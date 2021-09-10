@@ -22,6 +22,19 @@ public class GeneralSettingsController extends ChildSettingsController {
     private DisplayMode availableDisplayModes[];
     private int displayModeSelectedIndex;
 
+    private ComboBox sutComboBox;
+    private ComboBox<DisplayModeWrapper> resolutionComboBox;
+    private TextField webDriverPathField;
+    private TextField locationInputField;
+    private Spinner numSequencesSpinner;
+    private Spinner numActionsSpinner;
+    private CheckBox alwaysCompileCheckBox;
+
+    private SpinnerValueFactory<Integer> numActionsValueFactory;
+    private SpinnerValueFactory<Integer> numSequencesValueFactory;
+
+    private GeneralSettings generalSettings;
+
     public GeneralSettingsController(Settings settings) {
         super("General settings", settings);
     }
@@ -40,7 +53,7 @@ public class GeneralSettingsController extends ChildSettingsController {
         availableDisplayModes = dev.getDisplayModes();
 
 
-        ComboBox sutComboBox = (ComboBox) view.lookup("#sutConnectorSelection");
+        sutComboBox = (ComboBox) view.lookup("#sutConnectorSelection");
         sutComboBox.getItems().addAll(
                 Settings.SUT_CONNECTOR_CMDLINE,
                 Settings.SUT_CONNECTOR_PROCESS_NAME,
@@ -48,7 +61,7 @@ public class GeneralSettingsController extends ChildSettingsController {
                 Settings.SUT_CONNECTOR_WEBDRIVER
         );
 
-        ComboBox<DisplayModeWrapper> resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
+        resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
 //        SingleSelectionModel<DisplayMode> resolutionSelectionModel = new SingleSelectionModel<DisplayMode>() {
 //            @Override
 //            protected DisplayMode getModelItem(int index) {
@@ -78,11 +91,7 @@ public class GeneralSettingsController extends ChildSettingsController {
 //            }
 //            index++;
 //        }
-        System.out.println(String.format("Current display mode: %dx%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
-        System.out.println("SUT connector value: " + settings.get(ConfigTags.SUTConnectorValue));
-        GeneralSettings generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue));
-
-        sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
+        generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue));
 
         DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
         int selectedWidth = selectedDisplayMode.getWidth();
@@ -113,10 +122,10 @@ public class GeneralSettingsController extends ChildSettingsController {
 //            }
 //        }
 
-        TextField webDriverPathField = (TextField) view.lookup("#driverPath");
+        webDriverPathField = (TextField) view.lookup("#driverPath");
         webDriverPathField.setText(generalSettings.getDriver());
 
-        TextField locationInputField = (TextField) view.lookup("#locationInput");
+        locationInputField = (TextField) view.lookup("#locationInput");
         locationInputField.setText(generalSettings.getLocation());
 
         FileChooser driverChooser = new FileChooser();
@@ -135,18 +144,30 @@ public class GeneralSettingsController extends ChildSettingsController {
             locationInputField.setText(locationFile.toURI().toString());
         });
 
-        Spinner numSequencesSpinner = (Spinner) view.lookup("#numSequences");
-        SpinnerValueFactory<Integer> numSequencesValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
-        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences));
+        numSequencesSpinner = (Spinner) view.lookup("#numSequences");
+        numSequencesValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
         numSequencesSpinner.setValueFactory(numSequencesValueFactory);
-        Spinner numActionsSpinner = (Spinner) view.lookup("#numActions");
-        SpinnerValueFactory<Integer> numActionsValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
-        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength));
+        numActionsSpinner = (Spinner) view.lookup("#numActions");
+        numActionsValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
         numActionsSpinner.setValueFactory(numActionsValueFactory);
-//        numActionsSpinner.getValueFactory().setValue(settings.get(ConfigTags.SequenceLength));
-//        numActionsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(settings.
-//                get(ConfigTags.SequenceLength), 1));
-        CheckBox alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
+        alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
         alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
+
+        sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
+        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences));
+        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength));
+    }
+
+    @Override
+    protected void save(Settings settings) {
+        generalSettings.setDisplayMode(resolutionComboBox.getValue().getMode());
+        generalSettings.setDriver(webDriverPathField.getText());
+        generalSettings.setLocation(locationInputField.getText());
+        settings.set(ConfigTags.SUTConnectorValue, generalSettings.toString());
+
+        settings.set(ConfigTags.SUTConnector, sutComboBox.getValue().toString());
+        settings.set(ConfigTags.Sequences, numSequencesValueFactory.getValue());
+        settings.set(ConfigTags.SequenceLength, numActionsValueFactory.getValue());
+        settings.set(ConfigTags.AlwaysCompile, alwaysCompileCheckBox.isSelected());
     }
 }

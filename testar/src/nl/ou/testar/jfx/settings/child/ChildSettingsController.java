@@ -13,39 +13,21 @@ import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 
-public class ChildSettingsController extends ViewController {
-
-//    private String contentResourcePath;
+public abstract class ChildSettingsController extends ViewController {
 
     public ChildSettingsController(String title, Settings settings) {
         super(title, "jfx/settings_child.fxml", settings);
-//        this.contentResourcePath = resourcePath;
     }
-
-//    @Override
-//    public Parent obtainView() throws IOException {
-//        Parent view = super.obtainView();
-//        VBox contentBox = (VBox) view.lookup("#contentBox");
-//        ObservableList<Node> children = contentBox.getChildren();
-//        if (children.size() == 0) {
-//            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(contentResourcePath));
-//            Parent contentView = loader.load();
-//            children.add(contentView);
-//            contentViewDidLoad(contentView);
-//        }
-//        return view;
-//    }
-//
-//    public void contentViewDidLoad(Parent contentView) {
-//        //To be overriden
-//    }
-
     @Override
     public void viewDidLoad(Parent view) {
         super.viewDidLoad(view);
         Button btnBack = (Button) view.lookup("#btnBack");
         btnBack.setOnAction(event -> {
             getNavigationController().navigateBack();
+        });
+        Button btnSave = (Button) view.lookup("#btnSave");
+        btnSave.setOnAction(event -> {
+            save(settings);
         });
     }
 
@@ -63,4 +45,6 @@ public class ChildSettingsController extends ViewController {
         VBox contentBox = (VBox) contentView.lookup("#contentBox");
         contentBox.getChildren().add(sectionBox);
     }
+
+    protected abstract void save(Settings settings);
 }
