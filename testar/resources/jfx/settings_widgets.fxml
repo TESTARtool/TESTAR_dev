@@ -13,22 +13,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="600.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox prefHeight="108.0" prefWidth="199.0">
          <children>
-            <JFXCheckBox maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Store widgets" textFill="WHITE" unCheckedColor="WHITE">
+            <JFXCheckBox id="storeWidgets" maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Store widgets" textFill="WHITE" unCheckedColor="WHITE">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Accessbridge enabled" textFill="WHITE" unCheckedColor="WHITE">
+            <JFXCheckBox id="accessbridgeEnabled" maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Accessbridge enabled" textFill="WHITE" unCheckedColor="WHITE">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Reset database" textFill="WHITE" unCheckedColor="WHITE">
+            <JFXCheckBox id="resetDatabase" maxWidth="1.7976931348623157E308" prefHeight="35.0" text="Reset database" textFill="WHITE" unCheckedColor="WHITE">
                <font>
                   <Font name="Arial Bold" size="14.0" />
                </font>
