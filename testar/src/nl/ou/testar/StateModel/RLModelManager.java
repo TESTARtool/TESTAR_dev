@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -52,6 +53,8 @@ public class RLModelManager extends ModelManager implements StateModelManager {
 
     protected final Tag<?> tag;
     protected final Tag<?> vtag;
+    // Other Q tag for Double Q-learning
+    protected final Tag<?> tagB;
     
     protected AbstractState previousAbstractState = null;
     
@@ -75,13 +78,15 @@ public class RLModelManager extends ModelManager implements StateModelManager {
                              final QFunction qFunction,
                              final Tag<?> tag,
                              final VFunction vFunction,
-                             final Tag<?> vtag) {
+                             final Tag<?> vtag,
+                             final Tag<?> tagB) {
         super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
         this.rewardFunction = rewardFunction;
         this.qFunction = qFunction;
         this.vFunction = vFunction;
         this.tag = tag;
         this.vtag = vtag;
+        this.tagB = tagB;
     }
 
     @Override
@@ -116,15 +121,25 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         // Update and use the VValue
         float vValue = 0f;
         if (qFunction.getClass().getName().contains("QVLearningFunction")) {
-            vValue = vFunction.getVValue((Tag<Float>)this.vtag, previouslyExecutedAbstractAction, selectedAbstractAction, reward);
+            vValue = vFunction.getVValue((Tag<Float>) this.vtag, previouslyExecutedAbstractAction, selectedAbstractAction, reward);
             previouslyExecutedAbstractAction.addAttribute(vtag, vValue);
         }
 
-        final float qValue = qFunction.getQValue((Tag<Float>)this.tag, previouslyExecutedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions, vValue);
+        Tag<Float> qTag = (Tag<Float>)this.tag;
+        Tag<Float> q2Tag = (Tag<Float>)this.tagB;
+
+        // Flip around the tags for the Q-value to switch between policy A or B when using the DoubleQFunction
+        if (qFunction.getClass().getName().contains("DoubleQFunction") && new Random().nextBoolean()) {
+            qTag = (Tag<Float>)this.tagB;
+            q2Tag = (Tag<Float>)this.tag;
+        }
+
+        final float qValue = qFunction.getQValue(qTag, previouslyExecutedAbstractAction, selectedAbstractAction, reward, currentAbstractState, actions, vValue, q2Tag);
 
         // set attribute for saving in the graph database
         if(previouslyExecutedAbstractAction != null) {
-            previouslyExecutedAbstractAction.addAttribute(tag, qValue);
+            previouslyExecutedAbstractAction.addAttribute(qTag, qValue);
+
             System.out.println("qFunction.getClass().getName(): " + qFunction.getClass().getName());
             if (qFunction.getClass().getName().contains("QBorjaFunction2")) equalizeQValues(qValue, actions);
 

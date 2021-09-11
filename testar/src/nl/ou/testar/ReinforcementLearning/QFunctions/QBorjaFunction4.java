@@ -18,7 +18,7 @@ public class QBorjaFunction4 implements QFunction {
      * {@inheritDoc}
      */
     @Override
-    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction selectedAbstractAction, final float reward, final AbstractState currentAbstractState, final Set<Action> actions, float vValue) {
+    public float getQValue(Tag<Float> rl_tag, final AbstractAction previouslyExecutedAction, final AbstractAction selectedAbstractAction, final float reward, final AbstractState currentAbstractState, final Set<Action> actions, float vValue, Tag<Float> rl_tagB) {
         if(previouslyExecutedAction == null) {
             return 0f;
         }

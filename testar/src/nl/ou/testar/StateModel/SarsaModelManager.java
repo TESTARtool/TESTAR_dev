@@ -16,8 +16,8 @@ import java.util.Set;
 
 public class SarsaModelManager extends RLModelManager implements StateModelManager {
 
-    public SarsaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag, VFunction vFunction, Tag<?> vtag) {
-        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag, vFunction, vtag);
+    public SarsaModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets, RewardFunction rewardFunction, QFunction qFunction, Tag<?> tag, VFunction vFunction, Tag<?> vtag, Tag<?> tagB) {
+        super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets, rewardFunction, qFunction, tag, vFunction, vtag, tagB);
     }
 
     @Override

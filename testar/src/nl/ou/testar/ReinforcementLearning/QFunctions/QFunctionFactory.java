@@ -41,6 +41,9 @@ public class QFunctionFactory {
             case "QVLearningFunction":
                 selectedQFunction = new QVLearningFunction(alphaDiscount, gammaDiscount, defaultQValue);
                 break;
+            case "DoubleQFunction":
+                selectedQFunction = new DoubleQFunction(alphaDiscount, gammaDiscount, defaultQValue);
+                break;
             default:
                 selectedQFunction = new SarsaQFunction(alphaDiscount, gammaDiscount, defaultQValue);
         }

@@ -4,18 +4,9 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tag;
-
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-/**
- * Implements the default Q-function of Sarsa
- */
-public class SarsaQFunction implements QFunction {
-
-    private static final Logger logger = LogManager.getLogger(SarsaQFunction.class);
-
+public class DoubleQFunction implements QFunction {
     private final float alphaDiscount;
     private final float gammaDiscount;
     private final float defaultQValue;
@@ -26,13 +17,11 @@ public class SarsaQFunction implements QFunction {
      * @param gammaDiscount
      * @param defaultQValue
      */
-    public SarsaQFunction(float alphaDiscount, final float gammaDiscount, final float defaultQValue) {
-        logger.info("SarsaQFunction initialized with alpha='{} gamma='{}' and defaultQValue='{}'", alphaDiscount, gammaDiscount, defaultQValue);
+    public DoubleQFunction(float alphaDiscount, final float gammaDiscount, final float defaultQValue) {
         this.alphaDiscount = alphaDiscount;
         this.gammaDiscount = gammaDiscount;
         this.defaultQValue = defaultQValue;
     }
-
     /**
      * {@inheritDoc}
      */
@@ -42,15 +31,14 @@ public class SarsaQFunction implements QFunction {
         if (previouslyExecutedAction != null) {
             oldQValue = previouslyExecutedAction.getAttributes().get(rl_tag, defaultQValue);
         }
+        System.out.println("OLD QVALUE of: " + Float.toString(oldQValue));
 
-        float newQValue = defaultQValue;
-        if (actionUnderExecution != null) {
-            newQValue = actionUnderExecution.getAttributes().get(rl_tag, defaultQValue);
+        float otherQValue = 0f;
+        if (previouslyExecutedAction != null) {
+            otherQValue = previouslyExecutedAction.getAttributes().get(rl_tagB, defaultQValue);
         }
+        System.out.println("OTHER QVALUE of: " + Float.toString(otherQValue));
 
-        return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
+        return oldQValue + alphaDiscount * (reward + gammaDiscount * otherQValue - oldQValue);
     }
-
 }
-
-

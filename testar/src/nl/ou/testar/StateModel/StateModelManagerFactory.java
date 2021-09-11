@@ -86,6 +86,7 @@ public class StateModelManagerFactory {
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
             final VFunction vFunction = new VFunction(settings);
             Tag<?> vtag = RLTags.getTag("vvalue");
+            Tag<?> tagB = RLTags.getTag("secondqvalue");
 
             logger.info("State model with Reinforcement Learning Model Manager selected");
             switch (stateModelRL){
@@ -101,7 +102,8 @@ public class StateModelManagerFactory {
                         qFunction,
                         tag,
                         vFunction,
-                        vtag);
+                        vtag,
+                        tagB);
             case "BorjaModelManager":
                 logger.info("State model with BorjaModelManager selected");
                 return new BorjaModelManager(abstractStateModel,
@@ -114,7 +116,22 @@ public class StateModelManagerFactory {
                         qFunction,
                         tag,
                         vFunction,
-                        vtag);
+                        vtag,
+                        tagB);
+            case "DoubleQLearningModelManager":
+                logger.info("State model with DoubleQLearningModelManager selected");
+                return new DoubleQLearningModelManager(abstractStateModel,
+                        actionSelector,
+                        persistenceManager,
+                        concreteStateTags,
+                        sequenceManager,
+                        storeWidgets,
+                        rewardFunction,
+                        qFunction,
+                        tag,
+                        vFunction,
+                        vtag,
+                        tagB);
             default:
                 logger.info("State model with sarsaModelManager selected");
                 return new SarsaModelManager(abstractStateModel,
@@ -127,7 +144,8 @@ public class StateModelManagerFactory {
                         qFunction,
                         tag,
                         vFunction,
-                        vtag);
+                        vtag,
+                        tagB);
             }
         }
         
