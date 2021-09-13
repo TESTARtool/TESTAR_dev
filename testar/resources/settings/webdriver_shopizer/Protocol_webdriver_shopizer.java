@@ -206,7 +206,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
         try {
             String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
             Object response = WdDriver.executeScript(query);
-            return (response != null ?  new WdSelectListAction(elementId, response.toString()) : new AnnotatingActionCompiler().leftClickAt(w) );
+            return (response != null ?  new WdSelectListAction(elementId, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
         } catch (Exception e) {
             System.out.println("*** ACTION WARNING: problems trying randomly select a list value: " + elementId);
         }

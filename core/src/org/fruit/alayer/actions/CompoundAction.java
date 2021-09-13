@@ -47,6 +47,7 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 
 /**
  * An action that is composed of several other actions.
@@ -78,6 +79,12 @@ public final class CompoundAction extends TaggableBase implements Action {
 			for(int i = 0; i < relativeDurations.size(); i++)
 				relativeDurations.set(i, relativeDurations.get(i) / durationSum);
 			return new CompoundAction(this);
+		}
+
+		public CompoundAction build(Widget originWidget){
+		    CompoundAction compoundAction = build();
+		    compoundAction.set(Tags.OriginWidget, originWidget);
+		    return compoundAction;
 		}
 	}
 	

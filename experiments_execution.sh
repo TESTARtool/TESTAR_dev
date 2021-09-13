@@ -55,8 +55,10 @@ fi
 ### Wait until all docker containers have finished
 until [ -z "$(docker ps -a -q --filter "status=running")" ]
 do
-  sleep 10
+  sleep 30
   echo "Waiting for TESTAR docker containers to finish the GUI exploration..."
+  ### Print the total cpu and memory usage of all the processes (OrientDB, Apache Tomcat, Dockers, Java Dumper)
+  ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU % " cpu " , MEM % " mem }1' | tail -n 1
 done
 
 ### Stop apache server, jacoco dumper will end automatically
@@ -71,3 +73,4 @@ sleep 20
 ### Cope web metrics results to samba server
 cd /home/testar/dumper_parabank/
 cp webCoverageMetrics* /home/testar/qsamba/results/
+cp stateModelMetrics* /home/testar/qsamba/results/

@@ -36,11 +36,12 @@ public class WdActionRoles {
 	private WdActionRoles(){}
 
 	public static final Role
-	
+
 	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
 	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
 	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
 	SubmitScript = Role.from("SubmitScript", ExecuteScript),
-	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript);
+	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
+	SelectListAction = Role.from("SelectListAction", ExecuteScript);
 	
 }

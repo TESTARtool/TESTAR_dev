@@ -36,6 +36,7 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.webdriver.WdDriver;
 
 public class WdSelectListAction extends TaggableBase implements Action {
@@ -44,11 +45,12 @@ public class WdSelectListAction extends TaggableBase implements Action {
     private String elementId;
     private String value;
 
-    public WdSelectListAction(String elementId, String value) {
+    public WdSelectListAction(String elementId, String value, Widget widget) {
         this.elementId = elementId;
         this.value = value;
-        this.set(Tags.Role, WdActionRoles.SetAttributeScript);
+        this.set(Tags.Role, WdActionRoles.SelectListAction);
         this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.set(Tags.OriginWidget, widget);
     }
 
     @Override

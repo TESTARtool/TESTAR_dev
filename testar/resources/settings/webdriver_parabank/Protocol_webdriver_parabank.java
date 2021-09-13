@@ -117,121 +117,127 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
             return forcedActions;
         }
 
+        // Triggered action https://para.testar.org/parabank/transfer.htm
+        if(WdDriver.getCurrentUrl().contains("transfer.htm")) {
+            Widget widget = getWidgetWithMatchingTag("WebId", "amount", state);
+            if(widget != null) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(widget, "100", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build(widget));
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(widget, "string", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build(widget));
+            }
+        }
+
+        //Triggered action https://para.testar.org/parabank/requestloan.htm
+        if(WdDriver.getCurrentUrl().contains("requestloan.htm")) {
+            Widget widget = getWidgetWithMatchingTag("WebId", "amount", state);
+            if(widget != null) {
+                // Correct
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(widget, "111", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "downPayment", state), "222", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build(widget));
+                // Error
+                actions.add(new CompoundAction.Builder()
+                        .add(ac.clickTypeInto(widget, "aaa", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "downPayment", state), "bbb", true), 10)
+                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
+                        .build(widget));
+            }
+        }
+
         // iterate through all widgets
         for (Widget widget : state) {
 
             // Triggered action for register if user is not logged
             if(widget.get(WdTags.WebId, "").contains("customerForm")) {
-                actions.add(customerFormFill(state));
-            }
-
-            // Triggered action https://para.testar.org/parabank/transfer.htm
-            if(widget.get(WdTags.WebTextContent, "").contains("Transfer Funds")) {
-                // Correct
-                actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "100", true), 10)
-                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
-                // Error
-                actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "string", true), 10)
-                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                actions.add(customerFormFill(state, widget));
             }
 
             // Triggered action https://para.testar.org/parabank/billpay.htm
             if(widget.get(WdTags.WebName, "").contains("payee.name")) {
-                actions.add(paymentService(state));
+                actions.add(paymentService(state, widget));
             }
 
             // Triggered action https://para.testar.org/parabank/findtrans.htm
             if(widget.get(WdTags.WebId, "").contains("criteria.transactionId")) {
                 // Correct
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "12145", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "12145", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
                 // Error
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "1", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "1", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
             }
             if(widget.get(WdTags.WebId, "").contains("criteria.onDate")) {
                 // Correct
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.onDate", state), "12-12-2020", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.onDate", state), "12-12-2020", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
                 // Error
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.onDate", state), "1", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.onDate", state), "1", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
             }
             if(widget.get(WdTags.WebId, "").contains("criteria.fromDate")) {
                 // Correct
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.fromDate", state), "01-01-2020", true), 10)
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.toDate", state), "09-09-2021", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.fromDate", state), "01-01-2020", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.toDate", state), "09-09-2021", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
                 // Error
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.fromDate", state), "01-01-2020", true), 10)
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.toDate", state), "1", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.fromDate", state), "01-01-2020", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.toDate", state), "1", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
             }
             if(widget.get(WdTags.WebId, "").contains("criteria.amount")) {
                 // Correct
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "100", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "100", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
                 // Error
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "criteria.transactionId", state), "a", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "a", true), 10)
                         .add(ac.hitKey(KBKeys.VK_TAB), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
             }
 
             //Triggered action https://para.testar.org/parabank/updateprofile.htm
             if(widget.get(WdTags.WebId, "").contains("customer.lastName")) {
                 // Correct
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "customer.lastName", state), "testar", true), 10)
+                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "customer.lastName", state), "testar", true), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
                 // Error
                 actions.add(new CompoundAction.Builder()
-                        .add(ac.pasteTextInto(getWidgetWithMatchingTag("webid", "customer.lastName", state), "1234567890123456789012345678901234567890", true), 10)
+                        .add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "customer.lastName", state), "1234567890123456789012345678901234567890", true), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
-            }
-
-            //Triggered action https://para.testar.org/parabank/requestloan.htm
-            if(widget.get(WdTags.WebTextContent, "").contains("Apply for a Loan")) {
-                // Correct
-                actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "111", true), 10)
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "downPayment", state), "222", true), 10)
-                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
-                // Error
-                actions.add(new CompoundAction.Builder()
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "amount", state), "aaa", true), 10)
-                        .add(ac.clickTypeInto(getWidgetWithMatchingTag("webid", "downPayment", state), "bbb", true), 10)
-                        .add(ac.hitKey(KBKeys.VK_ENTER), 10)
-                        .build());
+                        .build(widget));
             }
 
             // only consider enabled and non-tabu widgets
@@ -281,7 +287,11 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         String[] dates = {"12-12-2020", "08-19-2021", "08-26-2021"};
         String[] amounts = {"100", "1000"};
         String[] transactions = {"12145", "14143", "13255", "12478", "13366", "12700"};
-        if(w.get(WdTags.WebId, "").toLowerCase().contains("amount") || w.get(WdTags.WebId, "").toLowerCase().contains("pay")) {
+        String[] accounts = {"12345", "12456", "12567"};
+
+        if(w.get(WdTags.WebId, "").toLowerCase().contains("amount") 
+                || w.get(WdTags.WebId, "").toLowerCase().contains("pay") 
+                || w.get(WdTags.WebName, "").toLowerCase().contains("amount")) {
             return amounts[new Random().nextInt(amounts.length)];
         }
         if(w.get(WdTags.WebId, "").toLowerCase().contains("date")) {
@@ -289,6 +299,9 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         }
         if(w.get(WdTags.WebId, "").toLowerCase().contains("transaction")) {
             return transactions[new Random().nextInt(transactions.length)];
+        }
+        if(w.get(WdTags.WebName, "").toLowerCase().contains("account")) {
+            return accounts[new Random().nextInt(accounts.length)];
         }
         return this.getRandomText(w);
     }
@@ -300,7 +313,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
      * @param state
      * @return
      */
-    private Action customerFormFill(State state) {
+    private Action customerFormFill(State state, Widget widget) {
         // https://para.testar.org/parabank/register.htm
         String username = "testar" + new Random().nextInt(999);
         StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -317,7 +330,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
                 .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.password", state), "testar", true), 50)
                 .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "repeatedPassword", state), "testar", true), 50)
                 .add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Register", state)), 50)
-                .build();
+                .build(widget);
     }
 
     /**
@@ -327,7 +340,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
      * @param state
      * @return
      */
-    private Action paymentService(State state) {
+    private Action paymentService(State state, Widget widget) {
         StdActionCompiler ac = new AnnotatingActionCompiler();
         return new CompoundAction.Builder()
                 .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.name", state), "a", true), 50)
@@ -340,7 +353,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
                 .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "verifyAccount", state), "54321", true), 50)
                 .add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "amount", state), "111", true), 50)
                 .add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Send Payment", state)), 50)
-                .build();
+                .build(widget);
     }
 
     /**
@@ -368,7 +381,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
             //String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
             String query = String.format("return document.getElementById('%s').item(%s).value", elementId, selectLength);
             Object response = WdDriver.executeScript(query);
-            return (response != null ?  new WdSelectListAction(elementId, response.toString()) : new AnnotatingActionCompiler().leftClickAt(w) );
+            return (response != null ?  new WdSelectListAction(elementId, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
         } catch (Exception e) {
             System.out.println("*** ACTION WARNING: problems trying randomly select a list value: " + elementId);
         }
