@@ -53,6 +53,11 @@ public class RLTags extends TagsBase  {
 	public static final Tag<Float> QBorja = from("qborja", Float.class);
 
 	public static final Tag<Float> QLearningVValue = from("vvalue", Float.class);
+
+	/**
+	 * Second Q-value for Double Q-learning
+	 */
+	public static final Tag<Float> QLearningValueB = from("secondqvalue", Float.class);
 	
 	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
 		{
@@ -61,6 +66,7 @@ public class RLTags extends TagsBase  {
 			add(QLearningValue);
 			add(QBorja);
 			add(QLearningVValue);
+			add(QLearningValueB);
 		}
 	};
 
