@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package desktop_codeo_remote_system;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
