@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 1
-SequenceLength = 1
+SequenceLength = 500
 
 #################################################################
 # Oracles based on suspicious titles
@@ -52,7 +52,7 @@ SequenceLength = 1
 #################################################################
 
 SuspiciousTitles = .*[eE]xcep[ct]i[o?]n.*
-TagsForSuspiciousOracle = Title
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -65,7 +65,7 @@ TagsForSuspiciousOracle = Title
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs
@@ -107,7 +107,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_codeo_elinos_project/Protocol_desktop_codeo_elinos_project
+ProtocolClass = desktop_codeo/Protocol_desktop_codeo
 
 #################################################################
 # State model inference settings
@@ -121,9 +121,9 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = codeo_elinos_project
-ApplicationVersion = 35
-ActionSelectionAlgorithm = random
+ApplicationName = codeo
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################
@@ -132,7 +132,7 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetTitle,WidgetPath,WidgetControlType
 
 #################################################################
 # WebDriver features
@@ -192,7 +192,7 @@ ProtocolSpecificSetting_5 =
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\desktop_codeo_elinos_project\\ExtendedSettings.xml
+ExtendedSettingsFile = .\\settings\\desktop_codeo\\ExtendedSettings.xml
 
 #################################################################
 # Other more advanced settings
@@ -216,10 +216,10 @@ UnattendedTests = false
 TestGenerator = random
 NonReactingUIThreshold = 100
 ResetDataStore = false
-VisualizeActions = true
+VisualizeActions = false
 OfflineGraphConversion = true
 RefreshSpyCanvas = 0.5
-ListeningMode = true
+ListeningMode = false
 TempDir = ./output/temp
 MaxTime = 3.1536E7
 StopGenerationOnFault = true

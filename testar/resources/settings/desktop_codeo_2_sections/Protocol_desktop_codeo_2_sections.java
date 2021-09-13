@@ -46,7 +46,7 @@ import org.testar.protocols.DesktopProtocol;
 
 import es.upv.staq.testar.NativeLinker;
 
-public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
+public class Protocol_desktop_codeo_2_sections extends DesktopProtocol {
 
     private double menubarFilter;
 
@@ -129,12 +129,7 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 			expectedExecution = forceAction(system, "New");
 			System.out.println(". . . New . . .");
 		}
-/*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project...");
-			System.out.println(". . . Project... . . .");
-		}
-*/
+		
 		if (expectedExecution) {
 			expectedExecution = forceAction(system, "ELinOS Project");
 			System.out.println(". . . ELinOS Project . . .");
@@ -149,12 +144,7 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 			expectedExecution = forceAction(system, "Project name");
 			System.out.println(". . . Project name . . .");
 		}
-        /*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "ELinOS System Project");
-			System.out.println(". . . ELinOS System Project . . .");
-		}
-        */
+		
 		if (expectedExecution) {
 			expectedExecution = forceAction(system, "&Next");
 			System.out.println(". . . &Next . . .");
@@ -165,33 +155,7 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 			System.out.println(". . . Use Feature Sets . . .");
 			System.out.println(". . . expectedExecution = " + expectedExecution);
 		}
-        /*
-        State currentState = getState(system);
-        Set<Action> actions = deriveActions(system, currentState);
-        System.out.println("Actions around checkboxes:");
-        for (Action a : actions) {
-            //Set<Tags> tagSet = a.get(Tags.OriginWidget).get(Tags.tagSet());
-            System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc, ""));
-        }
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Debug");
-			System.out.println(". . . Debug . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Networking");
-			System.out.println(". . . Networking . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Webserver");
-			System.out.println(". . . Webserver . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        */
+		
 		if (expectedExecution) {
 			expectedExecution = forceAction(system, "&Next");
 			System.out.println(". . . &Next . . .");
@@ -216,8 +180,9 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 			System.out.println(". . . expectedExecution = " + expectedExecution);
 		}
 
-       Util.pause(350);
+        Util.pause(350);
         
+		/*
 		if (expectedExecution) {
 			expectedExecution = forceAction(system, "fullName_Project");
 			System.out.println(". . . Project . . .");
@@ -228,6 +193,89 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 			expectedExecution = forceAction(system, "Build Project");
 			System.out.println(". . . Build Project . . .");
 			System.out.println(". . . expectedExecution = " + expectedExecution);
+		}
+		*/
+		
+		if (expectedExecution) {
+			expectedExecution = forceAction(system, "Remote Systems");
+			System.out.println(". . . Remote Systems . . .");
+		}
+        
+		if (expectedExecution) {
+			expectedExecution = forceAction(system, "New");
+			System.out.println(". . . New . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Target Connection");
+			System.out.println(". . . Target Connection . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "&Next");
+			System.out.println(". . . &Next . . .");
+		}
+		
+        /*
+		if (expectedExecution) {
+			expectedExecution = forceAction(system, "leftDoubleClick_CODEO");
+			System.out.println(". . . CODEO . . .");
+		}
+        */
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "ELinOS");
+			System.out.println(". . . ELinOS . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "&Next");
+			System.out.println(". . . &Next . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Connection name");
+			System.out.println(". . . Connection name . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Simulate target with QEMU");
+			System.out.println(". . . Simulate target with QEMU . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Workspace");
+			System.out.println(". . . Workspace . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "OK");
+			System.out.println(". . . OK . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "&Next");
+			System.out.println(". . . &Next . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Finish");
+			System.out.println(". . . Finish . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "Start Simulation");
+			System.out.println(". . . Start Simulation . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "OK");
+			System.out.println(". . . OK . . .");
+		}
+
+        if (expectedExecution) {
+			expectedExecution = forceAction(system, "OK");
+			System.out.println(". . . OK . . .");
 		}
 		
         System.out.println(". . . beginSequence END . . .");

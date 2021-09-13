@@ -40,13 +40,12 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.Util;
 import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
 
 import es.upv.staq.testar.NativeLinker;
 
-public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
+public class Protocol_desktop_codeo extends DesktopProtocol {
 
     private double menubarFilter;
 
@@ -60,7 +59,7 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
         super.initialize(settings);
 
         // Set desired License
-        //licenseSUT = new CODEOLicense();
+        licenseSUT = new CODEOLicense();
 
         // TESTAR will execute the SUT with Java
         // We need this to add JMX parameters properly (-Dcom.sun.management.jmxremote.port=5000)
@@ -106,134 +105,6 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 		Util.pause(30);*/
         return system;
     }
-	
-	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
-	 */
-	@Override
-	protected void beginSequence(SUT system, State state){
-		
-        System.out.println(". . . beginSequence START . . .");
-        
-		boolean expectedExecution = true;
-        
-        if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project Explorer");
-			System.out.println(". . . Project Explorer . . .");
-		}
-
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "New");
-			System.out.println(". . . New . . .");
-		}
-/*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project...");
-			System.out.println(". . . Project... . . .");
-		}
-*/
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "ELinOS Project");
-			System.out.println(". . . ELinOS Project . . .");
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project name");
-			System.out.println(". . . Project name . . .");
-		}
-        /*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "ELinOS System Project");
-			System.out.println(". . . ELinOS System Project . . .");
-		}
-        */
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Use Feature Sets");
-			System.out.println(". . . Use Feature Sets . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        /*
-        State currentState = getState(system);
-        Set<Action> actions = deriveActions(system, currentState);
-        System.out.println("Actions around checkboxes:");
-        for (Action a : actions) {
-            //Set<Tags> tagSet = a.get(Tags.OriginWidget).get(Tags.tagSet());
-            System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc, ""));
-        }
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Debug");
-			System.out.println(". . . Debug . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Networking");
-			System.out.println(". . . Networking . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Webserver");
-			System.out.println(". . . Webserver . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        */
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Board");
-			System.out.println(". . . Board . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "QEMU (x86)");
-			System.out.println(". . . QEMU (x86) . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Finish");
-			System.out.println(". . . Finish . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-
-       Util.pause(350);
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "fullName_Project");
-			System.out.println(". . . Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Build Project");
-			System.out.println(". . . Build Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-		
-        System.out.println(". . . beginSequence END . . .");
-		
-		super.beginSequence(system, state);
-	}
 
     /**
      * This method is called when the TESTAR requests the state of the SUT.
@@ -324,13 +195,6 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
                 }
             }
         }
-		
-		System.out.println("... LIST OF ACTIONS ...");
-		for(Action a : actions) {
-			System.out.println(a.get(Tags.OriginWidget).get(Tags.Desc));
-		}	
-		System.out.println("... END OF LIST ...");
-		
         return actions;
     }
 
@@ -456,37 +320,20 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
         super.closeTestSession();
     }
 
-	private boolean forceAction(SUT system, String widgetDesc) {
-		Action actionToExecute = null;
-		State currentState = getState(system);
-        Set<Action> actions = deriveActions(system, currentState);
-        boolean fullName = false;
-        
-        if (widgetDesc.contains("fullName")) {
-            fullName = true;
-            widgetDesc = widgetDesc.substring(widgetDesc.indexOf("_") + 1);
-        }
-                  
-    	for (Action a : actions) {
-            if (fullName == true) {
-                if ((a.get(Tags.OriginWidget, null) != null) && (a.get(Tags.OriginWidget).get(Tags.Desc, "") == widgetDesc)) {
-                    actionToExecute = a;
-            		break;
-                }
-            } else {
-                if ((a.get(Tags.OriginWidget, null) != null) && (a.get(Tags.OriginWidget).get(Tags.Desc, "").contains(widgetDesc))) {
-                    actionToExecute = a;
-            		break;
-                }
-            }
-        }
-				
-		if (actionToExecute == null) {
-			return false;
-		} else {
-			executeAction(system, currentState, actionToExecute);
-			return true;
-		}
-	}	
+}
 
+/**
+ *  Helper class to customize SUT License as desires
+ */
+class CODEOLicense {
+
+    String sutTitle = "CODEO";
+    String sutName = "PikeOS Certified Hypervisor Eclipse-based CODEO";
+    String sutUrl = "https://www.sysgo.com/products/pikeos-hypervisor/eclipse-based-codeo";
+    String product = "SYSGO";
+    boolean isOpenSource = false;
+
+    public CODEOLicense () { 
+        // Create object for JSON Artefact purposes
+    }
 }

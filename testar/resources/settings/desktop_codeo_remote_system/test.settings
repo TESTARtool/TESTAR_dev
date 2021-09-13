@@ -107,7 +107,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_codeo_elinos_project/Protocol_desktop_codeo_elinos_project
+ProtocolClass = desktop_codeo_remote_system/Protocol_desktop_codeo_remote_system
 
 #################################################################
 # State model inference settings
@@ -121,8 +121,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = codeo_elinos_project
-ApplicationVersion = 35
+ApplicationName = codeo_remote_system
+ApplicationVersion = 30
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 
@@ -192,7 +192,7 @@ ProtocolSpecificSetting_5 =
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\desktop_codeo_elinos_project\\ExtendedSettings.xml
+ExtendedSettingsFile = .\\settings\\desktop_codeo_remote_system\\ExtendedSettings.xml
 
 #################################################################
 # Other more advanced settings

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<TESTAR_uifilter version="1.0.20170515">
+	<coding_types>
+		<coding type="Abs(R)ID" desc="ROLE property"/>
+		<coding type="Abs(R,T)ID" desc="ROLE and TITLE properties"/>
+		<coding type="Abs(R,T,P)ID" desc="ROLE, TITLE and PATH properties"/>
+	</coding_types>
+	<filtering_types>
+		<filtering type="-2147483648" desc="TABU LIST"/>
+		<filtering type="-2147483647" desc="WHITE LIST"/>
+		<filtering type="-427" desc="ANY"/>
+		<filtering type="-1" desc="PRIMITIVE_TEXT"/>
+		<filtering type="-2" desc="PRIMITIVE_NUMBER"/>
+		<filtering type="-13451473" desc="BASIC_DATE"/>
+		<filtering type="-1345133417" desc="BASIC_EMAIL"/>
+		<filtering type="-134513313" desc="BASIC_WEBURL"/>
+	</filtering_types>
+	<filters>
+		<filter wid="WT1t2jfc5182193259776" filtering="-2147483647" coding="Abs(R,T)ID" role="UIATabItem" p.role="UIATabControl" title="1889543754" p.title="-1695284826" depth="10" children="0"/>
+	</filters>
+</TESTAR_uifilter>

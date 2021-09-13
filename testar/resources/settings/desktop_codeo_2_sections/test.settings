@@ -107,12 +107,12 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_codeo_elinos_project/Protocol_desktop_codeo_elinos_project
+ProtocolClass = desktop_codeo_2_sections/Protocol_desktop_codeo_2_sections
 
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 10.102.0.244
@@ -121,8 +121,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = codeo_elinos_project
-ApplicationVersion = 35
+ApplicationName = codeo_2_sections
+ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 
@@ -192,7 +192,7 @@ ProtocolSpecificSetting_5 =
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\desktop_codeo_elinos_project\\ExtendedSettings.xml
+ExtendedSettingsFile = .\\settings\\desktop_codeo_2_sections\\ExtendedSettings.xml
 
 #################################################################
 # Other more advanced settings
