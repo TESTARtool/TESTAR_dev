@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package jedit_prioritize_new_actions;
+
 import java.util.Objects;
 import java.util.Set;
 import nl.ou.testar.PrioritizeNewActionsSelector;

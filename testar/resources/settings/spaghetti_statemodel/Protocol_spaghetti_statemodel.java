@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package spaghetti_statemodel;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;

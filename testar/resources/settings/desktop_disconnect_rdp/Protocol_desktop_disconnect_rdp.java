@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package desktop_disconnect_rdp;
+
 import java.io.File;
 import java.io.IOException;
 

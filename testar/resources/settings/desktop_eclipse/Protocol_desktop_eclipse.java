@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package desktop_eclipse;
 
 import org.apache.commons.io.FileUtils;
 import org.testar.jacoco.MergeJacocoFiles;

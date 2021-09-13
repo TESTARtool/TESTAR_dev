@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package eclipse_random;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;

@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package rachota_reinforcement_learning;
+
 import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;

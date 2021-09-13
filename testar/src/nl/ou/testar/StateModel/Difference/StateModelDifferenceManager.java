@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package nl.ou.testar.StateModel.Difference;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.webdriver.enums.WdMapping;
 import org.fruit.alayer.windows.UIAMapping;
 import org.fruit.monkey.Main;
+import org.testar.json.JsonArtefactLogs;
 
 import com.google.common.collect.Sets;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
@@ -126,6 +128,34 @@ public class StateModelDifferenceManager {
 	private HashMap<String, String> newStatesImages = new HashMap<>();
 	// Prepare a Map to associate an Abstract State identifier with all the new Action Description
 	private HashMap<String, Set<Pair<String, String>>> newActions = new HashMap<>();
+	
+	// Information for the State Model Difference JSON Object
+	// Default values are empty parameters, by default we consider previous model doesn't exist
+	private boolean existsPreviousStateModel = false;
+	private int numberDisappearedAbstractStates = -1;
+	private int numberNewAbstractStates = -1;
+	private String stateModelDifferenceHTMLReport = "Previous State Model doesn't exist";
+	private List<Pair<String, List<String>>> specificWidgetTreeDifference = new ArrayList<>();
+
+	public boolean existsPreviousStateModel() {
+		return existsPreviousStateModel;
+	}
+
+	public int getNumberDisappearedAbstractStates() {
+		return numberDisappearedAbstractStates;
+	}
+
+	public int getNumberNewAbstractStates() {
+		return numberNewAbstractStates;
+	}
+
+	public String getStateModelDifferenceHTMLReport() {
+		return stateModelDifferenceHTMLReport;
+	}
+
+	public List<Pair<String, List<String>>> getSpecificWidgetTreeDifference() {
+	    return specificWidgetTreeDifference;
+	}
 
 	public void calculateModelDifference(Config config, Pair<String,String> stateModelOne, Pair<String,String> stateModelTwo) {
 		if(stateModelOne.left().isEmpty() || stateModelOne.right().isEmpty() || stateModelTwo.left().isEmpty() || stateModelTwo.right().isEmpty()) {
@@ -220,6 +250,11 @@ public class StateModelDifferenceManager {
 					newActions.put(abstractStateId, modelDifferenceDatabase.outgoingActionIdDesc(identifierModelTwo, abstractStateId));
 				}
 			});
+			
+			// Update information for State Model Difference JSON Object
+			existsPreviousStateModel = true;
+			numberDisappearedAbstractStates = disappearedAbstractStates.size();
+			numberNewAbstractStates = newAbstractStates.size();
 
 			createHTMLreport();
 
@@ -251,6 +286,7 @@ public class StateModelDifferenceManager {
 			System.out.println("Model One: " + abstractAttributesModelOne);
 			System.out.println("Model Two: " + abstractAttributesModelTwo);
 			System.out.println("\n ************************************************************************************ \n");
+			JsonArtefactLogs.addWarning("State Model Difference: We don't have two models to compare or Abstract Attributes are different");
 			return false;
 		} else {
 			// Update Set object "abstractAttributesTags" with the Tags
@@ -384,7 +420,8 @@ public class StateModelDifferenceManager {
 
 					differenceHTML.addSpecificStateChange(disappearedStatesImages.get(dissStateModelOne), newStatesImages.get(newStateModelTwo), diffDisk);
 
-					differenceHTML.addSpecificActionReached(Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne).toString());
+					String specificActionReached = Sets.intersection(incomingActionsModelTwo, incomingActionsModelOne).toString();
+					differenceHTML.addSpecificActionReached(specificActionReached);
 
 					// Widget Tree Abstract Properties Difference
 					StateModelDifferenceJsonWidget stateModelDifferenceJsonWidget = new StateModelDifferenceJsonWidget(modelDifferenceDatabase, abstractAttributesTags);
@@ -392,6 +429,8 @@ public class StateModelDifferenceManager {
 					for(String widgetInformation : widgetTreeDifference) {
 						differenceHTML.addSpecificWidgetInfo(widgetInformation);
 					}
+					
+					specificWidgetTreeDifference.add(new Pair<String, List<String>>(specificActionReached, widgetTreeDifference));
 				}
 			}
 

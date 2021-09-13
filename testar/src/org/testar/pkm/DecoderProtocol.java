@@ -88,6 +88,8 @@ public class DecoderProtocol extends GenericUtilsProtocol {
     protected String stateModelArtefactDirectory = "";
     protected String reportHTMLStateModelDifference = "";
 
+    boolean decoderExceptionThrown = false;
+    
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
      */
@@ -127,7 +129,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
         // Update sequence info for DECODER Test Results Artefact
         String actionInfo = String.format("Executed action %s", action.get(Tags.Desc, "NoDescription"));
 
-        if(action.get(Tags.OriginWidget, null) != null) {
+        if(action.get(Tags.OriginWidget) != null) {
             actionInfo = String.format("Executed action %s in widget: %s", 
                     action.get(Tags.Role, ActionRoles.Action), action.get(Tags.OriginWidget).getAbstractRepresentation());
         }
@@ -162,7 +164,7 @@ public class DecoderProtocol extends GenericUtilsProtocol {
                 + " " + status + " \"" + statusInfo + "\"" );
 
         sequencesOutputDir.add(getGeneratedSequenceName());
-        logsOutputDir.add(getGeneratedLogName());
+        logsOutputDir.add(htmlReport.getGeneratedLogName());
         htmlOutputDir.add(htmlReport.getGeneratedHTMLName());
         sequencesVerdicts.add(verdictInfo);
         runInfo.add(new LinkedList<String>(sequenceInfo));

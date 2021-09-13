@@ -495,6 +495,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                     " | time | " + actionTime +
                     " | " + actionCoverage;
             writeCoverageFile(coverageInfo);
+
             extractJacocoActionMergedReport(jacocoFileAction);
 
             return coverageInfo;

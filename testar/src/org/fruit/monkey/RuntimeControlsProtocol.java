@@ -35,8 +35,6 @@ import es.upv.staq.testar.EventHandler;
 import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 import java.util.Arrays;
@@ -53,11 +51,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
     protected boolean visualizationOn = false;
-
-    @Override
-    protected Action selectAction(State state, Set<Action> actions) {
-        return null;
-    }
+    protected boolean typeReady = false;
+    protected String typedText = "";
 
     public enum Modes{
         Spy,
@@ -65,7 +60,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         Generate,
         Quit,
         View,
-        Replay;
+        Replay,
+        Analysis,
+        Report,
+        ModelDiff;
     }
 
     protected Modes mode;
@@ -103,39 +101,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     	FlashFeedback.flash(modeNfo, 1000);
     	
     }
-    
-    //Old code to switch between modes
-    /*private synchronized void nextMode(boolean forward){
-        if(forward){
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }else{
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }
-
-        // Add some logging
-        // Add the FlashFeedback about the mode you are in in the upper left corner.
-        String modeParamS = "";
-        if (mode == Modes.Record)
-            modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
-
-        String modeNfo = "'" + mode + "' mode active." + modeParamS;
-        LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        FlashFeedback.flash(modeNfo);
-    }*/
 
     /**
      * Set the mode with the given parameter value
@@ -144,9 +109,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected synchronized void setMode(Modes mode){
         if (mode() == mode) return;
         else this.mode = mode;
-//        List<Modes> modesList = Arrays.asList(Modes.values());
-//        while (mode() != mode)
-//            nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
     }
 
 
@@ -214,41 +176,28 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             }
         }
 
-        //Disabled and replaced with Shift + Arrow Up to toggle visualization on/off:
-//        // SHIFT + 1 --> toggle action visualization
-//        else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
-//
-//            // SHIFT + 2 --> toggle showing accessibility properties of the widget
-//        else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
-//
-//            // SHIFT + 3 --> toggle basic or all accessibility properties of the widget
-//        else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
-//
-//            // SHIFT + 4 --> toggle the widget tree
-//        else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
-
             // SHIFT + 0 --> undocumented feature
         else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
             System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 
-            // TODO: Find out if this commented code is anything useful
-		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
-			AdhocServer.startAdhocServer();
-			mode = Modes.AdhocTest;
-			LogSerialiser.log("'" + mode + "' mode active.\n", LogSerialiser.LogLevel.Info);
-		}*/
+        // Flag (Control key) for Record mode to indicate that we want to record a typed text
+        else if (mode() == Modes.Record && key == KBKeys.VK_CONTROL){
+        	typeReady = !typeReady;
+        	System.out.println("RECORD MODE: Recording Typed Text ? " + typeReady);
+        	System.out.println("PRESS CONTROL KEY TO SWTICH");
+        }
 
-            // In GenerateManual mode you can press any key except SHIFT to add a user keyboard
-            // This is because SHIFT is used for the TESTAR shortcuts
-            // This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-            // cannot be recorded as an user event in GenerateManual....
+        // If typedReady prepare desired text
+        else if (mode() == Modes.Record && typeReady){
+        	typedText = typedText + (char)key.code();
+        }
+        
+        // In GenerateManual mode you can press any key except SHIFT to add a user keyboard
+        // This is because SHIFT is used for the TESTAR shortcuts
+        // This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+        // cannot be recorded as an user event in GenerateManual....
         else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null){
-            //System.out.println("USER_EVENT key_down! " + key.toString());
-            userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
+        	userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
         }
 
         // SHIFT + ALT --> Toggle widget-tree hieracrhy display
@@ -259,7 +208,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     //jnativehook is platform independent
     @Override
     public void keyUp(KBKeys key){
-        pressed.remove(key);
+    	pressed.remove(key);
     }
 
     /**

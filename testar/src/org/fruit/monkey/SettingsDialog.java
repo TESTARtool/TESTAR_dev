@@ -36,9 +36,7 @@ import nl.ou.testar.StateModel.Settings.StateModelPanel;
 
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.dialog.*;
-import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
@@ -72,7 +70,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.2.14 (7-Jan-2021) + experiments + tycho settings";
+  public static final String TESTAR_VERSION = "DECODER version - master 2.2.17 (3-May-2021)";
 
   private String settingsFile;
   private Settings settings;

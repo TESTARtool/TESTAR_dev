@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package upm_purerandom;
+
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;

@@ -49,10 +49,15 @@ public class HtmlSequenceReport {
     private boolean firstActionsAdded = false;
     
     private String generatedHtml;
-
+    private String generatedLogName;
+    
     public String getGeneratedHTMLName() {
-    	return generatedHtml;
-    }
+		return generatedHtml;
+	}
+    
+    public String getGeneratedLogName() {
+		return generatedLogName;
+	}
 
     private static final String[] HEADER = new String[] {
             "<!DOCTYPE html>",
@@ -78,6 +83,7 @@ public class HtmlSequenceReport {
             		+ REPORT_FILENAME_AFT;
             
             generatedHtml = filename;
+            generatedLogName = filename;
             
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
@@ -98,6 +104,7 @@ public class HtmlSequenceReport {
     		String imagePath = state.get(Tags.ScreenshotPath);
     		// repairing the file paths:
     		if(imagePath.contains("output\\")){
+    			//int indexStart = imagePath.indexOf("./output");
     			int indexScrn = imagePath.indexOf("\\scrshots\\");
     			String replaceString = imagePath.substring(0, indexScrn + 1);
     			imagePath = imagePath.replace(replaceString,"../");
@@ -129,6 +136,7 @@ public class HtmlSequenceReport {
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
     		if(imagePath.contains("output\\")){
+    			//int indexStart = imagePath.indexOf("./output");
     			int indexScrn = imagePath.indexOf("\\scrshots\\");
     			String replaceString = imagePath.substring(0, indexScrn + 1);
     			imagePath = imagePath.replace(replaceString,"../");
@@ -136,13 +144,19 @@ public class HtmlSequenceReport {
     		write("<h2>State "+innerLoopCounter+"</h2>");
     		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
     		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-    		write("<p><img src=\""+imagePath+"\"></p>");
+    		//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
+    		//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
+    		//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
+    		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+    		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
+    		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
     	}catch(Exception e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
     	}
     	innerLoopCounter++;
     }
+
 
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
@@ -231,19 +245,18 @@ public class HtmlSequenceReport {
 
     public void addSelectedAction(State state, Action action){
     	String screenshotDir = OutputStructure.screenshotsOutputDir;
-
     	if(screenshotDir.contains("./output")){
         	int indexStart = screenshotDir.indexOf("./output");
         	int indexScrn = screenshotDir.indexOf("scrshots");
         	String replaceString = screenshotDir.substring(indexStart,indexScrn);
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
-
+    	
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
         		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
-
+        
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 
@@ -255,11 +268,12 @@ public class HtmlSequenceReport {
         }catch(Exception e){}
 
         write("</h4>");
-        if(actionPath.contains("output\\")){
-        	int indexScrn = actionPath.indexOf("\\scrshots\\");
-        	String replaceString = actionPath.substring(0, indexScrn + 1);
-        	actionPath = actionPath.replace(replaceString,"../");
-        }
+		if(actionPath.contains("output\\")){
+			//int indexStart = imagePath.indexOf("./output");
+			int indexScrn = actionPath.indexOf("\\scrshots\\");
+			String replaceString = actionPath.substring(0, indexScrn + 1);
+			actionPath = actionPath.replace(replaceString,"../");
+		}
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
 

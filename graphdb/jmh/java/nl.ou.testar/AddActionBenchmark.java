@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 public class AddActionBenchmark {
 
 
-    OrientDBRepository graphFactory;
+	OrientDBRepository graphFactory;
 
     @Setup(Level.Invocation)
     public void setupDatabase() {

@@ -28,6 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+package desktop_codeo_elinos_project;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -40,6 +42,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
 
@@ -115,120 +118,7 @@ public class Protocol_desktop_codeo_elinos_project extends DesktopProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state){
 		
-        System.out.println(". . . beginSequence START . . .");
         
-		boolean expectedExecution = true;
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "New");
-			System.out.println(". . . New . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        /*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project...");
-			System.out.println(". . . Project... . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        */
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "ELinOS Project");
-			System.out.println(". . . ELinOS Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project name");
-			System.out.println(". . . Project name . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        /*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "ELinOS System Project");
-			System.out.println(". . . ELinOS System Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        */
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        /*
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Use Feature Sets");
-			System.out.println(". . . Use Feature Sets . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        */
-        
-        State currentState = getState(system);
-        Set<Action> actions = deriveActions(system, currentState);
-        for (Action a : actions) {
-            Set<Tags> tagSet = a.get(Tags.OriginWidget).get(Tags.tagSet());
-        }
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Debug");
-			System.out.println(". . . Debug . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Networking");
-			System.out.println(". . . Networking . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Webserver");
-			System.out.println(". . . Webserver . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "&Next");
-			System.out.println(". . . &Next . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Board");
-			System.out.println(". . . Board . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "QEMU (x86)");
-			System.out.println(". . . QEMU (x86) . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Finish");
-			System.out.println(". . . Finish . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Project");
-			System.out.println(". . . Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-        
-		if (expectedExecution) {
-			expectedExecution = forceAction(system, "Build Project");
-			System.out.println(". . . Build Project . . .");
-			System.out.println(". . . expectedExecution = " + expectedExecution);
-		}
-		
-        System.out.println(". . . beginSequence END . . .");
 		
 		super.beginSequence(system, state);
 	}
