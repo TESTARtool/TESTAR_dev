@@ -24,8 +24,8 @@ public class MiscSettingsController extends ChildSettingsController {
     private String outPath = settings.get(ConfigTags.OutputDir);
     private String tmpPath = settings.get(ConfigTags.TempDir);
 
-    public MiscSettingsController(Settings settings) {
-        super("", settings);
+    public MiscSettingsController(Settings settings, String settingsPath) {
+        super("", settings, settingsPath);
     }
 
     @Override

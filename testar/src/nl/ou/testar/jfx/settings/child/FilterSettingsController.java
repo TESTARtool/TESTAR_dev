@@ -51,8 +51,8 @@ public class FilterSettingsController extends ChildSettingsController {
         }
     }
 
-    public FilterSettingsController(Settings settings) {
-        super("Filters & oracles", settings);
+    public FilterSettingsController(Settings settings, String settingsPath) {
+        super("Filters & oracles", settings, settingsPath);
     }
 
     @Override

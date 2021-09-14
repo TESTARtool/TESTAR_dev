@@ -12,6 +12,8 @@ import nl.ou.testar.jfx.settings.SettingsController;
 import javafx.scene.control.*;
 import org.fruit.monkey.Settings;
 
+import java.io.File;
+
 public class MainController extends ViewController {
 
     enum Mode {
@@ -19,9 +21,20 @@ public class MainController extends ViewController {
     }
 
     private Mode mode;
+    private String settingsPath;
 
-    public MainController(Settings settings) {
+    private DashboardController dashboardController;
+    private SettingsController settingsController;
+
+    public DashboardController getDashboardController() {
+        return dashboardController;
+    }
+
+    public MainController(Settings settings, String settingsPath) {
         super("Testar", "jfx/main.fxml", settings);
+        this.settingsPath = settingsPath;
+        dashboardController = new DashboardController(settings, settingsPath);
+        settingsController = new SettingsController(settings, settingsPath);
     }
 
     private void setupMode(Parent view, Mode mode) {
@@ -33,10 +46,10 @@ public class MainController extends ViewController {
             ViewController targetController;
             switch (mode) {
                 case SETTINGS:
-                    targetController = new SettingsController(settings);
+                    targetController = settingsController;
                     break;
                 default: //HOME
-                    targetController = new DashboardController(settings);
+                    targetController = dashboardController;
                     break;
             }
             final NavigationController navigationController = new NavigationController(targetController);

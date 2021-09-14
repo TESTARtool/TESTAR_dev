@@ -35,8 +35,8 @@ public class GeneralSettingsController extends ChildSettingsController {
 
     private GeneralSettings generalSettings;
 
-    public GeneralSettingsController(Settings settings) {
-        super("General settings", settings);
+    public GeneralSettingsController(Settings settings, String settingsPath) {
+        super("General settings", settings, settingsPath);
     }
 
     @Override

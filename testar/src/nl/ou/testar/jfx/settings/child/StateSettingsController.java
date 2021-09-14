@@ -27,8 +27,8 @@ public class StateSettingsController extends ChildSettingsController {
     private CheckBox accessbridgeEnabled;
     private CheckBox resetDatabase;
 
-    public StateSettingsController(Settings settings) {
-        super("", settings);
+    public StateSettingsController(Settings settings, String settingsPath) {
+        super("", settings, settingsPath);
     }
 
     @Override

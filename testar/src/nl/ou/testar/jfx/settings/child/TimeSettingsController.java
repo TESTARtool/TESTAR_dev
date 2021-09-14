@@ -16,8 +16,8 @@ public class TimeSettingsController extends ChildSettingsController {
     private SpinnerValueFactory<Double> maxTestTimeValueFactory;
     private CheckBox useRecordTimingCheckbox;
 
-    public TimeSettingsController(Settings settings) {
-        super("Time settings", settings);
+    public TimeSettingsController(Settings settings, String settingsPath) {
+        super("Time settings", settings, settingsPath);
     }
 
     @Override
