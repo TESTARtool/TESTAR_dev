@@ -30,12 +30,34 @@ async def concrete_state_traverse(from_cid, to_cid):
 
 @statemodel.route("/api/concrete/<string:cid>")
 async def json_concrete_state_details(cid):
-    return jsonify(orientdb.concrete_state_from_cid(cid))
+    state = orientdb.concrete_state_from_cid(cid)
+
+    if state:
+        return jsonify(state)
+
+    return jsonify({'message': 'State not found or misses information.'})
 
 @statemodel.route("/api/concrete/")
 async def json_concrete_state_list():
-    return  jsonify(orientdb.concrete_states())
+    state = orientdb.concrete_states()
+    if state:
+        return jsonify(state)
+    else:
+        return jsonify({'message': 'No states found.'})
 
 @statemodel.route("/api/concrete/traverse/<string:from_cid>/<string:to_cid>")
 async def json_state_traverse(from_cid, to_cid):
-    return jsonify(orientdb.concrete_state_traverse(from_cid, to_cid))
+
+    # Don't request items with the same ConcreteID
+    if from_cid == to_cid:
+        return jsonify({'message': 'from_cid & to_cid are the same'})
+
+    path = orientdb.concrete_state_traverse(from_cid, to_cid)
+
+    # Only return path when it exists
+    if path:
+        return jsonify(path)
+
+    # Return error message if there is no path between 2 states
+    else:
+        return jsonify({'message': f'No path found from `{from_cid}` to `{to_cid}`.'})
