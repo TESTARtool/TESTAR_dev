@@ -7,9 +7,9 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.fruit.Pair;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Pair;
+import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +24,8 @@ public class MiscSettingsController extends ChildSettingsController {
     private String outPath = settings.get(ConfigTags.OutputDir);
     private String tmpPath = settings.get(ConfigTags.TempDir);
 
-    public MiscSettingsController(Settings settings) {
-        super("", settings);
+    public MiscSettingsController(Settings settings, String settingsPath) {
+        super("", settings, settingsPath);
     }
 
     @Override

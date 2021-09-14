@@ -6,8 +6,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,8 @@ public class StateSettingsController extends ChildSettingsController {
     private CheckBox accessbridgeEnabled;
     private CheckBox resetDatabase;
 
-    public StateSettingsController(Settings settings) {
-        super("", settings);
+    public StateSettingsController(Settings settings, String settingsPath) {
+        super("", settings, settingsPath);
     }
 
     @Override

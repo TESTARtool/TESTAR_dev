@@ -6,8 +6,8 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import nl.ou.testar.jfx.utils.DisplayModeWrapper;
 import nl.ou.testar.jfx.utils.GeneralSettings;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -35,8 +35,8 @@ public class GeneralSettingsController extends ChildSettingsController {
 
     private GeneralSettings generalSettings;
 
-    public GeneralSettingsController(Settings settings) {
-        super("General settings", settings);
+    public GeneralSettingsController(Settings settings, String settingsPath) {
+        super("General settings", settings, settingsPath);
     }
 
     @Override

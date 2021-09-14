@@ -5,8 +5,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import org.apache.commons.lang3.StringUtils;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,8 +51,8 @@ public class FilterSettingsController extends ChildSettingsController {
         }
     }
 
-    public FilterSettingsController(Settings settings) {
-        super("Filters & oracles", settings);
+    public FilterSettingsController(Settings settings, String settingsPath) {
+        super("Filters & oracles", settings, settingsPath);
     }
 
     @Override

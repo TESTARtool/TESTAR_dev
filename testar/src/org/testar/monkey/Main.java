@@ -46,6 +46,7 @@ import nl.ou.testar.jfx.MainController;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -65,7 +66,7 @@ import org.testar.settingsdialog.SettingsDialog;
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
 
-public class Main extends Application {
+public class Main extends Application implements DashboardDelegate {
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -77,6 +78,8 @@ public class Main extends Application {
 	public static String settingsDir = testarDir + "settings" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
+
+	private Stage primaryStage;
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
@@ -114,6 +117,7 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		this.primaryStage = primaryStage;
 
 		System.out.println("(0)");
 		isValidJavaEnvironment();
@@ -128,7 +132,6 @@ public class Main extends Application {
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
-		System.out.println("(4)");
 		Settings settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
@@ -142,33 +145,39 @@ public class Main extends Application {
 			initOperatingSystem();
 
 			startTestar(settings);
+
+			shutdown();
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
-		else{
+		else {
 			System.out.println("(9)");
-			while(startTestarDialog(primaryStage, settings, testSettingsFileName)) {
-
-				testSettingsFileName = getTestSettingsFile();
-				settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
-
-				setTestarDirectory(settings);
-
-				initCodingManager(settings);
-
-				initOperatingSystem();
-
-				startTestar(settings);
-			}
+			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
-
-		TestSerialiser.exit();
-		ScreenshotSerialiser.exit();
-		LogSerialiser.exit();
 
 //		System.out.println("(18)");
 //		System.exit(0);
 
+	}
+
+	@Override
+	public void startTesting(Settings settings) {
+		primaryStage.close();
+
+		final String testSettingsFileName = getTestSettingsFile();
+		settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
+		setTestarDirectory(settings);
+		initCodingManager(settings);
+		initOperatingSystem();
+		startTestar(settings);
+
+		shutdown();
+	}
+
+	private void shutdown() {
+		TestSerialiser.exit();
+		ScreenshotSerialiser.exit();
+		LogSerialiser.exit();
 	}
 
 	private static boolean isValidJavaEnvironment() {
@@ -351,9 +360,12 @@ public class Main extends Application {
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
 	 */
-	public static boolean startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+	public boolean startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+		final String settingsPath = getTestSettingsFile();
 
-		NavigationController navigationController = new NavigationController(new MainController(settings));
+		MainController mainController = new MainController(settings, settingsPath);
+		mainController.getDashboardController().setDelegate(this);
+		NavigationController navigationController = new NavigationController(mainController);
 		navigationController.startWithDelegate(new NavigationDelegate() {
 			@Override
 			public void onViewControllerActivated(ViewController viewController, Parent view) {
@@ -386,8 +398,7 @@ public class Main extends Application {
 	 */
 	private static void startTestar(Settings settings) {
 
-		launch();
-		if (true) return;
+//		launch();
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {

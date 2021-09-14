@@ -4,8 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.io.IOException;
 
@@ -16,8 +16,8 @@ public class TimeSettingsController extends ChildSettingsController {
     private SpinnerValueFactory<Double> maxTestTimeValueFactory;
     private CheckBox useRecordTimingCheckbox;
 
-    public TimeSettingsController(Settings settings) {
-        super("Time settings", settings);
+    public TimeSettingsController(Settings settings, String settingsPath) {
+        super("Time settings", settings, settingsPath);
     }
 
     @Override

@@ -2,7 +2,7 @@ package nl.ou.testar.jfx.core;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

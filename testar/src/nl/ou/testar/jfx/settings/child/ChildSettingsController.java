@@ -1,22 +1,26 @@
 package nl.ou.testar.jfx.settings.child;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
-import org.fruit.Pair;
-import org.fruit.monkey.Settings;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.monkey.Main;
+import org.testar.monkey.Settings;
+import org.testar.monkey.Util;
+import org.testar.serialisation.LogSerialiser;
 
 import java.io.IOException;
 
 public abstract class ChildSettingsController extends ViewController {
 
-    public ChildSettingsController(String title, Settings settings) {
+    private String settingsPath;
+
+    public ChildSettingsController(String title, Settings settings, String settingsPath) {
         super(title, "jfx/settings_child.fxml", settings);
+        this.settingsPath = settingsPath;
     }
     @Override
     public void viewDidLoad(Parent view) {
@@ -28,6 +32,7 @@ public abstract class ChildSettingsController extends ViewController {
         Button btnSave = (Button) view.lookup("#btnSave");
         btnSave.setOnAction(event -> {
             save(settings);
+            persist(settings);
         });
     }
 
@@ -47,4 +52,15 @@ public abstract class ChildSettingsController extends ViewController {
     }
 
     protected abstract void save(Settings settings);
+
+    private void persist(Settings settings) {
+        ExtendedSettingsFactory.SaveAll();
+        try {
+            Util.saveToFile(settings.toFileString(), settingsPath);
+            Settings.setSettingsPath(settingsPath.substring(0,settingsPath.indexOf(Main.SETTINGS_FILE)-1));
+            System.out.println("Saved current settings to <" + settingsPath + ">");
+        } catch (IOException e1) {
+            LogSerialiser.log("Unable to save current settings to <" + settingsPath + ">: " + e1.toString() + "\n");
+        }
+    }
 }
