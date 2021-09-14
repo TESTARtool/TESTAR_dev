@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package desktop_codeo_elinos_project;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;

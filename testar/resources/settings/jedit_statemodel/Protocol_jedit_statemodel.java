@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package jedit_statemodel;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;

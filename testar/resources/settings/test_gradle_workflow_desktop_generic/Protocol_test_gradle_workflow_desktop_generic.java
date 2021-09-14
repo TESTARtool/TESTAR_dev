@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package test_gradle_workflow_desktop_generic;
-
 import java.io.File;
 import java.util.Set;
 

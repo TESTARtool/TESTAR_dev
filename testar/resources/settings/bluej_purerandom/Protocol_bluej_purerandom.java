@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package bluej_purerandom;
-
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;

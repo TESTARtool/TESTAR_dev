@@ -28,8 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-package bluej_qlearning;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;

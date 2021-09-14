@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package bluej_prioritize_new_actions;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;

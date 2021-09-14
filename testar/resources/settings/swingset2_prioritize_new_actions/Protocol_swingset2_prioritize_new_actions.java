@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package swingset2_prioritize_new_actions;
-
 import java.util.Set;
 import nl.ou.testar.PrioritizeNewActionsSelector;
 import org.fruit.monkey.Settings;

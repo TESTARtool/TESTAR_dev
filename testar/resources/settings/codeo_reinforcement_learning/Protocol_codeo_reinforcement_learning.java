@@ -28,9 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.GreedyPolicy;
+import nl.ou.testar.ReinforcementLearning.Policies.Policy;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.experiments.RachotaProtocol;
+import org.testar.protocols.experiments.CodeoProtocol;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import java.util.Set;
 import org.fruit.alayer.windows.AccessBridgeFetcher;
@@ -46,14 +55,18 @@ import java.io.FileWriter;
 import org.fruit.alayer.*;
 
 /**
- * This protocol together with the settings provides a specific behavior to test rachota
+ * This protocol together with the settings provides a specific behavior to test Codeo
  * We will use Java Access Bridge settings (AccessBridgeEnabled = true) for widget tree extraction
  *
- * It uses Random Selection algorithm.
+ * It uses Reinforcement Learning Action Selection algorithm
+ * Check test.setting - Reinforcement learning settings
  */
-public class Protocol_rachota_purerandom extends RachotaProtocol {
+public class Protocol_codeo_reinforcement_learning extends CodeoProtocol {
 
 	private String reportTimeDir;
+	
+    private ActionSelector actionSelector = null;
+    private Policy policy = null;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -66,10 +79,21 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 		// Disconnect from Windows Remote Desktop, without close the GUI session
 		// User will need to disable or accept UAC permission prompt message
 		//disconnectRDP();
+	    
+        //Create Abstract Model with Reinforcement Learning Implementation
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
+        
+        // Extended settings framework, set ConfigTags settings with XML framework values 
+        // test.setting -> ExtendedSettingsFile
+        ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+        settings = rlXmlSetting.updateXMLSettings(settings);
+
+        policy = PolicyFactory.getPolicy(settings);
+        actionSelector = new ReinforcementLearningActionSelector(policy);
 
 		super.initialize(settings);
 
-		// rachota: Requires Java Access Bridge
+		// Codeo: Requires Java Access Bridge
 		System.out.println("Are we running Java Access Bridge ? " + settings.get(ConfigTags.AccessBridgeEnabled, false));
 
 		// TESTAR will execute the SUT with Java
@@ -101,7 +125,7 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 			e.printStackTrace();
 		}
 
-		// wait 10 seconds, give time to rachota to start
+		// wait 10 seconds, give time to Codeo to start
 		Util.pause(10);
 
 		super.beginSequence(system, state);
@@ -136,7 +160,7 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, state);
 		}
 
-		// rachota: sometimes rachota freezes, TESTAR detects the SUT
+		// Codeo: sometimes Codeo freezes, TESTAR detects the SUT
 		// but cannot extract anything at JavaAccessBridge level
 		// Use this count for Verdict
 		if(actions.isEmpty()) {
@@ -144,7 +168,7 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 			try {
 				// Windows level call to check if application is not responding.
 				boolean isHung = WinProcess.isHungWindow(state.child(0).get(Tags.HWND, (long)0));
-				System.out.println("Is Rachota Hung ? " + isHung);
+				System.out.println("Is Codeo Hung ? " + isHung);
 			} catch (IndexOutOfBoundsException iobe) {
 				System.out.println("TESTAR State has no childs!");
 				countEmptyStateTimes = countEmptyStateTimes + 1;
@@ -162,18 +186,30 @@ public class Protocol_rachota_purerandom extends RachotaProtocol {
 	}
 
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 * Select one of the available actions using a reinforcement learning action selection algorithm
 	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	 * overwrite it, not always running it, we have take care of the HTML report here
 	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
-	 * @return  the selected action (non-null!)
+	 * @return the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-		// RandomSelector: Desktop protocol will return a random action
-		return(super.selectAction(state, actions));
+	protected Action selectAction(final State state, final Set<Action> actions) {
+	    //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+	    //unwanted processes are killed and SUT is put into foreground.
+	    final Action preSelectedAction = preSelectAction(state, actions);
+	    if (preSelectedAction != null) {
+	        return preSelectedAction;
+	    }
+	    Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+	    if(modelAction==null) {
+	        System.out.println("State model based action selection did not find an action. Using random action selection.");
+	        // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+	        return RandomActionSelector.selectAction(actions);
+	    }
+	    return modelAction;
 	}
 
 	/**

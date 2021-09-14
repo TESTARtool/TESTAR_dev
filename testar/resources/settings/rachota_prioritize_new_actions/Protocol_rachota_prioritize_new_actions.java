@@ -28,8 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package rachota_prioritize_new_actions;
-
 import java.util.Set;
 import nl.ou.testar.PrioritizeNewActionsSelector;
 import org.fruit.alayer.*;
