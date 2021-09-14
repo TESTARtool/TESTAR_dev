@@ -57,12 +57,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.testar.*;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -437,9 +436,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
 	private void popupMessage(String message) {
+		System.out.println("An exception occurred: " + message);
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setContentText(message);
+			alert.showAndWait();
 		}
 	}
 
