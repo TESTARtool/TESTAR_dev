@@ -62,6 +62,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
+import javafx.scene.control.Alert;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
@@ -448,9 +449,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
 	private void popupMessage(String message) {
+		System.out.println("An exception occurred: " + message);
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setContentText(message);
+			alert.showAndWait();
 		}
 	}
 
