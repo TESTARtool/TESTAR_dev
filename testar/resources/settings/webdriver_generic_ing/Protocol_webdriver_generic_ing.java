@@ -34,7 +34,6 @@ import net.sf.saxon.om.Item;
 import net.sf.saxon.s9api.*;
 import net.sf.saxon.value.BooleanValue;
 import nl.ou.testar.RandomActionSelector;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.*;
@@ -46,6 +45,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.openqa.selenium.logging.LogEntry;
@@ -94,7 +94,6 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private boolean first_action = true;
 	
 	static {
-		WdDriver.forceActivateTab = false;
 		saxonProcessor = new Processor(false);
 		xqueryCompiler = saxonProcessor.newXQueryCompiler();
 		xsltCompiler = saxonProcessor.newXsltCompiler();
@@ -240,11 +239,18 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	@Override
 	protected void initialize(Settings settings) {
+		WdDriver.forceActivateTab = false;
+		WdDriver.followLinks = true;
+		
+		if (settings.get(ConfigTags.HeadlessMode)) {
+			logger.info("HEADLESS MODE");
+			WdDriver.headlessMode = true;
+		}
+		
 		NativeLinker.addWdDriverOS();
 		super.initialize(settings);
 		ensureDomainsAllowed();
 		
-		WdDriver.followLinks = true;
 		consumeRulesFile();
 	}
 
@@ -255,6 +261,9 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 				Document d = documentBuilder.newDocument();
 				// recursive through all widgets
 				Node n = toNode(d, s);
+				
+				if (n == null) { n = d.createElement("NO_DOCUMENT"); }
+				
 				d.appendChild(n);
 				s.set(MyTags.XML, n);
 			} catch (Exception e) {
@@ -267,6 +276,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	protected Node toNode(Document d, WdWidget w) {
 		WdElement el = w.element;
 		
+		if (el == null || el.tagName == null) {
+			return null;
+		}
+		
 		Element e =  d.createElement(escape(el.tagName));
 		Map <String, String> map = el.attributeMap;
 
@@ -277,7 +290,10 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		if (el.checked) { e.setAttribute("checked", "true"); }
 		if (el.selected) { e.setAttribute("selected", "true"); }
 
-		for (int i = 0; i < w.childCount() ; i++) { e.appendChild(toNode(d, w.child(i))); }
+		for (int i = 0; i < w.childCount() ; i++) {
+			Node n = toNode(d, w.child(i));
+			if (n != null) { e.appendChild(n); }
+		}
 
 		w.set(MyTags.XML, e);
 
@@ -298,7 +314,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	private String hashString(String message, String algorithm) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
-			return Base64.encodeBase64String(digest.digest(message.getBytes(StandardCharsets.UTF_8)));
+			return Base64.getEncoder().encodeToString(digest.digest(message.getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception e) {
 			throw new RuntimeException("Could not generate hash from String", e);
 		}
@@ -339,6 +355,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		super.beginSequence(system, state);
 		first_action = true;        // we are starting to take a first action
 		nr_no_actions = 0;          // and we start counting states where there are no actions
+		logger.info("Start sequence #" + sequenceCount());
 	}
 
 	private boolean match(XQueryEvaluator comp, XdmItem item) {
@@ -715,6 +732,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 		boolean success = super.executeAction(system, state, action);
 		if (success) visitedActionsData.addAction((WdState)state, action);
 		first_action = false;
+		logger.info(" Executed Action #" + actionCount());
 		return success;
 	}
 
@@ -753,7 +771,7 @@ public class Protocol_webdriver_generic_ing extends WebdriverProtocol {
 	
 	@Override
 	protected boolean moreActions(State state) {
-		return (super.moreActions(state) && (nr_no_actions < 3)) || (!first_action);
+		return (first_action || (super.moreActions(state) && (nr_no_actions < 3)));
 	}
 
 	@Override

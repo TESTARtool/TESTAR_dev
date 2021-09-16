@@ -460,6 +460,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
 	private void popupMessage(String message) {
+		System.out.println("SHOW: " + settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup));
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);

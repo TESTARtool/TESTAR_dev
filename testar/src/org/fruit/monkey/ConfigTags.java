@@ -148,6 +148,7 @@ public final class ConfigTags {
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
 
+  public static final Tag<Boolean> HeadlessMode = Tag.from("HeadlessMode", Boolean.class);
   /*
   //TODO web driver settings for login feature
   public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);

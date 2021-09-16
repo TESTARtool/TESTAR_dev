@@ -89,6 +89,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 }
                 System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
+                
                 if (state != null && state.childCount() > 0){
                     long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
                     System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");

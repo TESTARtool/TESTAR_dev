@@ -10,7 +10,9 @@ dependencies {
     compile project(':core')
 
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-rc-1'
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.5.13
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     // https://mvnrepository.com/artifact/com.github.curious-odd-man/rgxgen
     compile group: 'com.github.curious-odd-man', name: 'rgxgen', version: '1.2'
     // https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE

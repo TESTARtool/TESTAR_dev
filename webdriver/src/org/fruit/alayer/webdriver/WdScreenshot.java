@@ -39,6 +39,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 /**
@@ -55,10 +56,11 @@ public class WdScreenshot extends AWTCanvas {
       throws StateBuildException {
     WdScreenshot wdScreenshot = new WdScreenshot();
     RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
-
+    
     try {
-      File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
-      BufferedImage fullImg = ImageIO.read(screenshot);
+      byte[] screenshot = webDriver.getScreenshotAs(OutputType.BYTES);
+      
+      BufferedImage fullImg = ImageIO.read(new ByteArrayInputStream(screenshot));
       double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
       int x = (int) Math.max(0, r.x() * displayScale);
       int y = (int) Math.max(0, r.y() * displayScale);

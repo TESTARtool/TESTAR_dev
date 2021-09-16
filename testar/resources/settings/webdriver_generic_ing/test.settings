@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 10
-SequenceLength = 1000
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -167,14 +167,15 @@ FaultThreshold = 1.0E-9
 DrawWidgetInfo = false
 MaxReward = 9999999.0
 LogLevel = 1
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 Delete = 
 MyClassPath = ./settings
 ReplayRetryTime = 30.0
 ProcessesToKillDuringTest = 
-ShowSettingsAfterTest = true
+ShowSettingsAfterTest = false
 ForceToSequenceLength = true
 OutputDir = ./output
+FlashFeedback = false
 UnattendedTests = false
 TestGenerator = random
 StartupTime = 2.0
@@ -196,3 +197,4 @@ VisualizeActions = true
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
 OfflineGraphConversion = true
+HeadlessMode = false

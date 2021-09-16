@@ -104,7 +104,8 @@ public class CanvasDimensions extends Thread {
     // This assumes no status bars on the left or on the bottom
     try {
       List<Long> screen = (List<Long>)
-          WdDriver.executeScript("return canvasDimensionsTestar()");
+          WdDriver.executeScript(canvas_dimensions + "" +
+              "\nreturn canvasDimensionsTestar()");
       if (screen == null) {
         return;
       }
@@ -119,4 +120,14 @@ public class CanvasDimensions extends Thread {
 
     }
   }
+  
+  static final String canvas_dimensions = "function canvasDimensionsTestar() {\n" +
+      "    return [window.screenX,\n" +
+      "        window.screenY + window.outerHeight - window.innerHeight,\n" +
+      "        document.documentElement.clientWidth,\n" +
+      "        document.documentElement.clientHeight,\n" +
+      "        window.innerWidth,\n" +
+      "        window.innerHeight\n" +
+      "    ];\n" +
+      "}";
 }
