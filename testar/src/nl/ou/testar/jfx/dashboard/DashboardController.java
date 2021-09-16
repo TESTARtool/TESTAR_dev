@@ -1,17 +1,18 @@
 package nl.ou.testar.jfx.dashboard;
 
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.special.DisplayShelf;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.RuntimeControlsProtocol;
 import org.fruit.monkey.Settings;
 
-import javax.swing.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -113,5 +114,14 @@ public class DashboardController extends ViewController {
         btnViewReports.setOnAction(event -> {
             startTesting(view, RuntimeControlsProtocol.Modes.View);
         });
+
+        HBox carouselBox = (HBox) view.lookup("#carouselBox");
+        final String imagePaths[] = {"/logos/ing.png", "/logos/marviq.png", "/logos/open_university.png", "/logos/philips.png", "/logos/sogeti.png"};
+        final Image images[] = Arrays.stream(imagePaths).map(path -> new Image(path)).toArray(Image[]::new);
+        DisplayShelf carouselView = new DisplayShelf(images);
+        carouselBox.getChildren().add(carouselView);
+        carouselView.prefWidthProperty().bind(carouselBox.widthProperty());
+        carouselView.prefHeightProperty().bind(carouselBox.heightProperty());
+//        System.out.println(String.format("Box size: %dx%d", (int) Math.round(carouselBox.getPrefWidth()), (int) Math.round(carouselBox.getPrefHeight())));
     }
 }

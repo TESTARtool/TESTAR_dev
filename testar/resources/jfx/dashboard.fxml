@@ -90,7 +90,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="BOTTOM_CENTER" minHeight="24.0" prefHeight="42.0">
+      <HBox alignment="BOTTOM_CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0">
          <children>
             <Label text="Our partners" textFill="WHITE">
                <font>
@@ -99,34 +99,6 @@
             </Label>
          </children>
       </HBox>
-      <HBox alignment="CENTER" minHeight="60.0" prefHeight="80.0">
-         <children>
-            <ImageView scaleX="0.75" scaleY="0.75">
-               <image>
-                  <Image url="@logos/ing.png" />
-               </image>
-            </ImageView>
-            <ImageView scaleX="0.75" scaleY="0.75">
-               <image>
-                  <Image url="@logos/marviq.png" />
-               </image>
-            </ImageView>
-            <ImageView scaleX="0.75" scaleY="0.75">
-               <image>
-                  <Image url="@logos/open_university.png" />
-               </image>
-            </ImageView>
-            <ImageView scaleX="0.75" scaleY="0.75">
-               <image>
-                  <Image url="@logos/philips.png" />
-               </image>
-            </ImageView>
-            <ImageView scaleX="0.75" scaleY="0.75">
-               <image>
-                  <Image url="@logos/sogeti.png" />
-               </image>
-            </ImageView>
-         </children>
-      </HBox>
+      <HBox id="carouselBox" alignment="CENTER" minHeight="60.0" prefHeight="120.0" />
    </children>
 </VBox>
