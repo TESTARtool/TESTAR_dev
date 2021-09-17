@@ -52,13 +52,22 @@ then
   done
 fi
 
+### We move to dumper folder to have all the metrics in the same place
+cd /home/testar/dumper_parabank/
+### Create a text file to print performance metrics
+filedate=$(date +performanceMetrics_%Y_%m_%d_%H_%M_%S).txt
+touch $filedate
+
 ### Wait until all docker containers have finished
 until [ -z "$(docker ps -a -q --filter "status=running")" ]
 do
   sleep 30
   echo "Waiting for TESTAR docker containers to finish the GUI exploration..."
   ### Print the total cpu and memory usage of all the processes (OrientDB, Apache Tomcat, Dockers, Java Dumper)
-  ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU % " cpu " , MEM % " mem }1' | tail -n 1
+  #ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU | " cpu " | MEM | " mem }1' | tail -n 1
+  per=$(ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU | " cpu " | MEM | " mem }1' | tail -n 1)
+  nodes=$(docker ps -a -q --filter "status=running" | wc -l)
+  echo "Time | $(date +%Y_%m_%d_%H_%M_%S) | Dockers | $nodes | $per" >> $filedate
 done
 
 ### Stop apache server, jacoco dumper will end automatically
@@ -70,7 +79,25 @@ cd /home/testar/
 
 ### Wait a bit in case jacocoDumper has some thread finishing
 sleep 20
-### Cope web metrics results to samba server
-cd /home/testar/dumper_parabank/
-cp webCoverageMetrics* /home/testar/qsamba/results/
-cp stateModelMetrics* /home/testar/qsamba/results/
+
+if [ $# -eq 0 ]
+then
+  ### Create folder if does not exist
+  mkdir -p /home/testar/qsamba/results/docker_test
+  ### Copy web metrics results to samba server
+  cd /home/testar/dumper_parabank/
+  cp webCoverageMetrics* /home/testar/qsamba/results/docker_test
+  cp stateModelMetrics* /home/testar/qsamba/results/docker_test
+  cp performanceMetrics* /home/testar/qsamba/results/docker_test
+fi
+
+if [ $# -eq 1 ]
+then
+  ### Create folder if does not exist
+  mkdir -p /home/testar/qsamba/results/dockers_$1
+  ### Copy web metrics results to samba server
+  cd /home/testar/dumper_parabank/
+  cp webCoverageMetrics* /home/testar/qsamba/results/dockers_$1
+  cp stateModelMetrics* /home/testar/qsamba/results/dockers_$1
+  cp performanceMetrics* /home/testar/qsamba/results/dockers_$1
+fi
