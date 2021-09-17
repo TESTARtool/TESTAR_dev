@@ -313,7 +313,27 @@ public class ProtocolUtil {
 		Rect rectSUT = viewPortRect;
 		for (Widget w : state) {
 			if(w.get(Tags.Shape, null) != null && !w.get(Tags.Role, Roles.Process).equals(Roles.Process)) {
-				Rect widgetRect = Rect.from(w.get(Tags.Shape).x(), w.get(Tags.Shape).y(), w.get(Tags.Shape).width(), w.get(Tags.Shape).height());
+				double xPos = w.get(Tags.Shape).x();
+				double yPos = w.get(Tags.Shape).y();
+				// Minus values are invalid, change them to 0
+				double width = Math.max(w.get(Tags.Shape).width(), 0d);
+				double height = Math.max(w.get(Tags.Shape).height(), 0d);
+				// Widget x coordinate can be out of screen
+				if(xPos < 0d) {
+					width -= xPos;
+					xPos = 0d;
+				}
+				// Widget y coordinate can be out of screen
+				if(yPos < 0d) {
+					height -= yPos;
+					yPos = 0d;
+				}
+				// Validate width and height
+				if(width <= 0d || height <= 0d) {
+					return viewPortRect;
+				}
+
+				Rect widgetRect = Rect.from(xPos, yPos, width, height);
 				if(!Rect.contains(rectSUT, widgetRect)) {
 					rectSUT = Rect.union(rectSUT, widgetRect);
 				}
