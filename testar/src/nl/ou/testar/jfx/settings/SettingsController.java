@@ -4,6 +4,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.settings.child.*;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.io.File;
@@ -40,5 +41,7 @@ public class SettingsController extends ViewController {
         btnState.setOnAction(event -> {
             getNavigationController().navigateTo(new StateSettingsController(settings, settingsPath), true);
         });
+
+        btnState.setDisable(!settings.get(ConfigTags.StateModelEnabled, false));
     }
 }

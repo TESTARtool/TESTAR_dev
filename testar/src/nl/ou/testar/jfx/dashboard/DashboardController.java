@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import nl.ou.testar.jfx.core.ViewController;
-import nl.ou.testar.jfx.special.DisplayShelf;
+import nl.ou.testar.jfx.thirdparty.DisplayShelf;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.RuntimeControlsProtocol;
 import org.fruit.monkey.Settings;
