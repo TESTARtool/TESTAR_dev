@@ -9,7 +9,7 @@ import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.monkey.Settings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import nl.ou.testar.jfx.special.DisplayShelf;
+import nl.ou.testar.jfx.thirdparty.DisplayShelf;
 
 import java.io.File;
 import java.util.Arrays;

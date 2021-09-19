@@ -29,7 +29,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package nl.ou.testar.jfx.special;
+package nl.ou.testar.jfx.thirdparty;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -152,7 +152,7 @@ public class DisplayShelf extends Region {
             }
             while (offset < -SPACING && scrollBar.getValue() < images.length - 1) {
                 offset += SPACING;
-                pressedX += SPACING;
+                pressedX -= SPACING;
                 scrollBar.setValue(scrollBar.getValue() + 1);
             }
 //            scrollBar.setValue();
