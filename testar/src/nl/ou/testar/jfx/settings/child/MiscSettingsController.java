@@ -24,6 +24,10 @@ public class MiscSettingsController extends ChildSettingsController {
     private String outPath = settings.get(ConfigTags.OutputDir);
     private String tmpPath = settings.get(ConfigTags.TempDir);
 
+    private CheckBox webFollowLinks;
+    private CheckBox webBrowserFullscreen;
+    private CheckBox webSwitchNewTabs;
+
     public MiscSettingsController(Settings settings, String settingsPath) {
         super("", settings, settingsPath);
     }
@@ -34,6 +38,9 @@ public class MiscSettingsController extends ChildSettingsController {
         try {
             putSection(view, "Misc", "jfx/settings_misc.fxml");
             putSection(view, "Files on SUT startup", "jfx/settings_startup.fxml");
+            if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+                putSection(view, "Web settings", "jfx/settings_web.fxml");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -246,6 +253,16 @@ public class MiscSettingsController extends ChildSettingsController {
             };
             return cell;
         });
+
+        if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+            webFollowLinks = (CheckBox) view.lookup("#webFollowLinks");
+            webBrowserFullscreen = (CheckBox) view.lookup("#webBrowserFullscreen");
+            webSwitchNewTabs = (CheckBox) view.lookup("#webSwitchNewTabs");
+
+            webFollowLinks.setSelected(settings.get(ConfigTags.FollowLinks));
+            webBrowserFullscreen.setSelected(settings.get(ConfigTags.BrowserFullScreen));
+            webSwitchNewTabs.setSelected(settings.get(ConfigTags.SwitchNewTabs));
+        }
     }
 
     @Override
@@ -254,5 +271,10 @@ public class MiscSettingsController extends ChildSettingsController {
         settings.set(ConfigTags.TempDir, tmpPath);
         settings.set(ConfigTags.CopyFromTo, copyTable.getItems());
         settings.set(ConfigTags.Delete, deleteTable.getItems());
+        if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+            settings.set(ConfigTags.FollowLinks, webFollowLinks.isSelected());
+            settings.set(ConfigTags.BrowserFullScreen, webBrowserFullscreen.isSelected());
+            settings.set(ConfigTags.BrowserFullScreen, webSwitchNewTabs.isSelected());
+        }
     }
 }

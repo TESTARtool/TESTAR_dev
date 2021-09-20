@@ -94,6 +94,9 @@ public class GeneralSettingsController extends ChildSettingsController {
         generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue));
 
         DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
+        if (selectedDisplayMode == null) {
+            selectedDisplayMode = dev.getDisplayMode();
+        }
         int selectedWidth = selectedDisplayMode.getWidth();
         int selectedHeight = selectedDisplayMode.getHeight();
         int displayModeIndex = 0;

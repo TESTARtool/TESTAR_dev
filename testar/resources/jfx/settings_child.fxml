@@ -9,7 +9,7 @@
 
 <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb #4d8acb #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox alignment="TOP_RIGHT">
+      <HBox alignment="TOP_RIGHT" prefHeight="500.0">
          <children>
             <VBox id="contentBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <opaqueInsets>
