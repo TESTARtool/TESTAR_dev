@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.Policies;
 
+import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.ReinforcementLearning.Utils.ReinforcementLearningUtil;
 import org.fruit.alayer.Tag;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +29,9 @@ public class PolicyFactory {
             case "BoltzmannDistributedExplorationPolicy":
                 selectedPolicy = getBoltzmannDistributedExplorationPolicy(settings);
                 break;
+            case "EpsilonGreedyDoubleQPolicy":
+                selectedPolicy = getEpsilonGreedyDoubleQPolicy(settings);
+                break;
             default:
                 selectedPolicy = getGreedyPolicy(settings);
         }
@@ -48,6 +52,14 @@ public class PolicyFactory {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new GreedyPolicy<Float>(defaultQValue, tag);
+    }
+
+    private static Policy getEpsilonGreedyDoubleQPolicy(final Settings settings) {
+        final float epsilon = settings.get(ConfigTags.Epsilon, 0.4f);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
+        Tag<Float> tagB = (Tag<Float>) RLTags.getTag("secondqvalue");
+        return new EpsilonGreedyDoubleQPolicy(new GreedyDoubleQPolicy<Float>(defaultQValue, tag, tagB), epsilon);
     }
 
     private static Policy getOptimisticQValuesInitializationPolicy(final Settings settings) {
