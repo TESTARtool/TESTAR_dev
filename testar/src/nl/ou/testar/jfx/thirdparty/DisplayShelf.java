@@ -59,13 +59,8 @@ public class DisplayShelf extends Region {
 
     private final Duration DURATION = Duration.millis(500);
     private final Interpolator INTERPOLATOR = Interpolator.EASE_BOTH;
-    private final double SPACING = 100;
     private final double LEFT_OFFSET = -110;
     private final double RIGHT_OFFSET = 110;
-    private final double TOP_OFFSET = 165;
-    private final double SCALE_LARGE = 0.55;
-    private final double SCALE_SMALL = 0.35;
-    private final double ASPECT_RATIO = 0.25;
     private PerspectiveImage[] items;
     private Group centered = new Group();
     private Group left = new Group();
@@ -77,16 +72,26 @@ public class DisplayShelf extends Region {
     private boolean localChange = false;
     private Rectangle clip = new Rectangle();
 
+    // These settings were changed/added in ticket IVS-128 to conform our style
+    // @author Michael Tikhonenko (Marviq B.V)
+    private final double SPACING = 100;
+    private final double SCALE_LARGE = 0.55;
+    private final double SCALE_SMALL = 0.35;
+    private final double TOP_OFFSET = 165;
+    private final double ASPECT_RATIO = 0.25;
+    // End of changes by IVS-128
+
+    // This variable was added in ticket IVS-128 to implement panning
+    // @author Michael Tikhonenko (Marviq B.V)
     private double pressedX;
 
     public DisplayShelf(Image[] images) {
         // set clip
         setClip(clip);
-        // set background gradient using css
-//        setStyle("-fx-background-color: linear-gradient(to bottom,"
-//                + " black 60, #141414 60.1%, black 100%);");
-        // style scroll bar color
-//        scrollBar.setStyle("-fx-base: #202020; -fx-background: #202020;");
+
+        // Custom scroll bar style removed in ticket IVS-128 - not applicable for us
+        // @author Michael Tikhonenko (Marviq B.V)
+
         // create items
         items = new PerspectiveImage[images.length];
         for (int i = 0; i < images.length; i++) {
@@ -138,7 +143,8 @@ public class DisplayShelf extends Region {
             }
         });
 
-
+        // These 2 methods was added in ticket IVS-128 to implement panning
+        // @author Michael Tikhonenko (Marviq B.V)
         setOnMousePressed(event -> {
             pressedX = event.getX();
         });
@@ -155,8 +161,8 @@ public class DisplayShelf extends Region {
                 pressedX -= SPACING;
                 scrollBar.setValue(scrollBar.getValue() + 1);
             }
-//            scrollBar.setValue();
         });
+        // End of changes by IVS-128
 
         // update
         update();
@@ -201,19 +207,25 @@ public class DisplayShelf extends Region {
             double newX = -left.getChildren().size()
                     * SPACING + SPACING * i + LEFT_OFFSET;
             keyFrames.add(new KeyFrame(DURATION,
+                    // These settings were changed/added in ticket IVS-128 to conform our style
+                    // @author Michael Tikhonenko (Marviq B.V)
                     new KeyValue(it.translateXProperty(), newX, INTERPOLATOR),
                     new KeyValue(it.translateYProperty(), TOP_OFFSET, INTERPOLATOR),
                     new KeyValue(it.scaleXProperty(), SCALE_SMALL, INTERPOLATOR),
                     new KeyValue(it.scaleYProperty(), ASPECT_RATIO * SCALE_SMALL, INTERPOLATOR),
+                    // End of changes by IVS-128
                     new KeyValue(it.angle, 45.0, INTERPOLATOR)));
         }
         // add keyframe for center item
         final PerspectiveImage centerItem = items[centerIndex];
         keyFrames.add(new KeyFrame(DURATION,
+                // These settings were changed/added in ticket IVS-128 to conform our style
+                // @author Michael Tikhonenko (Marviq B.V)
                 new KeyValue(centerItem.translateXProperty(), 0, INTERPOLATOR),
                 new KeyValue(centerItem.translateYProperty(), TOP_OFFSET, INTERPOLATOR),
                 new KeyValue(centerItem.scaleXProperty(), SCALE_LARGE, INTERPOLATOR),
                 new KeyValue(centerItem.scaleYProperty(), ASPECT_RATIO * SCALE_LARGE, INTERPOLATOR),
+                // End of changes by IVS-128
                 new KeyValue(centerItem.angle, 90.0, INTERPOLATOR)));
         // add keyframes for right items
         for (int i = 0; i < right.getChildren().size(); i++) {
@@ -221,10 +233,13 @@ public class DisplayShelf extends Region {
             final double newX = right.getChildren().size()
                     * SPACING - SPACING * i + RIGHT_OFFSET;
             keyFrames.add(new KeyFrame(DURATION,
+                    // These settings were changed/added in ticket IVS-128 to conform our style
+                    // @author Michael Tikhonenko (Marviq B.V)
                     new KeyValue(it.translateXProperty(), newX, INTERPOLATOR),
                     new KeyValue(it.translateYProperty(), TOP_OFFSET, INTERPOLATOR),
                     new KeyValue(it.scaleXProperty(), SCALE_SMALL, INTERPOLATOR),
                     new KeyValue(it.scaleYProperty(), ASPECT_RATIO * SCALE_SMALL, INTERPOLATOR),
+                    // End of changes by IVS-128
                     new KeyValue(it.angle, 135.0, INTERPOLATOR)));
         }
         // play animation
