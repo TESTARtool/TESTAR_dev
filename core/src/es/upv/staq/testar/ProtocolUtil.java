@@ -312,7 +312,7 @@ public class ProtocolUtil {
 	private static Rect calculateRectOfSUT(State state, Rect viewPortRect) {
 		Rect rectSUT = viewPortRect;
 		for (Widget w : state) {
-			if(w.get(Tags.Shape, null) != null && !w.get(Tags.Role, Roles.Process).equals(Roles.Process)) {
+			if(w.get(Tags.Enabled, false) && w.get(Tags.Shape, null) != null && !w.get(Tags.Role, Roles.Process).equals(Roles.Process)) {
 				double xPos = w.get(Tags.Shape).x();
 				double yPos = w.get(Tags.Shape).y();
 				// Minus values are invalid, change them to 0
