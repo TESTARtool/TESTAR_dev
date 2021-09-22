@@ -130,8 +130,14 @@ public class DatabaseTestReport implements TestReport {
     }
 
     private int addAction(State state, Action action) throws SQLException {
+
+        Timestamp timestamp = null;
+        if( state.get(Tags.TimeStamp, null) != null) {
+            timestamp = new Timestamp(state.get(Tags.TimeStamp));
+        }
+
         return sqlService.registerAction(action.toShortString(), action.toString(),
-                    state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath),
-                    new Timestamp(state.get(Tags.TimeStamp)));
+                    state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
+                    timestamp);
     }
 }
