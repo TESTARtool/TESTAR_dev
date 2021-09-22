@@ -1,15 +1,25 @@
 package nl.ou.testar.jfx.settings.child;
 
 import com.jfoenix.controls.JFXTextArea;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import nl.ou.testar.jfx.controls.TagControl;
+import nl.ou.testar.jfx.controls.TagInput;
 import org.apache.commons.lang3.StringUtils;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FilterSettingsController extends ChildSettingsController {
 
@@ -22,32 +32,98 @@ public class FilterSettingsController extends ChildSettingsController {
             "Suspicious Process Output (regular expression)"
     };
 
-    private String values[] = new String[6];
-
     private int selectedIndex = 0;
 
     private Label descriptionLabel;
     private JFXTextArea textArea;
+    private FlowPane tagsPane;
     private Button choiceButtons[] = new Button[6];
+
+    private String clickFilter;
+    private String processesToKill;
+    private String suspiciousTitles;
+    private String suspiciousProcessOutput;
+
+    private List<String> filterTags;
+    private List<String> oracleTags;
+
+    FXMLLoader tagLoader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/tag.fxml"));
 
     private void selectItem(int index) {
         if (index == selectedIndex) {
             return;
         }
-        values[selectedIndex] = textArea.getText();
+
+        storeValue(selectedIndex);
+
         setSelection(selectedIndex, false);
         setSelection(index, true);
         selectedIndex = index;
     }
 
+    private void storeValue(int index) {
+        switch(index) {
+            case 0:
+                clickFilter = textArea.getText();
+                break;
+            case 1:
+                filterTags = readTagsFromPane(tagsPane);
+                break;
+            case 2:
+                processesToKill = textArea.getText();
+                break;
+            case 3:
+                suspiciousTitles = textArea.getText();
+                break;
+            case 4:
+                oracleTags = readTagsFromPane(tagsPane);
+                break;
+            default:
+                suspiciousProcessOutput = textArea.getText();
+                break;
+        }
+    }
+
     private void setSelection(int index, boolean selected) {
         if (selected) {
             descriptionLabel.setText(descriptions[index]);
-            textArea.setText(values[index]);
             choiceButtons[index].setStyle("-fx-background-color:#a7a7a7;-fx-background-radius:18");
         }
         else {
             choiceButtons[index].setStyle("-fx-background-color:#f7f7f7;;-fx-background-radius:18");
+        }
+
+        switch (index) {
+            case 0:
+                textArea.setVisible(true);
+                tagsPane.setVisible(false);
+                textArea.setText(clickFilter);
+                break;
+            case 1:
+                textArea.setVisible(false);
+                tagsPane.setVisible(true);
+                fillPaneWithTags(tagsPane, filterTags);
+                break;
+            case 2:
+                textArea.setVisible(true);
+                tagsPane.setVisible(false);
+                textArea.setText(processesToKill);
+                break;
+            case 3:
+                textArea.setVisible(true);
+                tagsPane.setVisible(false);
+                textArea.setText(suspiciousTitles);
+                break;
+            case 4:
+                textArea.setVisible(false);
+                tagsPane.setVisible(true);
+                fillPaneWithTags(tagsPane, oracleTags);
+                break;
+            default:
+                textArea.setVisible(true);
+                tagsPane.setVisible(false);
+                textArea.setText(suspiciousProcessOutput);
+                break;
         }
     }
 
@@ -64,18 +140,21 @@ public class FilterSettingsController extends ChildSettingsController {
             e.printStackTrace();
         }
 
-        values[0] = settings.get(ConfigTags.ClickFilter);
-        values[1] = StringUtils.join(settings.get(ConfigTags.TagsToFilter));
-        values[2] = settings.get(ConfigTags.ProcessesToKillDuringTest);
-        values[3] = settings.get(ConfigTags.SuspiciousTitles);
-        values[4] = StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle));
-        values[5] = settings.get(ConfigTags.SuspiciousProcessOutput);
+        clickFilter = settings.get(ConfigTags.ClickFilter);
+        filterTags = settings.get(ConfigTags.TagsToFilter);
+        processesToKill = settings.get(ConfigTags.ProcessesToKillDuringTest);
+        suspiciousTitles = settings.get(ConfigTags.SuspiciousTitles);
+        oracleTags = settings.get(ConfigTags.TagsForSuspiciousOracle);
+        suspiciousProcessOutput = settings.get(ConfigTags.SuspiciousProcessOutput);
 
         descriptionLabel = (Label) view.lookup("#descriptionLabel");
         textArea = (JFXTextArea) view.lookup("#textArea");
+        tagsPane = (FlowPane) view.lookup("#tagsPane");
 
         choiceButtons[0] = (Button) view.lookup("#btnFilterClick");
-        choiceButtons[0].setOnAction(event -> {selectItem(0);});
+        choiceButtons[0].setOnAction(event -> {
+            selectItem(0);
+        });
         choiceButtons[1] = (Button) view.lookup("#btnFilterTags");
         choiceButtons[1].setOnAction(event -> {selectItem(1);});
         choiceButtons[2] = (Button) view.lookup("#btnFilterProcess");
@@ -90,13 +169,49 @@ public class FilterSettingsController extends ChildSettingsController {
         setSelection(selectedIndex, true);
     }
 
+    private void fillPaneWithTags(FlowPane pane, List<String> tags) {
+        pane.getChildren().clear();
+        System.out.println(String.format("Found %d tag(s)", tags.size()));
+        pane.getChildren().addAll(tags.stream().map(tag -> {
+            final TagControl tagControl = new TagControl(tag);
+            tagControl.setDelegate(() -> {
+                pane.getChildren().remove(tagControl);
+            });
+            return tagControl;
+        }/*new TagControl(tag, new TagControl.Delegate() {
+            @Override
+            public void onClose() {
+                pane.getChildren().remove(this);
+            }
+        }*/).collect(Collectors.toList()));
+
+        final TagInput tagInput = new TagInput();
+        tagInput.setDelegate(tag -> {
+            int index = pane.getChildren().size() - 1;
+            final TagControl tagControl = new TagControl(tag);
+            tagControl.setDelegate(() -> {
+                pane.getChildren().remove(tagControl);
+            });
+            pane.getChildren().add(index, tagControl);
+            tagInput.clear();
+        });
+        pane.getChildren().add(tagInput);
+    }
+
+    private List<String> readTagsFromPane(FlowPane pane) {
+        return pane.getChildren().stream().filter(child -> TagControl.class.isInstance(child))
+                .map(child -> ((TagControl) child).getTag()).collect(Collectors.toList());
+    }
+
     @Override
     protected void save(Settings settings) {
-        settings.set(ConfigTags.ClickFilter, values[0]);
-        settings.set(ConfigTags.TagsToFilter, Arrays.asList(values[1].split(";")));
-        settings.set(ConfigTags.ProcessesToKillDuringTest, values[2]);
-        settings.set(ConfigTags.SuspiciousTitles, values[3]);
-        settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(values[4].split(";")));
-        settings.set(ConfigTags.SuspiciousProcessOutput, values[5]);
+        storeValue(selectedIndex);
+
+        settings.set(ConfigTags.ClickFilter, clickFilter);
+        settings.set(ConfigTags.TagsToFilter, filterTags);
+        settings.set(ConfigTags.ProcessesToKillDuringTest, processesToKill);
+        settings.set(ConfigTags.SuspiciousTitles, suspiciousTitles);
+        settings.set(ConfigTags.TagsForSuspiciousOracle, oracleTags);
+        settings.set(ConfigTags.SuspiciousProcessOutput, suspiciousProcessOutput);
     }
 }
