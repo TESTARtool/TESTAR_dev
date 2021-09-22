@@ -4,11 +4,43 @@ import pyorient
 
 class OrientDB:
     def __init__(self, host: str, port: int, user: str, database: str, password: str):
-        self._client = pyorient.OrientDB(host, port)
-        self.database = self._client.db_open(database, user, password)
+        self._host = host
+        self._port = port
+        self._database = database
+        self._user = user
+        self._password = password
+        self._authenticate()
+        
+    def _authenticate(self):
+        self._client = pyorient.OrientDB(self._host, self._port)
+        self.database = self._client.db_open(self._database, self._user, self._password)
 
-    def query(self, command, **kwargs) -> list:
-        return self._client.query(command, **kwargs)
+
+    def query(self, command: str, **kwargs) -> list:
+        """Execute query on OrientDB.
+
+        Each query has one retry unless `retries` has been set to one.
+        TODO: There is no protected from SQL injection. This should be implemented
+
+        Args:
+            command (str): Query that should be executed on the database
+
+        Raises:
+            pyorient.exceptions.PyOrientSecurityException: Raised when the token has been expired
+
+        Returns:
+            list: Of oRecord objects
+        """
+        try: 
+            return self._client.query(command, **kwargs)
+        except pyorient.exceptions.PyOrientSecurityException as ex: 
+            if kwargs.get('retries', 0) == 1:
+                raise ex
+
+            # Retry
+            self._authenticate()
+            kwargs['retries'] = 1
+            return self.query(command, **kwargs)
 
     def concrete_states(self) -> list:
         states = self.query('SELECT format("%s", @rid), * FROM ConcreteState')
