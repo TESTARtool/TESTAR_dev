@@ -1,0 +1,7 @@
+output/
+testar-db/
+supervisord.pid
+
+# Python
+__pycache__
+*.pyc

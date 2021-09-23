@@ -45,11 +45,14 @@ public class WdRootElement extends WdElement {
 
   public WdRootElement(Map<String, Object> packedbody) {
     super(packedbody, null, null);
+
     root = this;
     parent = this;
     isForeground = (Boolean) packedbody.get("documentHasFocus");
     documentTitle = (String) packedbody.get("documentTitle");
     blocked = false;
+
+    setupXPaths("/html[1]/body[1]");
   }
 
   public WdElement at(double x, double y) {

@@ -34,6 +34,7 @@ package org.testar.protocols;
 import nl.ou.testar.DerivedActions;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.SequenceReport;
 import org.fruit.Drag;
 import org.fruit.Environment;
 import org.fruit.alayer.*;
@@ -53,7 +54,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected SequenceReport htmlReport;
     protected State latestState;
 
     /**

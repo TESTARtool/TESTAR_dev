@@ -31,21 +31,17 @@
 
 package nl.ou.testar.HtmlReporting;
 
+import nl.ou.testar.SequenceReport;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
+import org.fruit.alayer.*;
 import org.testar.OutputStructure;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.io.*;
-import java.nio.file.Paths;
 import java.util.Set;
 
-public class HtmlSequenceReport {
+public class HtmlSequenceReport implements SequenceReport {
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;

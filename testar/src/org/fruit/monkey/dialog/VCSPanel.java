@@ -1,12 +1,17 @@
 package org.fruit.monkey.dialog;
 
 import org.eclipse.jgit.lib.ProgressMonitor;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.monkey.SettingsPanel;
 import org.fruit.monkey.codeanalysis.CodeAnalysisService;
 import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
 import org.fruit.monkey.codeanalysis.RepositoryLanguage;
 import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
+import org.fruit.monkey.docker.DockerPoolService;
+import org.fruit.monkey.sonarqube.SonarqubeService;
+import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
+import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;
 import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
@@ -16,8 +21,11 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -46,6 +54,7 @@ public class VCSPanel extends SettingsPanel {
     private final JProgressBar[] languageContentProgressBars = new JProgressBar[LANGUAGES_TO_DISPLAY];
     private final JLabel[] languageContentLabels = new JLabel[LANGUAGES_TO_DISPLAY];
     private JButton fullScanningReportButton;
+    private JButton sonarqubeButton;
     private final static int LANGUAGES_TO_DISPLAY = 3;
     private final static int LANGUAGE_CONTENT_BAR_MIN = 0;
     private final static int LANGUAGE_CONTENT_BAR_MAX = 100;
@@ -61,19 +70,33 @@ public class VCSPanel extends SettingsPanel {
     private final static String CLONE_SUCCESS_MESSAGE = "Repository cloned successfully";
     private final static String CLONE_PROCESSING_LABEL = "Cloning project...";
     private final static String FULL_REPORT_BUTTON = "Full report";
+    private final static String SONARQUBE_BUTTON = "Sonarqube";
     private final static String CLONING_PROPERTY = "cloning_property";
 
+    private final static String DOCKER_UNAVAILABLE_TITLE = "Docker not available";
+    private final static String DOCKER_UNAVAILABLE_MESSAGE = "Docker seems not to be up and running on your machine";
+    private final static String BTN_CANCEL = "Cancel";
+    private final static String BTN_INSTALL_DOCKER = "Install Docker >>";
+
+    private final static String DOCKER_LINK = "https://docs.docker.com/get-docker/";
 
     private PropertyChangeSupport propertyChangeSupport;
 
     private GitService gitService;
     private CodeAnalysisService codeAnalysisService;
+    private DockerPoolService dockerService;
+    private SonarqubeService sonarqubeService;
 
     private RepositoryLanguageComposition repositoryComposition;
+    private String sonarqubeConfPath;
+    private String sonarqubeClientConfPath;
+    private Path repositoryPath;
 
     public VCSPanel() {
         gitService = new GitServiceImpl();
         codeAnalysisService = new CodeAnalysisServiceImpl();
+        sonarqubeService = new SonarqubeServiceImpl("sonarqube");
+        dockerService = sonarqubeService.getDockerService();
         propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(this::cloneFinished);
         initGitRepositoryUrlSection();
@@ -151,6 +174,11 @@ public class VCSPanel extends SettingsPanel {
         cloneProcessingLabel = new JLabel(CLONE_PROCESSING_LABEL);
         cloneProcessingProgressBar = new JProgressBar();
         cloneTaskLabel = new JLabel();
+
+        //TEMP
+        gitRepositoryUrlTextField.setText("https://github.com/SeleniumHQ/selenium-ide");
+        authorizationRequiredCheckBox.setSelected(false);
+
         toggleCloneProcessingVisibility(false);
     }
 
@@ -159,6 +187,7 @@ public class VCSPanel extends SettingsPanel {
             toggleLanguageVisibility(visible, i);
         }
         this.fullScanningReportButton.setVisible(visible);
+        this.sonarqubeButton.setVisible(visible);
     }
 
     private void toggleLanguageVisibility(boolean visible, int index) {
@@ -170,8 +199,9 @@ public class VCSPanel extends SettingsPanel {
         toggleCloneProcessingVisibility(true);
         new Thread(() -> {
             GitCredentials credentials = new GitCredentials(gitUsernameTextField.getText(), new String(gitPasswordField.getPassword()));
-            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
+            repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), credentials, new ProgressBarMonitor());
             scanRepository(repositoryPath);
+            System.out.println("Repository path: " + (repositoryPath == null ? "N/A" : repositoryPath.toString()));
             toggleCloneProcessingVisibility(false);
             viewRepositoryComposition();
             propertyChangeSupport.firePropertyChange(CLONING_PROPERTY, null, repositoryPath);
@@ -198,9 +228,9 @@ public class VCSPanel extends SettingsPanel {
         for (int i = 0; (i < LANGUAGES_TO_DISPLAY) && (i < repositoryComposition.getRepositoryLanguages().size()); i++) {
             setLanguageValue(repositoryLanguages.get(i), i);
         }
-        if (repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY) {
-            fullScanningReportButton.setVisible(true);
-        }
+        fullScanningReportButton.setEnabled(repositoryComposition.getRepositoryLanguages().size() > LANGUAGES_TO_DISPLAY);
+        fullScanningReportButton.setVisible(true);
+        this.sonarqubeButton.setVisible(true);
     }
 
     private void setLanguageValue(RepositoryLanguage repositoryLanguage, int index) {
@@ -223,7 +253,7 @@ public class VCSPanel extends SettingsPanel {
     private void cloneRepository() {
         toggleCloneProcessingVisibility(true);
         new Thread(() -> {
-            Path repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
+            repositoryPath = gitService.cloneRepository(gitRepositoryUrlTextField.getText(), new ProgressBarMonitor());
             scanRepository(repositoryPath);
             toggleCloneProcessingVisibility(false);
             viewRepositoryComposition();
@@ -240,11 +270,122 @@ public class VCSPanel extends SettingsPanel {
         this.fullScanningReportButton.addActionListener((event) -> {
             viewFullReport();
         });
+        this.sonarqubeButton = new JButton((SONARQUBE_BUTTON));
+        this.sonarqubeButton.addActionListener(event -> {
+            processWithSonarqube();
+        });
         toggleLanguageSectionVisibility(false);
     }
 
     private void viewFullReport() {
         new ScanningReportDialog(repositoryComposition);
+    }
+
+    private void processWithSonarqube() {
+        if (!dockerService.isDockerAvailable()) {
+            Object[] options = {BTN_CANCEL, BTN_INSTALL_DOCKER};
+            int n = JOptionPane.showOptionDialog(this,
+                    DOCKER_UNAVAILABLE_MESSAGE,
+                    DOCKER_UNAVAILABLE_TITLE,
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+            if (n > 0) {
+                try {
+                    Desktop.getDesktop().browse(new URI(DOCKER_LINK));
+                }
+                catch (Exception e) {}
+            }
+        }
+        else {
+            //TODO
+            String path = repositoryPath.toString();
+            if (!path.substring(path.length() - 1).equals(File.separator)) {
+                path += File.separator;
+            }
+            final String projectSourceDir = path;
+
+            final SonarqubeDialog sonarqubeDialog = new SonarqubeDialog(
+                    (JFrame) SwingUtilities.getWindowAncestor(this));/*,
+                    (projectName, projectKey) -> {
+                        new Thread(() -> {
+                            try {
+                                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath,
+                                        projectSourceDir, null);
+                            } catch (IOException e) {
+                                System.out.println("Something went wrong: " + e.getLocalizedMessage());
+                            }
+                        }).start();
+                    });*.
+            sonarqubeDialog.pack();
+            sonarqubeDialog.setLocationRelativeTo(null);
+            sonarqubeDialog.setVisible(true);*/
+
+            final Thread mainThread = Thread.currentThread();
+            sonarqubeDialog.setDelegate((projectName, projectKey) -> {
+
+                new Thread(() -> {
+                    try {
+                        sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath,
+                                projectSourceDir, new SonarqubeServiceDelegate() {
+
+                                    private boolean isComplete = false;
+
+                                    @Override
+                                    public void onInfoMessage(InfoStatus status, String message) {
+                                        sonarqubeDialog.setStatus(message);
+                                    }
+
+                                    @Override
+                                    public void onError(ErrorCode errorCode, String message) {
+                                        if (isComplete) {
+                                            return;
+                                        }
+                                        isComplete = true;
+
+                                        String errorTitle;
+                                        switch (errorCode) {
+                                            case SERVICE_ERROR:
+                                                errorTitle = "Service Failure";
+                                                break;
+                                            case CONNECTION_ERROR:
+                                                errorTitle = "Connection Failure";
+                                                break;
+                                            case SCANNER_ERROR:
+                                                errorTitle = "Scanner Failure";
+                                                break;
+                                            case ANALYSING_ERROR:
+                                                errorTitle = "Analysis Failure";
+                                                break;
+                                            default: //REPORT_ERROR
+                                                errorTitle = "Report Failure";
+                                                break;
+                                        }
+                                        sonarqubeDialog.showError(errorTitle, message);
+                                    }
+
+                                    @Override
+                                    public void onComplete(String report) {
+                                        if (isComplete) {
+                                            return;
+                                        }
+                                        isComplete = true;
+
+                                        sonarqubeDialog.complete("http://localhost:9000/dashboard?id=" + projectKey, report);
+                                    }
+                                });
+                    } catch (IOException e) {
+                        sonarqubeDialog.showError("Unknown Error", e.getLocalizedMessage());
+                    }
+                }).start();
+            });
+
+            sonarqubeDialog.pack();
+            sonarqubeDialog.setLocationRelativeTo(null);
+            sonarqubeDialog.setVisible(true);
+        }
     }
 
     /**
@@ -254,6 +395,13 @@ public class VCSPanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(Settings settings) {
+        String path = settings.get(ConfigTags.OutputDir);
+        if (!path.substring(path.length() - 1).equals(File.separator)) {
+            path += File.separator;
+        }
+        sonarqubeConfPath = path + "sonarqube" + File.separator;
+        sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
+
         GroupLayout groupLayout = new GroupLayout(this);
         this.setLayout(groupLayout);
         groupLayout.setHorizontalGroup(
@@ -305,7 +453,9 @@ public class VCSPanel extends SettingsPanel {
                                         .addComponent(languageContentLabels[2], 20, 60, 200))
                                 .addGroup(groupLayout.createSequentialGroup()
                                         .addGap(PREFERRED_SIZE, 138, PREFERRED_SIZE)
-                                        .addComponent(fullScanningReportButton))
+                                        .addComponent(fullScanningReportButton)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(sonarqubeButton))
                         ));
 
         groupLayout.setVerticalGroup(
@@ -351,7 +501,9 @@ public class VCSPanel extends SettingsPanel {
                                         .addComponent(languageContentProgressBars[2])
                                         .addComponent(languageContentLabels[2]))
                                 .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(fullScanningReportButton))
+                                        .addComponent(fullScanningReportButton)//)
+//                                .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(sonarqubeButton))
                                 .addPreferredGap(UNRELATED)
                         ));
     }

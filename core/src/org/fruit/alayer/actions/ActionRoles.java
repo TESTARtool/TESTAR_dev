@@ -70,5 +70,15 @@ public final class ActionRoles {
 	DropDown = Role.from("DropDown", Click, KeyDown),
 	PasteTextInto = Role.from("PasteTextInto", ClickAt, Paste),
 	Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),
-	LeftDrag = Role.from("LeftDrag", Drag);
+	LeftDrag = Role.from("LeftDrag", Drag),
+
+	Selenium = Role.from("Selenium"),
+	SeleniumClear = Role.from("Clear", Selenium),
+	SeleniumClick = Role.from("Click", Selenium),
+	SeleniumDrag = Role.from("Drag", Selenium),
+	SeleniumSendKeys = Role.from("SendKeys", Selenium),
+	SeleniumSubmit = Role.from("Submit", Selenium),
+
+	SeleniumDoubleClick = Role.from("DoubleClick", SeleniumClick),
+	SeleniumTripleClick = Role.from("TripleClick", SeleniumClick);
 }

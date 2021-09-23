@@ -94,6 +94,16 @@ public final class ConfigTags {
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
+
+  // MySQL reporting databse configuration
+  public static final Tag<String> SQLReporting = Tag.from("SQLReporting", String.class);
+  public static final Tag<String> SQLReportingType = Tag.from("SQLReportingType", String.class);
+  public static final Tag<String> SQLReportingServer = Tag.from("SQLReportingServer", String.class);
+  public static final Tag<String> SQLReportingUser = Tag.from("SQLReportingUser", String.class);
+  public static final Tag<String> SQLReportingDB = Tag.from("SQLReportingDB", String.class);
+  public static final Tag<String> SQLReportingDirectory = Tag.from("SQLReportingDirectory", String.class);
+  public static final Tag<String> SQLReportingPassword = Tag.from("SQLReportingPassword", String.class);
+
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
   public static final Tag<String> DataStore = Tag.from("DataStore", String.class);
@@ -109,6 +119,8 @@ public final class ConfigTags {
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
   public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
+  public static final Tag<String> ReportType = Tag.from("ReportType", String.class);
+  public static final Tag<Integer> ReportServicePort = Tag.from("ReportServicePort", Integer.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 

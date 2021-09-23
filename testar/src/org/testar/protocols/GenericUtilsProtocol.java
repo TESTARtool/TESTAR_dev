@@ -37,10 +37,7 @@ import nl.ou.testar.DerivedActions;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.*;
 import org.fruit.monkey.ConfigTags;
 
 import java.util.ArrayList;
@@ -70,7 +67,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
+                WidgetActionCompiler ac = new AnnotatingActionCompiler();
                 //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
                 executeAction(system,state,ac.leftClickAt(widget));
                 // is waiting needed after the action has been executed?
@@ -107,7 +104,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
+                WidgetActionCompiler ac = new AnnotatingActionCompiler();
                 executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
                 // is waiting needed after the action has been executed?
                 return true;
@@ -143,7 +140,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		//looking for a widget with matching tag value:
     		Widget widget = getWidgetWithMatchingTag(tag,value,state);
     		if(widget!=null){
-    			StdActionCompiler ac = new AnnotatingActionCompiler();
+                WidgetActionCompiler ac = new AnnotatingActionCompiler();
     			executeAction(system, state, ac.pasteTextInto(widget, textToPaste, true));
     			// is waiting needed after the action has been executed?
     			return true;
@@ -211,7 +208,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param widget
      */
     @Deprecated
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget){
+    protected void addSlidingActions(Set<Action> actions, WidgetActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget){
         Drag[] drags = null;
         //If there are scroll (drags/drops) actions possible
         if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
@@ -229,7 +226,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     @Deprecated
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+    protected void addSlidingActions(Set<Action> actions, WidgetActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
         addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
     }
 
@@ -243,7 +240,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param widget
      * @return DerivedActions with added sliding actions in the available actions
      */
-    protected DerivedActions addSlidingActions(DerivedActions derived, StdActionCompiler ac, Drag[] drags, Widget widget){
+    protected DerivedActions addSlidingActions(DerivedActions derived, WidgetActionCompiler ac, Drag[] drags, Widget widget){
 
             //TODO creates multiple drag actions for one widget?
             //For each possible drag, create an action and add it to the derived actions
