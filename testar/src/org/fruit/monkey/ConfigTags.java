@@ -145,6 +145,17 @@ public final class ConfigTags {
   public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
   public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
 
+  public static final Tag<String> GitUrl = Tag.from("GitUrl", String.class);
+  public static final Tag<String> GitUsername = Tag.from("GitUsername", String.class);
+  public static final Tag<String> GitToken = Tag.from("GitToken", String.class);
+  public static final Tag<String> GitBranch = Tag.from("GitBranch", String.class);
+
+  public static final Tag<String> SonarUrl = Tag.from("SonarUrl", String.class);
+  public static final Tag<String> SonarUsername = Tag.from("SonarUsername", String.class);
+  public static final Tag<String> SonarPassword = Tag.from("SonarPassword", String.class);
+  public static final Tag<Boolean> SonarDockerize = Tag.from("SonarDockerize", Boolean.class);
+  public static final Tag<Boolean> SonarSaveResult = Tag.from("SonarSaveResult", Boolean.class);
+
   /*
   //TODO web driver settings for login feature
   public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
