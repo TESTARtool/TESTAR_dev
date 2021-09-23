@@ -22,6 +22,7 @@ public class SettingsController extends ViewController {
         Button btnFilters = (Button) view.lookup("#btnFilters");
         Button btnTime = (Button) view.lookup("#btnTime");
         Button btnMisc = (Button) view.lookup("#btnMisc");
+        Button btnWhitebox = (Button) view.lookup("#btnWhitebox");
         Button btnState = (Button) view.lookup("#btnState");
 
         btnGeneral.setOnAction(event -> {
@@ -35,6 +36,9 @@ public class SettingsController extends ViewController {
         });
         btnMisc.setOnAction(event -> {
             getNavigationController().navigateTo(new MiscSettingsController(settings, settingsPath), true);
+        });
+        btnWhitebox.setOnAction(event -> {
+            getNavigationController().navigateTo(new WhiteboxSettingsController(settings, settingsPath), true);
         });
         btnState.setOnAction(event -> {
             getNavigationController().navigateTo(new StateSettingsController(settings, settingsPath), true);

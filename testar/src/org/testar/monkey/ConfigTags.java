@@ -150,6 +150,16 @@ public final class ConfigTags {
   public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class);
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
+  public static final Tag<String> GitUrl = Tag.from("GitUrl", String.class);
+  public static final Tag<String> GitUsername = Tag.from("GitUsername", String.class);
+  public static final Tag<String> GitToken = Tag.from("GitToken", String.class);
+  public static final Tag<String> GitBranch = Tag.from("GitBranch", String.class);
+
+  public static final Tag<String> SonarUrl = Tag.from("SonarUrl", String.class);
+  public static final Tag<String> SonarUsername = Tag.from("SonarUsername", String.class);
+  public static final Tag<String> SonarPassword = Tag.from("SonarPassword", String.class);
+  public static final Tag<Boolean> SonarDockerize = Tag.from("SonarDockerize", Boolean.class);
+  public static final Tag<Boolean> SonarSaveResult = Tag.from("SonarSaveResult", Boolean.class);
 
   /*
   //TODO web driver settings for login feature

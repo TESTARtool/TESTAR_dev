@@ -1,0 +1,97 @@
+package nl.ou.testar.jfx.settings.child;
+
+import javafx.scene.Parent;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
+
+import java.io.IOException;
+
+public class WhiteboxSettingsController extends ChildSettingsController {
+
+    private TextField gitUrlField;
+    private TextField gitUsernameField;
+    private TextField gitTokenField;
+    private TextField gitBranchField;
+
+    private TextField sonarUrlField;
+    private TextField sonarUsernameField;
+    private TextField sonarPasswordField;
+
+    private CheckBox sonarDockerizeBox;
+    private CheckBox sonarSaveResultBox;
+
+    public WhiteboxSettingsController(Settings settings, String settingsPath) {
+        super("Whitebox", settings, settingsPath);
+    }
+
+    @Override
+    public void viewDidLoad(Parent view) {
+        super.viewDidLoad(view);
+        try {
+            putSection(view, "Git", "jfx/settings_git.fxml");
+            putSection(view, "Sonarqube", "jfx/settings_sonarqube.fxml");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        gitUrlField = (TextField) view.lookup("#gitUrl");
+        gitUsernameField = (TextField) view.lookup("#gitUsername");
+        gitTokenField = (TextField) view.lookup("#gitToken");
+        gitBranchField = (TextField) view.lookup("#gitBranch");
+
+        sonarUrlField = (TextField) view.lookup("#sonarUrl");
+        sonarUsernameField = (TextField) view.lookup("#sonarUsername");
+        sonarPasswordField = (TextField) view.lookup("#sonarPassword");
+
+        sonarDockerizeBox = (CheckBox) view.lookup("#sonarDockerize");
+        sonarSaveResultBox = (CheckBox) view.lookup("#sonarSaveResult");
+
+        sonarDockerizeBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            updateSonarFields(newValue);
+        });
+
+        gitUrlField.setText(settings.get(ConfigTags.GitUrl, ""));
+        gitUsernameField.setText(settings.get(ConfigTags.GitUsername, ""));
+        gitTokenField.setText(settings.get(ConfigTags.GitToken, ""));
+        gitBranchField.setText(settings.get(ConfigTags.GitBranch, ""));
+
+        sonarUrlField.setText(settings.get(ConfigTags.SonarUrl, ""));
+        sonarUsernameField.setText(settings.get(ConfigTags.SonarUsername, ""));
+        sonarPasswordField.setText(settings.get(ConfigTags.SonarPassword, ""));
+
+        sonarDockerizeBox.setSelected(settings.get(ConfigTags.SonarDockerize, false));
+        sonarSaveResultBox.setSelected(settings.get(ConfigTags.SonarSaveResult, true));
+
+        updateSonarFields(sonarDockerizeBox.isSelected());
+    }
+
+    private void updateSonarFields(boolean dockerEnabled) {
+        if (dockerEnabled) {
+            sonarUrlField.setDisable(true);
+            sonarUsernameField.setDisable(true);
+            sonarPasswordField.setDisable(true);
+        }
+        else {
+            sonarUrlField.setDisable(false);
+            sonarUsernameField.setDisable(false);
+            sonarPasswordField.setDisable(false);
+
+        }
+    }
+
+    @Override
+    protected void save(Settings settings) {
+        // TODO: show alert view
+        settings.set(ConfigTags.GitUrl, gitUrlField.getText());
+        settings.set(ConfigTags.GitUsername, gitUsernameField.getText());
+        settings.set(ConfigTags.GitToken, gitTokenField.getText());
+        settings.set(ConfigTags.GitBranch, gitBranchField.getText());
+
+        settings.set(ConfigTags.SonarUrl, sonarUrlField.getText());
+        settings.set(ConfigTags.SonarUsername, sonarUsernameField.getText());
+        settings.set(ConfigTags.SonarPassword, sonarPasswordField.getText());
+    }
+}

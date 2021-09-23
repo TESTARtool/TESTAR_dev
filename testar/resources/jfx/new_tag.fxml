@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+
+
+<TextField id="newTagInput" prefHeight="26.0" prefWidth="120.0" promptText="New Tag" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" />
