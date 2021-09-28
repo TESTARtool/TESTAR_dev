@@ -22,11 +22,7 @@ class StateViewer {
   drawAction(action) {
     this.ctx.beginPath();
     this.ctx.lineWidth = "2";
-    if (action["toOracle"]) {
-    } else {
-    }
     this.ctx.strokeStyle = action["toOracle"] ? "#D6965E" : "#5E9ED5";
-
     this.ctx.rect(...action.shape);
     this.ctx.stroke();
   }
