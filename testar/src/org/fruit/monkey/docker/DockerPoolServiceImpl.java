@@ -173,7 +173,9 @@ public class DockerPoolServiceImpl implements DockerPoolService {
 
     public static void disposeAll(boolean alsoRemoveImages) {
         for (DockerPoolServiceImpl instance: registry) {
-            instance.disposeInternal(alsoRemoveImages);
+            if (instance.isDockerAvailable()) {
+                instance.disposeInternal(alsoRemoveImages);
+            }
         }
         registry.clear();
     }
