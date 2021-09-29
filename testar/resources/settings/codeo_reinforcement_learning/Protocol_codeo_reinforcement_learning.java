@@ -404,13 +404,13 @@ public class Protocol_codeo_reinforcement_learning extends DesktopProtocol {
 		super.closeTestSession();
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
-			//-extractJacocoRunReport();
-			//-compressOutputRunFolder();
-			//-copyOutputToNewFolderUsingIpAddress("N:");
+			extractJacocoRunReport();
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
 
-			copyJacocoBuildAllFile();
-            String runCoverageInfo = extractJacocoRunReport();
-            addRunJacocoCoverageDetails(runCoverageInfo);
+			//-copyJacocoBuildAllFile();
+            //-String runCoverageInfo = extractJacocoRunReport();
+            //-addRunJacocoCoverageDetails(runCoverageInfo);
 		}
 
 		// Execute DECODER PKM insertion

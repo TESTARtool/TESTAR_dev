@@ -7,6 +7,7 @@
 	<!-- Use the jacoco.exec and the codeo.jar classes to create the coverage report -->
 	<target name="report" description="Create a coverage report">
 		<property name="jacocoFile" value="../jacoco-client.exec" />
+		<!-- <property name="jacocoFile" value="../jacoco.exec" /> -->
 		<property name="reportCoverageDir" value="reports" />
 		<jacoco:report xmlns:jacoco="antlib:org.jacoco.ant">
 			<executiondata>
@@ -28,6 +29,8 @@
 			</structure>
 
 			<csv destfile="${reportCoverageDir}/report_jacoco.csv" />
+			<html destdir="${reportCoverageDir}" />
+			<xml destfile="${reportCoverageDir}/reportjacoco.xml" />
 		</jacoco:report>
 	</target>
 	
