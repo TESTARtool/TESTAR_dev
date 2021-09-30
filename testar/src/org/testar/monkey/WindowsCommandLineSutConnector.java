@@ -74,7 +74,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
         if (flashFeedback) {
             int countTimeFlash = 0;
             while(countTimeFlash<timeFlash && !sut.isRunning()) {
-                FlashFeedback.flash(printSutInfo, 2000);
+//                FlashFeedback.flash(printSutInfo, 2000);
                 countTimeFlash += 2000;
             }
         }
@@ -87,7 +87,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 //Print info to the user to know that TESTAR is READY for its use :-)
                 if (flashFeedback) {
                     printSutInfo = "SUT is READY";
-                    FlashFeedback.flash(printSutInfo,2000);
+//                    FlashFeedback.flash(printSutInfo,2000);
                 }
                 logger.trace("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
@@ -107,7 +107,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
                 if (flashFeedback) {
                     printSutInfo = "Waiting for the SUT to be accessible ...";
-                    FlashFeedback.flash(printSutInfo, 500);
+//                    FlashFeedback.flash(printSutInfo, 500);
                 }
             }
             Util.pauseMs(500);
