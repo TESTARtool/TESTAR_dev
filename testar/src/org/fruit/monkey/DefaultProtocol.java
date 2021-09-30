@@ -58,9 +58,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import es.upv.staq.testar.*;
 import javafx.scene.control.Alert;
 import nl.ou.testar.*;

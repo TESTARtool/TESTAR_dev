@@ -30,7 +30,7 @@
 
 package org.fruit.monkey;
 
-import es.upv.staq.testar.FlashFeedback;
+//import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Util;
@@ -69,7 +69,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
         //Refresh the flash information, to avoid that SUT hide the information
         int countTimeFlash = 0;
         while(countTimeFlash<timeFlash && !sut.isRunning()) {
-            FlashFeedback.flash(printSutInfo, 2000);
+//            FlashFeedback.flash(printSutInfo, 2000);
             countTimeFlash += 2000;
         }
 
@@ -80,7 +80,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
             if (sut.isRunning()){
                 //Print info to the user to know that TESTAR is READY for its use :-)
                 printSutInfo = "SUT is READY";
-                FlashFeedback.flash(printSutInfo,2000);
+//                FlashFeedback.flash(printSutInfo,2000);
                 System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
                 if (state != null && state.childCount() > 0){
@@ -91,7 +91,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
             }else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
                 printSutInfo = "Waiting for the SUT to be accessible ...";
-                FlashFeedback.flash(printSutInfo, 500);
+//                FlashFeedback.flash(printSutInfo, 500);
             }
             Util.pauseMs(500);
         } while (System.currentTimeMillis() - now < ENGAGE_TIME); //TODO runtime controls QUIT does not work now: mode() != RuntimeControlsProtocol.Modes.Quit &&

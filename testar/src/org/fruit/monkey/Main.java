@@ -164,8 +164,6 @@ public class Main extends Application implements DashboardDelegate {
 	public void startTesting(Settings settings) {
 		primaryStage.close();
 
-		final String testSettingsFileName = getTestSettingsFile();
-		settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
