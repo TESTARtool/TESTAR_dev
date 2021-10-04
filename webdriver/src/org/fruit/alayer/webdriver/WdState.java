@@ -113,14 +113,14 @@ public final class WdState extends WdWidget implements State {
 
 	@SuppressWarnings("unchecked")
 	public <T> T get(WdWidget w, Tag<T> t, T defaultValue) {
-		
+
 		Tag<T> stateManagementTag = WdMapping.getMappedStateTag(t);
 		if (stateManagementTag != null) {
 			t = stateManagementTag;
 		}
 
 		Object ret = w.tags.get(t);
-		
+
 		if (ret != null) {
 			return (T)ret;
 		}
@@ -176,6 +176,9 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(Tags.HasStandardMouse)) {
 			ret = w == this ? ((WdRootElement) element).hasStandardMouse : null;
+		}
+		else if(t.equals(WdTags.WebHttpStatus)) {
+			ret = w == this ? ((WdRootElement) element).httpStatus : null;
 		}
 		else if (t.equals(WdTags.WebName)) {
 			ret = w.element.name;

@@ -72,6 +72,7 @@ public class WdStateFetcher implements Callable<WdState> {
     wdRoot.timeStamp = System.currentTimeMillis();
     wdRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
     wdRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;
+    wdRoot.httpStatus = WdDriver.getStatusCode(WdDriver.getCurrentUrl());
     wdRoot.pid = system.get(Tags.PID);
 
     return wdRoot;

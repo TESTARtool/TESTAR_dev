@@ -54,6 +54,11 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
@@ -68,6 +73,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class WdDriver extends SUTBase {
@@ -78,6 +86,13 @@ public class WdDriver extends SUTBase {
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
   public static boolean disableSecurity = false;
+  public static int lastStatusCode = 0;
+
+  public enum WebDriverType {
+    CHROME, GECKO, MICROSOFT
+  }
+
+  public static WebDriverType webDriverType;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -116,12 +131,15 @@ public class WdDriver extends SUTBase {
     String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
 
     if (driverPath.toLowerCase().contains("chrome")) {
+      webDriverType = WebDriverType.CHROME;
       webDriver = startChromeDriver(driverPath, extensionPath);
     }
     else if (driverPath.toLowerCase().contains("gecko")) {
+      webDriverType = WebDriverType.GECKO;
       webDriver = startGeckoDriver(driverPath, extensionPath);
     }
     else if (driverPath.toLowerCase().contains("microsoft")) {
+      webDriverType = WebDriverType.MICROSOFT;
       webDriver = startEdgeDriver(driverPath, extensionPath);
     }
     else {
@@ -162,6 +180,15 @@ public class WdDriver extends SUTBase {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
+    options.addArguments("--verbose");
+
+    // Run the chrome driver extra verbose
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
+
+    // Ducttape solution https://stackoverflow.com/a/62456219
+    options.setCapability("goog:loggingPrefs", logPrefs);
+
     if(fullScreen) {
     	options.addArguments("--start-maximized");
     }
@@ -179,7 +206,7 @@ public class WdDriver extends SUTBase {
 
   private static RemoteWebDriver startGeckoDriver(String geckoDriverPath,
                                                   String extensionPath) {
-    String nullPath = "/dev/null";
+    String nullPath = "/home/anon/Projects/test.txt";
     if (System.getProperty("os.name").toLowerCase().contains("windows")) {
       nullPath = "NUL";
     }
@@ -435,6 +462,59 @@ public class WdDriver extends SUTBase {
     }
     catch (NullPointerException | WebDriverException ignored) {
       return new HashSet<>();
+    }
+  }
+
+  public static int getStatusCodeChrome(String url) {
+    try {
+      LogEntries logs = webDriver.manage().logs().get(LogType.PERFORMANCE);
+      // Status code finder
+      // Pre java formatted: "status"\s*:\s*\(d+,)?
+      final Pattern statusPattern = Pattern.compile("\"status\"\\s*:\\s*(\\d+),?");
+      // Url finder
+      // Pre java formatted: "url"\s?:\s?"(http[s]?:\/\/.[^"]*)",?\,?
+      final Pattern urlPattern = Pattern.compile("\"url\"\\s?:\\s?\"(http[s]?:\\/\\/.[^\"#]*)\",?\\,?");
+
+      HashMap<String, Integer> urlStatusCodes = new HashMap();
+
+      for (Iterator<LogEntry> it = logs.iterator(); it.hasNext();) {
+        LogEntry entry = it.next();
+        String message = entry.getMessage();
+        Matcher statusMatcher = statusPattern.matcher(message);
+        Matcher urlMatcher = urlPattern.matcher(message);
+
+        // Store status code if found
+        if (statusMatcher.find() && urlMatcher.find()) {
+          String matchedStatus = statusMatcher.group(1);
+          String matchedUrl = urlMatcher.group(1);
+          urlStatusCodes.put(matchedUrl, Integer.parseInt(matchedStatus));
+        }
+
+      }
+      if (urlStatusCodes.containsKey(url)) lastStatusCode = urlStatusCodes.get(url);
+      return lastStatusCode;
+    } catch (Exception ex) {
+      System.err.println("Exception while trying to obtain status codes");
+      ex.printStackTrace();
+      return 0;
+    }
+  }
+
+  public static int getStatusCodeGecko(String url) {
+    return 0;
+  }
+
+  public static int getStatusCode(String url) {
+    String cleanedUrl = url.replace("#.*", "");
+
+    // Implement case for the microsoft driver.
+    switch (webDriverType) {
+      case CHROME:
+        return getStatusCodeChrome(cleanedUrl);
+      case GECKO:
+        return getStatusCodeGecko(cleanedUrl);
+      default:
+        return 0;
     }
   }
 
