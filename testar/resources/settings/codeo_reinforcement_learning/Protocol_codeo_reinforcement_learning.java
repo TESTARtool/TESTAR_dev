@@ -421,6 +421,7 @@ public class Protocol_codeo_reinforcement_learning extends DesktopProtocol {
 /**
  *  Helper class to customize SUT License as desires
  */
+/*
 class CODEOLicense {
 
     String sutTitle = "CODEO";
@@ -433,3 +434,4 @@ class CODEOLicense {
         // Create object for JSON Artefact purposes
     }
 }
+*/
