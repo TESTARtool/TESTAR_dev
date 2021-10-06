@@ -206,7 +206,7 @@ public class WdDriver extends SUTBase {
 
   private static RemoteWebDriver startGeckoDriver(String geckoDriverPath,
                                                   String extensionPath) {
-    String nullPath = "/home/anon/Projects/test.txt";
+    String nullPath = "/dev/null";
     if (System.getProperty("os.name").toLowerCase().contains("windows")) {
       nullPath = "NUL";
     }
