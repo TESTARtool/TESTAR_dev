@@ -110,8 +110,36 @@ public class Main extends Application implements DashboardDelegate {
 	 * @throws IOException
 	 */
 
-	public static void main(String args[]) {
-		launch(args);
+	public static void main(String[] args) {
+//		launch(args);
+		stub(Arrays.asList(args));
+	}
+
+	private static void stub(List<String> parameters) {
+		isValidJavaEnvironment();
+		verifyTestarInitialDirectory();
+
+		SSE_ACTIVATED = "webdriver_generic";
+//		initTestarSSE(null, rawParameters);
+
+		String testSettingsFileName = getTestSettingsFile();
+		System.out.println("Test settings is <" + testSettingsFileName + ">");
+
+		Settings settings = loadTestarSettings(parameters, testSettingsFileName);
+
+		settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
+
+		System.out.println("<<< 0 >>>");
+		setTestarDirectory(settings);
+		System.out.println("<<< 1 >>>");
+		initCodingManager(settings);
+		System.out.println("<<< 2 >>>");
+		initOperatingSystem();
+		System.out.println("<<< 3 >>>");
+		startTestar(settings);
+		System.out.println("<<< 4 >>>");
+		shutdown();
+		System.out.println("<<< 5 >>>");
 	}
 
 	@Override
@@ -125,7 +153,7 @@ public class Main extends Application implements DashboardDelegate {
 		verifyTestarInitialDirectory();
 
 		System.out.println("(2)");
-		initTestarSSE(getParameters());
+		initTestarSSE(getParameters(), null);
 
 		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
@@ -184,7 +212,7 @@ public class Main extends Application implements DashboardDelegate {
 //		Platform.exit();
 	}
 
-	private void shutdown() {
+	private static void shutdown() {
 		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
@@ -249,7 +277,7 @@ public class Main extends Application implements DashboardDelegate {
 	 *
 	 * @param parameters
 	 */
-	private static void initTestarSSE(Parameters parameters){
+	private static void initTestarSSE(Parameters parameters, List<String> rawParameters){
 
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -259,11 +287,15 @@ public class Main extends Application implements DashboardDelegate {
 
 		//Allow users to use command line to choose a protocol modifying sse file
 		System.out.println("[0]");
-		for(String sett : parameters.getRaw()) {
+		if (rawParameters == null) {
+			rawParameters = parameters.getRaw();
+		}
+		for(String sett : rawParameters) {
 			if(sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
-				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");}
+				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");
+			}
 		}
 
 		String[] files = getSSE();
@@ -355,7 +387,7 @@ public class Main extends Application implements DashboardDelegate {
 
 		//TODO: Understand what this exactly does?
 		overrideWithUserProperties(settings);
-		Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+		Float SST = null;//settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 		if (SST != null) {
 			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
 		}
@@ -488,7 +520,6 @@ public class Main extends Application implements DashboardDelegate {
 			System.out.println("+++ 6 +++");
 		}
 		System.out.println("+++ 7 +++");
-		System.out.println("+++ 8 +++");
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
