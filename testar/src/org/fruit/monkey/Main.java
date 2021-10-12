@@ -56,6 +56,7 @@ import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
+import org.apache.commons.compress.utils.Lists;
 import org.fruit.*;
 import org.fruit.alayer.Tag;
 
@@ -152,14 +153,14 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			}
 		});
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-				DockerPoolServiceImpl.disposeAll(false);
-				System.out.println("Docker instances disposed");
-			}
-		});
+//		Runtime.getRuntime().addShutdownHook(new Thread() {
+//
+//			@Override
+//			public void run() {
+//				DockerPoolServiceImpl.disposeAll(false);
+//				System.out.println("Docker instances disposed");
+//			}
+//		});
 
 		isValidJavaEnvironment();
 
@@ -503,7 +504,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("+++ 6 +++");
 		}
 		System.out.println("+++ 7 +++");
-		System.out.println("+++ 8 +++");
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
