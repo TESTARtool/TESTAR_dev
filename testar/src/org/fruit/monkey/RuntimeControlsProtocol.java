@@ -32,14 +32,12 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.EventHandler;
-import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
-import java.util.Arrays;
+
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -93,7 +91,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-    	FlashFeedback.flash(modeNfo, 1000);
+    	// TODO: Flash feedback
+//    	FlashFeedbackOld.flash(modeNfo, 1000);
     	
     }
     
@@ -109,7 +108,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
                     break;
             }
         }else{
-            switch(mode){
+            switch(mode){e
                 case Record:
                     mode = Modes.Generate; break;
                 case Generate:

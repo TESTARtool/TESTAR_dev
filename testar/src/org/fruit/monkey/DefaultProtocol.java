@@ -41,7 +41,6 @@ import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 
-import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -90,6 +89,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.dispatcher.SwingDispatchService;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
 
@@ -214,26 +214,28 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//initialize TESTAR with the given settings:
 		initialize(settings);
-
+		System.out.println("Protocol started");
 		try {
 
 			if (mode() == Modes.View) {
 				if(isHtmlFile() || isLogFile()) {
-					try {
-						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
-						Desktop.getDesktop().browse(file.toURI());
-					}catch (Exception e) {
-						popupMessage("Exception: Check the path of the file, something is wrong");
-						System.out.println("Exception: Check the path of the file, something is wrong");
-					}
+					// TODO: enable browser
+//					try {
+//						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
+//						Desktop.getDesktop().browse(file.toURI());
+//					}catch (Exception e) {
+//						popupMessage("Exception: Check the path of the file, something is wrong");
+//						System.out.println("Exception: Check the path of the file, something is wrong");
+//					}
 				} else if (!findHTMLreport().contains("error")) {
-					try {
-						File htmlFile = new File(findHTMLreport());
-						Desktop.getDesktop().browse(htmlFile.toURI());
-					}catch (Exception e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
-						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
-					}
+					// TODO: enable browser
+//					try {
+//						File htmlFile = new File(findHTMLreport());
+//						Desktop.getDesktop().browse(htmlFile.toURI());
+//					}catch (Exception e) {
+//						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
+//						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
+//					}
 				}
 				/*else if(isValidFile())
 					new SequenceViewer(settings);*/
@@ -306,10 +308,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Quit;
 		}
 
+		System.out.println("Protocol finished");
 		//allowing close-up in the end of test session:
 		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
+		System.out.println("All closed");
 	}
 
 	/**
@@ -351,6 +355,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
+//				GlobalScreen.setEventDispatcher(new SwingDispatchService());
 
 				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
@@ -652,15 +657,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while (mode() != Modes.Quit && moreSequences()) {
 			exceptionThrown = false;
 
+			System.out.println("::: 0 :::");
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
+			System.out.println("::: 1 :::");
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
+			System.out.println("::: 2 :::");
 			system = startSutIfNotRunning(system);
 
 			if(startFromGenerate) {
@@ -670,8 +678,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			//initializing TESTAR for a new sequence:
+			System.out.println("::: 3 :::");
 			startTestSequence(system);
 
+			System.out.println("::: 4 :::");
 			try {
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
@@ -680,7 +690,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
-				
+
 				//update state after begin sequence SUT modification
 				state = getState(system);
 
@@ -724,6 +734,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
+				System.out.println("sequenceCount = " + sequenceCount);
 				sequenceCount++;
 
 			} catch (Exception e) {
@@ -738,6 +749,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
 
 		if (mode() == Modes.Quit && !exceptionThrown) {
 			// the user initiated the shutdown
@@ -1672,7 +1684,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				ac.releaseCachedAutomationElements();
 		}
 		if(system !=null){
+			System.out.println("System class: " + system.getClass().getSimpleName());
 			system.stop();
+			SystemProcessHandling.killRunningProcesses(system, 0);
 		}
 	}
 
@@ -1688,16 +1702,31 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//cleaning the variables started in initialize()
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
+				System.out.println("-= 0 =-");
 				if (GlobalScreen.isNativeHookRegistered()) {
+					System.out.println("-= 1 =-");
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+					System.out.println("-= 2 =-");
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+					System.out.println("-= 3 =-");
 					GlobalScreen.removeNativeMouseListener(eventHandler);
+					System.out.println("-= 4 =-");
 					GlobalScreen.removeNativeKeyListener(eventHandler);
+					System.out.println("-= 5 =-");
+//					new Thread(() -> {
+//						try {
+//							GlobalScreen.unregisterNativeHook();
+//						} catch (NativeHookException e) {
+//							e.printStackTrace();
+//						}
+//					}).start();
 					GlobalScreen.unregisterNativeHook();
+					System.out.println("-= 6 =-");
 				}
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
+			System.out.println("-= ERROR =-");
 		}
 
 	}

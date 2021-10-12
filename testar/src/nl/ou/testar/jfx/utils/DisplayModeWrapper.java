@@ -1,6 +1,6 @@
 package nl.ou.testar.jfx.utils;
 
-import java.awt.*;
+import java.awt.DisplayMode;
 
 public class DisplayModeWrapper {
 
