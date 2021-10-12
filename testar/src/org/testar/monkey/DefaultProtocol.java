@@ -40,7 +40,7 @@ import static org.testar.monkey.alayer.Tags.IsRunning;
 import static org.testar.monkey.alayer.Tags.OracleVerdict;
 import static org.testar.monkey.alayer.Tags.SystemState;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,12 +52,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import org.testar.*;
+import org.testar.monkey.alayer.Canvas;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.Shape;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
@@ -214,7 +218,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
-
+		System.out.println("Protocol started");
 		try {
 
 			if (mode() == Modes.View) {
@@ -297,10 +301,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		// can there be other kind of exceptions?
 
+		System.out.println("Protocol finished");
 		//allowing close-up in the end of test session:
 		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
+		System.out.println("All closed");
 	}
 
 	/**
@@ -342,6 +348,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
+//				GlobalScreen.setEventDispatcher(new SwingDispatchService());
 
 				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
@@ -633,11 +640,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while (mode() != Modes.Quit && moreSequences()) {
 			exceptionThrown = false;
 
+			System.out.println("::: 0 :::");
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
+			System.out.println("::: 1 :::");
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
@@ -645,6 +654,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			faultySequence = false;
 
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
+			System.out.println("::: 2 :::");
 			system = startSutIfNotRunning(system);
 
 			if(startFromGenerate) {
@@ -654,8 +664,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			//initializing TESTAR for a new sequence:
+			System.out.println("::: 3 :::");
 			startTestSequence(system);
 
+			System.out.println("::: 4 :::");
 			try {
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
@@ -702,6 +714,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
+				System.out.println("sequenceCount = " + sequenceCount);
 				sequenceCount++;
 
 			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
@@ -716,6 +729,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
 
 		if (mode() == Modes.Quit && !exceptionThrown) {
 			// the user initiated the shutdown
@@ -1764,7 +1778,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				ac.releaseCachedAutomationElements();
 		}
 		if(system !=null){
+			System.out.println("System class: " + system.getClass().getSimpleName());
 			system.stop();
+			SystemProcessHandling.killRunningProcesses(system, 0);
 		}
 	}
 
@@ -1780,12 +1796,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//cleaning the variables started in initialize()
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
+				System.out.println("-= 0 =-");
 				if (GlobalScreen.isNativeHookRegistered()) {
+					System.out.println("-= 1 =-");
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+					System.out.println("-= 2 =-");
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+					System.out.println("-= 3 =-");
 					GlobalScreen.removeNativeMouseListener(eventHandler);
+					System.out.println("-= 4 =-");
 					GlobalScreen.removeNativeKeyListener(eventHandler);
+					System.out.println("-= 5 =-");
+//					new Thread(() -> {
+//						try {
+//							GlobalScreen.unregisterNativeHook();
+//						} catch (NativeHookException e) {
+//							e.printStackTrace();
+//						}
+//					}).start();
 					GlobalScreen.unregisterNativeHook();
+					System.out.println("-= 6 =-");
 				}
 			}
 		} catch (NativeHookException e) {
@@ -1793,6 +1823,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (NullPointerException e) {
 			// no ConfigTags
 			e.printStackTrace();
+			System.out.println("-= ERROR =-");
 		}
 
 	}

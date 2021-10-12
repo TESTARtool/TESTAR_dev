@@ -61,7 +61,6 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.extendedsettings.ExtendedSettingFile;
 import org.testar.extendedsettings.ExtendedSettingsFactory;
-import org.testar.settingsdialog.SettingsDialog;
 
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
@@ -137,16 +136,17 @@ public class Main extends Application implements DashboardDelegate {
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
-
+			System.out.println("<<< 0 >>>");
 			setTestarDirectory(settings);
-
+			System.out.println("<<< 1 >>>");
 			initCodingManager(settings);
-
+			System.out.println("<<< 2 >>>");
 			initOperatingSystem();
-
+			System.out.println("<<< 3 >>>");
 			startTestar(settings);
-
+			System.out.println("<<< 4 >>>");
 			shutdown();
+			System.out.println("<<< 5 >>>");
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
@@ -161,15 +161,27 @@ public class Main extends Application implements DashboardDelegate {
 	}
 
 	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.out.println("Application stopped");
+	}
+
+	@Override
 	public void startTesting(Settings settings) {
-		primaryStage.close();
+//		primaryStage.close();
 
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
+		System.out.println("Starting TESTAR protocol");
 		startTestar(settings);
+		System.out.println("Shutting down...");
 
-		shutdown();
+//		Platform.runLater(() -> {
+			shutdown();
+			System.out.println("Work complete");
+//		});
+//		Platform.exit();
 	}
 
 	private void shutdown() {
@@ -358,7 +370,8 @@ public class Main extends Application implements DashboardDelegate {
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
 	 */
-	public boolean startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+	public void startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+		System.out.println("Starting TESTARne4dfx dialog");
 		final String settingsPath = getTestSettingsFile();
 
 		MainController mainController = new MainController(settings, settingsPath);
@@ -372,19 +385,6 @@ public class Main extends Application implements DashboardDelegate {
 				stage.show();
 			}
 		});
-
-		if (true) return false;
-
-		// Start up the TESTAR Dialog
-		try {
-			if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
-				return false;
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return true;
 	}
 
 	/**
@@ -406,6 +406,7 @@ public class Main extends Application implements DashboardDelegate {
 
 		URLClassLoader loader = null;
 
+		Thread protocolThread = null;
 		try {
 		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
 			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
@@ -430,7 +431,11 @@ public class Main extends Application implements DashboardDelegate {
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
 
 			//Run TESTAR protocol with the selected settings
+			System.out.println("+++ 0 +++");
+//			protocolThread = new Thread(() -> protocol.run(settings));
+//			protocolThread.start();
 			protocol.run(settings);
+			System.out.println("+++ 1 +++");
 
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -456,8 +461,16 @@ public class Main extends Application implements DashboardDelegate {
 			e.printStackTrace();
 			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
-		} finally {
-			// Closing TESTAR
+		}
+		finally {
+//			if (protocolThread != null) {
+//				try {
+//					protocolThread.join();
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+			System.out.println("+++ 2 +++");
 			if (loader != null) {
 				try {
 					loader.close();
@@ -465,11 +478,17 @@ public class Main extends Application implements DashboardDelegate {
 					e.printStackTrace();
 				}
 			}
+			System.out.println("+++ 3 +++");
 
 			TestSerialiser.exit();
+			System.out.println("+++ 4 +++");
 			ScreenshotSerialiser.exit();
+			System.out.println("+++ 5 +++");
 			LogSerialiser.exit();
+			System.out.println("+++ 6 +++");
 		}
+		System.out.println("+++ 7 +++");
+		System.out.println("+++ 8 +++");
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.

@@ -1,5 +1,6 @@
 package nl.ou.testar.jfx.dashboard;
 
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -9,6 +10,7 @@ import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.monkey.Settings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
 
 import java.io.File;
@@ -44,7 +46,10 @@ public class DashboardController extends ViewController {
 //            ret = settings;
             System.out.println("Start testing...");
             if (delegate != null) {
-                delegate.startTesting(settings);
+                Platform.runLater(() -> delegate.startTesting(settings));
+//                Platform.exit();
+                final Stage stage = (Stage) view.getScene().getWindow();
+                stage.close();
             }
             else {
                 System.out.println("No delegate!");
@@ -53,6 +58,9 @@ public class DashboardController extends ViewController {
             final Alert alert = new Alert(Alert.AlertType.ERROR, ise.getMessage());
             alert.show();
         }
+//        finally {
+//            Platform.exit();
+//        }
     }
 
     private void checkSettings(Settings settings) throws IllegalStateException {

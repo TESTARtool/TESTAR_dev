@@ -369,12 +369,13 @@ public class FilteringManager
       return;
     }
     Object[] options = DataManager.DATA_TYPES.keySet().toArray();
-    String s = (String) JOptionPane.showInputDialog(new JFrame(), "Input values:", "Widget input value type",
-        JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-    if (DataManager.DATA_TYPES.containsKey(s)) {
-      filterLists(cursorWidget, DataManager.DATA_TYPES.get(s), preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
-      saveFilters();
-    }
+    // TODO: show input widget
+//    String s = (String) JOptionPane.showInputDialog(new JFrame(), "Input values:", "Widget input value type",
+//        JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+//    if (DataManager.DATA_TYPES.containsKey(s)) {
+//      filterLists(cursorWidget, DataManager.DATA_TYPES.get(s), preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
+//      saveFilters();
+//    }
   }
 
   public boolean blackListed (Widget w)
