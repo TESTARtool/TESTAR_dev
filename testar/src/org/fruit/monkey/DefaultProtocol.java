@@ -89,6 +89,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.dispatcher.SwingDispatchService;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
 
@@ -655,15 +656,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while (mode() != Modes.Quit && moreSequences()) {
 			exceptionThrown = false;
 
+			System.out.println("::: 0 :::");
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
+			System.out.println("::: 1 :::");
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
+			System.out.println("::: 2 :::");
 			system = startSutIfNotRunning(system);
 
 			if(startFromGenerate) {
@@ -673,8 +677,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			//initializing TESTAR for a new sequence:
+			System.out.println("::: 3 :::");
 			startTestSequence(system);
 
+			System.out.println("::: 4 :::");
 			try {
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
@@ -727,6 +733,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
+				System.out.println("sequenceCount = " + sequenceCount);
 				sequenceCount++;
 
 			} catch (Exception e) {
@@ -1694,16 +1701,31 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//cleaning the variables started in initialize()
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
+				System.out.println("-= 0 =-");
 				if (GlobalScreen.isNativeHookRegistered()) {
+					System.out.println("-= 1 =-");
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+					System.out.println("-= 2 =-");
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+					System.out.println("-= 3 =-");
 					GlobalScreen.removeNativeMouseListener(eventHandler);
+					System.out.println("-= 4 =-");
 					GlobalScreen.removeNativeKeyListener(eventHandler);
+					System.out.println("-= 5 =-");
+//					new Thread(() -> {
+//						try {
+//							GlobalScreen.unregisterNativeHook();
+//						} catch (NativeHookException e) {
+//							e.printStackTrace();
+//						}
+//					}).start();
 					GlobalScreen.unregisterNativeHook();
+					System.out.println("-= 6 =-");
 				}
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
+			System.out.println("-= ERROR =-");
 		}
 
 	}

@@ -34,7 +34,7 @@ package org.testar.protocols;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-import java.awt.*;
+//import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -79,7 +79,7 @@ import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
-import org.fruit.monkey.dialog.ProgressDialog;
+//import org.fruit.monkey.dialog.ProgressDialog;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceDelegate;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
@@ -147,18 +147,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
 			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
-			ProgressDialog progressDialog = new ProgressDialog();
-			progressDialog.setStatusString("Preparing OrientDB");
+			// TODO: Re-enable progress dialog
+//			ProgressDialog progressDialog = new ProgressDialog();
+//			progressDialog.setStatusString("Preparing OrientDB");
 
 			orientService.setDelegate(new OrientDBServiceDelegate() {
 				@Override
 				public void onStateChanged(State state, String description) {
-					progressDialog.setStatusString(description);
+					// TODO: Re-enable progress dialog
+//					progressDialog.setStatusString(description);
 				}
 
 				@Override
 				public void onServiceReady() {
-					progressDialog.endProgress(null, true);
+					// TODO: Re-enable progress dialog
+//					progressDialog.endProgress(null, true);
 				}
 			});
 
@@ -178,9 +181,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					System.out.println("OrientDB docker image finished.");
 				}
 			}.start();
-			progressDialog.pack();
-			progressDialog.setLocationRelativeTo(null);
-			progressDialog.setVisible(true);
+			// TODO: Re-enable progress dialog
+//			progressDialog.pack();
+//			progressDialog.setLocationRelativeTo(null);
+//			progressDialog.setVisible(true);
 
 
 		}
@@ -192,18 +196,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			final String userName = settings.get(ConfigTags.SQLReportingUser);
 			final String userPassword = settings.get(ConfigTags.SQLReportingPassword);
 
-			ProgressDialog progressDialog = new ProgressDialog();
-			progressDialog.setStatusString("Starting database connection");
+			// TODO: Re-enable progress dialog
+//			ProgressDialog progressDialog = new ProgressDialog();
+//			progressDialog.setStatusString("Starting database connection");
 			
 			sqlService.setDelegate(new MySqlServiceDelegate() {
 				@Override
 				public void onStateChanged(State state, String description) {
-					progressDialog.setStatusString(description);
+					// TODO: Re-enable progress dialog
+//					progressDialog.setStatusString(description);
 				}
 
 				@Override
 				public void onServiceReady(String str) {
-					progressDialog.endProgress(null, true);
+					// TODO: Re-enable progress dialog
+//					progressDialog.endProgress(null, true);
 				}
 			});
 
@@ -227,9 +234,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}.start();
 
 
-			progressDialog.pack();
-			progressDialog.setLocationRelativeTo(null);
-			progressDialog.setVisible(true);
+			// TODO: Re-enable progress dialog
+//			progressDialog.pack();
+//			progressDialog.setLocationRelativeTo(null);
+//			progressDialog.setVisible(true);
 		}
 
 		// Initialize HTML Report (Dashboard)
@@ -289,8 +297,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			final String oUsername = settings.get(ConfigTags.DataStoreUser);
 			final String oPassword = settings.get(ConfigTags.DataStorePassword);
 
-			ProgressDialog progressDialog = new ProgressDialog();
-			progressDialog.setStatusString("Preparing report");
+			// TODO: Re-enable progress dialog
+//			ProgressDialog progressDialog = new ProgressDialog();
+//			progressDialog.setStatusString("Preparing report");
 
 			try {
 				ReportingBuilder reportingBuilder = new ReportingBuilder(port, Main.getReportingService(), dbEnabled, settings.get(ConfigTags.StateModelEnabled));
@@ -303,19 +312,23 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				reportingService.setDelegate(new ReportingServiceDelegate() {
 					@Override
 					public void onStateChanged(State state, String description) {
-						progressDialog.setStatusString(description);
+						// TODO: Re-enable progress dialog
+//						progressDialog.setStatusString(description);
 					}
 
 					@Override
 					public void onServiceReady(String url) {
-						progressDialog.endProgress(null, true);
-						try {
-							Desktop.getDesktop().browse(new URI("http://localhost:" + port));
-						}
-						catch (Exception e) {
-							System.err.println("Cannot browse report: " + e.getMessage());
-							e.printStackTrace();
-						}
+						// TODO: Re-enable progress dialog
+//						progressDialog.endProgress(null, true);
+
+						// TODO: open web link
+//						try {
+//							Desktop.getDesktop().browse(new URI("http://localhost:" + port));
+//						}
+//						catch (Exception e) {
+//							System.err.println("Cannot browse report: " + e.getMessage());
+//							e.printStackTrace();
+//						}
 					}
 				});
 				new Thread() {
@@ -330,9 +343,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					}
 				}.start();
 
-				progressDialog.pack();
-				progressDialog.setLocationRelativeTo(null);
-				progressDialog.setVisible(true);
+				// TODO: Re-enable progress dialog
+//				progressDialog.pack();
+//				progressDialog.setLocationRelativeTo(null);
+//				progressDialog.setVisible(true);
 			}
 			catch (IOException e) {
 				System.err.println("Cannot init web service: " + e.getMessage());
