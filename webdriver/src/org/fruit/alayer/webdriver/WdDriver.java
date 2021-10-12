@@ -308,8 +308,10 @@ public class WdDriver extends SUTBase {
   @Override
   public void stop() throws SystemStopException {
     if (webDriver != null) {
+      System.out.println("Quitting web driver...");
       webDriver.quit();
       webDriver = null;
+      System.out.println("...done");
     }
 
     CanvasDimensions.stopThread();

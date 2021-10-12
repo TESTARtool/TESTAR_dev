@@ -1,6 +1,6 @@
 package nl.ou.testar.jfx.utils;
 
-import java.awt.*;
+import java.awt.DisplayMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
