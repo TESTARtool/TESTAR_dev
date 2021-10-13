@@ -46,10 +46,12 @@ public class DashboardController extends ViewController {
 //            ret = settings;
             System.out.println("Start testing...");
             if (delegate != null) {
-                Platform.runLater(() -> delegate.startTesting(settings));
+//                Platform.runLater(() -> delegate.startTesting(settings));
+                Platform.runLater(() -> new Thread(() -> delegate.startTesting(settings)).start());
 //                Platform.exit();
+
                 final Stage stage = (Stage) view.getScene().getWindow();
-                stage.close();
+//                stage.hide();
             }
             else {
                 System.out.println("No delegate!");
@@ -130,6 +132,5 @@ public class DashboardController extends ViewController {
         carouselBox.getChildren().add(carouselView);
         carouselView.prefWidthProperty().bind(carouselBox.widthProperty());
         carouselView.prefHeightProperty().bind(carouselBox.heightProperty());
-//        System.out.println(String.format("Box size: %dx%d", (int) Math.round(carouselBox.getPrefWidth()), (int) Math.round(carouselBox.getPrefHeight())));
     }
 }
