@@ -5,8 +5,9 @@ from mysql.connector.pooling import MySQLConnectionPool
 from mysql.connector.cursor import MySQLCursorBuffered
 
 
-class MySqlDatabase():
+class MySqlDatabase:
     """Singletron database connector"""
+
     _instance = None
 
     def __del__(self):
@@ -22,7 +23,6 @@ class MySqlDatabase():
             # Initialization
             cls._instance.connect()
         return cls._instance
-
 
     def connect(self):
         """Create pooled database connection from enviroment variables"""
@@ -52,9 +52,10 @@ class MySqlDatabase():
             with self.db_pool.get_connection() as connection:
                 with connection.cursor(buffered=True) as cursor:
                     return fn(*args, cursor=cursor, **kwargs)
+
         return inner
 
-    def does_exist(self,name: str, id: int) -> bool:
+    def does_exist(self, name: str, id: int) -> bool:
         """Verify if an object exists in the database.
 
         Args:
@@ -77,10 +78,10 @@ class MySqlDatabase():
 
             # Verify if it has been found
             return result[0] == 1
+
         return internal()
 
-    def get_property(
-        self, field: str, table: str, object_id: int) -> object:
+    def get_property(self, field: str, table: str, object_id: int) -> object:
         """Retrieve a single property from a single row.
 
         Args:
@@ -92,11 +93,12 @@ class MySqlDatabase():
         Returns:
             object: Any kind of data returned by the database
         """
-        
+
         @self.cursor
         def internal(cursor: MySQLCursorBuffered) -> object:
             query = f"SELECT {field} FROM {table} WHERE id=%s"
             cursor.execute(query, (object_id,))
             result = cursor.fetchone()
             return result[0]
+
         return internal()
