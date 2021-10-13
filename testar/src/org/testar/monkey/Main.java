@@ -54,6 +54,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
@@ -111,35 +113,7 @@ public class Main extends Application implements DashboardDelegate {
 	 */
 
 	public static void main(String[] args) {
-//		launch(args);
-		stub(Arrays.asList(args));
-	}
-
-	private static void stub(List<String> parameters) {
-		isValidJavaEnvironment();
-		verifyTestarInitialDirectory();
-
-		SSE_ACTIVATED = "webdriver_generic";
-//		initTestarSSE(null, rawParameters);
-
-		String testSettingsFileName = getTestSettingsFile();
-		System.out.println("Test settings is <" + testSettingsFileName + ">");
-
-		Settings settings = loadTestarSettings(parameters, testSettingsFileName);
-
-		settings.set(Mode, RuntimeControlsProtocol.Modes.Generate);
-
-		System.out.println("<<< 0 >>>");
-		setTestarDirectory(settings);
-		System.out.println("<<< 1 >>>");
-		initCodingManager(settings);
-		System.out.println("<<< 2 >>>");
-		initOperatingSystem();
-		System.out.println("<<< 3 >>>");
-		startTestar(settings);
-		System.out.println("<<< 4 >>>");
-		shutdown();
-		System.out.println("<<< 5 >>>");
+		launch();
 	}
 
 	@Override
@@ -173,7 +147,7 @@ public class Main extends Application implements DashboardDelegate {
 			System.out.println("<<< 3 >>>");
 			startTestar(settings);
 			System.out.println("<<< 4 >>>");
-			shutdown();
+//			shutdown();
 			System.out.println("<<< 5 >>>");
 		}
 
@@ -191,25 +165,16 @@ public class Main extends Application implements DashboardDelegate {
 	@Override
 	public void stop() throws Exception {
 		super.stop();
-		System.out.println("Application stopped");
+		System.exit(0);
 	}
 
 	@Override
 	public void startTesting(Settings settings) {
-//		primaryStage.close();
-
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
-		System.out.println("Starting TESTAR protocol");
 		startTestar(settings);
-		System.out.println("Shutting down...");
-
-//		Platform.runLater(() -> {
-			shutdown();
-			System.out.println("Work complete");
-//		});
-//		Platform.exit();
+		shutdown();
 	}
 
 	private static void shutdown() {
@@ -438,7 +403,6 @@ public class Main extends Application implements DashboardDelegate {
 
 		URLClassLoader loader = null;
 
-		Thread protocolThread = null;
 		try {
 		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
 			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
@@ -463,11 +427,7 @@ public class Main extends Application implements DashboardDelegate {
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
 
 			//Run TESTAR protocol with the selected settings
-			System.out.println("+++ 0 +++");
-//			protocolThread = new Thread(() -> protocol.run(settings));
-//			protocolThread.start();
 			protocol.run(settings);
-			System.out.println("+++ 1 +++");
 
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -495,14 +455,6 @@ public class Main extends Application implements DashboardDelegate {
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
 		}
 		finally {
-//			if (protocolThread != null) {
-//				try {
-//					protocolThread.join();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-			System.out.println("+++ 2 +++");
 			if (loader != null) {
 				try {
 					loader.close();
@@ -510,14 +462,10 @@ public class Main extends Application implements DashboardDelegate {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("+++ 3 +++");
 
 			TestSerialiser.exit();
-			System.out.println("+++ 4 +++");
 			ScreenshotSerialiser.exit();
-			System.out.println("+++ 5 +++");
 			LogSerialiser.exit();
-			System.out.println("+++ 6 +++");
 		}
 		System.out.println("+++ 7 +++");
 	}
