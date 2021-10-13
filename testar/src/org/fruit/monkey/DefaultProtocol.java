@@ -214,7 +214,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//initialize TESTAR with the given settings:
 		initialize(settings);
-		System.out.println("Protocol started");
 		try {
 
 			if (mode() == Modes.View) {
@@ -657,18 +656,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while (mode() != Modes.Quit && moreSequences()) {
 			exceptionThrown = false;
 
-			System.out.println("::: 0 :::");
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
-			System.out.println("::: 1 :::");
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
 
 			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
-			System.out.println("::: 2 :::");
 			system = startSutIfNotRunning(system);
 
 			if(startFromGenerate) {
@@ -678,10 +674,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			//initializing TESTAR for a new sequence:
-			System.out.println("::: 3 :::");
 			startTestSequence(system);
 
-			System.out.println("::: 4 :::");
 			try {
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
@@ -734,7 +728,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
-				System.out.println("sequenceCount = " + sequenceCount);
 				sequenceCount++;
 
 			} catch (Exception e) {
