@@ -104,6 +104,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 	private static DockerPoolService reportingDockerService = new DockerPoolServiceImpl();
 
+	private static final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+	private static Thread mainThread;
+
 	public static DockerPoolService getReportingService() {
 		return reportingDockerService;
 	}
@@ -205,7 +208,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
-		System.out.println("Starting TESTAR protocol");
 		startTestar(settings);
 	}
 
@@ -438,7 +440,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 		URLClassLoader loader = null;
 
-		Thread protocolThread = null;
 		try {
 			List<String> cp = settings.get(MyClassPath);
 			URL[] classPath = new URL[cp.size()];
@@ -466,11 +467,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			}
 
 			//Run TESTAR protocol with the selected settings
-			System.out.println("+++ 0 +++");
-//			protocolThread = new Thread(() -> protocol.run(settings));
-//			protocolThread.start();
 			protocol.run(settings);
-			System.out.println("+++ 1 +++");
 
 		}catch (Throwable t) {
 			LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
@@ -479,14 +476,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			t.printStackTrace(LogSerialiser.getLogStream());
 		}
 		finally {
-//			if (protocolThread != null) {
-//				try {
-//					protocolThread.join();
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-			System.out.println("+++ 2 +++");
 			if (loader != null) {
 				try {
 					loader.close();
@@ -494,14 +483,10 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 					e.printStackTrace();
 				}
 			}
-			System.out.println("+++ 3 +++");
 
 			TestSerialiser.exit();
-			System.out.println("+++ 4 +++");
 			ScreenshotSerialiser.exit();
-			System.out.println("+++ 5 +++");
 			LogSerialiser.exit();
-			System.out.println("+++ 6 +++");
 		}
 		System.out.println("+++ 7 +++");
 	}
