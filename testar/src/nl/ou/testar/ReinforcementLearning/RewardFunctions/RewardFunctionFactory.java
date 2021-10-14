@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.Helpers.CompareScreenshotsByPixelsHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.monkey.ConfigTags;
@@ -23,6 +24,9 @@ public class RewardFunctionFactory {
                 break;
             case "ABTBasedRewardFunction":
                 selectedRewardFunction = new ABTBasedRewardFunction();
+                break;
+            case "CompareScreenshotsByPixelsRewardFunction":
+                selectedRewardFunction = new CompareScreenshotsByPixelsRewardFunction(new CompareScreenshotsByPixelsHelper());
                 break;
             case "BorjaReward4":
                 selectedRewardFunction = new BorjaReward4();
