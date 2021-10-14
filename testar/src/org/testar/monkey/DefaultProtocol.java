@@ -219,7 +219,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 		try {
-
+			if (true) throw new SessionNotCreatedException("Fake exception");
 			if (mode() == Modes.View) {
 				if(isHtmlFile() || isLogFile()) {
 					try {
@@ -1789,26 +1789,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//cleaning the variables started in initialize()
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
-				System.out.println("-= 0 =-");
 				if (GlobalScreen.isNativeHookRegistered()) {
-					System.out.println("-= 1 =-");
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-					System.out.println("-= 2 =-");
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-					System.out.println("-= 3 =-");
 					GlobalScreen.removeNativeMouseListener(eventHandler);
-					System.out.println("-= 4 =-");
 					GlobalScreen.removeNativeKeyListener(eventHandler);
-					System.out.println("-= 5 =-");
-//					new Thread(() -> {
-//						try {
-//							GlobalScreen.unregisterNativeHook();
-//						} catch (NativeHookException e) {
-//							e.printStackTrace();
-//						}
-//					}).start();
 					GlobalScreen.unregisterNativeHook();
-					System.out.println("-= 6 =-");
 				}
 			}
 		} catch (NativeHookException e) {
@@ -1816,7 +1802,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (NullPointerException e) {
 			// no ConfigTags
 			e.printStackTrace();
-			System.out.println("-= ERROR =-");
 		}
 
 	}
