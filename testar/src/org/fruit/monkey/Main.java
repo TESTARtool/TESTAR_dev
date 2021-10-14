@@ -445,7 +445,6 @@ public class Main extends Application implements DashboardDelegate {
 			ScreenshotSerialiser.exit();
 			LogSerialiser.exit();
 		}
-		System.out.println("+++ 7 +++");
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
