@@ -41,6 +41,7 @@ public class WdRootElement extends WdElement {
   public boolean isForeground;
   public boolean hasStandardMouse;
   public boolean hasStandardKeyboard;
+  public int httpStatus;
   public String documentTitle;
 
   public WdRootElement(Map<String, Object> packedbody) {

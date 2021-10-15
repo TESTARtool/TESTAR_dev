@@ -54,6 +54,9 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebItemStatus = from("WebItemStatus", String.class);
   public static final Tag<String> Desc = from("Desc", String.class);
 
+  /** The returned HTTP status code */
+  public static final Tag<Integer> WebHttpStatus = from("WebHttpStatus", Integer.class);
+
   public static final Tag<String> WebTagName = from("WebTagName", String.class);
 
   /**
@@ -244,4 +247,9 @@ public class WdTags extends TagsBase {
    * Access key of a widget.
    */
   public static final Tag<String> WebAccessKey = from("WebAccessKey", String.class);
+
+  /**
+   * Store HTTP return value
+   */
+  public static final Tag<Integer> WebHTTPValue = from("WebHttpValue", Integer.class);
 }
