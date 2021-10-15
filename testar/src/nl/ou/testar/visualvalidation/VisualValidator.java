@@ -185,9 +185,13 @@ public class VisualValidator implements VisualValidationManager, OcrResultCallba
             );
             _matcherResult.getNoLocationMatches().forEach(result ->
                     {
-                        drawRectangle(copy, result._location, java.awt.Color.red);
-                        // Overwrite the verdict if we couldn't find a location match for expected text.
-                        validationVerdict[0] = createFailedToMatchVerdict(result);
+                        if (result instanceof ExpectedElement) {
+                            drawRectangle(copy, result._location, java.awt.Color.red);
+                            // Overwrite the verdict if we couldn't find a location match for expected text.
+                            validationVerdict[0] = createFailedToMatchVerdict(result);
+                        } else {
+                            drawRectangle(copy, result._location, Color.magenta);
+                        }
                     }
             );
         }

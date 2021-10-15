@@ -154,8 +154,12 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
     private void extractedText(Rectangle applicationPosition, double displayScale, List<ExpectedElement> expectedElements, Widget widget) {
         String widgetRole = widget.get(Role).name();
         String text = widget.get(getVisualTextTag(widgetRole), "");
+        StringBuilder sb = new StringBuilder();
+        Util.ancestors(widget).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
+        String ancestors = sb.toString();
+        boolean ignored = true;
 
-        if (widgetIsIncluded(widget, widgetRole)) {
+        if (widgetIsIncluded(widget, widgetRole, ancestors)) {
             if (text != null && !text.isEmpty()) {
                 Rectangle absoluteLocation = getLocation(widget);
                 Location relativeLocation = new Location(
@@ -164,26 +168,24 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
                         (int) (absoluteLocation.width * displayScale),
                         (int) (absoluteLocation.height * displayScale));
                 expectedElements.add(new ExpectedElement(relativeLocation, text));
+                ignored = false;
             }
-        } else {
-            if (_loggingEnabled) {
-                Logger.log(Level.DEBUG, TAG, "Widget {} with role {} is ignored", text, widgetRole);
-            }
+        }
+
+        if (_loggingEnabled) {
+            Logger.log(Level.INFO, TAG, "Widget {} with role {} and ancestors {} is {}",
+                    text, widgetRole, ancestors, ignored ? "ignored" : "added");
         }
     }
 
-    protected boolean widgetIsIncluded(Widget widget, String role) {
+    protected boolean widgetIsIncluded(Widget widget, String role, String ancestors) {
         boolean containsReadableText = true;
         if (_blacklist.containsKey(role)) {
             containsReadableText = false;
             try {
                 List<String> blacklistedAncestors = _blacklist.get(role);
                 if (!blacklistedAncestors.isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
-                    Util.ancestors(widget).forEach(it -> sb.append(WidgetTextSetting.ANCESTOR_SEPARATOR).append(it.get(Role, Roles.Widget)));
-
                     // Check if we should ignore this widget based on its ancestors.
-                    String ancestors = sb.toString();
                     containsReadableText = blacklistedAncestors.stream().noneMatch(ancestors::equals);
                 }
             } catch (NullPointerException ignored) {

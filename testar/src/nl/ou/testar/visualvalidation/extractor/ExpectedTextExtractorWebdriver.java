@@ -12,8 +12,8 @@ class ExpectedTextExtractorWebdriver extends ExpectedTextExtractorBase {
     }
 
     @Override
-    protected boolean widgetIsIncluded(Widget widget, String role) {
+    protected boolean widgetIsIncluded(Widget widget, String role, String ancestors) {
         // Check if the widget is visible
-        return widget.get(WebIsFullOnScreen) && super.widgetIsIncluded(widget, role);
+        return widget.get(WebIsFullOnScreen) && super.widgetIsIncluded(widget, role, ancestors);
     }
 }

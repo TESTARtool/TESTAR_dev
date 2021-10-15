@@ -32,6 +32,7 @@
 package nl.ou.testar.HtmlReporting;
 
 import nl.ou.testar.a11y.reporting.HTMLReporter;
+import nl.ou.testar.visualvalidation.extractor.ExpectedElement;
 import nl.ou.testar.visualvalidation.matcher.CharacterMatchEntry;
 import nl.ou.testar.visualvalidation.matcher.ContentMatchResult;
 import nl.ou.testar.visualvalidation.matcher.LocationMatch;
@@ -49,7 +50,6 @@ import java.io.PrintWriter;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class HtmlSequenceReport implements Reporting {
 
@@ -342,8 +342,10 @@ public class HtmlSequenceReport implements Reporting {
                 write("<p><img src=\"" + screenshotPath + "\"></p>");
 
                 // List the expected elements without a location match.
-                result.getNoLocationMatches().forEach(it ->
-                        write("<h4>No match for: \"" + it._text + "\" at location: " + it._location + "</h4>")
+                result.getNoLocationMatches().forEach(it -> {
+                            String type = it instanceof ExpectedElement ? "expected" : "ocr";
+                            write("<h4>No match for " + type + ": \"" + it._text + "\" at location: " + it._location + "</h4>");
+                        }
                 );
 
                 // List the expected elements with a location match.
