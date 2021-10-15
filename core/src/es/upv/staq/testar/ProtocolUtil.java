@@ -245,10 +245,20 @@ public class ProtocolUtil {
 	 */
 	public static AWTCanvas getStateshotBinary(State state) {
 		Shape viewPort = null;
-		if (state.childCount() > 0){
-			viewPort = state.child(0).get(Tags.Shape, null);
-			if (viewPort != null && (viewPort.width() * viewPort.height() < 1))
-				viewPort = null;
+		for (int index = 0; index < state.childCount(); index++){
+			// While testing Word (2109 build 14430.20270) we noticed that the height of the screenshots was only 5px.
+			// After investigation, we noticed that root contained 5 children. Four had "MSO_BORDEREFFECT_WINDOW_CLASS"
+			// and had none children. And only one was called "OpusApp" and contained child elements.
+			// Ideally this check is more strict; (frameworkId == Win32 and classname != MSO_BORDEREFFECT_WINDOW_CLASS)
+			// but unfortunately these tags are not available at this generic level. Previous implementation directly
+			// used the first child. However, it makes more sense to select the widget which contains children.
+			if (state.child(index).childCount() != 0) {
+				viewPort = state.child(index).get(Tags.Shape, null);
+				if (viewPort != null && (viewPort.width() * viewPort.height() < 1)) {
+					viewPort = null;
+				}
+				break;
+			}
 		}
 		
 		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
