@@ -58,6 +58,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.*;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Color;
@@ -179,6 +180,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
 
+	protected ProtocolDelegate delegate;
+
+	public ProtocolDelegate getDelegate() {
+		return delegate;
+	}
+
+	public  void setDelegate(ProtocolDelegate delegate) {
+		this.delegate = delegate;
+	}
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -218,18 +228,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
-		try {
-			if (true) throw new SessionNotCreatedException("Fake exception");
+		if (delegate != null) try {
 			if (mode() == Modes.View) {
 				if(isHtmlFile() || isLogFile()) {
 					try {
 						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 						Desktop.getDesktop().browse(file.toURI());
 					} catch (IOException e) {
-						popupMessage("Exception: Check the path of the file, something is wrong");
+						delegate.popupMessage("Exception: Check the path of the file, something is wrong");
 						System.out.println("Exception: Check the path of the file, something is wrong");
 					} catch (NoSuchTagException e) {
-						popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
+						delegate.popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
 						System.out.println("Exception: ConfigTags.PathToReplaySequence is missing");
 					}
 				} else if (!findHTMLreport().contains("error")) {
@@ -237,11 +246,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
 					} catch (IOException e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
+						delegate.popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
 				} else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
+					delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
@@ -254,11 +263,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runGenerateOuterLoop(system);
 			}
 
-		}catch(WinApiException we) {
-			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is correctly defined";
+		} catch(WinApiException we) {
 
-			popupMessage(msg);
+			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition";
+
+			delegate.popupMessage(msg);
+
 			System.out.println(msg);
 			we.printStackTrace();
 
@@ -270,31 +281,39 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
     					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
-						//TODO check when implementing other webdriver than chromedriver
-						//TODO remove when automatically killing webdriver process when creating the session fails
-    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-    					+ "Please use Windows Task Manager to stop that process.";
-
-    			popupMessage(msg);
+				//TODO check when implementing other webdriver than chromedriver
+				//TODO remove when automatically killing webdriver process when creating the session fails
+				+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
+						+ "Please use Windows Task Manager to stop that process.";
+    			
+    			delegate.popupMessage(msg);
+    			
     			System.out.println(msg);
     			System.out.println(e.getMessage());
-    		}else {
-    			System.out.println("ERROR starting Selenium WebDriver");
-    			e.printStackTrace();
+    			
+    		} else {
+    			String msg = "********** ERROR starting Selenium WebDriver ********";
+				delegate.popupMessage(msg);
+
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
     		}
-		}catch (IllegalStateException e) {
-			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-				
+    		
+		} catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+
 				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists and is correctly defined";
 
-				popupMessage(msg);
+				delegate.popupMessage(msg);
+
 				System.out.println(msg);
 			}else {
 				e.printStackTrace();
 			}
-		}catch(SystemStartException SystemStartException) {
+
+		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
 		}
@@ -714,7 +733,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
 				System.out.println(message);
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
-				stackTrace.add(message);
+//				stackTrace.add(message);
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;

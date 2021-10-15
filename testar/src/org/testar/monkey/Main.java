@@ -30,6 +30,8 @@
 
 package org.testar.monkey;
 
+import javafx.application.Platform;
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
 import org.testar.serialisation.LogSerialiser;
@@ -40,6 +42,7 @@ import org.testar.monkey.alayer.Tag;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 import nl.ou.testar.jfx.MainController;
@@ -51,11 +54,10 @@ import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
@@ -67,7 +69,7 @@ import org.testar.extendedsettings.ExtendedSettingsFactory;
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
 
-public class Main extends Application implements DashboardDelegate {
+public class Main extends Application implements DashboardDelegate, ProtocolDelegate {
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -391,7 +393,7 @@ public class Main extends Application implements DashboardDelegate {
 	 *
 	 * @param settings
 	 */
-	private static void startTestar(Settings settings) {
+	private void startTestar(Settings settings) {
 
 //		launch();
 
@@ -425,6 +427,10 @@ public class Main extends Application implements DashboardDelegate {
 			LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
+
+			if (DefaultProtocol.class.isInstance(protocol)) {
+				((DefaultProtocol)protocol).setDelegate(this);
+			}
 
 			//Run TESTAR protocol with the selected settings
 			protocol.run(settings);
@@ -828,5 +834,28 @@ public class Main extends Application implements DashboardDelegate {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
+	}
+
+	/**
+	 * Shows the error message dialog
+	 *
+	 * @param message
+	 */
+	public void popupMessage(String message) {
+		Platform.runLater(() -> {
+			final Alert alert = new Alert(Alert.AlertType.ERROR, message);
+			alert.show();
+		});
+	}
+
+	/**
+	 * Opens link in a browser
+	 *
+	 * @param uri
+	 */
+	public void openURI(URI uri) {
+		Platform.runLater(() -> {
+			getHostServices().showDocument(uri.toString());
+		});
 	}
 }
