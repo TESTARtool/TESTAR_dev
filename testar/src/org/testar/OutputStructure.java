@@ -97,9 +97,10 @@ public class OutputStructure {
 					executedSUTname = domain;
 				}
 				else if (sutConnectorValue.contains(".exe")) {
-					int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
 					int endSUT = sutConnectorValue.indexOf(".exe");
-					String sutName = sutConnectorValue.substring(startSUT, endSUT);
+					String pathWithoutArguments = sutConnectorValue.substring(0, endSUT);
+					int startSUT = pathWithoutArguments.lastIndexOf(File.separator)+1;
+					String sutName = pathWithoutArguments.substring(startSUT, endSUT);
 					executedSUTname = sutName;
 				}
 				else if (sutConnectorValue.contains(".jar")) {
