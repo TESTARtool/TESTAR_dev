@@ -176,6 +176,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
+	protected ProtocolDelegate delegate;
+
+	public ProtocolDelegate getDelegate() {
+		return delegate;
+	}
+
+	public  void setDelegate(ProtocolDelegate delegate) {
+		this.delegate = delegate;
+	}
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -214,32 +223,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//initialize TESTAR with the given settings:
 		initialize(settings);
-		try {
-			if (true) throw new SessionNotCreatedException("Fake exception");
+		if (delegate != null) try {
 			if (mode() == Modes.View) {
 				if(isHtmlFile() || isLogFile()) {
-					// TODO: enable browser
-//					try {
-//						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
-//						Desktop.getDesktop().browse(file.toURI());
-//					}catch (Exception e) {
-//						popupMessage("Exception: Check the path of the file, something is wrong");
-//						System.out.println("Exception: Check the path of the file, something is wrong");
-//					}
+					File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
+					delegate.openURI(file.toURI());
+
 				} else if (!findHTMLreport().contains("error")) {
-					// TODO: enable browser
-//					try {
-//						File htmlFile = new File(findHTMLreport());
-//						Desktop.getDesktop().browse(htmlFile.toURI());
-//					}catch (Exception e) {
-//						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
-//						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
-//					}
+					File htmlFile = new File(findHTMLreport());
+					delegate.openURI(htmlFile.toURI());
 				}
 				/*else if(isValidFile())
 					new SequenceViewer(settings);*/
 				else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
+					delegate.popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
@@ -252,20 +249,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runGenerateOuterLoop(system);
 			}
 
-		}catch(WinApiException we) {
+		} catch(WinApiException we) {
 
 			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
 			+" is a correct definition";
 
-			popupMessage(msg);
+			delegate.popupMessage(msg);
 
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
 			
-		}catch(SessionNotCreatedException e) {
+		} catch(SessionNotCreatedException e) {
 			
-    		if(e.getMessage().contains("Chrome version")) {
+    		if (e.getMessage().contains("Chrome version")) {
     			
     			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
@@ -274,24 +271,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
     					+ "You can use Task Manager to finish it.";
     			
-    			popupMessage(msg);
+    			delegate.popupMessage(msg);
     			
     			System.out.println(msg);
     			System.out.println(e.getMessage());
     			
-    		}else {
-    			System.out.println("********** ERROR starting Selenium WebDriver ********");
+    		} else {
+    			String msg = "********** ERROR starting Selenium WebDriver ********";
+				delegate.popupMessage(msg);
+
+    			System.out.println(msg);
     			System.out.println(e.getMessage());
     		}
     		
-		}catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			if (e.getMessage().contains("driver executable does not exist")) {
 				
 				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists or if is a correct definition";
 
-				popupMessage(msg);
+				delegate.popupMessage(msg);
 
 				System.out.println(msg);
 			
@@ -299,7 +299,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				e.printStackTrace();
 			}
 		
-		}catch(SystemStartException SystemStartException) {
+		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
@@ -731,10 +731,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				sequenceCount++;
 
 			} catch (Exception e) {
-				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
-				System.out.println(message);
+				String messagZe = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+//				System.out.println(message);
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
-				stackTrace.add(message);
+//				stackTrace.add(message);
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;
