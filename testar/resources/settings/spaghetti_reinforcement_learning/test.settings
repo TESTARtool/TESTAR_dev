@@ -112,7 +112,7 @@ ProtocolClass = spaghetti_reinforcement_learning/Protocol_spaghetti_reinforcemen
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
-DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+DataStoreDirectory = C:\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -142,15 +142,17 @@ DecayRate = 0.0001
 Temperature = 1.0
 RewardFunction = BorjaReward2
 Policy = GreedyPolicy
-TagName = qborja
-QFunction = QBorjaFunction2
+TagName = defaultrl
+QFunction = QlearningFunction
 
 #################################################################
 # Extended settings file
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\spaghetti_reinforcement_learning\\ExtendedRLBorjaActionGroup.xml
+ExtendedSettingsFile = .\\settings\\spaghetti_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
+# ExtendedSettingsFile = .\\settings\\spaghetti_reinforcement_learning\\ExtendedRLQVLearning.xml
+# ExtendedSettingsFile = .\\settings\\spaghetti_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Other more advanced settings

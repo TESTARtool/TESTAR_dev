@@ -282,8 +282,8 @@ public class Protocol_swingset2_reinforcement_learning extends SwingSet2Protocol
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
-			compressOutputRunFolder();
-			copyOutputToNewFolderUsingIpAddress("N:");
+//			compressOutputRunFolder();
+//			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }
