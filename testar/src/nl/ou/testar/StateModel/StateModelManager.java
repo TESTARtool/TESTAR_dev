@@ -3,6 +3,8 @@ package nl.ou.testar.StateModel;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
 import java.util.Set;
 
 public interface StateModelManager {
@@ -21,4 +23,6 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedByUser();
 
     void notifyTestSequenceInterruptedBySystem(String message);
+
+    OResultSet queryStateModel(String query);
 }
