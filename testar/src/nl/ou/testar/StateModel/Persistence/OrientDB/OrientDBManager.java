@@ -685,4 +685,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public void setListening(boolean listening) {
         this.listening = listening;
     }
+
+    public EntityManager getEntityManager() {
+    	return entityManager;
+    }
 }
