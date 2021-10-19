@@ -479,6 +479,10 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ReplayApplicationName, "")); // replay state model
+			defaults.add(Pair.from(ReplayApplicationVersion, "")); // replay state model
+			defaults.add(Pair.from(ReplayModelSequenceId, "")); // replay state model
+			defaults.add(Pair.from(ReplayModelSequenceTime, "")); // replay state model
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			

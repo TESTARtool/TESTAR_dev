@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
@@ -11,6 +12,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 import java.util.*;
 
@@ -268,6 +271,12 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
+    }
+
+    @Override
+    public OResultSet queryStateModel(String query) {
+    	EntityManager manager = persistenceManager.getEntityManager();
+    	return manager.getConnection().getDatabaseSession().query(query);
     }
 
 }

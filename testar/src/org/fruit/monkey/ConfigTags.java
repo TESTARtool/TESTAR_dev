@@ -111,6 +111,11 @@ public final class ConfigTags {
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
+  // Replay state model
+  public static final Tag<String> ReplayApplicationName = Tag.from("ReplayApplicationName", String.class);
+  public static final Tag<String> ReplayApplicationVersion = Tag.from("ReplayApplicationVersion", String.class);
+  public static final Tag<String> ReplayModelSequenceId = Tag.from("ReplayModelSequenceId", String.class);
+  public static final Tag<String> ReplayModelSequenceTime = Tag.from("ReplayModelSequenceTime", String.class);
 
   // state model difference
   public static final Tag<String> PreviousApplicationName = Tag.from("PreviousApplicationName", String.class);
