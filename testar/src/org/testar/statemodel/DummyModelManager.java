@@ -3,6 +3,8 @@ package org.testar.statemodel;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
 import java.util.Set;
 
 public class DummyModelManager implements StateModelManager{
@@ -45,5 +47,10 @@ public class DummyModelManager implements StateModelManager{
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
 
+    }
+
+    @Override
+    public OResultSet queryStateModel(String query) {
+    	return null;
     }
 }
