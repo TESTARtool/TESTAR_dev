@@ -639,6 +639,10 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(ReportServicePort, 8080));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ReplayApplicationName, "")); // replay state model
+			defaults.add(Pair.from(ReplayApplicationVersion, "")); // replay state model
+			defaults.add(Pair.from(ReplayModelSequenceId, "")); // replay state model
+			defaults.add(Pair.from(ReplayModelSequenceTime, "")); // replay state model
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(AlwaysCompile, true));

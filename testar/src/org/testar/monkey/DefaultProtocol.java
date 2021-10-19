@@ -61,6 +61,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import nl.ou.testar.*;
 import org.fruit.monkey.ProtocolDelegate;
+import org.fruit.monkey.ReplayStateModelUtil;
 import org.testar.*;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Color;
@@ -70,6 +71,8 @@ import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
 import nl.ou.testar.jfx.StartupProgressMonitor;
+import nl.ou.testar.StateModel.Exception.StateModelException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -319,6 +322,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					progressMonitor.beginTask("Replay in progress", 0);
 				}
 				runReplayLoop();
+			} else if (mode() == Modes.ReplayModel) {
+				runReplayStateModelOuterLoop(settings);
 			} else if (mode() == Modes.Spy) {
 				if (progressMonitor != null) {
 					progressMonitor.beginTask("Spy in progress", 0);
@@ -430,7 +435,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay || mode() == Modes.ReplayModel) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
@@ -2075,4 +2080,243 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	    CodingManager.buildEnvironmentActionIDs(state, action);
 	}
 
+	/**
+	 * Replay Mode using State Model Sequence Layer
+	 * 
+	 * @param settings
+	 * @throws StateModelException
+	 */
+	protected void runReplayStateModelOuterLoop(final Settings settings) throws StateModelException {
+		// We need at least the name of the model we want to replay (maybe created without version)
+		if (settings.get(ConfigTags.ReplayApplicationName,"").isEmpty()) {
+			System.err.println(String.format("ERROR: ReplayModel mode needs at least the setting ReplayApplicationName"));
+
+			// notify the stateModelManager that the testing has finished
+			stateModelManager.notifyTestingEnded();
+
+			// Finish TESTAR execution
+			mode = Modes.Quit;
+			return;
+		}
+
+		// Get State Model Identifier from the model we want to replay
+		// We will need this to extract the abstract actions later
+		String replayName = settings.get(ConfigTags.ReplayApplicationName,"");
+		String replayVersion = settings.get(ConfigTags.ReplayApplicationVersion,"");
+		String replayModelIdentifier = ReplayStateModelUtil.getReplayModelIdentifier(stateModelManager, replayName, replayVersion);
+
+		//TODO: Extract abstract attributes from the State Model we want to replay, to use the same attributes
+
+		// User has indicated the specific sequence id to replay,
+		// Only replay this sequence and stop
+		if(!settings.get(ConfigTags.ReplayModelSequenceId,"").isEmpty()) {
+			String msg = String.format("ReplayStateModelOuterLoop... Specific TestSequence %s for AbstractStateModel (%s, %s)", settings.get(ConfigTags.ReplayModelSequenceId), replayName, replayVersion);
+			System.out.println(msg);
+			runReplayStateModelInnerLoop(settings.get(ConfigTags.ReplayModelSequenceId), replayModelIdentifier);
+		}
+		// User has indicated a specific sequence time to replay
+		// Only replay this sequence and stop
+		else if(!settings.get(ConfigTags.ReplayModelSequenceTime,"").isEmpty()) {
+			String msg = String.format("ReplayStateModelOuterLoop... Specific TestSequence TIME %s for AbstractStateModel (%s, %s)", settings.get(ConfigTags.ReplayModelSequenceTime), replayName, replayVersion);
+			System.out.println(msg);
+			String sequenceIdentifier = ReplayStateModelUtil.getReplaySequenceIdentifierByTime(stateModelManager, settings.get(ConfigTags.ReplayModelSequenceTime));
+			runReplayStateModelInnerLoop(sequenceIdentifier, replayModelIdentifier);
+		}
+		// User has indicated a complete state model (name and version) to replay
+		// Replay all the existing sequences of this model
+		else {
+			// Get the number of TestSequences of the model we want to replay
+			int numberTestSequences = ReplayStateModelUtil.getReplayTestSequenceNumber(stateModelManager, replayModelIdentifier, replayName, replayVersion);
+			String msg = String.format("ReplayStateModelOuterLoop... %s TestSequences found for AbstractStateModel (%s, %s)", numberTestSequences, replayName, replayVersion);
+			System.out.println(msg);
+
+			// Iterate over all TestSequences to reproduce them
+			for(int testSeq = 1; testSeq <= numberTestSequences; testSeq++) {
+				// Get the sequence identifier of the test TestSequences to reproduce
+				// Every iteration will get the next TestSequences identifier
+				String sequenceIdentifier = ReplayStateModelUtil.getReplaySequenceIdentifierByCounter(stateModelManager, testSeq);
+				runReplayStateModelInnerLoop(sequenceIdentifier, replayModelIdentifier);
+			}
+		}
+
+		// notify the statemodelmanager that the testing has finished
+		stateModelManager.notifyTestingEnded();
+
+		// Going back to TESTAR settings dialog if it was used to start replay:
+		mode = Modes.Quit;
+	}
+
+	protected void runReplayStateModelInnerLoop(String sequenceIdentifier, String replayModelIdentifier) throws StateModelException {
+		// Number of actions that contains the current sequence to replay
+		int replayActionCount = ReplayStateModelUtil.getReplayActionStepsCount(stateModelManager, sequenceIdentifier);
+
+		//Reset LogSerialiser
+		LogSerialiser.finish();
+		LogSerialiser.exit();
+
+		synchronized(this){
+			OutputStructure.calculateInnerLoopDateString();
+			OutputStructure.sequenceInnerLoopCount++;
+		}
+
+		preSequencePreparations();
+
+		// action extracted or not successfully
+		boolean success = true;
+		// reset the faulty variable because we started a new execution
+		faultySequence = false;
+
+		SUT system = startSystem();
+
+		//Generating the new sequence file that can be replayed:
+		generatedSequence = getAndStoreGeneratedSequence();
+		currentSeq = getAndStoreSequenceFile();
+
+		this.cv = buildCanvas();
+		State state = getState(system);
+
+		setReplayVerdict(getVerdict(state));
+
+		// notify the statemodelmanager
+		stateModelManager.notifyTestSequencedStarted();
+
+		double rrt = settings.get(ConfigTags.ReplayRetryTime);
+
+		// count the action execution number
+		actionCount = 1;
+
+		while(success && !faultySequence && mode() == Modes.ReplayModel && actionCount <= replayActionCount){
+			/**
+			 * Extract the action we want to replay
+			 */
+			// Get the counter of the action step
+			// We need to do this because one model contains multiple sequences
+			String actionSequence = sequenceIdentifier + "-" + actionCount + "-" + sequenceIdentifier + "-" + (actionCount+1);
+			int counterStep = ReplayStateModelUtil.getReplayCounterOfActionStep(stateModelManager, actionSequence);
+
+			// Now we get the AbstractActionId of the model that contains this counter action step
+			// This is the action we want to replay and we need to search in the state
+			String abstractActionReplayId = ReplayStateModelUtil.getReplayAbstractActionIdofCounter(stateModelManager, counterStep, replayModelIdentifier);
+
+			// Derive Actions of the current State
+			Set<Action> actions = deriveActions(system,state);
+			buildStateActionsIdentifiers(state, actions);
+
+			// notify to state model the current state
+			stateModelManager.notifyNewStateReached(state, actions);
+
+			// Now lets see if current state contains the action we want to replay
+			Action actionToReplay = null;
+			for(Action a : actions) {
+				// Abstract Action identifiers match
+				if(a.get(Tags.AbstractIDCustom, "").equals(abstractActionReplayId)) {
+					actionToReplay = a;
+					break;
+				}
+			}
+
+			// We do not find the action we want to replay in the current state
+			// The SUT has changed or we are using a different abstraction
+			// But the sequence is not replayable
+			if(actionToReplay == null) {
+				String msg = String.format("The abstract action to replay %s was not found in the SUT state", abstractActionReplayId);
+				msg = msg.concat("\n");
+				msg = msg.concat("The SUT has changed or we are using a different abstraction");
+
+				System.out.println(msg);
+				setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+
+				// We do not success trying to found the action to replay
+				success = false;
+			} else {
+				// Action to Replay was found, lets execute it
+
+				double actionDelay = settings.get(ConfigTags.TimeToWaitAfterAction, 1.0);
+				double actionDuration = settings.get(ConfigTags.ActionDuration, 1.0);
+
+				cv.begin(); Util.clear(cv);
+				cv.end();
+
+				// In Replay-mode, we only show the red dot if visualizationOn is true:
+				if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, actionToReplay);
+
+				try{
+					String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]", actionCount, actionToReplay.get(Desc, ""));
+					LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
+
+					preSelectAction(system, state, actions);
+
+					//before action execution, pass it to the state model manager
+					stateModelManager.notifyActionExecution(actionToReplay);
+
+					actionToReplay.run(system, state, actionDuration);
+
+					actionCount++;
+					LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
+				} catch(ActionFailedException afe){}
+
+				Util.pause(actionDelay);
+
+				state = getState(system);
+
+				//Saving the actions and the executed action into replayable test sequence:
+				saveActionIntoFragmentForReplayableSequence(actionToReplay, state, actions);
+
+				setReplayVerdict(getVerdict(state));
+			}
+		}
+
+		cv.release();
+
+		// notify to state model the last state
+		Set<Action> actions = deriveActions(system, state);
+		buildStateActionsIdentifiers(state, actions);
+		for(Action a : actions)
+			if(a.get(Tags.AbstractIDCustom, null) == null)
+				buildEnvironmentActionIdentifiers(state, a);
+
+		stateModelManager.notifyNewStateReached(state, actions);
+
+		if (cv != null) { cv.release(); }
+		if (system != null) { system.stop(); }
+
+		if(faultySequence) {
+			String msg = "Replayed Sequence contains Errors: "+ getReplayVerdict().info();
+			System.out.println(msg);
+			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+		} else if(success) {
+			String msg = "Sequence successfully replayed!\n";
+			System.out.println(msg);
+			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+		} else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE) {			
+			System.out.println(getReplayVerdict().info());
+			LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
+
+		} else {
+			String msg = "Fail replaying sequence.\n";
+			System.out.println(msg);
+			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
+		}
+
+		//calling finishSequence() to allow scripting GUI interactions to close the SUT:
+		finishSequence();
+
+		// notify the state model manager of the sequence end
+		stateModelManager.notifyTestSequenceStopped();
+
+		//Close and save the replayable fragment of the current sequence
+		writeAndCloseFragmentForReplayableSequence();
+
+		//Copy sequence file into proper directory:
+		classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
+
+		LogSerialiser.finish();
+
+		postSequenceProcessing();
+
+		//Stop system and close the SUT
+		stopSystem(system);
+	}
 }
