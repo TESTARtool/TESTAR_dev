@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.WidgetImageComparison;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.monkey.ConfigTags;
@@ -12,13 +13,13 @@ public class RewardFunctionFactory {
     public static RewardFunction getRewardFunction (final Settings settings) {
         final String rewardFunction = settings.get(ConfigTags.RewardFunction, "");
         final RewardFunction selectedRewardFunction;
+        final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
 
         switch(rewardFunction) {
             case "WidgetTreeBasedRewardFunction":
                 selectedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(new LRKeyrootsHelper(), new TreeDistHelper());
                 break;
             case "ImageRecognitionBasedRewardFunction":
-                final float defaultReward = settings.get(ConfigTags.DefaultReward, 1.0f);
                 selectedRewardFunction = new ImageRecognitionBasedRewardFunction(defaultReward);
                 break;
             case "ABTBasedRewardFunction":
@@ -32,6 +33,11 @@ public class RewardFunctionFactory {
                 break;
             case "BorjaReward2":
                 selectedRewardFunction = new BorjaReward2();
+                break;
+            case "WidgetImageComparison":
+                // Defines the percentage of how much the widget reward function should count in the reward
+                final float widgetComparisonShare = settings.get(ConfigTags.WidgetComparisonShare, 0.5f);
+                selectedRewardFunction = new WidgetImageComparison(defaultReward, widgetComparisonShare);
                 break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();

@@ -127,7 +127,7 @@ public final class ConfigTags {
   public static final Tag<String> QFunction = Tag.from("QFunction", String.class);
   public static final Tag<Float> DefaultVValue = Tag.from("DefaultVValue", Float.class);
   public static final Tag<Float> Beta = Tag.from("Beta", Float.class);
-  public static final Tag<String> VTagName = Tag.from("VTagName", String.class);
+  public static final Tag<Float> WidgetComparisonShare = Tag.from("WidgetComparisonShare", Float.class);
 
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
