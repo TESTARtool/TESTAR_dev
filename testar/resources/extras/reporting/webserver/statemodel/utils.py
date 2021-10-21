@@ -52,7 +52,6 @@ def concrete_state_traverse(cid_from: str, cid_to: str):
 def _edge_to_object(uid: str):
     query = "SELECT format('%s', @rid), out.ConcreteID, in.ConcreteID, in.oracleVerdictCode , `Shape`, `ConcreteID`, `Desc`, `ValuePattern` FROM ConcreteAction WHERE uid='?';"
     edge = orientdb.query(query, uid)
-    print(edge, orientdb._sanitize(query, uid), flush=True)
     # Select first if it exists or return nothing
     if edge:
         edge = edge[0]
