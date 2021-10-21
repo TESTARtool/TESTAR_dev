@@ -28,7 +28,7 @@
           <td>{{ state['edges_in']|length}}</td>
           <td>{{ state['edges_out']|count}}</td>
           <td>{{ state['oracle'] }}</td>
-          <td><a href="/concrete/{{ state['cid'] }}">X</a></td>
+          <td><button class="show-details" onclick="location.href='/concrete/{{ state['cid'] }}'">Details</button></td>
         </tr>
     {% endfor %}
     </table>
