@@ -36,15 +36,18 @@
     </section>
 
     <script>
-        const iterations = {{ report.sequence_count() }} //#[chart_iteration];
+        const iterations = {{ report.sequence_count() }};
     </script>
 
     <section class="result">
         <h2>Oracle metrics (chart)</h2>
         <canvas id="oracleMetricChart" class="chart"></canvas>
         <script>
+            // Override text colour
+            Chart.defaults.global.defaultFontColor = "#fff";
+
             /** @type {number[]} */
-            let oracleValues = [{{ report.oracle_count() }} ,{{ report.get_ok_sequence_count() }}] //[0]//#[chart_oracles];
+            let oracleValues = [{{ report.oracle_count() }} ,{{ report.get_ok_sequence_count() }}];
             /**  @type {string[]} */
             let oracleIndices = ['Faults', 'Success'];
         </script>
@@ -59,15 +62,14 @@
             let issueValues = []//#[chart_issues];
             /**  @type {number[]} */
 
-                {% for sequence in  report.get_sequences() %}
+                /** {% for sequence in  report.get_sequences() %}
                     issueValues.push("{{ sequence.veredict_count() }}")
-                {% endfor %}
+                {% endfor %} **/
             
             let issueIndices = new Array(iterations);
             for (let index = 0; index < iterations; index++) {
                 issueIndices[index] = index + 1;
             }
-      
         </script>
         <script src="{{ url_for('static', filename='js/issueMetricChart.js') }}"></script>
     </section>
@@ -86,7 +88,7 @@
             </thead>
             <tbody>
             {% for sequence in report.get_sequences() %}
-            <tr>
+            <tr class="value">
                 <td>{{ sequence.get_id() }}</td>
                 <td>{{ sequence.veredict_count() }}</td>
                 <td>{{ sequence.has_oracle() }}</td>  

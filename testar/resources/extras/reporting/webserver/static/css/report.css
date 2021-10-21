@@ -1,34 +1,19 @@
-/* Import Ubuntu font */
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;1,500&display=swap');
 
-/**************************************/
-/*    Global parameters and values
-/**************************************/
 
 * {
     /********************/
     /*      Colours
     /********************/
-    --background: #EEE;
-
-    --card-background: #FFF;
-    --card-shadow: #CCCA;
-
-    --link-colour: #400;
-    --link-colour-visited: #600;
-    --link-colour-active: #800;
-    --link-colour-hover: #860;
-
-    /********************/
-    /* Iteration overview
-    /********************/
-    --overview-background: #F8F8F8;
-    --overview-background-header: #DADADA;
-    --overview-border: #E0E0E0;
-
-    --overview-detail-background: #EAEAEA;
-    --overview-detail-background-hover: #D0D0D0;
-    --overview-detail-background-active: #C0C0C0;
+    --background-lighter: #5E9ED5;
+    --background: #5E9ED5;
+    --background-darker: #297ec8;
+    --color: #FFF;
+    
+    --link-colour: #FFF;
+    --link-colour-visited: #FFF;
+    --link-colour-active: #FFF;
+    --link-colour-hover: #275781;
 
     /********************/
     /*      Wrapper
@@ -41,7 +26,7 @@
     --card-template: "x x";
 
     --min-card-width: 100px;
-    --min-card-height: calc(var(--min-card-width) / 2);
+    --min-card-height: calc(var(--chart-height) + var(--min-card-width) / 2);
 
     /********************/
     /*      Charts
@@ -54,37 +39,59 @@
     /*      Lists
     /********************/
     --list-item-spacing: 5px;
-}
 
-/**************************************/
-/*          Default values
-/**************************************/
+    /********************/
+    /* Iteration overview
+    /********************/
 
-* {
-    font-family: 'Ubuntu', sans-serif;
-}
+    --overview-background: #5E9ED5;
+    --overview-background-header: #5E9ED5;
+    --overview-border: #FFF;
 
-a:link {
-    color: var(--link-colour);
-}
+    --overview-detail-background: #ffffff;
+    --overview-detail-background-hover: #275781;
+    --overview-detail-background-active: #5E9ED5;
 
-a:visited {
-    color: var(--link-colour-visited);
-}
-
-a:active {
-    color: var(--link-colour-active);
-}
-
-a:hover {
-    color: var(--link-colour-hover);
 }
 
 body {
-    background: var(--background);
+    background-color: var(--background);
+    margin:0;
+    padding:0;
+}
 
-    margin: 0;
-    padding: 0;
+
+.content {
+    background-color: var(--background);
+    color: var(--color);
+    font-family: 'Poppins', sans-serif;
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--color);
+
+}
+
+body {
+    background-color: #5E9ED5;
+    color: var(--color);
+    margin:0;
+    padding:0;
+}
+
+table, th, td {
+    border-bottom: 1px solid var(--color);
+    text-align: center;
+    color: var(--color)
+}
+
+.text-h2 {
+    font-size: x-large;
+    font-weight: bold;
 }
 
 /**************************************/
@@ -118,7 +125,7 @@ section#results section.result {
     width: 90%;
     height: fit-content;
 
-    border-radius: 10px;
+    border-radius: 5px;
 
     box-shadow: 2px 2px 1px 1px var(--card-shadow);
 
@@ -184,9 +191,6 @@ table.iteration-overview > tr, th {
     background: var(--overview-background-header);
 }
 
-table.iteration-overview > tr.value:not(.arrows), td:not(:first-child) {
-    border-left: 1px solid var(--overview-border);
-}
 
 table.iteration-overview > tr.value, td {  
     border-top: 1px solid var(--overview-border);
@@ -202,7 +206,7 @@ table.iteration-overview > tr.value, td {
     }
 }
 
-table.iteration-overview tr.value td button.show-details {
+button.show-details {
     margin: 5px;
     padding: 2px;
 
@@ -216,16 +220,16 @@ table.iteration-overview tr.value td button.show-details {
     transition: ease-in-out 0.5s;
 }
 
-table.iteration-overview tr.value td button.show-details:hover {
+button.show-details:hover {
     background: var(--overview-detail-background-hover);
 }
 
-table.iteration-overview tr.value td button.show-details:active {
+button.show-details:active {
     background: var(--overview-detail-background-active);
     transition-duration: 0.25s;
 }
 
-table.iteration-overview tr.value td button.show-details.arrow {
+button.show-details.arrow {
     width: 50px;
     border-radius: 5px;
 }
@@ -233,6 +237,10 @@ table.iteration-overview tr.value td button.show-details.arrow {
 /**************************************/
 /*         Sequence Overview
 /**************************************/
+
+.result {
+    border: 1px solid var(--color);
+}
 
 table#sequenceOverviewTable {
     margin-top: 1em;
@@ -290,4 +298,21 @@ table#sequenceOverviewTable tr td:first-child:hover {
     width: 50vw;
     max-width: 50vw;
     transition: all 0.5s ease-in-out 0s;
+}
+
+
+a:link {
+    color: var(--link-colour);
+}
+
+a:visited {
+    color: var(--link-colour-visited);
+}
+
+a:active {
+    color: var(--link-colour-active);
+}
+
+a:hover {
+    color: var(--link-colour-hover);
 }

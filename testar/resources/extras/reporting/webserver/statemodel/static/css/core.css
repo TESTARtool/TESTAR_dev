@@ -11,7 +11,6 @@ table {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid white;
-
 }
 
 body {
@@ -52,4 +51,27 @@ table, th, td {
 
 .no-oracle-link::before {
     content: "[";
+}
+
+button.show-details {
+    margin: 5px;
+    padding: 2px;
+
+    width: 80%;
+    height: 100%;
+
+    border: none;
+
+    background: #ffffff;
+
+    transition: ease-in-out 0.5s;
+}
+
+button.show-details:hover {
+    background: #275781;
+}
+
+button.show-details:active {
+    background: #5E9ED5;
+    transition-duration: 0.25s;
 }
