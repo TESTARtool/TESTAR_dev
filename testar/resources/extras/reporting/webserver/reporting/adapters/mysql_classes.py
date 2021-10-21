@@ -8,6 +8,7 @@ from .abstract_classes import AbstractReport, AbstractSequence, AbstractAction
 
 database = MySqlDatabase()
 
+
 class Action(AbstractAction):
     # TODO: TEST EACH FEATURE
     def __init__(self, action_id: int, check: bool = True):
