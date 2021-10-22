@@ -1,11 +1,13 @@
 package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
-import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
 import nl.ou.testar.jfx.settings.bindings.control.ControlBinding;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -19,6 +21,11 @@ public class WhiteboxSettingsController extends SettingsEditController {
     private TextField sonarUrlField;
     private TextField sonarUsernameField;
     private TextField sonarPasswordField;
+
+    private TextArea sonarProjectPropertiesArea;
+    private TextField sonarProjectNameField;
+    private TextField sonarProjectKeyField;
+    private CheckBox sonarSaveResultBox;
 
     public WhiteboxSettingsController(Settings settings, String settingsPath) {
         super("Whitebox", settings, settingsPath);

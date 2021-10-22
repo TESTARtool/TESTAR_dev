@@ -95,7 +95,25 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         final String imageId = dockerClient.buildImageCmd(destination).exec(new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
-                System.out.println(item);
+                String status = item.getStatus();
+                if(status == null) {
+                    status = "N/A";
+                }
+                Long currentProgress = null;
+                Long totalProgress = null;
+                ResponseItem.ProgressDetail progressDetail = item.getProgressDetail();
+                if (progressDetail != null) {
+                    currentProgress = progressDetail.getCurrent();
+                    totalProgress = progressDetail.getTotal();
+                }
+                if (currentProgress == null) {
+                    currentProgress = 0L;
+                }
+                if (totalProgress == null) {
+                    totalProgress = 0L;
+                }
+                System.out.println("Status: " + status + ", progress: " + currentProgress + " of " + totalProgress);
+//                System.out.println(item);
                 super.onNext(item);
             }
         }).awaitImageId();
