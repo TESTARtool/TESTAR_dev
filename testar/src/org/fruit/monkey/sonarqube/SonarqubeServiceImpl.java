@@ -238,7 +238,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         final HostConfig hostConfig = HostConfig.newHostConfig()
                 .withBinds(new Bind(sourcePath, new Volume("/usr/src")));
         final String dockerfileContent =
-                "FROM sonarsource/sonar-scanner-cli AS sonarqube_scan\n" +
+                "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
                 "ENV SONAR_HOST_URL http://sonarqube:9000\n" +
                 "ENV SONAR_TOKEN " + token  + "\n";
 

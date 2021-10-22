@@ -2,6 +2,7 @@ package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -20,6 +21,10 @@ public class WhiteboxSettingsController extends ChildSettingsController {
     private TextField sonarPasswordField;
 
     private CheckBox sonarDockerizeBox;
+
+    private TextArea sonarProjectPropertiesArea;
+    private TextField sonarProjectNameField;
+    private TextField sonarProjectKeyField;
     private CheckBox sonarSaveResultBox;
 
     public WhiteboxSettingsController(Settings settings, String settingsPath) {
@@ -31,7 +36,8 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         super.viewDidLoad(view);
         try {
             putSection(view, "Git", "jfx/settings_git.fxml");
-            putSection(view, "Sonarqube", "jfx/settings_sonarqube.fxml");
+            putSection(view, "Sonarqube service", "jfx/settings_sonarqube.fxml");
+            putSection(view, "Sonarqube project", "jfx/settings_sonar_project.fxml");
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -47,6 +53,10 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         sonarPasswordField = (TextField) view.lookup("#sonarPassword");
 
         sonarDockerizeBox = (CheckBox) view.lookup("#sonarDockerize");
+
+        sonarProjectPropertiesArea = (TextArea) view.lookup("#sonarProjectProperties");
+        sonarProjectNameField = (TextField) view.lookup("#sonarProjectName");
+        sonarProjectKeyField = (TextField) view.lookup("#sonarProjectKey");
         sonarSaveResultBox = (CheckBox) view.lookup("#sonarSaveResult");
 
         sonarDockerizeBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -63,6 +73,10 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         sonarPasswordField.setText(settings.get(ConfigTags.SonarPassword, ""));
 
         sonarDockerizeBox.setSelected(settings.get(ConfigTags.SonarDockerize, false));
+
+        sonarProjectPropertiesArea.setText(settings.get(ConfigTags.SonarProjectProperties, ""));
+        sonarProjectNameField.setText(settings.get(ConfigTags.SonarProjectName, ""));
+        sonarProjectKeyField.setText(settings.get(ConfigTags.SonarProjectKey, ""));
         sonarSaveResultBox.setSelected(settings.get(ConfigTags.SonarSaveResult, true));
 
         updateSonarFields(sonarDockerizeBox.isSelected());
