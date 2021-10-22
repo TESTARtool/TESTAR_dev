@@ -161,6 +161,10 @@ public final class ConfigTags {
   public static final Tag<Boolean> SonarDockerize = Tag.from("SonarDockerize", Boolean.class);
   public static final Tag<Boolean> SonarSaveResult = Tag.from("SonarSaveResult", Boolean.class);
 
+  public static final Tag<String> SonarProjectProperties = Tag.from("SonarProjectProperties", String.class);
+  public static final Tag<String> SonarProjectName = Tag.from("SonarProjectName", String.class);
+  public static final Tag<String> SonarProjectKey = Tag.from("SonarProjectKey", String.class);
+
   /*
   //TODO web driver settings for login feature
   public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
