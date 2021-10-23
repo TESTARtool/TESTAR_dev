@@ -144,7 +144,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
             if (qFunction.getClass().getName().contains("QBorjaFunction2")) equalizeQValues(qValue, actions);
 
             //*** FOR DEBUGGING PURPOSES
-            float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag);
+            float lastQValue = previouslyExecutedAbstractAction.getAttributes().get((Tag<Float>) this.tag, 0f);
             qValuesList.add(lastQValue);
             System.out.println("qValuesList: " + qValuesList);
             //*** FOR DEBUGGING PURPOSES

@@ -19,6 +19,10 @@ public class VisitedUnvisitedRewardFunction implements RewardFunction {
 
     @Override
     public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
+        if (executedAbstractAction == null) {
+            return 0f;
+        }
+
         int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
         executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
 
@@ -38,7 +42,7 @@ public class VisitedUnvisitedRewardFunction implements RewardFunction {
 
         // Give a negative reward if all actions have already been executed, so that the state does not need to be visited anymore.
         float reward = -0.5f;
-        
+
         if (unvisitedActionsCount != 0) {
             reward = unvisitedActionsCount / actionsCount;
         }
