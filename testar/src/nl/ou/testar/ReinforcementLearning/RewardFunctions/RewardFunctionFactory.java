@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.VisitedUnvisitedRewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.WidgetImageComparison;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +39,9 @@ public class RewardFunctionFactory {
                 // Defines the percentage of how much the widget reward function should count in the reward
                 final float widgetComparisonShare = settings.get(ConfigTags.WidgetComparisonShare, 0.5f);
                 selectedRewardFunction = new WidgetImageComparison(defaultReward, widgetComparisonShare);
+                break;
+            case "VisitedUnvisitedRewardFunction":
+                selectedRewardFunction = new VisitedUnvisitedRewardFunction();
                 break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();
