@@ -16,6 +16,8 @@ public class WhiteboxSettingsController extends ChildSettingsController {
     private TextField gitTokenField;
     private TextField gitBranchField;
 
+    private CheckBox gitAuthorizationRequiredBox;
+
     private TextField sonarUrlField;
     private TextField sonarUsernameField;
     private TextField sonarPasswordField;
@@ -48,6 +50,12 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         gitTokenField = (TextField) view.lookup("#gitToken");
         gitBranchField = (TextField) view.lookup("#gitBranch");
 
+        gitAuthorizationRequiredBox = (CheckBox) view.lookup("#authorizationRequired");
+
+        gitAuthorizationRequiredBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            updateGitFields(newValue);
+        });
+
         sonarUrlField = (TextField) view.lookup("#sonarUrl");
         sonarUsernameField = (TextField) view.lookup("#sonarUsername");
         sonarPasswordField = (TextField) view.lookup("#sonarPassword");
@@ -68,6 +76,8 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         gitTokenField.setText(settings.get(ConfigTags.GitToken, ""));
         gitBranchField.setText(settings.get(ConfigTags.GitBranch, ""));
 
+        gitAuthorizationRequiredBox.setSelected(settings.get(ConfigTags.GitAuthRequired));
+
         sonarUrlField.setText(settings.get(ConfigTags.SonarUrl, ""));
         sonarUsernameField.setText(settings.get(ConfigTags.SonarUsername, ""));
         sonarPasswordField.setText(settings.get(ConfigTags.SonarPassword, ""));
@@ -80,6 +90,11 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         sonarSaveResultBox.setSelected(settings.get(ConfigTags.SonarSaveResult, true));
 
         updateSonarFields(sonarDockerizeBox.isSelected());
+    }
+
+    private void updateGitFields(boolean authorizationRequired) {
+        gitUsernameField.setDisable(!authorizationRequired);
+        gitTokenField.setDisable(!authorizationRequired);
     }
 
     private void updateSonarFields(boolean dockerEnabled) {
@@ -103,9 +118,14 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         settings.set(ConfigTags.GitUsername, gitUsernameField.getText());
         settings.set(ConfigTags.GitToken, gitTokenField.getText());
         settings.set(ConfigTags.GitBranch, gitBranchField.getText());
+        settings.set(ConfigTags.GitAuthRequired, gitAuthorizationRequiredBox.isSelected());
 
         settings.set(ConfigTags.SonarUrl, sonarUrlField.getText());
         settings.set(ConfigTags.SonarUsername, sonarUsernameField.getText());
         settings.set(ConfigTags.SonarPassword, sonarPasswordField.getText());
+
+        settings.set(ConfigTags.SonarProjectProperties, sonarProjectPropertiesArea.getText());
+        settings.set(ConfigTags.SonarProjectName, sonarProjectNameField.getText());
+        settings.set(ConfigTags.SonarProjectKey, sonarProjectKeyField.getText());
     }
 }

@@ -11,9 +11,11 @@ import org.testar.monkey.Settings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import nl.ou.testar.jfx.WhiteboxTestStatus;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -51,7 +53,6 @@ public class DashboardController extends ViewController {
 //                Platform.exit();
 
                 final Stage stage = (Stage) view.getScene().getWindow();
-//                stage.hide();
             }
             else {
                 System.out.println("No delegate!");
@@ -63,6 +64,18 @@ public class DashboardController extends ViewController {
 //        finally {
 //            Platform.exit();
 //        }
+    }
+
+    private void startWhiteboxTesting(Parent view) {
+        final Stage stage = (Stage) view.getScene().getWindow();
+//        stage.close();
+
+        try {
+            new WhiteboxTestStatus().start(stage);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkSettings(Settings settings) throws IllegalStateException {
@@ -118,6 +131,11 @@ public class DashboardController extends ViewController {
         Button btnReplayTest = (Button) view.lookup("#btnReplayTest");
         btnReplayTest.setOnAction(event -> {
             startTesting(view, RuntimeControlsProtocol.Modes.Replay);
+        });
+
+        Button btnWhiteboxTest = (Button) view.lookup("#btnWhiteboxTest");
+        btnWhiteboxTest.setOnAction(event -> {
+            startWhiteboxTesting(view);
         });
 
         Button btnViewReports = (Button) view.lookup("#btnViewReports");

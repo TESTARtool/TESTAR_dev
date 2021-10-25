@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -12,9 +13,9 @@
 <GridPane prefWidth="700.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <columnConstraints>
       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="332.0" minWidth="10.0" prefWidth="319.0" />
+      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="102.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="175.0" />
    </columnConstraints>
    <rowConstraints>
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -33,7 +34,7 @@
             <Insets right="8.0" />
          </padding>
       </Label>
-      <Label text="Username" textFill="WHITE" GridPane.rowIndex="1">
+      <Label prefHeight="18.0" prefWidth="81.0" text="Username" textFill="WHITE" GridPane.columnIndex="2">
          <font>
             <Font size="14.0" />
          </font>
@@ -55,7 +56,7 @@
             <Insets right="8.0" />
          </padding>
       </Label>
-      <Label text="Branch" textFill="WHITE" GridPane.columnIndex="2">
+      <Label text="Branch" textFill="WHITE" GridPane.rowIndex="1">
          <font>
             <Font size="14.0" />
          </font>
@@ -67,13 +68,13 @@
          </padding>
       </Label>
       <TextField id="gitUrl" GridPane.columnIndex="1" />
-      <TextField id="gitUsername" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <TextField id="gitToken" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-      <TextField id="gitBranch" GridPane.columnIndex="3" />
-      <JFXCheckBox id="sonarDockerize" text="Authorization required" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <TextField id="gitUsername" prefHeight="26.0" prefWidth="182.0" GridPane.columnIndex="3" />
+      <TextField id="gitBranch" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <JFXCheckBox id="authorizationRequired" text="Authorization required" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <font>
             <Font size="14.0" />
          </font>
       </JFXCheckBox>
+      <PasswordField GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
 </GridPane>
