@@ -14,4 +14,7 @@ public interface DockerPoolService {
     String startWithImage(String imageId, String name, HostConfig hostConfig);
     public String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env);
     void dispose(boolean alsoRemoveImages);
+
+    void setDelegate(DockerPoolServiceDelegate delegate);
+    DockerPoolServiceDelegate getDelegate();
 }

@@ -21,6 +21,7 @@ import java.util.Set;
 public class DockerPoolServiceImpl implements DockerPoolService {
 
     private String serviceId;
+    private DockerPoolServiceDelegate delegate;
 
     private DockerHttpClient dockerHttpClient;
     private DockerClient dockerClient;
@@ -43,6 +44,14 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         dockerClient = DockerClientImpl.getInstance(dockerConfig, dockerHttpClient);
 
         registry.add(this);
+    }
+
+    public void setDelegate(DockerPoolServiceDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    public DockerPoolServiceDelegate getDelegate() {
+        return delegate;
     }
 
     public void start(String serviceId) {
@@ -95,25 +104,17 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         final String imageId = dockerClient.buildImageCmd(destination).exec(new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
-                String status = item.getStatus();
-                if(status == null) {
-                    status = "N/A";
+                if (delegate != null) {
+                    String status = item.getStatus();
+                    Long currentProgress = null;
+                    Long totalProgress = null;
+                    ResponseItem.ProgressDetail progressDetail = item.getProgressDetail();
+                    if (progressDetail != null) {
+                        currentProgress = progressDetail.getCurrent();
+                        totalProgress = progressDetail.getTotal();
+                    }
+                    delegate.onStatusChange(status, currentProgress, totalProgress);
                 }
-                Long currentProgress = null;
-                Long totalProgress = null;
-                ResponseItem.ProgressDetail progressDetail = item.getProgressDetail();
-                if (progressDetail != null) {
-                    currentProgress = progressDetail.getCurrent();
-                    totalProgress = progressDetail.getTotal();
-                }
-                if (currentProgress == null) {
-                    currentProgress = 0L;
-                }
-                if (totalProgress == null) {
-                    totalProgress = 0L;
-                }
-                System.out.println("Status: " + status + ", progress: " + currentProgress + " of " + totalProgress);
-//                System.out.println(item);
                 super.onNext(item);
             }
         }).awaitImageId();

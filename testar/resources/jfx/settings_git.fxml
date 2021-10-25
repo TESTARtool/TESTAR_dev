@@ -69,6 +69,7 @@
       </Label>
       <TextField id="gitUrl" GridPane.columnIndex="1" />
       <TextField id="gitUsername" GridPane.columnIndex="3" />
+      <TextField id="gitUsername" prefHeight="26.0" prefWidth="182.0" GridPane.columnIndex="3" />
       <TextField id="gitBranch" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <JFXCheckBox id="authorizationRequired" text="Authorization required" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <font>

@@ -16,8 +16,8 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.docker.DockerPoolService;
+import org.fruit.monkey.docker.DockerPoolServiceDelegate;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
-import org.fruit.monkey.webserver.ReportingServiceDelegate;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +45,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
     public void setDelegate(SonarqubeServiceDelegate delegate) {
         this.delegate = delegate;
+        dockerPoolService.setDelegate(delegate);
     }
 
     public DockerPoolService getDockerService() {
@@ -60,7 +61,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             // 1. Create and start a service
 
             if (delegate != null) {
-                delegate.onInfoMessage(SonarqubeServiceDelegate.InfoStatus.CREATING_SERVICE, "Creating a service");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Creating a service");
             }
 
             File confDir = new File(sonarqubeDirPath);
@@ -85,7 +86,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             // 2. Obtain a token as an admin
 
             if (delegate != null) {
-                delegate.onInfoMessage(SonarqubeServiceDelegate.InfoStatus.CREATING_SERVICE, "Waiting for service to start");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Waiting for service to start");
             }
 
             String token = null;
@@ -110,7 +111,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             String scannerContainerId = null;
 
             if (delegate != null) {
-                delegate.onInfoMessage(SonarqubeServiceDelegate.InfoStatus.CREATING_SCANNER, "Building a project scanner instance");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Building a project scanner instance");
             }
 
             try {
@@ -124,7 +125,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             awaitingReport = true;
             if (delegate != null) {
-                delegate.onInfoMessage(SonarqubeServiceDelegate.InfoStatus.CREATING_SCANNER, "Obtaining a scan report");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Obtaining a scan report");
             }
             dockerPoolService.getClient().waitContainerCmd(scannerContainerId).exec(new ResultCallback<WaitResponse>() {
 

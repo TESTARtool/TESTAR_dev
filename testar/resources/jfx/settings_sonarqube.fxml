@@ -56,9 +56,8 @@
          </padding>
       </Label>
       <TextField id="sonarUrl" GridPane.columnIndex="1" />
-      <TextField id="sonarUsername" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <TextField id="sonarPassword" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-      <JFXCheckBox id="sonarDockerize" text="Create Docker instance for Sonarqube" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="RIGHT">
+      <TextField id="sonarUsername" GridPane.columnIndex="3" />
+      <JFXCheckBox id="sonarDockerize" text="Create Docker instance for Sonarqube" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
          <font>
             <Font size="14.0" />
          </font>

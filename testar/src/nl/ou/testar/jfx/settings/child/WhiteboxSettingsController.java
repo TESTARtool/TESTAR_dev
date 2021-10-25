@@ -1,7 +1,6 @@
 package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
-import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
 import nl.ou.testar.jfx.settings.bindings.control.ControlBinding;
@@ -21,11 +20,6 @@ public class WhiteboxSettingsController extends SettingsEditController {
     private TextField sonarUrlField;
     private TextField sonarUsernameField;
     private TextField sonarPasswordField;
-
-    private TextArea sonarProjectPropertiesArea;
-    private TextField sonarProjectNameField;
-    private TextField sonarProjectKeyField;
-    private CheckBox sonarSaveResultBox;
 
     public WhiteboxSettingsController(Settings settings, String settingsPath) {
         super("Whitebox", settings, settingsPath);
@@ -49,6 +43,9 @@ public class WhiteboxSettingsController extends SettingsEditController {
         TextField gitBranchField = (TextField) view.lookup("#gitBranch");
 
         final CheckBox gitAuthorizationRequiredBox = (CheckBox) view.lookup("#authorizationRequired");
+        gitAuthorizationRequiredBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            updateGitFields(newValue);
+        });
 
         sonarUrlField = (TextField) view.lookup("#sonarUrl");
         sonarUsernameField = (TextField) view.lookup("#sonarUsername");
