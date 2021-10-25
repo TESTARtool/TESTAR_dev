@@ -89,7 +89,6 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
 
