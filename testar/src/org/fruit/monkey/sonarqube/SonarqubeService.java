@@ -10,5 +10,5 @@ public interface SonarqubeService {
     void setDelegate(SonarqubeServiceDelegate delegate);
     DockerPoolService getDockerService();
     void analyseProject(String projectName, String projectKey, String sonarqubeDirPath,
-                        String projectSourceDir, SonarqubeServiceDelegate delegate)  throws IOException;
+                        String projectSourceDir)  throws IOException;
 }

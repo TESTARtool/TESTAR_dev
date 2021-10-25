@@ -53,7 +53,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     }
 
     @Override
-    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir, SonarqubeServiceDelegate delegate) {
+    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir) {
         System.out.println("Analysing a project " + projectName);
         dockerPoolService.start(serviceId);
         boolean awaitingReport = false;
@@ -100,6 +100,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
 
             if (token == null) {
+                System.out.println("Token is null");
                 if (delegate != null) {
                     delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, errorMessage);
                 }
@@ -117,7 +118,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             try {
                 scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, token);
             } catch (Exception e) {
-                delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, errorMessage);
+                delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
                 return;
             }
 
