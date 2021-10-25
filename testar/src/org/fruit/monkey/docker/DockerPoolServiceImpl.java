@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DockerPoolServiceImpl implements DockerPoolService {
 
@@ -28,6 +30,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private Set<String> containerIds;
     private Set<String> imageIds;
     private String networkId;
+    private Lock dockerLock = new ReentrantLock();
 
     final static HashSet<DockerPoolServiceImpl> registry = new HashSet<>();
 
@@ -55,6 +58,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     }
 
     public void start(String serviceId) {
+        dockerLock.lock();
         this.serviceId = serviceId;
         final String networkName = "testar_" + serviceId;
         List<Network> dockerNetworks = dockerClient.listNetworksCmd().withNameFilter(networkName).exec();
@@ -64,6 +68,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName(networkName).withDriver("bridge").withAttachable(true).exec();
             this.networkId = networkResponse.getId();
         }
+        dockerLock.unlock();
     }
 
     public boolean isDockerAvailable() {
