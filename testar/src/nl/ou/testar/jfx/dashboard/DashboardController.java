@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import nl.ou.testar.jfx.WhiteboxTestStatus;
+import nl.ou.testar.jfx.WhiteboxTestLauncher;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
 import org.fruit.monkey.ConfigTags;
@@ -71,7 +71,7 @@ public class DashboardController extends ViewController {
 //        stage.close();
 
         try {
-            new WhiteboxTestStatus().start(stage);
+            new WhiteboxTestLauncher().start(stage, settings);
         }
         catch(IOException e) {
             e.printStackTrace();

@@ -76,7 +76,7 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         gitTokenField.setText(settings.get(ConfigTags.GitToken, ""));
         gitBranchField.setText(settings.get(ConfigTags.GitBranch, ""));
 
-        gitAuthorizationRequiredBox.setSelected(settings.get(ConfigTags.GitAuthRequired));
+        gitAuthorizationRequiredBox.setSelected(settings.get(ConfigTags.GitAuthRequired, false));
 
         sonarUrlField.setText(settings.get(ConfigTags.SonarUrl, ""));
         sonarUsernameField.setText(settings.get(ConfigTags.SonarUsername, ""));
