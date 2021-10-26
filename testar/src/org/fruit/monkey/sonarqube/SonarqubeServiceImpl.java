@@ -143,6 +143,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                     if (delegate != null) {
                         delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
                     }
+                    System.out.println("-= Disposing on error =-");
                     dockerPoolService.dispose(false);
                 }
 
@@ -161,9 +162,10 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                             delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, e.getLocalizedMessage());
                         }
                     }
-                    finally {
-                        dockerPoolService.dispose(false);
-                    }
+//                    finally {
+//                        System.out.println("-= Dispose on complete =-");
+//                        dockerPoolService.dispose(false);
+//                    }
                 }
 
                 @Override
@@ -179,6 +181,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         }
         finally {
             if (!awaitingReport) {
+                System.out.println("-= Not awaiting report =-");
                 dockerPoolService.dispose(false);
             }
         }

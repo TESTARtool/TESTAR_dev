@@ -65,10 +65,11 @@ public class DashboardController extends ViewController {
         final Stage stage = (Stage) view.getScene().getWindow();
 
         try {
-            new WhiteboxTestLauncher().start(stage, settings);
+            final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
+            whiteboxTestLauncher.setDashboardDelegate(delegate);
+            whiteboxTestLauncher.start(stage, settings);
         }
         catch(IOException e) {
-            e.printStackTrace();
         }
     }
 
