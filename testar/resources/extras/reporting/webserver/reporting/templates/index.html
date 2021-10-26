@@ -9,38 +9,45 @@
   </head>
   <body>
     <div class="content">
-    <h2 class="text-h2">Reports</h2>
-    <table style="width:100%" class="iteration-overview">
-      <thead>
-        <tr>
-          <th id="report-id">Id</th>
-          <th id="report-name">Name</th>
-          <th id="report-url">Url</th>
-          <th id="report-sequences">Sequence count</th>
-          <th id="report-oracles">Oracles</th>
-          <th id="report-details">Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for report in reports %}
-        <tr>
-          <td>{{ report.get_id() }}</td>
-          <td>{{ report.get_name() }}</td>
-          <td><a href="{{ report.get_url() }}" target="_blank" rel="noopener noreferrer">{{ report.get_url() }}</a></td>
-          <td>{{ report.sequence_count() }}</td>
-          <td>{{ report.oracle_count() }}</td>
-          <td>
-            <button
-              class="show-details"
-              onclick="location.href='/report/{{report.get_id()}}/'"
-            >
-              Details
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+      <h2 class="text-h2">Reports</h2>
+      <table style="width: 100%" class="iteration-overview">
+        <thead>
+          <tr>
+            <th id="report-id">Id</th>
+            <th id="report-name">Name</th>
+            <th id="report-url">Url</th>
+            <th id="report-sequences">Sequence count</th>
+            <th id="report-oracles">Oracles</th>
+            <th id="report-details">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+          <tr>
+            <td>{{ report.get_id() }}</td>
+            <td>{{ report.get_name() }}</td>
+            <td>
+              <a
+                href="{{ report.get_url() }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ report.get_url() }}</a
+              >
+            </td>
+            <td>{{ report.sequence_count() }}</td>
+            <td>{{ report.oracle_count() }}</td>
+            <td>
+              <button
+                class="show-details"
+                onclick="location.href='/report/{{report.get_id()}}/'"
+              >
+                Details
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
