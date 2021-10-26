@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.Stage;
@@ -40,6 +41,15 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
     private int totalProgress;
 
     private DashboardDelegate dashboardDelegate;
+
+    private String projectName;
+    private String projectKey;
+
+    private final SonarqubeService sonarqubeService = new SonarqubeServiceImpl("sonarqube");
+
+    public WhiteboxTestLauncher() {
+        sonarqubeService.setDelegate(this);
+    }
 
     public void setDashboardDelegate(DashboardDelegate dashboardDelegate) {
         this.dashboardDelegate = dashboardDelegate;
@@ -81,8 +91,9 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
         final String sonarqubeConfPath = path + "sonarqube" + File.separator;
         final String sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
-        final String projectName = settings.get(ConfigTags.SonarProjectName, "Demo");
-        final String projectKey = settings.get(ConfigTags.SonarProjectKey, "demo");
+
+        projectName = settings.get(ConfigTags.SonarProjectName, "Demo");
+        projectKey = settings.get(ConfigTags.SonarProjectKey, "demo");
 
         if (settings.get(ConfigTags.GitAuthRequired, false)) {
             // TODO: set credentials
@@ -103,8 +114,12 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
             try {
                 sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
             } catch (IOException e) {
-                // TODO: handle error
-                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Whitebox testing exception");
+                alert.setHeaderText("Project analysis failure");
+                alert.setContentText(e.getLocalizedMessage());
+
+                alert.showAndWait();
             }
         }).start();
 
@@ -186,22 +201,26 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
     @Override
     public void onError(ErrorCode errorCode, String message) {
-        // TODO: show error dialog
-        System.err.println(message);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Whitebox testing exception");
+            alert.setHeaderText("Sonarqube service failure");
+            alert.setContentText(message);
+
+            alert.showAndWait();
+        });
     }
 
     @Override
     public void onComplete(String report) {
-        // TODO: complete process
         System.out.println("Report: " + report);
         Platform.runLater(() -> {
             whiteboxStage.close();
             parentStage.show();
 
             if (dashboardDelegate != null) {
-                //TODO: build an exact URI
                 try {
-                    dashboardDelegate.openURI(new URI("http://localhost:9000"));
+                    dashboardDelegate.openURI(new URI("http://localhost:9000/dashboard?id=" + projectKey));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
