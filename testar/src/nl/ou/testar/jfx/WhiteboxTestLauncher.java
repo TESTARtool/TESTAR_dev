@@ -64,7 +64,6 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
         if (!path.substring(path.length() - 1).equals(File.separator)) {
             path += File.separator;
         }
-        final String projectSourceDir = path;
 
         final String branchName = settings.get(ConfigTags.GitBranch, null);
 
@@ -91,6 +90,11 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
             System.out.println("...done");
 
             // TODO: scan repository and analyse code
+
+            String projectSourceDir = repositoryPath.toString();
+            if (!projectSourceDir.substring(projectSourceDir.length() - 1).equals(File.separator)) {
+                projectSourceDir += File.separator;
+            }
 
             try {
                 sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);

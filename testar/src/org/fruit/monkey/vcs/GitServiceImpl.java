@@ -41,7 +41,7 @@ public class GitServiceImpl implements GitService {
     public Path cloneRepository(String repositoryUrl, GitCredentials gitCredentials, ProgressMonitor progressMonitor, String branchName) {
             try {
                 File repositoryDirectory = prepareRepositoryDirectory(repositoryUrl);
-                CloneCommand cloneCommand =Git.cloneRepository()
+                CloneCommand cloneCommand = Git.cloneRepository()
                         .setURI(repositoryUrl)
                         .setDirectory(repositoryDirectory)
                         .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitCredentials.getUsername(), gitCredentials.getPassword()))
