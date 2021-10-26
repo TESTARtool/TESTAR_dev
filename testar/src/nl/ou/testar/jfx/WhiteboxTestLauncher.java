@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -19,6 +20,8 @@ import org.fruit.monkey.vcs.GitServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDelegate {
@@ -35,6 +38,16 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
     private int currentProgress;
     private int totalProgress;
+
+    private DashboardDelegate dashboardDelegate;
+
+    public void setDashboardDelegate(DashboardDelegate dashboardDelegate) {
+        this.dashboardDelegate = dashboardDelegate;
+    }
+
+    public DashboardDelegate getDashboardDelegate() {
+        return dashboardDelegate;
+    }
 
     public void start(Stage stage, Settings settings) throws IOException {
         parentStage = stage;
@@ -180,9 +193,19 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
     @Override
     public void onComplete(String report) {
         // TODO: complete process
+        System.out.println("Report: " + report);
         Platform.runLater(() -> {
             whiteboxStage.close();
             parentStage.show();
+
+            if (dashboardDelegate != null) {
+                //TODO: build an exact URI
+                try {
+                    dashboardDelegate.openURI(new URI("http://localhost:9000"));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
         });
     }
 }

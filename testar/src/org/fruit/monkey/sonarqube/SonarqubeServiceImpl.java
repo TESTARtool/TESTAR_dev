@@ -242,7 +242,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
                 "ENV SONAR_HOST_URL http://sonarqube:9000\n" +
-                "ENV SONAR_TOKEN " + token  + "\n";
+                "ENV SONAR_TOKEN " + token  + "\n" +
+                "WORKDIR /usr/src\n" +
+                "RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
         final String containerId = dockerPoolService.startWithImage(imageId, "sonar-scanner", hostConfig);
