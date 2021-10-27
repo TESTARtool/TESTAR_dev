@@ -199,9 +199,9 @@ RefreshSpyCanvas = 1.0
 # Whitebox test settings
 #################################################################
 
-GitUrl = https://github.com/SeleniumHQ/selenium-ide
+GitUrl = https://github.com/crystal-lang/crystal 
 GitAuthRequired = false
 
 SonarDockerize = true
-sonarProjectNameField = "Demo"
-sonarProjectKeyField = "Demo"
+SonarProjectNameField = "Demo"
+SonarProjectKeyField = "Demo"
