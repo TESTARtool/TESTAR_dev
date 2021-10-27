@@ -46,8 +46,12 @@ public class NavigationController {
         return currentViewController;
     }
 
-    public void navigateTo(ViewController viewController, Boolean pushToStack) {
+    public boolean navigateTo(ViewController viewController, Boolean pushToStack) {
         //TODO: delegate shouldn't be nil
+        if (!currentViewController.checkBeforeExit()) {
+            return false;
+        }
+
         try {
             Parent view = viewController.obtainView();
             ViewController previousViewController = currentViewController;
@@ -62,8 +66,11 @@ public class NavigationController {
             delegate.onViewControllerActivated(currentViewController, view);
             previousViewController.viewDidDisappear();
             currentViewController.viewDidAppear(view);
+
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -74,6 +81,10 @@ public class NavigationController {
     public ViewController navigateBack() throws UnsupportedOperationException {
         if (currentViewController.equals(rootViewController)) {
             throw new UnsupportedOperationException("No way back from the root view controller");
+        }
+
+        if (!currentViewController.checkBeforeExit()) {
+            return null;
         }
 
         try {

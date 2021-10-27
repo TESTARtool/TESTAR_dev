@@ -89,6 +89,7 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         sonarProjectKeyField.setText(settings.get(ConfigTags.SonarProjectKey, ""));
         sonarSaveResultBox.setSelected(settings.get(ConfigTags.SonarSaveResult, true));
 
+        updateGitFields(gitAuthorizationRequiredBox.isSelected());
         updateSonarFields(sonarDockerizeBox.isSelected());
     }
 
@@ -109,6 +110,44 @@ public class WhiteboxSettingsController extends ChildSettingsController {
             sonarPasswordField.setDisable(false);
 
         }
+    }
+
+    @Override
+    protected boolean needsSave(Settings settings) {
+        if (!gitUrlField.getText().equals(settings.get(ConfigTags.GitUrl, ""))) {
+            return true;
+        }
+        if (!gitUsernameField.getText().equals(settings.get(ConfigTags.GitUsername, ""))) {
+            return true;
+        }
+        if (!gitTokenField.getText().equals(settings.get(ConfigTags.GitToken, ""))) {
+            return true;
+        }
+        if (!gitBranchField.getText().equals(settings.get(ConfigTags.GitBranch, ""))) {
+            return true;
+        }
+        if (gitAuthorizationRequiredBox.isSelected() != settings.get(ConfigTags.GitAuthRequired, false)) {
+            return true;
+        }
+        if (!sonarUrlField.getText().equals(settings.get(ConfigTags.SonarUrl, ""))) {
+            return true;
+        }
+        if (!sonarUsernameField.getText().equals(settings.get(ConfigTags.SonarUsername, ""))) {
+            return true;
+        }
+        if (!sonarPasswordField.getText().equals(settings.get(ConfigTags.SonarPassword, ""))) {
+            return true;
+        }
+        if (!sonarProjectPropertiesArea.getText().equals(settings.get(ConfigTags.SonarProjectProperties, ""))) {
+            return true;
+        }
+        if (!sonarProjectNameField.getText().equals(settings.get(ConfigTags.SonarProjectName, ""))) {
+            return true;
+        }
+        if (!sonarProjectKeyField.getText().equals(settings.get(ConfigTags.SonarProjectKey, ""))) {
+            return true;
+        }
+        return false;
     }
 
     @Override
