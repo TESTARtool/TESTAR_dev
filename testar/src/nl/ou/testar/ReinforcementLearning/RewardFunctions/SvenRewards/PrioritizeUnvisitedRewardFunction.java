@@ -46,15 +46,14 @@ public class PrioritizeUnvisitedRewardFunction implements RewardFunction {
         logger.debug("DEBUG: totalActions={}", previousActionsCount);
         logger.debug("DEBUG: actionsUnvisited={}", unvisitedActionsCount);
 
-        float reward = 0f;
+        float reward = -0.5f;
         // Penalize the executed action when there are still unvisited actions from the previous state whilst the actions has been executed multiple times
         if (previousStatesUnvisitedActionsCount > 0 && executionCounter > 1) {
             reward = -1;
+        } else if (unvisitedActionsCount != 0) {
+            reward = unvisitedActionsCount / previousActionsCount;
         }
 
-        if (unvisitedActionsCount != 0) {
-            reward += unvisitedActionsCount / previousActionsCount;
-        }
         logger.debug("DEBUG: reward={}", reward);
 
         return reward;
