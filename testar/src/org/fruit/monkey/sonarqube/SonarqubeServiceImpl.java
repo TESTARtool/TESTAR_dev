@@ -86,7 +86,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             // 2. Obtain a token as an admin
 
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Waiting for service to start");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Service is ready to run");
+                delegate.onStatusChange("Waiting for response", null, null);
             }
 
             String token = null;
@@ -126,7 +127,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             awaitingReport = true;
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Obtaining a scan report");
+                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Scanning a project");
+                delegate.onStatusChange("Please be patient", null, null);
             }
             dockerPoolService.getClient().waitContainerCmd(scannerContainerId).exec(new ResultCallback<WaitResponse>() {
 
