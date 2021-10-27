@@ -60,7 +60,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState,  null, executedAction, null, actions);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,  null, executedAction, null, actions, previousAbstractState);
 
         // then
         assertEquals(0f, reward, 0);
@@ -82,7 +82,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions, previousAbstractState);
 
         // then
         assertEquals(0.25f, reward, 0.05f);
@@ -104,7 +104,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState,   null, executedAction, null, actions, previousAbstractState);
 
         // then
         assertEquals(0.50f, reward, 0.05f);
@@ -126,7 +126,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions, previousAbstractState);
 
         // then
         assertEquals(0.75f, reward, 0.05f);
@@ -148,7 +148,7 @@ public class ImageRecognitionBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions);
+        final float reward = rewardFunction.getReward(null, null, currentAbstractState, null, executedAction, null, actions, previousAbstractState);
 
         // then
         assertEquals(1.00f, reward, 0.05f);

@@ -100,7 +100,7 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         Set<Action> actions = new HashSet<Action>();
 
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, null, null, actions);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, null, null, actions, previousAbstractState);
 
         // then
         assertEquals(2f, reward, 0.00001);

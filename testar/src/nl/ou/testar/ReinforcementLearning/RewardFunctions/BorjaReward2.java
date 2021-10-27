@@ -14,7 +14,7 @@ public class BorjaReward2 implements RewardFunction {
     private State previousState = null;
     
 	@Override
-	public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, Action executedAction, AbstractAction executedAbstractAction, final AbstractAction selectedAction, Set<Action> actions) {
+	public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, Action executedAction, AbstractAction executedAbstractAction, final AbstractAction selectedAction, Set<Action> actions, AbstractState previousAbstractState) {
 		System.out.println(". . . . . Enfoque 2 . . . . .");
 		float reward = 0f;
         

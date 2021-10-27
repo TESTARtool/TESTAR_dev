@@ -2,7 +2,6 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
 import com.google.common.collect.Iterables;
 
-import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
@@ -19,7 +18,7 @@ public class BorjaReward3 implements RewardFunction{
     //private Set<Action> previousActions;
 
     @Override
-    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, Action executedAction, AbstractAction executedAbstractAction,  AbstractAction selectedAction, Set<Action> actions) {
+    public float getReward(State state, ConcreteState currentConcreteState, AbstractState currentAbstractState, Action executedAction, AbstractAction executedAbstractAction, AbstractAction selectedAction, Set<Action> actions, AbstractState previousAbstractState) {
         System.out.println(". . . . . Enfoque 3 . . . . .");
         float reward = 0f;
         

@@ -13,6 +13,7 @@ import org.fruit.alayer.Roles;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.sikuli.basics.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,10 +113,13 @@ public class RLModelManager extends ModelManager implements StateModelManager {
      *
      * @param selectedAbstractAction, can be null
      */
-    protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {    
+    protected void updateQValue(final AbstractAction selectedAbstractAction, final Set<Action> actions) {
+        if (previousAbstractState == null) {
+            previousAbstractState = currentAbstractState;
+        }
         // get reward and Q-value
         System.out.println("UpdateQValue RLModelManager");
-        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, previouslyExecutedTestarAction, previouslyExecutedAbstractAction, selectedAbstractAction, actions);
+        float reward = rewardFunction.getReward(state, getCurrentConcreteState(), currentAbstractState, previouslyExecutedTestarAction, previouslyExecutedAbstractAction, selectedAbstractAction, actions, previousAbstractState);
         System.out.println("REWARD: " + Float.toString(reward));
 
         // Update and use the VValue
@@ -169,6 +173,7 @@ public class RLModelManager extends ModelManager implements StateModelManager {
         }
         //*** FOR DEBUGGING PURPOSES - QBorjaFunction2
 
+        previousAbstractState = currentAbstractState;
     }
 
     @Override

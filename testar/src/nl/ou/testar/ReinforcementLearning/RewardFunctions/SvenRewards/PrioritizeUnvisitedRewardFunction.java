@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-public class VisitedUnvisitedRewardFunction implements RewardFunction {
+public class PrioritizeUnvisitedRewardFunction implements RewardFunction {
 
-    private static final Logger logger = LoggerFactory.getLogger(VisitedUnvisitedRewardFunction.class);
+    private static final Logger logger = LoggerFactory.getLogger(PrioritizeUnvisitedRewardFunction.class);
 
     @Override
     public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions, AbstractState previousAbstractState) {
@@ -25,9 +25,8 @@ public class VisitedUnvisitedRewardFunction implements RewardFunction {
         int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
         executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
 
-        float actionsCount = currentAbstractState.getActions().size();
+        float previousActionsCount = currentAbstractState.getActions().size();
         float unvisitedActionsCount = 0;
-
 
         for (AbstractAction action : currentAbstractState.getActions()) {
             if (action.getAttributes().get(RLTags.Counter, 0) == 0) {
@@ -35,15 +34,26 @@ public class VisitedUnvisitedRewardFunction implements RewardFunction {
             }
         }
 
+        float previousStatesUnvisitedActionsCount = 0;
+
+        for (AbstractAction action : previousAbstractState.getActions()) {
+            if (action.getAttributes().get(RLTags.Counter, 0) == 0) {
+                previousStatesUnvisitedActionsCount++;
+            }
+        }
+
         logger.debug("DEBUG: executionCounter={}", executionCounter);
-        logger.debug("DEBUG: totalActions={}", actionsCount);
+        logger.debug("DEBUG: totalActions={}", previousActionsCount);
         logger.debug("DEBUG: actionsUnvisited={}", unvisitedActionsCount);
 
-        // Give a negative reward if all actions have already been executed, so that the state does not need to be visited anymore.
-        float reward = -0.5f;
+        float reward = 0f;
+        // Penalize the executed action when there are still unvisited actions from the previous state whilst the actions has been executed multiple times
+        if (previousStatesUnvisitedActionsCount > 0 && executionCounter > 1) {
+            reward = -1;
+        }
 
         if (unvisitedActionsCount != 0) {
-            reward = unvisitedActionsCount / actionsCount;
+            reward += unvisitedActionsCount / previousActionsCount;
         }
         logger.debug("DEBUG: reward={}", reward);
 

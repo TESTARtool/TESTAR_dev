@@ -1,25 +1,15 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
-import nl.ou.testar.ReinforcementLearning.RLTags;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
-import nl.ou.testar.a11y.reporting.HTMLReporter;
 
-import org.apache.commons.math3.analysis.function.Abs;
-import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Color;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
-import org.testar.OutputStructure;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
-import java.io.*;
 import java.util.Set;
 
 public class BorjaReward4 implements RewardFunction {
@@ -31,7 +21,7 @@ public class BorjaReward4 implements RewardFunction {
      *{@inheritDoc}
      */
     @Override
-    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
+    public float getReward(State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions, AbstractState previousAbstractState) {
     	System.out.println(". . . . . Enfoque 4 . . . . .");
 		float reward = 0f;
 		AWTCanvas currentStateCanvas = es.upv.staq.testar.ProtocolUtil.getStateshotBinary(state);

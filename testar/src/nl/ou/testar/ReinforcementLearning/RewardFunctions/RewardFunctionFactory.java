@@ -1,5 +1,6 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.PrioritizeUnvisitedRewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.VisitedUnvisitedRewardFunction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.SvenRewards.WidgetImageComparison;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,9 @@ public class RewardFunctionFactory {
                 break;
             case "VisitedUnvisitedRewardFunction":
                 selectedRewardFunction = new VisitedUnvisitedRewardFunction();
+                break;
+            case "PrioritizeUnvisitedRewardFunction":
+                selectedRewardFunction = new PrioritizeUnvisitedRewardFunction();
                 break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();

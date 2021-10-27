@@ -23,9 +23,10 @@ public interface RewardFunction {
      * @param currentAbstractState The {@link AbstractState} the SUT is in
      * @param executedAction The {@link AbstractAction} that was executed
      * @param actions
+     * @param previousAbstractState
      * @return The calculated reward
      */
-    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions);
+    public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions, AbstractState previousAbstractState);
 
     /**
      * Resets the reward function
