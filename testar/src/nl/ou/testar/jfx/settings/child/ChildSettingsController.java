@@ -2,8 +2,7 @@ package nl.ou.testar.jfx.settings.child;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
 import org.testar.extendedsettings.ExtendedSettingsFactory;
@@ -13,6 +12,7 @@ import org.testar.monkey.Util;
 import org.testar.serialisation.LogSerialiser;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public abstract class ChildSettingsController extends ViewController {
 
@@ -33,6 +33,7 @@ public abstract class ChildSettingsController extends ViewController {
         btnSave.setOnAction(event -> {
             save(settings);
             persist(settings);
+            getNavigationController().navigateBack();
         });
     }
 
@@ -51,6 +52,8 @@ public abstract class ChildSettingsController extends ViewController {
         contentBox.getChildren().add(sectionBox);
     }
 
+    protected abstract boolean needsSave(Settings settings);
+
     protected abstract void save(Settings settings);
 
     private void persist(Settings settings) {
@@ -62,5 +65,33 @@ public abstract class ChildSettingsController extends ViewController {
         } catch (IOException e1) {
             LogSerialiser.log("Unable to save current settings to <" + settingsPath + ">: " + e1.toString() + "\n");
         }
+    }
+
+    @Override
+    public boolean checkBeforeExit() {
+        if (!needsSave(settings)) {
+            return true;
+        }
+
+        Alert saveAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        saveAlert.setTitle("Are you sure?");
+        saveAlert.setHeaderText("There are unsaved changes");
+        saveAlert.setContentText("Do you want to save them?");
+
+        ButtonType save = new ButtonType("Save");
+        ButtonType discard = new ButtonType("Discard");
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        saveAlert.getButtonTypes().setAll(save, discard, cancel);
+
+        Optional<ButtonType> result = saveAlert.showAndWait();
+        if (result.get() == save) {
+            save(settings);
+            return true;
+        } else if (result.get() == discard) {
+            return true;
+        }
+
+        return false;
     }
 }

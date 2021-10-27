@@ -14,6 +14,7 @@ import org.testar.monkey.Settings;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -140,12 +141,12 @@ public class FilterSettingsController extends ChildSettingsController {
             e.printStackTrace();
         }
 
-        clickFilter = settings.get(ConfigTags.ClickFilter);
-        filterTags = settings.get(ConfigTags.TagsToFilter);
-        processesToKill = settings.get(ConfigTags.ProcessesToKillDuringTest);
-        suspiciousTitles = settings.get(ConfigTags.SuspiciousTitles);
-        oracleTags = settings.get(ConfigTags.TagsForSuspiciousOracle);
-        suspiciousProcessOutput = settings.get(ConfigTags.SuspiciousProcessOutput);
+        clickFilter = settings.get(ConfigTags.ClickFilter, "");
+        filterTags = settings.get(ConfigTags.TagsToFilter, Collections.emptyList());
+        processesToKill = settings.get(ConfigTags.ProcessesToKillDuringTest, "");
+        suspiciousTitles = settings.get(ConfigTags.SuspiciousTitles, "");
+        oracleTags = settings.get(ConfigTags.TagsForSuspiciousOracle, Collections.emptyList());
+        suspiciousProcessOutput = settings.get(ConfigTags.SuspiciousProcessOutput, "");
 
         descriptionLabel = (Label) view.lookup("#descriptionLabel");
         textArea = (JFXTextArea) view.lookup("#textArea");
@@ -201,6 +202,29 @@ public class FilterSettingsController extends ChildSettingsController {
     private List<String> readTagsFromPane(FlowPane pane) {
         return pane.getChildren().stream().filter(child -> TagControl.class.isInstance(child))
                 .map(child -> ((TagControl) child).getTag()).collect(Collectors.toList());
+    }
+
+    @Override
+    protected boolean needsSave(Settings settings) {
+        if (clickFilter != null && !clickFilter.equals(settings.get(ConfigTags.ClickFilter, ""))) {
+            return true;
+        }
+        if (filterTags != null & !filterTags.equals(settings.get(ConfigTags.TagsToFilter, Collections.emptyList()))) {
+            return true;
+        }
+        if (processesToKill != null && !processesToKill.equals(settings.get(ConfigTags.ProcessesToKillDuringTest, ""))) {
+            return true;
+        }
+        if (suspiciousTitles != null && !suspiciousTitles.equals(settings.get(ConfigTags.SuspiciousTitles, ""))) {
+            return true;
+        }
+        if (oracleTags != null && !oracleTags.equals((settings.get(ConfigTags.TagsForSuspiciousOracle, Collections.emptyList())))) {
+            return true;
+        }
+        if (suspiciousProcessOutput != null && !suspiciousProcessOutput.equals(settings.get(ConfigTags.SuspiciousProcessOutput, ""))) {
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -64,4 +64,8 @@ public abstract class ViewController {
     public void viewDidDisappear() {
         // to be overridden
     }
+
+    public boolean checkBeforeExit() {
+        return true;
+    }
 }

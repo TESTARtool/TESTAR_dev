@@ -62,36 +62,18 @@ public class GeneralSettingsController extends ChildSettingsController {
         );
 
         resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
-//        SingleSelectionModel<DisplayMode> resolutionSelectionModel = new SingleSelectionModel<DisplayMode>() {
-//            @Override
-//            protected DisplayMode getModelItem(int index) {
-//                return availableDisplayModes[index];
-//            }
-//
-//            @Override
-//            protected int getItemCount() {
-//                return availableDisplayModes.length;
-//            }
-//        };
-//        resolutionComboBox.setSelectionModel(resolutionSelectionModel);
         resolutionComboBox.setItems(FXCollections.observableArrayList(
                 Arrays.stream(availableDisplayModes).map(mode -> new DisplayModeWrapper(mode, true))
                         .collect(Collectors.toList())
         ));
+        resolutionComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            generalSettings.setDisplayMode(newValue.getMode());
+        });
         DisplayMode currentDisplayMode = dev.getDisplayMode();
         System.out.println(String.format("Current dislpay mode: %dx%d+%d+%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight(), currentDisplayMode.getBitDepth(), currentDisplayMode.getRefreshRate()));
         int index = 0;
         displayModeSelectedIndex = 0;
-//        for (DisplayMode displayMode : availableDisplayModes) {
-////            resolutionComboBox.getItems().add(String.format("%dx%d", displayMode.getWidth(), displayMode.getHeight()));
-//            if (displayMode.equals(currentDisplayMode)) {
-//                resolutionComboBox.getSelectionModel().select(index);
-////                resolutionComboBox.setValue("Skunk");
-////                displayModeSelectedIndex = index;
-//            }
-//            index++;
-//        }
-        generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue));
+        generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue, ""));
 
         DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
         if (selectedDisplayMode == null) {
@@ -110,26 +92,18 @@ public class GeneralSettingsController extends ChildSettingsController {
             resolutionComboBox.getItems().add(new DisplayModeWrapper(selectedDisplayMode, false));
         }
         resolutionComboBox.getSelectionModel().select(displayModeIndex);
-//        resolutionComboBox.setValue(new DisplayModeWrapper(generalSettings.getDisplayMode()));
-//        resolutionComboBox.setId(String.format("%dx%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight()));
-
-//        GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment()
-//                .getScreenDevices();
-//        for (int i = 0; i < devices.length; i++) {
-////            GraphicsDevice dev = devices[i];
-////            System.out.println("device " + i);
-//            DisplayMode[] modes = dev.getDisplayModes();
-//            for (int j = 0; j < modes.length; j++) {
-//                DisplayMode m = modes[j];
-//                System.out.println(" " + j + ": " + m.getWidth() + " x " + m.getHeight());
-//            }
-//        }
 
         webDriverPathField = (TextField) view.lookup("#driverPath");
         webDriverPathField.setText(generalSettings.getDriver());
+        webDriverPathField.textProperty().addListener((observable, oldValue, newValue) -> {
+            generalSettings.setDriver(newValue);
+        });
 
         locationInputField = (TextField) view.lookup("#locationInput");
         locationInputField.setText(generalSettings.getLocation());
+        locationInputField.textProperty().addListener((observable, oldValue, newValue) -> {
+            generalSettings.setLocation(newValue);
+        });
 
         FileChooser driverChooser = new FileChooser();
         FileChooser locationChooser = new FileChooser();
@@ -154,20 +128,36 @@ public class GeneralSettingsController extends ChildSettingsController {
         numActionsValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
         numActionsSpinner.setValueFactory(numActionsValueFactory);
         alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
-        alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
+        alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile, false));
 
         sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
-        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences));
-        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength));
+        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences, 0));
+        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength, 0));
+    }
+
+    @Override
+    protected boolean needsSave(Settings settings) {
+        if (!generalSettings.toString().equals(settings.get(ConfigTags.SUTConnectorValue, ""))) {
+            return true;
+        }
+        if (!sutComboBox.getValue().toString().equals(settings.get(ConfigTags.SUTConnector, ""))) {
+            return true;
+        }
+        if (!numSequencesValueFactory.getValue().equals(settings.get(ConfigTags.Sequences, 0))) {
+            return true;
+        }
+        if (!numActionsValueFactory.getValue().equals(settings.get(ConfigTags.SequenceLength, 0))) {
+            return true;
+        }
+        if (!alwaysCompileCheckBox.isSelected() == settings.get(ConfigTags.AlwaysCompile, false)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     protected void save(Settings settings) {
-        generalSettings.setDisplayMode(resolutionComboBox.getValue().getMode());
-        generalSettings.setDriver(webDriverPathField.getText());
-        generalSettings.setLocation(locationInputField.getText());
         settings.set(ConfigTags.SUTConnectorValue, generalSettings.toString());
-
         settings.set(ConfigTags.SUTConnector, sutComboBox.getValue().toString());
         settings.set(ConfigTags.Sequences, numSequencesValueFactory.getValue());
         settings.set(ConfigTags.SequenceLength, numActionsValueFactory.getValue());

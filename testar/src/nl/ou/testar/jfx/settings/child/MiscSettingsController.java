@@ -13,6 +13,9 @@ import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MiscSettingsController extends ChildSettingsController {
     private Label labelOutDir;
@@ -21,8 +24,8 @@ public class MiscSettingsController extends ChildSettingsController {
     private TableView<Pair<String, String>> copyTable;
     private TableView<String> deleteTable;
 
-    private String outPath = settings.get(ConfigTags.OutputDir);
-    private String tmpPath = settings.get(ConfigTags.TempDir);
+    private String outPath = settings.get(ConfigTags.OutputDir, "");
+    private String tmpPath = settings.get(ConfigTags.TempDir, "");
 
     private CheckBox webFollowLinks;
     private CheckBox webBrowserFullscreen;
@@ -38,7 +41,7 @@ public class MiscSettingsController extends ChildSettingsController {
         try {
             putSection(view, "Misc", "jfx/settings_misc.fxml");
             putSection(view, "Files on SUT startup", "jfx/settings_startup.fxml");
-            if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+            if(isWebDriver(settings)) {
                 putSection(view, "Web settings", "jfx/settings_web.fxml");
             }
         } catch (IOException e) {
@@ -201,7 +204,7 @@ public class MiscSettingsController extends ChildSettingsController {
         TableColumn<String, Void> deleteToolsColumn = (TableColumn<String, Void>) deleteTable.getColumns().get(1);
         deleteColumn.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
 
-        deleteTable.getItems().addAll(settings.get(ConfigTags.Delete));
+        deleteTable.getItems().addAll(settings.get(ConfigTags.Delete, Collections.emptyList()));
         deleteTable.getItems().add("");
 
         deleteColumn.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
@@ -254,7 +257,7 @@ public class MiscSettingsController extends ChildSettingsController {
             return cell;
         });
 
-        if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+        if(isWebDriver(settings)) {
             webFollowLinks = (CheckBox) view.lookup("#webFollowLinks");
             webBrowserFullscreen = (CheckBox) view.lookup("#webBrowserFullscreen");
             webSwitchNewTabs = (CheckBox) view.lookup("#webSwitchNewTabs");
@@ -266,15 +269,55 @@ public class MiscSettingsController extends ChildSettingsController {
     }
 
     @Override
+    protected boolean needsSave(Settings settings) {
+        if (outPath != null && !outPath.equals(settings.get(ConfigTags.OutputDir, ""))) {
+            return true;
+        }
+        if (tmpPath != null && !tmpPath.equals(settings.get(ConfigTags.TempDir, ""))) {
+            return  true;
+        }
+        if (!itemsToCopy().equals(settings.get(ConfigTags.CopyFromTo, Collections.emptyList()))) {
+            return true;
+        }
+        if (!itemsToDelete().equals(settings.get(ConfigTags.Delete, Collections.emptyList()))) {
+            return true;
+        }
+        if (isWebDriver(settings)) {
+            if (webFollowLinks.isSelected() != settings.get(ConfigTags.FollowLinks, false)) {
+                return true;
+            }
+            if (webBrowserFullscreen.isSelected() != settings.get(ConfigTags.BrowserFullScreen, false)) {
+                return true;
+            }
+            if (webSwitchNewTabs.isSelected() != settings.get(ConfigTags.SwitchNewTabs, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     protected void save(Settings settings) {
         settings.set(ConfigTags.OutputDir, outPath);
         settings.set(ConfigTags.TempDir, tmpPath);
-        settings.set(ConfigTags.CopyFromTo, copyTable.getItems());
-        settings.set(ConfigTags.Delete, deleteTable.getItems());
-        if(settings.get(ConfigTags.ProtocolClass).contains("webdriver")) {
+        settings.set(ConfigTags.CopyFromTo, itemsToCopy());
+        settings.set(ConfigTags.Delete, itemsToDelete());
+        if (isWebDriver(settings)) {
             settings.set(ConfigTags.FollowLinks, webFollowLinks.isSelected());
             settings.set(ConfigTags.BrowserFullScreen, webBrowserFullscreen.isSelected());
-            settings.set(ConfigTags.BrowserFullScreen, webSwitchNewTabs.isSelected());
+            settings.set(ConfigTags.SwitchNewTabs, webSwitchNewTabs.isSelected());
         }
+    }
+
+    private boolean isWebDriver(Settings settings) {
+        return settings.get(ConfigTags.ProtocolClass, "").contains("webdriver");
+    }
+
+    private List<Pair<String, String>> itemsToCopy() {
+        return copyTable.getItems().stream().filter(item -> item.left().length() > 0 && item.right().length() > 0).collect(Collectors.toList());
+    }
+
+    private List<String> itemsToDelete() {
+        return deleteTable.getItems().stream().filter(item -> item.length() > 0).collect(Collectors.toList());
     }
 }
