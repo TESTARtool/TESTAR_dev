@@ -7,20 +7,27 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.codeanalysis.CodeAnalysisService;
+import org.fruit.monkey.codeanalysis.CodeAnalysisServiceImpl;
+import org.fruit.monkey.codeanalysis.RepositoryLanguage;
+import org.fruit.monkey.codeanalysis.RepositoryLanguageComposition;
 import org.fruit.monkey.sonarqube.SonarqubeService;
 import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
 import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;
+import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -36,6 +43,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
     private Label stageLabel;
     private Label statusLabel;
     private ProgressBar progressBar;
+    private VBox contentBox;
 
     private int currentProgress;
     private int totalProgress;
@@ -44,7 +52,12 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
     private String projectName;
     private String projectKey;
+    private GitCredentials gitCredentials;
 
+    private final static int HEADER_HEIGHT = 56;
+    private final static int ITEM_HEIGHT = 44;
+
+    private final CodeAnalysisService codeAnalysisService = new CodeAnalysisServiceImpl();
     private final SonarqubeService sonarqubeService = new SonarqubeServiceImpl("sonarqube");
 
     public WhiteboxTestLauncher() {
@@ -70,6 +83,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
         stageLabel = (Label) view.lookup("#procStage");
         statusLabel = (Label) view.lookup("#procStatus");
         progressBar = (ProgressBar) view.lookup("#procProgressBar");
+        contentBox = (VBox) view.lookup("#contentBox");
 
         whiteboxStage.setScene(new Scene(view));
         whiteboxStage.show();
@@ -87,7 +101,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
             path += File.separator;
         }
 
-        final String branchName = settings.get(ConfigTags.GitBranch);
+        final String branchName = settings.get(ConfigTags.GitBranch, null);
 
         final String sonarqubeConfPath = path + "sonarqube" + File.separator;
         final String sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
@@ -96,15 +110,48 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
         projectKey = settings.get(ConfigTags.SonarProjectKey, "demo");
 
         if (settings.get(ConfigTags.GitAuthRequired, false)) {
-            // TODO: set credentials
+            gitCredentials = new GitCredentials(settings.get(ConfigTags.GitUsername), settings.get(ConfigTags.GitToken));
         }
 
+        stageLabel.setText("Cloning repository");
         new Thread(() -> {
-            System.out.println("Cloning repository...");
-            final Path repositoryPath = gitService.cloneRepository(repositoryUrl, this, branchName);
+            Path repositoryPath;
+            if (gitCredentials == null) {
+                repositoryPath = gitService.cloneRepository(repositoryUrl, this, branchName);
+            }
+            else {
+                repositoryPath = gitService.cloneRepository(repositoryUrl, gitCredentials, this, branchName);
+            }
             System.out.println("...done");
 
-            // TODO: scan repository and analyse code
+            Platform.runLater(() -> {
+                stageLabel.setText("Analysing code");
+                statusLabel.setText("Scaning project");
+                progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            });
+
+            RepositoryLanguageComposition composition = codeAnalysisService.scanRepository(repositoryPath);
+
+            Platform.runLater(() -> {
+                try {
+                    FXMLLoader headerLoader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/lang_header.fxml"));
+                    contentBox.getChildren().add(headerLoader.load());
+                    whiteboxStage.setHeight(whiteboxStage.getHeight() + HEADER_HEIGHT);
+                    for (RepositoryLanguage language: composition.getRepositoryLanguages()) {
+                        whiteboxStage.setHeight(whiteboxStage.getHeight() + ITEM_HEIGHT);
+                        FXMLLoader itemLoader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/lang_item.fxml"));
+                        Parent itemView = itemLoader.load();
+                        Label itemLabel = (Label) itemView.lookup("#lang");
+                        ProgressBar itemProgressBar = (ProgressBar) itemView.lookup("#ratio");
+                        BigDecimal percentage = language.getPercentage();
+                        itemLabel.setText(String.format("%d%% %s", percentage.intValue(), language.getSupportedLanguage().getName()));
+                        itemProgressBar.setProgress(0.01 * percentage.doubleValue());
+                        contentBox.getChildren().add(itemView);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
             String projectSourceDir = repositoryPath.toString();
             if (!projectSourceDir.substring(projectSourceDir.length() - 1).equals(File.separator)) {
@@ -120,6 +167,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
                 alert.setContentText(e.getLocalizedMessage());
 
                 alert.showAndWait();
+                stop();
             }
         }).start();
 
@@ -208,6 +256,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
             alert.setContentText(message);
 
             alert.showAndWait();
+            stop();
         });
     }
 
