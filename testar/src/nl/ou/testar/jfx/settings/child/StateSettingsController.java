@@ -58,14 +58,14 @@ public class StateSettingsController extends ChildSettingsController {
         dataStoreType.getItems().addAll("remote", "plocal");
         dataStoreMode.getItems().addAll("none", "instant", "delayed", "hybrid");
 
-        dataStore.setText(settings.get(ConfigTags.DataStore));
-        dataStoreDB.setText(settings.get(ConfigTags.DataStoreDB));
-        dataStoreType.setValue(settings.get(ConfigTags.DataStore));
-        dataStoreUser.setText(settings.get(ConfigTags.DataStoreUser));
-        dataStoreServer.setText(settings.get(ConfigTags.DataStoreServer));
-        dataStorePassword.setText(settings.get(ConfigTags.DataStorePassword));
-        dataStoreDirectory.setText(settings.get(ConfigTags.DataStoreDirectory));
-        dataStoreMode.setValue(settings.get(ConfigTags.DataStoreMode));
+        dataStore.setText(settings.get(ConfigTags.DataStore, ""));
+        dataStoreDB.setText(settings.get(ConfigTags.DataStoreDB, ""));
+        dataStoreType.setValue(settings.get(ConfigTags.DataStore, ""));
+        dataStoreUser.setText(settings.get(ConfigTags.DataStoreUser, ""));
+        dataStoreServer.setText(settings.get(ConfigTags.DataStoreServer, ""));
+        dataStorePassword.setText(settings.get(ConfigTags.DataStorePassword, ""));
+        dataStoreDirectory.setText(settings.get(ConfigTags.DataStoreDirectory, ""));
+        dataStoreMode.setValue(settings.get(ConfigTags.DataStoreMode, ""));
 
         storeWidgets.setSelected(settings.get(ConfigTags.StateModelStoreWidgets, false));
         accessbridgeEnabled.setSelected(settings.get(ConfigTags.AccessBridgeEnabled, false));
@@ -85,6 +85,45 @@ public class StateSettingsController extends ChildSettingsController {
                 dataStoreDirectory.setText(newDir.getAbsolutePath());
             }
         });
+    }
+
+    @Override
+    protected boolean needsSave(Settings settings) {
+        if (!dataStore.getText().equals(settings.get(ConfigTags.DataStore, ""))) {
+            return true;
+        }
+        if (!dataStoreDB.getText().equals(settings.get(ConfigTags.DataStoreDB, ""))) {
+            return true;
+        }
+        if (!dataStoreType.getValue().equals(settings.get(ConfigTags.DataStoreType, ""))) {
+            return true;
+        }
+        if (!dataStoreUser.getText().equals(settings.get(ConfigTags.DataStoreUser, ""))) {
+            return true;
+        }
+        if (!dataStoreServer.getText().equals(settings.get(ConfigTags.DataStoreServer, ""))) {
+            return true;
+        }
+        if (!dataStorePassword.getText().equals(settings.get(ConfigTags.DataStorePassword, ""))) {
+            return true;
+        }
+        if (!dataStoreDirectory.getText().equals(settings.get(ConfigTags.DataStoreDirectory, ""))) {
+            return true;
+        }
+        if (!dataStoreMode.getValue().equals(settings.get(ConfigTags.DataStoreMode, ""))) {
+            return true;
+        }
+
+        if (storeWidgets.isSelected() != settings.get(ConfigTags.StateModelStoreWidgets, false)) {
+            return true;
+        }
+        if (accessbridgeEnabled.isSelected() != settings.get(ConfigTags.AccessBridgeEnabled, false)) {
+            return true;
+        }
+        if (resetDatabase.isSelected() != settings.get(ConfigTags.ResetDataStore, false)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

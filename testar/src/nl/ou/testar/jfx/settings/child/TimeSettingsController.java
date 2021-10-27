@@ -31,23 +31,43 @@ public class TimeSettingsController extends ChildSettingsController {
 
         Spinner actionDurationSpinner = (Spinner) view.lookup("#actionDuration");
         actionDurationValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        actionDurationValueFactory.setValue(settings.get(ConfigTags.ActionDuration));
+        actionDurationValueFactory.setValue(settings.get(ConfigTags.ActionDuration, 0.0));
         actionDurationSpinner.setValueFactory(actionDurationValueFactory);
         Spinner waitTimeSpinner = (Spinner) view.lookup("#waitTime");
         waitTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        waitTimeValueFactory.setValue(settings.get(ConfigTags.TimeToWaitAfterAction));
+        waitTimeValueFactory.setValue(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0));
         waitTimeSpinner.setValueFactory(waitTimeValueFactory);
         Spinner startupTimeSpinner = (Spinner) view.lookup("#startupTime");
         startupTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        startupTimeValueFactory.setValue(settings.get(ConfigTags.StartupTime));
+        startupTimeValueFactory.setValue(settings.get(ConfigTags.StartupTime, 0.0));
         startupTimeSpinner.setValueFactory(startupTimeValueFactory);
         Spinner maxTestTimeSpinner = (Spinner) view.lookup("#maxTestTime");
         maxTestTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        maxTestTimeValueFactory.setValue(settings.get(ConfigTags.MaxTime));
+        maxTestTimeValueFactory.setValue(settings.get(ConfigTags.MaxTime, 0.0));
         maxTestTimeSpinner.setValueFactory(maxTestTimeValueFactory);
 
         useRecordTimingCheckbox = (CheckBox) view.lookup("#useRecordTiming");
-        useRecordTimingCheckbox.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay));
+        useRecordTimingCheckbox.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false));
+    }
+
+    @Override
+    protected boolean needsSave(Settings settings) {
+        if (!actionDurationValueFactory.getValue().equals(settings.get(ConfigTags.ActionDuration, 0.0))) {
+            return true;
+        }
+        if (!waitTimeValueFactory.getValue().equals(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0))) {
+            return true;
+        }
+        if (!startupTimeValueFactory.getValue().equals(settings.get(ConfigTags.StartupTime, 0.0))) {
+            return true;
+        }
+        if (!maxTestTimeValueFactory.getValue().equals(settings.get(ConfigTags.MaxTime, 0.0))) {
+            return true;
+        }
+        if (useRecordTimingCheckbox.isSelected() != settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -186,3 +186,14 @@ TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
+
+#################################################################
+# Whitebox test settings
+#################################################################
+
+GitUrl = https://github.com/SeleniumHQ/selenium-ide
+GitAuthRequired = false
+
+SonarDockerize = true
+sonarProjectNameField = "Demo"
+sonarProjectKeyField = "Demo"
