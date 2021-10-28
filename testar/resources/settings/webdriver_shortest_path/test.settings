@@ -197,3 +197,9 @@ TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
+
+SonarDockerize = true
+SonarProjectName = Demo
+SonarProjectKey = Demo
+GitUrl = https://github.com/crystal-lang/crystal
+GitAuthRequired = false
