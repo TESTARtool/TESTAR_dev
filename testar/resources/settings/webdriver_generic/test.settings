@@ -199,9 +199,9 @@ RefreshSpyCanvas = 1.0
 # Whitebox test settings
 #################################################################
 
+SonarDockerize = true
+SonarProjectName = Demo
+SonarProjectKey = Demo
 GitUrl = https://github.com/crystal-lang/crystal 
 GitAuthRequired = false
 
-SonarDockerize = true
-SonarProjectNameField = "Demo"
-SonarProjectKeyField = "Demo"

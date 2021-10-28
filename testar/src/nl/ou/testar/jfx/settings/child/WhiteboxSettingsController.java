@@ -82,7 +82,7 @@ public class WhiteboxSettingsController extends ChildSettingsController {
         sonarUsernameField.setText(settings.get(ConfigTags.SonarUsername, ""));
         sonarPasswordField.setText(settings.get(ConfigTags.SonarPassword, ""));
 
-        sonarDockerizeBox.setSelected(settings.get(ConfigTags.SonarDockerize, false));
+        sonarDockerizeBox.setSelected(settings.get(ConfigTags.SonarDockerize, true));
 
         sonarProjectPropertiesArea.setText(settings.get(ConfigTags.SonarProjectProperties, ""));
         sonarProjectNameField.setText(settings.get(ConfigTags.SonarProjectName, ""));
