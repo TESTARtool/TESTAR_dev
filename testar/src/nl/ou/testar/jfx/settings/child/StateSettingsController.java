@@ -60,7 +60,7 @@ public class StateSettingsController extends ChildSettingsController {
 
         dataStore.setText(settings.get(ConfigTags.DataStore, ""));
         dataStoreDB.setText(settings.get(ConfigTags.DataStoreDB, ""));
-        dataStoreType.setValue(settings.get(ConfigTags.DataStore, ""));
+        dataStoreType.setValue(settings.get(ConfigTags.DataStoreType, ""));
         dataStoreUser.setText(settings.get(ConfigTags.DataStoreUser, ""));
         dataStoreServer.setText(settings.get(ConfigTags.DataStoreServer, ""));
         dataStorePassword.setText(settings.get(ConfigTags.DataStorePassword, ""));
