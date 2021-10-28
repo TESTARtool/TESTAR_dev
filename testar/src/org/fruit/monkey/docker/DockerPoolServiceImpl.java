@@ -118,6 +118,11 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 super.onNext(item);
             }
         }).awaitImageId();
+
+        if (delegate != null) {
+            delegate.onStatusChange("Finalizing", null, null);
+        }
+
         imageIds.add(imageId);
 
         return imageId;

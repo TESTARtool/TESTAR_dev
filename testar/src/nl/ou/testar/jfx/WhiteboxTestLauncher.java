@@ -262,7 +262,6 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
     @Override
     public void onComplete(String report) {
-        System.out.println("Report: " + report);
         Platform.runLater(() -> {
             whiteboxStage.close();
             parentStage.show();
