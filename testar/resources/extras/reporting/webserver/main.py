@@ -19,6 +19,5 @@ if bool(os.environ.get("ORIENTDB_ENABLED", "0")):
 if __name__ == "__main__":
     print(" * Running without UWSGI")
 
-
     # TODO: Remove static variables
     app.run(port=80, host="0.0.0.0")
