@@ -164,10 +164,15 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                             delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, e.getLocalizedMessage());
                         }
                     }
-//                    finally {
-//                        System.out.println("-= Dispose on complete =-");
-//                        dockerPoolService.dispose(false);
-//                    }
+                    finally {
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("-= Dispose on complete =-");
+                        dockerPoolService.dispose(false);
+                    }
                 }
 
                 @Override
