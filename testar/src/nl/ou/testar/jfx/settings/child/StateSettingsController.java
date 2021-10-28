@@ -55,7 +55,7 @@ public class StateSettingsController extends ChildSettingsController {
         accessbridgeEnabled = (CheckBox) view.lookup("#accessbridgeEnabled");
         resetDatabase = (CheckBox) view.lookup("#resetDatabase");
 
-        dataStoreType.getItems().addAll("remote", "plocal");
+        dataStoreType.getItems().addAll("remote", "plocal", "docker");
         dataStoreMode.getItems().addAll("none", "instant", "delayed", "hybrid");
 
         dataStore.setText(settings.get(ConfigTags.DataStore, ""));
