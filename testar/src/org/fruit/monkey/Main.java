@@ -155,16 +155,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				shutdown();
 			}
 		});
-
-//		Runtime.getRuntime().addShutdownHook(new Thread() {
-//
-//			@Override
-//			public void run() {
-//				DockerPoolServiceImpl.disposeAll(false);
-//				System.out.println("Docker instances disposed");
-//			}
-//		});
-
+		
 		isValidJavaEnvironment();
 
 		verifyTestarInitialDirectory();
