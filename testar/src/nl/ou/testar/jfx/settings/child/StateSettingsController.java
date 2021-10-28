@@ -45,7 +45,7 @@ public class StateSettingsController extends SettingsEditController {
         CheckBox accessbridgeEnabled = (CheckBox) view.lookup("#accessbridgeEnabled");
         CheckBox resetDatabase = (CheckBox) view.lookup("#resetDatabase");
 
-        dataStoreType.getItems().addAll("remote", "plocal");
+        dataStoreType.getItems().addAll("remote", "plocal", "docker");
         dataStoreMode.getItems().addAll("none", "instant", "delayed", "hybrid");
 
         addBinding(dataStore, ConfigTags.DataStore, ConfigBinding.GenericType.FIELD_STRING);
