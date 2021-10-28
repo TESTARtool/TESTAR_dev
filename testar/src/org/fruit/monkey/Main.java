@@ -147,14 +147,14 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
-//		Runtime.getRuntime().addShutdownHook(new Thread() {
-//
-//			@Override
-//			public void run() {
-//				DockerPoolServiceImpl.disposeAll(false);
-//				System.out.println("Docker instances disposed");
-//			}
-//		});
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				DockerPoolServiceImpl.disposeAll(false);
+				System.out.println("Docker instances disposed");
+			}
+		});
 
 		isValidJavaEnvironment();
 
