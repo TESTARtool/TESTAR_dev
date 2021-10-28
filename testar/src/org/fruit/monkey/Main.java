@@ -339,6 +339,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 			ChoiceDialog settingsSelectorDialog = new ChoiceDialog(options[0], options);
 			settingsSelectorDialog.setTitle("TESTAR settings");
+			settingsSelectorDialog.setHeaderText("Welcome to TESTAR!");
 			settingsSelectorDialog.setContentText("Select the desired setting:");
 			Optional<String> sseSelected = settingsSelectorDialog.showAndWait();
 
