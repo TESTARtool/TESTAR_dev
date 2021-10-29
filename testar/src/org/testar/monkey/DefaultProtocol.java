@@ -2081,7 +2081,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	}
 
 	/**
-	 * Replay Mode using State Model Sequence Layer
+	 * Replay Mode using State Model Sequence Layer. 
 	 * 
 	 * @param settings
 	 * @throws StateModelException
@@ -2192,12 +2192,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			// Get the counter of the action step
 			// We need to do this because one model contains multiple sequences
 			String actionSequence = sequenceIdentifier + "-" + actionCount + "-" + sequenceIdentifier + "-" + (actionCount+1);
-			int counterStep = ReplayStateModelUtil.getReplayCounterOfActionStep(stateModelManager, actionSequence);
+			String concreteActionId = ReplayStateModelUtil.getReplayConcreteActionStep(stateModelManager, actionSequence);
 
 			// Now we get the AbstractActionId of the model that contains this counter action step
 			// This is the action we want to replay and we need to search in the state
-			String abstractActionReplayId = ReplayStateModelUtil.getReplayAbstractActionIdofCounter(stateModelManager, counterStep, replayModelIdentifier);
-
+			String abstractActionReplayId = ReplayStateModelUtil.getReplayAbstractActionIdFromConcreteAction(stateModelManager, replayModelIdentifier, concreteActionId);
 			// Derive Actions of the current State
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);

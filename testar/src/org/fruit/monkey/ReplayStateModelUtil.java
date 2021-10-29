@@ -40,7 +40,7 @@ public class ReplayStateModelUtil {
 	private ReplayStateModelUtil() {}
 
 	/**
-	 * Query the OrientDB database to get the model identifier using the name and version of the model we want to replay
+	 * Query the OrientDB database to get the model identifier using the name and version of the model we want to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param replayName
@@ -51,7 +51,7 @@ public class ReplayStateModelUtil {
 	public static String getReplayModelIdentifier(StateModelManager stateModelManager, String replayName, String replayVersion) throws StateModelException {
 		OResultSet resultSet = stateModelManager.queryStateModel("select modelIdentifier from AbstractStateModel where applicationName='" + replayName +"' and applicationVersion='" + replayVersion + "'");
 
-		String replayModelIdentifier = ""; // {modelIdentifier: 16q1mx4113647030708}
+		String replayModelIdentifier = ""; // result set String is {modelIdentifier: 16q1mx4113647030708}
 		if(resultSet.hasNext()) {
 			try {
 				replayModelIdentifier = resultSet.next().toString().replace("\n", "").trim();
@@ -73,7 +73,7 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Extract the number of TestSequences that exists in the desired State Model to replay
+	 * Extract the number of TestSequences that exists in the desired State Model to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param replayModelIdentifier
@@ -107,7 +107,7 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Get the sequence identifier of the indicated TestSequence counter we want to replay
+	 * Get the sequence identifier of the indicated TestSequence counter we want to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param replayTestSequenceCounter
@@ -117,7 +117,7 @@ public class ReplayStateModelUtil {
 	public static String getReplaySequenceIdentifierByCounter(StateModelManager stateModelManager, int replayTestSequenceCounter) throws StateModelException {
 		OResultSet resultSet = stateModelManager.queryStateModel("select sequenceId from TestSequence where counter='" + replayTestSequenceCounter + "'");
 
-		String sequenceIdentifier = ""; // {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e}
+		String sequenceIdentifier = ""; // result set String is {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e}
 		if(resultSet.hasNext()) {
 			try {
 				sequenceIdentifier = resultSet.next().toString().replace("\n", "").trim();
@@ -143,7 +143,7 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Get the sequence identifier of the indicated TestSequence time stamp we want to replay
+	 * Get the sequence identifier of the indicated TestSequence time stamp we want to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param sequenceTime
@@ -153,7 +153,7 @@ public class ReplayStateModelUtil {
 	public static String getReplaySequenceIdentifierByTime(StateModelManager stateModelManager, String sequenceTime) throws StateModelException {
 		OResultSet resultSet = stateModelManager.queryStateModel("select sequenceId from TestSequence where startDateTime.asString()='" + sequenceTime + "'");
 
-		String sequenceIdentifier = ""; // {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e}
+		String sequenceIdentifier = ""; // result set String is {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e}
 		if(resultSet.hasNext()) {
 			try {
 				sequenceIdentifier = resultSet.next().toString().replace("\n", "").trim();
@@ -179,7 +179,7 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Based on a sequence identifier, extract the number of actions steps that exists to replay
+	 * Based on a sequence identifier, extract the number of actions steps that exists to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param sequenceIdentifier
@@ -211,70 +211,77 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Based on an action step, get the counter of this action
+	 * Get the concreteActionId of the specific actionSequence step. 
+	 * From testSequenceStep action to ConcreteActionId. 
 	 * 
 	 * @param stateModelManager
 	 * @param actionSequence
 	 * @return
 	 * @throws StateModelException
 	 */
-	public static int getReplayCounterOfActionStep(StateModelManager stateModelManager, String actionSequence) throws StateModelException {
-		OResultSet resultSet = stateModelManager.queryStateModel("select counter from SequenceStep where stepId='" + actionSequence + "'");
+	public static String getReplayConcreteActionStep(StateModelManager stateModelManager, String actionSequence) throws StateModelException {
+		OResultSet resultSet = stateModelManager.queryStateModel("select concreteActionId from SequenceStep where stepId='" + actionSequence + "'");
 
-		int counterStep = 0;
+		String concreteActionId = ""; // result set String is {concreteActionId: AACje7hg01f4180421590}
 		if(resultSet.hasNext()) {
 			try {
-				counterStep = extractNumber(resultSet.next().toString());
+				concreteActionId = resultSet.next().toString().replace("\n", "").trim();
 			} catch (Exception e) {
-				String msg = String.format("getReplayCounterOfActionStep: ERROR parsing the counter of SequenceStep stepId %s", actionSequence);
+				String msg = String.format("getReplayConcreteActionStep: ERROR parsing the concreteActionId of SequenceStep stepId %s", actionSequence);
 				e.printStackTrace();
 				throw new StateModelException(msg);
 			}
 		} else {
-			String msg = String.format("getReplayCounterOfActionStep: counter not found for SequenceStep stepId %s", actionSequence);
+			String msg = String.format("getReplayConcreteActionStep: concreteActionId not found for SequenceStep stepId %s", actionSequence);
 			throw new StateModelException(msg);
 		}
-		if(counterStep == 0) {
-			String msg = String.format("getReplayCounterOfActionStep: 0 counter SequenceStep found (counter must not be 0) for SequenceStep stepId %s", actionSequence);
+		if(concreteActionId.isEmpty()) {
+			String msg = String.format("getReplayConcreteActionStep: concreteActionId to replay found but is EMPTY for SequenceStep stepId %s", actionSequence);
 			throw new StateModelException(msg);
 		}
 
-		return counterStep;
+		// {concreteActionId: AACje7hg01f4180421590} to AACje7hg01f4180421590
+		System.out.println(String.format("getReplayConcreteActionStep... %s ", concreteActionId));
+		concreteActionId = concreteActionId.replace("{", "").replace("}", "").trim().split(":")[1].trim();
+		System.out.println(String.format("getReplayConcreteActionStep... Replaying Action %s ...", concreteActionId));
+
+		return concreteActionId;
 	}
 
 	/**
-	 * Get the AbstractActionId of the model based on a counter action step
+	 * Get the abstractActionId of one AbstractStateModel by checking if it is related with a concrete action. 
+	 * From ConcreteActionId to AbstractActionId. 
 	 * 
 	 * @param stateModelManager
-	 * @param counterStep
 	 * @param replayModelIdentifier
+	 * @param concreteActionId
 	 * @return
 	 * @throws StateModelException
 	 */
-	public static String getReplayAbstractActionIdofCounter(StateModelManager stateModelManager, int counterStep, String replayModelIdentifier) throws StateModelException {
-		OResultSet resultSet = stateModelManager.queryStateModel("select actionId from AbstractAction where counter='" + counterStep +"' and modelIdentifier='" + replayModelIdentifier + "'");
+	public static String getReplayAbstractActionIdFromConcreteAction(StateModelManager stateModelManager, String replayModelIdentifier, String concreteActionId) throws StateModelException {
+		OResultSet resultSet = stateModelManager.queryStateModel("select actionId from AbstractAction where modelIdentifier='" + replayModelIdentifier + "' and concreteActionIds.asString() containstext '" + concreteActionId + "'");
 
-		String abstractActionReplayId = ""; // {actionId: AACje7hg01f4180421590}
+		String abstractActionReplayId = ""; // result set String is {actionId: AACje7hg01f4180421590}
 		if(resultSet.hasNext()) {
 			try {
 				abstractActionReplayId = resultSet.next().toString().replace("\n", "").trim();
 			} catch (Exception e) {
-				String msg = String.format("getReplayAbstractActionIdofCounter: AbstractAction Id to replay found but error parsing the id");
+				String msg = String.format("getReplayAbstractActionIdFromConcreteAction: AbstractAction Id to replay found but error parsing the id");
 				e.printStackTrace();
 				throw new StateModelException(msg);
 			}
 		} else {
-			String msg = String.format("getReplayAbstractActionIdofCounter: AbstractAction Id to replay NOT found");
+			String msg = String.format("getReplayAbstractActionIdFromConcreteAction: AbstractAction Id to replay NOT found");
 			throw new StateModelException(msg);
 		}
 		if(abstractActionReplayId.isEmpty()) {
-			String msg = String.format("getReplayAbstractActionIdofCounter: AbstractAction Id to replay is EMPTY");
+			String msg = String.format("getReplayAbstractActionIdFromConcreteAction: AbstractAction Id to replay is EMPTY");
 			throw new StateModelException(msg);
 		}
 		// {actionId: AACje7hg01f4180421590} to AACje7hg01f4180421590
-		System.out.println(String.format("getReplayAbstractActionIdofCounter... %s ", abstractActionReplayId));
+		System.out.println(String.format("getReplayAbstractActionIdFromConcreteAction... %s ", abstractActionReplayId));
 		abstractActionReplayId = abstractActionReplayId.replace("{", "").replace("}", "").trim().split(":")[1].trim();
-		System.out.println(String.format("getReplayAbstractActionIdofCounter... Replaying Action %s ...", abstractActionReplayId));
+		System.out.println(String.format("getReplayAbstractActionIdFromConcreteAction... Replaying Action %s ...", abstractActionReplayId));
 
 		return abstractActionReplayId;
 	}
