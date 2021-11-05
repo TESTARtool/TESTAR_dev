@@ -5,7 +5,6 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -147,7 +146,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Spinner id="numSequences" prefHeight="26.0" prefWidth="94.0" />
+            <TextField id="numSequences" prefHeight="26.0" prefWidth="91.0" />
             <Label text="Sequence actions" textFill="WHITE">
                <font>
                   <Font size="14.0" />
@@ -156,7 +155,7 @@
                   <Insets left="32.0" />
                </HBox.margin>
             </Label>
-            <Spinner id="numActions" prefHeight="26.0" prefWidth="94.0" />
+            <TextField id="numActions" prefHeight="26.0" prefWidth="106.0" />
          </children>
          <VBox.margin>
             <Insets top="16.0" />

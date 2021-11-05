@@ -2,19 +2,20 @@ package nl.ou.testar.jfx.settings.child;
 
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
+import javafx.scene.control.TextField;
+import org.apache.commons.lang.math.NumberUtils;
 
 import java.io.IOException;
 
 public class TimeSettingsController extends ChildSettingsController {
-    private SpinnerValueFactory<Double> actionDurationValueFactory;
-    private SpinnerValueFactory<Double> waitTimeValueFactory;
-    private SpinnerValueFactory<Double> startupTimeValueFactory;
-    private SpinnerValueFactory<Double> maxTestTimeValueFactory;
+
     private CheckBox useRecordTimingCheckbox;
+    private TextField actionDurationField;
+    private TextField waitTimeField;
+    private TextField startupTimeField;
+    private TextField maxTestTimeField;
 
     public TimeSettingsController(Settings settings, String settingsPath) {
         super("Time settings", settings, settingsPath);
@@ -29,22 +30,23 @@ public class TimeSettingsController extends ChildSettingsController {
             e.printStackTrace();
         }
 
-        Spinner actionDurationSpinner = (Spinner) view.lookup("#actionDuration");
-        actionDurationValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        actionDurationValueFactory.setValue(settings.get(ConfigTags.ActionDuration, 0.0));
-        actionDurationSpinner.setValueFactory(actionDurationValueFactory);
-        Spinner waitTimeSpinner = (Spinner) view.lookup("#waitTime");
-        waitTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        waitTimeValueFactory.setValue(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0));
-        waitTimeSpinner.setValueFactory(waitTimeValueFactory);
-        Spinner startupTimeSpinner = (Spinner) view.lookup("#startupTime");
-        startupTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        startupTimeValueFactory.setValue(settings.get(ConfigTags.StartupTime, 0.0));
-        startupTimeSpinner.setValueFactory(startupTimeValueFactory);
-        Spinner maxTestTimeSpinner = (Spinner) view.lookup("#maxTestTime");
-        maxTestTimeValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE);
-        maxTestTimeValueFactory.setValue(settings.get(ConfigTags.MaxTime, 0.0));
-        maxTestTimeSpinner.setValueFactory(maxTestTimeValueFactory);
+        actionDurationField = (TextField) view.lookup("#actionDuration");
+        actionDurationField.setPromptText("0");
+        limitInputToPattern(actionDurationField, ChildSettingsController.INPUT_PATTERN_NUMBER);
+        waitTimeField = (TextField) view.lookup("#waitTime");
+        waitTimeField.setPromptText("0");
+        limitInputToPattern(waitTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
+        startupTimeField = (TextField) view.lookup("#startupTime");
+        startupTimeField.setPromptText("0");
+        limitInputToPattern(startupTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
+        maxTestTimeField = (TextField) view.lookup("#maxTestTime");
+        maxTestTimeField.setPromptText("0");
+        limitInputToPattern(maxTestTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
+
+        actionDurationField.setText(settings.get(ConfigTags.ActionDuration, 0.0).toString());
+        waitTimeField.setText(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0).toString());
+        startupTimeField.setText(settings.get(ConfigTags.StartupTime, 0.0).toString());
+        maxTestTimeField.setText(settings.get(ConfigTags.MaxTime, 0.0).toString());
 
         useRecordTimingCheckbox = (CheckBox) view.lookup("#useRecordTiming");
         useRecordTimingCheckbox.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false));
@@ -52,16 +54,16 @@ public class TimeSettingsController extends ChildSettingsController {
 
     @Override
     protected boolean needsSave(Settings settings) {
-        if (!actionDurationValueFactory.getValue().equals(settings.get(ConfigTags.ActionDuration, 0.0))) {
+        if (!actionDurationField.getText().equals(settings.get(ConfigTags.ActionDuration, 0.0).toString())) {
             return true;
         }
-        if (!waitTimeValueFactory.getValue().equals(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0))) {
+        if (!waitTimeField.getText().equals(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0).toString())) {
             return true;
         }
-        if (!startupTimeValueFactory.getValue().equals(settings.get(ConfigTags.StartupTime, 0.0))) {
+        if (!startupTimeField.getText().equals(settings.get(ConfigTags.StartupTime, 0.0).toString())) {
             return true;
         }
-        if (!maxTestTimeValueFactory.getValue().equals(settings.get(ConfigTags.MaxTime, 0.0))) {
+        if (!maxTestTimeField.getText().equals(settings.get(ConfigTags.MaxTime, 0.0).toString())) {
             return true;
         }
         if (useRecordTimingCheckbox.isSelected() != settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false)) {
@@ -72,10 +74,10 @@ public class TimeSettingsController extends ChildSettingsController {
 
     @Override
     protected void save(Settings settings) {
-        settings.set(ConfigTags.ActionDuration, actionDurationValueFactory.getValue());
-        settings.set(ConfigTags.TimeToWaitAfterAction, waitTimeValueFactory.getValue());
-        settings.set(ConfigTags.StartupTime, startupTimeValueFactory.getValue());
-        settings.set(ConfigTags.MaxTime, maxTestTimeValueFactory.getValue());
+        settings.set(ConfigTags.ActionDuration, NumberUtils.toDouble(actionDurationField.getText(), 0));
+        settings.set(ConfigTags.TimeToWaitAfterAction, NumberUtils.toDouble(waitTimeField.getText(), 0));
+        settings.set(ConfigTags.StartupTime, NumberUtils.toDouble(startupTimeField.getText(), 0));
+        settings.set(ConfigTags.MaxTime, NumberUtils.toDouble(maxTestTimeField.getText(), 0));
 
         settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, useRecordTimingCheckbox.isSelected());
     }

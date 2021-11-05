@@ -3,7 +3,7 @@
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -29,7 +29,6 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner id="actionDuration" GridPane.columnIndex="1" />
       <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -46,7 +45,6 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner id="startupTime" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <Label text="Action wait time" textFill="WHITE" GridPane.columnIndex="3">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -57,8 +55,6 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Label>
-      <Spinner id="waitTime" GridPane.columnIndex="4" />
-      <Spinner id="maxTestTime" GridPane.columnIndex="4" GridPane.rowIndex="1" />
       <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
          <font>
             <Font name="Arial Bold" size="14.0" />
@@ -97,5 +93,9 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </JFXCheckBox>
+      <TextField id="actionDuration" GridPane.columnIndex="1" />
+      <TextField id="startupTime" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField id="waitTime" GridPane.columnIndex="4" />
+      <TextField id="maxTestTime" GridPane.columnIndex="4" GridPane.rowIndex="1" />
    </children>
 </GridPane>
