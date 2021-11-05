@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import nl.ou.testar.jfx.utils.DisplayModeWrapper;
 import nl.ou.testar.jfx.utils.GeneralSettings;
+import org.apache.commons.lang.math.NumberUtils;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -26,12 +27,9 @@ public class GeneralSettingsController extends ChildSettingsController {
     private ComboBox<DisplayModeWrapper> resolutionComboBox;
     private TextField webDriverPathField;
     private TextField locationInputField;
-    private Spinner numSequencesSpinner;
-    private Spinner numActionsSpinner;
+    private TextField numSequencesField;
+    private TextField numActionsField;
     private CheckBox alwaysCompileCheckBox;
-
-    private SpinnerValueFactory<Integer> numActionsValueFactory;
-    private SpinnerValueFactory<Integer> numSequencesValueFactory;
 
     private GeneralSettings generalSettings;
 
@@ -121,18 +119,19 @@ public class GeneralSettingsController extends ChildSettingsController {
             locationInputField.setText(locationFile.toURI().toString());
         });
 
-        numSequencesSpinner = (Spinner) view.lookup("#numSequences");
-        numSequencesValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
-        numSequencesSpinner.setValueFactory(numSequencesValueFactory);
-        numActionsSpinner = (Spinner) view.lookup("#numActions");
-        numActionsValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE);
-        numActionsSpinner.setValueFactory(numActionsValueFactory);
+        numSequencesField = (TextField) view.lookup("#numSequences");
+        numSequencesField.setPromptText("0");
+        limitInputToPattern(numSequencesField, ChildSettingsController.INPUT_PATTERN_INTEGER);
+        numActionsField = (TextField) view.lookup("#numActions");
+        numActionsField.setPromptText("0");
+        limitInputToPattern(numActionsField, ChildSettingsController.INPUT_PATTERN_INTEGER);
         alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
         alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile, false));
 
         sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
-        numSequencesValueFactory.setValue(settings.get(ConfigTags.Sequences, 0));
-        numActionsValueFactory.setValue(settings.get(ConfigTags.SequenceLength, 0));
+
+        numSequencesField.setText(settings.get(ConfigTags.Sequences, 0).toString());
+        numActionsField.setText(settings.get(ConfigTags.SequenceLength, 0).toString());
     }
 
     @Override
@@ -143,10 +142,10 @@ public class GeneralSettingsController extends ChildSettingsController {
         if (!sutComboBox.getValue().toString().equals(settings.get(ConfigTags.SUTConnector, ""))) {
             return true;
         }
-        if (!numSequencesValueFactory.getValue().equals(settings.get(ConfigTags.Sequences, 0))) {
+        if (!numSequencesField.getText().equals(settings.get(ConfigTags.Sequences, 0).toString())) {
             return true;
         }
-        if (!numActionsValueFactory.getValue().equals(settings.get(ConfigTags.SequenceLength, 0))) {
+        if (!numActionsField.getText().equals(settings.get(ConfigTags.SequenceLength, 0).toString())) {
             return true;
         }
         if (!alwaysCompileCheckBox.isSelected() == settings.get(ConfigTags.AlwaysCompile, false)) {
@@ -159,8 +158,8 @@ public class GeneralSettingsController extends ChildSettingsController {
     protected void save(Settings settings) {
         settings.set(ConfigTags.SUTConnectorValue, generalSettings.toString());
         settings.set(ConfigTags.SUTConnector, sutComboBox.getValue().toString());
-        settings.set(ConfigTags.Sequences, numSequencesValueFactory.getValue());
-        settings.set(ConfigTags.SequenceLength, numActionsValueFactory.getValue());
+        settings.set(ConfigTags.Sequences, NumberUtils.toInt(numSequencesField.getText(), 0));
+        settings.set(ConfigTags.SequenceLength, NumberUtils.toInt(numActionsField.getText(), 0));
         settings.set(ConfigTags.AlwaysCompile, alwaysCompileCheckBox.isSelected());
     }
 }
