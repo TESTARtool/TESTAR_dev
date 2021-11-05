@@ -1,6 +1,8 @@
 package nl.ou.testar.jfx.settings.child;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -13,8 +15,13 @@ import org.testar.settings.ExtendedSettingsFactory;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 public abstract class ChildSettingsController extends ViewController {
+
+    public final static String INPUT_PATTERN_INTEGER = "\\d*";
+    public final static String INPUT_PATTERN_NUMBER = "\\d*|\\d+\\,\\d*";
 
     private String settingsPath;
 
@@ -93,5 +100,13 @@ public abstract class ChildSettingsController extends ViewController {
         }
 
         return false;
+    }
+
+    protected void limitInputToPattern(TextField textField, String patternString) {
+        Pattern pattern = Pattern.compile(patternString);
+        TextFormatter formatter = new TextFormatter((UnaryOperator<TextFormatter.Change>) change ->
+                pattern.matcher(change.getControlNewText()).matches() ? change : null);
+
+        textField.setTextFormatter(formatter);
     }
 }
