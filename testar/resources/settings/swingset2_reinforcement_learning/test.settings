@@ -152,9 +152,9 @@ QFunction = QlearningFunction
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
+# ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
 # ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLQVLearning.xml
-# ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Other more advanced settings

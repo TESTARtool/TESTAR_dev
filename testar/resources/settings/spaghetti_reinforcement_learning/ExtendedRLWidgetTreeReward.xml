@@ -12,8 +12,10 @@
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
+        <tagName>WidgetTreeReward</tagName>
         <rewardFunction>WidgetTreeBasedRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>
+        <qFunction>QlearningFunction</qFunction>
     </reinforcementLearningSettings>
 
     <!-- Visual ORACLE OCR -->
