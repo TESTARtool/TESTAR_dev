@@ -39,6 +39,7 @@ public class RewardFunctionFactory {
             case "WidgetImageComparison":
                 // Defines the percentage of how much the widget reward function should count in the reward
                 final float widgetComparisonShare = settings.get(ConfigTags.WidgetComparisonShare, 0.5f);
+                logger.info("Using widgetComparisonShare='{}'", widgetComparisonShare);
                 selectedRewardFunction = new WidgetImageComparison(defaultReward, widgetComparisonShare);
                 break;
             case "VisitedUnvisitedRewardFunction":

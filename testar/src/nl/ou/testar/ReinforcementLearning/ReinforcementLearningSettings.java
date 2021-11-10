@@ -23,6 +23,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
     public Float decayRate;
     public Float temperature;
     public Float maxQValue;
+    public Float defaultVValue;
+    public Float widgetComparisonShare;
     public String tagName;
     public String qFunction;
 
@@ -39,6 +41,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
                 && this.temperature.equals(other.temperature)
                 && this.maxQValue.equals(other.maxQValue)
                 && this.tagName.equals(other.tagName)
+                && this.defaultVValue.equals(other.defaultVValue)
+                && this.widgetComparisonShare.equals(other.widgetComparisonShare)
                 && this.qFunction.equals(other.qFunction)) {
             return 0;
         }
@@ -60,6 +64,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
                 "maxQValue=" + maxQValue +
                 "tagName=" + tagName +
                 "qFunction=" + qFunction +
+                "defaultVValue=" + defaultVValue +
+                "widgetComparisonShare=" + widgetComparisonShare +
                 '}';
     }
 
@@ -68,6 +74,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         DefaultInstance.alpha = (float)1.0;
         DefaultInstance.gamma = (float)0.99;
         DefaultInstance.defaultValue = (float)0.0;
+        DefaultInstance.defaultVValue = (float)0.0;
+        DefaultInstance.widgetComparisonShare = (float)0.5;
         DefaultInstance.defaultReward = (float)0.0;
         DefaultInstance.epsilon = (float)0.7;
         DefaultInstance.maxQValue = (float)1.0;
@@ -113,6 +121,10 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         System.out.println("TagName value : " + settings.get(ConfigTags.TagName));
         settings.set(ConfigTags.QFunction, this.qFunction);
         System.out.println("QFunction value : " + settings.get(ConfigTags.QFunction));
+        settings.set(ConfigTags.DefaultVValue, this.defaultVValue);
+        System.out.println("DefaultVValue value : " + settings.get(ConfigTags.DefaultVValue));
+        settings.set(ConfigTags.WidgetComparisonShare, this.widgetComparisonShare);
+        System.out.println("WidgetComparisonShare value : " + settings.get(ConfigTags.WidgetComparisonShare));
         
         // Force new Application Name adding the RL Extended Settings
         // This is being done to differentiate experiments results

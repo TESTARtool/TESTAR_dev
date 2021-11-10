@@ -154,7 +154,7 @@ QFunction = QlearningFunction
 #################################################################
 # ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
 # ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLQVLearning.xml
-ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQlearningWCS_1.xml
 
 #################################################################
 # Other more advanced settings
