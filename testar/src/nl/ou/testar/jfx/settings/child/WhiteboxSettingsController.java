@@ -4,30 +4,22 @@ import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
+import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
+import nl.ou.testar.jfx.settings.bindings.control.ControlBinding;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.io.IOException;
 
-public class WhiteboxSettingsController extends ChildSettingsController {
+public class WhiteboxSettingsController extends SettingsEditController {
 
-    private TextField gitUrlField;
     private TextField gitUsernameField;
     private TextField gitTokenField;
-    private TextField gitBranchField;
-
-    private CheckBox gitAuthorizationRequiredBox;
 
     private TextField sonarUrlField;
     private TextField sonarUsernameField;
     private TextField sonarPasswordField;
-
-    private CheckBox sonarDockerizeBox;
-
-    private TextArea sonarProjectPropertiesArea;
-    private TextField sonarProjectNameField;
-    private TextField sonarProjectKeyField;
-    private CheckBox sonarSaveResultBox;
 
     public WhiteboxSettingsController(Settings settings, String settingsPath) {
         super("Whitebox", settings, settingsPath);
@@ -45,52 +37,100 @@ public class WhiteboxSettingsController extends ChildSettingsController {
             e.printStackTrace();
         }
 
-        gitUrlField = (TextField) view.lookup("#gitUrl");
+        TextField gitUrlField = (TextField) view.lookup("#gitUrl");
         gitUsernameField = (TextField) view.lookup("#gitUsername");
         gitTokenField = (TextField) view.lookup("#gitToken");
-        gitBranchField = (TextField) view.lookup("#gitBranch");
+        TextField gitBranchField = (TextField) view.lookup("#gitBranch");
 
-        gitAuthorizationRequiredBox = (CheckBox) view.lookup("#authorizationRequired");
-
-        gitAuthorizationRequiredBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            updateGitFields(newValue);
-        });
+        final CheckBox gitAuthorizationRequiredBox = (CheckBox) view.lookup("#authorizationRequired");
 
         sonarUrlField = (TextField) view.lookup("#sonarUrl");
         sonarUsernameField = (TextField) view.lookup("#sonarUsername");
         sonarPasswordField = (TextField) view.lookup("#sonarPassword");
 
-        sonarDockerizeBox = (CheckBox) view.lookup("#sonarDockerize");
+        CheckBox sonarDockerizeBox = (CheckBox) view.lookup("#sonarDockerize");
 
-        sonarProjectPropertiesArea = (TextArea) view.lookup("#sonarProjectProperties");
-        sonarProjectNameField = (TextField) view.lookup("#sonarProjectName");
-        sonarProjectKeyField = (TextField) view.lookup("#sonarProjectKey");
-        sonarSaveResultBox = (CheckBox) view.lookup("#sonarSaveResult");
+        TextArea sonarProjectPropertiesArea = (TextArea) view.lookup("#sonarProjectProperties");
+        TextField sonarProjectNameField = (TextField) view.lookup("#sonarProjectName");
+        TextField sonarProjectKeyField = (TextField) view.lookup("#sonarProjectKey");
+        CheckBox sonarSaveResultBox = (CheckBox) view.lookup("#sonarSaveResult");
 
-        sonarDockerizeBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            updateSonarFields(newValue);
-        });
+        addBinding(gitUrlField, ConfigTags.GitUrl, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(gitUsernameField, ConfigTags.GitUsername, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(gitTokenField, ConfigTags.GitToken, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(gitBranchField, ConfigTags.GitBranch, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarUrlField, ConfigTags.SonarUrl, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarUsernameField, ConfigTags.SonarUsername, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarPasswordField, ConfigTags.SonarPassword, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarProjectPropertiesArea, ConfigTags.SonarProjectProperties, ConfigBinding.GenericType.TEXT_INPUT);
+        addBinding(sonarProjectNameField, ConfigTags.SonarProjectName, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarProjectKeyField, ConfigTags.SonarProjectKey, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarSaveResultBox, ConfigTags.SonarSaveResult, ConfigBinding.GenericType.CHECK_BOX);
 
-        gitUrlField.setText(settings.get(ConfigTags.GitUrl, ""));
-        gitUsernameField.setText(settings.get(ConfigTags.GitUsername, ""));
-        gitTokenField.setText(settings.get(ConfigTags.GitToken, ""));
-        gitBranchField.setText(settings.get(ConfigTags.GitBranch, ""));
+        ControlBinding<Boolean> gitAuthorizationRequiredControlBinding = new ControlBinding<Boolean>() {
+            @Override
+            public void setValue(Boolean value) {
+                gitAuthorizationRequiredBox.setSelected(value);
+                updateGitFields(value);
+            }
 
-        gitAuthorizationRequiredBox.setSelected(settings.get(ConfigTags.GitAuthRequired, false));
+            @Override
+            public Boolean getValue() {
+                return gitAuthorizationRequiredBox.isSelected();
+            }
 
-        sonarUrlField.setText(settings.get(ConfigTags.SonarUrl, ""));
-        sonarUsernameField.setText(settings.get(ConfigTags.SonarUsername, ""));
-        sonarPasswordField.setText(settings.get(ConfigTags.SonarPassword, ""));
+            @Override
+            public void onBind(Callback<Boolean> callback) {
+                gitAuthorizationRequiredBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    callback.onUpdate(newValue);
+                });
+            }
+        };
+        try {
+            ConfigBinding<Boolean> gitAuthorizationRequiredConfigBinding = new ConfigBinding.Builder<Boolean>()
+                    .withCustomControlBinding(gitAuthorizationRequiredControlBinding)
+                    .withSettings(settings)
+                    .withTag(ConfigTags.GitAuthRequired)
+                    .withGenericType(ConfigBinding.GenericType.CHECK_BOX)
+                    .build();
+            addBinding(gitAuthorizationRequiredConfigBinding);
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
 
-        sonarDockerizeBox.setSelected(settings.get(ConfigTags.SonarDockerize, true));
+        ControlBinding<Boolean> sonarDockerizeControlBinding = new ControlBinding<Boolean>() {
 
-        sonarProjectPropertiesArea.setText(settings.get(ConfigTags.SonarProjectProperties, ""));
-        sonarProjectNameField.setText(settings.get(ConfigTags.SonarProjectName, ""));
-        sonarProjectKeyField.setText(settings.get(ConfigTags.SonarProjectKey, ""));
-        sonarSaveResultBox.setSelected(settings.get(ConfigTags.SonarSaveResult, true));
+            @Override
+            public void setValue(Boolean value) {
+                System.out.println("Dockerize: " + value.toString());
+                sonarDockerizeBox.setSelected(value);
+                updateSonarFields(value);
+            }
 
-        updateGitFields(gitAuthorizationRequiredBox.isSelected());
-        updateSonarFields(sonarDockerizeBox.isSelected());
+            @Override
+            public Boolean getValue() {
+                return sonarDockerizeBox.isSelected();
+            }
+
+            @Override
+            public void onBind(Callback<Boolean> callback) {
+                sonarDockerizeBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                    callback.onUpdate(newValue);
+                });
+            }
+        };
+        ConfigBinding<Boolean> sonarDockerizeConfigBinding = null;
+        try {
+            sonarDockerizeConfigBinding = new ConfigBinding.Builder<Boolean>()
+                    .withCustomControlBinding(sonarDockerizeControlBinding)
+                    .withSettings(settings)
+                    .withTag(ConfigTags.SonarDockerize)
+                    .withGenericType(ConfigBinding.GenericType.CHECK_BOX)
+                    .build();
+            addBinding(sonarDockerizeConfigBinding);
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateGitFields(boolean authorizationRequired) {
@@ -110,61 +150,5 @@ public class WhiteboxSettingsController extends ChildSettingsController {
             sonarPasswordField.setDisable(false);
 
         }
-    }
-
-    @Override
-    protected boolean needsSave(Settings settings) {
-        if (!gitUrlField.getText().equals(settings.get(ConfigTags.GitUrl, ""))) {
-            return true;
-        }
-        if (!gitUsernameField.getText().equals(settings.get(ConfigTags.GitUsername, ""))) {
-            return true;
-        }
-        if (!gitTokenField.getText().equals(settings.get(ConfigTags.GitToken, ""))) {
-            return true;
-        }
-        if (!gitBranchField.getText().equals(settings.get(ConfigTags.GitBranch, ""))) {
-            return true;
-        }
-        if (gitAuthorizationRequiredBox.isSelected() != settings.get(ConfigTags.GitAuthRequired, false)) {
-            return true;
-        }
-        if (!sonarUrlField.getText().equals(settings.get(ConfigTags.SonarUrl, ""))) {
-            return true;
-        }
-        if (!sonarUsernameField.getText().equals(settings.get(ConfigTags.SonarUsername, ""))) {
-            return true;
-        }
-        if (!sonarPasswordField.getText().equals(settings.get(ConfigTags.SonarPassword, ""))) {
-            return true;
-        }
-        if (!sonarProjectPropertiesArea.getText().equals(settings.get(ConfigTags.SonarProjectProperties, ""))) {
-            return true;
-        }
-        if (!sonarProjectNameField.getText().equals(settings.get(ConfigTags.SonarProjectName, ""))) {
-            return true;
-        }
-        if (!sonarProjectKeyField.getText().equals(settings.get(ConfigTags.SonarProjectKey, ""))) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    protected void save(Settings settings) {
-        // TODO: show alert view
-        settings.set(ConfigTags.GitUrl, gitUrlField.getText());
-        settings.set(ConfigTags.GitUsername, gitUsernameField.getText());
-        settings.set(ConfigTags.GitToken, gitTokenField.getText());
-        settings.set(ConfigTags.GitBranch, gitBranchField.getText());
-        settings.set(ConfigTags.GitAuthRequired, gitAuthorizationRequiredBox.isSelected());
-
-        settings.set(ConfigTags.SonarUrl, sonarUrlField.getText());
-        settings.set(ConfigTags.SonarUsername, sonarUsernameField.getText());
-        settings.set(ConfigTags.SonarPassword, sonarPasswordField.getText());
-
-        settings.set(ConfigTags.SonarProjectProperties, sonarProjectPropertiesArea.getText());
-        settings.set(ConfigTags.SonarProjectName, sonarProjectNameField.getText());
-        settings.set(ConfigTags.SonarProjectKey, sonarProjectKeyField.getText());
     }
 }

@@ -1,32 +1,33 @@
 package nl.ou.testar.jfx.settings.child;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
+import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
 import org.fruit.Util;
+import org.fruit.alayer.Tag;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
+import java.util.Set;
 
-public abstract class ChildSettingsController extends ViewController {
-
-    public final static String INPUT_PATTERN_INTEGER = "\\d*";
-    public final static String INPUT_PATTERN_NUMBER = "\\d*|\\d+\\,\\d*";
+public abstract class SettingsEditController extends ViewController {
 
     private String settingsPath;
 
-    public ChildSettingsController(String title, Settings settings, String settingsPath) {
+    private Set<ConfigBinding> bindings;
+
+    public SettingsEditController(String title, Settings settings, String settingsPath) {
         super(title, "jfx/settings_child.fxml", settings);
+        bindings = new HashSet<>();
         this.settingsPath = settingsPath;
     }
     @Override
@@ -59,9 +60,20 @@ public abstract class ChildSettingsController extends ViewController {
         contentBox.getChildren().add(sectionBox);
     }
 
-    protected abstract boolean needsSave(Settings settings);
+    protected boolean needsSave(Settings settings) {
+        for (ConfigBinding binding: bindings) {
+            if (binding.needsSave()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    protected abstract void save(Settings settings);
+    protected void save(Settings settings) {
+        for (ConfigBinding binding: bindings) {
+            binding.save();
+        }
+    }
 
     private void persist(Settings settings) {
         ExtendedSettingsFactory.SaveAll();
@@ -102,11 +114,25 @@ public abstract class ChildSettingsController extends ViewController {
         return false;
     }
 
-    protected void limitInputToPattern(TextField textField, String patternString) {
-        Pattern pattern = Pattern.compile(patternString);
-        TextFormatter formatter = new TextFormatter((UnaryOperator<TextFormatter.Change>) change ->
-                pattern.matcher(change.getControlNewText()).matches() ? change : null);
+    protected void addBinding(ConfigBinding binding) {
+        binding.bind();
+        bindings.add(binding);
+    }
 
-        textField.setTextFormatter(formatter);
+    protected ConfigBinding addBinding(Control control, Tag tag, ConfigBinding.GenericType bindingType) {
+        ConfigBinding binding = null;
+        ConfigBinding.Builder builder = new ConfigBinding.Builder();
+        try {
+            binding = builder
+                    .withControl(control)
+                    .withGenericType(bindingType)
+                    .withSettings(settings)
+                    .withTag(tag)
+                    .build();
+            addBinding(binding);
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
+        return binding;
     }
 }
