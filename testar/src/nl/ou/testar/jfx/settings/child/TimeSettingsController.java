@@ -5,17 +5,13 @@ import javafx.scene.control.CheckBox;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import javafx.scene.control.TextField;
-import org.apache.commons.lang.math.NumberUtils;
+import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 
 import java.io.IOException;
 
-public class TimeSettingsController extends ChildSettingsController {
+public class TimeSettingsController extends SettingsEditController {
 
     private CheckBox useRecordTimingCheckbox;
-    private TextField actionDurationField;
-    private TextField waitTimeField;
-    private TextField startupTimeField;
-    private TextField maxTestTimeField;
 
     public TimeSettingsController(Settings settings, String settingsPath) {
         super("Time settings", settings, settingsPath);
@@ -30,41 +26,24 @@ public class TimeSettingsController extends ChildSettingsController {
             e.printStackTrace();
         }
 
-        actionDurationField = (TextField) view.lookup("#actionDuration");
-        actionDurationField.setPromptText("0");
-        limitInputToPattern(actionDurationField, ChildSettingsController.INPUT_PATTERN_NUMBER);
-        waitTimeField = (TextField) view.lookup("#waitTime");
-        waitTimeField.setPromptText("0");
-        limitInputToPattern(waitTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
-        startupTimeField = (TextField) view.lookup("#startupTime");
-        startupTimeField.setPromptText("0");
-        limitInputToPattern(startupTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
-        maxTestTimeField = (TextField) view.lookup("#maxTestTime");
-        maxTestTimeField.setPromptText("0");
-        limitInputToPattern(maxTestTimeField, ChildSettingsController.INPUT_PATTERN_NUMBER);
-
-        actionDurationField.setText(settings.get(ConfigTags.ActionDuration, 0.0).toString());
-        waitTimeField.setText(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0).toString());
-        startupTimeField.setText(settings.get(ConfigTags.StartupTime, 0.0).toString());
-        maxTestTimeField.setText(settings.get(ConfigTags.MaxTime, 0.0).toString());
+        TextField actionDurationField = (TextField) view.lookup("#actionDuration");
+        TextField waitTimeField = (TextField) view.lookup("#waitTime");
+        TextField startupTimeField = (TextField) view.lookup("#startupTime");
+        TextField maxTestTimeField = (TextField) view.lookup("#maxTestTime");
 
         useRecordTimingCheckbox = (CheckBox) view.lookup("#useRecordTiming");
         useRecordTimingCheckbox.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false));
+
+        addBinding(actionDurationField, ConfigTags.ActionDuration, ConfigBinding.GenericType.FIELD_DOUBLE);
+        addBinding(waitTimeField, ConfigTags.TimeToWaitAfterAction, ConfigBinding.GenericType.FIELD_DOUBLE);
+        addBinding(startupTimeField, ConfigTags.StartupTime, ConfigBinding.GenericType.FIELD_DOUBLE);
+        addBinding(maxTestTimeField, ConfigTags.MaxTime, ConfigBinding.GenericType.FIELD_DOUBLE);
     }
 
     @Override
     protected boolean needsSave(Settings settings) {
-        if (!actionDurationField.getText().equals(settings.get(ConfigTags.ActionDuration, 0.0).toString())) {
-            return true;
-        }
-        if (!waitTimeField.getText().equals(settings.get(ConfigTags.TimeToWaitAfterAction, 0.0).toString())) {
-            return true;
-        }
-        if (!startupTimeField.getText().equals(settings.get(ConfigTags.StartupTime, 0.0).toString())) {
-            return true;
-        }
-        if (!maxTestTimeField.getText().equals(settings.get(ConfigTags.MaxTime, 0.0).toString())) {
-            return true;
+        if (super.needsSave(settings)) {
+            return  true;
         }
         if (useRecordTimingCheckbox.isSelected() != settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, false)) {
             return true;
@@ -74,11 +53,7 @@ public class TimeSettingsController extends ChildSettingsController {
 
     @Override
     protected void save(Settings settings) {
-        settings.set(ConfigTags.ActionDuration, NumberUtils.toDouble(actionDurationField.getText(), 0));
-        settings.set(ConfigTags.TimeToWaitAfterAction, NumberUtils.toDouble(waitTimeField.getText(), 0));
-        settings.set(ConfigTags.StartupTime, NumberUtils.toDouble(startupTimeField.getText(), 0));
-        settings.set(ConfigTags.MaxTime, NumberUtils.toDouble(maxTestTimeField.getText(), 0));
-
+        super.save(settings);
         settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, useRecordTimingCheckbox.isSelected());
     }
 }

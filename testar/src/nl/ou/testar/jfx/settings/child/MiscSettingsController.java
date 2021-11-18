@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Settings;
+import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MiscSettingsController extends ChildSettingsController {
+public class MiscSettingsController extends SettingsEditController {
     private Label labelOutDir;
     private Label labelTmpDir;
 
@@ -26,10 +27,6 @@ public class MiscSettingsController extends ChildSettingsController {
 
     private String outPath = settings.get(ConfigTags.OutputDir, "");
     private String tmpPath = settings.get(ConfigTags.TempDir, "");
-
-    private CheckBox webFollowLinks;
-    private CheckBox webBrowserFullscreen;
-    private CheckBox webSwitchNewTabs;
 
     public MiscSettingsController(Settings settings, String settingsPath) {
         super("", settings, settingsPath);
@@ -258,18 +255,21 @@ public class MiscSettingsController extends ChildSettingsController {
         });
 
         if(isWebDriver(settings)) {
-            webFollowLinks = (CheckBox) view.lookup("#webFollowLinks");
-            webBrowserFullscreen = (CheckBox) view.lookup("#webBrowserFullscreen");
-            webSwitchNewTabs = (CheckBox) view.lookup("#webSwitchNewTabs");
+            CheckBox webFollowLinks = (CheckBox) view.lookup("#webFollowLinks");
+            CheckBox webBrowserFullscreen = (CheckBox) view.lookup("#webBrowserFullscreen");
+            CheckBox webSwitchNewTabs = (CheckBox) view.lookup("#webSwitchNewTabs");
 
-            webFollowLinks.setSelected(settings.get(ConfigTags.FollowLinks));
-            webBrowserFullscreen.setSelected(settings.get(ConfigTags.BrowserFullScreen));
-            webSwitchNewTabs.setSelected(settings.get(ConfigTags.SwitchNewTabs));
+            addBinding(webFollowLinks, ConfigTags.FollowLinks, ConfigBinding.GenericType.CHECK_BOX);
+            addBinding(webBrowserFullscreen, ConfigTags.BrowserFullScreen, ConfigBinding.GenericType.CHECK_BOX);
+            addBinding(webSwitchNewTabs, ConfigTags.SwitchNewTabs, ConfigBinding.GenericType.CHECK_BOX);
         }
     }
 
     @Override
     protected boolean needsSave(Settings settings) {
+        if (super.needsSave(settings)) {
+            return true;
+        }
         if (outPath != null && !outPath.equals(settings.get(ConfigTags.OutputDir, ""))) {
             return true;
         }
@@ -282,31 +282,16 @@ public class MiscSettingsController extends ChildSettingsController {
         if (!itemsToDelete().equals(settings.get(ConfigTags.Delete, Collections.emptyList()))) {
             return true;
         }
-        if (isWebDriver(settings)) {
-            if (webFollowLinks.isSelected() != settings.get(ConfigTags.FollowLinks, false)) {
-                return true;
-            }
-            if (webBrowserFullscreen.isSelected() != settings.get(ConfigTags.BrowserFullScreen, false)) {
-                return true;
-            }
-            if (webSwitchNewTabs.isSelected() != settings.get(ConfigTags.SwitchNewTabs, false)) {
-                return true;
-            }
-        }
         return false;
     }
 
     @Override
     protected void save(Settings settings) {
+        super.save(settings);
         settings.set(ConfigTags.OutputDir, outPath);
         settings.set(ConfigTags.TempDir, tmpPath);
         settings.set(ConfigTags.CopyFromTo, itemsToCopy());
         settings.set(ConfigTags.Delete, itemsToDelete());
-        if (isWebDriver(settings)) {
-            settings.set(ConfigTags.FollowLinks, webFollowLinks.isSelected());
-            settings.set(ConfigTags.BrowserFullScreen, webBrowserFullscreen.isSelected());
-            settings.set(ConfigTags.SwitchNewTabs, webSwitchNewTabs.isSelected());
-        }
     }
 
     private boolean isWebDriver(Settings settings) {
