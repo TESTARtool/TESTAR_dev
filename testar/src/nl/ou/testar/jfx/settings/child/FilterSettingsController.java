@@ -8,21 +8,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import nl.ou.testar.jfx.controls.TagControl;
 import nl.ou.testar.jfx.controls.TagInput;
-import org.apache.commons.lang3.StringUtils;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-public class FilterSettingsController extends ChildSettingsController {
+public class FilterSettingsController extends SettingsEditController {
 
     private final static String descriptions[] = {
             "Filter actions on the widgets based on Tags values (regular expression):",

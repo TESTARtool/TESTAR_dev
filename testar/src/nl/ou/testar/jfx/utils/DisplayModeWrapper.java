@@ -21,6 +21,18 @@ public class DisplayModeWrapper {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof DisplayModeWrapper)) {
+            return false;
+        }
+        DisplayModeWrapper wrapper = (DisplayModeWrapper) obj;
+        return (mode.getWidth() == wrapper.mode.getWidth() && mode.getHeight() == wrapper.mode.getHeight());
+    }
+
+    @Override
     public String toString() {
         String result = String.format("%dx%d", mode.getWidth(), mode.getHeight());
         if (!supported) {

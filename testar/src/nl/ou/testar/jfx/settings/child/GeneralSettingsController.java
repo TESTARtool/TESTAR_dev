@@ -4,9 +4,15 @@ import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import nl.ou.testar.jfx.settings.bindings.AbstractConfigBinding;
+import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
+import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
+import nl.ou.testar.jfx.settings.bindings.control.ComboBoxBinding;
+import nl.ou.testar.jfx.settings.bindings.control.ControlBinding;
+import nl.ou.testar.jfx.settings.bindings.control.StringFieldBinding;
+import nl.ou.testar.jfx.settings.bindings.data.DataSource;
 import nl.ou.testar.jfx.utils.DisplayModeWrapper;
 import nl.ou.testar.jfx.utils.GeneralSettings;
-import org.apache.commons.lang.math.NumberUtils;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -16,20 +22,12 @@ import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-public class GeneralSettingsController extends ChildSettingsController {
+public class GeneralSettingsController extends SettingsEditController {
 
     private DisplayMode availableDisplayModes[];
-    private int displayModeSelectedIndex;
-
-    private ComboBox sutComboBox;
-    private ComboBox<DisplayModeWrapper> resolutionComboBox;
-    private TextField webDriverPathField;
-    private TextField locationInputField;
-    private TextField numSequencesField;
-    private TextField numActionsField;
-    private CheckBox alwaysCompileCheckBox;
 
     private GeneralSettings generalSettings;
 
@@ -51,7 +49,7 @@ public class GeneralSettingsController extends ChildSettingsController {
         availableDisplayModes = dev.getDisplayModes();
 
 
-        sutComboBox = (ComboBox) view.lookup("#sutConnectorSelection");
+        ComboBox sutComboBox = (ComboBox) view.lookup("#sutConnectorSelection");
         sutComboBox.getItems().addAll(
                 Settings.SUT_CONNECTOR_CMDLINE,
                 Settings.SUT_CONNECTOR_PROCESS_NAME,
@@ -59,49 +57,22 @@ public class GeneralSettingsController extends ChildSettingsController {
                 Settings.SUT_CONNECTOR_WEBDRIVER
         );
 
-        resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
-        resolutionComboBox.setItems(FXCollections.observableArrayList(
-                Arrays.stream(availableDisplayModes).map(mode -> new DisplayModeWrapper(mode, true))
-                        .collect(Collectors.toList())
-        ));
-        resolutionComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            generalSettings.setDisplayMode(newValue.getMode());
-        });
+        final List<DisplayModeWrapper> availableResolutions = Arrays.stream(availableDisplayModes).map(mode -> new DisplayModeWrapper(mode, true))
+                .collect(Collectors.toList());
+        ComboBox<DisplayModeWrapper> resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
         DisplayMode currentDisplayMode = dev.getDisplayMode();
         System.out.println(String.format("Current dislpay mode: %dx%d+%d+%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight(), currentDisplayMode.getBitDepth(), currentDisplayMode.getRefreshRate()));
-        int index = 0;
-        displayModeSelectedIndex = 0;
         generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue, ""));
 
         DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
-        if (selectedDisplayMode == null) {
-            selectedDisplayMode = dev.getDisplayMode();
-        }
-        int selectedWidth = selectedDisplayMode.getWidth();
-        int selectedHeight = selectedDisplayMode.getHeight();
-        int displayModeIndex = 0;
-        for (DisplayMode displayMode : availableDisplayModes) {
-            if (displayMode.getWidth() == selectedWidth && displayMode.getHeight() == selectedHeight) {
-                break;
-            }
-            displayModeIndex++;
-        }
-        if (displayModeIndex == availableDisplayModes.length) {
-            resolutionComboBox.getItems().add(new DisplayModeWrapper(selectedDisplayMode, false));
-        }
-        resolutionComboBox.getSelectionModel().select(displayModeIndex);
 
-        webDriverPathField = (TextField) view.lookup("#driverPath");
-        webDriverPathField.setText(generalSettings.getDriver());
-        webDriverPathField.textProperty().addListener((observable, oldValue, newValue) -> {
-            generalSettings.setDriver(newValue);
-        });
+        if (!isModeAvailable(selectedDisplayMode)) {
+            availableResolutions.add(new DisplayModeWrapper(selectedDisplayMode, false));
+        }
+        resolutionComboBox.setItems(FXCollections.observableArrayList(availableResolutions));
 
-        locationInputField = (TextField) view.lookup("#locationInput");
-        locationInputField.setText(generalSettings.getLocation());
-        locationInputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            generalSettings.setLocation(newValue);
-        });
+        TextField webDriverPathField = (TextField) view.lookup("#driverPath");
+        TextField locationInputField = (TextField) view.lookup("#locationInput");
 
         FileChooser driverChooser = new FileChooser();
         FileChooser locationChooser = new FileChooser();
@@ -109,46 +80,144 @@ public class GeneralSettingsController extends ChildSettingsController {
         Button btnSelectDriver = (Button) view.lookup("#btnSelectDriver");
         Button btnSelectLocation = (Button) view.lookup("#btnSelectLocation");
 
-        btnSelectDriver.setOnAction(event -> {
-            File driverFile = driverChooser.showOpenDialog(view.getScene().getWindow());
-            webDriverPathField.setText(driverFile.getAbsolutePath());
-        });
+        TextField numSequencesField = (TextField) view.lookup("#numSequences");
+        TextField numActionsField = (TextField) view.lookup("#numActions");
+        CheckBox alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
 
-        btnSelectLocation.setOnAction(event -> {
-            File locationFile = locationChooser.showOpenDialog(view.getScene().getWindow());
-            locationInputField.setText(locationFile.toURI().toString());
-        });
+        AbstractConfigBinding<TextField, String> webDriverBinding = new AbstractConfigBinding<TextField, String>(webDriverPathField) {
+            @Override
+            protected String getTargetValue() {
+                return generalSettings.getDriver();
+            }
 
-        numSequencesField = (TextField) view.lookup("#numSequences");
-        numSequencesField.setPromptText("0");
-        limitInputToPattern(numSequencesField, ChildSettingsController.INPUT_PATTERN_INTEGER);
-        numActionsField = (TextField) view.lookup("#numActions");
-        numActionsField.setPromptText("0");
-        limitInputToPattern(numActionsField, ChildSettingsController.INPUT_PATTERN_INTEGER);
-        alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
-        alwaysCompileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile, false));
+            @Override
+            protected void setTargetValue(String value) {
+                generalSettings.setDriver(value);
+            }
 
-        sutComboBox.setValue(settings.get(ConfigTags.SUTConnector));
+            @Override
+            public void onBind() {
+                control.textProperty().set(getTargetValue());
+                webDriverPathField.textProperty().addListener((observable, oldValue, newValue) -> {
+                    setTargetValue(newValue);
+                });
+            }
+        };
 
-        numSequencesField.setText(settings.get(ConfigTags.Sequences, 0).toString());
-        numActionsField.setText(settings.get(ConfigTags.SequenceLength, 0).toString());
+        addBinding(numSequencesField, ConfigTags.Sequences, ConfigBinding.GenericType.FIELD_INT);
+        addBinding(numActionsField, ConfigTags.SequenceLength, ConfigBinding.GenericType.FIELD_INT);
+        addBinding(sutComboBox, ConfigTags.SUTConnector, ConfigBinding.GenericType.COMBO_BOX);
+        addBinding(alwaysCompileCheckBox, ConfigTags.AlwaysCompile, ConfigBinding.GenericType.CHECK_BOX);
+
+        ConfigBinding.Builder<String> builder = new ConfigBinding.Builder<>();
+
+        ControlBinding<String> webDriverControlBinding = new StringFieldBinding(webDriverPathField);
+        DataSource<String> webDriverDataSource = new DataSource<String>() {
+            @Override
+            public Class getDataType() {
+                return String.class;
+            }
+
+            @Override
+            public String getData() {
+                return generalSettings.getDriver();
+            }
+
+            @Override
+            public void setData(String data) {
+                generalSettings.setDriver(data);
+            }
+        };
+
+        try {
+            final ConfigBinding webDriverConfigBinding = builder
+                    .withCustomControlBinding(webDriverControlBinding)
+                    .withCustomDataSource(webDriverDataSource)
+                    .build();
+
+            addBinding(webDriverConfigBinding);
+
+            btnSelectDriver.setOnAction(event -> {
+                File driverFile = driverChooser.showOpenDialog(view.getScene().getWindow());
+                webDriverConfigBinding.setValue(driverFile.getAbsolutePath());
+            });
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
+
+        ControlBinding<String> locationControlBinding = new StringFieldBinding(locationInputField);
+        DataSource<String> locationDataSource = new DataSource<String>() {
+            @Override
+            public Class getDataType() {
+                return String.class;
+            }
+
+            @Override
+            public String getData() {
+                return generalSettings.getLocation();
+            }
+
+            @Override
+            public void setData(String data) {
+                generalSettings.setLocation(data);
+            }
+        };
+
+        try {
+            final ConfigBinding<String> locationConfigBinding = builder
+                    .withCustomControlBinding(locationControlBinding)
+                    .withCustomDataSource(locationDataSource)
+                    .build();
+
+            addBinding(locationConfigBinding);
+
+            btnSelectLocation.setOnAction(event -> {
+                File locationFile = locationChooser.showOpenDialog(view.getScene().getWindow());
+                locationConfigBinding.setValue(locationFile.toURI().toString());
+            });
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
+
+        ControlBinding<DisplayModeWrapper> resolutionControlBinding = new ComboBoxBinding<>(resolutionComboBox);
+        DataSource<DisplayModeWrapper> resolutionDataSource = new DataSource<DisplayModeWrapper>() {
+            @Override
+            public Class getDataType() {
+                return DisplayModeWrapper.class;
+            }
+
+            @Override
+            public DisplayModeWrapper getData() {
+                DisplayMode displayMode = generalSettings.getDisplayMode();
+                return new DisplayModeWrapper(displayMode, isModeAvailable(displayMode));
+            }
+
+            @Override
+            public void setData(DisplayModeWrapper data) {
+                generalSettings.setDisplayMode(data.getMode());
+            }
+        };
+        try {
+            ConfigBinding<DisplayModeWrapper> resolutionConfigBinding = new ConfigBinding.Builder<DisplayModeWrapper>()
+                    .withCustomControlBinding(resolutionControlBinding)
+                    .withCustomDataSource(resolutionDataSource)
+                    .build();
+            addBinding(resolutionConfigBinding);
+        } catch (ConfigBindingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isModeAvailable(DisplayMode displayMode) {
+        return Arrays.stream(availableDisplayModes).anyMatch(displayMode::equals);
     }
 
     @Override
     protected boolean needsSave(Settings settings) {
+        if (super.needsSave(settings)) {
+            return true;
+        }
         if (!generalSettings.toString().equals(settings.get(ConfigTags.SUTConnectorValue, ""))) {
-            return true;
-        }
-        if (!sutComboBox.getValue().toString().equals(settings.get(ConfigTags.SUTConnector, ""))) {
-            return true;
-        }
-        if (!numSequencesField.getText().equals(settings.get(ConfigTags.Sequences, 0).toString())) {
-            return true;
-        }
-        if (!numActionsField.getText().equals(settings.get(ConfigTags.SequenceLength, 0).toString())) {
-            return true;
-        }
-        if (!alwaysCompileCheckBox.isSelected() == settings.get(ConfigTags.AlwaysCompile, false)) {
             return true;
         }
         return false;
@@ -156,10 +225,7 @@ public class GeneralSettingsController extends ChildSettingsController {
 
     @Override
     protected void save(Settings settings) {
+        super.save(settings);
         settings.set(ConfigTags.SUTConnectorValue, generalSettings.toString());
-        settings.set(ConfigTags.SUTConnector, sutComboBox.getValue().toString());
-        settings.set(ConfigTags.Sequences, NumberUtils.toInt(numSequencesField.getText(), 0));
-        settings.set(ConfigTags.SequenceLength, NumberUtils.toInt(numActionsField.getText(), 0));
-        settings.set(ConfigTags.AlwaysCompile, alwaysCompileCheckBox.isSelected());
     }
 }
