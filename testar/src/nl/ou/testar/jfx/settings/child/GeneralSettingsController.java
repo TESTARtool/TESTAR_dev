@@ -61,32 +61,11 @@ public class GeneralSettingsController extends SettingsEditController {
 //        TextField numActionsField = (TextField) generalSection.lookup("#numActions");
 //        CheckBox alwaysCompileCheckBox = (CheckBox) generalSection.lookup("#alwaysCompile");
 
-//        if (webDriverPathField == null) {
-//            System.out.println("Failed to lookup web driver path field");
-//        }
-//        if (locationInputField == null) {
-//            System.out.println("Failed to lookup location input field");
-//        }
-//        if (btnSelectDriver == null) {
-//            System.out.println("Failed to lookup driver selection button");
-//        }
-//        if (btnSelectLocation == null) {
-//            System.out.println("Failed to lookup location selection button");
-//        }
-//        if (numSequencesField == null) {
-//            System.out.println("Failed to lookup sequence number field");
-//        }
-//        if (numActionsField == null) {
-//            System.out.println("Failed to lookup action number field");
-//        }
-//        if (alwaysCompileCheckBox == null) {
-//            System.out.println("Failed to lookup sa check box");
-//        }
-
         ComboBox sutComboBox = (ComboBox) generalSection.lookup("#sutConnectorSelection");
         if (sutComboBox == null) {
             System.out.println("Failed to lookup SUT combo box");
         }
+
         sutComboBox.getItems().addAll(
                 Settings.SUT_CONNECTOR_CMDLINE,
                 Settings.SUT_CONNECTOR_PROCESS_NAME,
