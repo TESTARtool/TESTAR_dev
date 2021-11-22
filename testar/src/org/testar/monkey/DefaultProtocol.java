@@ -2129,12 +2129,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			String msg = String.format("ReplayStateModelOuterLoop... %s TestSequences found for AbstractStateModel (%s, %s)", numberTestSequences, replayName, replayVersion);
 			System.out.println(msg);
 
+			// Get the counter of the initial TestSequence we want to replay.
+			// Ex: maybe we need to replay 3 TestSequences from TS-7 to TS-9
+			int initialTestSequence = ReplayStateModelUtil.getReplayInitialTestSequence(stateModelManager, replayModelIdentifier, replayName, replayVersion);
+			int totalTestSequence = initialTestSequence + (numberTestSequences - 1);
+			System.out.println(String.format("ReplayStateModelOuterLoop... replaying TS from %s to %s", initialTestSequence, totalTestSequence));
+
 			// Iterate over all TestSequences to reproduce them
-			for(int testSeq = 1; testSeq <= numberTestSequences; testSeq++) {
-				// Get the sequence identifier of the test TestSequences to reproduce
-				// Every iteration will get the next TestSequences identifier
-				String sequenceIdentifier = ReplayStateModelUtil.getReplaySequenceIdentifierByCounter(stateModelManager, testSeq);
-				runReplayStateModelInnerLoop(sequenceIdentifier, replayModelIdentifier);
+			for(int testSeq = initialTestSequence; testSeq <= totalTestSequence; testSeq++) {
+			    // Get the sequence identifier of the test TestSequences to reproduce
+			    // Every iteration will get the next TestSequences identifier
+			    String sequenceIdentifier = ReplayStateModelUtil.getReplaySequenceIdentifierByCounter(stateModelManager, testSeq);
+			    runReplayStateModelInnerLoop(sequenceIdentifier, replayModelIdentifier);
 			}
 		}
 
@@ -2212,8 +2218,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					break;
 				}
 			}
+			// State actions does not contain the action we want to replay
+			if(actionToReplay == null) {
+			    // But lets check system preSelectedActions (ESC, foreground, kill process)
+			    Action systemAction = preSelectAction(state, actions);
+			    if(systemAction!=null && systemAction.get(Tags.AbstractIDCustom, "").equals(abstractActionReplayId)) {
+			        actionToReplay = systemAction;
+			    }
+			}
 
-			// We do not find the action we want to replay in the current state
+			// We do not find the action we want to replay in the current state or in the system actions
 			// The SUT has changed or we are using a different abstraction
 			// But the sequence is not replayable
 			if(actionToReplay == null) {
