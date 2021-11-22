@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.testar.StateManagementTags.*;
+import static org.testar.monkey.alayer.windows.UIATags.*;
 
 public class UIAMapping {
 
@@ -62,22 +63,22 @@ public class UIAMapping {
             put(WidgetItemType, UIATags.UIAItemType);
             put(WidgetItemStatus, UIATags.UIAItemStatus);
             put(WidgetPath, Tags.Path);
-            put(WidgetBoundary, UIATags.UIABoundingRectangle);
-            put(WidgetIsOffscreen, UIATags.UIAIsOffscreen);
-            put(WidgetAccelatorKey, UIATags.UIAAcceleratorKey);
-            put(WidgetAccessKey, UIATags.UIAAccessKey);
-            put(WidgetAriaProperties, UIATags.UIAAriaProperties);
-            put(WidgetAriaRole, UIATags.UIAAriaRole);
-            put(WidgetIsDialog, UIATags.UIAIsDialog);
-            put(WidgetIsPassword, UIATags.UIAIsPassword);
-            put(WidgetIsPeripheral, UIATags.UIAIsPeripheral);
-            put(WidgetIsRequiredForForm, UIATags.UIAIsRequiredForForm);
-            put(WidgetLandmarkType, UIATags.UIALandmarkType);
-            put(WidgetGroupLevel, UIATags.UIALevel);
-            put(WidgetLiveSetting, UIATags.UIALiveSetting);
-            put(WidgetSetPosition, UIATags.UIAPositionInSet);
-            put(WidgetSetSize, UIATags.UIASizeOfSet);
-            put(WidgetRotation, UIATags.UIARotation);
+            put(WidgetRelativeBoundary, Tags.RelativePosition);
+            put(WidgetIsOffscreen, UIAIsOffscreen);
+            put(WidgetAccelatorKey, UIAAcceleratorKey);
+            put(WidgetAccessKey, UIAAccessKey);
+            put(WidgetAriaProperties, UIAAriaProperties);
+            put(WidgetAriaRole, UIAAriaRole);
+            put(WidgetIsDialog, UIAIsDialog);
+            put(WidgetIsPassword, UIAIsPassword);
+            put(WidgetIsPeripheral, UIAIsPeripheral);
+            put(WidgetIsRequiredForForm, UIAIsRequiredForForm);
+            put(WidgetLandmarkType, UIALandmarkType);
+            put(WidgetGroupLevel, UIALevel);
+            put(WidgetLiveSetting, UIALiveSetting);
+            put(WidgetSetPosition, UIAPositionInSet);
+            put(WidgetSetSize, UIASizeOfSet);
+            put(WidgetRotation, UIARotation);
 
             // patterns
             put(WidgetAnnotationPattern, UIATags.UIAIsAnnotationPatternAvailable);

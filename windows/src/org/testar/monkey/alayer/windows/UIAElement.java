@@ -35,6 +35,7 @@ package org.testar.monkey.alayer.windows;
 
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.TaggableBase;
+import org.fruit.alayer.RelativeRect;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -56,6 +57,7 @@ class UIAElement extends TaggableBase implements Serializable {
 		scrollPattern, hScroll, vScroll; // by urueda
 	long ctrlId, culture, orientation, windowHandle, wndInteractionState, wndVisualState;
 	Rect rect;
+	RelativeRect relativeRect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
 		acceleratorKey, accessKey;
 	String valuePattern;
