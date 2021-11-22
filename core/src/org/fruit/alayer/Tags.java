@@ -61,7 +61,13 @@ public final class Tags extends TagsBase {
 	 * draw the widget's shape and to determine whether a point lies within the its shape.
 	 * However, a shape of a widget does not tell whether or not this widget is obscured
 	 * by other widgets (use the <code>HitTester</code> Tag instead!) */
-	public static final Tag<Shape> Shape = from("Shape", Shape.class);	
+	public static final Tag<Shape> Shape = from("Shape", Shape.class);
+
+	/**
+	 * This property represents the relative position of a widget. 
+	 * The position is relative to the top-left corner of the SUT state. 
+	 */
+	public static final Tag<RelativePosition> RelativePosition = from("RelativePosition", RelativePosition.class);
 
 	/** Usually attached to widgets. It tells whether this widget this widget is rendered.
 	 * If so, it does not necessarily mean that it is also visible, since it could still

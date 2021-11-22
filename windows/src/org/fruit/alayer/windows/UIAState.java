@@ -136,7 +136,9 @@ final class UIAState extends UIAWidget implements State {
 			returnObject = new UIAHitTester(widget.uiaElement);
 		}else if(tag.equals(Tags.Shape)){
 			returnObject = widget.uiaElement.rect;
-		}else if(tag.equals(Tags.Blocked)){
+		}else if(tag.equals(Tags.RelativePosition)){
+            returnObject = widget.uiaElement.relativeRect;
+        }else if(tag.equals(Tags.Blocked)){
 			returnObject = widget.uiaElement.blocked;
 		}else if(tag.equals(Tags.Enabled)){
 			returnObject = widget.uiaElement.enabled;

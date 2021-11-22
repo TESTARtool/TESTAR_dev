@@ -300,8 +300,12 @@ public class StateFetcher implements Callable<UIAState>{
 
 		// bounding rectangle
 		long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaCachePointer, true);
-		if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
+		if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0) {
+		    // Absolute screen coordinates for this widget element
 			uiaElement.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+			// Relative coordinates based on this widget element and root state window
+			uiaElement.relativeRect = RelativeRect.fromWidgetStateRect(r[0], r[1], r[2], r[3], getTopLevelElementFromWidget(uiaElement).rect);
+		}
 
 		uiaElement.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaCachePointer, true);
 		uiaElement.name = Windows.IUIAutomationElement_get_Name(uiaCachePointer, true);
@@ -812,5 +816,21 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 		escapedData = escapedData.replaceAll(";", "^");
 		return escapedData;
+	}
+	
+	/**
+	 * Find the first top level ancestor for one element. 
+	 * Example: Notepad Font window is the top level ancestor of Font elements. 
+	 * 
+	 * @param element
+	 * @return
+	 */
+	private UIAElement getTopLevelElementFromWidget(UIAElement element) {
+        // Iterate through element parents until find the top level ancestor
+	    while(!element.isTopLevelContainer && !element.isTopmostWnd && !element.isModal 
+	            && element.parent != null && element.parent != element.root) {
+	        element = element.parent;
+	    }
+	    return element;
 	}
 }

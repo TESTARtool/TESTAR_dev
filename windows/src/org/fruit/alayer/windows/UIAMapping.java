@@ -63,7 +63,7 @@ public class UIAMapping {
             put(WidgetItemType, UIAItemType);
             put(WidgetItemStatus, UIAItemStatus);
             put(WidgetPath, Tags.Path);
-            put(WidgetBoundary, UIABoundingRectangle);
+            put(WidgetRelativeBoundary, Tags.RelativePosition);
             put(WidgetIsOffscreen, UIAIsOffscreen);
             put(WidgetAccelatorKey, UIAAcceleratorKey);
             put(WidgetAccessKey, UIAAccessKey);
