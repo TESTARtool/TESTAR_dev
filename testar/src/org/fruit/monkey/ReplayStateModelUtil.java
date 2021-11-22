@@ -107,6 +107,40 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
+	 * Get the counter of the initial TestSequence of the desired State Model to replay. 
+	 * 
+	 * @param stateModelManager
+	 * @param replayModelIdentifier
+	 * @param replayName
+	 * @param replayVersion
+	 * @return
+	 * @throws StateModelException
+	 */
+	public static int getReplayInitialTestSequence(StateModelManager stateModelManager, String replayModelIdentifier, String replayName, String replayVersion) throws StateModelException {
+	    OResultSet resultSet = stateModelManager.queryStateModel("select counter from TestSequence where modelIdentifier='" + replayModelIdentifier + "'");
+
+	    int initialTestSequences = 0;
+	    if(resultSet.hasNext()) {
+	        try {
+	            initialTestSequences = extractNumber(resultSet.next().toString());
+	        } catch (Exception e) {
+	            String msg = String.format("getReplayInitialTestSequence: ERROR parsing the initial TestSequences counter for AbstractStateModel (%s, %s)", replayName, replayVersion);
+	            e.printStackTrace();
+	            throw new StateModelException(msg);
+	        }
+	    } else {
+	        String msg = String.format("getReplayInitialTestSequence: Initial TestSequence counter not found for AbstractStateModel with name: %s, version: %s", replayName, replayVersion);
+	        throw new StateModelException(msg);
+	    }
+	    if(initialTestSequences == 0) {
+	        String msg = String.format("getReplayInitialTestSequence: 0 initial TestSequences counter (this must not happen) for AbstractStateModel (%s, %s)", replayName, replayVersion);
+	        throw new StateModelException(msg);
+	    }
+
+	    return initialTestSequences;
+	}
+
+	/**
 	 * Get the sequence identifier of the indicated TestSequence counter we want to replay. 
 	 * 
 	 * @param stateModelManager
