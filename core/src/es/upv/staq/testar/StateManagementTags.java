@@ -93,8 +93,8 @@ public class StateManagementTags {
     // the path in the widget tree that leads to the widget
     public static final Tag<String> WidgetPath = Tag.from("Path to the widget", String.class);
 
-    // the on-screen boundaries for the widget (coordinates)
-    public static final Tag<String> WidgetBoundary = Tag.from("Widget on-screen boundaries", String.class);
+    // the on-screen relative boundaries for the widget (coordinates)
+    public static final Tag<String> WidgetRelativeBoundary = Tag.from("Widget on-screen relative boundaries", String.class);
 
     // is the widget off-screen?
     public static final Tag<Boolean> WidgetIsOffscreen = Tag.from("Widget is off-screen", Boolean.class);
@@ -339,7 +339,7 @@ public class StateManagementTags {
             add(WidgetItemType);
             add(WidgetItemStatus);
             add(WidgetPath);
-            add(WidgetBoundary);
+            add(WidgetRelativeBoundary);
             // new
             add(WidgetAccelatorKey);
             add(WidgetAccessKey);

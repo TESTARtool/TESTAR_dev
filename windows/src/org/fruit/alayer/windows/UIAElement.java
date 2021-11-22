@@ -34,6 +34,7 @@
 package org.fruit.alayer.windows;
 
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.RelativeRect;
 import org.fruit.alayer.TaggableBase;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ class UIAElement extends TaggableBase implements Serializable {
 		scrollPattern, hScroll, vScroll; // by urueda
 	long ctrlId, culture, orientation, windowHandle, wndInteractionState, wndVisualState;
 	Rect rect;
+	RelativeRect relativeRect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
 		acceleratorKey, accessKey;
 	String valuePattern;
