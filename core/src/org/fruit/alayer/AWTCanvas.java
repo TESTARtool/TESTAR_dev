@@ -124,10 +124,25 @@ public class AWTCanvas implements Image, Canvas {
 			// the rectangle may capture multiple screens!
 			Rectangle rect = new Rectangle((int)(r.x() * displayScale), (int)(r.y() * displayScale),
 					(int)(r.width() * displayScale), (int)(r.height() * displayScale));
-			return new AWTCanvas(r.x() * displayScale, r.y() * displayScale, new Robot().createScreenCapture(rect), format, quality);
+
+			// Create an image from the desired rectangle or the screen size if negative values
+			BufferedImage img = createScreenCapture(rect);
+
+			return new AWTCanvas(r.x() * displayScale, r.y() * displayScale, img, format, quality);
 		} catch (AWTException awte) {
 			throw new RuntimeException(awte);
 		}
+	}
+
+	private static BufferedImage createScreenCapture(Rectangle rect) throws AWTException {
+	    try {
+	        return new Robot().createScreenCapture(rect); 
+	    } catch (java.lang.NegativeArraySizeException e) {
+	        System.err.println("NegativeArraySizeException taking a state screenshot");
+	    }
+	    System.out.println("Taking a desktop screenshot...");
+	    return new Robot().createScreenCapture(new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+
 	}
 
 	public static AWTCanvas fromFile(String file) throws IOException{
