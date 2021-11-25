@@ -613,16 +613,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
 
-    	sequenceReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-    	testReport.addTestVerdict(getVerdict(latestState).join(processVerdict), lastExecutedAction, latestState);
-
     	String sequencesPath = getGeneratedSequenceName();
     	try {
     		sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
     	}catch (Exception e) {}
 
-    	String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-    	String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+		String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+
+        if(mode() == Modes.Replay || mode() == Modes.ReplayModel) {
+            sequenceReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+            testReport.addTestVerdict(getReplayVerdict().join(processVerdict), lastExecutedAction, latestState);
+            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+        }
+        else {
+			sequenceReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+			testReport.addTestVerdict(getVerdict(latestState), lastExecutedAction, latestState);
+            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+        }
 
     	statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
 
