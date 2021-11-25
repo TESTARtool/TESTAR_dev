@@ -191,20 +191,20 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void postSequenceProcessing() {
-        String status = "";
-        String statusInfo = "";
-
-        if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
-        }
-        else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
-        }
-
+    	String status = "";
+    	String statusInfo = "";
+    	
+    	if(mode() == Modes.Replay || mode() == Modes.ReplayModel) {
+    		htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+    		status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+    		statusInfo = (getReplayVerdict().join(processVerdict)).info();
+    	}
+    	else {
+    		htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+    		status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+    		statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+    	}
+        
         String sequencesPath = getGeneratedSequenceName();
         try {
             sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();

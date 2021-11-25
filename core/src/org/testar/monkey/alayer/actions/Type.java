@@ -54,14 +54,20 @@ public final class Type extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 2555715152455716781L;
 	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
-	private final String text;
+	private String text;
 	
 	public Type(String text){
 		Assert.hasText(text);
 		checkAscii(text);
 		this.text = text;
 	}
-	
+
+	public void setText(String text) {
+	    Assert.hasText(text);
+	    checkAscii(text);
+	    this.text = text;
+	}
+
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
