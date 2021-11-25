@@ -318,6 +318,35 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
+	 * Get the actionDescription of the specific actionSequence step. 
+	 * 
+	 * @param stateModelManager
+	 * @param actionSequence
+	 * @return
+	 * @throws StateModelException
+	 */
+	public static String getReplayActionDescription(StateModelManager stateModelManager, String actionSequence) throws StateModelException {
+	    OResultSet resultSet = stateModelManager.queryStateModel("select actionDescription from SequenceStep where stepId='" + actionSequence + "'");
+
+	    String actionDescription = ""; 
+	    if(resultSet.hasNext()) {
+	        try {
+	            actionDescription = resultSet.next().toString().replace("\n", "").trim();
+	        } catch (Exception e) {
+	            String msg = String.format("getReplayActionDescription: ERROR obtaining the actionDescription of SequenceStep stepId %s", actionSequence);
+	            e.printStackTrace();
+	            throw new StateModelException(msg);
+	        }
+	    } else {
+	        String msg = String.format("getReplayActionDescription: actionDescription not found for SequenceStep stepId %s", actionSequence);
+	        throw new StateModelException(msg);
+	    }
+
+	    actionDescription = actionDescription.replace("{", "").replace("}", "").trim().split(":")[1].trim();
+	    return actionDescription;
+	}
+
+	/**
 	 * Get the abstractActionId of one AbstractStateModel by checking if it is related with a concrete action. 
 	 * From ConcreteActionId to AbstractActionId. 
 	 * 

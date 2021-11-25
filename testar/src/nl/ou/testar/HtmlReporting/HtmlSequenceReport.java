@@ -160,8 +160,8 @@ public class HtmlSequenceReport implements Reporting{
     			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h2>State "+innerLoopCounter+"</h2>");
-    		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
-    		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
+    		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
+    		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdAvailable")+"</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
     	}catch(Exception e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
@@ -183,11 +183,8 @@ public class HtmlSequenceReport implements Reporting{
             }catch(Exception e){}
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
-            write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
-            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(Exception e){}
+            write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+            write(" || AbstractIDCustom="+action.get(Tags.AbstractIDCustom));
             write("</li>");
         }
         write("</ul>");
@@ -207,7 +204,7 @@ public class HtmlSequenceReport implements Reporting{
                 	}
                 }catch(Exception e){}
 
-                write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+                write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
                 
                 write("</li>");
@@ -225,7 +222,7 @@ public class HtmlSequenceReport implements Reporting{
             		}
             	}catch(Exception e){}
 
-            	write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+            	write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             	write("</li>");
@@ -245,7 +242,7 @@ public class HtmlSequenceReport implements Reporting{
             			}
             		}catch(Exception e){}
 
-            		write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+            		write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             		write("</li>");
@@ -271,7 +268,7 @@ public class HtmlSequenceReport implements Reporting{
         		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
 
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
-        write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+        write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 
         try{
         	if(action.get(Tags.Desc)!=null) {
