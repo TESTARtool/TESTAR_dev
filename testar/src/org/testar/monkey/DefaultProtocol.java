@@ -2088,7 +2088,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	protected void runReplayStateModelOuterLoop(final Settings settings) throws StateModelException {
 		// We need at least the name of the model we want to replay (maybe created without version)
 		if (settings.get(ConfigTags.ReplayApplicationName,"").isEmpty()) {
-			System.err.println(String.format("ERROR: ReplayModel mode needs at least the setting ReplayApplicationName"));
+		    System.err.println("------------------------------------------------------------------------");
+		    System.err.println("ERROR: ReplayModel mode needs at least the setting ReplayApplicationName");
+		    System.err.println("------------------------------------------------------------------------");
 
 			// notify the stateModelManager that the testing has finished
 			stateModelManager.notifyTestingEnded();
@@ -2104,7 +2106,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		String replayVersion = settings.get(ConfigTags.ReplayApplicationVersion,"");
 		String replayModelIdentifier = ReplayStateModelUtil.getReplayModelIdentifier(stateModelManager, replayName, replayVersion);
 
-		//TODO: Extract abstract attributes from the State Model we want to replay, to use the same attributes
+		// Check if the model to replay and current model are using different abstraction
+		// If so, no sense to use replay model mode, because actions identifiers will be different
+		String replayAbsAtt = ReplayStateModelUtil.getReplayModelAbstractAttributes(stateModelManager, replayModelIdentifier);
+		String currentAbsAtt = Arrays.toString(CodingManager.getCustomTagsForAbstractId());
+		if(!ReplayStateModelUtil.sameAbstractionAttributes(replayAbsAtt, currentAbsAtt)) {
+		    System.err.println("--------------------------------------------------------------------------------");
+		    System.err.println("ERROR: Replay and Current StateModel are using different AbstractStateAttributes");
+		    System.err.println("ERROR: StateModel to replay AbstractStateAttributes: " + replayAbsAtt);
+		    System.err.println("ERROR: Current StateModel AbstractStateAttributes: " + currentAbsAtt);
+		    System.err.println("--------------------------------------------------------------------------------");
+
+		    // notify the stateModelManager that the testing has finished
+		    stateModelManager.notifyTestingEnded();
+
+		    // Finish TESTAR execution
+		    mode = Modes.Quit;
+		    return;
+		}
 
 		// User has indicated the specific sequence id to replay,
 		// Only replay this sequence and stop
@@ -2221,7 +2240,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			// State actions does not contain the action we want to replay
 			if(actionToReplay == null) {
 			    // But lets check system preSelectedActions (ESC, foreground, kill process)
-			    Action systemAction = preSelectAction(state, actions);
+			    Action systemAction = preSelectAction(system, state, actions).stream().findAny().get();
 			    if(systemAction!=null && systemAction.get(Tags.AbstractIDCustom, "").equals(abstractActionReplayId)) {
 			        actionToReplay = systemAction;
 			    }
