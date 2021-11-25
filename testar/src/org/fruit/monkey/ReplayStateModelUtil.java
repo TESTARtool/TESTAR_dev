@@ -30,9 +30,15 @@
 
 package org.fruit.monkey;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 import nl.ou.testar.StateModel.Exception.StateModelException;
+import org.testar.StateManagementTags;
+import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.StateModelManager;
 
 public class ReplayStateModelUtil {
@@ -70,6 +76,35 @@ public class ReplayStateModelUtil {
 		System.out.println(String.format("getReplayModelIdentifier... Replaying State Model identifier %s ...", replayModelIdentifier));
 
 		return replayModelIdentifier;
+	}
+
+	/**
+	 * Query the desired StateModel to extract the used abstractionAttributes. 
+	 * 
+	 * @param stateModelManager
+	 * @param modelIdentifier
+	 * @return
+	 * @throws StateModelException
+	 */
+	public static String getReplayModelAbstractAttributes(StateModelManager stateModelManager, String modelIdentifier) throws StateModelException {
+	    OResultSet resultSet = stateModelManager.queryStateModel("select abstractionAttributes from AbstractStateModel where modelIdentifier='" + modelIdentifier +"'");
+
+	    String abstractAttributes = "";
+	    if(resultSet.hasNext()) {
+	        try {
+	            abstractAttributes = resultSet.next().toString().replace("\n", "").trim();
+	        } catch (Exception e) {
+	            String msg = String.format("getReplayModelIdentifier: abstractAttributes found but there is an error extracting the information");
+	            e.printStackTrace();
+	            throw new StateModelException(msg);
+	        }
+	    } else {
+	        String msg = String.format("getReplayModelIdentifier: abstractAttributes not found");
+	        throw new StateModelException(msg);
+	    }
+	    // {abstractionAttributes: [Widget title, Path to the widget, Widget control type]}
+	    abstractAttributes = abstractAttributes.replace("{", "").replace("}", "").trim().split(":")[1].trim();
+	    return abstractAttributes;
 	}
 
 	/**
@@ -337,6 +372,52 @@ public class ReplayStateModelUtil {
 		}
 
 		return Integer.parseInt(sb.toString());
+	}
+
+	/**
+	 * Compare two abstract attributes strings to check if the abstraction is the same. 
+	 * 
+	 * @param replayAbsAtt
+	 * @param currentAbsAtt
+	 * @return
+	 */
+	public static boolean sameAbstractionAttributes(String replayAbsAtt, String currentAbsAtt) {
+	    String[] replayArr = replayAbsAtt.replace("[", "").replace("]", "").replaceAll("\\s","").split(",");
+	    String[] currentArr = currentAbsAtt.replace("[", "").replace("]", "").replaceAll("\\s","").split(",");
+	    Arrays.sort(replayArr);
+	    Arrays.sort(currentArr);
+	    return Arrays.equals(replayArr, currentArr);
+	}
+
+	/**
+	 * Helper class to transform State Model String attributes
+	 * into a StateManagementTag Setting Strings
+	 * 
+	 * From: [Widget title, Path to the widget, Widget control type]
+	 * To: [WidgetTitle,WidgetPath,WidgetControlType]
+	 * 
+	 * @return
+	 */
+	private static String transformDescriptionToAbtractTag(String abstractionAttributes) {
+	    // Input: "[Widget title, Path to the widget, Widget control type]"
+	    // TO: "Widget title, Path to the widget, Widget control type"
+	    abstractionAttributes = abstractionAttributes.replace("[", "").replace("]", "");
+
+	    // Array: ["Widget title"][" Path to the widget"][" Widget control type"]
+	    // ToArray: ["WidgetTitle"]["WidgetPath"]["WidgetControlType"]
+	    String description[] = abstractionAttributes.split(",");
+	    String modelTags[] = new String[description.length];
+	    for(int i = 0; i < description.length; i++) {
+	        String stripDescription = StringUtils.stripStart(description[i], null);
+	        for(Tag<?> t : StateManagementTags.getAllTags()) {
+	            if(t.name().equals(stripDescription)) {
+	                modelTags[i] = StateManagementTags.getSettingsStringFromTag(t);
+	            }
+	        }
+	    }
+
+	    // Return [WidgetTitle,WidgetPath,WidgetControlType]
+	    return Arrays.toString(modelTags);
 	}
 
 }
