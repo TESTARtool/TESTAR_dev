@@ -66,7 +66,7 @@ import org.testar.*;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Color;
 import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.actions.NOP;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
@@ -76,9 +76,6 @@ import nl.ou.testar.StateModel.Exception.StateModelException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.ActivateSystem;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -2218,6 +2215,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			// We need to do this because one model contains multiple sequences
 			String actionSequence = sequenceIdentifier + "-" + actionCount + "-" + sequenceIdentifier + "-" + (actionCount+1);
 			String concreteActionId = ReplayStateModelUtil.getReplayConcreteActionStep(stateModelManager, actionSequence);
+			String actionDescriptionReplay = ReplayStateModelUtil.getReplayActionDescription(stateModelManager, actionSequence);
 
 			// Now we get the AbstractActionId of the model that contains this counter action step
 			// This is the action we want to replay and we need to search in the state
@@ -2226,17 +2224,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
-			// notify to state model the current state
-			stateModelManager.notifyNewStateReached(state, actions);
-
 			// Now lets see if current state contains the action we want to replay
 			Action actionToReplay = null;
+			// First, use the AbstractIDCustom of current state actions to find the action we want to replay
 			for(Action a : actions) {
-				// Abstract Action identifiers match
-				if(a.get(Tags.AbstractIDCustom, "").equals(abstractActionReplayId)) {
-					actionToReplay = a;
-					break;
-				}
+			    if(a.get(Tags.AbstractIDCustom, "").equals(abstractActionReplayId)) {
+			        actionToReplay = a;
+			        // For Type actions we need to type the same text
+			        if(actionToReplay.get(Tags.Role, ActionRoles.Action).toString().contains("Type")) {
+			            actionToReplay = actionTypeToReplay(actionToReplay, actionDescriptionReplay);
+			        }
+			        break;
+			    }
 			}
 			// State actions does not contain the action we want to replay
 			if(actionToReplay == null) {
@@ -2247,14 +2246,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			    }
 			}
 
-			// We do not find the action we want to replay in the current state or in the system actions
+			// notify to state model the current state
+			stateModelManager.notifyNewStateReached(state, actions);
+
+			// We did not find the action we want to replay in the current state or in the system actions
 			// The SUT has changed or we are using a different abstraction
 			// But the sequence is not replayable
 			if(actionToReplay == null) {
-				String msg = String.format("The abstract action to replay %s was not found in the SUT state", abstractActionReplayId);
+				String msg = String.format("Action 'AbstractIDCustom=%s' to replay '%s' not found. ", 
+				        abstractActionReplayId, actionDescriptionReplay);
 				msg = msg.concat("\n");
-				msg = msg.concat("The SUT has changed or we are using a different abstraction");
-
+				msg = msg.concat("The State is different or action is not derived");
 				System.out.println(msg);
 				setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
 
@@ -2350,5 +2352,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 		//Stop system and close the SUT
 		stopSystem(system);
+	}
+
+	/**
+	 * Replay a Type action requires to reuse the same text. 
+	 * 
+	 * @param actionToReplay
+	 * @param actionDescriptionReplay
+	 * @return
+	 */
+	private Action actionTypeToReplay(Action actionToReplay, String actionDescriptionReplay) {
+	    for(Action compAct : ((CompoundAction)actionToReplay).getActions()) {
+	        if(compAct instanceof Type) {
+	            //Type 'kotrnrls' into 'Editor de texto
+	            String replayText = actionDescriptionReplay.substring(6);
+	            replayText = replayText.substring(0, replayText.indexOf("'"));
+	            ((Type)compAct).setText(replayText);
+	            actionToReplay.set(Tags.Desc, actionDescriptionReplay);
+	        }
+	    }
+	    return actionToReplay;
 	}
 }
