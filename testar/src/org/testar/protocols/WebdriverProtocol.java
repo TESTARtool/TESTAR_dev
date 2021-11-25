@@ -353,7 +353,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         String status = "";
         String statusInfo = "";
 
-        if(mode() == Modes.Replay) {
+        if(mode() == Modes.Replay || mode() == Modes.ReplayModel) {
             htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
             status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
