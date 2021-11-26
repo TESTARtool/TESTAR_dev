@@ -2166,6 +2166,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				System.out.println(msg);
 				setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
 
+				// TODO: Improve comparing with replayed model (differences in the widget-tree)
+				// And move to HTML report or log file
+				System.out.println("---------------------------------------------------------------------");
+				System.out.println("UNREPLAYABLE: State is different or action to replay was not derived");
+				System.out.println("UNREPLAYABLE: Check the abstraction of the State, Widgets and Actions");
+				System.out.println(String.format("Not found Action AbstractIDCustom='%s' with description='%s'", 
+				        abstractActionReplayId, actionDescriptionReplay));
+				if(state != null) {
+				    System.out.println(String.format("Current State: AbstractIDCustom='%s' , ConcreteIDCustom='%s'", 
+				            state.get(Tags.AbstractIDCustom, ""), state.get(Tags.ConcreteIDCustom, "")));
+				    for(Widget w : state) {
+				        System.out.println(String.format("Widget: AbstractIDCustom='%s' , Title='%s'", 
+				                w.get(Tags.AbstractIDCustom, ""), w.get(Tags.Title, "")));
+				    }
+				}
+				System.out.println("---------------------------------------------------------------------");
+
 				// We do not success trying to found the action to replay
 				success = false;
 			} else {
