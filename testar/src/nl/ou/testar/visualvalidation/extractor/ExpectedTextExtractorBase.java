@@ -59,16 +59,19 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
     ExpectedTextExtractorBase(Tag<String> defaultTag) {
         WidgetTextConfiguration config = ExtendedSettingsFactory.createWidgetTextConfiguration();
         // Load the extractor configuration into a lookup table for quick access.
-        config.widget.forEach(it -> {
-            if (it.ignore) {
-                List<String> ancestor = it.ancestor.isEmpty() ?
-                        Collections.emptyList() : Collections.singletonList(it.ancestor);
-                _blacklist.merge(it.role, ancestor, (list1, list2) ->
-                        Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList()));
-            } else {
-                _lookupTable.put(it.role, it.tag);
-            }
-        });
+        try {
+            config.widget.forEach(it -> {
+                if (it.ignore) {
+                    List<String> ancestor = it.ancestor.isEmpty() ?
+                            Collections.emptyList() : Collections.singletonList(it.ancestor);
+                    _blacklist.merge(it.role, ancestor, (list1, list2) ->
+                            Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList()));
+                } else {
+                    _lookupTable.put(it.role, it.tag);
+                }
+            });
+        } catch (NullPointerException ignored) {
+        }
 
         _loggingEnabled = config.loggingEnabled;
 

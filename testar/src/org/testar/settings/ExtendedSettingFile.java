@@ -105,7 +105,7 @@ public class ExtendedSettingFile implements Serializable {
     /**
      * Constructor, each specialization must have a unique implementation of this class.
      *
-     * @param fileLocation    The absolute path the the XML file.
+     * @param fileLocation    The absolute path of the XML file.
      * @param fileAccessMutex Mutex for thread-safe access.
      */
     protected ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {

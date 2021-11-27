@@ -1222,7 +1222,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	        double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
-	        while(success && !faultySequence && mode() == Modes.Replay){
+			boolean suppressFaultySequence = ExtendedSettingsFactory.createVisualValidationSettings().enabled;
+
+	        while(success && (suppressFaultySequence || !faultySequence) && mode() == Modes.Replay){
 
 	            //Initialize local fragment and read saved action of PathToReplaySequence File
 	            Taggable replayableFragment;
@@ -1741,19 +1743,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
-        AWTCanvas screenshot;
-        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-            screenshot = WdProtocolUtil.getActionshot(state, action);
-        } else {
-            screenshot = ProtocolUtil.getActionshot(state, action);
-        }
-        state.set(ExecutedAction, action);
-        ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), screenshot);
-
-        htmlReport.addVisualValidationResult(
-                visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null)),
-                state, action
-        );
+		takeActionScreenshot(state, action);
 
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
@@ -1779,16 +1769,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return false;
 		}
 	}
-	
-	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-	    // Get an action screenshot based on the NativeLinker platform
-	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-	        WdProtocolUtil.getActionshot(state,action);
-	    } else {
-	        ProtocolUtil.getActionshot(state,action);
-	    }
 
-	    try{
+	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+		takeActionScreenshot(state, action);
+
+		try{
 	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
 	        Util.pause(halfWait); // help for a better match of the state' actions visualization
 	        action.run(system, state, actionDuration);
@@ -1809,6 +1794,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    }catch(ActionFailedException afe){
 	        return false;
 	    }
+	}
+
+	private void takeActionScreenshot(State state, Action action) {
+		AWTCanvas screenshot;
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			screenshot = WdProtocolUtil.getActionshot(state, action);
+		} else {
+			screenshot = ProtocolUtil.getActionshot(state, action);
+		}
+		state.set(ExecutedAction, action);
+		ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+				action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+				screenshot);
+
+		htmlReport.addVisualValidationResult(
+				visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null)),
+				state, action
+		);
 	}
 
 	/**
