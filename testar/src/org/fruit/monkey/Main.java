@@ -103,6 +103,17 @@ public class Main {
 		
 		verifyTestarInitialDirectory();
 
+		System.out.println("Default path for settingsDir is <" + new File(settingsDir).getAbsolutePath() + ">");
+		if(args.length > 0) {
+			for(String ar : args) {
+				// CMD Example: testar settingsDir="C://Users//Username//Desktop//test_ecj//settings//"
+				if(ar.contains("settingsDir=")) {
+					settingsDir = ar.split("=")[1];
+				}
+			}
+		}
+		System.out.println("New path for settingsDir is <" + new File(settingsDir).getAbsolutePath() + ">");
+
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
