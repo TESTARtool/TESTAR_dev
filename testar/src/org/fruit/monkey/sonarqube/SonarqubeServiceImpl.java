@@ -16,7 +16,6 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.docker.DockerPoolService;
-import org.fruit.monkey.docker.DockerPoolServiceDelegate;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
 
 import java.io.*;
@@ -29,7 +28,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     private final String serviceId;
     private HttpClient httpClient ;
     private DockerPoolService dockerPoolService;
-    private SonarqubeServiceDelegate delegate;
+    private AdvancedDockerPoolServiceDelegate delegate;
 
     private final static String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
@@ -39,11 +38,11 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         httpClient = HttpClientBuilder.create().build();
     }
 
-    public SonarqubeServiceDelegate getDelegate() {
+    public AdvancedDockerPoolServiceDelegate getDelegate() {
         return delegate;
     }
 
-    public void setDelegate(SonarqubeServiceDelegate delegate) {
+    public void setDelegate(AdvancedDockerPoolServiceDelegate delegate) {
         this.delegate = delegate;
         dockerPoolService.setDelegate(delegate);
     }
@@ -61,7 +60,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             // 1. Create and start a service
 
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Creating a service");
+                delegate.onStageChange(AdvancedDockerPoolServiceDelegate.InfoStage.CREATING_SERVICE, "Creating a service");
             }
 
             File confDir = new File(sonarqubeDirPath);
@@ -78,7 +77,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
             catch (Exception e) {
                 if (delegate != null) {
-                    delegate.onError(SonarqubeServiceDelegate.ErrorCode.SERVICE_ERROR, e.getLocalizedMessage());
+                    delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.SERVICE_ERROR, e.getLocalizedMessage());
                 }
                 return;
             }
@@ -86,7 +85,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             // 2. Obtain a token as an admin
 
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SERVICE, "Service is ready to run");
+                delegate.onStageChange(AdvancedDockerPoolServiceDelegate.InfoStage.CREATING_SERVICE, "Service is ready to run");
                 delegate.onStatusChange("Waiting for response", null, null);
             }
 
@@ -103,7 +102,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             if (token == null) {
                 System.out.println("Token is null");
                 if (delegate != null) {
-                    delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, errorMessage);
+                    delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.CONNECTION_ERROR, errorMessage);
                 }
                 return;
             }
@@ -113,13 +112,13 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             String scannerContainerId = null;
 
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Building a project scanner instance");
+                delegate.onStageChange(AdvancedDockerPoolServiceDelegate.InfoStage.CREATING_SCANNER, "Building a project scanner instance");
             }
 
             try {
                 scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, token);
             } catch (Exception e) {
-                delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
+                delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
                 return;
             }
 
@@ -127,7 +126,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             awaitingReport = true;
             if (delegate != null) {
-                delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Scanning a project");
+                delegate.onStageChange(AdvancedDockerPoolServiceDelegate.InfoStage.CREATING_SCANNER, "Scanning a project");
                 delegate.onStatusChange("Please be patient", null, null);
             }
             dockerPoolService.getClient().waitContainerCmd(scannerContainerId).exec(new ResultCallback<WaitResponse>() {
@@ -143,7 +142,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 @Override
                 public void onError(Throwable throwable) {
                     if (delegate != null) {
-                        delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
+                        delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
                     }
                     System.out.println("-= Disposing on error =-");
                     dockerPoolService.dispose(false);
@@ -161,7 +160,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                     catch (Exception e) {
                         System.out.println("No report available: " + e.getLocalizedMessage());
                         if (delegate != null) {
-                            delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, e.getLocalizedMessage());
+                            delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.ANALYSING_ERROR, e.getLocalizedMessage());
                         }
                     }
                     finally {
@@ -183,7 +182,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         } catch (Exception e) {
             System.out.println("Something went wrong");
             if (delegate != null) {
-                delegate.onError(SonarqubeServiceDelegate.ErrorCode.UNKNOWN_ERROR, e.getLocalizedMessage());
+                delegate.onError(AdvancedDockerPoolServiceDelegate.ErrorCode.UNKNOWN_ERROR, e.getLocalizedMessage());
             }
         }
         finally {

@@ -129,6 +129,8 @@ public class DashboardController extends ViewController {
             startTesting(view, RuntimeControlsProtocol.Modes.Record);
         });
 
+        // more functionality
+
         Button btnReplayTest = (Button) view.lookup("#btnReplayTest");
         btnReplayTest.setOnAction(event -> {
             startTesting(view, RuntimeControlsProtocol.Modes.Replay);

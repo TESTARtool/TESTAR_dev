@@ -194,6 +194,6 @@ public class ConfigBinding<T> {
                 throw new ConfigBindingException(String.format("Data type mismatch: expected %s, actual %s",
                         expectedTagType.getSimpleName(), dataSource.getDataType().getSimpleName()));
             }
-        };
+        }
     }
 }
