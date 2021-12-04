@@ -354,11 +354,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
     					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
-				//TODO check when implementing other webdriver than chromedriver
-				//TODO remove when automatically killing webdriver process when creating the session fails
-				+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-						+ "Please use Windows Task Manager to stop that process.";
-    			
+    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
+    					+ "You can use Task Manager to finish it.";
+
     			delegate.popupMessage(msg);
     			
     			System.out.println(msg);
@@ -373,9 +371,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     		}
     		
 		} catch (IllegalStateException e) {
-			if (e.getMessage().contains("driver executable does not exist")) {
+			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
 
-				String msg = "Exception: Check whether chromedriver.exe path: \n"
+				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists and is correctly defined";
 
@@ -385,6 +383,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			}else {
 				e.printStackTrace();
 			}
+
 		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
