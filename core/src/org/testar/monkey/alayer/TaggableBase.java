@@ -48,9 +48,31 @@ public class TaggableBase implements Taggable, Serializable {
 	private Map<Tag<?>, Object> tagValues = Util.newHashMap();
 	boolean allFetched;
 	
+	public interface NativePeer{
+		long access();
+		void release();
+		boolean valid();
+	}
+	
+	private final static class InvalidPeer implements NativePeer {
+		private InvalidPeer() {
+		}
+
+		public long access() {
+			throw new IllegalStateException("InvalidPeer access!");
+		}
+
+		public void release() {
+		}
+
+		public boolean valid() {
+			return false;
+		}
+	}
+
 	public final <T> T get(Tag<T> tag) throws NoSuchTagException {
 		T ret = get(tag, null);
-		if(ret == null)
+		if (ret == null)
 			throw new NoSuchTagException(tag);
 		return ret;
 	}
