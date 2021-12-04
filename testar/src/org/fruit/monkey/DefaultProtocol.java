@@ -332,20 +332,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			delegate.popupMessage(msg);
 
 			System.out.println(msg);
+			we.printStackTrace();
 
 			this.mode = Modes.Quit;
-			
+
 		} catch(SessionNotCreatedException e) {
 			
-    		if (e.getMessage().contains("Chrome version")) {
-    			
+    		if(e.getMessage()!=null && e.getMessage().contains("Chrome version")) {
+
     			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
     					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
     					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
     					+ "You can use Task Manager to finish it.";
-    			
+
     			delegate.popupMessage(msg);
     			
     			System.out.println(msg);
@@ -360,8 +361,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     		}
     		
 		} catch (IllegalStateException e) {
-			if (e.getMessage().contains("driver executable does not exist")) {
-				
+			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
+
 				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists or if is a correct definition";
@@ -369,11 +370,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 				delegate.popupMessage(msg);
 
 				System.out.println(msg);
-			
 			}else {
 				e.printStackTrace();
 			}
-		
+
 		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
