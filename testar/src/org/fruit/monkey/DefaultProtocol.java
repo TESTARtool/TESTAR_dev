@@ -1289,8 +1289,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            }
 	        }
 
-	        cv.release();
-
 	        // notify to state model the last state
 	        Set<Action> actions = deriveActions(system, state);
 	        buildStateActionsIdentifiers(state, actions);
@@ -1299,6 +1297,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                buildEnvironmentActionIdentifiers(state, a);
 
 	        stateModelManager.notifyNewStateReached(state, actions);
+
+	        cv.release();
 
 	    } catch(IOException ioe){
 	        throw new RuntimeException("Cannot read file.", ioe);
