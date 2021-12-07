@@ -194,6 +194,6 @@ RefreshSpyCanvas = 1.0
 SonarDockerize = true
 SonarProjectName = Demo
 SonarProjectKey = demo
-GitUrl = https://github.com/crystal-lang/crystal
+GitUrl = https://github.com/ICTU/quality-time
 GitAuthRequired = false
 
