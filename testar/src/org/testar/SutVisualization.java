@@ -264,7 +264,7 @@ public class SutVisualization {
     public static void visualizeSelectedAction(Settings settings, Canvas canvas, State state, Action action){
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
         try {
-            org.testar.monkey.alayer.Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
+            Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
             //final int BLINK_COUNT = 3;
             //final double BLINK_DELAY = 0.5;
             double actionDuration = settings.get(ConfigTags.ActionDuration);

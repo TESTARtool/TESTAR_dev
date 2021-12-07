@@ -2300,8 +2300,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			}
 		}
 
-		cv.release();
-
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		buildStateActionsIdentifiers(state, actions);
@@ -2310,6 +2308,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 				buildEnvironmentActionIdentifiers(state, a);
 
 		stateModelManager.notifyNewStateReached(state, actions);
+
+		cv.release();
 
 		if (cv != null) { cv.release(); }
 		if (system != null) { system.stop(); }
