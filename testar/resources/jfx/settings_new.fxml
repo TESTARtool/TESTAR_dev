@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Settings" textFill="WHITE">
+      <Label id="titleLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Settings" textFill="WHITE" VBox.vgrow="NEVER">
          <font>
             <Font name="Arial Black" size="18.0" />
          </font>
@@ -22,7 +22,7 @@
             <Insets left="32.0" />
          </padding>
       </Label>
-      <HBox alignment="CENTER" prefHeight="350.0" style="-fx-spacing: 24; -fx-background-color: #4d8acb #4d8acb;">
+      <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-spacing: 24; -fx-background-color: #4d8acb #4d8acb;" VBox.vgrow="ALWAYS">
          <children>
             <JFXButton id="btnGeneral" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="General" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <graphic>
@@ -53,7 +53,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="CENTER" prefHeight="350.0" style="-fx-spacing: 24; -fx-background-color: #4d8acb #4d8acb;">
+      <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" style="-fx-spacing: 24; -fx-background-color: #4d8acb #4d8acb;" VBox.vgrow="ALWAYS">
          <children>
             <JFXButton id="btnMisc" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Misc" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <graphic>

@@ -3,6 +3,8 @@ package nl.ou.testar.jfx.settings.child;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
 import org.testar.extendedsettings.ExtendedSettingsFactory;
@@ -46,18 +48,30 @@ public abstract class SettingsEditController extends ViewController {
     }
 
     // TODO: put some docs
-    protected void putSection(Parent contentView, String title, String resourcePath) throws IOException {
+    protected Parent putSection(Parent contentView, String title, String resourcePath) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/settings_section.fxml"));
         VBox sectionBox =  (VBox) loader.load();
 
         loader = new FXMLLoader(getClass().getClassLoader().getResource(resourcePath));
-        sectionBox.getChildren().add(loader.load());
+        Parent section = loader.load();
+        VBox.setVgrow(section, Priority.ALWAYS);
+        sectionBox.getChildren().add(section);
 
         Label titleLabel = (Label) sectionBox.lookup("#titleLabel");
         titleLabel.setText(title);
 
+//        AnchorPane contentPane = (AnchorPane) sectionBox.lookup("#contentPane");
+//        contentPane.getChildren().add(contentView);
+//        AnchorPane.setLeftAnchor(contentView, 0.0);
+//        AnchorPane.setTopAnchor(contentView, 0.0);
+//        AnchorPane.setRightAnchor(contentView, 0.0);
+//        AnchorPane.setBottomAnchor(contentView, 0.0);
+
         VBox contentBox = (VBox) contentView.lookup("#contentBox");
+        VBox.setVgrow(sectionBox, Priority.ALWAYS);
         contentBox.getChildren().add(sectionBox);
+
+        return section;
     }
 
     protected boolean needsSave(Settings settings) {

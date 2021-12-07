@@ -129,8 +129,9 @@ public class FilterSettingsController extends SettingsEditController {
     @Override
     public void viewDidLoad(Parent view) {
         super.viewDidLoad(view);
+        Parent filterSection = null;
         try {
-            putSection(view, "Filters & oracles", "jfx/settings_filter.fxml");
+            filterSection = putSection(view, "Filters & oracles", "jfx/settings_filter.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,23 +143,23 @@ public class FilterSettingsController extends SettingsEditController {
         oracleTags = settings.get(ConfigTags.TagsForSuspiciousOracle, Collections.emptyList());
         suspiciousProcessOutput = settings.get(ConfigTags.SuspiciousProcessOutput, "");
 
-        descriptionLabel = (Label) view.lookup("#descriptionLabel");
-        textArea = (JFXTextArea) view.lookup("#textArea");
-        tagsPane = (FlowPane) view.lookup("#tagsPane");
+        descriptionLabel = (Label) filterSection.lookup("#descriptionLabel");
+        textArea = (JFXTextArea) filterSection.lookup("#textArea");
+        tagsPane = (FlowPane) filterSection.lookup("#tagsPane");
 
-        choiceButtons[0] = (Button) view.lookup("#btnFilterClick");
+        choiceButtons[0] = (Button) filterSection.lookup("#btnFilterClick");
         choiceButtons[0].setOnAction(event -> {
             selectItem(0);
         });
-        choiceButtons[1] = (Button) view.lookup("#btnFilterTags");
+        choiceButtons[1] = (Button) filterSection.lookup("#btnFilterTags");
         choiceButtons[1].setOnAction(event -> {selectItem(1);});
-        choiceButtons[2] = (Button) view.lookup("#btnFilterProcess");
+        choiceButtons[2] = (Button) filterSection.lookup("#btnFilterProcess");
         choiceButtons[2].setOnAction(event -> {selectItem(2);});
-        choiceButtons[3] = (Button) view.lookup("#btnOracleTitles");
+        choiceButtons[3] = (Button) filterSection.lookup("#btnOracleTitles");
         choiceButtons[3].setOnAction(event -> {selectItem(3);});
-        choiceButtons[4] = (Button) view.lookup("#btnOracleTags");
+        choiceButtons[4] = (Button) filterSection.lookup("#btnOracleTags");
         choiceButtons[4].setOnAction(event -> {selectItem(4);});
-        choiceButtons[5] = (Button) view.lookup("#btnOracleProcess");
+        choiceButtons[5] = (Button) filterSection.lookup("#btnOracleProcess");
         choiceButtons[5].setOnAction(event -> {selectItem(5);});
 
         setSelection(selectedIndex, true);
