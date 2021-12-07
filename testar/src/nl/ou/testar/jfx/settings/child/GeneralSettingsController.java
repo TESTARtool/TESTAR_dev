@@ -38,18 +38,55 @@ public class GeneralSettingsController extends SettingsEditController {
     @Override
     public void viewDidLoad(Parent view) {
         super.viewDidLoad(view);
+        Parent generalSection = null;
         try {
-            putSection(view, "General settings", "jfx/settings_general.fxml");
+            generalSection = putSection(view, "General settings", "jfx/settings_general.fxml");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("General settings loaded");
 
         GraphicsDevice dev = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
         availableDisplayModes = dev.getDisplayModes();
 
+//        TextField webDriverPathField = (TextField) generalSection.lookup("#driverPath");
+//        TextField locationInputField = (TextField) generalSection.lookup("#locationInput");
+//
+//        Button btnSelectDriver = (Button) generalSection.lookup("#btnSelectDriver");
+//        Button btnSelectLocation = (Button) generalSection.lookup("#btnSelectLocation");
+//
+//        TextField numSequencesField = (TextField) generalSection.lookup("#numSequences");
+//        TextField numActionsField = (TextField) generalSection.lookup("#numActions");
+//        CheckBox alwaysCompileCheckBox = (CheckBox) generalSection.lookup("#alwaysCompile");
 
-        ComboBox sutComboBox = (ComboBox) view.lookup("#sutConnectorSelection");
+//        if (webDriverPathField == null) {
+//            System.out.println("Failed to lookup web driver path field");
+//        }
+//        if (locationInputField == null) {
+//            System.out.println("Failed to lookup location input field");
+//        }
+//        if (btnSelectDriver == null) {
+//            System.out.println("Failed to lookup driver selection button");
+//        }
+//        if (btnSelectLocation == null) {
+//            System.out.println("Failed to lookup location selection button");
+//        }
+//        if (numSequencesField == null) {
+//            System.out.println("Failed to lookup sequence number field");
+//        }
+//        if (numActionsField == null) {
+//            System.out.println("Failed to lookup action number field");
+//        }
+//        if (alwaysCompileCheckBox == null) {
+//            System.out.println("Failed to lookup sa check box");
+//        }
+
+        ComboBox sutComboBox = (ComboBox) generalSection.lookup("#sutConnectorSelection");
+        if (sutComboBox == null) {
+            System.out.println("Failed to lookup SUT combo box");
+        }
         sutComboBox.getItems().addAll(
                 Settings.SUT_CONNECTOR_CMDLINE,
                 Settings.SUT_CONNECTOR_PROCESS_NAME,
@@ -59,7 +96,7 @@ public class GeneralSettingsController extends SettingsEditController {
 
         final List<DisplayModeWrapper> availableResolutions = Arrays.stream(availableDisplayModes).map(mode -> new DisplayModeWrapper(mode, true))
                 .collect(Collectors.toList());
-        ComboBox<DisplayModeWrapper> resolutionComboBox = (ComboBox<DisplayModeWrapper>) view.lookup("#resolutionSelection");
+        ComboBox<DisplayModeWrapper> resolutionComboBox = (ComboBox<DisplayModeWrapper>) generalSection.lookup("#resolutionSelection");
         DisplayMode currentDisplayMode = dev.getDisplayMode();
         System.out.println(String.format("Current dislpay mode: %dx%d+%d+%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight(), currentDisplayMode.getBitDepth(), currentDisplayMode.getRefreshRate()));
         generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue, ""));
@@ -71,18 +108,18 @@ public class GeneralSettingsController extends SettingsEditController {
         }
         resolutionComboBox.setItems(FXCollections.observableArrayList(availableResolutions));
 
-        TextField webDriverPathField = (TextField) view.lookup("#driverPath");
-        TextField locationInputField = (TextField) view.lookup("#locationInput");
+        TextField webDriverPathField = (TextField) generalSection.lookup("#driverPath");
+        TextField locationInputField = (TextField) generalSection.lookup("#locationInput");
 
         FileChooser driverChooser = new FileChooser();
         FileChooser locationChooser = new FileChooser();
 
-        Button btnSelectDriver = (Button) view.lookup("#btnSelectDriver");
-        Button btnSelectLocation = (Button) view.lookup("#btnSelectLocation");
+        Button btnSelectDriver = (Button) generalSection.lookup("#btnSelectDriver");
+        Button btnSelectLocation = (Button) generalSection.lookup("#btnSelectLocation");
 
-        TextField numSequencesField = (TextField) view.lookup("#numSequences");
-        TextField numActionsField = (TextField) view.lookup("#numActions");
-        CheckBox alwaysCompileCheckBox = (CheckBox) view.lookup("#alwaysCompile");
+        TextField numSequencesField = (TextField) generalSection.lookup("#numSequences");
+        TextField numActionsField = (TextField) generalSection.lookup("#numActions");
+        CheckBox alwaysCompileCheckBox = (CheckBox) generalSection.lookup("#alwaysCompile");
 
         AbstractConfigBinding<TextField, String> webDriverBinding = new AbstractConfigBinding<TextField, String>(webDriverPathField) {
             @Override

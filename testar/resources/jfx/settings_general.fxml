@@ -15,14 +15,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="700.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="332.0" prefWidth="492.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <GridPane alignment="CENTER_LEFT">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="161.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="486.0" minWidth="10.0" prefWidth="432.0" />
-            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="194.0" minWidth="10.0" prefWidth="58.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="216.0" minWidth="10.0" prefWidth="136.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="162.0" minWidth="10.0" prefWidth="161.0" />
+          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="64.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="194.0" minWidth="10.0" prefWidth="58.0" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="216.0" minWidth="10.0" prefWidth="136.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="149.0" prefHeight="64.0" vgrow="SOMETIMES" />

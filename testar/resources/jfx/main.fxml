@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane id="main" prefHeight="620.0" prefWidth="920.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane id="main" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <Label prefHeight="42.0" text="TEST*" textFill="WHITE" BorderPane.alignment="CENTER">
          <font>
@@ -24,7 +25,7 @@
    <left>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <VBox alignment="TOP_CENTER" prefWidth="64.0" style="-fx-spacing: 28;">
+            <VBox alignment="TOP_CENTER" prefWidth="64.0" style="-fx-spacing: 28;" HBox.hgrow="ALWAYS">
                <children>
                   <JFXButton id="btnHome" contentDisplay="GRAPHIC_ONLY">
                      <graphic>
@@ -44,11 +45,20 @@
                         </ImageView>
                      </graphic>
                   </JFXButton>
+                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY" scaleX="0.33" scaleY="0.33">
+                     <graphic>
+                        <ImageView id="btnMisc">
+                           <image>
+                              <Image url="@icons/misc.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
                </children>
             </VBox>
             <VBox alignment="CENTER" prefWidth="4.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" height="476.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="4.0" VBox.vgrow="ALWAYS">
+                  <Rectangle arcHeight="5.0" arcWidth="5.0" height="8.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="8.0" VBox.vgrow="ALWAYS">
                      <fill>
                         <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
                            <stops>
@@ -72,6 +82,6 @@
       </HBox>
    </left>
    <center>
-      <BorderPane id="contentPane" BorderPane.alignment="CENTER" />
+      <AnchorPane id="contentPane" style="-fx-border-color: ffffff;" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

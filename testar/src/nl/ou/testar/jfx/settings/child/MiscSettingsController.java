@@ -35,6 +35,14 @@ public class MiscSettingsController extends SettingsEditController {
     @Override
     public void viewDidLoad(Parent view) {
         super.viewDidLoad(view);
+
+//        try {
+//            putSection(view, "Stub", "jfx/settings_stub.fxml");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (true) return;
+
         try {
             putSection(view, "Misc", "jfx/settings_misc.fxml");
             putSection(view, "Files on SUT startup", "jfx/settings_startup.fxml");
@@ -44,6 +52,7 @@ public class MiscSettingsController extends SettingsEditController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (true) return;
 
 
         Button btnSelectOutDir = (Button) view.lookup("#btnSelectOutDir");

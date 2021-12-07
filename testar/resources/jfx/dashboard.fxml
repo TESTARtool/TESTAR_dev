@@ -11,7 +11,7 @@
 
 <VBox alignment="CENTER" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Dashboard" textFill="WHITE">
+      <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Dashboard" textFill="WHITE" VBox.vgrow="NEVER">
          <font>
             <Font name="Arial Black" size="18.0" />
          </font>
@@ -22,7 +22,8 @@
             <Insets left="32.0" />
          </VBox.margin>
       </Label>
-      <HBox alignment="CENTER" style="-fx-spacing: 24;">
+      <HBox VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER" style="-fx-spacing: 24;" VBox.vgrow="NEVER">
          <children>
             <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="SPY Mode" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <graphic>
@@ -53,7 +54,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="CENTER" style="-fx-spacing: 24;">
+      <HBox alignment="CENTER" style="-fx-spacing: 24;" VBox.vgrow="NEVER">
          <children>
             <JFXButton id="btnWhiteboxTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Static analysis" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <graphic>
@@ -87,7 +88,7 @@
             <Insets top="16.0" />
          </VBox.margin>
       </HBox>
-      <HBox alignment="CENTER" minHeight="36.0" prefHeight="100.0" style="-fx-spacing: 40;">
+      <HBox alignment="CENTER" minHeight="48.0" style="-fx-spacing: 40;" VBox.vgrow="ALWAYS">
          <children>
             <JFXButton id="btnDownloads" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: a8cbe8; -fx-background-radius: 18;" text="Visit downloads" textFill="WHITE">
                <font>
@@ -106,7 +107,7 @@
             </JFXButton>
          </children>
       </HBox>
-      <HBox alignment="BOTTOM_CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0">
+      <HBox alignment="CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0" VBox.vgrow="ALWAYS">
          <children>
             <Label text="Our partners" textFill="WHITE">
                <font>
@@ -115,6 +116,6 @@
             </Label>
          </children>
       </HBox>
-      <HBox id="carouselBox" alignment="CENTER" minHeight="60.0" prefHeight="120.0" />
+      <HBox id="carouselBox" alignment="CENTER" minHeight="60.0" prefHeight="120.0" VBox.vgrow="NEVER" />
    </children>
 </VBox>

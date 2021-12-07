@@ -1,12 +1,14 @@
 package nl.ou.testar.jfx;
 
 import javafx.scene.Parent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.dashboard.DashboardController;
+import nl.ou.testar.jfx.misc.MiscController;
 import nl.ou.testar.jfx.settings.SettingsController;
 
 import javafx.scene.control.*;
@@ -17,7 +19,7 @@ import java.io.File;
 public class MainController extends ViewController {
 
     enum Mode {
-        HOME, SETTINGS
+        HOME, SETTINGS, MISC
     }
 
     private Mode mode;
@@ -25,6 +27,7 @@ public class MainController extends ViewController {
 
     private DashboardController dashboardController;
     private SettingsController settingsController;
+    private MiscController miscController;
 
     public DashboardController getDashboardController() {
         return dashboardController;
@@ -35,6 +38,7 @@ public class MainController extends ViewController {
         this.settingsPath = settingsPath;
         dashboardController = new DashboardController(settings, settingsPath);
         settingsController = new SettingsController(settings, settingsPath);
+        miscController = new MiscController("Misc", settings);
     }
 
     private void setupMode(Parent view, Mode mode) {
@@ -42,11 +46,15 @@ public class MainController extends ViewController {
 //            final Label titleLabel = (Label) view.lookup("#titleLabel");
 //            final Button btnBack = (Button) view.lookup("#btnBack");
 
-            final BorderPane contentPane = (BorderPane) view.lookup("#contentPane");
+//            final BorderPane contentPane = (BorderPane) view.lookup("#contentPane");
+            final AnchorPane contentPane = (AnchorPane) view.lookup("#contentPane");
             ViewController targetController;
             switch (mode) {
                 case SETTINGS:
                     targetController = settingsController;
+                    break;
+                case MISC:
+                    targetController = miscController;
                     break;
                 default: //HOME
                     targetController = dashboardController;
@@ -57,7 +65,12 @@ public class MainController extends ViewController {
                 @Override
                 public void onViewControllerActivated(ViewController viewController, Parent view) {
 //                    titleLabel.setText(viewController.getTitle());
-                    contentPane.setCenter(view);
+                    contentPane.getChildren().clear();
+                    contentPane.getChildren().add(view);
+                    AnchorPane.setLeftAnchor(view, 0.0);
+                    AnchorPane.setTopAnchor(view, 0.0);
+                    AnchorPane.setRightAnchor(view, 0.0);
+                    AnchorPane.setBottomAnchor(view, 0.0);
 //                    btnBack.setVisible(navigationController.isBackAvailable());
 //                    contentPane.getChildren().removeAll();
 //                    contentPane.getChildren().add(view);
@@ -76,6 +89,7 @@ public class MainController extends ViewController {
     public void viewDidLoad(Parent view) {
         Button btnHome = (Button) view.lookup("#btnHome");
         Button btnSettings = (Button) view.lookup("#btnSettings");
+        Button btnMisc = (Button) view.lookup("#btnMisc");
 
         btnHome.setOnAction(event -> {
             setupMode(view, Mode.HOME);
@@ -85,6 +99,10 @@ public class MainController extends ViewController {
             setupMode(view, Mode.SETTINGS);
         });
 
-        setupMode(view, Mode.HOME);
+//        btnMisc.setOnAction(event -> {
+//            setupMode(view, Mode.MISC);
+//        });
+
+        setupMode(view, Mode.MISC);
     }
 }
