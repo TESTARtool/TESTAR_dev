@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox fillHeight="false" style="-fx-background-color: #0000bb;" VBox.vgrow="ALWAYS" />
+      <HBox fillHeight="false" style="-fx-background-color: #00ff00;" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>

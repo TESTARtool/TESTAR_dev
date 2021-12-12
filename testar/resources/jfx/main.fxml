@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -8,10 +9,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.paint.RadialGradient?>
-<?import javafx.scene.paint.Stop?>
-<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane id="main" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
@@ -45,43 +42,21 @@
                         </ImageView>
                      </graphic>
                   </JFXButton>
-                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY" scaleX="0.33" scaleY="0.33">
-                     <graphic>
-                        <ImageView id="btnMisc">
-                           <image>
-                              <Image url="@icons/misc.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </JFXButton>
+                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY" scaleX="0.33" scaleY="0.33" />
                </children>
             </VBox>
-            <VBox alignment="CENTER" prefWidth="4.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" height="8.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="8.0" VBox.vgrow="ALWAYS">
-                     <fill>
-                        <RadialGradient centerX="0.5" centerY="0.5" radius="0.5">
-                           <stops>
-                              <Stop>
-                                 <color>
-                                    <Color red="1.0" green="1.0" blue="1.0" />
-                                 </color>
-                              </Stop>
-                              <Stop offset="1.0">
-                                 <color>
-                                    <Color red="0.3019607961177826" green="0.5411764979362488" blue="0.7960784435272217" />
-                                 </color>
-                              </Stop>
-                           </stops>
-                        </RadialGradient>
-                     </fill>
-                  </Rectangle>
-               </children>
+            <VBox id="separatorBox" alignment="CENTER" prefWidth="2.0" style="-fx-background-color: #ffffff;" HBox.hgrow="ALWAYS">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets bottom="24.0" />
+               </HBox.margin>
             </VBox>
          </children>
       </HBox>
    </left>
    <center>
-      <AnchorPane id="contentPane" style="-fx-border-color: ffffff;" BorderPane.alignment="CENTER" />
+      <AnchorPane id="contentPane" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

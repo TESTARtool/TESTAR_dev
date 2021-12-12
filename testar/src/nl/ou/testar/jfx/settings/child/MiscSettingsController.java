@@ -44,16 +44,14 @@ public class MiscSettingsController extends SettingsEditController {
 //        if (true) return;
 
         try {
-            putSection(view, "Misc", "jfx/settings_misc.fxml");
-            putSection(view, "Files on SUT startup", "jfx/settings_startup.fxml");
+            putSection(view, "Misc", "jfx/settings_misc.fxml", false);
+            putSection(view, "Files on SUT startup", "jfx/settings_startup.fxml", true);
             if(isWebDriver(settings)) {
-                putSection(view, "Web settings", "jfx/settings_web.fxml");
+                putSection(view, "Web settings", "jfx/settings_web.fxml", false);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (true) return;
-
 
         Button btnSelectOutDir = (Button) view.lookup("#btnSelectOutDir");
         Button btnSelectTmpDir = (Button) view.lookup("#btnSelectTmpDir");

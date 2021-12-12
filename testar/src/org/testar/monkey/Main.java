@@ -383,13 +383,17 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			public void onViewControllerActivated(ViewController viewController, Parent view) {
 				stage.setTitle(viewController.getTitle());
 				stage.setScene(new Scene(view));
+				stage.sizeToScene();
 				stage.show();
+//				stage.setMinWidth(stage.getWidth());
+//				stage.setMinHeight(stage.getHeight());
 			}
 		});
 	}
 
 	/**
 	 * Start TESTAR protocol with the selected settings
+	 *
 	 *
 	 * This method get the specific protocol class of the selected settings to run TESTAR
 	 *

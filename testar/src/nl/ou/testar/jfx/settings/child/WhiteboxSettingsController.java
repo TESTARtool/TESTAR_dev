@@ -29,9 +29,9 @@ public class WhiteboxSettingsController extends SettingsEditController {
     public void viewDidLoad(Parent view) {
         super.viewDidLoad(view);
         try {
-            putSection(view, "Git", "jfx/settings_git.fxml");
-            putSection(view, "Sonarqube service", "jfx/settings_sonarqube.fxml");
-            putSection(view, "Sonarqube project", "jfx/settings_sonar_project.fxml");
+            putSection(view, "Git", "jfx/settings_git.fxml", false);
+            putSection(view, "Sonarqube service", "jfx/settings_sonarqube.fxml", false);
+            putSection(view, "Sonarqube project", "jfx/settings_sonar_project.fxml", true);
         }
         catch (IOException e) {
             e.printStackTrace();

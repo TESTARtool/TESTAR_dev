@@ -19,10 +19,10 @@
             <Insets />
          </opaqueInsets>
          <VBox.margin>
-            <Insets left="16.0" />
+            <Insets />
          </VBox.margin>
       </Label>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" height="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0">
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="4.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="256.0">
          <fill>
             <LinearGradient endX="1.0" endY="1.0">
                <stops>
@@ -40,8 +40,11 @@
             </LinearGradient>
          </fill>
          <VBox.margin>
-            <Insets bottom="8.0" left="16.0" />
+            <Insets bottom="8.0" />
          </VBox.margin>
       </Rectangle>
    </children>
+   <padding>
+      <Insets left="16.0" />
+   </padding>
 </VBox>
