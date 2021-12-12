@@ -20,7 +20,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <AnchorPane style="-fx-border-color: #ffffff; -fx-border-radius: 5;">
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #ffffff; -fx-border-radius: 5;" VBox.vgrow="ALWAYS">
          <children>
             <FlowPane id="tagsPane" hgap="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-hgap: 8; -fx-vgap: 8;" vgap="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <padding>

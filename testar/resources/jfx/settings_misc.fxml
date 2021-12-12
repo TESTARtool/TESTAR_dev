@@ -11,8 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="32.0" minWidth="32.0" style="-fx-background-color: #4d8acb; -fx-border-color: #FFFFFF;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="32.0" minWidth="32.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
          <columnConstraints>
@@ -26,9 +25,9 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="CENTER_RIGHT">
                <children>
-                  <Label prefWidth="150.0" text="Output directory" textFill="WHITE">
+                  <Label text="Output directory" textFill="WHITE">
                      <font>
                         <Font name="Arial Bold" size="14.0" />
                      </font>
@@ -44,7 +43,7 @@
                   </JFXButton>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="100.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+            <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" GridPane.columnSpan="2" GridPane.rowIndex="1">
                <children>
                   <Label id="labelOutDir" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Not selected" textFill="WHITE" HBox.hgrow="ALWAYS">
                      <font>
@@ -80,9 +79,9 @@
                   <Insets right="8.0" />
                </GridPane.margin>
             </JFXButton>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2">
+            <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="2">
                <children>
-                  <Label prefWidth="150.0" text="Temp directory" textFill="WHITE">
+                  <Label text="Temp directory" textFill="WHITE">
                      <font>
                         <Font name="Arial Bold" size="14.0" />
                      </font>
@@ -113,7 +112,7 @@
                   <Insets right="8.0" />
                </GridPane.margin>
             </JFXButton>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
+            <HBox alignment="CENTER_LEFT" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
                <children>
                   <Label id="labelTmpDir" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Not selected" textFill="WHITE" HBox.hgrow="ALWAYS">
                      <font>

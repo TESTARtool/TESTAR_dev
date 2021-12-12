@@ -15,23 +15,23 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="332.0" prefWidth="492.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <GridPane alignment="CENTER_LEFT">
+      <GridPane alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
         <columnConstraints>
-          <ColumnConstraints hgrow="NEVER" maxWidth="162.0" minWidth="10.0" prefWidth="161.0" />
+          <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
           <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="64.0" />
-            <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="194.0" minWidth="10.0" prefWidth="58.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="194.0" minWidth="10.0" prefWidth="58.0" />
             <ColumnConstraints hgrow="NEVER" maxWidth="216.0" minWidth="10.0" prefWidth="136.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="149.0" prefHeight="64.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="160.0" prefHeight="64.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="141.0" prefHeight="64.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
-            <HBox alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_RIGHT">
                <children>
                   <Label text="SUT Connector" textFill="WHITE">
                      <font>
@@ -49,7 +49,7 @@
                   </JFXButton>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="1">
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="1">
                <children>
                   <Label text="Webdriver" textFill="WHITE">
                      <font>
@@ -67,7 +67,7 @@
                   </JFXButton>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="2">
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="2">
                <children>
                   <Label text="Resolution" textFill="WHITE">
                      <font>
@@ -85,7 +85,7 @@
                   </JFXButton>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" GridPane.rowIndex="3">
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="3">
                <children>
                   <Label text="Location" textFill="WHITE">
                      <font>
@@ -139,14 +139,14 @@
             <TextField id="driverPath" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 8;">
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 8;" VBox.vgrow="NEVER">
          <children>
             <Label text="Number of sequences" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <TextField id="numSequences" prefHeight="26.0" prefWidth="91.0" />
+            <TextField id="numSequences" prefHeight="26.0" prefWidth="100.0" />
             <Label text="Sequence actions" textFill="WHITE">
                <font>
                   <Font size="14.0" />
@@ -155,7 +155,7 @@
                   <Insets left="32.0" />
                </HBox.margin>
             </Label>
-            <TextField id="numActions" prefHeight="26.0" prefWidth="106.0" />
+            <TextField id="numActions" prefHeight="26.0" prefWidth="100.0" />
          </children>
          <VBox.margin>
             <Insets top="16.0" />

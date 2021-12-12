@@ -48,13 +48,13 @@ public abstract class SettingsEditController extends ViewController {
     }
 
     // TODO: put some docs
-    protected Parent putSection(Parent contentView, String title, String resourcePath) throws IOException {
+    protected Parent putSection(Parent contentView, String title, String resourcePath, boolean stretchAllowed) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/settings_section.fxml"));
         VBox sectionBox =  (VBox) loader.load();
 
         loader = new FXMLLoader(getClass().getClassLoader().getResource(resourcePath));
         Parent section = loader.load();
-        VBox.setVgrow(section, Priority.ALWAYS);
+        VBox.setVgrow(section, stretchAllowed ? Priority.ALWAYS : Priority.NEVER);
         sectionBox.getChildren().add(section);
 
         Label titleLabel = (Label) sectionBox.lookup("#titleLabel");
@@ -68,10 +68,14 @@ public abstract class SettingsEditController extends ViewController {
 //        AnchorPane.setBottomAnchor(contentView, 0.0);
 
         VBox contentBox = (VBox) contentView.lookup("#contentBox");
-        VBox.setVgrow(sectionBox, Priority.ALWAYS);
+        VBox.setVgrow(sectionBox, stretchAllowed ? Priority.ALWAYS : Priority.NEVER);
         contentBox.getChildren().add(sectionBox);
 
         return section;
+    }
+
+    protected Parent putSection(Parent contentView, String title, String resourcePath) throws IOException {
+        return putSection(contentView, title, resourcePath, true);
     }
 
     protected boolean needsSave(Settings settings) {

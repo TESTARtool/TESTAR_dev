@@ -9,15 +9,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="700.0" style="-fx-background-color: #4d8acb; -fx-spacing: 8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #4d8acb; -fx-spacing: 8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label text="Project properties" textFill="WHITE" />
-      <JFXTextArea id="sonarProjectProperties" focusColor="#4d8acb" prefHeight="69.0" prefWidth="686.0" style="-fx-border-color: #ffffff; -fx-border-radius: 5; -fx-text-fill: ffffff;" unFocusColor="#4d8acb">
+      <JFXTextArea id="sonarProjectProperties" focusColor="#4d8acb" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="32.0" minWidth="32.0" prefHeight="32.0" prefWidth="32.0" style="-fx-border-color: #ffffff; -fx-border-radius: 5; -fx-text-fill: ffffff;" unFocusColor="#4d8acb" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </VBox.margin>
       </JFXTextArea>
-      <HBox prefWidth="200.0">
+      <HBox>
          <children>
             <Label prefHeight="25.0" text="Project name" textFill="WHITE">
                <font>
@@ -30,8 +30,8 @@
                   <Insets right="8.0" />
                </padding>
             </Label>
-            <TextField id="sonarProjectName" prefHeight="26.0" prefWidth="170.0" />
-            <Label prefHeight="26.0" text="Project key" textFill="WHITE">
+            <TextField id="sonarProjectName" />
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Project key" textFill="WHITE">
                <font>
                   <Font size="14.0" />
                </font>
@@ -45,14 +45,13 @@
                   <Insets left="12.0" />
                </HBox.margin>
             </Label>
-            <TextField id="sonarProjectKey" prefHeight="26.0" prefWidth="161.0" />
-            <JFXCheckBox id="sonarSaveResult" prefHeight="26.0" prefWidth="148.0" text="Save Sonarqube result" textFill="WHITE" unCheckedColor="WHITE">
+            <TextField id="sonarProjectKey" />
+            <JFXCheckBox id="sonarSaveResult" prefHeight="26.0" text="Save Sonarqube result" textFill="WHITE" unCheckedColor="WHITE">
                <HBox.margin>
                   <Insets left="12.0" />
                </HBox.margin>
             </JFXCheckBox>
          </children>
       </HBox>
-      <HBox />
    </children>
 </VBox>

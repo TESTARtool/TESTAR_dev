@@ -4,6 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
@@ -103,6 +105,6 @@ public class MainController extends ViewController {
 //            setupMode(view, Mode.MISC);
 //        });
 
-        setupMode(view, Mode.MISC);
+        setupMode(view, Mode.HOME);
     }
 }
