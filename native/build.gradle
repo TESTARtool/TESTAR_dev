@@ -1,8 +1,8 @@
 dependencies {
-    compile project(':core')
-    compile project(':windows')
-    compile project(':webdriver')
-    compile project(':linux')
-    compile files('../linux/lib/libatspi.jar')
+    implementation project(':core')
+    implementation project(':windows')
+    implementation project(':webdriver')
+    implementation project(':linux')
+    implementation files('../linux/lib/libatspi.jar')
 }
 

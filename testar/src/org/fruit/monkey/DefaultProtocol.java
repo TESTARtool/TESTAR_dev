@@ -1195,7 +1195,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
 
-				CodingManager.buildIDs(state, actionStatus.getAction());
+				CodingManager.buildIDs(state, Collections.singleton(actionStatus.getAction()));
 
 				//notify the state model manager of the executed action
 				stateModelManager.notifyActionExecution(actionStatus.getAction());
