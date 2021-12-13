@@ -403,7 +403,7 @@ public final class WinProcess extends SUTBase {
 
 	public long pid(){
 		if(!isRunning())
-			throw new IllegalStateException();
+			throw new IllegalStateException("Error trying to get the pid of the SUT windows process!");
 		return Windows.GetProcessId(hProcess);
 	}
 

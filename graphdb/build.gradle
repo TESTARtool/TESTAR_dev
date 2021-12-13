@@ -18,16 +18,18 @@ jmhReport {
 }
 
 dependencies {
-    compile project(':core')
-    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
-    //compile group: 'com.tinkerpop.gremlin', name: 'gremlin-java', version: '2.6.0'
-    //compile group: 'com.tinkerpop.gremlin', name: 'gremlin-groovy', version: '2.6.0'
-    //compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.9'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+    implementation project(':core')
+    implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.15.0'
+    //implementation group: 'com.tinkerpop.gremlin', name: 'gremlin-java', version: '2.6.0'
+    //implementation group: 'com.tinkerpop.gremlin', name: 'gremlin-groovy', version: '2.6.0'
+    //implementation group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.9'
+    testImplementation group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 
-    jmhCompile project
-    jmhCompile 'org.openjdk.jmh:jmh-core:1.19'
-    jmhCompile 'org.openjdk.jmh:jmh-generator-annprocess:1.19'
+    jmhImplementation project
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.19'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.19'
 }
 
 task jmh(type: JavaExec, description: 'Executing JMH benchmarks') {
