@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://localhost:5000/"
+SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "file:///Users/michaeltikhonenko/work/TESTAR_dev/suts/web_calculator.html"
 
 #################################################################
 # Sequences
@@ -35,7 +35,7 @@ SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://localhost:500
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 10
+Sequences = 3
 SequenceLength = 10
 
 #################################################################
@@ -152,6 +152,7 @@ OverrideWebDriverDisplayScale =
 # Reporting configuration
 
 # TODO
+ReportServicePort = 8000
 ReportType = DATABASE
 SQLReporting = testar
 SQLReportingType = local
