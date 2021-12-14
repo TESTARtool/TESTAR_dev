@@ -145,6 +145,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
+		Thread mysqlThread = null;
+		Thread orientdbThread = null;
+
 		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
 			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
@@ -165,7 +168,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			});
 
-			new Thread() {
+			mysqlThread = new Thread() {
 				@Override
 				public void run() {
 					try {
@@ -180,8 +183,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					}
 					System.out.println("OrientDB docker image finished.");
 				}
-			}.start();
-			// TODO: Re-enable progress dialog
+			};
+			mysqlThread.start();
 //			progressDialog.pack();
 //			progressDialog.setLocationRelativeTo(null);
 //			progressDialog.setVisible(true);
@@ -189,7 +192,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		}
 
-		if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
+		 if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
 			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
 			final String databaseName = settings.get(ConfigTags.SQLReporting);
@@ -214,7 +217,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			});
 
-			new Thread() {
+			 orientdbThread = new Thread() {
 				@Override
 				public void run() {
 					try {
@@ -231,7 +234,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						e.printStackTrace();
 					}
 				}
-			}.start();
+			};
+			orientdbThread.start();
 
 
 			// TODO: Re-enable progress dialog
@@ -250,7 +254,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		this.firstNonNullUrl = null; // FIXME: There should be a better way to find the URL right?
 
 		// reads the settings from file:
-		super.initialize(settings);
+//		super.initialize(settings);
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = settings.get(ConfigTags.ClickableClasses);
@@ -274,6 +278,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+
+		try {
+			if (mysqlThread != null) {
+				mysqlThread.join();
+			}
+			if (orientdbThread != null) {
+				orientdbThread.join();
+			}
+		} catch (InterruptedException e) {
+			System.out.println("Database thread interrupted: " + e.getMessage());
+			e.printStackTrace();
+		}
+		super.initialize(settings);
 	}
 
 	@Override

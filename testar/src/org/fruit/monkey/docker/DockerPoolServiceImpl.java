@@ -13,10 +13,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class DockerPoolServiceImpl implements DockerPoolService {
 
@@ -25,14 +22,14 @@ public class DockerPoolServiceImpl implements DockerPoolService {
 
     private DockerHttpClient dockerHttpClient;
     private DockerClient dockerClient;
-    private Set<String> containerIds;
+    private Map<String, String> containerIds;
     private Set<String> imageIds;
     private String networkId;
 
     final static HashSet<DockerPoolServiceImpl> registry = new HashSet<>();
 
     public DockerPoolServiceImpl() {
-        containerIds = new HashSet<>();
+        containerIds = new HashMap<>();
         imageIds = new HashSet<>();
 
         final DockerClientConfig dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
@@ -54,7 +51,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         return delegate;
     }
 
-    public void start(String serviceId) {
+    public synchronized void start(String serviceId) {
         this.serviceId = serviceId;
         final String networkName = "testar_" + serviceId;
         List<Network> dockerNetworks = dockerClient.listNetworksCmd().withNameFilter(networkName).exec();
@@ -128,19 +125,24 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         return imageId;
     }
 
-    public String startWithImage(String imageId, String name, HostConfig hostConfig) {
+    public synchronized String startWithImage(String imageId, String name, HostConfig hostConfig) {
         return startWithImage(imageId, name, hostConfig, null);
     }
 
-    public String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env) {
+    public synchronized String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env) {
+        String containerId = containerIds.get(name);
+        if (containerId != null) {
+            return containerId;
+        }
+        
         final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
                 .withName(name)
                 .withHostName(name)
                 .withHostConfig(hostConfig);
         final CreateContainerResponse containerResponse =
                 (env == null ? cmd.exec() : cmd.withEnv(env).exec());
-        final String containerId = containerResponse.getId();
-        containerIds.add(containerId);
+        containerId = containerResponse.getId();
+        containerIds.put(name, containerId);
         dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
         dockerClient.startContainerCmd(containerId).exec();
 
@@ -150,7 +152,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private void disposeInternal(boolean alsoRemoveImages) {
         for (Container container : dockerClient.listContainersCmd().withShowAll(true).exec()) {
             final String containerId = container.getId();
-            if (containerIds.contains(containerId)) {
+            if (containerIds.values().contains(containerId)) {
                 System.out.println("Container ID: " + containerId);
                 if (container.getState().toLowerCase(Locale.ROOT).contains("running")) {
                     dockerClient.killContainerCmd(containerId).exec();
