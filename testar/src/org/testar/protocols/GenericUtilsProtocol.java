@@ -44,11 +44,13 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.jacoco.JacocoFilesCreator;
 import org.testar.jacoco.MergeJacocoFiles;
+import org.testar.jacoco.ReportGenerator;
 import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
 
@@ -70,6 +72,15 @@ import java.util.regex.Pattern;
 import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
+	
+	protected String codeInfo = "";
+	
+    @Override
+    protected State getState(SUT system) throws StateBuildException {
+        State state = super.getState(system);
+        state.set(Tags.CodeCoverage, codeInfo);
+        return state;
+    }
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -459,11 +470,17 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 					.build());
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
+	        
+	        ReportGenerator generator = new ReportGenerator(new File(jacocoFileAction), 
+	        		new File(Main.testarDir + File.separator + "suts" + File.separator + "rachota_files"), 
+	        		new File(Main.testarDir + File.separator + "suts" + File.separator + "rachota_files"));
+            codeInfo = generator.create();
 
 	    } catch (Exception e) {
 	        LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
 	                LogSerialiser.LogLevel.Info);
 	        System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+	        e.printStackTrace();
 	    }
 	    
 	    try {
