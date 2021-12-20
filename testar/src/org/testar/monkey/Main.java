@@ -121,6 +121,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				shutdown();
+			}
+		});
 
 		System.out.println("(0)");
 		isValidJavaEnvironment();
@@ -149,7 +156,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("<<< 3 >>>");
 			startTestar(settings);
 			System.out.println("<<< 4 >>>");
-//			shutdown();
 			System.out.println("<<< 5 >>>");
 		}
 
@@ -158,10 +164,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("(9)");
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
-
-//		System.out.println("(18)");
-//		System.exit(0);
-
 	}
 
 	@Override
@@ -176,7 +178,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		initCodingManager(settings);
 		initOperatingSystem();
 		startTestar(settings);
-		shutdown();
 	}
 
 	private static void shutdown() {
