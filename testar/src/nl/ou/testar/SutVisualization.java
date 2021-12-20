@@ -288,5 +288,4 @@ public class SutVisualization {
             if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }
-
 }
