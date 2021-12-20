@@ -168,7 +168,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			});
 
-			mysqlThread = new Thread() {
+			orientdbThread = new Thread() {
 				@Override
 				public void run() {
 					try {
@@ -184,7 +184,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					System.out.println("OrientDB docker image finished.");
 				}
 			};
-			mysqlThread.start();
+			orientdbThread.start();
 //			progressDialog.pack();
 //			progressDialog.setLocationRelativeTo(null);
 //			progressDialog.setVisible(true);
@@ -217,7 +217,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			});
 
-			 orientdbThread = new Thread() {
+			 mysqlThread = new Thread() {
 				@Override
 				public void run() {
 					try {
@@ -235,7 +235,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					}
 				}
 			};
-			orientdbThread.start();
+			 mysqlThread.start();
 
 
 			// TODO: Re-enable progress dialog
@@ -243,6 +243,20 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 //			progressDialog.setLocationRelativeTo(null);
 //			progressDialog.setVisible(true);
 		}
+
+		try {
+			if (mysqlThread != null) {
+				mysqlThread.join();
+			}
+			if (orientdbThread != null) {
+				orientdbThread.join();
+			}
+		} catch (InterruptedException e) {
+			System.out.println("Database thread interrupted: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		super.initialize(settings);
 
 		// Initialize HTML Report (Dashboard)
 		if (sqlService != null) {
@@ -278,19 +292,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
-
-		try {
-			if (mysqlThread != null) {
-				mysqlThread.join();
-			}
-			if (orientdbThread != null) {
-				orientdbThread.join();
-			}
-		} catch (InterruptedException e) {
-			System.out.println("Database thread interrupted: " + e.getMessage());
-			e.printStackTrace();
-		}
-		super.initialize(settings);
 	}
 
 	@Override
