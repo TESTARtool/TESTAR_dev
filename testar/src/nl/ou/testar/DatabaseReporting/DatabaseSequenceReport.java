@@ -17,10 +17,14 @@ public class DatabaseSequenceReport implements SequenceReport {
 
     @Override
     public void addState(State state) {
+        String concreteIdCustom = state.get(Tags.ConcreteIDCustom);
+        String abstractId = state.get(Tags.AbstractID);
         try {
-            sqlService.registerState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID),
-                    state.get(Tags.Abstract_R_ID), state.get(Tags.Abstract_R_T_ID),
-                    state.get(Tags.Abstract_R_T_P_ID));
+            if (sqlService.findState(concreteIdCustom, abstractId) < 0) {
+                sqlService.registerState(concreteIdCustom, abstractId,
+                        state.get(Tags.Abstract_R_ID), state.get(Tags.Abstract_R_T_ID),
+                        state.get(Tags.Abstract_R_T_P_ID));
+            }
         }
         catch (SQLException e) {
             System.err.println("Could not add a state: " + e.getMessage());
