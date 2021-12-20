@@ -151,8 +151,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 			@Override
 			public void run() {
-				DockerPoolServiceImpl.disposeAll(false);
-				System.out.println("Docker instances disposed");
+				shutdown();
 			}
 		});
 
@@ -179,7 +178,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("<<< 3 >>>");
 			startTestar(settings);
 			System.out.println("<<< 4 >>>");
-//			shutdown();
 			System.out.println("<<< 5 >>>");
 		}
 
@@ -187,10 +185,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		else {
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
-
-//		System.out.println("(18)");
-//		System.exit(0);
-
 	}
 
 	@Override
@@ -205,7 +199,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		initCodingManager(settings);
 		initOperatingSystem();
 		startTestar(settings);
-		shutdown();
 	}
 
 	private static void shutdown() {
