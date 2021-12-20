@@ -302,7 +302,7 @@ public class JavaScreenCanvas implements Canvas {
      */
     private void runningCheck() {
         if(!_running)
-            throw new IllegalStateException();
+            throw new IllegalStateException("Linux Spy window is not running!");
     }
 
 

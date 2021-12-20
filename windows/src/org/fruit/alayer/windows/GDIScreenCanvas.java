@@ -171,7 +171,7 @@ public final class GDIScreenCanvas implements Canvas {
 
 	private void check(){
 		if(!running)
-			throw new IllegalStateException();
+			throw new IllegalStateException("GDIScreenCanvas window is not running!");
 	}
 
 	public double width() { return width; }

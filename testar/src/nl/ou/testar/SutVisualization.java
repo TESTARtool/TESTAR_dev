@@ -57,8 +57,13 @@ public class SutVisualization {
      */
     public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
         Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-        for(Action a : actions){
-            a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+        try {
+            for(Action a : actions){
+                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+            }
+        } catch(IllegalStateException ise) {
+            System.out.println("visualizeFilteredActions : canvas visualization not available!");
+            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }
 
@@ -207,10 +212,15 @@ public class SutVisualization {
                 maxz = zindex;
         }
         int alfa;
-        for(Action a : actions){
-            zindex = 1; // default
-            Pen vp = Pen.PEN_IGNORE;
-            a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
+        try {
+            for(Action a : actions){
+                zindex = 1; // default
+                Pen vp = Pen.PEN_IGNORE;
+                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
+            }
+        } catch(IllegalStateException ise) {
+            System.out.println("visualizeActions : canvas visualization not available!");
+            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }
 
@@ -256,22 +266,26 @@ public class SutVisualization {
      */
     public static void visualizeSelectedAction(Settings settings, Canvas canvas, State state, Action action){
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-        Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
-        //final int BLINK_COUNT = 3;
-        //final double BLINK_DELAY = 0.5;
-        double actionDuration = settings.get(ConfigTags.ActionDuration);
-        final int BLINK_COUNT = 3;
-        final double BLINK_DELAY = actionDuration / BLINK_COUNT;
-        for(int i = 0; i < BLINK_COUNT; i++){
-            Util.pause(BLINK_DELAY);
-            canvas.begin();
-            visualizer.run(state, canvas, Pen.PEN_IGNORE);
-            canvas.end();
-            Util.pause(BLINK_DELAY);
-            canvas.begin();
-            visualizer.run(state, canvas, redPen);
-            canvas.end();
+        try {
+            Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
+            //final int BLINK_COUNT = 3;
+            //final double BLINK_DELAY = 0.5;
+            double actionDuration = settings.get(ConfigTags.ActionDuration);
+            final int BLINK_COUNT = 3;
+            final double BLINK_DELAY = actionDuration / BLINK_COUNT;
+            for(int i = 0; i < BLINK_COUNT; i++){
+                Util.pause(BLINK_DELAY);
+                canvas.begin();
+                visualizer.run(state, canvas, Pen.PEN_IGNORE);
+                canvas.end();
+                Util.pause(BLINK_DELAY);
+                canvas.begin();
+                visualizer.run(state, canvas, redPen);
+                canvas.end();
+            }
+        } catch(IllegalStateException ise) {
+            System.out.println("visualizeSelectedAction : canvas visualization not available!");
+            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }
-
 }
