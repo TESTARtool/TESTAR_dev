@@ -1,6 +1,8 @@
 package org.testar.jacoco;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jacoco.core.analysis.IBundleCoverage;
 import org.jacoco.core.analysis.IClassCoverage;
@@ -18,9 +20,9 @@ public class CodeReader implements IReportGroupVisitor {
 
 	private final String groupName;
 	
-	private String codeInfo = "";
+	private List<String> codeInfo = new ArrayList<>();
 
-	public String getCodeInfo() {
+	public List<String> getCodeInfo() {
 		return codeInfo;
 	}
 
@@ -37,12 +39,15 @@ public class CodeReader implements IReportGroupVisitor {
 			final String packageName = p.getName();
 			for (final IClassCoverage c : p.getClasses()) {
 				if (c.containsCode()) {
-					String className = c.getName()+c.getSignature()+c.getSuperName()+c.getInterfaceNames();
-					codeInfo = codeInfo.concat("Package: " + packageName + ", code class name: " + className);
+					String coverageLine = "";
+					// org/cesilko/rachota/gui/InactivityReminderDialog$14nulljava/lang/Object //[Ljava.lang.String;@6fe0d143
+					String className = c.getName()+c.getSignature()+c.getSuperName();//+c.getInterfaceNames();
+					coverageLine = coverageLine.concat("Package: " + packageName + ", code class name: " + className + " -");
 					for (final CounterEntity entity : COUNTERS) {
 						final ICounter counter = c.getCounter(entity);
-						codeInfo = codeInfo.concat(entity.name() + ": miss " + counter.getMissedCount() + " cover " + counter.getCoveredCount() + "\n");
+						coverageLine = coverageLine.concat(" " + entity.name() + ": miss " + counter.getMissedCount() + " cover " + counter.getCoveredCount());
 					}
+					codeInfo.add(coverageLine);
 				}
 			}
 		}

@@ -54,8 +54,10 @@ import org.testar.jacoco.ReportGenerator;
 import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -72,15 +74,17 @@ import java.util.regex.Pattern;
 import static org.fruit.alayer.Tags.Title;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
-	
-	protected String codeInfo = "";
-	
-    @Override
-    protected State getState(SUT system) throws StateBuildException {
-        State state = super.getState(system);
-        state.set(Tags.CodeCoverage, codeInfo);
-        return state;
-    }
+
+	protected List<String> codeInfo = new ArrayList<>();
+	protected List<String> codeDiff = new ArrayList<>();
+
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		State state = super.getState(system);
+		state.set(Tags.CodeCoverage, codeInfo.toString());
+		state.set(Tags.CodeCoverageDiff, codeDiff.toString());
+		return state;
+	}
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -470,11 +474,19 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 					.build());
 
 	        extractJacocoActionMergedReport(jacocoFileAction);
-	        
+
+	        // Get the code coverage information
 	        ReportGenerator generator = new ReportGenerator(new File(jacocoFileAction), 
 	        		new File(Main.testarDir + File.separator + "suts" + File.separator + "rachota_files"), 
 	        		new File(Main.testarDir + File.separator + "suts" + File.separator + "rachota_files"));
-            codeInfo = generator.create();
+	        List<String> newCodeCoverage = generator.create();
+
+	        // Compare previous code coverage with the new one to get new covered classes
+	        codeDiff = new ArrayList<String>(newCodeCoverage);
+	        codeDiff.removeAll(codeInfo);
+
+	        // Update code coverage information
+	        codeInfo = newCodeCoverage;
 
 	    } catch (Exception e) {
 	        LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,

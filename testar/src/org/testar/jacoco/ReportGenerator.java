@@ -15,6 +15,7 @@ package org.testar.jacoco;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
@@ -65,7 +66,7 @@ public class ReportGenerator {
      *
      * @throws IOException
      */
-    public String create() throws IOException {
+    public List<String> create() throws IOException {
 
         // Read the jacoco.exec file. Multiple data files could be merged
         // at this point
@@ -89,7 +90,7 @@ public class ReportGenerator {
      * @param bundleCoverage
      * @throws IOException
      */
-    private String createReport(final IBundleCoverage bundleCoverage) throws IOException {
+    private List<String> createReport(final IBundleCoverage bundleCoverage) throws IOException {
         final IReportGroupVisitor visitor = new CodeReader();
 
         visitor.visitBundle(bundleCoverage, new DirectorySourceFileLocator(sourceDirectory, "utf-8", 4));

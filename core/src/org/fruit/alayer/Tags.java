@@ -218,6 +218,7 @@ public final class Tags extends TagsBase {
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
 	public static final Tag<String> CodeCoverage = from("CodeCoverage", String.class);
+	public static final Tag<String> CodeCoverageDiff = from("CodeCoverageDiff", String.class);
 	
 	private static Set<Tag<String>> generalStringVerdictTags;
 	static {
