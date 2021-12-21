@@ -211,6 +211,40 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     }
 
     /**
+     * Checking whether the state is in Windows File Browser, and creating left click on Cancel button if it is
+     *
+     * @param actions
+     * @param state
+     * @return
+     */
+    protected Set<Action> deriveOnlyCancelActionIfInFileBrowser(Set<Action> actions, State state){
+        Set<Action> returnActions = actions;
+        // to recognize File Browser, iterate through all widgets of the state to check whether "New Folder" is found
+        boolean fileBrowserDetected = false;
+        for(Widget w : state){
+            if(w.get(Tags.Title, "").equalsIgnoreCase("New Folder")){
+                //TODO remove debug print:
+                System.out.println("DEBUG: File Browser window found - creating cancel action");
+                fileBrowserDetected = true;
+                break;
+            }
+        }
+        if(fileBrowserDetected){
+            StdActionCompiler ac = new AnnotatingActionCompiler();
+            for(Widget w : state){
+                if(isClickable(w) && w.get(Tags.Title, "").equalsIgnoreCase("Cancel")){
+                    //TODO remove debug print:
+                    System.out.println("DEBUG: Cancel button found - adding cancel click to actions");
+                    returnActions.add(ac.leftClickAt(w));
+                    break;
+                }
+            }
+        }
+        return returnActions;
+    }
+
+
+    /**
      * Iterating through all widgets of the given state. 
      *
      * Adding derived actions into the given set of actions and returning the modified set of actions.
