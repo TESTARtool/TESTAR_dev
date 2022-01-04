@@ -245,15 +245,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
 					}catch (Exception e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
-						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
+						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
+						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
 				}
 				/*else if(isValidFile())
 					new SequenceViewer(settings);*/
 				else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
-					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
+					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
+					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				runReplayLoop();
@@ -266,8 +266,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is a correct definition";
+			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is correctly defined";
 
 			popupMessage(msg);
 			System.out.println(msg);
@@ -279,10 +279,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
-    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
-    					+ "You can use Task Manager to finish it.";
+						//TODO check when implementing other webdriver than chromedriver
+						//TODO remove when automatically killing webdriver process when creating the session fails
+    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
+    					+ "Please use Windows Task Manager to stop that process.";
 
     			popupMessage(msg);
     			System.out.println(msg);
@@ -294,9 +296,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}catch (IllegalStateException e) {
 			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
 				
-				String msg = "Exception: Check if chromedriver.exe path: \n"
+				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
-				+"\n exists or if is a correct definition";
+				+"\n exists and is correctly defined";
 
 				popupMessage(msg);
 				System.out.println(msg);
@@ -394,9 +396,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			ois.close();
 
 		} catch (ClassNotFoundException | IOException e) {
-			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
+			popupMessage("ERROR: File is not readable, please select a correct TESTAR sequence file");
 
-			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
+			System.out.println("ERROR: File is not readable, please select a correct file (output/sequences)");
 
 			return false;
 		}
