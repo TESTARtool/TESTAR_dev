@@ -50,7 +50,7 @@ public class PerspectiveImage extends Parent {
     // Width modified for our needs
     // @author Michael Tikhonenko (Marviq B.V)
     public static final double WIDTH = 200;
-    
+
     public static final double HEIGHT = WIDTH + (WIDTH * REFLECTION_SIZE);
 
     private static final double RADIUS_H = WIDTH / 2;
