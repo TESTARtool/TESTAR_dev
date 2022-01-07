@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = E:\\TESTAR\\SUT\\Debug\\SUT.exe
+SUTConnectorValue = "suts/Robin/SUT.exe"
 
 #################################################################
 # Sequences
@@ -32,7 +32,7 @@ SUTConnectorValue = E:\\TESTAR\\SUT\\Debug\\SUT.exe
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious titles
