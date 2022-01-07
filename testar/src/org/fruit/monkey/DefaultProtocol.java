@@ -1543,7 +1543,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
 			for(Tag tag : w.tags()){
 				if(tag.name().equals(tagForSuspiciousOracle)){
-					tagValue = w.get(tag, "");
+					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
+					tagValue = w.get(tag, "").toString().replace("\n", " ").replace("\r", " ");
 					break;
 					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
