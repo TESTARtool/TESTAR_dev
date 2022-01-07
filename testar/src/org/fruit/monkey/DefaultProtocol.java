@@ -1516,6 +1516,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
+		System.out.println("DEBUG: checking suspiciousValueVerdict");
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
@@ -1533,40 +1534,46 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return Verdict.OK;
 	}
 	
-	private Verdict suspiciousStringValueMatcher(Widget w) {
-		Matcher m;
+	private Verdict suspiciousStringValueMatcher(Widget widget) {
+		Matcher matcher;
 
 		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
 			String tagValue = "";
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-			for(Tag tag : w.tags()){
+			for(Tag tag : widget.tags()){
 				if(tag.name().equals(tagForSuspiciousOracle)){
-					tagValue = w.get(tag, "");
+					tagValue = widget.get(tag, "");
+					System.out.println("DEBUG: value for tag "+tagForSuspiciousOracle+"="+tagValue);
 					break;
-					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
 			}
 
 			//Check whether the Tag value is empty or null
-			if (tagValue == null || tagValue.isEmpty())
+			if (tagValue == null || tagValue.isEmpty()){
+				System.out.println("DEBUG: value is empty");
 				continue; //no action
+			}
 
 			//Ignore value ValuePattern for UIAEdit widgets
-			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+			if(tagValue.equals("ValuePattern") && widget.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
+				System.out.println("DEBUG: skipping value pattern in uiaedit");
 				continue;
 			}
 
-			m = this.suspiciousTitlesMatchers.get(tagValue);
-			if (m == null){
-				m = this.suspiciousTitlesPattern.matcher(tagValue);
-				this.suspiciousTitlesMatchers.put(tagValue, m);
+			matcher = this.suspiciousTitlesMatchers.get(tagValue);
+			if (matcher == null){
+				System.out.println("DEBUG: matcher was null");
+				matcher = this.suspiciousTitlesPattern.matcher(tagValue);
+				this.suspiciousTitlesMatchers.put(tagValue, matcher);
 			}
 
-			if (m.matches()){
+			if (matcher.matches()){
+				System.out.println("DEBUG: suspicious text found!");
+				//TODO is this visualizer working? have not seen it...
 				Visualizer visualizer = Util.NullVisualizer;
 				// visualize the problematic widget, by marking it with a red box
-				if(w.get(Tags.Shape, null) != null)
-					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+				if(widget.get(Tags.Shape, null) != null)
+					visualizer = new ShapeVisualizer(RedPen, widget.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
 				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
 			}
