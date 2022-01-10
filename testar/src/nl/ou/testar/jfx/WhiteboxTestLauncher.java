@@ -93,9 +93,6 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
         final GitService gitService = new GitServiceImpl();
         final String repositoryUrl = settings.get(ConfigTags.GitUrl);
 
-        final SonarqubeService sonarqubeService = new SonarqubeServiceImpl("sonarqube");
-        sonarqubeService.setDelegate(this);
-
         String path = settings.get(ConfigTags.OutputDir);
         if (!path.substring(path.length() - 1).equals(File.separator)) {
             path += File.separator;
@@ -157,6 +154,9 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
             if (!projectSourceDir.substring(projectSourceDir.length() - 1).equals(File.separator)) {
                 projectSourceDir += File.separator;
             }
+
+            final SonarqubeService sonarqubeService = new SonarqubeServiceImpl("sonarqube");
+            sonarqubeService.setDelegate(this);
 
             try {
                 sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
