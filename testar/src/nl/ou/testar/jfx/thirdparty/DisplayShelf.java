@@ -307,7 +307,6 @@ public class DisplayShelf extends Region {
 
             double newX = -left.getChildren().size()
                     * SPACING + SPACING * i + LEFT_OFFSET;
-            System.out.println("New X: "+ newX);
 
             keyFrames.add(new KeyFrame(duration,
                     // These settings were changed/added in ticket IVS-128 to conform our style
