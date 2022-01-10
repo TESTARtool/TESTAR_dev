@@ -41,16 +41,11 @@ public class DashboardController extends ViewController {
 
     private void startTesting(Parent view, RuntimeControlsProtocol.Modes mode) {
         try {
-//            extractInformation(settings);
             checkSettings(settings);
             settings.set(ConfigTags.Mode, mode);
-//            saveCurrentSettings();
-//            ret = settings;
             System.out.println("Start testing...");
             if (delegate != null) {
-//                Platform.runLater(() -> delegate.startTesting(settings));
                 Platform.runLater(() -> new Thread(() -> delegate.startTesting(settings)).start());
-//                Platform.exit();
 
                 final Stage stage = (Stage) view.getScene().getWindow();
             }

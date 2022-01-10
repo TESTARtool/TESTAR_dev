@@ -75,6 +75,6 @@
             <Font size="14.0" />
          </font>
       </JFXCheckBox>
-      <PasswordField GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <PasswordField id="gitToken" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
 </GridPane>
