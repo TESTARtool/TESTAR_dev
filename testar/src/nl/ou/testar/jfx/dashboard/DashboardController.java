@@ -66,7 +66,7 @@ public class DashboardController extends ViewController {
 //        stage.close();
 
         try {
-            new WhiteboxTestStatus().start(stage);
+            new WhiteboxTestStatus().start(stage, settings);
         }
         catch(IOException e) {
             e.printStackTrace();
