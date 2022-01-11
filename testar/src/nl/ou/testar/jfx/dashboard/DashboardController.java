@@ -56,14 +56,10 @@ public class DashboardController extends ViewController {
             final Alert alert = new Alert(Alert.AlertType.ERROR, ise.getMessage());
             alert.show();
         }
-//        finally {
-//            Platform.exit();
-//        }
     }
 
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
-//        stage.close();
 
         try {
             new WhiteboxTestStatus().start(stage, settings);

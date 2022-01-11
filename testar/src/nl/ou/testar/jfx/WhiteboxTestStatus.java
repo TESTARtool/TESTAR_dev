@@ -5,14 +5,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 import org.eclipse.jgit.lib.ProgressMonitor;
 import org.fruit.monkey.ConfigTags;
@@ -25,11 +23,8 @@ import org.fruit.monkey.vcs.GitCredentials;
 import org.fruit.monkey.vcs.GitService;
 import org.fruit.monkey.vcs.GitServiceImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class WhiteboxTestStatus implements ProgressMonitor {
@@ -76,15 +71,7 @@ public class WhiteboxTestStatus implements ProgressMonitor {
         final GitService gitService = new GitServiceImpl();
         final String repositoryUrl = settings.get(ConfigTags.GitUrl);
 
-        String path = settings.get(ConfigTags.OutputDir);
-        if (!path.substring(path.length() - 1).equals(File.separator)) {
-            path += File.separator;
-        }
-
         final String branchName = settings.get(ConfigTags.GitBranch, null);
-
-        final String sonarqubeConfPath = path + "sonarqube" + File.separator;
-        final String sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
 
         projectName = settings.get(ConfigTags.SonarProjectName, "Demo");
         projectKey = settings.get(ConfigTags.SonarProjectKey, "demo");
@@ -103,18 +90,6 @@ public class WhiteboxTestStatus implements ProgressMonitor {
             }
             System.out.println("...done");
 
-//            Platform.runLater(() -> {
-//                        stageLabel.setText("All done");
-//                        statusLabel.setText("Press any key to close");
-//                        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-//
-//                        whiteboxStage.getScene().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-//                            @Override
-//                            public void handle(KeyEvent event) {
-//                                whiteboxStage.close();
-//                            }
-//                        });
-//                    });
             RepositoryLanguageComposition composition = codeAnalysisService.scanRepository(repositoryPath);
 
             Platform.runLater(() -> {
