@@ -4,5 +4,5 @@ echo "Start Xvfb"
 /opt/bin/start-xvfb.sh &
 sleep 2
 cd /testar/bin
-./testar
+./testar sse=webdriver_statemodel_shared
 #sh -c "while true; do sleep 1; done"

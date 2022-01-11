@@ -318,10 +318,15 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Action preSelectAction(State state, Set<Action> actions){
         // adding available actions into the HTML report:
         htmlReport.addActions(actions);
-		if (actions.size() == 0)
-		{			
+
+        // Derive actions didn't find any action, inform the user and return WdHistoryBackAction
+		if(actions == null || actions.isEmpty()) {
+			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
 			return new WdHistoryBackAction();
-		}
+		}		
+
         return(super.preSelectAction(state, actions));
     }
 

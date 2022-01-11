@@ -81,31 +81,20 @@ public class EntityManager {
 
     public static String getConnectionString() {
         return connectionString;
-
     }
+
     public EntityManager(Config config) {
         EntityManager.config = config;
-
-
-        //connectionString = config.getConnectionType() + ":"
-         //       + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
-         //       + "/";
-        
-        //OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         connection = getNewConnection(); //new Connection(orientDB, config);
         init();
     }
 
-    public static Connection getNewConnection(OrientDB orientDB)
-    {
-        
+    public static Connection getNewConnection(OrientDB orientDB) {
        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-       System.out.println("orientDB = "+orientDB);
        return new Connection(orientDB, EntityManager.config);
     }
 
-    public Connection getNewConnection()
-    {
+    public Connection getNewConnection() {
         connectionString = config.getConnectionType() + ":"
         + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
         + "/";
@@ -113,6 +102,7 @@ public class EntityManager {
        OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
        return  new Connection(orientDB, config);
     }
+
     /**
      * This method tells the Entity Manager to close its connection. Should be
      * called before the entity manager itself becomes unused.
@@ -133,8 +123,7 @@ public class EntityManager {
                 OSchema schema = db.getMetadata().getSchema();
                 OSequenceLibrary sequenceLibrary = db.getMetadata().getSequenceLibrary();
                 for (OClass oClass : DependencyHelper.sortDependenciesForDeletion(schema.getClasses())) {
-                    if ((oClass.isEdgeType() || oClass.isVertexType())
-                            && !(oClass.getName().equals("V") || oClass.getName().equals("E"))) {
+                    if ((oClass.isEdgeType() || oClass.isVertexType()) && !(oClass.getName().equals("V") || oClass.getName().equals("E"))) {
                         System.out.println("Dropping class " + oClass.getName());
                         db.command("TRUNCATE CLASS " + oClass.getName() + " UNSAFE");
                         schema.dropClass(oClass.getName());
@@ -177,8 +166,6 @@ public class EntityManager {
      * @throws EntityNotFoundException
      */
     private OVertex retrieveVertex(VertexEntity vertexEntity, ODatabaseSession db) throws EntityNotFoundException {
-        //System.out.println("retrieveVertext: state id = "+vertexEntity.getPropertyValue("stateId"));
-        
         Property identifier = vertexEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
             // cannot retrieve a vertex without identifier
@@ -220,10 +207,8 @@ public class EntityManager {
      */
     private OEdge retrieveEdge(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
         // when looking for an edge, there are 2 options.
-        // an edge can have an Id field, in which case we will just look for the id, as
-        // it will be indexed and unique.
-        // If an edge does not have an Id field, we will attempt to look for an edge
-        // between the source and target vertices.
+        // an edge can have an Id field, in which case we will just look for the id, as it will be indexed and unique.
+        // If an edge does not have an Id field, we will attempt to look for an edge between the source and target vertices.
         Property identifier = edgeEntity.getEntityClass().getIdentifier();
         OResultSet rs;
         if (identifier != null) {
@@ -280,12 +265,9 @@ public class EntityManager {
      * @return
      * @throws EntityNotFoundException
      */
-    private OResultSet retrieveEdgeWithoutId(EdgeEntity edgeEntity, ODatabaseSession db)
-            throws EntityNotFoundException {
-        // for this one we need a more tricky query using specific graph query
-        // capabilities
-        // first, we need to make sure we have been provided the source and target
-        // vertices, otherwise there is nothing to search
+    private OResultSet retrieveEdgeWithoutId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
+        // for this one we need a more tricky query using specific graph query capabilities
+        // first, we need to make sure we have been provided the source and target vertices, otherwise there is nothing to search
         if (edgeEntity.getSourceEntity() == null || edgeEntity.getTargetEntity() == null) {
             throw new EntityNotFoundException();
         }
@@ -319,8 +301,7 @@ public class EntityManager {
     }
 
     /**
-     * This method will attempt to create a new class if it is not already present
-     * in the database
+     * This method will attempt to create a new class if it is not already present in the database
      * 
      * @param entityClass
      */

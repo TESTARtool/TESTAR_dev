@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!-- https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_tabs -->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+</style>
+</head>
+<body>
+
+<h2>Tabs</h2>
+<p>Click on the buttons inside the tabbed menu:</p>
+
+<div class="tab">
+  <button id="tabSpain" class="tablinks" onclick="openCity(event, 'Spain')">Spain</button>
+  <button id="tabFrance" class="tablinks" onclick="openCity(event, 'France')">France</button>
+  <button id="tabPortugal" class="tablinks" onclick="openCity(event, 'Portugal')">Portugal</button>
+  <button id="tabItaly" class="tablinks" onclick="openCity(event, 'Italy')">Italy</button>
+  <button id="tabRomania" class="tablinks" onclick="openCity(event, 'Romania')">Romania</button>
+</div>
+
+<div id="Spain" class="tabcontent">
+  <h3>Spain</h3>
+  <button id="buttonValencia">Valencia</button>
+  <button id="buttonMadrid">Madrid</button>
+  <button id="buttonBarcelona">Barcelona</button>
+  <button id="buttonSevilla">Sevilla</button>
+  <button id="buttonZaragoza">Zaragoza</button>
+</div>
+
+<div id="France" class="tabcontent">
+  <h3>France</h3>
+  <button id="buttonParis">Paris</button>
+  <button id="buttonLyon">Lyon</button>
+  <button id="buttonToulouse">Toulouse</button>
+  <button id="buttonNantes">Nantes</button>
+  <button id="buttonMarsella">Marsella</button>
+</div>
+
+<div id="Portugal" class="tabcontent">
+  <h3>Portugal</h3>
+  <button id="buttonLisboa">Lisboa</button>
+  <button id="buttonOporto">Oporto</button>
+  <button id="buttonCoimbra">Coimbra</button>
+  <button id="buttonFaro">Faro</button>
+  <button id="buttonViseu">Viseu</button>
+</div>
+
+<div id="Italy" class="tabcontent">
+  <h3>Italy</h3>
+  <button id="buttonRoma">Roma</button>
+  <button id="buttonMilan">Milan</button>
+  <button id="buttonNapoles">Napoles</button>
+  <button id="buttonFlorencia">Florencia</button>
+  <button id="buttonVenecia">Venecia</button>
+</div>
+
+<div id="Romania" class="tabcontent">
+  <h3>Romania</h3>
+  <button id="buttonBucarest">Bucarest</button>
+  <button id="buttonClujNapoca">ClujNapoca</button>
+  <button id="buttonBrasov">Brasov</button>
+  <button id="buttonTimisoara">Timisoara</button>
+  <button id="buttonDeva">Deva</button>
+</div>
+
+<script>
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>
+   
+</body>
+</html> 

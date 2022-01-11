@@ -72,14 +72,14 @@ public class AbstractState extends AbstractEntity implements Persistable {
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
         connection = EntityManager.getNewConnection(database); 
-        System.out.println("AbstractState: database = " + database + ", connection = " + connection);   
+  
         if (actions != null) {
             for(AbstractAction action:actions) {
                 this.actions.put(action.getActionId(), action);
                 if (!actionExistsInDatabase(action)) {
                     unvisitedActions.put(action.getActionId(), action);
                 } else {
-                    System.out.println(action.getActionId()+" already existed in abstract state; do not add to unvisited");
+                    System.out.println(action.getActionId() + " already existed in abstract state; do not add to unvisited");
                 }
 
             }
@@ -167,14 +167,12 @@ public class AbstractState extends AbstractEntity implements Persistable {
      */
     public Set<AbstractAction> getUnvisitedActions() {
         String myId = this.getId();        
-        String sql = "select from abstractaction where out in (select @rid from abstractstate where stateId = '" + myId + "')";
-        System.out.println("Update visited actions of this node by adding database values sql = " + sql);
+        String sql = "select from AbstractAction where out in (select @rid from AbstractState where stateId = '" + myId + "')";
 
         try(ODatabaseSession db = connection.getDatabaseSession()) {
             OResultSet results = db.query(sql);
             while (results.hasNext()) {
                 String actionId = results.next().getProperty("actionId");
-                System.out.println("ActionId " + actionId + " was ook al gevonden volgens de database");
                 try {
                     unvisitedActions.remove(actionId);
                 } catch (Exception e) {
@@ -184,7 +182,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
             }
         } 
 
-        sql = "select from unvisitedabstractaction where in in (select from BeingExecuted)";
+        sql = "select from UnvisitedAbstractAction where in in (select from BeingExecuted)";
 
         try(ODatabaseSession db = connection.getDatabaseSession()) {
             OResultSet results = db.query(sql);
