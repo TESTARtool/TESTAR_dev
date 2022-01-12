@@ -30,6 +30,7 @@
 
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 
@@ -48,6 +49,10 @@ public class Connection {
     public Connection(OrientDB orientDB, Config config) {
         this.orientDB = orientDB;
         this.config = config;
+        // https://github.com/orientechnologies/orientdb/blob/master/core/src/main/java/com/orientechnologies/orient/core/config/OGlobalConfiguration.java
+        // Because multiple and simultaneous connections are hanging the orientdb session (distributed inference)
+        // Set max Request completion timeout to 10s
+        OGlobalConfiguration.NETWORK_REQUEST_TIMEOUT.setValue(10000);
     }
 
     /**

@@ -35,6 +35,7 @@ import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.exception.OCommandExecutionException;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
+import com.orientechnologies.orient.core.exception.ODatabaseException;
 import com.orientechnologies.orient.core.exception.OSchemaException;
 import com.orientechnologies.orient.core.exception.OStorageException;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -62,50 +63,38 @@ import java.util.stream.Collectors;
 
 public class EntityManager {
 
-    // the connection object holding the datastore instance and the connection
-    // configuration information
+    // the connection object holding the datastore instance and the connection configuration information
     private Connection connection;
+    private static Config config;
 
     private int baseSleep = 50;
     private int randSleep = 200;
 
     private int backOff = 1;
+
     /**
      * Constructor
-     * 
      * @param config
      */
-    private static String connectionString;
-
-    private static Config config;
-
-    public static String getConnectionString() {
-        return connectionString;
-    }
-
     public EntityManager(Config config) {
-        EntityManager.config = config;
-        connection = getNewConnection(); //new Connection(orientDB, config);
-        init();
+    	EntityManager.config = config;
+    	String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
+    			config.getServer() : config.getDatabaseDirectory()) + "/";
+    	OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+    	connection = new Connection(orientDB, config);
+    	init();
     }
-
-    public static Connection getNewConnection(OrientDB orientDB) {
-       orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-       return new Connection(orientDB, EntityManager.config);
-    }
-
-    public Connection getNewConnection() {
-        connectionString = config.getConnectionType() + ":"
-        + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory())
-        + "/";
-
-       OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-       return  new Connection(orientDB, config);
+    
+    public static Connection getNewConnection() {
+    	String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
+    			config.getServer() : config.getDatabaseDirectory()) + "/";
+    	OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+    	return  new Connection(orientDB, config);
     }
 
     /**
-     * This method tells the Entity Manager to close its connection. Should be
-     * called before the entity manager itself becomes unused.
+     * This method tells the Entity Manager to close its connection.
+     * Should be called before the entity manager itself becomes unused.
      */
     public void releaseConnection() {
         connection.releaseConnection();
@@ -312,27 +301,21 @@ public class EntityManager {
             try (ODatabaseSession db = connection.getDatabaseSession()) {
                 // check if the class already exists
                 OClass oClass = db.getClass(entityClass.getClassName());
-                if (oClass != null)
-                    return;
+                if (oClass != null) return;
 
                 // no class yet, let's create it
                 String entitySuperClass = entityClass.isVertex() ? "V" : entityClass.isEdge() ? "E" : "";
-                String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName()
-                        : entitySuperClass;
+                String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName() : entitySuperClass;
                 oClass = db.createClass(entityClass.getClassName(), superClassName);
 
                 Set<String> propertyBlackList = new HashSet<>();
-                // if the entityclass has a super class, we need to filter out the properties
-                // that have already been
-                // created in the super class, as OrientDB will throw an error if we try to
-                // create it again in the child class
+                // if the entityclass has a super class, we need to filter out the properties that have already been
+                // created in the super class, as OrientDB will throw an error if we try to create it again in the child class
                 if (entityClass.getSuperClassName() != null) {
                     // fetch the superclass
-                    EntityClass superClass = EntityClassFactory
-                            .createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
+                    EntityClass superClass = EntityClassFactory.createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
                     if (superClass != null) {
-                        propertyBlackList = superClass.getProperties().stream().map(Property::getPropertyName)
-                                .collect(Collectors.toSet());
+                        propertyBlackList = superClass.getProperties().stream().map(Property::getPropertyName).collect(Collectors.toSet());
                     }
                 }
 
@@ -342,8 +325,7 @@ public class EntityManager {
                     if (property.isAutoIncrement()) {
                         String sequenceName = createSequenceId(entityClass, property);
                         System.out.println("creating sequence: " + sequenceName);
-                        db.getMetadata().getSequenceLibrary().createSequence(sequenceName,
-                                OSequence.SEQUENCE_TYPE.ORDERED, null);
+                        db.getMetadata().getSequenceLibrary().createSequence(sequenceName, OSequence.SEQUENCE_TYPE.ORDERED, null);
                     }
 
                     // we might need to skip adding certain properties
@@ -353,15 +335,13 @@ public class EntityManager {
                     }
 
                     OProperty dbProperty = null;
-                    // binary types we do not create, as they will be stored as separate binary
-                    // records
+                    // binary types we do not create, as they will be stored as separate binary records
                     if (property.getPropertyType() == OType.BINARY) {
                         continue;
                     }
                     // for linked and embedded type a childtype needs to be specified
                     else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
-                        dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(),
-                                property.getChildType());
+                        dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
                     } else {
                         dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType());
                     }
@@ -373,38 +353,43 @@ public class EntityManager {
                     // we add an index for certain property fields
                     if (property.isIndexAble()) {
                         String indexField = entityClass.getClassName() + "." + property.getPropertyName() + "Idx";
-                        OClass.INDEX_TYPE indexType = property.isIdentifier() ? OClass.INDEX_TYPE.UNIQUE_HASH_INDEX
-                                : OClass.INDEX_TYPE.NOTUNIQUE_HASH_INDEX;
+                        OClass.INDEX_TYPE indexType = property.isIdentifier() ? OClass.INDEX_TYPE.UNIQUE_HASH_INDEX : OClass.INDEX_TYPE.NOTUNIQUE_HASH_INDEX;
                         oClass.createIndex(indexField, indexType, property.getPropertyName());
                     }
                 }
-            } catch (OConcurrentModificationException cme)
-            {
+            } catch (OConcurrentModificationException cme) {
                 backOff++;
-                System.out.println("Concurrency exception during create class; retry");
+                System.out.println("EntityManager createClass: Concurrency exception during create class; retry");
                 randomSleep(15000, 5000);
                 repeat = true;
-            } catch (OSchemaException se)
-            {
+            } catch (OSchemaException se) {
                 backOff++;
-                System.out.println("Schema exception");
+                System.out.println("EntityManager createClass: Schema exception");
                 randomSleep(15000, 5000);
                 repeat = true;
-            } catch (OCommandExecutionException cme)
-            {
+            } catch (OCommandExecutionException cme) {
                 backOff++;
-                System.out.println("Command execution exception "+cme);
+                System.out.println("EntityManager createClass: Command execution exception " + cme);
                 randomSleep(15000, 5000);
                 repeat = true;
-            } catch (OStorageException ose)
-            {
+            } catch (OStorageException ose) {
                 backOff++;
-                System.out.println("Storage execution exception "+ose);
+                System.out.println("EntityManager createClass: Storage execution exception " + ose);
+                randomSleep(15000, 5000);
+                repeat = true;
+            } catch (ODatabaseException ode) {
+                backOff++;
+                System.out.println("EntityManager createClass: ODatabaseException " + ode);
+                randomSleep(15000, 5000);
+                repeat = true;
+            } catch (Exception e) {
+                backOff++;
+                System.out.println("EntityManager createClass: Exception " + e);
                 randomSleep(15000, 5000);
                 repeat = true;
             }
-
         } while (repeat);
+
         backOff = 1;
     }
 
@@ -418,26 +403,21 @@ public class EntityManager {
         do {
             repeat = false;
             try (ODatabaseSession db = connection.getDatabaseSession()) {
-               
                 if (entity.getEntityClass().isVertex()) {
                     saveVertexEntity((VertexEntity) entity, db);
                 } else if (entity.getEntityClass().isEdge()) {
                     saveEdgeEntity((EdgeEntity) entity, db);
                 }
             } catch (OConcurrentModificationException cme) {
-
                 repeat = true;
-                System.out.println("saveEntity concurrency exception " + cme);
+                System.out.println("EntityManager saveEntity concurrency exception: " + cme);
                 backOff++;
                 randomSleep(baseSleep, randSleep);
-                
-
-
-            } catch (ORecordDuplicatedException dupl)
-            {
-                System.out.println("DuplicateException "+dupl);
+            } catch (ORecordDuplicatedException dupl) {
+                System.out.println("EntityManager saveEntity DuplicateException: " + dupl);
             }
         } while (repeat);
+
         backOff=1;
     }
 
@@ -455,15 +435,11 @@ public class EntityManager {
                 OVertex oVertex = null;
                 boolean newVertex = false;
                 try {
-
                     // check to see if the vertex already exists in the database
-
                     oVertex = retrieveVertex(entity, db);
-                    
                 } catch (EntityNotFoundException e) {
                     // vertex doesn't exist yet. No problemo. We'll create one.
                     oVertex = db.newVertex(entity.getEntityClass().getClassName());
-                   // System.out.println("Create new vertex");
                     newVertex = true;
                 }
 
@@ -483,8 +459,7 @@ public class EntityManager {
                         // make sure the property does not have a value yet
                         if (oVertex.getProperty(property.getPropertyName()) == null) {
                             // fetch the sequence
-                            OSequence sequence = db.getMetadata().getSequenceLibrary()
-                                    .getSequence(createSequenceId(entity.getEntityClass(), property));
+                            OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
                             setProperty(oVertex, property.getPropertyName(), sequence.next(), db);
                         }
                     }
@@ -492,25 +467,23 @@ public class EntityManager {
 
                 oVertex.save();
             } catch (OConcurrentModificationException cme) {
-                System.out.println("ConcurrencyException " + cme);
+                System.out.println("EntityManager saveVertexEntity ConcurrencyException: " + cme);
                 backOff++;
                 randomSleep(50, 200);
                 repeat = true;
-            }catch (ORecordDuplicatedException dupl)
-            {
-                System.out.println("DuplicateException "+dupl);
+            } catch (ORecordDuplicatedException dupl) {
+                System.out.println("EntityManager saveVertexEntity DuplicateException: " + dupl);
             }
         } while (repeat);
+
         backOff=1;
     }
 
     private OVertex createOrRetrieveVertex(VertexEntity entity, ODatabaseSession db) {
-
         boolean repeat = false;
         OVertex vertex;
         int bckOff = 1;
         do {
-
             repeat = false;
             try {
                 vertex = retrieveVertex(entity, db);
@@ -518,44 +491,35 @@ public class EntityManager {
                     try {
                         storeVertex(vertex, entity, db);
                     } catch (OConcurrentModificationException cme) {
-                        System.out.println("Concurrency exception EntityManager.java(480)");
+                        System.out.println("EntityManager createOrRetrieveVertex Concurrency exception: " + cme);
                         randomSleep(50, 200);
                         repeat = true;
-
-                    }catch (ORecordDuplicatedException dupl)
-                    {
-                        System.out.println("DuplicateException"+dupl);
+                    } catch (ORecordDuplicatedException dupl) {
+                        System.out.println("EntityManager createOrRetrieveVertex DuplicateException: " + dupl);
                     }
                 }
-                
             } catch (EntityNotFoundException e) {
-
                 vertex = db.newVertex(entity.getEntityClass().getClassName());
                 try {
                     storeVertex(vertex, entity, db);
                 } catch (OConcurrentModificationException cme) {
-                    System.out.println("Concurrency exception EntityManager.java(480)");
+                    System.out.println("EntityManager createOrRetrieveVertex EntityNotFoundException Concurrency exception: " + cme);
                     randomSleep(50, 200, bckOff);
                     bckOff++;
                     repeat = true;
-
-                }catch (ORecordDuplicatedException dupl)
-                {
-                    System.out.println("DuplicateException"+dupl);
+                } catch (ORecordDuplicatedException dupl) {
+                    System.out.println("EntityManager createOrRetrieveVertex EntityNotFoundException DuplicateException: " + dupl);
                 }
             }
-
         } while (repeat);
-        
+
         return vertex;
     }
 
     private void storeVertex(OVertex vertex, VertexEntity entity, ODatabaseSession db) {
-
         for (String propertyName : entity.getPropertyNames()) {
             setProperty(vertex, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
-
         // check if one of the properties is an auto-increment field.
         // in that case we need to ask a sequence to provide a value
         for (Property property : entity.getEntityClass().getProperties()) {
@@ -563,15 +527,13 @@ public class EntityManager {
                 // make sure the property does not have a value yet
                 if (vertex.getProperty(property.getPropertyName()) == null) {
                     // fetch the sequence
-                    OSequence sequence = db.getMetadata().getSequenceLibrary()
-                            .getSequence(createSequenceId(entity.getEntityClass(), property));
+                    OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
                     setProperty(vertex, property.getPropertyName(), sequence.next(), db);
                 }
             }
         }
 
         vertex.save();
-
     }
 
     /**
@@ -581,7 +543,6 @@ public class EntityManager {
      * @param db
      */
     private void saveEdgeEntity(EdgeEntity entity, ODatabaseSession db) {
-
         // an edge always needs both a source and a target vertex
         // an edge has a source and target vertex
         if (entity.getSourceEntity() == null || entity.getTargetEntity() == null) {
@@ -595,37 +556,32 @@ public class EntityManager {
         OEdge edge;
         do {
             repeat = false;
-
             try {
                 edge = retrieveEdge(entity, db);
                 // the edge exists. Check if we have to update properties
                 if (entity.updateEnabled()) {
-
                     for (String propertyName : entity.getPropertyNames()) {
                         setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
                     }
                 }
-                // that's all we need to do. An edge has a unique identifier, no need to
-                // continue processing.
+                // that's all we need to do. An edge has a unique identifier, no need to continue processing.
                 return;
 
             } catch (EntityNotFoundException e) {
-                // we don't do anything here. If the edge does not exist, we just want to
-                // continue with method execution
+                // we don't do anything here. If the edge does not exist, we just want to continue with method execution
             } catch (OConcurrentModificationException cme) {
-                System.out.println("ConcurrencyException " + cme);
+                System.out.println("EntityManager saveEdgeEntity ConcurrencyException: " + cme);
                 backOff++;
                 randomSleep(50, 200);
                 repeat = true;
-            } catch (ORecordDuplicatedException dupl)
-            {
-                System.out.println("DuplicateException "+dupl);
+            } catch (ORecordDuplicatedException dupl) {
+                System.out.println("EntityManager saveEdgeEntity DuplicateException: " + dupl);
             }
         } while (repeat);
+
         backOff=1;
 
         // retrieve and/or update/save the source vertex
-
         do {
             repeat = false;
             OVertex sourceVertex = createOrRetrieveVertex(entity.getSourceEntity(), db);
@@ -646,38 +602,33 @@ public class EntityManager {
                     // make sure the property does not have a value yet
                     if (edge.getProperty(property.getPropertyName()) == null) {
                         // fetch the sequence
-                        OSequence sequence = db.getMetadata().getSequenceLibrary()
-                                .getSequence(createSequenceId(entity.getEntityClass(), property));
+                        OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
                         setProperty(edge, property.getPropertyName(), sequence.next(), db);
                     }
                 }
             }
             try {
-
                 edge.save();
             } catch (OConcurrentModificationException cme) {
-                System.out.println("Concurrency exception " + cme+" while writing edge; repeat");
+                System.out.println("EntityManager saveEdgeEntity Concurrency exception " + cme + " while writing edge; repeat");
                 backOff++;
                 randomSleep(50, 200, backOff);
                 repeat = true;
-            }catch (ORecordDuplicatedException dupl)
-            {
-                System.out.println("DuplicateException " +dupl);
+            } catch (ORecordDuplicatedException dupl) {
+                System.out.println("EntityManager saveEdgeEntity DuplicateException: " + dupl);
             }
         } while (repeat);
-        backOff=1;
 
+        backOff=1;
     }
 
     private void randomSleep(int base , int maxRandom, int backOff) {
         int sleepTime = base + new Random(System.currentTimeMillis()).nextInt((int)Math.pow(2, backOff));
-            
-        if (base < 200)
-        {
+        if (base < 200) {
             sleepTime += Math.pow(2, backOff);      
         }
         try {
-            System.out.println("Sleep random time duration = " + sleepTime + " ms backOff = "+backOff);
+            System.out.println("Sleep random time duration = " + sleepTime + " ms backOff = "+ backOff);
             Thread.sleep(sleepTime);
         } catch (Exception e) {
         }
@@ -729,8 +680,7 @@ public class EntityManager {
                     return;
                 }
 
-                String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE "
-                        + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
+                String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
                 Map<String, Object> params = new HashMap<>();
                 params.put(identifier.getPropertyName(), idValues);
                 db.command(stmt, params);
@@ -840,8 +790,7 @@ public class EntityManager {
      *                         with the property name used as a key
      * @return
      */
-    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass,
-            Map<String, PropertyValue> entityProperties) {
+    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, PropertyValue> entityProperties) {
         HashSet<DocumentEntity> documents = new HashSet<>();
         try (ODatabaseSession db = connection.getDatabaseSession()) {
             String stmt = "SELECT FROM " + entityClass.getClassName();
@@ -854,8 +803,7 @@ public class EntityManager {
                 stmt += " WHERE ";
                 for (String propertyName : entityProperties.keySet()) {
                     stringJoiner.add(propertyName + " = :" + propertyName);
-                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).getType(),
-                            entityProperties.get(propertyName).getValue()));
+                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).getType(), entityProperties.get(propertyName).getValue()));
                 }
                 stmt += stringJoiner.toString();
                 rs = db.query(stmt, params);
@@ -916,7 +864,6 @@ public class EntityManager {
             } else {
                 return null;
             }
-
         }
     }
 
@@ -984,8 +931,7 @@ public class EntityManager {
         if (!targetVertex.getSchemaType().isPresent())
             return null;
         OClass oTargetClass = targetVertex.getSchemaType().get();
-        EntityClassFactory.EntityClassName targetClassName = EntityClassFactory
-                .getEntityClassName(oTargetClass.getName());
+        EntityClassFactory.EntityClassName targetClassName = EntityClassFactory.getEntityClassName(oTargetClass.getName());
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(targetClassName);
         VertexEntity targetEntity = new VertexEntity(targetEntityClass);
         // set the attributes on the target vertex
@@ -1022,8 +968,7 @@ public class EntityManager {
             return null;
 
         OClass sourceVertexClass = sourceVertex.getSchemaType().get();
-        EntityClassFactory.EntityClassName sourceClassName = EntityClassFactory
-                .getEntityClassName(sourceVertexClass.getName());
+        EntityClassFactory.EntityClassName sourceClassName = EntityClassFactory.getEntityClassName(sourceVertexClass.getName());
         EntityClass sourceClass = EntityClassFactory.createEntityClass(sourceClassName);
         if (sourceClass == null)
             return null;

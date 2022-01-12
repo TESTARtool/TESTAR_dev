@@ -71,8 +71,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
-        connection = EntityManager.getNewConnection(database); 
-  
+        connection = EntityManager.getNewConnection(); 
+
         if (actions != null) {
             for(AbstractAction action:actions) {
                 this.actions.put(action.getActionId(), action);
@@ -92,8 +92,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
             // first check if they're in the database
             OResultSet result = db.query("select from abstractaction where actionId = '"+action.getActionId()+"'");
             return result.hasNext();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Exception during database");
         }
         return false;

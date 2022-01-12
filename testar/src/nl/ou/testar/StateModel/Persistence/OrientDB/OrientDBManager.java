@@ -31,9 +31,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.db.OrientDB;
-import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
@@ -83,7 +80,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      */
     private boolean listening = true;
 
-    public ODatabaseSession dbSession;
     /**
      * A set of orientdb classes that this class needs to operate
      */
@@ -111,15 +107,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      * 
      * @param eventHelper
      */
-
-    private Settings settings;
-
     public OrientDBManager(EventHelper eventHelper, EntityManager entityManager, Settings settings) {
-        // super(eventHelper, entityManager);
         this.eventHelper = eventHelper;
-        this.settings = settings;
         this.entityManager = entityManager;
-        database = new OrientDB(EntityManager.getConnectionString(), OrientDBConfig.defaultConfig());
         init();
     }
 
@@ -133,6 +123,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first
+        // TODO: Check sorted order, not always the same
         for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
             System.out.println("Creating " + entityClass.getClassName() + " - " + entityClass.getSuperClassName());
             entityManager.createClass(entityClass);
@@ -167,52 +158,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // deal with the unvisited actions on the states
         persistUnvisitedActions(abstractState, abstractStateEntity);
-    }
-
-    public OResultSet ExecuteCommand(Connection connection, String command) {
-        System.out.println("OrientDBManager ExecuteCommand " + command);
-        boolean repeat = false;
-        do {
-            repeat = false;
-            try (ODatabaseSession db = connection.getDatabaseSession()) {
-                return db.command(command);
-            } catch (OConcurrentModificationException ex) {
-                repeat = true;
-                try {
-                    Thread.sleep(2000);
-                } catch (Exception e) {}
-            }
-        } while (repeat);
-        
-        return null;
-    }
-
-    public OResultSet ExecuteQuery(ODatabaseSession db, String query) {
-        System.out.println("OrientDBManager ExecuteQuery " + query);
-        boolean repeat = false;
-        do {
-            repeat = false;
-            try {
-
-                return db.query(query);
-            } catch (OConcurrentModificationException ex) {
-                repeat = true;
-                try {
-                    Thread.sleep(2000);
-                } catch (Exception e) {}
-            }
-        } while (repeat);
-
-        return null;
-    }
-
-    OrientDB database;
-
-    ODatabaseSession CreateDatabaseConnection() {
-        Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
-        ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
-        System.out.println("Own database connection created");
-        return dbSession;
     }
 
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
