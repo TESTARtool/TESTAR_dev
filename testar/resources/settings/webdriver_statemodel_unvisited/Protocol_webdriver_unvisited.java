@@ -85,14 +85,12 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 
 	    m = (ModelManager) stateModelManager;
 	    if (m.persistenceManager != null) {
-	        System.out.println("PersistenceManager != null type = " + m.persistenceManager.getClass());
 	        odb = (OrientDBManager) m.persistenceManager;
 	        em = odb.entityManager;
 			Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
 			String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory()) + "/";
 			database = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
 
-	        System.out.println("dbSession initialized");
 	        Random r = new Random();
 	        nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
 	        System.out.println("nodeName = " + nodeName);

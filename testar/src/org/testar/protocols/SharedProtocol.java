@@ -31,7 +31,6 @@
 package org.testar.protocols;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
@@ -56,7 +55,6 @@ import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
-import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.StateModel.ModelManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManagerFactory;
@@ -92,13 +90,11 @@ public class SharedProtocol extends WebdriverProtocol {
 
 		modelManager = (ModelManager) stateModelManager;
 		if (modelManager.persistenceManager != null) {
-			System.out.println("PersistenceManager != null type = " + modelManager.persistenceManager.getClass());
 			orientDbManager = (OrientDBManager) modelManager.persistenceManager;
 			entityManager = orientDbManager.entityManager;
 			Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
 			String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory()) + "/";
 			database = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-			System.out.println("Shared protocol: database connection created");
 
 			// Open a database connection to create a BeingExecuted vertex for this TESTAR instance
 			Random r = new Random();
@@ -353,7 +349,7 @@ public class SharedProtocol extends WebdriverProtocol {
 			ReturnActionToBlackHole();
 			targetSharedAction = null;
 			Action histBackAction = new WdHistoryBackAction();
-			CodingManager.buildIDs(state, Collections.singleton(histBackAction));
+			buildEnvironmentActionIdentifiers(state, histBackAction);
 			return histBackAction;
 		}
 

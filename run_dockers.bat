@@ -19,12 +19,18 @@ docker build -t testar/testarstatemodel:latest .
 rem docker container rm $(docker container ls -aq)
 FOR /f "tokens=*" %%i IN ('docker ps -aq') DO docker rm %%i
 
+@echo Started Execution: %date% %time%
+
 FOR /L %%A IN (1,1,%1) DO (
   docker run -d --add-host=host.docker.internal:host-gateway --shm-size=512m testar/testarstatemodel:latest
 )
 
 cd "C:\Users\Fernando\Desktop\DistributedTest"
 
-timeout /t 300
+:wait
+timeout /t 5
+FOR /f "tokens=*" %%i IN ('docker ps -a -q --filter "status=running"') DO GOTO wait
 
-FOR /f "tokens=*" %%i IN ('docker ps -q') DO docker stop %%i
+@echo End Execution: %date% %time%
+
+rem FOR /f "tokens=*" %%i IN ('docker ps -q') DO docker stop %%i

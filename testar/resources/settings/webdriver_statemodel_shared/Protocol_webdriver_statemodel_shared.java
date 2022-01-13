@@ -47,6 +47,9 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_webdriver_statemodel_shared extends SharedProtocol {
 
+	// Example of web with 11 states and 160 actions to debug the distributed approach
+	// https://testar.org/images/development/experiments/apache-tomcat-cities.zip
+
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
 	private static Map<String, String> policyAttributes = new HashMap<String, String>() {

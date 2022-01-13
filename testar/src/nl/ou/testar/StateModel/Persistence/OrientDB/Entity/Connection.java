@@ -51,8 +51,9 @@ public class Connection {
         this.config = config;
         // https://github.com/orientechnologies/orientdb/blob/master/core/src/main/java/com/orientechnologies/orient/core/config/OGlobalConfiguration.java
         // Because multiple and simultaneous connections are hanging the orientdb session (distributed inference)
-        // Set max Request completion timeout to 10s
-        OGlobalConfiguration.NETWORK_REQUEST_TIMEOUT.setValue(10000);
+        // Set max Request completion timeout to 5s, 3 tries
+        OGlobalConfiguration.NETWORK_REQUEST_TIMEOUT.setValue(5000);
+        OGlobalConfiguration.NETWORK_SOCKET_RETRY.setValue(3);
     }
 
     /**

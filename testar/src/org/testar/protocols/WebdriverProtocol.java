@@ -71,7 +71,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.Reporting;
@@ -304,7 +303,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
 			// Create and build the id of the HistoryBackAction
 			Action histBackAction = new WdHistoryBackAction();
-			CodingManager.buildIDs(state, Collections.singleton(histBackAction));
+			buildEnvironmentActionIdentifiers(state, histBackAction);
 			actions = new HashSet<>(Collections.singletonList(histBackAction));
 		}
 
