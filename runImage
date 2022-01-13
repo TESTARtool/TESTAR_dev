@@ -1,9 +1,10 @@
 #!/bin/sh
 cat /README.Docker
 echo "Start Xvfb"
-/opt/bin/start-xvfb.sh &
+#/opt/bin/start-xvfb.sh &
+# redirect output messages to ignore default settings message
+/opt/bin/start-xvfb.sh 1> /dev/null &
 sleep 2
 cd /testar/bin
-#./testar
-./testar sse=webdriver_parabank
+./testar sse=webdriver_statemodel_shared
 #sh -c "while true; do sleep 1; done"

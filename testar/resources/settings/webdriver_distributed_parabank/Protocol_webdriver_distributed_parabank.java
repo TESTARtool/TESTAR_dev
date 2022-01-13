@@ -56,7 +56,7 @@ import java.io.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import com.orientechnologies.orient.core.db.ODatabaseSession;
+
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.db.*;
@@ -88,12 +88,12 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 
 	    m = (ModelManager) stateModelManager;
 	    if (m.persistenceManager != null) {
-	        System.out.println("PersistenceManager != null type = " + m.persistenceManager.getClass());
 	        odb = (OrientDBManager) m.persistenceManager;
 	        em = odb.entityManager;
-	        database = new OrientDB(EntityManager.getConnectionString(), OrientDBConfig.defaultConfig());
+			Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
+			String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory()) + "/";
+			database = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
 
-	        System.out.println("dbSession initialized");
 	        Random r = new Random();
 	        nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
 	        System.out.println("nodeName = " + nodeName);

@@ -3,7 +3,7 @@ FROM selenium/standalone-chrome
 ##FROM ubuntu:20.04
 ##EXPOSE 5900
 ##RUN echo Europe/Amsterdam >/etc/timezone
-##RUN apt-get update && apt-get install -y curl xvfb chromium-bsu openjdk-14-jdk unzip x11vnc fonts-liberation libcairo2 libgbm1 libgdk-pixbuf2.0-0 libpango-1.0.0 libpangocairo-1.0-0 xdg-utils libgtk-3-0 wget
+##RUN apt-get update && apt-get install -y curl xvfb chromium-bsu openjdk-11-jdk unzip x11vnc fonts-liberation libcairo2 libgbm1 libgdk-pixbuf2.0-0 libpango-1.0.0 libpangocairo-1.0-0 xdg-utils libgtk-3-0 wget
 ##RUN curl -SLO "https://chromedriver.storage.googleapis.com/85.0.4183.87/chromedriver_linux64.zip" \
 ##  && unzip "chromedriver_linux64.zip" -d /usr/local/bin \
 ##  && rm "chromedriver_linux64.zip"
@@ -17,11 +17,13 @@ FROM selenium/standalone-chrome
 
 # COPY pin_nodesource /etc/apt/preferences.d/nodesource
 USER root
-RUN apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y openjdk-16-jdk libxkbcommon-x11-0
+
+RUN apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update && apt-get install -y openjdk-11-jdk libxkbcommon-x11-0
 
 ADD testar/target/distributions/testar.tar .
 
-ENV JAVA_HOME "/usr/lib/jvm/java-16-openjdk-amd64"
+ENV JAVA_HOME "/usr/lib/jvm/java-11-openjdk-amd64"
+
 ENV DISPLAY=":99.0"
 
 COPY runImage /runImage
