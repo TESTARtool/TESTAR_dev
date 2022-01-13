@@ -85,6 +85,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.webdriver.WdProtocolUtil;
+import org.fruit.alayer.windows.StateFetcher;
 import org.fruit.alayer.windows.WinApiException;
 
 import es.upv.staq.testar.managers.DataManager;
@@ -1423,6 +1424,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
+			if(settings.get(ConfigTags.AccessBridgeEnabled)) {StateFetcher.accessBridgeEnabled = true;}
 			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{

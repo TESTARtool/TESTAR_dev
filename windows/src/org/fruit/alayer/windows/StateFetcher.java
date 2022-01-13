@@ -57,7 +57,7 @@ public class StateFetcher implements Callable<UIAState>{
 
 	private boolean releaseCachedAutomatinElement;
 	
-	private boolean accessBridgeEnabled;
+	public static boolean accessBridgeEnabled;
 	
 	private static Pattern sutProcessesMatcher;
 
@@ -69,7 +69,7 @@ public class StateFetcher implements Callable<UIAState>{
 		this.system = system;
 		this.automationPointer = automationPointer;
 		this.cacheRequestPointer = cacheRequestPointer;
-		this.accessBridgeEnabled = accessBridgeEnabled;
+		StateFetcher.accessBridgeEnabled = accessBridgeEnabled;
 		if (SUTProcesses == null || SUTProcesses.isEmpty())
 			StateFetcher.sutProcessesMatcher = null;
 		else
@@ -165,7 +165,7 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
 				if(!isOwnedWindow){
 					//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+					modalElement = StateFetcher.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
 															  uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
 				} else
 					ownedWindows.add(windowHandle);
@@ -178,7 +178,7 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+				if ((modalE = StateFetcher.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
 														 uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
 					modalElement = modalE;
 
@@ -625,7 +625,7 @@ public class StateFetcher implements Callable<UIAState>{
 
 	private void calculateZIndices(UIAElement el){
 		if (el.parent != null){
-			if (this.accessBridgeEnabled) // TLC are not exposed as visible desktop controls
+			if (StateFetcher.accessBridgeEnabled) // TLC are not exposed as visible desktop controls
 				el.zindex = el.parent.zindex + (el.parent.isTopLevelContainer ? 1 : 0);
 			else if (!el.isTopLevelContainer)		
 				el.zindex = el.parent.zindex;
