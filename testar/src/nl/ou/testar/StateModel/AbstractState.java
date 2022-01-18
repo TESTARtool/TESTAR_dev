@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 public class AbstractState extends AbstractEntity implements Persistable {
@@ -57,7 +56,6 @@ public class AbstractState extends AbstractEntity implements Persistable {
     // is this an initial state?
     private boolean isInitial = false;
 
-    OrientDB database;
     Connection connection;
 
     /**
@@ -187,7 +185,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
             OResultSet results = db.query(sql);
             while (results.hasNext()) {
                 String actionId = results.next().getProperty("actionId");
-                System.out.println("ActionId " + actionId + " is in BeingExecuted; remove as well from unvisited");
+                //System.out.println("ActionId " + actionId + " is in BeingExecuted; remove as well from unvisited");
                 try {
                     unvisitedActions.remove(actionId);
                 } catch (Exception e) {

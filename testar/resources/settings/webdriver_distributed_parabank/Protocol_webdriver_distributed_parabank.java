@@ -1,7 +1,7 @@
 /**
  * 
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,160 +29,135 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.monkey.Settings;
-import org.testar.protocols.WebdriverProtocol;
-import nl.ou.testar.StateModel.*;
-import nl.ou.testar.StateModel.Persistence.OrientDB.*;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
-
+import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
+import org.testar.protocols.SharedProtocol;
+import nl.ou.testar.RandomActionSelector;
 import java.util.*;
-import java.lang.Thread;
-import java.net.*;
-
-import org.w3c.dom.*;
-
-import javax.xml.parsers.*;
-import java.io.*;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
-import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.db.*;
-import com.orientechnologies.orient.core.sql.executor.*;
-import com.orientechnologies.orient.core.record.*;
-
-public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
-	OrientDBManager odb;
-	ModelManager m;
-	String nodeName = "";
-	EntityManager em;
-	String selectedAction = null;
-	// Connection connection;
-	OrientDB database;
-
-    // List of atributes to identify and close policy popups
-    // Set to null to disable this feature
-    private static Map<String, String> policyAttributes = new HashMap<String, String>() {
-        {
-            put("id", "sncmp-banner-btn-agree");
-        }
-    };
+public class Protocol_webdriver_distributed_parabank extends SharedProtocol {
 
 	@Override
-	protected void initialize(Settings settings) {
-	    super.initialize(settings);
-
-	    System.out.println("State model constructor");
-
-	    m = (ModelManager) stateModelManager;
-	    if (m.persistenceManager != null) {
-	        odb = (OrientDBManager) m.persistenceManager;
-	        em = odb.entityManager;
-			Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
-			String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ? config.getServer() : config.getDatabaseDirectory()) + "/";
-			database = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-
-	        Random r = new Random();
-	        nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
-	        System.out.println("nodeName = " + nodeName);
-	        ODatabaseSession dbSession = createDatabaseConnection();
-	        ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
-	        dbSession.close();
-	    }
+	protected void buildStateIdentifiers(State state) {
+		CodingManager.buildIDs(state);
+		// Reset widgets AbstractIDCustom identifier values to empty
+		for(Widget w : state) { w.set(Tags.AbstractIDCustom, ""); }
+		// Custom the State AbstractIDCustom identifier to ignore Format menu bar widgets
+		customBuildAbstractIDCustom(state);
 	}
 
-	/*
-	 * private void getLogin() { Form form = new Form(); form.add("x", "foo");
-	 * form.add("y", "bar");
-	 * 
-	 * ClientResource resource = new
-	 * ClientResource("http://localhost:8080/someresource");
-	 * 
-	 * Response response = resource.post(form.getWebRepresentation());
-	 * 
-	 * if (response.getStatus().isSuccess()) { System.out.println("Success! " +
-	 * response.getStatus()); System.out.println(response.getEntity().getText()); }
-	 * else { System.out.println("ERROR! " + response.getStatus());
-	 * System.out.println(response.getEntity().getText()); } }
-	 */
+	private synchronized void customBuildAbstractIDCustom(Widget widget){
+		if (widget.parent() != null) {
+			// If the widget is a son of a WdSELECT widget, force to use static web id for the main menu but ignore options
+			if(isSonOfSelect(widget)) {
+				// Use web id property of main select menu <select id="transactionType" name="transactionType"/>
+				if(!widget.get(WdTags.WebId, "").isEmpty()) {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				}
+				// <option value="January">January</option> or <option value="February">February</option> or <option value="March">March</option> or etc
+				return;
+			}
+
+			// If the widget is a son of a WdTABLE widget, ignore when creating the state abstract id
+			if(isSonOfTable(widget)) { return; }
+
+			// FILTERED because is son of table
+			// Bill pay, phone number widget has a dynamic WebId property, always force to use WebName
+			if(widget.get(WdTags.WebName, "").equals("payee.phoneNumber")) { 
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebName));
+				return;
+			}
+			// Open New Account creates a widget with dynamic text content and web name based on the new number, force to use static web id
+			if(widget.get(WdTags.WebId, "").equals("newAccountId")) { 
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+			// Bill payment complete, contains a dynamic amount and account id in the state
+			// Use the span element and web id to detect these dynamic values
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSPAN) && 
+					(widget.get(WdTags.WebId, "").equals("payeeName") || widget.get(WdTags.WebId, "").equals("amount") || widget.get(WdTags.WebId, "").equals("fromAccountId"))) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId()));
+
+		} else if (widget instanceof State) {
+			StringBuilder abstractIdCustom;
+			abstractIdCustom = new StringBuilder();
+			for (Widget childWidget : (State) widget) {
+				if (childWidget != widget) {
+					customBuildAbstractIDCustom(childWidget);
+					abstractIdCustom.append(childWidget.get(Tags.AbstractIDCustom));
+				}
+			}
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(abstractIdCustom.toString()));
+		}
+	}
+
+	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		// Custom the Action AbstractIDCustom identifier
+		for(Action a : actions) {
+			if(a.get(Tags.OriginWidget) != null) {
+				Widget widget = a.get(Tags.OriginWidget);
+				if(isSonOfTable(widget)) {
+					// If the widget of the action is a dynamic element of a table, consider the state id and widget role
+					String customIdentifier = CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom) + widget.get(Tags.Role));
+					a.set(Tags.AbstractIDCustom, customIdentifier);
+				}
+			}
+		}
+	}
+
+	private boolean isSonOfTable(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) return true;
+		else return isSonOfTable(widget.parent());
+	}
+
+	private boolean isSonOfSelect(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) return true;
+		else return isSonOfSelect(widget.parent());
+	}
 
 	/**
-	 * Called once during the life time of TESTAR This method can be used to perform
-	 * initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
 	 */
-	ODatabaseSession createDatabaseConnection() {
-		// connection = new Connection(database, OrientDBManagerFactory.getDatabaseConfig(settings));
-		Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
-		ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
-		System.out.println("Own database connection created");
-		return dbSession;
-	}
-
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
-		System.out.println("BeginSequence");
-		_moreActions = true;
-		stopSequences = false;
-	}
+		moreSharedActions = true;
 
-	boolean hasHadActionsInDb = false;
-	boolean stopSequences = false;
+		// GUI login sequence 
+		//waitLeftClickAndTypeIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5, 1.0);
+		//waitLeftClickAndTypeIntoWidgetWithMatchingTag("name", "password", "demo", state, system, 5, 1.0);
+		//waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+		//Util.pause(1);
 
-	public OResultSet ExecuteCommand(ODatabaseSession db, String actie) {
-		System.out.println("ExecuteCommand " + actie);
-		boolean repeat = false;
-		do {
-			repeat = false;
-			try {
-				System.out.println("dbSession = " + db);
-				return db.command(actie);
-			} catch (OConcurrentModificationException ex) {
-				repeat = true;
-				try {
-					Thread.sleep(2000);
-				} catch (Exception e) {
-				}
-
-			}
-		} while (repeat);
-		return null;
-	}
-
-	public OResultSet ExecuteQuery(ODatabaseSession db, String actie) {
-		System.out.println("ExecuteQuery " + actie);
-		boolean repeat = false;
-		do {
-			repeat = false;
-			try {
-				System.out.println("dbSession = " + db);
-
-				return db.query(actie);
-			} catch (OConcurrentModificationException ex) {
-				repeat = true;
-				try {
-					Thread.sleep(2000);
-				} catch (Exception e) {
-				}
-
-			}
-		} while (repeat);
-
-		return null;
+		// Script login sequence
+		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
+		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
+		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
+		Util.pause(1);
 	}
 
 	/**
@@ -196,41 +171,29 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
-	    // parabank wsdl pages have no widgets, we need to force a webdriver history back action
-	    if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
-	        WdDriver.executeScript("window.history.back();");
-	        Util.pause(1);
-	    }
+		// parabank wsdl pages have no widgets, we need to force a webdriver history back action
+		if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
+			WdDriver.executeScript("window.history.back();");
+			Util.pause(1);
+		}
 
-	    return super.getState(system);
+		return super.getState(system);
 	}
 
 	/**
-	 * This method is used by TESTAR to determine the set of currently available
-	 * actions. You can use the SUT's current state, analyze the widgets and their
-	 * properties to create a set of sensible actions, such as: "Click every Button
-	 * which is enabled" etc. The return value is supposed to be non-null. If the
-	 * returned set is empty, TESTAR will stop generation of the current action and
-	 * continue with the next one.
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
 	 *
 	 * @param system the SUT
 	 * @param state  the SUT's current state
 	 * @return a set of actions
 	 */
-
-	/*
-	 * public CompoundAction fillForm(HashMap<org.fruit.alayer.Widget, String>
-	 * values) { StdActionCompiler ac = new AnnotatingActionCompiler();
-	 * 
-	 * CompoundAction a = CompoundAction.Builder(); values.forEach((k,v)->
-	 * a.add(ac.clickTypeInto(k, v, true)));
-	 * 
-	 * return a; }
-	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
-		System.out.println("Protocol file: deriveActions: unvisited actions");
 		Set<Action> actions = super.deriveActions(system, state);
 
 		// create an action compiler, which helps us create actions
@@ -239,233 +202,296 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if (forcedActions != null && forcedActions.size() > 0) {
-			System.out.println("Executing forced action");
 			return forcedActions;
 		}
 
+		// Triggered action https://para.testar.org/parabank/transfer.htm
+		if(WdDriver.getCurrentUrl().contains("transfer.htm")) {
+			Widget widget = getWidgetWithMatchingTag("WebId", "amount", state);
+			if(widget != null) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(widget, "100", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(widget, "string", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+		}
+
+		//Triggered action https://para.testar.org/parabank/requestloan.htm
+		if(WdDriver.getCurrentUrl().contains("requestloan.htm")) {
+			Widget widget = getWidgetWithMatchingTag("WebId", "amount", state);
+			if(widget != null) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(widget, "111", true), 10)
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "downPayment", state), "222", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(widget, "aaa", true), 10)
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "downPayment", state), "bbb", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+		}
+
 		// iterate through all widgets
-		for (org.fruit.alayer.Widget widget : state) {
+		for (Widget widget : state) {
+
+			// Triggered action for register if user is not logged
+			if(widget.get(WdTags.WebId, "").contains("customerForm")) {
+				actions.add(customerFormFill(state, widget));
+			}
+
+			// Triggered action https://para.testar.org/parabank/billpay.htm
+			if(widget.get(WdTags.WebName, "").contains("payee.name")) {
+				actions.add(paymentService(state, widget));
+			}
+
+			// Triggered action https://para.testar.org/parabank/findtrans.htm
+			if(widget.get(WdTags.WebId, "").contains("criteria.transactionId")) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "12145", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "1", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+			if(widget.get(WdTags.WebId, "").contains("criteria.onDate")) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.onDate", state), "12-12-2020", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.onDate", state), "1", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+			if(widget.get(WdTags.WebId, "").contains("criteria.fromDate")) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.fromDate", state), "01-01-2020", true), 10)
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.toDate", state), "09-09-2021", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.fromDate", state), "01-01-2020", true), 10)
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.toDate", state), "1", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+			if(widget.get(WdTags.WebId, "").contains("criteria.amount")) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "100", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "criteria.transactionId", state), "a", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+
+			//Triggered action https://para.testar.org/parabank/updateprofile.htm
+			if(widget.get(WdTags.WebId, "").contains("customer.lastName")) {
+				// Correct
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "customer.lastName", state), "testar", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+				// Error
+				actions.add(new CompoundAction.Builder()
+						.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "customer.lastName", state), "1234567890123456789012345678901234567890", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
+			}
+
 			// only consider enabled and non-tabu widgets
-
-			// System.out.println("DeriveAction widget = "+widget+" class =
-			// "+widget.getClass());
-			WdWidget wd = (WdWidget) widget;
-			WdElement element = wd.element;
-			// System.out.println("DeriveAction widget = "+widget+" class =
-			// "+widget.getClass()+" wd = "+wd+" elem= "+element.tagName);
-			// if (isForm(widget))
-			// {
-			// System.out.println("Form gevonden");
-			// fillForm(actions, ac, state, wd,null);
-
-			// }
 			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
-			// If the element is blocked, Testar can't click on or type in the widget
+			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false)) {
 				continue;
 			}
 
 			// type into text boxes
-			// if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget)
-			// || isUnfiltered(widget))) {
-			// actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-			// }
+			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+				actions.add(ac.clickTypeInto(widget, getRandomParabankData(widget), true));
+			}
 
 			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				if (!isLinkDenied(widget)) {
+			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+				// Click on select web items opens the menu but does not allow TESTAR to select an item,
+				// thats why we need a custom action selection
+				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+					actions.add(randomFromSelectList(widget));
+				} else {
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
 
-		if (actions.size() == 0) {
-			System.out.println("Actions.size == 0; Return historyback and done with DeriveActions");
+		if(actions.isEmpty()) {
 			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 		}
-
-		System.out.println("Done with DeriveActions");
 
 		return actions;
 	}
 
-	public HashMap<String, String> readFormFile(String fileName) {
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.parse(new File(fileName));
-			document.getDocumentElement().normalize();
-			Element root = document.getDocumentElement();
-			System.out.println("readFormFile");
-			NodeList items = root.getChildNodes();
-			HashMap<String, String> result = new HashMap<>();
+	/**
+	 * Get specific text data for parabank text fields
+	 * 
+	 * @param w
+	 * @return
+	 */
+	private String getRandomParabankData(Widget w) {
+		String[] dates = {"12-12-2020", "08-19-2021", "08-26-2021"};
+		String[] amounts = {"100", "1000"};
+		String[] transactions = {"12145", "14143", "13255", "12478", "13366", "12700"};
+		String[] accounts = {"12345", "12456", "12567"};
 
-			for (int i = 0; i < items.getLength(); i++) {
-				Node item = items.item(i);
-				Element node = (Element) item;
-				String value = node.getTextContent();
-				// System.out.println(node.getNodeName() +"=" +value);
-				result.put(node.getNodeName(), value);
-			}
-
-			System.out.println("End form files");
-			return result;
-		} catch (Exception e) {
+		if(w.get(WdTags.WebId, "").toLowerCase().contains("amount") 
+				|| w.get(WdTags.WebId, "").toLowerCase().contains("pay") 
+				|| w.get(WdTags.WebName, "").toLowerCase().contains("amount")) {
+			return amounts[new Random().nextInt(amounts.length)];
 		}
-		return null;
+		if(w.get(WdTags.WebId, "").toLowerCase().contains("date")) {
+			return dates[new Random().nextInt(dates.length)];
+		}
+		if(w.get(WdTags.WebId, "").toLowerCase().contains("transaction")) {
+			return transactions[new Random().nextInt(transactions.length)];
+		}
+		if(w.get(WdTags.WebName, "").toLowerCase().contains("account")) {
+			return accounts[new Random().nextInt(accounts.length)];
+		}
+		return this.getRandomText(w);
 	}
 
-	public void storeToFile(String fileName, HashMap<String, String> data) {
-		String result = "<form><performSubmit>true</performSubmit>";
-
-		for (Map.Entry<String, String> entry : data.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			result += "<" + key + ">" + value + "</" + key + ">";
-		}
-		result += "</form>";
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-			writer.write(result);
-
-			writer.close();
-		} catch (Exception e) {
-		}
-		// System.out.println(result);
+	/**
+	 * Create a specific action to fill the register user form. 
+	 * This only works if we are not logged all the sequence. 
+	 * 
+	 * @param state
+	 * @return
+	 */
+	private Action customerFormFill(State state, Widget widget) {
+		// https://para.testar.org/parabank/register.htm
+		String username = "testar" + new Random().nextInt(999);
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.firstName", state), "testar", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.lastName", state), "testar", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.street", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.city", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.state", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.address.zipCode", state), "12345", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.phoneNumber", state), "123456789", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.ssn", state), "123456789", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.username", state), username, true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "customer.password", state), "testar", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "repeatedPassword", state), "testar", true), 50)
+				.add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Register", state)), 50)
+				.build(widget);
 	}
 
-	boolean inForm = false;
-
-	@Override
-	protected boolean blackListed(org.fruit.alayer.Widget w) {
-		if (inForm)
-			return false;
-
-		return super.blackListed(w);
+	/**
+	 * Create a specific action to fill the register user form. 
+	 * This only works if we are not logged all the sequence. 
+	 * 
+	 * @param state
+	 * @return
+	 */
+	private Action paymentService(State state, Widget widget) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.name", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.street", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.city", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.state", state), "a", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.address.zipCode", state), "12345", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.phoneNumber", state), "123456789", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "payee.accountNumber", state), "54321", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "verifyAccount", state), "54321", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "amount", state), "111", true), 50)
+				.add(ac.leftClickAt(getWidgetWithMatchingTag("value", "Send Payment", state)), 50)
+				.build(widget);
 	}
 
-	public int buildForm(CompoundAction.Builder caB, WdWidget widget, HashMap<String, String> fields, boolean storeFile,
-			StdActionCompiler ac) {
-		int sum = 0;
-		WdElement element = widget.element;
-		String defaultValue = "write-random-genenerated-value";
-		if (isTypeable(widget)) {
-			// System.out.println("field "+element.name+" found it");
-			if (storeFile) {
-				fields.put(element.name, defaultValue);
+	/**
+	 * Randomly select one item from the select list widget. 
+	 * 
+	 * @param w
+	 * @return
+	 */
+	private Action randomFromSelectList(Widget w) {
+		int selectLength = 1;
+		String elementId = w.get(WdTags.WebId, "");
+		String elementName = w.get(WdTags.WebName, "");
+
+		// Get the number of values of the specific select list item
+		// Comment out because we are going to select always the first value of the select list
+		/*try {
+            String query = String.format("return document.getElementById('%s').length", elementId);
+            Object response = WdDriver.executeScript(query);
+            selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+        } catch (Exception e) {
+            System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
+        }*/
+
+		// Select one of the values randomly, or the first one if previous length failed
+		if(!elementId.isEmpty()) {
+			try {
+				//String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
+				String query = String.format("return document.getElementById('%s').item(%s).value", elementId, selectLength);
+				Object response = WdDriver.executeScript(query);
+				return (response != null ?  new WdSelectListAction(elementId, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
+			} catch (Exception e) {
+				System.out.println("*** ACTION WARNING: problems trying randomly select a list value using WebId: " + elementId);
+				e.printStackTrace();
 			}
-			if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-				caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
-				sum += 2;
-			}
-		}
-
-		String baseElem = element.tagName;
-		// System.out.println("check children: current element "+element.tagName+" number
-		// childs: "+widget.childCount());
-		for (int i = 0; i < widget.childCount(); i++) {
-			WdWidget w = widget.child(i);
-			// System.out.println("child "+i+" of element "+baseElem);
-			// WdElement
-			element = w.element;
-
-			// System.out.println("buildForm :"+ element.tagName +" "+element.name);
-			if (isTypeable(w)) {
-				// System.out.println("field "+element.name+" found it");
-				if (storeFile) {
-					fields.put(element.name, defaultValue);
-				}
-				if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-					caB.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
-					sum += 2;
-					// System.out.println("element.name in the fields; add to caB som+2 som =
-					// "+sum);
-				}
-			} else {
-				// System.out.println("Element "+element.tagName+" is not typeable");
-				sum += buildForm(caB, widget.child(i), fields, storeFile, ac);
-			}
-		}
-		// System.out.println("done with baseElem "+baseElem+" sum = "+sum);
-		return sum;
-	}
-
-	public void fillForm(Set<Action> actions, StdActionCompiler ac, State state, WdWidget widget,
-			HashMap<String, String> fields) {
-		// System.out.println("Url = "+WdDriver.getCurrentUrl());
-		inForm = true;
-		if (fields == null) {
-			fields = new HashMap<String, String>();
-		}
-
-		URI uri = null;
-		try {
-			uri = new URI(WdDriver.getCurrentUrl());
-		} catch (Exception e) {
-		}
-
-		String formId = widget.getAttribute("name");
-		if (formId == null) {
-			formId = "";
-		}
-
-		String path = (uri.getPath() + "/" + formId).replace("/", "_") + ".xml";
-		System.out.println("Look for file " + path);
-		File f = new File(path);
-		Boolean storeFile = true;
-		if (f.exists()) {
-			storeFile = false;
-			fields = readFormFile(path);
-			System.out.println("File exists, read the data from file");
-		}
-
-		CompoundAction.Builder caB = new CompoundAction.Builder();
-		int sum = buildForm(caB, widget, fields, storeFile, ac);
-
-		if (fields.containsKey("performSubmit")) {
-			boolean submit = Boolean.getBoolean(fields.get("performSubmit"));
-			if (submit && formId != "") {
-				caB.add(new WdSubmitAction(formId), 2);
+		} else if(!elementName.isEmpty()) {
+			try {
+				String query = String.format("return document.getElementsByName('%s')[0].item(%s).value", elementName, selectLength);
+				Object response = WdDriver.executeScript(query);
+				return (response != null ?  new WdSelectListAction(elementName, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
+			} catch (Exception e) {
+				System.out.println("*** ACTION WARNING: problems trying randomly select a list value using WebName: " + elementName);
+				e.printStackTrace();
 			}
 		}
-		if (storeFile) {
-			storeToFile(path, fields);
-		}
-		if (sum > 0) {
-			CompoundAction ca = caB.build();
-			actions.add(ca);
-		}
-		inForm = false;
-		System.out.println("fillForm ready");
-	}
 
-	boolean _moreActions = true;
-
-	@Override
-	protected boolean moreActions(State state) {
-		System.out.println("MoreActions: _moreActions = " + _moreActions);
-		return _moreActions;
-	}
-
-	boolean stop = false;
-
-	@Override
-	protected boolean moreSequences() {
-		boolean result = (CountInDb("unvisitedabstractaction") > 0) || !stop;
-
-		System.out.println("moreSequences: " + result);
-		return result;
+		return new AnnotatingActionCompiler().leftClickAt(w);
 	}
 
 	@Override
-	protected boolean isClickable(org.fruit.alayer.Widget widget) {
+	protected boolean isClickable(Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...
@@ -486,355 +512,75 @@ public class Protocol_webdriver_distributed_parabank extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	boolean isForm(org.fruit.alayer.Widget widget) {
-		Role r = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(r, new Role[] { WdRoles.WdFORM })) {
-			return r.equals(WdRoles.WdFORM);
-		}
-		return false;
-	}
-
 	@Override
-	protected boolean isTypeable(org.fruit.alayer.Widget widget) {
+	protected boolean isTypeable(Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type.toLowerCase();
+				String type = ((WdWidget) widget).element.type;
 				return WdRoles.typeableInputTypes().contains(type);
 			}
 			return true;
 		}
+
 		return false;
 	}
 
-	/**
-	 * Select one of the available actions using an action selection algorithm (for
-	 * example random action selection)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return the selected action (non-null!)
-	 */
-
-	private Boolean finishedAction = false;
-
-	public ArrayList<String> GetUnvisitedActionsFromDatabase(String currentAbstractState) {
-		System.out.println("GetUnvisitedActionsFromDatabase");
-		ArrayList<String> result = new ArrayList<>();
-		String sql = "SELECT expand(path) FROM (  SELECT shortestPath($from, $to) AS path   LET     $from = (SELECT FROM abstractstate WHERE stateId='"
-				+ currentAbstractState + "'),     $to = (SELECT FROM BlackHole)   UNWIND path)";
-		System.out.println(sql);
-		OResultSet rs = null;
-		ODatabaseSession db = createDatabaseConnection();
-		try {
-			rs = ExecuteQuery(db, sql);
-
-			while (rs.hasNext()) {
-				OResult item = rs.next();
-				if (item.isVertex()) {
-					System.out.println("Item is a vertex");
-					Optional<OVertex> optionalVertex = item.getVertex();
-
-					OVertex nodeVertex = optionalVertex.get();
-					for (OEdge edge : nodeVertex.getEdges(ODirection.OUT, "UnvisitedAbstractAction")) {
-						result.add(edge.getProperty("actionId"));
-						System.out.println("Edge " + edge + " found with ID = " + edge.getProperty("actionId"));
-					}
-
-				}
-
-				System.out.println("friend: " + item);
-			}
-		} catch (Exception e) {
-			System.out.println("Exception during GetUnvisitedActionsFromDatabase " + e);
-			e.printStackTrace();
-		} finally {
-			rs.close();
-			db.close();
-		}
-
-		System.out.println("Ready with pick up actions");
-		return result;
-	}
-
-	// TODO: Check if rename aantal to number affects the sql query
-	public long CountInDb(String table) {
-		long aantal = 0;
-		String sql = "SELECT count(*) as aantal from " + table;
-		ODatabaseSession db = createDatabaseConnection();
-		try {
-			OResultSet rs = ExecuteQuery(db, sql);
-			OResult item = rs.next();
-			aantal = item.getProperty("aantal");
-			rs.close();
-			System.out.println(sql + "  aantal =  " + aantal);
-		} finally {
-			db.close();
-		}
-		if (aantal > 0) {
-			hasHadActionsInDb = true;
-		}
-
-		return aantal;
-	}
-
-	public void UpdateAbstractActionInProgress(String actionId) {
-		ODatabaseSession db = createDatabaseConnection();
-		try {
-			System.out.println("action AbstractID = " + actionId);
-
-			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='"
-					+ nodeName + "') where actionId='" + actionId + "'";
-			System.out.println("Execute" + sql);
-
-			ExecuteCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("Can not update unvisitedAbstractAction; set selectedAction to null");
-			selectedAction = null;
-		} finally {
-			db.close();
-		}
-	}
-
-	public HashMap<String, Action> ConvertActionSetToDictionary(Set<Action> actions) {
-		System.out.println("Convert Set<Action> to HashMap containing actionIds as keys");
-		HashMap<String, Action> actionMap = new HashMap<>();
-		ArrayList<Action> actionList = new ArrayList<>(actions);
-		for (Action a : actionList) {
-			System.out.println(
-					"Add action " + a.get(Tags.AbstractIDCustom) + "  to actionMap; description = " + a.get(Tags.Desc));
-			actionMap.put(a.get(Tags.AbstractIDCustom), a);
-		}
-		System.out.println("ActionMap initialized");
-		return actionMap;
-	}
-
-	public String selectRandomAction(ArrayList<String> actions) {
-		long graphTime = System.currentTimeMillis();
-		Random rnd = new Random(graphTime);
-
-		String ac = actions.get(rnd.nextInt(actions.size()));
-		UpdateAbstractActionInProgress(ac);
-		System.out.println("Update action " + ac + " from BlackHole to BeingExecuted");
-		return ac;
-	}
-
-	int cyclesWaitBeforeNewAction = 0;
-
-	String lastState = "";
-	int sameState = 0;
-
-	private String getNewSelectedAction(State state, Set<Action> actions) {
-		String result = null;
-		System.out.println("getNewSelectedAction state = " + state.get(Tags.AbstractIDCustom));
-		Boolean ok = false;
-		do {
-			try {
-				ArrayList<String> availableActionsFromDb = GetUnvisitedActionsFromDatabase(
-						state.get(Tags.AbstractIDCustom));
-
-				System.out.println(
-						"Number of shortest path actions available in database: " + availableActionsFromDb.size());
-
-				if (availableActionsFromDb.size() >= 1) {
-					ok = true;
-					String action = selectRandomAction(availableActionsFromDb);
-					System.out.println("Action from database selected: action = " + action);
-					return action;
-				}
-
-				long numberAbstractActions = CountInDb("abstractstate");
-
-				System.out.println(
-						"No actions available in database; abstract states in database = " + numberAbstractActions);
-
-				if (numberAbstractActions == 0) {
-					Action a = super.selectAction(state, actions);
-					String action = a.get(Tags.AbstractIDCustom);
-					System.out.println(
-							"Since this is the first run and no abstractactions exists take a random action; statemodel is probably lagging action = "
-									+ action);
-					return action;
-				}
-
-				// System.out.println("Not allowed to be here! or really done");
-				_moreActions = false;
-				stop = true;
-				Action a = super.selectAction(state, actions);
-				String action = a.get(Tags.AbstractIDCustom);
-				System.out.println("Just return random action and stop; action = " + action);
-				return action;
-
-			} catch (Exception e) {
-				int sleepTime = new Random(System.currentTimeMillis()).nextInt(5000);
-				System.out.println("Exception while getting action; Wait " + sleepTime + " ms " + e);
-
-				ok = false;
-				try {
-					Thread.sleep(sleepTime);
-				} catch (Exception th) {
-
-				}
-			}
-
-		} while (!ok);
-		return result;
-	}
-
-	class TmpData {
-		public TmpData(ORecordId rid, String stateId) {
-			this.stateId = stateId;
-			this.rid = rid.toString();
-			System.out.println("TmpData " + stateId + "  " + rid);
-		}
-
-		public String stateId;
-		public String rid;
-	}
-
-	public void ReturnActionToBlackHole() {
-		ODatabaseSession db = createDatabaseConnection();
-		try {
-			String sql = "update unvisitedabstractaction set in = (select from blackhole) where actionId='"
-					+ selectedAction + "'";
-			System.out.println("Return action to blackhole from beingexecuted: " + selectedAction + " sql = " + sql);
-			ExecuteCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("Not possible to return selectedAction " + selectedAction + "  to blackhole" + e);
-		} finally {
-			db.close();
-		}
-	}
-
-	public Action traversePath(State state, Set<Action> actions) {
-
-		String q1 = "select stateId from abstractstate where @rid in (select outV() from UnvisitedAbstractAction where actionId = '"
-				+ selectedAction + "')";
-
-		String destinationStateId = "";
-		ODatabaseSession db = createDatabaseConnection();
-
-		OResultSet destinationStatResultSet = ExecuteQuery(db, q1);
-		if (destinationStatResultSet.hasNext()) {
-			OResult item = destinationStatResultSet.next();
-			System.out.println("destinationResultSet item = " + item);
-			// Optional<OVertex> optionalVertex = item.getProperty("stateId");
-			destinationStateId = item.getProperty("stateId");
-			System.out.println("traversePath: onderweg naar " + destinationStateId);
-			destinationStatResultSet.close();
-			db.close();
-		} else {
-			System.out.println(
-					"State is stuck beacuse the unvisitedaction not found; set selectedAction to null; run historyback now");
-			destinationStatResultSet.close();
-			ReturnActionToBlackHole();
-			selectedAction = null;
-			return new WdHistoryBackAction();
-		}
-
-		// get stateId from q1
-
-		// SELECT @rid, stateId from (
-		// SELECT expand(path) FROM ( SELECT shortestPath($from,
-		// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
-		// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
-		// Where stateId='SACwpszr27b61710690312') UNWIND path))
-		String q2 = "SELECT @rid, stateId from (SELECT expand(path) FROM (  SELECT shortestPath($from, $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate WHERE stateId='"
-				+ state.get(Tags.AbstractIDCustom) + "'), $to = (SELECT FROM abstractstate Where stateId='"
-				+ destinationStateId + "') UNWIND path))";
-		db = createDatabaseConnection();
-		OResultSet pathResultSet = ExecuteQuery(db, q2);
-		Vector<TmpData> v = new Vector<>();
-
-		while (pathResultSet.hasNext()) {
-			OResult item = pathResultSet.next();
-			v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
-
-		}
-		pathResultSet.close();
-		db.close();
-
-		if (v.size() < 2) {
-			System.out.println(
-					"There is no path! Execute super.selectAction; Also end sequence by setting _moreActions=false");
-			ReturnActionToBlackHole();
-			selectedAction = null;
-			_moreActions = false;
-			return super.selectAction(state, actions);
-		}
-
-		// Find an abstractaction to perform
-		String q3 = "select from abstractaction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
-
-		String abstractActionId = "";
-		HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-		db = createDatabaseConnection();
-		OResultSet abstractActionResultSet = ExecuteQuery(db, q3);
-		while (abstractActionResultSet.hasNext()) {
-			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
-			System.out.println("traversePath: use action " + abstractActionId);
-
-			System.out.println("Check if " + abstractActionId + " is available");
-			if (availableActions.containsKey(abstractActionId)) {
-				System.out.println(
-						"Action " + abstractActionId + " is available in the avilableActions; this is being executed");
-				abstractActionResultSet.close();
-				db.close();
-				return availableActions.get(abstractActionId);
-			}
-		}
-		abstractActionResultSet.close();
-		db.close();
-
-		System.out.println("Action that needs to be made does not exist");
-		ReturnActionToBlackHole();
-		selectedAction = null;
-
-		return super.selectAction(state, actions);
+	@Override
+	protected boolean moreActions(State state) {
+		System.out.println("MoreSharedActions ? " + moreSharedActions);
+		// For time budget experiments also check max time setting
+		return moreSharedActions && (timeElapsed() < settings().get(ConfigTags.MaxTime));
 	}
 
 	@Override
+	protected boolean moreSequences() {
+		// For time budget experiments also check max time setting
+		boolean result = ((CountInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
+		System.out.println("moreSharedSequences ? " + result);
+		return result;
+	}
+
+	/**
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action (non-null!)
+	 */
+	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		// Call the preSelectAction method from the AbstractProtocol so that, if
-		// necessary,
+		// Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		// unwanted processes are killed and SUT is put into foreground.
 		Action retAction = preSelectAction(state, actions);
+		if (retAction != null) { return retAction; }
 
-		if (retAction != null) {
-			return retAction;
+		// targetSharedAction is an unvisited action
+		// First check whether we do have a target shared action marked to execute; if not select one
+		if (targetSharedAction == null) {
+			targetSharedAction = getNewTargetSharedAction(state, actions);
 		}
 
-		// First check whether we do have a selected action; if not select one
-		if (selectedAction == null) {
-			selectedAction = getNewSelectedAction(state, actions);
-		}
-
-		if (selectedAction != null) {
-			System.out.println("selectedAction != null actions.length = " + actions.size() + " state id = "
-					+ state.get(Tags.AbstractIDCustom));
+		if (targetSharedAction != null) {
 			HashMap<String, Action> actionMap = ConvertActionSetToDictionary(actions);
-			System.out.println("actionMap.size() = " + actionMap.size());
-			// select path towards the selected action
-			if (actionMap.containsKey(selectedAction)) {
-				System.out.println("Needed action is currently available, so select this action");
-				// Perform desired action since it's available from this point
-				Action a = actionMap.get(selectedAction); // Get the AbstractAction matching the selectedAction
-				selectedAction = null; // Reset selectedAction so next time a new one will be choosen.
-				return a;
-			} else {
-				System.out.println("Needed action is unavailable, select from path to be followed");
-				Action a = traversePath(state, actions);
-				return a;
+
+			// Check if the target shared action to execute is in the current state
+			if (actionMap.containsKey(targetSharedAction)) {
+				Action targetAction = actionMap.get(targetSharedAction);
+				System.out.println("TargetSharedAction is in the current state, just select it : " + targetAction.get(Tags.AbstractIDCustom) + " , " + targetAction.get(Tags.Desc));
+				targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
+				return targetAction;
+			} 
+			// Target shared action to execute is not in the current state, calculate the path to reach our desired target action
+			else {
+				Action nextStepAction = traversePath(state, actions);
+				System.out.println("Unavailable TargetSharedAction, select from path to be followed : " + nextStepAction.get(Tags.AbstractIDCustom) + " , " + nextStepAction.get(Tags.Desc));
+				return nextStepAction;
 			}
 		}
 
-		if (retAction != null)
-			return retAction;
-		System.out.println("Return a fallback action");
-
-		retAction = super.selectAction(state, actions);
-
-		return retAction;
+		System.out.println("**** Shared State Model Protocol did not find an action to select, return a random action ****");
+		return RandomActionSelector.selectAction(actions);
 	}
 }

@@ -27,7 +27,7 @@ Mode = Generate
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://host.docker.internal:8080/parabank"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://localhost:8080/parabank"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://host.docker.i
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 20
-SequenceLength = 200
+Sequences = 1
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -108,14 +108,13 @@ ProtocolClass = webdriver_parabank/Protocol_webdriver_parabank
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = host.docker.internal
-DataStoreDirectory =
+DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = parabank
-ApplicationVersion = 1.0
+ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
@@ -125,12 +124,12 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetTextContent
 
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = 
 DeniedExtensions = pdf;jpg;png;wsdl;pfx
 DomainsAllowed = para.testar.org
 FollowLinks = true
@@ -178,12 +177,12 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
-ShowVisualSettingsDialogOnStartup = false
+TimeToWaitAfterAction = 1
+ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3600
 ShowSettingsAfterTest = false
-TimeToWaitAfterAction = 1
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0

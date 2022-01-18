@@ -32,6 +32,7 @@
 package es.upv.staq.testar;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 import org.fruit.alayer.*;
@@ -185,39 +186,58 @@ public class CodingManager {
 	 * @param actions The actions.
 	 */
 	public static synchronized void buildIDs(State state, Set<Action> actions){
-	    for (Action a : actions) {
-	        a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-	                CodingManager.codify(state.get(Tags.ConcreteID), a));
-	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
-	                CodingManager.codify(state.get(Tags.ConcreteIDCustom), a));
-	        a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-	                CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
-	    }
+		for (Action a : actions) {
+			a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
+					CodingManager.codify(state.get(Tags.ConcreteID), a));
+			a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+					CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
+		}
 
-		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
-		// and then set their ids using incremental counters
-		Map<Role, Integer> roleCounter = new HashMap<>();
-		actions.stream().
-				filter(action -> {
-					try {
-						action.get(Tags.OriginWidget).get(Tags.Path);
-						return true;
-					}
-					catch (NoSuchTagException ex) {
-						System.out.println("No origin widget found for action role: ");
-						System.out.println(action.get(Tags.Role));
-						System.out.println(action.get(Tags.Desc));
-						return false;
-					}
-				}).
-				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
-				forEach(
-					action -> {
-						updateRoleCounter(action, roleCounter);
-						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
+		// Create the Custom Abstract Id and Custom Concrete Id for the derived actions
+		for (Action a : actions) {
+			/* To create the AbstractIDCustom use: 
+			 * - AbstractIDCustom of the state calculated with the selected abstract properties (core-StateManagementTags) of all widgets
+			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
+			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
+			 */
+			a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+					lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+
+			// For the ConcreteIDCustom use all core-StateManagementTags properties of the origin widget
+			a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
+					CodingManager.codify(state.get(Tags.ConcreteIDCustom), a));
+		}
+
+		// Check duplicated actions caused by bad abstraction
+		//checkDuplicatedAbstractActions(actions);
+	}
+
+	/**
+	 * Iterate through all actions to check for duplicates. 
+	 * Use Action AbstractIDCustom Tag for comparison. 
+	 * 
+	 * @param actions
+	 */
+	private static void checkDuplicatedAbstractActions(Set<Action> actions) {
+		// Create a list of Action AbstractIDCustom string property
+		List<String> abstractIds = actions.stream().map(action -> action.get(Tags.AbstractIDCustom)).collect(Collectors.toList());
+		// Obtain Action AbstractIDCustom duplicates
+		Set<String> duplicatedIds = abstractIds.stream().filter(id -> Collections.frequency(abstractIds, id) > 1).collect(Collectors.toSet());
+
+		for(String duplicatedAbstractId : duplicatedIds)
+			for(Action a : actions) {
+				// Ignore Drag actions for the moment, these actions will need a specific abstraction
+				if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.Drag)
+						|| a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.LeftDrag)) {
+					continue;
 				}
-		);
+
+				// Check if the action is the duplicated to print the information
+				if(a.get(Tags.AbstractIDCustom).equals(duplicatedAbstractId)) {
+					System.err.println(String.format("Warning! Bad abstraction detected. Duplicated action AbstractIDCustom: %s, %s", 
+							a.get(Tags.AbstractIDCustom), a.get(Tags.Desc)));
+				}
+			}
 	}
 
 	/**
@@ -235,45 +255,11 @@ public class CodingManager {
 					CodingManager.codify(state.get(Tags.AbstractIDCustom), action, ROLES_ABSTRACT_ACTION));
 	}
 
-	/**
-	 * This method will increment or initialize a role counter mapping for a given action.
-	 * @param action
-	 * @param roleCounter
-	 */
-	private static void updateRoleCounter(Action action, Map<Role, Integer> roleCounter) {
-		Role role;
-		try {
-			role = action.get(Tags.OriginWidget).get(Tags.Role);
-		}
-		catch (NoSuchTagException e) {
-			role = action.get(Tags.Role, Roles.Invalid);
-		}
-		// if the role as key is not present, this will initialize with 1, otherwise it will increment with 1
-		roleCounter.merge(role, 1, Integer::sum);
-	}
-
-	/**
-	 * This method will return a string that identifies each action (abstractly).
-	 * @param action
-	 * @param roleCounter
-	 * @return
-	 */
-	private static String getAbstractActionIdentifier(Action action, Map<Role, Integer> roleCounter) {
-		Role role;
-		try {
-			role = action.get(Tags.OriginWidget).get(Tags.Role);
-		}
-		catch (NoSuchTagException e) {
-			role = action.get(Tags.Role, Roles.Invalid);
-		}
-		return role.toString() + roleCounter.getOrDefault(role, 999);
-	}
-	
 	// ###############
 	//  STATES CODING
 	// ###############
 	
-	private static String codify(Widget state, Tag<?>... tags){
+	public static String codify(Widget state, Tag<?>... tags){
 		return lowCollisionID(getTaggedString(state, tags));
 	}
 
@@ -302,7 +288,7 @@ public class CodingManager {
 	//  IDS CODING
 	// ############
 
-	private static String lowCollisionID(String text){ // reduce ID collision probability
+	public static String lowCollisionID(String text){ // reduce ID collision probability
 		CRC32 crc32 = new CRC32();
 		crc32.update(text.getBytes());
 		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +

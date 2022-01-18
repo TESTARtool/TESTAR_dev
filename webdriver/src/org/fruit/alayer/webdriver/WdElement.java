@@ -262,6 +262,10 @@ public class WdElement extends TaggableBase implements Serializable {
   private void fillRect(Map<String, Object> packedElement) {
     List<Long> rect = (List<Long>) packedElement.get("rect");
     this.rect = Rect.from(rect.get(0), rect.get(1), rect.get(2), rect.get(3));
+    // hard coded to inspect web apps
+    if(tagName.equals("div")) {
+    	this.rect = Rect.from(0, 0, 0, 0);
+    }
   }
 
   @SuppressWarnings("unchecked")

@@ -28,7 +28,10 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
+import nl.ou.testar.RandomActionSelector;
+
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -41,6 +44,7 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
+import java.util.zip.CRC32;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -48,6 +52,92 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_parabank extends WebdriverProtocol {
+
+	@Override
+	protected void buildStateIdentifiers(State state) {
+		CodingManager.buildIDs(state);
+		// Reset widgets AbstractIDCustom identifier values to empty
+		for(Widget w : state) { w.set(Tags.AbstractIDCustom, ""); }
+		// Custom the State AbstractIDCustom identifier to ignore Format menu bar widgets
+		customBuildAbstractIDCustom(state);
+	}
+
+	private synchronized void customBuildAbstractIDCustom(Widget widget){
+		if (widget.parent() != null) {
+			// If the widget is a son of a WdSELECT widget, force to use static web id for the main menu but ignore options
+			if(isSonOfSelect(widget)) {
+				// Use web id property of main select menu <select id="transactionType" name="transactionType"/>
+				if(!widget.get(WdTags.WebId, "").isEmpty()) {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				}
+				// <option value="January">January</option> or <option value="February">February</option> or <option value="March">March</option> or etc
+				return;
+			}
+
+			// If the widget is a son of a WdTABLE widget, ignore when creating the state abstract id
+			if(isSonOfTable(widget)) { return; }
+
+			// FILTERED because is son of table
+			// Bill pay, phone number widget has a dynamic WebId property, always force to use WebName
+			if(widget.get(WdTags.WebName, "").equals("payee.phoneNumber")) { 
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebName));
+				return;
+			}
+			// Open New Account creates a widget with dynamic text content and web name based on the new number, force to use static web id
+			if(widget.get(WdTags.WebId, "").equals("newAccountId")) { 
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+			// Bill payment complete, contains a dynamic amount and account id in the state
+			// Use the span element and web id to detect these dynamic values
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSPAN) && 
+					(widget.get(WdTags.WebId, "").equals("payeeName") || widget.get(WdTags.WebId, "").equals("amount") || widget.get(WdTags.WebId, "").equals("fromAccountId"))) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId()));
+
+		} else if (widget instanceof State) {
+			StringBuilder abstractIdCustom;
+			abstractIdCustom = new StringBuilder();
+			for (Widget childWidget : (State) widget) {
+				if (childWidget != widget) {
+					customBuildAbstractIDCustom(childWidget);
+					abstractIdCustom.append(childWidget.get(Tags.AbstractIDCustom));
+				}
+			}
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(abstractIdCustom.toString()));
+		}
+	}
+
+	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		// Custom the Action AbstractIDCustom identifier
+		for(Action a : actions) {
+			if(a.get(Tags.OriginWidget) != null) {
+				Widget widget = a.get(Tags.OriginWidget);
+				if(isSonOfTable(widget)) {
+					// If the widget of the action is a dynamic element of a table, consider the state id and widget role
+					String customIdentifier = CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom) + widget.get(Tags.Role));
+					a.set(Tags.AbstractIDCustom, customIdentifier);
+				}
+			}
+		}
+	}
+
+	private boolean isSonOfTable(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) return true;
+		else return isSonOfTable(widget.parent());
+	}
+
+	private boolean isSonOfSelect(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) return true;
+		else return isSonOfSelect(widget.parent());
+	}
 
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -70,6 +160,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
         WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
         Util.pause(1);
+        //WdDriver.getRemoteWebDriver().get("http://localhost:8080/parabank/billpay.htm");
     }
 
     /**
@@ -88,8 +179,12 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
             WdDriver.executeScript("window.history.back();");
             Util.pause(1);
         }
+        
+        State state = super.getState(system);
 
-        return super.getState(system);
+        System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
+        
+        return state;
     }
 
     /**
@@ -364,7 +459,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
      */
     private Action randomFromSelectList(Widget w) {
         int selectLength = 1;
-        String elementId = w.get(WdTags.WebId, "noIdDetected");
+        String elementId = w.get(WdTags.WebId, "");
+        String elementName = w.get(WdTags.WebName, "");
 
         // Get the number of values of the specific select list item
         // Comment out because we are going to select always the first value of the select list
@@ -377,13 +473,25 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         }*/
 
         // Select one of the values randomly, or the first one if previous length failed
-        try {
-            //String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
-            String query = String.format("return document.getElementById('%s').item(%s).value", elementId, selectLength);
-            Object response = WdDriver.executeScript(query);
-            return (response != null ?  new WdSelectListAction(elementId, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
-        } catch (Exception e) {
-            System.out.println("*** ACTION WARNING: problems trying randomly select a list value: " + elementId);
+        if(!elementId.isEmpty()) {
+        	try {
+        		//String query = String.format("return document.getElementById('%s').item(%s).value", elementId, new Random().nextInt(selectLength));
+        		String query = String.format("return document.getElementById('%s').item(%s).value", elementId, selectLength);
+        		Object response = WdDriver.executeScript(query);
+        		return (response != null ?  new WdSelectListAction(elementId, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
+        	} catch (Exception e) {
+        		System.out.println("*** ACTION WARNING: problems trying randomly select a list value using WebId: " + elementId);
+        		e.printStackTrace();
+        	}
+        } else if(!elementName.isEmpty()) {
+        	try {
+        		String query = String.format("return document.getElementsByName('%s')[0].item(%s).value", elementName, selectLength);
+        		Object response = WdDriver.executeScript(query);
+        		return (response != null ?  new WdSelectListAction(elementName, response.toString(), w) : new AnnotatingActionCompiler().leftClickAt(w) );
+        	} catch (Exception e) {
+        		System.out.println("*** ACTION WARNING: problems trying randomly select a list value using WebName: " + elementName);
+        		e.printStackTrace();
+        	}
         }
 
         return new AnnotatingActionCompiler().leftClickAt(w);
@@ -429,5 +537,31 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
         }
 
         return false;
+    }
+
+    /**
+     * Select one of the available actions using an action selection algorithm (for example random action selection)
+     *
+     * @param state the SUT's current state
+     * @param actions the set of derived actions
+     * @return  the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions){
+
+    	//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+    	//unwanted processes are killed and SUT is put into foreground.
+    	Action retAction = preSelectAction(state, actions);
+    	if (retAction== null) {
+    		//if no preSelected actions are needed, then implement your own action selection strategy
+    		//using the action selector of the state model:
+    		retAction = stateModelManager.getAbstractActionToExecute(actions);
+    	}
+    	if(retAction==null) {
+    		System.out.println("State model based action selection did not find an action. Using random action selection.");
+    		// if state model fails, using random:
+    		retAction = RandomActionSelector.selectAction(actions);
+    	}
+    	return retAction;
     }
 }

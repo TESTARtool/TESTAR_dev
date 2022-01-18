@@ -44,6 +44,7 @@ import org.fruit.alayer.actions.WdHistoryBackAction;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -100,9 +101,11 @@ public class SharedProtocol extends WebdriverProtocol {
 			Random r = new Random();
 			nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
 			System.out.println("nodeName = " + nodeName);
-			ODatabaseSession dbSession = createDatabaseConnection(settings);
-			ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
-			dbSession.close();
+			try (ODatabaseSession dbSession = createDatabaseConnection(settings)) {
+				ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
+			} catch (Exception e) {
+				System.out.println("Exception creating vertex BeingExecuted to set node = " + nodeName);
+			}
 		}
 	}
 
@@ -114,8 +117,10 @@ public class SharedProtocol extends WebdriverProtocol {
 	 */
 	private ODatabaseSession createDatabaseConnection(Settings settings) {
 		Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
+		// Do I need this here? Probably not because global configuration set in Connection
+		OGlobalConfiguration.NETWORK_REQUEST_TIMEOUT.setValue(5000);
+		OGlobalConfiguration.NETWORK_SOCKET_RETRY.setValue(3);
 		ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
-		System.out.println("Shared protocol: database connection opened");
 		return dbSession;
 	}
 
@@ -182,15 +187,14 @@ public class SharedProtocol extends WebdriverProtocol {
 	protected long CountInDb(String entity) {
 		long number = 0;
 		String sql = "SELECT count(*) as number from " + entity;
-		ODatabaseSession db = createDatabaseConnection(settings);
-		try {
+		try (ODatabaseSession db = createDatabaseConnection(settings)) {
 			OResultSet rs = ExecuteQuery(db, sql);
 			OResult item = rs.next();
 			number = item.getProperty("number");
 			rs.close();
 			System.out.println(sql + "  number =  " + number);
-		} finally {
-			db.close();
+		} catch (Exception e) {
+			System.out.println("Exception CountInDb database query");
 		}
 
 		return number;
@@ -203,14 +207,14 @@ public class SharedProtocol extends WebdriverProtocol {
 	 * @return
 	 */
 	protected HashMap<String, Action> ConvertActionSetToDictionary(Set<Action> actions) {
-		System.out.println("SharedProtocol: Convert Set<Action> to HashMap containing actionIds as keys");
+		//System.out.println("SharedProtocol: Convert Set<Action> to HashMap containing actionIds as keys");
 		HashMap<String, Action> actionMap = new HashMap<>();
 		ArrayList<Action> actionList = new ArrayList<>(actions);
 		for (Action a : actionList) {
-			System.out.println("Add action " + a.get(Tags.AbstractIDCustom) + " to actionMap; description = " + a.get(Tags.Desc));
+			//System.out.println("Add action " + a.get(Tags.AbstractIDCustom) + " to actionMap; description = " + a.get(Tags.Desc));
 			actionMap.put(a.get(Tags.AbstractIDCustom), a);
 		}
-		System.out.println("actionMap.size() = " + actionMap.size());
+		//System.out.println("actionMap.size() = " + actionMap.size());
 		return actionMap;
 	}
 
@@ -251,8 +255,7 @@ public class SharedProtocol extends WebdriverProtocol {
 
 			} catch (Exception e) {
 				System.out.println("SharedProtocol: Exception during getNewTargetSharedAction " + e);
-				//int sleepTime = new Random(System.currentTimeMillis()).nextInt(5000);
-				//System.out.println("Exception while getting action; Wait " + sleepTime + " ms " + e);
+				e.printStackTrace();
 				availableAction = false;
 				try {
 					Thread.sleep(1000);
@@ -278,8 +281,7 @@ public class SharedProtocol extends WebdriverProtocol {
 		// $to=(SELECT FROM BlackHole where blackHoleId='jp3leu283079445017') UNWIND path)
 
 		OResultSet rs = null;
-		ODatabaseSession db = createDatabaseConnection(settings);
-		try {
+		try (ODatabaseSession db = createDatabaseConnection(settings)) {
 			rs = ExecuteQuery(db, sql);
 
 			while (rs.hasNext()) {
@@ -298,11 +300,10 @@ public class SharedProtocol extends WebdriverProtocol {
 			System.out.println("SharedProtocol: Exception during GetUnvisitedActionsFromDatabase");
 			e.printStackTrace();
 		} finally {
-			rs.close();
-			db.close();
+			if(rs != null) { rs.close(); }
 		}
 
-		System.out.println("SharedProtocol: DONE GetUnvisitedActionsFromDatabase");
+		//System.out.println("SharedProtocol: DONE GetUnvisitedActionsFromDatabase");
 		return result;
 	}
 
@@ -317,15 +318,12 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	private void UpdateAbstractActionToBeingExecuted(String actionId) {
-		ODatabaseSession db = createDatabaseConnection(settings);
-		try {
+		try (ODatabaseSession db = createDatabaseConnection(settings)) {
 			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='" + nodeName + "') where actionId='" + actionId + "'";
 			ExecuteCommand(db, sql);
 		} catch (Exception e) {
 			System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
 			targetSharedAction = null;
-		} finally {
-			db.close();
 		}
 	}
 
@@ -334,74 +332,75 @@ public class SharedProtocol extends WebdriverProtocol {
 		String destStateQuery = "select stateId from AbstractState where @rid in (select outV() from UnvisitedAbstractAction where actionId = '" + targetSharedAction + "')";
 
 		String destinationStateId = "";
-		ODatabaseSession db = createDatabaseConnection(settings);
 
-		OResultSet destinationStatResultSet = ExecuteQuery(db, destStateQuery);
-		if (destinationStatResultSet.hasNext()) {
-			OResult item = destinationStatResultSet.next();
-			destinationStateId = item.getProperty("stateId");
-			System.out.println("traversePath: way to state " + destinationStateId);
-			destinationStatResultSet.close();
-			db.close();
-		} else {
-			System.out.println("traversePath: State is stuck because no unvisited action found; set targetSharedAction to null; run historyback now");
-			destinationStatResultSet.close();
-			ReturnActionToBlackHole();
-			targetSharedAction = null;
-			Action histBackAction = new WdHistoryBackAction();
-			buildEnvironmentActionIdentifiers(state, histBackAction);
-			return histBackAction;
-		}
-
-		// get stateId from destStateQuery
-
-		// SELECT @rid, stateId from (
-		// SELECT expand(path) FROM ( SELECT shortestPath($from,
-		// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
-		// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
-		// Where stateId='SACwpszr27b61710690312') UNWIND path))
-		String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to,'OUT','AbstractAction') "
-				+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
-				+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
-		db = createDatabaseConnection(settings);
-		OResultSet pathResultSet = ExecuteQuery(db, stateRidQuery);
-		Vector<TmpData> v = new Vector<>();
-
-		while (pathResultSet.hasNext()) {
-			OResult item = pathResultSet.next();
-			v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
-		}
-		pathResultSet.close();
-		db.close();
-
-		if (v.size() < 2) {
-			System.out.println("traversePath: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
-			ReturnActionToBlackHole();
-			targetSharedAction = null;
-			moreSharedActions = false;
-			return super.selectAction(state, actions);
-		}
-
-		// Find an AbstractAction to perform
-		String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
-
-		String abstractActionId = "";
-		HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-		db = createDatabaseConnection(settings);
-		OResultSet abstractActionResultSet = ExecuteQuery(db, abstActQuery);
-		while (abstractActionResultSet.hasNext()) {
-			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
-			System.out.println("traversePath: Check if " + abstractActionId + " is available");
-
-			if (availableActions.containsKey(abstractActionId)) {
-				System.out.println("traversePath: Action " + abstractActionId + " is available in the avilableActions; this is being executed");
-				abstractActionResultSet.close();
+		try (ODatabaseSession db = createDatabaseConnection(settings)) {
+			OResultSet destinationStatResultSet = ExecuteQuery(db, destStateQuery);
+			if (destinationStatResultSet.hasNext()) {
+				OResult item = destinationStatResultSet.next();
+				destinationStateId = item.getProperty("stateId");
+				System.out.println("traversePath: way to state " + destinationStateId);
+				destinationStatResultSet.close();
+			} else {
+				System.out.println("traversePath: State is stuck because no unvisited action found; set targetSharedAction to null; run historyback now");
+				destinationStatResultSet.close();
+				ReturnActionToBlackHole();
+				targetSharedAction = null;
+				Action histBackAction = new WdHistoryBackAction();
+				buildEnvironmentActionIdentifiers(state, histBackAction);
 				db.close();
-				return availableActions.get(abstractActionId);
+				return histBackAction;
 			}
+
+			// get stateId from destStateQuery
+
+			// SELECT @rid, stateId from (
+			// SELECT expand(path) FROM ( SELECT shortestPath($from,
+			// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
+			// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
+			// Where stateId='SACwpszr27b61710690312') UNWIND path))
+			String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to,'OUT','AbstractAction') "
+					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
+					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
+
+			OResultSet pathResultSet = ExecuteQuery(db, stateRidQuery);
+			Vector<TmpData> v = new Vector<>();
+
+			while (pathResultSet.hasNext()) {
+				OResult item = pathResultSet.next();
+				v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
+			}
+			pathResultSet.close();
+
+			if (v.size() < 2) {
+				System.out.println("traversePath: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
+				ReturnActionToBlackHole();
+				targetSharedAction = null;
+				moreSharedActions = false;
+				db.close();
+				return super.selectAction(state, actions);
+			}
+
+			// Find an AbstractAction to perform
+			String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+
+			String abstractActionId = "";
+			HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
+			OResultSet abstractActionResultSet = ExecuteQuery(db, abstActQuery);
+			while (abstractActionResultSet.hasNext()) {
+				abstractActionId = abstractActionResultSet.next().getProperty("actionId");
+				System.out.println("traversePath: Check if " + abstractActionId + " is available");
+
+				if (availableActions.containsKey(abstractActionId)) {
+					System.out.println("traversePath: Action " + abstractActionId + " is available in the avilableActions; this is being executed");
+					abstractActionResultSet.close();
+					db.close();
+					return availableActions.get(abstractActionId);
+				}
+			}
+			abstractActionResultSet.close();
+		} catch (Exception e) {
+			System.out.println("Exception in the db connection when calculating traversePath");
 		}
-		abstractActionResultSet.close();
-		db.close();
 
 		System.out.println("traversePath: Action that needs to be made does not exist");
 		ReturnActionToBlackHole();
@@ -411,16 +410,13 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	private void ReturnActionToBlackHole() {
-		ODatabaseSession db = createDatabaseConnection(settings);
-		try {
+		try (ODatabaseSession db = createDatabaseConnection(settings)) {
 			// TODO: This query assumes that there is only one state model (one black hole) per database 
 			String sql = "update UnvisitedAbstractAction set in = (select from BlackHole) where actionId='" + targetSharedAction + "'";
 			System.out.println("Return action to BlackHole from BeingExecuted: " + targetSharedAction + " sql = " + sql);
 			ExecuteCommand(db, sql);
 		} catch (Exception e) {
 			System.out.println("Not possible to return targetSharedAction " + targetSharedAction + " to BlackHole : " + e);
-		} finally {
-			db.close();
 		}
 	}
 

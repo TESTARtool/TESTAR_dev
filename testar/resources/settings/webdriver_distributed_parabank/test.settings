@@ -35,8 +35,8 @@ SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://host.docker.i
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 20
-SequenceLength = 200
+Sequences = 1
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious titles
@@ -102,9 +102,9 @@ SUTProcesses =
 
 ProtocolClass = webdriver_distributed_parabank/Protocol_webdriver_distributed_parabank
 
-#################################################################\n"
+#################################################################
 # State model inference settings
-#################################################################\n"
+#################################################################
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
@@ -112,10 +112,9 @@ DataStoreServer = host.docker.internal
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = none
+DataStoreMode = instant
 ApplicationName = parabank
-ApplicationVersion = 1.0
-ActionSelectionAlgorithm = unvisited
+ApplicationVersion = 1
 StateModelStoreWidgets = false
 
 #################################################################
@@ -124,12 +123,12 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetTextContent
 
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = 
 DeniedExtensions = pdf;jpg;png;wsdl;pfx
 DomainsAllowed = para.testar.org
 FollowLinks = true
@@ -168,12 +167,12 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
+TimeToWaitAfterAction = 1
 ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3600
+MaxTime = 1800
 ShowSettingsAfterTest = false
-TimeToWaitAfterAction = 1
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
@@ -184,6 +183,5 @@ VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
-RefreshSpyCanvas = 1.0
 FlashFeedback = false
 ProtocolCompileDirectory = /tmp

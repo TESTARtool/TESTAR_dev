@@ -327,7 +327,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
 			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
 			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
-			return new WdHistoryBackAction();
+			Action histBackAction = new WdHistoryBackAction();
+			buildEnvironmentActionIdentifiers(state, histBackAction);
+			return histBackAction;
 		}		
 
         return(super.preSelectAction(state, actions));
