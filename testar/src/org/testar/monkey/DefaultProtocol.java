@@ -66,6 +66,7 @@ import org.testar.monkey.alayer.Shape;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -463,9 +464,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void popupMessage(String message) {
 		System.out.println("An exception occurred: " + message);
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setContentText(message);
-			alert.showAndWait();
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setContentText(message);
+				alert.showAndWait();
+			});
 		}
 	}
 
