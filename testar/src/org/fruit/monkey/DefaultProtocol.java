@@ -58,6 +58,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import es.upv.staq.testar.*;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
@@ -452,9 +453,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void popupMessage(String message) {
 		System.out.println("An exception occurred: " + message);
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setContentText(message);
-			alert.showAndWait();
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setContentText(message);
+				alert.showAndWait();
+			});
 		}
 	}
 
