@@ -482,7 +482,8 @@ public class Protocol_webdriver_unvisited extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	boolean isForm(org.fruit.alayer.Widget widget) {
+	@Override
+	protected boolean isForm(org.fruit.alayer.Widget widget) {
 		Role r = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(r, new Role[] { WdRoles.WdFORM })) {
 			return r.equals(WdRoles.WdFORM);

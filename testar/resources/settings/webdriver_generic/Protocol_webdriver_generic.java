@@ -201,6 +201,11 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+		    // fill forms actions
+		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
+		        fillForm(actions, ac, widget);
+		    }
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
