@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\webdrivers\\chromedriver.exe" "1920x900+0+0" "https://www.moneybird.com/login"
+SUTConnectorValue = "C:\\webdrivers\\chromedriver.exe" "1920x900+0+0" "http://0.thesis.invoicetool.net/login"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -44,6 +44,34 @@ AccessBridgeEnabled = false
 
 Sequences = 1
 SequenceLength = 100
+
+#################################################################
+# Reinforcement learning settings
+#################################################################
+Alpha = 1.0
+Gamma = 0.99
+DefaultVValue = 0.0
+DefaultValue = 0.0
+DefaultReward = 0.0
+Epsilon = 0.7
+MaxQValue = 1.0
+DecayRate = 0.0001
+Temperature = 1.0
+WidgetComparisonShare = 0.0
+RewardFunction = BorjaReward2
+Policy = GreedyPolicy
+TagName = defaultrl
+QFunction = QlearningFunction
+DefaultVValue = 0.0
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+# ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
+ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLQVLearning.xml
+# ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Oracles based on suspicious titles
@@ -117,19 +145,17 @@ GraphDBPassword =
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
-DataStore = 
-DataStoreType = remote
-DataStoreServer = 
-DataStoreDirectory = 
-DataStoreDB = 
-DataStoreUser = 
-DataStorePassword = 
-DataStoreMode = none
-ApplicationName = Moneybird
-ApplicationVersion = 
-ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreDirectory = E:\\orientdb-3.0.4\\databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = moneybird_RL
+ApplicationVersion = 1
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -199,3 +225,4 @@ VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
 OfflineGraphConversion = true
+

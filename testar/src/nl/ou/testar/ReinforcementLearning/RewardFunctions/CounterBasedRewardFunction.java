@@ -20,6 +20,10 @@ public class CounterBasedRewardFunction implements RewardFunction {
 
     @Override
     public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions, AbstractState previousAbstractState) {
+        if (executedAbstractAction == null) {
+            return 0f;
+        }
+
         int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
         executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
 

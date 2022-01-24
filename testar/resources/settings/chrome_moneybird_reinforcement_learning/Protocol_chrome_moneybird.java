@@ -28,8 +28,18 @@
  *
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.Policy;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -48,8 +58,13 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.settings.ExtendedSettingsFactory;
 
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -57,11 +72,15 @@ import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
+import java.io.IOException;
+
 
 public class Protocol_chrome_moneybird extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "_2ZNy4w8Nfa58d1", "_1hc34_9rc6xcjf", "_3e31E0yvd2UNDE");
+
+  private String reportDir;
 
   // Don't allow links and pages with these extensions
   // Set to null to ignore this feature
@@ -70,7 +89,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList("moneybird.com");
+  private static List<String> domainsAllowed = Arrays.asList("0.thesis.invoicetool.net");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -83,6 +102,9 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
         put("class", "lfr-btn-label");
       }};
 
+  private ActionSelector actionSelector = null;
+  private Policy policy = null;
+
   /**
    * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
@@ -92,6 +114,17 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   @Override
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
+
+    settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
+
+    // Extended settings framework, set ConfigTags settings with XML framework values
+    // test.setting -> ExtendedSettingsFile
+    ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+    settings = rlXmlSetting.updateXMLSettings(settings);
+
+    policy = PolicyFactory.getPolicy(settings);
+    actionSelector = new ReinforcementLearningActionSelector(policy);
+
     super.initialize(settings);
     ensureDomainsAllowed();
 
@@ -99,6 +132,13 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     WdDriver.followLinks = followLinks;
     
     WdDriver.fullScreen = true;
+
+    try{
+      reportDir = new File(OutputStructure.outerLoopOutputDir).getCanonicalPath();
+    } catch (Exception e) {
+      System.out.println("report.txt can not be created");
+      e.printStackTrace();
+    }
 
     // Override ProtocolUtil to allow WebDriver screenshots
     WdProtocolUtil protocolUtil = new WdProtocolUtil();
@@ -122,10 +162,10 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
 
         new CompoundAction.Builder()
                 // assume keyboard focus is on the user field
-                .add(new Type ("svenotje1@gmail.com") ,0.1)
+                .add(new Type ("info@moneybird.nl") ,0.1)
                 // assume next focusable field is pass
                 .add(new KeyDown (KBKeys.VK_TAB) ,0.5)
-                .add(new Type ("testjes12") ,0.1)
+                .add(new Type ("testtest1") ,0.1)
                 // assume login is performed by ENTER
                 .add(new KeyDown (KBKeys.VK_ENTER) ,0.5).build()
                 .run(sut ,null ,0.1);
@@ -501,15 +541,30 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   }
 
   /**
-   * Select one of the possible actions (e.g. at random)
+   * Select one of the available actions using a reinforcement learning action selection algorithm
    *
-   * @param state   the SUT's current state
-   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+   * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+   * overwrite it, not always running it, we have take care of the HTML report here
+   *
+   * @param state the SUT's current state
+   * @param actions the set of derived actions
    * @return the selected action (non-null!)
    */
   @Override
-  protected Action selectAction(State state, Set<Action> actions) {
-    return super.selectAction(state, actions);
+  protected Action selectAction(final State state, final Set<Action> actions) {
+    //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+    //unwanted processes are killed and SUT is put into foreground.
+    final Action preSelectedAction = preSelectAction(state, actions);
+    if (preSelectedAction != null) {
+      return preSelectedAction;
+    }
+    Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+    if(modelAction==null) {
+      System.out.println("State model based action selection did not find an action. Using random action selection.");
+      // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+      return RandomActionSelector.selectAction(actions);
+    }
+    return modelAction;
   }
 
   /**
@@ -522,7 +577,43 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
    */
   @Override
   protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+    boolean actionExecuted = super.executeAction(system, state, action);
+
+    try {
+      JSONObject json = readJsonFromUrl("http://echo.jsontest.com/Operand1/10/Operand2/5/Operator/+");
+      String coverage = (String) json.get("Operand1");
+      FileWriter myWriter = new FileWriter(reportDir + "/" + OutputStructure.executedSUTname + "_coverage.txt", true);
+      myWriter.write("Coverage: " + coverage + "%| \r\n");
+      myWriter.close();
+      System.out.println("Wrote time so far to file." + reportDir + "/_coverage.txt");
+    } catch (IOException | JSONException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
+
+    return actionExecuted;
+  }
+
+  private static String readAll(Reader rd) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    int cp;
+    while ((cp = rd.read()) != -1) {
+      sb.append((char) cp);
+    }
+    return sb.toString();
+  }
+
+  public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+
+    InputStream is = new URL(url).openStream();
+    try {
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+      String jsonText = readAll(rd);
+      JSONObject json = new JSONObject(jsonText);
+      return json;
+    } finally {
+      is.close();
+    }
   }
 
   /**
