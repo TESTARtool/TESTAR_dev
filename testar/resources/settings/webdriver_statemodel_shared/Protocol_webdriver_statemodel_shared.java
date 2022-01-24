@@ -154,6 +154,8 @@ public class Protocol_webdriver_statemodel_shared extends SharedProtocol {
 
 	@Override
 	protected boolean moreActions(State state) {
+		// Check if last traverse action leads TESTAR to the expected traverse destination state
+		verifyTraversePathDeterminism(state);
 		System.out.println("MoreSharedActions ? " + moreSharedActions);
 		return moreSharedActions;
 	}

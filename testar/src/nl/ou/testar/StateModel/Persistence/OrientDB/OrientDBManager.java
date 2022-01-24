@@ -100,7 +100,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.SequenceStep,
             EntityClassFactory.EntityClassName.Accessed, 
             EntityClassFactory.EntityClassName.FirstNode,
-            EntityClassFactory.EntityClassName.BeingExecuted));
+            EntityClassFactory.EntityClassName.BeingExecuted,
+            EntityClassFactory.EntityClassName.NonDeterministic));
 
     /**
      * Constructor
@@ -128,6 +129,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             System.out.println("Creating " + entityClass.getClassName() + " - " + entityClass.getSuperClassName());
             entityManager.createClass(entityClass);
         }
+        System.out.println("All EntityClasses created");
     }
 
     @Override
