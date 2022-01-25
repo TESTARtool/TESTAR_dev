@@ -576,9 +576,10 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	protected Action getTargetActionFound(HashMap<String, Action> actionMap) {
+		Action targetAction = actionMap.get(targetSharedAction);
 		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
 		nonDeterministicAction = false; // We achieve the target action, so the execution is deterministic
-		return actionMap.get(targetSharedAction);
+		return targetAction;
 	}
 
 	class TmpData {
