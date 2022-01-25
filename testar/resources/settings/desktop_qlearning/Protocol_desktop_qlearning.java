@@ -76,7 +76,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
@@ -111,7 +111,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(SUT system, State state, Set<Action> actions){
+	public Action selectAction(SUT system, State state, Set<Action> actions){
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action retAction = super.selectAction(system, state, actions);

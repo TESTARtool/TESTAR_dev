@@ -144,7 +144,7 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
@@ -177,7 +177,7 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(SUT system, State state, Set<Action> actions){
+	public Action selectAction(SUT system, State state, Set<Action> actions){
 		return(super.selectAction(system, state, actions));
 	}
 

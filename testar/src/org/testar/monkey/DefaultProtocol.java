@@ -57,7 +57,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import es.upv.staq.testar.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import nl.ou.testar.*;
@@ -69,8 +68,6 @@ import org.testar.monkey.alayer.Shape;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -98,10 +95,9 @@ import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
 import org.openqa.selenium.SessionNotCreatedException;
 
-public class DefaultProtocol extends RuntimeControlsProtocol {
+public class DefaultProtocol extends RuntimeControlsProtocol implements ActionResolver {
 
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
@@ -141,6 +137,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
+
+	// TODO: re-assign action resolver if needed
+	protected ActionResolver actionResolver = this;
+
+	// Should not provide any action resolver next to itself
+	@Override
+	public ActionResolver nextResolver() {
+		return null;
+	}
+
+	@Override
+	public void setNextResolver(ActionResolver nextResolver) {
+	}
 
 	protected final int actionCount() {
 		return actionCount;
@@ -184,6 +193,30 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
+	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
+			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+			BluePen = Pen.newPen().setColor(Color.Blue).
+			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+
+	protected ProtocolDelegate delegate;
+
+	public ProtocolDelegate getDelegate() {
+		return delegate;
+	}
+
+	/**
+	 * Puts a custom action resolver on the top of the chain
+	 *
+	 * @param customActionResolver
+	 */
+	public void assignActionResolver(ActionResolver customActionResolver) {
+		customActionResolver.setNextResolver(actionResolver);
+		actionResolver = customActionResolver;
+	}
+
+	public  void setDelegate(ProtocolDelegate delegate) {
+		this.delegate = delegate;
+	}
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -796,7 +829,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			//Deriving actions from the state:
-			Set<Action> actions = deriveActions(system, state);
+			Set<Action> actions = actionResolver.deriveActions(system, state);
 			buildStateActionsIdentifiers(state, actions);
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
@@ -812,7 +845,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
 			//Selecting one of the available actions:
-			Action action = selectAction(system, state, actions);
+			Action action = actionResolver.selectAction(system, state, actions);
 
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
@@ -837,7 +870,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// notify to state model the last state
-		Set<Action> actions = deriveActions(system, state);
+		Set<Action> actions = actionResolver.deriveActions(system, state);
 		buildStateActionsIdentifiers(state, actions);
 		for(Action a : actions)
 			if(a.get(Tags.AbstractIDCustom, null) == null)
@@ -939,9 +972,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			State state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
-
 			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
@@ -1032,7 +1064,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			State state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
 			//notify the state model manager of the new state
@@ -1594,7 +1626,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 * @throws ActionBuildException
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	@Override
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
 		Set<Action> actions = new HashSet<Action>();
 
@@ -1749,7 +1782,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actions
 	 * @return
 	 */
-	protected Action selectAction(SUT system, State state, Set<Action> actions){
+	@Override
+	public Action selectAction(SUT system, State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
 		return RandomActionSelector.selectAction(actions);
 	}
@@ -1911,7 +1945,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
 			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:

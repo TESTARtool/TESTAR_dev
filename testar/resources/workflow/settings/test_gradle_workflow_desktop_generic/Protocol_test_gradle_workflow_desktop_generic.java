@@ -65,7 +65,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	}
 
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.

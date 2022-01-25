@@ -40,8 +40,8 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 
 import org.testar.reporting.HtmlSequenceReport;
-import org.testar.reporting.Reporting;
 import org.testar.reporting.XMLSequenceReport;
+import nl.ou.testar.ActionResolver;
 
 import java.util.Set;
 
@@ -88,6 +88,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 		return new HtmlSequenceReport();
 	}
 	
+	protected ActionResolver actionResolver;
+	public ActionResolver getActionResolver() {
+		return actionResolver;
+	}
+	protected void setActionResolver(ActionResolver actionResolver) {
+		this.actionResolver = actionResolver;
+	}
+
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
 	 *
