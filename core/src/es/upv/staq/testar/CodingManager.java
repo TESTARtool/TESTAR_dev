@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.exceptions.NoSuchTagException;
@@ -200,8 +201,13 @@ public class CodingManager {
 			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
 			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
 			 */
-			a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-					lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+			if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.CompoundAction)) {
+				a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+						lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
+			} else {
+				a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+						lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+			}
 
 			// For the ConcreteIDCustom use all core-StateManagementTags properties of the origin widget
 			a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +

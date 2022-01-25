@@ -387,6 +387,12 @@ public class EntityManager {
                 else System.out.println("EntityManager createClass: Exception " + e);
                 randomSleep(3000);
                 repeat = true;
+            } catch (Error err) {
+            	backOff++;
+            	if(err.getMessage() != null) System.out.println("EntityManager createClass: Error " + err.getMessage());
+            	else System.out.println("EntityManager createClass: Error " + err);
+            	randomSleep(3000);
+            	repeat = true;
             }
         } while (repeat);
 

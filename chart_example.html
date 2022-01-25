@@ -1,6 +1,7 @@
 <!doctype html>
 <body>
-<input type="file" id="fileInput">
+<input type="file" id="fileInput" name="filefield" multiple="multiple">
+<div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
 <div id="covInstContainer" style="width: 500px; height: 400px;"></div>
 <div id="covBranContainer" style="width: 500px; height: 400px;"></div>
 <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js" type="text/javascript"></script>
@@ -10,47 +11,96 @@ var fileInput = document.getElementById('fileInput');
 var fileDisplayArea = document.getElementById('fileDisplayArea');
 
 fileInput.addEventListener('change', function(e) {
-    var file = fileInput.files[0];
-    var textType = /text.*/;
-    const covInstResults = [];
-	const covBranResults = [];
-	
-    if (file.type.match(textType)) {
-        var reader = new FileReader();
-        
-        reader.onload = function(e) {
-            var fileContent = reader.result;
-			var arrLines = fileContent.split("\r\n");
-			for (var i = 0; i < arrLines.length; i++) {
-			    // Time | 2021_09_13_11_28_33 | Missed Instructions | 16,305 of 18,288 | Cov | 10,84 | Missed Branches | 1,167 of 1,214 | Cov | 3,87 | Missed | 1,465 | Cxty | 1,738 | Missed | 3,610 | Lines | 4,184 | Missed | 864 | Methods | 1,127 | Missed | 67 | Classes | 153
-                covInstResults.push( parseFloat( arrLines[i].split(" | ")[5].replace(",",".") ) );
-				covBranResults.push( parseFloat( arrLines[i].split(" | ")[9].replace(",",".") ) );
-            }
-			
-			//console.log(covInstResults);
-			//console.log(covBranResults);
-			
-            //create a line chart
-            var chartInst = anychart.line(covInstResults);
-			var chartBran = anychart.line(covBranResults);
-	
-            chartInst.title("Instruction Coverage");
-			chartBran.title("Branch Coverage");
-			
-            //set the container where chart will be drawn
-            chartInst.container("covInstContainer");
-			chartBran.container("covBranContainer");
-			
-            //draw the chart on the page
-            chartInst.draw();
-			chartBran.draw();
+    const coverageFiles = fileInput.files;
+
+    // Validate we are reading txt files
+    for (var i = 0; i < coverageFiles.length; i++){
+        var textType = /text.*/;
+        if(!coverageFiles[i].type.match(textType)){
+            fileDisplayArea.innerText = "Some text coverageFile is not supported!"
+            throw new Error('Some text coverageFile is not supported!');
         }
-        
-        reader.readAsText(file);	
-    } else {
-        fileDisplayArea.innerText = "File not supported!"
     }
+	
+    myfunction(coverageFiles);
 });
+
+async function myfunction(coverageFiles) {
+	const allDataInst = [];
+	const allDataBran = [];
+	
+	//create a line chart
+	var chartInst = anychart.line();
+	var chartBran = anychart.line();
+    
+	chartInst.title("Instruction Coverage");
+	chartBran.title("Branch Coverage");
+
+    for (var i = 0; i < coverageFiles.length; i++){
+	    console.log(coverageFiles[i]);
+		
+        const singleDataInst = [];
+        const singleDataBran = [];
+		
+        const fileReader = new SyncFileReader(coverageFiles[i]);
+        const arrayBuffer = await fileReader.readAsText();
+        var arrLines = arrayBuffer.split("\r\n");
+        for (var line = 0; line < arrLines.length; line++) {
+		    // Skip empty line, usually at the end of the file
+			if(isEmpty(arrLines[line])) continue;
+			// Time | 2021_09_13_11_28_33 | Missed Instructions | 16,305 of 18,288 | Cov | 10,84 | Missed Branches | 1,167 of 1,214 | Cov | 3,87 | Missed | 1,465 | Cxty | 1,738 | Missed | 3,610 | Lines | 4,184 | Missed | 864 | Methods | 1,127 | Missed | 67 | Classes | 153
+			singleDataInst.push( parseFloat( arrLines[line].split(" | ")[5].replace(",",".") ) );
+			singleDataBran.push( parseFloat( arrLines[line].split(" | ")[9].replace(",",".") ) );
+        }
+        allDataInst.push(singleDataInst)
+        allDataBran.push(singleDataBran)
+        console.log(coverageFiles[i].name);
+        chartInst.line(allDataInst[i]).name(coverageFiles[i].name);
+        chartBran.line(allDataBran[i]).name(coverageFiles[i].name);
+		
+	}
+
+	//set the container where chart will be drawn
+	chartInst.container("covInstContainer");
+	chartBran.container("covBranContainer");
+
+	// Enable legend colours
+	chartInst.legend().enabled(true)
+	chartBran.legend().enabled(true)
+
+	//draw the chart on the page
+	chartInst.draw();
+	chartBran.draw();
+	console.log('finish drawing stuff');
+}
+
+function SyncFileReader(file) {
+    let self = this;
+    let ready = false;
+    let result = '';
+
+    const sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    self.readAsText = async function() {
+        while (ready === false) {
+          await sleep(100);
+        }
+        return result;
+    }    
+
+    const reader = new FileReader();
+    reader.onloadend = function(evt) {
+        result = evt.target.result;
+        ready = true;
+    };
+    reader.readAsText(file);
+}
+
+function isEmpty(str) {
+    return (!str || str.length === 0 );
+}
 </script>
 </body>
 </html>

@@ -118,8 +118,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		for(Action a : actions) {
 			if(a.get(Tags.OriginWidget) != null) {
 				Widget widget = a.get(Tags.OriginWidget);
-				if(isSonOfTable(widget)) {
-					// If the widget of the action is a dynamic element of a table, consider the state id and widget role
+				// If the widget of the action is a dynamic href element of a table, consider the state id and widget role
+				if(isSonOfTable(widget) && widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdA)) {
 					String customIdentifier = CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom) + widget.get(Tags.Role));
 					a.set(Tags.AbstractIDCustom, customIdentifier);
 				}
@@ -333,6 +333,18 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
                         .add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "customer.lastName", state), "1234567890123456789012345678901234567890", true), 10)
                         .add(ac.hitKey(KBKeys.VK_ENTER), 10)
                         .build(widget));
+            }
+
+            //Triggered action https://para.testar.org/parabank/contact.htm contactForm
+            if(widget.get(WdTags.WebId, "").contains("contactForm")) {
+            	// Correct
+            	actions.add(new CompoundAction.Builder()
+            			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "name", state), "a", true), 10)
+            			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "a", true), 10)
+            			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "phone", state), "123", true), 10)
+            			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "message", state), "hi", true), 10)
+            			.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+            			.build(widget));
             }
 
             // only consider enabled and non-tabu widgets
