@@ -35,15 +35,12 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 
 import org.testar.reporting.HtmlSequenceReport;
-import org.testar.reporting.Reporting;
 import org.testar.reporting.XMLSequenceReport;
-
-import java.util.Set;
+import nl.ou.testar.ActionResolver;
 
 /**
  * This is the abstract flow of TESTAR (generate mode):
@@ -88,6 +85,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 		return new HtmlSequenceReport();
 	}
 	
+	protected ActionResolver actionResolver;
+	public ActionResolver getActionResolver() {
+		return actionResolver;
+	}
+	protected void setActionResolver(ActionResolver actionResolver) {
+		this.actionResolver = actionResolver;
+	}
+
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
 	 *
@@ -152,26 +157,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	protected abstract Verdict getVerdict(State state);
-
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 *
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
-	protected abstract Set<Action> deriveActions(SUT system, State state) throws ActionBuildException;
-
-	/**
-	 * Select one of the available actions using the action selection algorithm of your choice (e.g. at random)
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action
-	 */
-	protected abstract Action selectAction(SUT system, State state, Set<Action> actions);
 
 	/**
 	 * Execute the selected action.

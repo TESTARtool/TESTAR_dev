@@ -81,7 +81,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 
@@ -157,7 +157,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(SUT system, State state, Set<Action> actions){
+	public Action selectAction(SUT system, State state, Set<Action> actions){
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.

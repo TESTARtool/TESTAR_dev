@@ -185,7 +185,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    * @return a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+  public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
     Set<Action> filteredActions = new HashSet<>();
@@ -362,7 +362,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    * @return the selected action (non-null!)
    */
   @Override
-  protected Action selectAction(SUT system, State state, Set<Action> actions) {
+  public Action selectAction(SUT system, State state, Set<Action> actions) {
     return super.selectAction(system, state, actions);
   }
 

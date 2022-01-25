@@ -76,7 +76,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 		super.beginSequence(system, state);
 		// 5 is the default maximum numeric weight
 		// the more it is increased, the more the probability % of selecting "similar" actions is reduced
-		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
+		similarActions = new SimilarityDetection(actionResolver.deriveActions(system, state), 5);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state)
+	public Set<Action> deriveActions(SUT system, State state)
 			throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
@@ -168,8 +168,8 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 * @return the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(SUT system, State state, Set<Action> actions) {
-		
+	public Action selectAction(SUT system, State state, Set<Action> actions) {
+
 		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
 		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
 		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
