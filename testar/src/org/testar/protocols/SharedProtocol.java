@@ -77,6 +77,7 @@ public class SharedProtocol extends WebdriverProtocol {
 	protected boolean moreSharedActions = true;
 	protected boolean stopSharedProtocol = false;
 	protected String traverseDestinationState = "";
+	protected boolean nonDeterministicAction = false;
 
 	@Override
 	protected void initialize(Settings settings) {
@@ -217,6 +218,7 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	protected String getNewTargetSharedAction(State state, Set<Action> actions) {
+		nonDeterministicAction = false; // Reset because new execution is starting
 		String result = null;
 		System.out.println("SharedProtocol: getNewTargetSharedAction state = " + state.get(Tags.AbstractIDCustom));
 		boolean availableAction = false;
@@ -332,6 +334,11 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	protected Action traversePath(State state, Set<Action> actions) {
+		if(nonDeterministicAction) {
+			// We need to calculate the path no the AbstractAction not the UnvisitedAbstractAction
+			return traverseAbstractAction(state, actions);
+		}
+
 		// TODO: Check if this is a problematic query if multiple state models exists in the same database
 		String destStateQuery = "select stateId from AbstractState where @rid in (select outV() from UnvisitedAbstractAction where actionId = '" + targetSharedAction + "')";
 
@@ -413,6 +420,77 @@ public class SharedProtocol extends WebdriverProtocol {
 
 		return super.selectAction(state, actions);
 	}
+	
+	private Action traverseAbstractAction(State state, Set<Action> actions) {
+		// TODO: If traverse to AbstractAction fails, should we update the edge to BlackHole?
+		System.out.println("traverseAbstractAction: Calculating the path to a Non Deterministic AbstractAction");
+		// TODO: Check if this is a problematic query if multiple state models exists in the same database
+		String destStateQuery = "select stateId from AbstractState where @rid in (select outV() from AbstractAction where actionId = '" + targetSharedAction + "')";
+
+		String destinationStateId = "";
+		ODatabaseSession db = createDatabaseConnection(settings);
+
+		OResultSet destinationStatResultSet = ExecuteQuery(db, destStateQuery);
+		if (destinationStatResultSet.hasNext()) {
+			OResult item = destinationStatResultSet.next();
+			destinationStateId = item.getProperty("stateId");
+			System.out.println("traverseAbstractAction: way to state " + destinationStateId);
+			destinationStatResultSet.close();
+			db.close();
+		} else {
+			System.out.println("traverseAbstractAction: Path not possible return random action");
+			destinationStatResultSet.close();
+			targetSharedAction = null;
+			return super.selectAction(state, actions);
+		}
+
+		String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to,'OUT','AbstractAction') "
+				+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
+				+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
+		db = createDatabaseConnection(settings);
+		OResultSet pathResultSet = ExecuteQuery(db, stateRidQuery);
+		Vector<TmpData> v = new Vector<>();
+
+		while (pathResultSet.hasNext()) {
+			OResult item = pathResultSet.next();
+			v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
+		}
+		pathResultSet.close();
+		db.close();
+
+		if (v.size() < 2) {
+			System.out.println("traverseAbstractAction: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
+			targetSharedAction = null;
+			moreSharedActions = false;
+			return super.selectAction(state, actions);
+		}
+
+		// Find an AbstractAction to perform
+		String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+
+		String abstractActionId = "";
+		HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
+		db = createDatabaseConnection(settings);
+		OResultSet abstractActionResultSet = ExecuteQuery(db, abstActQuery);
+		while (abstractActionResultSet.hasNext()) {
+			abstractActionId = abstractActionResultSet.next().getProperty("actionId");
+			System.out.println("traverseAbstractAction: Check if " + abstractActionId + " is available");
+
+			if (availableActions.containsKey(abstractActionId)) {
+				System.out.println("traverseAbstractAction: Action " + abstractActionId + " is available in the avilableActions; this is being executed");
+				abstractActionResultSet.close();
+				db.close();
+				return availableActions.get(abstractActionId);
+			}
+		}
+		abstractActionResultSet.close();
+		db.close();
+
+		System.out.println("traverseAbstractAction: Action that needs to be made does not exist");
+		targetSharedAction = null;
+
+		return super.selectAction(state, actions);
+	}
 
 	private void ReturnActionToBlackHole() {
 		ODatabaseSession db = createDatabaseConnection(settings);
@@ -446,6 +524,7 @@ public class SharedProtocol extends WebdriverProtocol {
 				// Mark targetSharedAction as NonDeterministic but changing the uid
 				markActionAsNonDeterministic(lastExecutedAction.get(Tags.AbstractIDCustom), traverseDestinationState);
 				// Force to execute the non deterministic action to discover the destination state
+				nonDeterministicAction = true;
 				targetSharedAction = lastExecutedAction.get(Tags.AbstractIDCustom);
 				traverseDestinationState = ""; // Reset to empty for next iteration
 				moreSharedActions = false; // Set to false to launch the SUT again
@@ -498,6 +577,12 @@ public class SharedProtocol extends WebdriverProtocol {
 			if(rs != null) rs.close();
 			if(db != null) db.close();
 		}
+	}
+
+	protected Action getTargetActionFound(HashMap<String, Action> actionMap) {
+		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
+		nonDeterministicAction = false; // We achieve the target action, so the execution is deterministic
+		return actionMap.get(targetSharedAction);
 	}
 
 	class TmpData {

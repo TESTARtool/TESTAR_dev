@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_tabs -->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+        #overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .vertical-center {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .overlay-button {
+            background-color: #82B541;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            font-size: 14px;
+            width: 200px;
+            margin-left: -72px;
+            cursor: pointer;
+            padding: 14px 19px 14px 19px;
+        }
+		
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+</style>
+</head>
+<body>
+
+    <div id="overlay">
+        <div class="vertical-center">
+            <center>
+                    <button id="closeButton"> Close Overlay </button>
+            </center>
+        </div>
+    </div>
+
+<h2>Tabs</h2>
+<p>Click on the buttons inside the tabbed menu:</p>
+
+<div class="tab">
+  <button id="tabOpen" class="tablinks" onclick="openTab(event, 'Open')">Open</button>
+</div>
+
+<div id="Open" class="tabcontent">
+  <h3>Open</h3>
+  <button id="buttonOne" onclick="this.parentElement.style.display='none'">One</button>
+  <button id="buttonTwo" onclick="this.parentElement.style.display='none'">Two</button>
+  <button id="buttonThree" onclick="this.parentElement.style.display='none'">Three</button>
+</div>
+
+<script>
+        function overlayOff() {
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        document.addEventListener("click", function (evnt) {
+            if (evnt.target.id === "closeButton") {
+                overlayOff();
+            }
+        });
+		
+var global = 0; 
+function openTab(evt, cityName) {
+  // This global variable will provoke non determinism
+  if(global > 0) return;
+  else global++;
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>
+   
+</body>
+</html> 

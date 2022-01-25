@@ -193,8 +193,7 @@ public class Protocol_webdriver_statemodel_shared extends SharedProtocol {
 			// Check if the target shared action to execute is in the current state
 			if (actionMap.containsKey(targetSharedAction)) {
 				System.out.println("Target Shared Action is in the current state, just select it");
-				Action targetAction = actionMap.get(targetSharedAction);
-				targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
+				Action targetAction = getTargetActionFound(actionMap);
 				return targetAction;
 			} 
 			// Target shared action to execute is not in the current state, calculate the path to reach our desired target action
