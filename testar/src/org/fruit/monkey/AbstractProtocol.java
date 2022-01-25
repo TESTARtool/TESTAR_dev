@@ -30,16 +30,14 @@
 
 package org.fruit.monkey;
 
+import nl.ou.testar.ActionResolver;
 import org.fruit.UnProc;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-
-import java.util.Set;
 
 /**
  * This is the abstract flow of TESTAR (generate mode):
@@ -67,6 +65,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 
 	protected Settings settings;
 	protected Settings settings(){ return settings; }
+
+	protected ActionResolver actionResolver;
+	public ActionResolver getActionResolver() {
+		return actionResolver;
+	}
+	protected void setActionResolver(ActionResolver actionResolver) {
+		this.actionResolver = actionResolver;
+	}
 
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
@@ -132,26 +138,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	protected abstract Verdict getVerdict(State state);
-
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 *
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
-	protected abstract Set<Action> deriveActions(SUT system, State state) throws ActionBuildException;
-
-	/**
-	 * Select one of the available actions using the action selection algorithm of your choice (e.g. at random)
-	 *
-	 * @param state the SUT's current state
-	 * @param actions the set of derived actions
-	 * @return  the selected action
-	 */
-	protected abstract Action selectAction(State state, Set<Action> actions);
 
 	/**
 	 * Execute the selected action.

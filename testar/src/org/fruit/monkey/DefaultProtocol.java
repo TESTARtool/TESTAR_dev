@@ -94,7 +94,7 @@ import org.jnativehook.dispatcher.SwingDispatchService;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.OutputStructure;
 
-public class DefaultProtocol extends RuntimeControlsProtocol {
+public class DefaultProtocol extends RuntimeControlsProtocol implements ActionResolver {
 
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
@@ -125,6 +125,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
+
+	// TODO: re-assign action resolver if needed
+	protected ActionResolver actionResolver = this;
+
+	// Should not provide any action resolver next to itself
+	@Override
+	public ActionResolver nextResolver() {
+		return null;
+	}
+
+	@Override
+	public void setNextResolver(ActionResolver nextResolver) {
+	}
 
 	protected final int actionCount() {
 		return actionCount;
@@ -181,6 +194,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public ProtocolDelegate getDelegate() {
 		return delegate;
+	}
+
+	/**
+	 * Puts a custom action resolver on the top of the chain
+	 *
+	 * @param customActionResolver
+	 */
+	public void assignActionResolver(ActionResolver customActionResolver) {
+		customActionResolver.setNextResolver(actionResolver);
+		actionResolver = customActionResolver;
 	}
 
 	public  void setDelegate(ProtocolDelegate delegate) {
@@ -800,7 +823,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.begin(); Util.clear(cv);
 
 			//Deriving actions from the state:
-			Set<Action> actions = deriveActions(system, state);
+			Set<Action> actions = actionResolver.deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
@@ -813,7 +836,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
 			//Selecting one of the available actions:
-			Action action = selectAction(state, actions);
+			Action action = actionResolver.selectAction(state, actions);
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
@@ -837,7 +860,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		// notify to state model the last state
-		Set<Action> actions = deriveActions(system, state);
+		Set<Action> actions = actionResolver.deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
 		for(Action a : actions)
 			if(a.get(Tags.AbstractIDCustom, null) == null)
@@ -961,7 +984,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			State state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
 			
@@ -1054,7 +1077,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			State state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
 			//notify the state model manager of the new state
@@ -1490,7 +1513,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 * @throws ActionBuildException
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	@Override
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
 		Set<Action> actions = new HashSet<Action>();
 
@@ -1631,7 +1655,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actions
 	 * @return
 	 */
-	protected Action selectAction(State state, Set<Action> actions){
+	@Override
+	public Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
 
 		Action a = preSelectAction(state, actions);
@@ -1796,7 +1821,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
 			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
 
-			Set<Action> actions = deriveActions(system,state);
+			Set<Action> actions = actionResolver.deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:

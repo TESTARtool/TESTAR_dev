@@ -325,7 +325,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -335,14 +335,14 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 
 		//----------------------
 		// BUILD CUSTOM ACTIONS
-		//----------------------		
+		//----------------------
 
 		// iterate through all widgets
 		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					// create left clicks
 					if(whiteListed(w) || isClickable(w))

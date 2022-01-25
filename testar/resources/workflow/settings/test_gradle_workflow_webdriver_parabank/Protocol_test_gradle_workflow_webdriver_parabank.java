@@ -114,7 +114,7 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
+    public Set<Action> deriveActions(SUT system, State state)
             throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
