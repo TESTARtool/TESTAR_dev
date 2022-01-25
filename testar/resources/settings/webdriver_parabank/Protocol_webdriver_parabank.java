@@ -343,6 +343,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
             			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "a", true), 10)
             			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "phone", state), "123", true), 10)
             			.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "message", state), "hi", true), 10)
+            			.add(ac.hitKey(KBKeys.VK_TAB), 10)
             			.add(ac.hitKey(KBKeys.VK_ENTER), 10)
             			.build(widget));
             }

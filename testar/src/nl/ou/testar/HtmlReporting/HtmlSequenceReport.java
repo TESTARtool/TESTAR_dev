@@ -265,6 +265,7 @@ public class HtmlSequenceReport implements Reporting{
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+        write("<h4>AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoConcreteIdAvailable"));
 
         try{
         	if(action.get(Tags.Desc)!=null) {

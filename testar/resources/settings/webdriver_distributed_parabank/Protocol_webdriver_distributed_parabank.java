@@ -336,6 +336,7 @@ public class Protocol_webdriver_distributed_parabank extends SharedProtocol {
 						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "a", true), 10)
 						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "phone", state), "123", true), 10)
 						.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "message", state), "hi", true), 10)
+						.add(ac.hitKey(KBKeys.VK_TAB), 10)
 						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
 						.build(widget));
 			}
@@ -541,6 +542,8 @@ public class Protocol_webdriver_distributed_parabank extends SharedProtocol {
 
 	@Override
 	protected boolean moreActions(State state) {
+		// Check if last traverse action leads TESTAR to the expected traverse destination state
+		verifyTraversePathDeterminism(state);
 		System.out.println("MoreSharedActions ? " + moreSharedActions);
 		// For time budget experiments also check max time setting
 		return moreSharedActions && (timeElapsed() < settings().get(ConfigTags.MaxTime));
@@ -579,9 +582,8 @@ public class Protocol_webdriver_distributed_parabank extends SharedProtocol {
 
 			// Check if the target shared action to execute is in the current state
 			if (actionMap.containsKey(targetSharedAction)) {
-				Action targetAction = actionMap.get(targetSharedAction);
+				Action targetAction = getTargetActionFound(actionMap);
 				System.out.println("TargetSharedAction is in the current state, just select it : " + targetAction.get(Tags.AbstractIDCustom) + " , " + targetAction.get(Tags.Desc));
-				targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
 				return targetAction;
 			} 
 			// Target shared action to execute is not in the current state, calculate the path to reach our desired target action
