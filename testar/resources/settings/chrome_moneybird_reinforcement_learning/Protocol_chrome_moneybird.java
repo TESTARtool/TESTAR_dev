@@ -89,7 +89,23 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // Set to null to ignore this feature
-  private static List<String> domainsAllowed = Arrays.asList("0.thesis.invoicetool.net");
+  private static List<String> domainsAllowed = Arrays.asList(
+          "0.thesis.invoicetool.net",
+          "1.thesis.invoicetool.net",
+          "2.thesis.invoicetool.net",
+          "3.thesis.invoicetool.net",
+          "4.thesis.invoicetool.net",
+          "5.thesis.invoicetool.net",
+          "6.thesis.invoicetool.net",
+          "7.thesis.invoicetool.net",
+          "8.thesis.invoicetool.net",
+          "9.thesis.invoicetool.net",
+          "10.thesis.invoicetool.net",
+          "11.thesis.invoicetool.net",
+          "12.thesis.invoicetool.net",
+          "13.thesis.invoicetool.net",
+          "14.thesis.invoicetool.net"
+          );
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
@@ -104,6 +120,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
 
   private ActionSelector actionSelector = null;
   private Policy policy = null;
+  private String connectedURL = null;
 
   /**
    * Called once during the life time of TESTAR
@@ -122,8 +139,18 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
     settings = rlXmlSetting.updateXMLSettings(settings);
 
+    String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+    connectedURL = parts[parts.length - 1].replace("\"", "");
+
     policy = PolicyFactory.getPolicy(settings);
     actionSelector = new ReinforcementLearningActionSelector(policy);
+
+    try {
+      JSONObject json = readJsonFromUrl(connectedURL + "/app/clear_coverage");
+    } catch (IOException | JSONException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
 
     super.initialize(settings);
     ensureDomainsAllowed();
@@ -228,7 +255,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
     for(Widget w : state) {
-      if(w.get(WdTags.WebTextContent,"").contains("internal error")) {
+      if(w.get(WdTags.WebTextContent,"").contains("MB2: 500")) {
         return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
                 "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'.");
       }
@@ -450,6 +477,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
 
     // Only allow pre-approved domains if
     String domain = getDomain(linkUrl);
+
     return !domainsAllowed.contains(domain);
   }
 
@@ -580,10 +608,10 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     boolean actionExecuted = super.executeAction(system, state, action);
 
     try {
-      JSONObject json = readJsonFromUrl("http://echo.jsontest.com/Operand1/10/Operand2/5/Operator/+");
-      String coverage = (String) json.get("Operand1");
+      JSONObject json = readJsonFromUrl(connectedURL + "/app/coverage");
+      Double coverage = (Double) json.get("coverage_percentage");
       FileWriter myWriter = new FileWriter(reportDir + "/" + OutputStructure.executedSUTname + "_coverage.txt", true);
-      myWriter.write("Coverage: " + coverage + "%| \r\n");
+      myWriter.write("Coverage: " + coverage.toString() + "%| \r\n");
       myWriter.close();
       System.out.println("Wrote time so far to file." + reportDir + "/_coverage.txt");
     } catch (IOException | JSONException e) {

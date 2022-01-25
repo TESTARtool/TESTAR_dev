@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\webdrivers\\chromedriver.exe" "1920x900+0+0" "http://0.thesis.invoicetool.net/login"
+SUTConnectorValue = "C:\\webdrivers\\chromedriver.exe" "1920x900+0+0" "http://0.thesis.invoicetool.net"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
