@@ -38,7 +38,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted, NonDeterministic}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -50,6 +50,7 @@ public class EntityClassFactory {
 
     static {
         classNameMap = new HashMap<>();
+        classNameMap.put("NonDeterministic", EntityClassName.NonDeterministic);
         classNameMap.put("BeingExecuted", EntityClassName.BeingExecuted);
         classNameMap.put("AbstractState", EntityClassName.AbstractState);
         classNameMap.put("AbstractAction", EntityClassName.AbstractAction);
@@ -89,8 +90,12 @@ public class EntityClassFactory {
         }
 
         switch (className) {
+            case NonDeterministic:
+                return createNonDeterministicClass();
+
             case BeingExecuted:
                 return createBeingExecutedClass();
+
             case AbstractState:
                 return createAbstractStateClass();
 
@@ -144,6 +149,18 @@ public class EntityClassFactory {
         }
     }
 
+    private static EntityClass createNonDeterministicClass() {
+    	EntityClass nonDeterministic = new EntityClass("NonDeterministic", EntityClass.EntityType.Vertex);
+    	entityClasses.put(EntityClassName.NonDeterministic, nonDeterministic);
+    	Property stateId = new Property("stateId", OType.STRING);
+
+    	stateId.setIdentifier(true);
+    	stateId.setMandatory(true);
+    	stateId.setNullable(false);
+    	nonDeterministic.addProperty(stateId);
+    	return nonDeterministic;
+    }
+
     private static EntityClass createBeingExecutedClass() {
         EntityClass beingExecuted = new EntityClass("BeingExecuted", EntityClass.EntityType.Vertex);
         entityClasses.put(EntityClassName.BeingExecuted, beingExecuted);
@@ -154,7 +171,6 @@ public class EntityClassFactory {
         nodeId.setNullable(false);
         beingExecuted.addProperty(nodeId);
         return beingExecuted;
-
     }
 
     private static EntityClass createAbstractStateClass() {
