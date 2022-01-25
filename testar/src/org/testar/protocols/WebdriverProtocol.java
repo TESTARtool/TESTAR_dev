@@ -558,7 +558,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * @return the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
+	public Action selectAction(State state, Set<Action> actions) {
 		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
 		if(actions == null || actions.isEmpty()) {
 			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));

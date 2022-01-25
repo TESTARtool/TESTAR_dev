@@ -58,8 +58,8 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
      * @param state the SUT's current state
      * @return  a set of actions
      */
-
-    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+    @Override
+    public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
         Set<Action> actions = super.deriveActions(system,state);
         // unwanted processes, force SUT to foreground, ... actions automatically derived!

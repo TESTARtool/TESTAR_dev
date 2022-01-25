@@ -33,6 +33,8 @@ package org.testar.protocols;
 
 import nl.ou.testar.SequenceReport;
 import org.testar.DerivedActions;
+import org.testar.RandomActionSelector;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.reporting.Reporting;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Environment;
@@ -56,6 +58,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected static double SCROLL_THICK = 16; //scroll thickness
     protected SequenceReport htmlReport;
     protected State latestState;
+    protected SUT system;
 
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -112,7 +115,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @return  a set of actions
      */
     @Override
-    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+    public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
         //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
         //the foreground. You should add all other actions here yourself.
@@ -128,11 +131,35 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @return
      */
     @Override
-    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-    	actions = super.preSelectAction(system, state, actions);
-    	// adding available actions into the HTML report:
-    	htmlReport.addActions(actions);
-    	return actions;
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions) {
+        actions = super.preSelectAction(system, state, actions);
+        // adding available actions into the HTML report:
+        htmlReport.addActions(actions);
+        return actions;
+    }
+
+    @Override
+    protected SUT startSystem() throws SystemStartException {
+        system = super.startSystem();
+        return system;
+    }
+
+    /**
+     * Select one of the available actions (e.g. at random)
+     * @param state the SUT's current state
+     * @param actions the set of derived actions
+     * @return  the selected action (non-null!)
+     */
+    @Override
+    public Action selectAction(State state, Set<Action> actions){
+        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+        //unwanted processes are killed and SUT is put into foreground.
+        Action retAction = preSelectAction(system, state, actions).stream().findAny().get();
+        if (retAction == null) {
+            //if no preSelected actions are needed, then implement your own strategy
+            retAction = RandomActionSelector.selectAction(actions);
+        }
+        return retAction;
     }
 
     /**
