@@ -42,9 +42,11 @@ do
 		echo "#@# # Stop step:  `date`"
 		mv -v *.sh ../done/
 		sleep 10
-		#reboot
-		/sbin/reboot
+		break
 	fi
 done
+
+#reboot
+/sbin/reboot
 
 }  2>&1  | tee -a runner.log

@@ -1,0 +1,112 @@
+<!doctype html>
+<body>
+<input type="file" id="fileInput" name="filefield" multiple="multiple">
+<div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
+<div id="AbstractStatesContainer" style="width: 500px; height: 400px;"></div>
+<div id="UnvisitedActionsContainer" style="width: 500px; height: 400px;"></div>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js" type="text/javascript"></script>
+<script>
+// https://jsfiddle.net/b1ynb405/
+var fileInput = document.getElementById('fileInput');
+var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+fileInput.addEventListener('change', function(e) {
+    const modelFiles = fileInput.files;
+
+    // Validate we are reading txt files
+    for (var i = 0; i < modelFiles.length; i++){
+        var textType = /text.*/;
+        if(!modelFiles[i].type.match(textType)){
+            fileDisplayArea.innerText = "Some text modelFiles is not supported!"
+            throw new Error('Some text modelFiles is not supported!');
+        }
+    }
+	
+    myfunction(modelFiles);
+});
+
+async function myfunction(modelFiles) {
+	const allAbsState = [];
+	const allUnviAct = [];
+	
+	//create a line chart
+	var chartAbsState = anychart.line();
+	var chartUnviAct = anychart.line();
+    
+	chartAbsState.title("Abstract States");
+	chartUnviAct.title("Unvisited Abstract Actions");
+
+    for (var i = 0; i < modelFiles.length; i++){
+	    console.log(modelFiles[i]);
+		
+        const singleDataAbsState = [];
+        const singleDataUnviAct = [];
+		
+        const fileReader = new SyncFileReader(modelFiles[i]);
+        const arrayBuffer = await fileReader.readAsText();
+		// Model metrics created with Windows CR LF
+        var arrLines = arrayBuffer.split("\r\n");
+        for (var line = 0; line < arrLines.length; line++) {
+		    // Skip empty line, usually at the end of the file
+			if(isEmpty(arrLines[line])) continue;
+			// Skip the lines that contains EXC message, dumper was extracting info but DB was not ready yet
+			if(containsExc(arrLines[line])) continue;
+			// Time | 2022_01_26_20_18_41 | AbstractStates 6 | AbstractActions 10 | UnvisitedActions 88 | ConcreteStates 6 | ConcreteActions 10
+			singleDataAbsState.push( parseInt( arrLines[line].split(" | ")[2].replace("AbstractStates","").trim() ) );
+			singleDataUnviAct.push( parseInt( arrLines[line].split(" | ")[4].replace("UnvisitedActions","").trim() ) );
+        }
+        allAbsState.push(singleDataAbsState)
+        allUnviAct.push(singleDataUnviAct)
+        console.log(modelFiles[i].name);
+        chartAbsState.line(allAbsState[i]).name(modelFiles[i].name);
+        chartUnviAct.line(allUnviAct[i]).name(modelFiles[i].name);
+		
+	}
+
+	//set the container where chart will be drawn
+	chartAbsState.container("AbstractStatesContainer");
+	chartUnviAct.container("UnvisitedActionsContainer");
+
+	// Enable legend colours
+	chartAbsState.legend().enabled(true)
+	chartUnviAct.legend().enabled(true)
+
+	//draw the chart on the page
+	chartAbsState.draw();
+	chartUnviAct.draw();
+	console.log('finish drawing stuff');
+}
+
+function SyncFileReader(file) {
+    let self = this;
+    let ready = false;
+    let result = '';
+
+    const sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    self.readAsText = async function() {
+        while (ready === false) {
+          await sleep(100);
+        }
+        return result;
+    }    
+
+    const reader = new FileReader();
+    reader.onloadend = function(evt) {
+        result = evt.target.result;
+        ready = true;
+    };
+    reader.readAsText(file);
+}
+
+function isEmpty(str) {
+    return (!str || str.length === 0 );
+}
+function containsExc(str) {
+    return (str.includes("EXC"));
+}
+</script>
+</body>
+</html>

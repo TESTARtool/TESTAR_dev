@@ -49,11 +49,11 @@ cd /home/testar/dumper_parabank/
 filedate=$(date +performanceMetrics_%Y_%m_%d_%H_%M_%S).txt
 touch $filedate
 
+echo "Waiting for TESTAR docker containers to finish the GUI exploration..."
 ### Wait until all docker containers have finished
 until [ -z "$(docker ps -a -q --filter "status=running")" ]
 do
-  sleep 30
-  echo "Waiting for TESTAR docker containers to finish the GUI exploration..."
+  sleep 5
   ### Print the total cpu and memory usage of all the processes (OrientDB, Apache Tomcat, Dockers, Java Dumper)
   #ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU | " cpu " | MEM | " mem }1' | tail -n 1
   # awk 'BEGIN {cpu=0;mem=0} {cpu+=$1; mem+=$2} END {print cpu,mem}'

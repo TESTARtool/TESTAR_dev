@@ -44,6 +44,7 @@ async function myfunction(coverageFiles) {
 		
         const fileReader = new SyncFileReader(coverageFiles[i]);
         const arrayBuffer = await fileReader.readAsText();
+		// Coverage metrics created with Windows CR LF
         var arrLines = arrayBuffer.split("\r\n");
         for (var line = 0; line < arrLines.length; line++) {
 		    // Skip empty line, usually at the end of the file

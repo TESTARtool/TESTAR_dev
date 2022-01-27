@@ -1,0 +1,107 @@
+<!doctype html>
+<body>
+<input type="file" id="fileInput" name="filefield" multiple="multiple">
+<div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
+<div id="cpuContainer" style="width: 500px; height: 400px;"></div>
+<div id="memContainer" style="width: 500px; height: 400px;"></div>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js" type="text/javascript"></script>
+<script>
+// https://jsfiddle.net/b1ynb405/
+var fileInput = document.getElementById('fileInput');
+var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+fileInput.addEventListener('change', function(e) {
+    const performanceFiles = fileInput.files;
+
+    // Validate we are reading txt files
+    for (var i = 0; i < performanceFiles.length; i++){
+        var textType = /text.*/;
+        if(!performanceFiles[i].type.match(textType)){
+            fileDisplayArea.innerText = "Some text performanceFile is not supported!"
+            throw new Error('Some text performanceFile is not supported!');
+        }
+    }
+	
+    myfunction(performanceFiles);
+});
+
+async function myfunction(performanceFiles) {
+	const allDataCpu = [];
+	const allDataMem = [];
+	
+	//create a line chart
+	var chartCpu = anychart.line();
+	var chartMem = anychart.line();
+    
+	chartCpu.title("CPU consumption");
+	chartMem.title("Memory consumption");
+
+    for (var i = 0; i < performanceFiles.length; i++){
+	    console.log(performanceFiles[i]);
+		
+        const singleDataCpu = [];
+        const singleDataMem = [];
+		
+        const fileReader = new SyncFileReader(performanceFiles[i]);
+        const arrayBuffer = await fileReader.readAsText();
+        // Performance metrics created with Unix system, so Unix LF
+		var arrLines = arrayBuffer.split("\n");
+        for (var line = 0; line < arrLines.length; line++) {
+		    // Skip empty line, usually at the end of the file
+			if(isEmpty(arrLines[line])) continue;
+			// Time | 2022_01_26_20_19_35 | Dockers | 1 | CPU | 203.6 | MEM | 22.4
+			singleDataCpu.push( parseFloat( arrLines[line].split(" | ")[5] ) );
+			singleDataMem.push( parseFloat( arrLines[line].split(" | ")[7] ) );
+        }
+        allDataCpu.push(singleDataCpu)
+        allDataMem.push(singleDataMem)
+        console.log(performanceFiles[i].name);
+        chartCpu.line(allDataCpu[i]).name(performanceFiles[i].name);
+        chartMem.line(allDataMem[i]).name(performanceFiles[i].name);
+		
+	}
+
+	//set the container where chart will be drawn
+	chartCpu.container("cpuContainer");
+	chartMem.container("memContainer");
+
+	// Enable legend colours
+	chartCpu.legend().enabled(true)
+	chartMem.legend().enabled(true)
+
+	//draw the chart on the page
+	chartCpu.draw();
+	chartMem.draw();
+	console.log('finish drawing stuff');
+}
+
+function SyncFileReader(file) {
+    let self = this;
+    let ready = false;
+    let result = '';
+
+    const sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    self.readAsText = async function() {
+        while (ready === false) {
+          await sleep(100);
+        }
+        return result;
+    }    
+
+    const reader = new FileReader();
+    reader.onloadend = function(evt) {
+        result = evt.target.result;
+        ready = true;
+    };
+    reader.readAsText(file);
+}
+
+function isEmpty(str) {
+    return (!str || str.length === 0 );
+}
+</script>
+</body>
+</html>
