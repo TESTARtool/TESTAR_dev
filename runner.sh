@@ -10,9 +10,13 @@ else
 	exit 1
 fi
 
-mkdir -p /home/testar/qsamba/{queue,current,done}
+# 10.102.0.225 172.17.0.1
+IP=`hostname -I | awk -F ' ' '{print $1}'`
+echo "My IP address is : $IP"
 
-cd /home/testar/qsamba/
+mkdir -p /home/testar/qsamba/scheduler/${IP}/{queue,current,done}
+
+cd /home/testar/qsamba/scheduler/${IP}/
 
 {
 

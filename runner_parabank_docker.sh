@@ -38,7 +38,9 @@ dos2unix runImage
 docker build -t testar/testarstatemodel:latest .
 
 ### Number of dockers containers that run in parallel
-for i in {1..$number_dockers}
+#for i in {1..$number_dockers}
+echo run $number_dockers docker containers
+for i in `seq 1 $number_dockers`
 do
   docker run -d --add-host=host.docker.internal:host-gateway --shm-size=512m --mount type=bind,source=/home/testar/TESTAR_dev,target=/mnt testar/testarstatemodel:latest
 done
