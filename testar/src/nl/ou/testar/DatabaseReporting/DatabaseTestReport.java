@@ -101,12 +101,14 @@ public class DatabaseTestReport implements TestReport {
 
             sqlService.setSelectionInIteration(iterationId, actionId, stateId);
 
-            for (Action pendingAction: pendingActions) {
-                sqlService.addActionToIteration(actionIds.get(pendingAction), iterationId);
-            }
-            for (Map.Entry<Action, State> pendingEntry: pendingSelectedActions.entrySet()) {
-                sqlService.addActionToIteration(actionIds.get(pendingEntry.getKey()), stateIds.get(pendingEntry.getValue()));
-            }
+//            for (Action pendingAction: pendingActions) {
+//                System.out.println("Adding action to iteration " + iterationId);
+//                sqlService.addActionToIteration(actionIds.get(pendingAction), iterationId);
+//            }
+//            for (Map.Entry<Action, State> pendingEntry: pendingSelectedActions.entrySet()) {
+//                System.out.println("Adding selected action to iteration " + stateIds.get(pendingEntry.getValue()));
+//                sqlService.addActionToIteration(actionIds.get(pendingEntry.getKey()), stateIds.get(pendingEntry.getValue()));
+//            }
         }
         catch (SQLException e) {
             System.err.println("Could not add a test verdict");
@@ -136,8 +138,11 @@ public class DatabaseTestReport implements TestReport {
             timestamp = new Timestamp(state.get(Tags.TimeStamp));
         }
 
-        return sqlService.registerAction(action.toShortString(), action.toString(),
+        // TODO: optimize actions saving
+        int actionId = sqlService.registerAction(action.toShortString(), action.toString(),
                     state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
                     timestamp);
+        sqlService.addActionToIteration(actionId, iterationId);
+        return actionId;
     }
 }
