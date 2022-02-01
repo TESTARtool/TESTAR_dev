@@ -15,6 +15,6 @@ public class ActionParser extends MultipleActionParser {
                 new WaitParser(),
                 new WaitParser()
         };
-        return new IActionParser[0];
+        return parsers;
     }
 }
