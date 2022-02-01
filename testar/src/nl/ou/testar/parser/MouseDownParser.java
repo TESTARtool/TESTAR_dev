@@ -16,7 +16,7 @@ public class MouseDownParser implements IActionParser {
     public Pair<Action, String> parse(String src) {
         final Pattern pattern = Pattern.compile(TEMPLATE, Pattern.CASE_INSENSITIVE);
         final Matcher matcher = pattern.matcher(src);
-        if (matcher.groupCount() > 2) {
+        if (matcher.matches() && matcher.groupCount() == 2) {
             final String buttonName = matcher.group(1);
             final String rest = matcher.group(2);
             return new Pair<>(new MouseDown(MouseButtons.valueOf(buttonName)), rest);
