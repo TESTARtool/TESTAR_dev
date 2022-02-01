@@ -8,7 +8,7 @@ public abstract class MultipleActionParser implements IActionParser {
     protected abstract IActionParser[] getParsers();
 
     @Override
-    public Pair<Action, String> parse(String src) {
+    public Pair<Action, String> parse(String src) throws ActionParseException {
         for (IActionParser parser: getParsers()) {
             final Pair<Action, String> result = parser.parse(src);
             if (result != null) {

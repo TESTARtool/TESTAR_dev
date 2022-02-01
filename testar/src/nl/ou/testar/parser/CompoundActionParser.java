@@ -26,7 +26,7 @@ public class CompoundActionParser implements IActionParser {
                     new WaitParser(),
                     new WaitParser()
             };
-            return new IActionParser[0];
+            return parsers;
         }
     };
 
@@ -34,12 +34,10 @@ public class CompoundActionParser implements IActionParser {
     public Pair<Action, String> parse(String src) throws ActionParseException {
         final Pattern pattern = Pattern.compile(TEMPLATE, Pattern.CASE_INSENSITIVE);
         final Matcher matcher = pattern.matcher(src);
-        int groupCount = matcher.groupCount();
-
         final CompoundAction.Builder builder = new CompoundAction.Builder();
-        if (groupCount > 1) {
+        if (matcher.matches() && matcher.groupCount() == 1) {
             String rest = matcher.group(1).trim();
-            while (rest != "") {
+            while (!rest.equals("")) {
                 final Pair<Action, String> result = itemParser.parse(rest);
                 if (result == null) {
                     throw new ActionParseException("Cannot parse action: " + rest);
@@ -47,6 +45,7 @@ public class CompoundActionParser implements IActionParser {
                 builder.add(result.left(), 1);
                 rest = result.right().trim();
             }
+            return new Pair<>(builder.build(), rest);
         }
         return null;
     }
