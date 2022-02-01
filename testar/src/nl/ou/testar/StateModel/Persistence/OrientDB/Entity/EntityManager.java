@@ -68,7 +68,6 @@ public class EntityManager {
     private static Config config;
 
     private int baseSleep = 200;
-    private int backOff = 1;
 
     /**
      * Constructor
@@ -356,47 +355,46 @@ public class EntityManager {
                     }
                 }
             } catch (OConcurrentModificationException cme) {
-                backOff++;
                 System.out.println("EntityManager createClass: Concurrency exception during create class; retry");
                 randomSleep(3000);
                 repeat = true;
             } catch (OSchemaException se) {
-                backOff++;
                 System.out.println("EntityManager createClass: Schema exception");
                 randomSleep(3000);
                 repeat = true;
             } catch (OCommandExecutionException cme) {
-                backOff++;
                 System.out.println("EntityManager createClass: Command execution exception " + cme);
                 randomSleep(3000);
                 repeat = true;
             } catch (OStorageException ose) {
-                backOff++;
                 System.out.println("EntityManager createClass: Storage execution exception " + ose);
                 randomSleep(3000);
                 repeat = true;
             } catch (ODatabaseException ode) {
-                backOff++;
                 if(ode.getMessage() != null) System.out.println("EntityManager createClass: ODatabaseException " + ode.getMessage());
                 else System.out.println("EntityManager createClass: ODatabaseException " + ode);
                 randomSleep(3000);
                 repeat = true;
             } catch (Exception e) {
-                backOff++;
                 if(e.getMessage() != null) System.out.println("EntityManager createClass: Exception " + e.getMessage());
                 else System.out.println("EntityManager createClass: Exception " + e);
+                e.printStackTrace();
                 randomSleep(3000);
                 repeat = true;
-            } catch (Error err) {
-            	backOff++;
-            	if(err.getMessage() != null) System.out.println("EntityManager createClass: Error " + err.getMessage());
-            	else System.out.println("EntityManager createClass: Error " + err);
+            } catch (StackOverflowError err) {
+            	if(err.getMessage() != null) System.out.println("EntityManager createClass: StackOverflowError " + err.getMessage());
+            	else System.out.println("EntityManager createClass: StackOverflowError " + err);
+            	err.printStackTrace();
             	randomSleep(3000);
+            	// Sometimes OrientDB connection throws a StackOverflowError trying to acquire the remote connection
+            	// https://github.com/orientechnologies/orientdb/blob/3.0.x/client/src/main/java/com/orientechnologies/orient/client/remote/ORemoteConnectionManager.java
+            	// try to use same connection does not work, is always throwing same StackOverflowError
+            	// but release and start a new connection seems to fix this java stack error
+            	releaseConnection();
+            	connection = getNewConnection();
             	repeat = true;
             }
         } while (repeat);
-
-        backOff = 1;
     }
 
     /**
@@ -417,14 +415,11 @@ public class EntityManager {
             } catch (OConcurrentModificationException cme) {
                 repeat = true;
                 System.out.println("EntityManager saveEntity concurrency exception: " + cme);
-                backOff++;
                 randomSleep(baseSleep);
             } catch (ORecordDuplicatedException dupl) {
                 System.out.println("EntityManager saveEntity DuplicateException: " + dupl);
             }
         } while (repeat);
-
-        backOff=1;
     }
 
     /**
@@ -474,21 +469,17 @@ public class EntityManager {
                 oVertex.save();
             } catch (OConcurrentModificationException cme) {
                 System.out.println("EntityManager saveVertexEntity ConcurrencyException: " + cme);
-                backOff++;
                 randomSleep(baseSleep);
                 repeat = true;
             } catch (ORecordDuplicatedException dupl) {
                 System.out.println("EntityManager saveVertexEntity DuplicateException: " + dupl);
             }
         } while (repeat);
-
-        backOff=1;
     }
 
     private OVertex createOrRetrieveVertex(VertexEntity entity, ODatabaseSession db) {
         boolean repeat = false;
         OVertex vertex;
-        int bckOff = 1;
         do {
             repeat = false;
             try {
@@ -510,8 +501,7 @@ public class EntityManager {
                     storeVertex(vertex, entity, db);
                 } catch (OConcurrentModificationException cme) {
                     System.out.println("EntityManager createOrRetrieveVertex EntityNotFoundException Concurrency exception: " + cme);
-                    randomSleep(baseSleep, bckOff);
-                    bckOff++;
+                    randomSleep(baseSleep);
                     repeat = true;
                 } catch (ORecordDuplicatedException dupl) {
                     System.out.println("EntityManager createOrRetrieveVertex EntityNotFoundException DuplicateException: " + dupl);
@@ -577,15 +567,12 @@ public class EntityManager {
                 // we don't do anything here. If the edge does not exist, we just want to continue with method execution
             } catch (OConcurrentModificationException cme) {
                 System.out.println("EntityManager saveEdgeEntity ConcurrencyException: " + cme);
-                backOff++;
                 randomSleep(baseSleep);
                 repeat = true;
             } catch (ORecordDuplicatedException dupl) {
                 System.out.println("EntityManager saveEdgeEntity DuplicateException: " + dupl);
             }
         } while (repeat);
-
-        backOff=1;
 
         // retrieve and/or update/save the source vertex
         do {
@@ -617,31 +604,26 @@ public class EntityManager {
                 edge.save();
             } catch (OConcurrentModificationException cme) {
                 System.out.println("EntityManager saveEdgeEntity Concurrency exception " + cme + " while writing edge; repeat");
-                backOff++;
-                randomSleep(baseSleep, backOff);
+                randomSleep(baseSleep);
                 repeat = true;
             } catch (ORecordDuplicatedException dupl) {
                 System.out.println("EntityManager saveEdgeEntity DuplicateException: " + dupl);
             }
         } while (repeat);
-
-        backOff=1;
-    }
-
-    private void randomSleep(int base , int backOff) {
-        int sleepTime = base + new Random(System.currentTimeMillis()).nextInt((int)Math.pow(2, backOff));
-        if (base < 200) {
-            sleepTime += Math.pow(2, backOff);      
-        }
-        try {
-            System.out.println("Sleep random time duration = " + sleepTime + " ms backOff = "+ backOff);
-            Thread.sleep(sleepTime);
-        } catch (Exception e) {
-        }
     }
 
     private void randomSleep(int base) {
-        randomSleep(base, backOff);
+    	try {
+    		int r = getRandomNumber(200, 1000);
+    		int sleepTime = base + r;
+    		System.out.println("Sleep random time duration = " + sleepTime);
+    		Thread.sleep(sleepTime);
+    	} catch (Exception e) {
+    	}
+    }
+
+    private int getRandomNumber(int min, int max) {
+    	return (int) ((Math.random() * (max - min)) + min);
     }
 
     public void deleteEntity(DocumentEntity entity) {

@@ -1,6 +1,8 @@
 <!doctype html>
 <body>
 <input type="file" id="fileInput" name="filefield" multiple="multiple">
+maxCpu:<textarea id="maxCpu"></textarea>
+maxMemory:<textarea id="maxMemory"></textarea>
 <div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
 <div id="cpuContainer" style="width: 500px; height: 400px;"></div>
 <div id="memContainer" style="width: 500px; height: 400px;"></div>
@@ -32,6 +34,12 @@ async function myfunction(performanceFiles) {
 	//create a line chart
 	var chartCpu = anychart.line();
 	var chartMem = anychart.line();
+	
+	// set y axis max value if user indicates
+	var maxCpu = document.getElementById("maxCpu") === null ? "" : document.getElementById("maxCpu").value;
+	var maxMemory = document.getElementById("maxMemory") === null ? "" : document.getElementById("maxMemory").value;
+	if(!isEmpty(maxCpu) && !isNaN(parseInt(maxCpu))) chartCpu.yScale().maximum(parseInt(maxCpu));
+	if(!isEmpty(maxMemory) && !isNaN(parseInt(maxMemory))) chartMem.yScale().maximum(parseInt(maxMemory));
     
 	chartCpu.title("CPU consumption");
 	chartMem.title("Memory consumption");

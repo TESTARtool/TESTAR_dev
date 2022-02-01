@@ -1,6 +1,8 @@
 <!doctype html>
 <body>
 <input type="file" id="fileInput" name="filefield" multiple="multiple">
+maxInstructions:<textarea id="maxInstructions"></textarea>
+maxBranches:<textarea id="maxBranches"></textarea>
 <div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
 <div id="covInstContainer" style="width: 500px; height: 400px;"></div>
 <div id="covBranContainer" style="width: 500px; height: 400px;"></div>
@@ -32,6 +34,12 @@ async function myfunction(coverageFiles) {
 	//create a line chart
 	var chartInst = anychart.line();
 	var chartBran = anychart.line();
+	
+	// set y axis max value if user indicates
+	var maxInstructions = document.getElementById("maxInstructions") === null ? "" : document.getElementById("maxInstructions").value;
+	var maxBranches = document.getElementById("maxBranches") === null ? "" : document.getElementById("maxBranches").value;
+	if(!isEmpty(maxInstructions) && !isNaN(parseInt(maxInstructions))) chartInst.yScale().maximum(parseInt(maxInstructions));
+	if(!isEmpty(maxBranches) && !isNaN(parseInt(maxBranches))) chartBran.yScale().maximum(parseInt(maxBranches));
     
 	chartInst.title("Instruction Coverage");
 	chartBran.title("Branch Coverage");

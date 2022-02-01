@@ -1,6 +1,8 @@
 <!doctype html>
 <body>
 <input type="file" id="fileInput" name="filefield" multiple="multiple">
+maxAbstractState:<textarea id="maxAbstractState"></textarea>
+maxUnvActions:<textarea id="maxUnvActions"></textarea>
 <div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
 <div id="AbstractStatesContainer" style="width: 500px; height: 400px;"></div>
 <div id="UnvisitedActionsContainer" style="width: 500px; height: 400px;"></div>
@@ -32,6 +34,12 @@ async function myfunction(modelFiles) {
 	//create a line chart
 	var chartAbsState = anychart.line();
 	var chartUnviAct = anychart.line();
+	
+	// set y axis max value if user indicates
+	var maxAbstractState = document.getElementById("maxAbstractState") === null ? "" : document.getElementById("maxAbstractState").value;
+	var maxUnvActions = document.getElementById("maxUnvActions") === null ? "" : document.getElementById("maxUnvActions").value;
+	if(!isEmpty(maxAbstractState) && !isNaN(parseInt(maxAbstractState))) chartAbsState.yScale().maximum(parseInt(maxAbstractState));
+	if(!isEmpty(maxUnvActions) && !isNaN(parseInt(maxUnvActions))) chartUnviAct.yScale().maximum(parseInt(maxUnvActions));
     
 	chartAbsState.title("Abstract States");
 	chartUnviAct.title("Unvisited Abstract Actions");
