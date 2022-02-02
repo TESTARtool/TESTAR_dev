@@ -65,8 +65,21 @@ public final class CompoundAction extends TaggableBase implements Action {
 		public Builder add(Action a, double relativeDuration){
 			Assert.notNull(a);
 			Assert.isTrue(relativeDuration >= 0);
-			relativeDurations.add(relativeDuration);
-			actions.add(a);
+			if (a.getClass().isAssignableFrom(CompoundAction.class)) {
+				// Avoid nesting compound actions - flattering
+				final CompoundAction compoundAction = (CompoundAction) a;
+				List<Action> nestedActions = compoundAction.getActions();
+				int nestedCount = nestedActions.size();
+				assert(nestedCount > 0);
+				actions.addAll(nestedActions);
+				for(double nestedDuration: compoundAction.relativeDurations) {
+					relativeDurations.add(relativeDuration * nestedDuration / nestedCount);
+				}
+			}
+			else {
+				actions.add(a);
+				relativeDurations.add(relativeDuration);
+			}
 			durationSum += relativeDuration;
 			return this;
 		}
