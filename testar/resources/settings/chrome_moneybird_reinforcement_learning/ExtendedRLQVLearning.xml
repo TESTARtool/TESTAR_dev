@@ -12,7 +12,7 @@
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
-        <rewardFunction>WidgetTreeBasedRewardFunction</rewardFunction>
+        <rewardFunction>PrioritizeUnvisitedRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>
         <tagName>qvlearning</tagName>
         <qFunction>QVFunction</qFunction>

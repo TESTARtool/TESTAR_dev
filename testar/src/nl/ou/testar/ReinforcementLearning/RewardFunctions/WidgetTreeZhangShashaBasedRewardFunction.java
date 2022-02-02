@@ -45,7 +45,7 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
 
         if (previousState == null) {
             previousState = state;
-            logger.info("Default reward for previous state:{} and current state {} is {}", previousState, state, 0f);
+            //logger.info("Default reward for previous state:{} and current state {} is {}", previousState, state, 0f);
             return 0f;
         }
 

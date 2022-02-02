@@ -73,6 +73,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class Protocol_chrome_moneybird extends WebdriverProtocol {
@@ -185,19 +186,16 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-	  SUT sut = super.startSystem();
+    SUT sut = super.startSystem();
 
-        new CompoundAction.Builder()
-                // assume keyboard focus is on the user field
-                .add(new Type ("info@moneybird.nl") ,0.1)
-                // assume next focusable field is pass
-                .add(new KeyDown (KBKeys.VK_TAB) ,0.5)
-                .add(new Type ("testtest1") ,0.1)
-                // assume login is performed by ENTER
-                .add(new KeyDown (KBKeys.VK_ENTER) ,0.5).build()
-                .run(sut ,null ,0.1);
-            
-     return sut;
+    try {
+      TimeUnit.SECONDS.sleep(5);
+    }catch (InterruptedException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
+
+    return sut;
   }
 
   /**
@@ -208,16 +206,24 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
+    new CompoundAction.Builder()
+            // assume keyboard focus is on the user field
+            .add(new Type ("info@moneybird.nl") ,1)
+            // assume next focusable field is pass
+            .add(new KeyDown (KBKeys.VK_TAB) ,0.2)
+            .add(new KeyUp(KBKeys.VK_TAB),0.2)
+            .add(new Type ("testtest1") ,1)
+            // assume login is performed by ENTER
+            .add(new KeyDown (KBKeys.VK_ENTER) ,0.2)
+            .add(new KeyUp (KBKeys.VK_ENTER),0.2).build()
+            .run(system, state ,2);
 
-    // Add your login sequence here
-
-    /*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
-
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
-
-    waitAndLeftClickWidgetWithMatchingTag(WdTags.WebValue, "Log In", state, system, 5, 1.0);
-*/
+    try {
+      TimeUnit.SECONDS.sleep(5);
+    }catch (InterruptedException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -245,7 +251,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   @Override
   protected Verdict getVerdict(State state) {
 
-    Verdict verdict = super.getVerdict(state); // by urueda
+    //Verdict verdict = super.getVerdict(state); // by urueda
     // system crashes, non-responsiveness and suspicious titles automatically detected!
 
     //-----------------------------------------------------------------------------
@@ -261,7 +267,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
       }
     }
 
-    return verdict;
+    return Verdict.OK;
   }
 
   /**
@@ -278,6 +284,28 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   @Override
   protected Set<Action> deriveActions(SUT system, State state)
       throws ActionBuildException {
+
+    if (isLoginPage()) {
+      new CompoundAction.Builder()
+              // assume keyboard focus is on the user field
+              .add(new Type ("info@moneybird.nl") ,1)
+              // assume next focusable field is pass
+              .add(new KeyDown (KBKeys.VK_TAB) ,0.2)
+              .add(new KeyUp(KBKeys.VK_TAB),0.2)
+              .add(new Type ("testtest1") ,1)
+              // assume login is performed by ENTER
+              .add(new KeyDown (KBKeys.VK_ENTER) ,0.2)
+              .add(new KeyUp (KBKeys.VK_ENTER),0.2).build()
+              .run(system, state ,2);
+
+      try {
+        TimeUnit.SECONDS.sleep(5);
+      }catch (InterruptedException e) {
+        System.out.println("An error occurred.");
+        e.printStackTrace();
+      }
+    }
+
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
 
@@ -419,6 +447,12 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     String ext = currentUrl.substring(currentUrl.lastIndexOf(".") + 1);
     ext = ext.replace("/", "").toLowerCase();
     return deniedExtensions.contains(ext);
+  }
+
+  public boolean isLoginPage() {
+    String currentUrl = WdDriver.getCurrentUrl();
+
+    return currentUrl.endsWith("login");
   }
 
   /*
@@ -610,10 +644,10 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     try {
       JSONObject json = readJsonFromUrl(connectedURL + "/app/coverage");
       Double coverage = (Double) json.get("coverage_percentage");
-      FileWriter myWriter = new FileWriter(reportDir + "/" + OutputStructure.executedSUTname + "_coverage.txt", true);
+      FileWriter myWriter = new FileWriter(reportDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt", true);
       myWriter.write("Coverage: " + coverage.toString() + "%| \r\n");
       myWriter.close();
-      System.out.println("Wrote time so far to file." + reportDir + "/_coverage.txt");
+      System.out.println("Wrote time so far to file." + reportDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt");
     } catch (IOException | JSONException e) {
       System.out.println("An error occurred.");
       e.printStackTrace();
@@ -674,5 +708,18 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   @Override
   protected boolean moreSequences() {
     return super.moreSequences();
+  }
+
+  /**
+   * This method is called after the last sequence, to allow for example handling the reporting of the session
+   */
+  @Override
+  protected void closeTestSession() {
+    super.closeTestSession();
+    // Extract and create run coverage report for Generate Mode
+    if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+      compressOutputRunFolder();
+      copyOutputToNewFolderUsingIpAddress("N:");
+    }
   }
 }
