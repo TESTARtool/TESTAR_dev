@@ -69,6 +69,7 @@ import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
@@ -257,7 +258,13 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     //-----------------------------------------------------------------------------
     // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
     //-----------------------------------------------------------------------------
+    if(!state.get(Tags.IsRunning, false)) {
+      return new Verdict(Verdict.SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+    }
 
+    if(state.get(Tags.NotResponding, false)){
+      return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+    }
     // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
     for(Widget w : state) {
