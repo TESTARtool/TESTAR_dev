@@ -91,6 +91,14 @@ public class Protocol_desktop_digioffice extends DesktopProtocol {
 	 @Override
 	protected void beginSequence(SUT system, State state){
 	 	super.beginSequence(system, state);
+
+    /*
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"username", "john", state, system, 5,1.0);
+
+    waitLeftClickAndTypeIntoWidgetWithMatchingTag(WdTags.WebName,"password", "demo", state, system, 5,1.0);
+*/
+    waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "WhiteOffice-veld", state, system, 5, 1.0);
+    
 	}
 
 	/**
