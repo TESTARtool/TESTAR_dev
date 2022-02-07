@@ -34,9 +34,11 @@ package org.testar.protocols;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -45,13 +47,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
@@ -64,12 +72,17 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -656,5 +669,129 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	protected boolean isForm(Widget widget) {
+	    Role role = widget.get(Tags.Role, Roles.Widget);
+	    return role.equals(WdRoles.WdFORM);
+	}
+
+	protected void fillForm(Set<Action> actions, StdActionCompiler ac, Widget widget) {
+	    String uriPath = "";
+	    try {
+	        uriPath = new URI(WdDriver.getCurrentUrl()).getPath();
+	    } catch (Exception e) {
+	        System.out.println("Exception obtaining URI path, use empty path");
+	    }
+
+	    String formName = widget.get(WdTags.WebName, "");
+	    String path = (uriPath + "_" + formName).replace("/", "_") + ".xml";
+	    System.out.println("Derive FillForm Action : look for file " + path);
+
+	    File f = new File(path);
+	    Map<String, String> fields = new HashMap<>();
+	    Boolean storeFile = true;
+	    if (f.exists()) {
+	        storeFile = false;
+	        fields = readFormFile(path);
+	        System.out.println("Derive FillForm Action : File exists, read the data from file");
+	    }
+
+	    CompoundAction.Builder formBuilder = new CompoundAction.Builder();
+	    int sum = buildForm(formBuilder, (WdWidget)widget, fields, storeFile, ac);
+
+	    if (storeFile) {
+	        storeToFile(path, fields);
+	        // By default create the performSubmit option as true and derive the submit action
+	        if (!formName.isEmpty()) {
+	            formBuilder.add(new WdSubmitAction(formName), 2);
+	        }
+	    } else if (fields != null && fields.containsKey("performSubmit")) {
+	        String submit = fields.get("performSubmit");
+	        if (submit.contains("true") && !formName.isEmpty()) {
+	            formBuilder.add(new WdSubmitAction(formName), 2);
+	        }
+	    }
+
+	    if (sum > 0) {
+	        Action formAction = formBuilder.build();
+	        formAction.set(Tags.OriginWidget, widget);
+	        actions.add(formAction);
+	    }
+	}
+
+	private int buildForm(CompoundAction.Builder formBuilder, WdWidget widget, Map<String, String> fields, boolean storeFile, StdActionCompiler ac) {
+	    int sum = 0;
+	    WdElement element = widget.element;
+	    String defaultValue = "write-random-genenerated-value";
+	    if (isTypeable(widget)) {
+	        if (storeFile) {
+	            fields.put(element.name, defaultValue);
+	        }
+	        if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+	            formBuilder.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
+	            sum += 2;
+	        }
+	    }
+
+	    for (int i = 0; i < widget.childCount(); i++) {
+	        WdWidget w = widget.child(i);
+	        element = w.element;
+
+	        if (isTypeable(w)) {
+	            if (storeFile) {
+	                fields.put(element.name, defaultValue);
+	            }
+	            if (fields.containsKey(element.name) && fields.get(element.name) != null) {
+	                formBuilder.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
+	                sum += 2;
+	            }
+	        } else {
+	            sum += buildForm(formBuilder, widget.child(i), fields, storeFile, ac);
+	        }
+	    }
+	    return sum;
+	}
+
+	private Map<String, String> readFormFile(String fileName) {
+	    try {
+	        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	        DocumentBuilder builder = factory.newDocumentBuilder();
+	        Document document = builder.parse(new File(fileName));
+	        document.getDocumentElement().normalize();
+	        Element root = document.getDocumentElement();
+	        NodeList items = root.getChildNodes();
+	        HashMap<String, String> result = new HashMap<>();
+
+	        for (int i = 0; i < items.getLength(); i++) {
+	            Node item = items.item(i);
+	            Element node = (Element) item;
+	            String value = node.getTextContent();
+	            result.put(node.getNodeName(), value);
+	        }
+
+	        return result;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
+	private void storeToFile(String fileName, Map<String, String> fields) {
+	    String result = "<form><performSubmit>true</performSubmit>";
+
+	    for (Map.Entry<String, String> entry : fields.entrySet()) {
+	        String key = entry.getKey();
+	        String value = entry.getValue();
+
+	        result += "<" + key + ">" + value + "</" + key + ">";
+	    }
+	    result += "</form>";
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+	        writer.write(result);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    System.out.println("Derive FillForm Action : storeToFile: " + result);
 	}
 }
