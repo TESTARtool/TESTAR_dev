@@ -778,7 +778,24 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	private void storeToFile(String fileName, Map<String, String> fields) {
-	    String result = "<form><performSubmit>true</performSubmit>";
+	    String result = "<form>";
+	    // Call two times because we hardcode two data input
+	    result += writeFormData(result, fields);
+	    result += writeFormData(result, fields);
+	    result += "</form>";
+
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+	        writer.write(result);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    System.out.println("Derive FillForm Action : storeToFile: " + result);
+	}
+
+	private String writeFormData(String result, Map<String, String> fields) {
+	    result += "<data>";
+	    result += "<weight>50</weight><performSubmit>true</performSubmit>";
 
 	    for (Map.Entry<String, String> entry : fields.entrySet()) {
 	        String key = entry.getKey();
@@ -786,12 +803,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	        result += "<" + key + ">" + value + "</" + key + ">";
 	    }
-	    result += "</form>";
-	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-	        writer.write(result);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    System.out.println("Derive FillForm Action : storeToFile: " + result);
+
+	    result += "</data>";
+	    return result;
 	}
 }
