@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -760,11 +761,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	        Document document = builder.parse(new File(fileName));
 	        document.getDocumentElement().normalize();
 	        Element root = document.getDocumentElement();
-	        NodeList items = root.getChildNodes();
+	        NodeList formDataList = root.getChildNodes();
 	        HashMap<String, String> result = new HashMap<>();
 
-	        for (int i = 0; i < items.getLength(); i++) {
-	            Node item = items.item(i);
+	        NodeList dataNode = selectRandomDataInput(formDataList);
+
+	        for (int i = 0; i < dataNode.getLength(); i++) {
+	            Node item = dataNode.item(i);
 	            Element node = (Element) item;
 	            String value = node.getTextContent();
 	            result.put(node.getNodeName(), value);
@@ -777,11 +780,52 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    return null;
 	}
 
+	private NodeList selectRandomDataInput(NodeList formDataList) {
+	    int total = 0;
+	    // Iterate through the data elements to calculate the sum of the weight values
+	    for (int top = 0; top < formDataList.getLength(); top++) {
+	        Node dataNode = formDataList.item(top);
+	        NodeList dataNodeList = dataNode.getChildNodes();
+	        for (int content = 0; content < dataNodeList.getLength(); content++) {
+	            Node item = dataNodeList.item(content);
+	            Element node = (Element) item;
+	            if(node.getNodeName().equals("weight")) {
+	                total += Integer.valueOf(node.getTextContent());
+	            }
+	        }
+	    }
+
+	    // Randomly select a number between 0 and the total sum of weight values
+	    // To randomly select a data node with values
+	    int random = new Random().nextInt((total)+1);
+
+	    int sum = 0;
+	    // Then iterate through the data elements to find the randomly selected data node
+	    for (int top = 0; top < formDataList.getLength(); top++) {
+	        Node dataNode = formDataList.item(top);
+	        NodeList dataNodeList = dataNode.getChildNodes();
+	        for (int content = 0; content < dataNodeList.getLength(); content++) {
+	            Node item = dataNodeList.item(content);
+	            Element node = (Element) item;
+	            if(node.getNodeName().equals("weight")) {
+	                sum += Integer.valueOf(node.getTextContent());
+	            }
+	            if(sum >= random) {
+	                // Returning the node values of the data node
+	                return node.getParentNode().getChildNodes();
+	            }
+	        }
+	    }
+
+	    // If something wrong, return the values of the first data node
+	    return formDataList.item(0).getChildNodes();
+	}
+
 	private void storeToFile(String fileName, Map<String, String> fields) {
 	    String result = "<form>";
 	    // Call two times because we hardcode two data input
-	    result += writeFormData(result, fields);
-	    result += writeFormData(result, fields);
+	    result = writeFormData(result, fields);
+	    result = writeFormData(result, fields);
 	    result += "</form>";
 
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
