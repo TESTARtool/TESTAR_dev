@@ -234,8 +234,8 @@ public class ProtocolUtil {
 	//  Screenshots helpers
 	// #####################
 	
-	public static String getStateshot(State state){
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state));
+	public static String getStateshot(State state, boolean overwrite){
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state), overwrite);
 	}
 
 	/**
