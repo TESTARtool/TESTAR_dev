@@ -51,7 +51,7 @@ public class WdProtocolUtil extends ProtocolUtil {
         state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
     Rect rect = Rect.from(0, 0, width, height);
     AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
+    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot, false);
   }
 
   public static String getActionshot(State state, Action action) {

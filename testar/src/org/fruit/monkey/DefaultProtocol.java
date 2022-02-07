@@ -804,6 +804,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
+			state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state, true));
+
 			//before action execution, pass it to the state model manager
 			stateModelManager.notifyActionExecution(action);
 
@@ -820,7 +822,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			cv.end();
 
 			// fetch the new state
-            state = getState(system);
+			state = getState(system);
 		}
 
 		// notify to state model the last state
@@ -1488,7 +1490,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
 			}else{
 				//System.out.println("DEBUG: normal state shot");
-				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state, false));
 			}
 		}
 	}

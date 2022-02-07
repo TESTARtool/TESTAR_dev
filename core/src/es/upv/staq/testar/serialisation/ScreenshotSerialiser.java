@@ -118,9 +118,9 @@ public class ScreenshotSerialiser extends Thread {
 		}
 	}
 
-	public static String saveStateshot(String stateID, AWTCanvas stateshot){
+	public static String saveStateshot(String stateID, AWTCanvas stateshot, boolean overwrite){
 		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
-		if (!new File(statePath).exists())
+		if (!new File(statePath).exists() || overwrite)
 			savethis(statePath,stateshot);
 		return statePath;
 	}

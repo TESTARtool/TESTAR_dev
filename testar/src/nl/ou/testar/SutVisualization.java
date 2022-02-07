@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -90,38 +90,41 @@ public class SutVisualization {
                 cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
                 cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
                 if (!showExtendedWidgetInfo){
-                    String rootText = "State: " + rootW.get(Tags.ConcreteID),
-                            widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
-                            roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-                            idxText = "Path: " + cursorWidget.get(Tags.Path);
+                    String widgetTitle = "Title: " + cursorWidget.get(Tags.Title, "");
+                    String widgetValuePattern = "ValuePattern: " + cursorWidget.get(Tags.ValuePattern, "");
+                    String widgetRole = "Role: " + cursorWidget.get(Role, Roles.Widget).toString();
 
-                    double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
-                    double miniwidgetInfoH = 80; // 20 * 4
+                    // Taking the max length of the 3 attributed to create width of the spy mode info canvas
+                    double miniwidgetInfoW = Math.max(Math.max(widgetTitle.length(), widgetValuePattern.length()), widgetRole.length()) * 8;
+                    if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
+                    double miniwidgetInfoH = 60; // 20 * 3
+
                     Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
                             cwShape.y() + cwShape.height()/2 + 32,
                             miniwidgetInfoW, miniwidgetInfoH);
+
                     Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+
                     if (repositionShape != minicwShape){
                         double x = repositionShape.x() - repositionShape.width() - 32,
                                 y = repositionShape.y() - repositionShape.height() - 32;
                         if (x < 0) x = 0; if (y < 0) y = 0;
                         minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
                     }
+
                     canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
                     canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-                    canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, idxText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, roleText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
+                    canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, widgetTitle);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, widgetValuePattern);
+                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, widgetRole);
                 }
 
                 // Is this really useful?:
                 if (markParentWidget){
-                    String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
+                    String cursorWidgetID = cursorWidget.get(Tags.ConcreteIDCustom, "");
                     boolean print = !cursorWidgetID.equals(lastPrintParentsOf);
                     if (print){
                         lastPrintParentsOf = cursorWidgetID;
-                        System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
                     }
                     int lvls = ProtocolUtil.markParents(canvas,cursorWidget,ProtocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
                     if (lvls > 0){
@@ -151,21 +154,13 @@ public class SutVisualization {
                 cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
 
                 if(showExtendedWidgetInfo){
-                    //canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-                    //canvas.rect(apen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
                     canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
                     canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
                     int pos = -20;
                     StringBuilder sb = new StringBuilder();
                     sb.append("Ancestors: ");
 
-                    //for(Widget p : Util.ancestors(cursorWidget))
-                    //	sb.append("::").append(p.get(Role, Roles.Widget));
-                    //canvas.text(apen, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-                    // (fix too many ancestors)
                     int i=0;
                     for(Widget p : Util.ancestors(cursorWidget)){
                         sb.append("::").append(p.get(Role, Roles.Widget));

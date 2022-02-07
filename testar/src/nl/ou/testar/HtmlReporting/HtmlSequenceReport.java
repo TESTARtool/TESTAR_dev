@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,7 +60,7 @@ public class HtmlSequenceReport implements Reporting{
     private PrintWriter out;
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
-    
+
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
@@ -112,20 +112,20 @@ public class HtmlSequenceReport implements Reporting{
     }
 
     public void addSequenceStep(State state, String actionImagePath){
-    	try {
-    		String imagePath = state.get(Tags.ScreenshotPath);
-    		// repairing the file paths:
-    		if(imagePath.contains("./output")){
-    			imagePath = imagePath.replace("./output","../");
-    		}
-    		write("<h4>State:</h4>");
-    		write("<p><img src=\""+imagePath+"\"></p>");
-    		write("<h4>Action:</h4>");
-    		write("<p><img src=\""+actionImagePath+"\"></p>");
-    	}catch(Exception e) {
-    		System.out.println("ERROR: Adding the Sequence step " + innerLoopCounter + " in the HTML report");
-    		write("<h2>ERROR Adding current Sequence step " + innerLoopCounter + "</h2>");
-    	}
+        try {
+            String imagePath = state.get(Tags.ScreenshotPath);
+            // repairing the file paths:
+            if(imagePath.contains("./output")){
+                imagePath = imagePath.replace("./output","../");
+            }
+            write("<h4>State:</h4>");
+            write("<p><img src=\""+imagePath+"\"></p>");
+            write("<h4>Action:</h4>");
+            write("<p><img src=\""+actionImagePath+"\"></p>");
+        }catch(Exception e) {
+            System.out.println("ERROR: Adding the Sequence step " + innerLoopCounter + " in the HTML report");
+            write("<h2>ERROR Adding current Sequence step " + innerLoopCounter + "</h2>");
+        }
     }
 
     public void addState(State state){
@@ -142,51 +142,40 @@ public class HtmlSequenceReport implements Reporting{
     }
 
     private void writeStateIntoReport(State state){
-    	try {
-    		String imagePath = state.get(Tags.ScreenshotPath);
-    		if(imagePath.contains("./output")){
-    			int indexStart = imagePath.indexOf("./output");
-    			int indexScrn = imagePath.indexOf("scrshots");
-    			String replaceString = imagePath.substring(indexStart,indexScrn);
-    			imagePath = imagePath.replace(replaceString,"../");
-    		}
-    		write("<h2>State "+innerLoopCounter+"</h2>");
-    		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
-    		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-    		//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
-    		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-    		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-    		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-    	}catch(Exception e) {
-    		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
-    		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
-    	}
-    	innerLoopCounter++;
+        try {
+            String imagePath = state.get(Tags.ScreenshotPath);
+            if(imagePath.contains("./output")){
+                int indexStart = imagePath.indexOf("./output");
+                int indexScrn = imagePath.indexOf("scrshots");
+                String replaceString = imagePath.substring(indexStart,indexScrn);
+                imagePath = imagePath.replace(replaceString,"../");
+            }
+            write("<h2>State "+innerLoopCounter+"</h2>");
+            write("<h4>State : ConcreteIDCustom=" + state.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable")
+            + " || AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable")+"</h4>");
+            write("<p><img src=\""+imagePath+"\"></p>");
+        }catch(Exception e) {
+            System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
+            write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
+        }
+        innerLoopCounter++;
     }
-
 
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
-//            try{if(action.get(Tags.Role)!=null) write("--Role="+action.get(Tags.Role));}catch(Exception e){}
-//            try{if(action.get(Tags.Targets)!=null) write("--Targets="+action.get(Tags.Targets));}catch(Exception e){}
             try{
-            	if(action.get(Tags.Desc)!=null) {
-            		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-            		write("<b>"+ escaped +"</b>  || ");
-            	}
+                if(action.get(Tags.Desc)!=null) {
+                    String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
+                    write("<b>"+ escaped +"</b>  || ");
+                }
             }catch(Exception e){}
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
-            write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
-            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(Exception e){}
+            write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable"));
+            write(" || AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable"));
             write("</li>");
         }
         write("</ul>");
@@ -198,104 +187,103 @@ public class HtmlSequenceReport implements Reporting{
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
             for(Action action:actions){
                 write("<li>");
-                
-                try{
-                	if(action.get(Tags.Desc)!=null) {
-                		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-                		write("<b>" + escaped + "</b>");
-                	}
-                }catch(Exception e){}
 
-                write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+                try{
+                    if(action.get(Tags.Desc)!=null) {
+                        String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
+                        write("<b>" + escaped + "</b>");
+                    }
+                } catch(Exception e){}
+
+                write(" || ConcreteIDCustom=" + action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable"));
+                write(" || AbstractIDCustom=" + action.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
-                
+
                 write("</li>");
             }
             write("</ul>");
         }else if(concreteIdsOfUnvisitedActions.size()==0){
             write("<h4>All actions have been visited, set of available actions:</h4><ul>");
             for(Action action:actions){
-            	write("<li>");
+                write("<li>");
 
-            	try{
-            		if(action.get(Tags.Desc)!=null) {
-            			String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-            			write("<b>" + escaped + "</b>");
-            		}
-            	}catch(Exception e){}
+                try{
+                    if(action.get(Tags.Desc)!=null) {
+                        String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
+                        write("<b>" + escaped + "</b>");
+                    }
+                }catch(Exception e){}
 
-            	write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
-            	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
+                write(" || ConcreteIDCustom=" + action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable"));
+                write(" || AbstractIDCustom=" + action.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable")
+                + " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
-            	write("</li>");
+                write("</li>");
             }
             write("</ul>");
         }else{
             write("<h4>"+concreteIdsOfUnvisitedActions.size()+" out of "+actions.size()+" actions have not been visited yet:</h4><ul>");
             for(Action action:actions){
-            	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"))){
-            		//action is unvisited -> showing:
-            		write("<li>");
+                if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable"))){
+                    //action is unvisited -> showing:
+                    write("<li>");
 
-            		try{
-            			if(action.get(Tags.Desc)!=null) {
-            				String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-            				write("<b>" + escaped + "</b>");
-            			}
-            		}catch(Exception e){}
+                    try{
+                        if(action.get(Tags.Desc)!=null) {
+                            String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
+                            write("<b>" + escaped + "</b>");
+                        }
+                    }catch(Exception e){}
 
-            		write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
-            		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
+                    write(" || ConcreteIDCustom=" + action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable"));
+                    write(" || AbstractIDCustom=" + action.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable")
+                    + " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
-            		write("</li>");
-            	}
+                    write("</li>");
+                }
             }
             write("</ul>");
         }
     }
 
     public void addSelectedAction(State state, Action action){
-    	String screenshotDir = OutputStructure.screenshotsOutputDir;
-//        System.out.println("path="+state_path);
-    	if(screenshotDir.contains("./output")){
-        	int indexStart = screenshotDir.indexOf("./output");
-        	int indexScrn = screenshotDir.indexOf("scrshots");
-        	String replaceString = screenshotDir.substring(indexStart,indexScrn);
-        	screenshotDir = screenshotDir.replace(replaceString,"../");
-        }
-//        System.out.println("path="+actionPath);
-        String actionPath = screenshotDir + File.separator 
-        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
-        		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
-        		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
-//        System.out.println("path="+actionPath);
-        write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
-        write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+        String screenshotDir = OutputStructure.screenshotsOutputDir;
 
-        try{
-        	if(action.get(Tags.Desc)!=null) {
-        		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-        		write(" || "+ escaped);
-        	}
-        }catch(Exception e){}
+        if(screenshotDir.contains("./output")){
+            int indexStart = screenshotDir.indexOf("./output");
+            int indexScrn = screenshotDir.indexOf("scrshots");
+            String replaceString = screenshotDir.substring(indexStart,indexScrn);
+            screenshotDir = screenshotDir.replace(replaceString,"../");
+        }
+
+        String actionPath = screenshotDir + File.separator 
+                + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+                + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+                + File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
+
+        write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
+
+        String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc, ""));
+        write("<h4>" + escaped + "</h4>");
+        write("<p><img src=\""+actionPath+"\"></p>");
+        write("<h4>Action: ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIDCustomAvailable")
+         + " || AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoAbstractIDCustomAvailable"));
 
         write("</h4>");
         if(actionPath.contains("./output")){
             actionPath = actionPath.replace("./output","..");
         }
-        write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
 
     public void addTestVerdict(Verdict verdict){
-    	String verdictInfo = verdict.info();
-    	if(verdict.severity() > Verdict.OK.severity())
-    		verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
-    	
+        String verdictInfo = verdict.info();
+        if(verdict.severity() > Verdict.OK.severity())
+            verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
+
         write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
 
-    
     public void close() {
         for(String s:HTMLReporter.FOOTER){
             write(s);
@@ -306,13 +294,5 @@ public class HtmlSequenceReport implements Reporting{
     private void write(String s) {
         out.println(s);
         out.flush();
-    }
-
-    private String start(String tag) {
-        return "<" + tag + ">";
-    }
-
-    private String end(String tag) {
-        return "</" + tag + ">";
     }
 }
