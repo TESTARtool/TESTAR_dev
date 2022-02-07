@@ -208,6 +208,82 @@ public class MySqlServiceImpl implements MySqlService {
         return -1;
     }
 
+    @Override
+    public int getReportId(String reportTag) throws SQLException {
+        PreparedStatement selectReportIdStatement = connection.prepareStatement("SELECT id FROM report WHERE tag = ?");
+        selectReportIdStatement.setString(1, reportTag);
+
+        final ResultSet resultSet = selectReportIdStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getFirstIterationId(int reportId) throws SQLException {
+        PreparedStatement selectFirstIterationIdStatement = connection.prepareStatement("SELECT id FROM iterations WHERE report_id = ? ORDER BY id LIMIT 1");
+        selectFirstIterationIdStatement.setInt(1, reportId);
+
+        final ResultSet resultSet = selectFirstIterationIdStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getNextIterationId(int reportId, int iterationId) throws SQLException {
+        PreparedStatement selectNextIterationIdStatement = connection.prepareStatement("SELECT id FROM iterations WHERE report_id = ? AND id > ? ORDER BY id LIMIT 1");
+        selectNextIterationIdStatement.setInt(1, reportId);
+        selectNextIterationIdStatement.setInt(2, iterationId);
+
+        final ResultSet resultSet = selectNextIterationIdStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return -1;
+    }
+
+    @Override
+    public ActionData getFirstAction(int iterationId) throws SQLException {
+        PreparedStatement selectFirstActionStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? ORDER BY start_time LIMIT 1");
+        selectFirstActionStatement.setInt(1, iterationId);
+
+        final ResultSet resultSet = selectFirstActionStatement.executeQuery();
+        if (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            final String name = resultSet.getString(2);
+            final String description = resultSet.getString(3);
+            final String status = resultSet.getString(4);
+            final String screenshot = resultSet.getString(5);
+            final Timestamp startTime = resultSet.getTimestamp(6);
+
+            return new ActionData(id, iterationId, name, description, status, screenshot, startTime);
+        }
+        return null;
+    }
+
+    @Override
+    public ActionData getNextAction(int iterationId, Timestamp actionTime) throws SQLException {
+        PreparedStatement selectNextActionStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? AND start_time > ? ORDER BY start_time LIMIT 1");
+        selectNextActionStatement.setInt(1, iterationId);
+        selectNextActionStatement.setTimestamp(2, actionTime);
+
+        final ResultSet resultSet = selectNextActionStatement.executeQuery();
+        if (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            final String name = resultSet.getString(2);
+            final String description = resultSet.getString(3);
+            final String status = resultSet.getString(4);
+            final String screenshot = resultSet.getString(5);
+            final Timestamp startTime = resultSet.getTimestamp(6);
+
+            return new ActionData(id, iterationId, name, description, status, screenshot, startTime);
+        }
+        return null;
+    }
+
     public synchronized void storeVerdict(int iterationId, String info, Double severity) throws SQLException {
         PreparedStatement updateVerdictStatement = connection.prepareStatement("UPDATE iterations SET info=?, severity=? WHERE id=?");
         updateVerdictStatement.setString(1, info);
