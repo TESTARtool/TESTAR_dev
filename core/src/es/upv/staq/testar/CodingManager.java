@@ -146,7 +146,7 @@ public class CodingManager {
  	 *
 	 */
 	public static synchronized void buildIDs(Widget widget){
-		if (widget.parent() != null){
+		if (widget.parent() != null){ // not root, so it is a "normal" widget, not a state
 			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, CodingManager.TAGS_CONCRETE_ID));
 			widget.set(Tags.AbstractID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_ID));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_R_ID));
@@ -154,7 +154,7 @@ public class CodingManager {
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
 			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE_CUSTOM + CodingManager.codify(widget, customTagsForConcreteId));
 			widget.set(Tags.AbstractIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, customTagsForAbstractId));
-		} else if (widget instanceof State) { // UI root
+		} else if (widget instanceof State) { // root widget means that it is a state
 			StringBuilder concreteId, abstractId, abstractRoleId, abstractRoleTitleId, abstractRoleTitlePathId, concreteIdCustom, abstractIdCustom;
 			concreteId = new StringBuilder(abstractId = new StringBuilder(abstractRoleId = new StringBuilder(abstractRoleTitleId = new StringBuilder(abstractRoleTitlePathId = new StringBuilder(concreteIdCustom = new StringBuilder(abstractIdCustom = new StringBuilder()))))));
 			for (Widget childWidget : (State) widget){

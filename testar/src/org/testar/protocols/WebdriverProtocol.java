@@ -58,15 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
@@ -677,14 +669,33 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    return role.equals(WdRoles.WdFORM);
 	}
 
+	/**
+	 * Function for automatically generating template XML file for the user to specify input values for a form
+	 * If the XML file for the form exists, it reads the input values and creates clickAndType actions for them
+	 *
+	 * Issues/improvements:
+	 * - naming of the XML file - now using full URL with domain also, sometimes the form properties are empty
+	 * - only handles text fields of the form, not drop-down menus or other type of widgets
+	 * - uses WebName of the form widget for telling the user which field the input is used for,
+	 * could be better to use for example <name=address> or <id=54>
+	 * - not tested what happens if the form does not fit to the screen and scrolling is needed to press submit
+	 * - change the path of the generated templates to the folder of the protocol in use
+	 * - if the web page has 2 forms, this only handles the first one
+	 *
+	 * @param actions
+	 * @param ac
+	 * @param widget
+	 */
 	protected void fillForm(Set<Action> actions, StdActionCompiler ac, Widget widget) {
 	    String uriPath = "";
 	    try {
-	        uriPath = new URI(WdDriver.getCurrentUrl()).getPath();
+	        uriPath = WdDriver.getCurrentUrl();
+	        uriPath = uriPath.substring(uriPath.indexOf("//")+2);
 	    } catch (Exception e) {
-	        System.out.println("Exception obtaining URI path, use empty path");
+	        System.out.println("Exception obtaining URI, use empty path");
 	    }
 
+	    // WebName is sometimes empty, then the generated XML file has only the URL as its name
 	    String formName = widget.get(WdTags.WebName, "");
 	    String path = (uriPath + "_" + formName).replace("/", "_") + ".xml";
 	    System.out.println("Derive FillForm Action : look for file " + path);
@@ -692,6 +703,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    File f = new File(path);
 	    Map<String, String> fields = new HashMap<>();
 	    Boolean storeFile = true;
+	    // Check whether the XML file for this form exists already
+		// If it exists, we read the XML file, and do not create a new one - storeFile = false
 	    if (f.exists()) {
 	        storeFile = false;
 	        fields = readFormFile(path);
@@ -699,7 +712,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    }
 
 	    CompoundAction.Builder formBuilder = new CompoundAction.Builder();
-	    int sum = buildForm(formBuilder, (WdWidget)widget, fields, storeFile, ac);
+	    int numberOfActions = buildForm(formBuilder, (WdWidget)widget, fields, storeFile, ac);
 
 	    if (storeFile) {
 	        storeToFile(path, fields);
@@ -714,7 +727,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	        }
 	    }
 
-	    if (sum > 0) {
+	    if (numberOfActions > 0) {
 	        Action formAction = formBuilder.build();
 	        formAction.set(Tags.OriginWidget, widget);
 	        actions.add(formAction);
@@ -722,36 +735,55 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	private int buildForm(CompoundAction.Builder formBuilder, WdWidget widget, Map<String, String> fields, boolean storeFile, StdActionCompiler ac) {
-	    int sum = 0;
+	    int numberOfActions = 0;
+	    // First handling the root element:
 	    WdElement element = widget.element;
 	    String defaultValue = "write-random-genenerated-value";
 	    if (isTypeable(widget)) {
 	        if (storeFile) {
-	            fields.put(element.name, defaultValue);
+//	        	for(Tag tag:widget.tags()){
+//
+//					System.out.println("DEBUG:")
+//				}
+	        	if(element.name.length()>0){
+					fields.put(element.name, defaultValue);
+				}else if(element.id.length()>0){
+					fields.put(element.id, defaultValue);
+					element.name = element.id;
+				}else{
+	        		System.out.println("DEBUG: name and id are empty!");
+				}
 	        }
 	        if (fields.containsKey(element.name) && fields.get(element.name) != null) {
 	            formBuilder.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
-	            sum += 2;
+				numberOfActions += 2;
 	        }
 	    }
-
+		//Then iterating the child elements:
 	    for (int i = 0; i < widget.childCount(); i++) {
 	        WdWidget w = widget.child(i);
 	        element = w.element;
 
 	        if (isTypeable(w)) {
 	            if (storeFile) {
-	                fields.put(element.name, defaultValue);
+					if(element.name.length()>0){
+						fields.put(element.name, defaultValue);
+					}else if(element.id.length()>0){
+						fields.put(element.id, defaultValue);
+						element.name = element.id;
+					}else{
+						System.out.println("DEBUG: name and id are empty!");
+					}
 	            }
 	            if (fields.containsKey(element.name) && fields.get(element.name) != null) {
 	                formBuilder.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
-	                sum += 2;
+					numberOfActions += 2;
 	            }
 	        } else {
-	            sum += buildForm(formBuilder, widget.child(i), fields, storeFile, ac);
+				numberOfActions += buildForm(formBuilder, widget.child(i), fields, storeFile, ac);
 	        }
 	    }
-	    return sum;
+	    return numberOfActions;
 	}
 
 	private Map<String, String> readFormFile(String fileName) {
