@@ -669,6 +669,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    return role.equals(WdRoles.WdFORM);
 	}
 
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Function for automatically generating template XML file for the user to specify input values for a form
 	 * If the XML file for the form exists, it reads the input values and creates clickAndType actions for them
@@ -681,6 +696,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * - not tested what happens if the form does not fit to the screen and scrolling is needed to press submit
 	 * - change the path of the generated templates to the folder of the protocol in use
 	 * - if the web page has 2 forms, this only handles the first one
+	 *
 	 *
 	 * @param actions
 	 * @param ac
@@ -697,8 +713,23 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	    // WebName is sometimes empty, then the generated XML file has only the URL as its name
 	    String formName = widget.get(WdTags.WebName, "");
-	    String path = (uriPath + "_" + formName).replace("/", "_") + ".xml";
-	    System.out.println("Derive FillForm Action : look for file " + path);
+		String path = uriPath;
+	    if(formName.length()>0){
+			path = uriPath + "_" + formName + ".xml";
+			System.out.println("Derive FillForm Action : look for file " + path);
+		}else if(widget.get(WdTags.WebId, "").length()>0){
+			path = uriPath + "_" + widget.get(WdTags.WebId, "") + ".xml";
+			System.out.println("Derive FillForm Action : look for file " + path);
+		}else{
+			System.out.println("DEBUG: Form name and ID are empty, using TESTAR widget path for the filename");
+			// How to find an element that does not have name or ID? We want xPath from Selenium
+			// TODO xPath for form element without attributes, instead of TESTAR widget path
+			// WdDriver.getRemoteWebDriver().findElement()
+			// 2 forms without name or id would be using the same XML filename even if one of the them has more fields
+			// Therefore, we add TESTAR widget path into the filename:
+			path = uriPath + "_" + widget.get(Tags.Path, "") + ".xml";
+		}
+		path = path.replace("/", "_") + ".xml";
 
 	    File f = new File(path);
 	    Map<String, String> fields = new HashMap<>();
@@ -714,7 +745,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    CompoundAction.Builder formBuilder = new CompoundAction.Builder();
 	    int numberOfActions = buildForm(formBuilder, (WdWidget)widget, fields, storeFile, ac);
 
-	    if (storeFile) {
+	    if (storeFile && numberOfActions > 0) {
 	        storeToFile(path, fields);
 	        // By default create the performSubmit option as true and derive the submit action
 	        if (!formName.isEmpty()) {

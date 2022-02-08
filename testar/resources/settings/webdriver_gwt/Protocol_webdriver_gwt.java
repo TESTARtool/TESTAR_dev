@@ -195,18 +195,4 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		return false;
-	}
 }
