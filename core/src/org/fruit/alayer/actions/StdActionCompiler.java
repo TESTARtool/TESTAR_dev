@@ -73,7 +73,7 @@ public class StdActionCompiler {
 	}
 	
 	public Action mouseMove(Widget w, Position position){
-		return new CompoundAction.Builder().add(new MouseMove(position), 0).add(NOP, 1).build();		
+		return new MouseMove(position);		
 	}
 	
 

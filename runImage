@@ -7,5 +7,6 @@ echo "Start Xvfb"
 sleep 2
 cd /testar/bin
 #./testar sse=webdriver_statemodel_shared
-./testar sse=webdriver_distributed_parabank
+#./testar sse=webdriver_distributed_parabank
+./testar sse=webdriver_distributed_shopizer
 #sh -c "while true; do sleep 1; done"

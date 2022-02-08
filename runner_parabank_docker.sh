@@ -59,7 +59,10 @@ do
   ### Print the total cpu and memory usage of all the processes (OrientDB, Apache Tomcat, Dockers, Java Dumper)
   #ps -a -o %cpu,%mem | tail -n +2 | awk '{cpu+=$1; mem+=$2} END { print "CPU | " cpu " | MEM | " mem }1' | tail -n 1
   # awk 'BEGIN {cpu=0;mem=0} {cpu+=$1; mem+=$2} END {print cpu,mem}'
-  per=$(ps -e -o %cpu,%mem | tail -n +2 | awk 'BEGIN {cpu=0;mem=0} {cpu+=$1; mem+=$2} END { print "CPU | " cpu " | MEM | " mem }1' | tail -n 1)
+  # top -b -n 5 -d.2 | grep "Cpu" | tail -n1 | awk '{print($2)}' | cut -d'%' -f 1
+  cpu=$(top -b -n 5 -d.2 | grep "Cpu" | tail -n1 | awk '{print($2)}' | cut -d'%' -f 1)
+  mem=$(ps -e -o %mem | tail -n +1 | awk 'BEGIN {mem=0} {mem+=$1} END { print mem }')
+  per=$(echo "CPU | " $cpu " | MEM | " $mem)
   nodes=$(docker ps -a -q --filter "status=running" | wc -l)
   echo "Time | $(date +%Y_%m_%d_%H_%M_%S) | Dockers | $nodes | $per" >> $filedate
 done

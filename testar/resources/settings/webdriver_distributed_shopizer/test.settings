@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://localhost:8080/shop"
+SUTConnectorValue = "/usr/bin/chromedriver" "1920x900+0+0" "http://host.docker.internal:8080/shop"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://local
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious titles
@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_shopizer/Protocol_webdriver_shopizer
+ProtocolClass = webdriver_distributed_shopizer/Protocol_webdriver_distributed_shopizer
 
 #################################################################
 # State model inference settings
@@ -108,15 +108,13 @@ ProtocolClass = webdriver_shopizer/Protocol_webdriver_shopizer
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
+DataStoreServer = host.docker.internal
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = shopizer
 ApplicationVersion = 1
-ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################
@@ -153,15 +151,6 @@ SwitchNewTabs = false
 OverrideWebDriverDisplayScale = 
 
 #################################################################
-# Settings (string) that can be used for user specified protocols
-#################################################################
-ProtocolSpecificSetting_1 = 
-ProtocolSpecificSetting_2 = 
-ProtocolSpecificSetting_3 = 
-ProtocolSpecificSetting_4 = 
-ProtocolSpecificSetting_5 = 
-
-#################################################################
 # Other more advanced settings
 #################################################################
 
@@ -178,19 +167,21 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
-ShowVisualSettingsDialogOnStartup = true
+TimeToWaitAfterAction = 1
+ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 1
+MaxTime = 300
+ShowSettingsAfterTest = false
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
+VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+FlashFeedback = false
+ProtocolCompileDirectory = /tmp
