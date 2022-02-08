@@ -203,7 +203,12 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		for (Widget widget : state) {
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
-		        fillForm(actions, ac, widget);
+		        Action formFillingAction = new WdFillFormAction(ac, widget);
+		        if(formFillingAction instanceof NOP){
+		        	// do nothing with NOP actions - the form was not actionable
+				}else{
+		        	actions.add(formFillingAction);
+				}
 		    }
 
 			// only consider enabled and non-tabu widgets
