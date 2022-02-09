@@ -90,7 +90,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action mouseMove(Widget w, Position position){
 		Action ret = super.mouseMove(w,position);
-		ret.set(Tags.Visualizer, new EllipseVisualizer(position, LClickPen, 10, 10));
+		ret.set(Tags.Visualizer, new EllipseVisualizer(position, MovePen, 10, 10));
 		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}

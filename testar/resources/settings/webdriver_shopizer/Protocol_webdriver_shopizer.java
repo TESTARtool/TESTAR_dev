@@ -118,6 +118,24 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 
+		    // dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
+		    // this is because a click will close the dropdown
+		    if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+		        actions.add(ac.mouseMove(widget));
+		    }
+
+		    // fill forms actions
+		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
+		        Action formFillingAction = new WdFillFormAction(ac, widget);
+		        if(((WdFillFormAction)formFillingAction).isHiddenForm()) {
+		            System.out.println("DEBUG: we derive a NOP action, but lets ignore");
+		            // do nothing with NOP actions - the form was not actionable
+		        } else {
+		            System.out.println("DEBUG: form action found: ");
+		            actions.add(formFillingAction);
+		        }
+		    }
+
 			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
 				actions.add(registrationFormFill(state, widget));
 			}
@@ -178,11 +196,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
-				} else if (widget.get(WdTags.WebCssClasses, "").contains("hidden-xs")) {
-					// span widgets that come from dropdown-toggle need a mouse movement but not a click, because a click will close the dropdown
-					actions.add(ac.mouseMove(widget));
 				} else {
-					actions.add(ac.leftClickAt(widget));
+				    actions.add(ac.leftClickAt(widget));
 				}
 			}
 		}

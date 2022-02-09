@@ -26,6 +26,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
     private StdActionCompiler ac;
     private Widget widget;
     private Action formFillingAction;
+    private boolean hidden = false;
 
     /**
      * Function for automatically generating template XML file for the user to specify input values for a form
@@ -52,6 +53,10 @@ public class WdFillFormAction extends TaggableBase implements Action {
         this.set(Tags.Desc, "Fill a form based on XML file.");
         formFillingAction = fillForm(ac, widget);
         this.set(Tags.OriginWidget, widget);
+    }
+
+    public boolean isHiddenForm() {
+        return hidden;
     }
 
     @Override
@@ -93,10 +98,10 @@ public class WdFillFormAction extends TaggableBase implements Action {
         String formName = widget.get(WdTags.WebName, "");
         String path = uriPath;
         if(formName.length()>0){
-            path = uriPath + "_" + formName + ".xml";
+            path = uriPath + "_" + formName;
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
         }else if(widget.get(WdTags.WebId, "").length()>0){
-            path = uriPath + "_" + widget.get(WdTags.WebId, "") + ".xml";
+            path = uriPath + "_" + widget.get(WdTags.WebId, "");
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
         }else{
             // System.out.println("DEBUG: Form name and ID are empty, using TESTAR widget path for the filename");
@@ -105,9 +110,9 @@ public class WdFillFormAction extends TaggableBase implements Action {
             // WdDriver.getRemoteWebDriver().findElement()
             // 2 forms without name or id would be using the same XML filename even if one of the them has more fields
             // Therefore, we add TESTAR widget path into the filename:
-            path = uriPath + "_" + widget.get(Tags.Path, "") + ".xml";
+            path = uriPath + "_" + widget.get(Tags.Path, "");
         }
-        path = path.replace("/", "_") + ".xml";
+        path = path.replace("/", "_").replace("?", "_") + ".xml";
 
         File f = new File(path);
         Map<String, String> fields = new HashMap<>();
@@ -127,12 +132,24 @@ public class WdFillFormAction extends TaggableBase implements Action {
             storeToFile(path, fields);
             // By default create the performSubmit option as true and derive the submit action
             if (!formName.isEmpty()) {
+                // If we found a form with a name property, use this property to execute a script submit action
                 formBuilder.add(new WdSubmitAction(formName), 2);
+            } else {
+                // If the form does not contains a name property, derive a GUI click action
+                // in the first submit widget of the form
+                Widget input = findSubmitButtonOfForm(widget);
+                formBuilder.add(ac.leftClickAt(input), 2);
             }
         } else if (fields != null && fields.containsKey("performSubmit")) {
             String submit = fields.get("performSubmit");
             if (submit.contains("true") && !formName.isEmpty()) {
+                // If we found a form with a name property, use this property to execute a script submit action
                 formBuilder.add(new WdSubmitAction(formName), 2);
+            } else if(submit.contains("true")) {
+                // If the form does not contains a name property, derive a GUI click action
+                // in the first submit widget of the form
+                Widget input = findSubmitButtonOfForm(widget);
+                formBuilder.add(ac.leftClickAt(input), 2);
             }
         }
 
@@ -142,10 +159,29 @@ public class WdFillFormAction extends TaggableBase implements Action {
         Action formAction = new NOP();
         if (numberOfActions > 0) {
             formAction = formBuilder.build();
+        } else {
+            // If the form does not contain fields, we mark as a hidden form
+            hidden = true;
         }
 
         formAction.set(Tags.OriginWidget, widget);
         return formAction;
+    }
+
+    private Widget findSubmitButtonOfForm(Widget form) {
+        Widget child = null;
+        for(int i = 0; i < form.childCount(); i++) {
+            if(form.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT)
+                    && form.child(i).get(WdTags.WebType,"").equalsIgnoreCase("submit")) {
+                return form.child(i);
+            } else {
+                child = findSubmitButtonOfForm(form.child(i));
+                if(child != null) {
+                    return child;
+                }
+            }
+        }
+        return child;
     }
 
     //TODO This is duplicated function from WebdriverProtocol.java - should be combined
