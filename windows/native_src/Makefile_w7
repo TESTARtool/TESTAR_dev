@@ -6,12 +6,12 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I AccessBridge
 # /I "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
           
-# DLLFILE="..\bin\org\fruit\alayer\windows\windows.dll"
+# DLLFILE="..\bin\org\testar\monkey\alayer\windows\windows.dll"
 
 # by urueda
 DLLFILE="..\bin\windows.dll"
 
-JAVA_CLASSFILE = "..\bin\org\fruit\alayer\windows\Windows.class"
+JAVA_CLASSFILE = "..\bin\org\testar\monkey\alayer\windows\Windows.class"
 
 JAVA_CLASS = Windows
 
