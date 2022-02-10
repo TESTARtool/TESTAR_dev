@@ -12,8 +12,8 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 
 DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\target\classes\java\main\org\fruit\alayer\windows\Windows.class"
-JAVA_CLASS = Windows
+JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\monkey\alayer\windows\Windows.class"
+JAVA_CLASS = org.testar.monkey.alayer.windows.Windows
 
 OBJFILES= main_w10.obj\
 # by urueda
