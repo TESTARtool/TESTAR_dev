@@ -31,11 +31,11 @@
 package org.testar.monkey;
 
 import org.testar.CodingManager;
-import org.testar.NativeLinker;
 import org.testar.ProtocolUtil;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.plugin.NativeLinker;
 
 import java.util.List;
 

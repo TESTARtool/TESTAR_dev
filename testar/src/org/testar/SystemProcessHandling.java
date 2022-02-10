@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.devices.ProcessHandle;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
+import org.testar.plugin.NativeLinker;
 
 import java.util.ArrayList;
 import java.util.Collections;

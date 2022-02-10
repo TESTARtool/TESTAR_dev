@@ -33,7 +33,7 @@ import java.util.Set;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.NativeLinker;
+import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;

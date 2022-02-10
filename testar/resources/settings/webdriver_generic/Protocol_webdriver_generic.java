@@ -28,7 +28,6 @@
  *
  */
 
-import org.testar.NativeLinker;
 import org.testar.SutVisualization;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
@@ -41,6 +40,7 @@ import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 

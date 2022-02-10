@@ -1,13 +1,14 @@
 package org.testar.StateModel;
 
-import org.testar.NativeLinker;
-import org.testar.OperatingSystems;
 import org.testar.ProtocolUtil;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;

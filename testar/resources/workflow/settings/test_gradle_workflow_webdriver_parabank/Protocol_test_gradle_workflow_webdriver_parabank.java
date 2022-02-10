@@ -28,8 +28,6 @@
  *
  */
 
-import org.testar.NativeLinker;
-
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
@@ -41,6 +39,7 @@ import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Settings;

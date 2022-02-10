@@ -31,8 +31,6 @@
 package org.testar.monkey;
 
 import org.testar.CodingManager;
-import org.testar.NativeLinker;
-import org.testar.OperatingSystems;
 import org.testar.StateManagementTags;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
@@ -47,6 +45,8 @@ import java.util.*;
 
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.settings.ExtendedSettingFile;
 import org.testar.settings.ExtendedSettingsFactory;
 

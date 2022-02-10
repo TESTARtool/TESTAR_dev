@@ -27,7 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-package org.testar;
+package org.testar.plugin;
 
 /**
  * Enumerates possible operating systems supported by Testar.

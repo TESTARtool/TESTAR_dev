@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar;
+package org.testar.plugin;
 
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.ProcessHandle;

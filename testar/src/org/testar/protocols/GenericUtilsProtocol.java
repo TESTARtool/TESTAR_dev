@@ -31,8 +31,6 @@
 
 package org.testar.protocols;
 
-import org.testar.NativeLinker;
-import org.testar.OperatingSystems;
 import org.testar.DerivedActions;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Util;
@@ -41,6 +39,8 @@ import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;

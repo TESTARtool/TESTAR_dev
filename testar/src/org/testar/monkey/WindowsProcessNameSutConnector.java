@@ -30,10 +30,10 @@
 
 package org.testar.monkey;
 
-import org.testar.NativeLinker;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.plugin.NativeLinker;
 
 import java.util.List;
 

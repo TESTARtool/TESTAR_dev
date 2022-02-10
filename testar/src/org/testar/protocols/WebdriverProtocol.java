@@ -67,11 +67,11 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
+import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
 
-import org.testar.NativeLinker;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.HtmlReporting.Reporting;
 

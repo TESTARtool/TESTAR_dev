@@ -31,7 +31,6 @@
 package org.testar.monkey;
 
 import org.testar.FlashFeedback;
-import org.testar.NativeLinker;
 import org.testar.SystemProcessHandling;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -39,6 +38,7 @@ import org.testar.monkey.alayer.StateBuilder;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.windows.WinApiException;
+import org.testar.plugin.NativeLinker;
 
 public class WindowsCommandLineSutConnector implements SutConnector {
 

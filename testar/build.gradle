@@ -71,10 +71,9 @@ task customZipDistribution(type: Zip) {
 
 dependencies {
     implementation project(':core')
-    implementation project(':native')
-    implementation project(':graphdb')
     implementation project(':webdriver')
     implementation project(':windows')
+    implementation project(':linux')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/sikulixapi.jar')
     implementation files('./lib/eye2.jar')

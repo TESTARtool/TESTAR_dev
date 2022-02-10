@@ -27,7 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-package org.testar;
+package org.testar.plugin;
 
 
 public class UnsupportedPlatformException extends RuntimeException {
