@@ -30,15 +30,11 @@
 
 
 import java.util.Set;
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+import org.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 

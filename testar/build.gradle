@@ -195,7 +195,7 @@ task buildWindows(type: Exec) {
 }
 buildWindows.dependsOn classes
 
-mainClassName='org.fruit.monkey.Main'
+mainClassName='org.testar.monkey.Main'
 
 
 /**

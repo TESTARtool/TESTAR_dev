@@ -13,7 +13,7 @@ DLLFILE="..\bin\windows.dll"
 
 JAVA_CLASSFILE = "..\bin\org\fruit\alayer\windows\Windows.class"
 
-JAVA_CLASS = org.fruit.alayer.windows.Windows
+JAVA_CLASS = Windows
 
 OBJFILES= main_w7.obj\
 # by ferpasri

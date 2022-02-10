@@ -32,19 +32,18 @@
 import java.io.File;
 import java.util.Set;
 
-import es.upv.staq.testar.ProtocolUtil;
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+import org.testar.ProtocolUtil;
+import org.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -86,7 +85,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.

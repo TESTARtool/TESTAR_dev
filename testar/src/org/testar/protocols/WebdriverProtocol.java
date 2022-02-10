@@ -31,8 +31,8 @@
 
 package org.testar.protocols;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -49,31 +49,31 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.fruit.Environment;
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.WdDriver;
-import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.alayer.windows.WinProcess;
-import org.fruit.alayer.windows.Windows;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Environment;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinProcess;
+import org.testar.monkey.alayer.windows.Windows;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.Reporting;
+import org.testar.NativeLinker;
+import org.testar.serialisation.LogSerialiser;
+import org.testar.HtmlReporting.Reporting;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions

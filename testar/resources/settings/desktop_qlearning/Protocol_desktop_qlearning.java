@@ -31,16 +31,13 @@
 
 import java.util.Set;
 
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+import org.testar.SimpleGuiStateGraph.QLearningActionSelector;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 /**

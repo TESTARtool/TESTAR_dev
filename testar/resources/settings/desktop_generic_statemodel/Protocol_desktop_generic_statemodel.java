@@ -30,9 +30,11 @@
 
 import java.util.Set;
 
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
+import org.testar.RandomActionSelector;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
