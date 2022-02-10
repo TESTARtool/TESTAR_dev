@@ -168,11 +168,15 @@ public class WdFillFormAction extends TaggableBase implements Action {
         return formAction;
     }
 
+    private static Boolean isSubmitButton(Widget submit_widget){
+        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
+        return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
+    }
+
     private Widget findSubmitButtonOfForm(Widget form) {
         Widget child = null;
         for(int i = 0; i < form.childCount(); i++) {
-            if(form.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT)
-                    && form.child(i).get(WdTags.WebType,"").equalsIgnoreCase("submit")) {
+            if(isSubmitButton(form.child(i))) {
                 return form.child(i);
             } else {
                 child = findSubmitButtonOfForm(form.child(i));
