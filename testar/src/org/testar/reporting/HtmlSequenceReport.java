@@ -37,6 +37,7 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.OutputStructure;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -126,7 +127,7 @@ public class HtmlSequenceReport implements Reporting{
     		write("<p><img src=\""+imagePath+"\"></p>");
     		write("<h4>Action:</h4>");
     		write("<p><img src=\""+actionImagePath+"\"></p>");
-    	}catch(NullPointerException e) {
+    	}catch(NullPointerException | NoSuchTagException e) {
     		System.out.println("ERROR: Adding the Sequence step " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current Sequence step " + innerLoopCounter + "</h2>");
     	}
@@ -163,7 +164,7 @@ public class HtmlSequenceReport implements Reporting{
     		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
     		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-    	}catch(NullPointerException e) {
+    	}catch(NullPointerException | NoSuchTagException e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
     	}
@@ -183,16 +184,16 @@ public class HtmlSequenceReport implements Reporting{
             		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             		write("<b>"+ escaped +"</b>  || ");
             	}
-            }catch(NullPointerException e){
+            }catch(NullPointerException | NoSuchTagException e){
                 e.printStackTrace();
             }
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
             write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
-            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(NullPointerException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(NullPointerException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(NullPointerException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(NullPointerException e){e.printStackTrace();}
+            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
             write("</li>");
         }
         write("</ul>");
@@ -210,7 +211,7 @@ public class HtmlSequenceReport implements Reporting{
                 		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
                 		write("<b>" + escaped + "</b>");
                 	}
-                }catch(NullPointerException e){}
+                }catch(NullPointerException | NoSuchTagException e){}
 
                 write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -228,7 +229,7 @@ public class HtmlSequenceReport implements Reporting{
             			String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             			write("<b>" + escaped + "</b>");
             		}
-            	}catch(NullPointerException e){}
+            	}catch(NullPointerException | NoSuchTagException e){}
 
             	write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -248,7 +249,7 @@ public class HtmlSequenceReport implements Reporting{
             				String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             				write("<b>" + escaped + "</b>");
             			}
-            		}catch(NullPointerException e){}
+            		}catch(NullPointerException | NoSuchTagException e){}
 
             		write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -283,7 +284,7 @@ public class HtmlSequenceReport implements Reporting{
         		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
         		write(" || "+ escaped);
         	}
-        }catch(NullPointerException e){}
+        }catch(NullPointerException | NoSuchTagException e){}
 
         write("</h4>");
         if(actionPath.contains("./output")){
