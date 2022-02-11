@@ -431,42 +431,9 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
     }
 }
 
-// Download last win32 chromedriver 
-task downloadChromedriver(type: Download, dependsOn: installDist) {
-    group = 'test_testar_workflow'
-    description ='downloadChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
-    Process process = builder.start();
-    process.waitFor()
-    
-    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
-    dest 'target/install/testar/bin'
-    overwrite false
-}
-
-// Extract Chromedriver from downloaded file
-task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
-    group = 'test_testar_workflow'
-    description ='downloadAndUnzipChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
-    into downloadChromedriver.dest
-}
-
 // Verify that TESTAR correctly executes chromedriver
 // To be sure, connect to ou.nl and detect Onderwijs suspicious title
-task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverSuspiciousTitle(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -486,7 +453,7 @@ task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChro
 }
 
 // Connect to para.testar.org and make a login
-task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverParabankLogin(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -506,7 +473,7 @@ task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChrome
 }
 
 // Verify that TESTAR correctly replays a sequence
-task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverCorrectReplay(type: Exec) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -526,7 +493,7 @@ task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChrome
 }
 
 // Verify that TESTAR correctly detects a not replayable sequence
-task runTestWebdriverUnreplayable(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverUnreplayable(type: Exec) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
