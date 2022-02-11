@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.HtmlReporting;
+package org.testar.reporting;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

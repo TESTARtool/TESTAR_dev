@@ -1,4 +1,4 @@
-package org.testar.StateModel.Persistence.OrientDB;
+package org.testar.statemodel.persistence.orientdb;
 
 public interface EventProcessor {
 }

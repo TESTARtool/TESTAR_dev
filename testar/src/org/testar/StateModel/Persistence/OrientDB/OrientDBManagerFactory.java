@@ -1,11 +1,11 @@
-package org.testar.StateModel.Persistence.OrientDB;
+package org.testar.statemodel.persistence.orientdb;
 
-import org.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import org.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
-import org.testar.StateModel.Persistence.PersistenceManager;
-import org.testar.StateModel.Persistence.PersistenceManagerFactory;
-import org.testar.StateModel.Persistence.QueueManager;
-import org.testar.StateModel.Util.EventHelper;
+import org.testar.statemodel.persistence.orientdb.Entity.Config;
+import org.testar.statemodel.persistence.orientdb.Entity.EntityManager;
+import org.testar.statemodel.persistence.PersistenceManager;
+import org.testar.statemodel.persistence.PersistenceManagerFactory;
+import org.testar.statemodel.persistence.QueueManager;
+import org.testar.statemodel.util.EventHelper;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 

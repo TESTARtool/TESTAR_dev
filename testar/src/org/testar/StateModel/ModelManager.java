@@ -1,16 +1,17 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.ActionSelection.ActionSelector;
-import org.testar.StateModel.Exception.ActionNotFoundException;
-import org.testar.StateModel.Exception.StateModelException;
-import org.testar.StateModel.Persistence.PersistenceManager;
-import org.testar.StateModel.Sequence.SequenceError;
-import org.testar.StateModel.Sequence.SequenceManager;
-import org.testar.StateModel.Util.AbstractStateService;
+import org.testar.statemodel.actionselection.ActionSelector;
+import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.exception.StateModelException;
+import org.testar.statemodel.persistence.PersistenceManager;
+import org.testar.statemodel.sequence.SequenceError;
+import org.testar.statemodel.sequence.SequenceManager;
+import org.testar.statemodel.util.AbstractStateService;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 import java.util.*;
 
@@ -228,14 +229,14 @@ public class ModelManager implements StateModelManager {
             System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
             for(Action action : actions) {
             	try {
-                if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
-                    return action;
+                    if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
+                        return action;
+                    }
+            	} catch (NoSuchTagException e) {
+                    String message = "ERROR getAbstractActionToExecute : " + action.get(Tags.Desc, "No description");
+                    System.out.println(message);
+                    errorMessages.add(message);
                 }
-            	}catch (Exception e) {
-            	    String message = "ERROR getAbstractActionToExecute : " + action.get(Tags.Desc, "No description");
-            		System.out.println(message);
-            		errorMessages.add(message);
-            	}
             }
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
             errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +

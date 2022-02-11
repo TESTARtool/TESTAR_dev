@@ -1,11 +1,11 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.Event.StateModelEvent;
-import org.testar.StateModel.Event.StateModelEventListener;
-import org.testar.StateModel.Event.StateModelEventType;
-import org.testar.StateModel.Exception.InvalidStateIdException;
-import org.testar.StateModel.Exception.StateModelException;
-import org.testar.StateModel.Exception.StateNotFoundException;
+import org.testar.statemodel.event.StateModelEvent;
+import org.testar.statemodel.event.StateModelEventListener;
+import org.testar.statemodel.event.StateModelEventType;
+import org.testar.statemodel.exception.InvalidStateIdException;
+import org.testar.statemodel.exception.StateModelException;
+import org.testar.statemodel.exception.StateNotFoundException;
 import org.testar.monkey.alayer.Tag;
 
 import java.util.HashSet;

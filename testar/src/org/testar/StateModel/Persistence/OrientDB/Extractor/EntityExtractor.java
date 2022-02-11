@@ -1,8 +1,8 @@
-package org.testar.StateModel.Persistence.OrientDB.Extractor;
+package org.testar.statemodel.persistence.orientdb.Extractor;
 
-import org.testar.StateModel.AbstractStateModel;
-import org.testar.StateModel.Exception.ExtractionException;
-import org.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
+import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.exception.ExtractionException;
+import org.testar.statemodel.persistence.orientdb.Entity.DocumentEntity;
 
 public interface EntityExtractor<T> {
 

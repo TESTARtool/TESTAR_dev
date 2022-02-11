@@ -39,6 +39,8 @@ import org.testar.monkey.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -155,9 +157,11 @@ public class Main {
 
 			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
+		}catch(Exception e) { //TODO check what kind of exceptions are possible
+			System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
 				+"Check if JAVA_HOME system variable is correctly defined \n \n"
-				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
+				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");
+		}
 
 		return true;
 	}
@@ -190,7 +194,7 @@ public class Main {
 		//Use the OS environment to obtain TESTAR directory
 		/*try {
 			testarDir = System.getenv(TESTAR_DIR_PROPERTY);
-		}catch (Exception e) {
+		}catch (IOException e) {
 			testarDir = "." + File.separator;
 			System.out.println(e);
 			System.out.println("Please execute TESTAR from their existing directory");
@@ -218,7 +222,7 @@ public class Main {
 			if(sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
-				}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
+				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");}
 		}
 
 		String[] files = getSSE();
@@ -380,13 +384,32 @@ public class Main {
 			//Run TESTAR protocol with the selected settings
 			protocol.run(settings);
 
-		}catch (Throwable t) {
-			LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			e.printStackTrace(LogSerialiser.getLogStream());
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} finally {
 			System.out.println("Main: Exception caught");
-			t.printStackTrace();
-			t.printStackTrace(LogSerialiser.getLogStream());
-		}
-		finally {
 			if (loader != null) {
 				try {
 					loader.close();
@@ -559,7 +582,7 @@ public class Main {
 			if(argv.length>0) {
 				try {
 					settings = Settings.fromFileCmd(defaults, file, argv);
-				}catch(Exception e) {
+				}catch(IOException e) {
 					System.out.println("Error with command line properties. Examples:");
 					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
 					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");

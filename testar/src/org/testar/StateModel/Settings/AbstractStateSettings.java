@@ -1,4 +1,4 @@
-package org.testar.StateModel.Settings;
+package org.testar.statemodel.settings;
 
 import org.testar.StateManagementTags;
 import org.testar.monkey.alayer.Tag;

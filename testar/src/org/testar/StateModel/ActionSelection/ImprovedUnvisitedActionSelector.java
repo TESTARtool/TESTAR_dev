@@ -1,11 +1,11 @@
-package org.testar.StateModel.ActionSelection;
+package org.testar.statemodel.actionselection;
 
-import org.testar.StateModel.AbstractAction;
-import org.testar.StateModel.AbstractState;
-import org.testar.StateModel.AbstractStateModel;
-import org.testar.StateModel.ActionSelection.Model.SelectorNode;
-import org.testar.StateModel.ActionSelection.Model.SelectorTree;
-import org.testar.StateModel.Exception.ActionNotFoundException;
+import org.testar.statemodel.AbstractAction;
+import org.testar.statemodel.AbstractState;
+import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.actionselection.model.SelectorNode;
+import org.testar.statemodel.actionselection.model.SelectorTree;
+import org.testar.statemodel.exception.ActionNotFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -38,9 +38,9 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 
-import org.testar.HtmlReporting.HtmlSequenceReport;
-import org.testar.HtmlReporting.Reporting;
-import org.testar.HtmlReporting.XMLSequenceReport;
+import org.testar.reporting.HtmlSequenceReport;
+import org.testar.reporting.Reporting;
+import org.testar.reporting.XMLSequenceReport;
 
 import java.util.Set;
 

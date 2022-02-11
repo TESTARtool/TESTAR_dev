@@ -1,7 +1,7 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.Exception.ActionNotFoundException;
-import org.testar.StateModel.Persistence.Persistable;
+import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.persistence.Persistable;
 
 import java.util.HashMap;
 import java.util.HashSet;

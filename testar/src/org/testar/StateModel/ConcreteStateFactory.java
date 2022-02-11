@@ -1,4 +1,4 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
 import org.testar.ProtocolUtil;
 import org.testar.monkey.alayer.AWTCanvas;

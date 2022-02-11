@@ -1,4 +1,4 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
@@ -46,7 +46,7 @@ public class Widget {
     public void addAttribute(Tag attribute, Object value) {
         try {
             attributes.set(attribute, value);
-        } catch (Exception e) {
+        } catch (Exception e) {//TODO what kind of exception?
             System.out.println("Problem adding value for tag " + attribute.name() + " to abstract state");
         }
     }

@@ -1,4 +1,4 @@
-package org.testar.StateModel.ActionSelection.Model;
+package org.testar.statemodel.actionselection.model;
 
 import java.util.ArrayList;
 import java.util.List;

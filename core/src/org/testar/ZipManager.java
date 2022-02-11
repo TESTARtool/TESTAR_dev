@@ -37,6 +37,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -100,7 +101,7 @@ public class ZipManager {
 			}
 			inf.end();
 			return convertFromBytes(baos.toByteArray());
-		} catch (Exception e) {
+		} catch (IOException | DataFormatException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return null; // cannot uncompress!
 		}

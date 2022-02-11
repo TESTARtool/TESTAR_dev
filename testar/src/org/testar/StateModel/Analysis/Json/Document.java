@@ -1,8 +1,7 @@
-package org.testar.StateModel.Analysis.Json;
+package org.testar.statemodel.analysis.json;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.HashMap;
 import java.util.Map;

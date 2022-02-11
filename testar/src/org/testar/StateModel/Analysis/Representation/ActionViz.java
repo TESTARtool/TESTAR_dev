@@ -1,4 +1,4 @@
-package org.testar.StateModel.Analysis.Representation;
+package org.testar.statemodel.analysis.representation;
 
 public class ActionViz {
 

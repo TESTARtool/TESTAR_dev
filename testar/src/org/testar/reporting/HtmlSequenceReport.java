@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.HtmlReporting;
+package org.testar.reporting;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.monkey.alayer.Action;
@@ -39,7 +39,9 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.OutputStructure;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 public class HtmlSequenceReport implements Reporting{
@@ -77,7 +79,9 @@ public class HtmlSequenceReport implements Reporting{
 
             write("<h1>TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount + "</h1>");
 
-        }catch (Exception e){
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
@@ -100,7 +104,9 @@ public class HtmlSequenceReport implements Reporting{
 
             write("<h1>TESTAR replay sequence report for file " + pathReplayedSequence + "</h1>");
 
-        } catch (Exception e){
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
@@ -120,7 +126,7 @@ public class HtmlSequenceReport implements Reporting{
     		write("<p><img src=\""+imagePath+"\"></p>");
     		write("<h4>Action:</h4>");
     		write("<p><img src=\""+actionImagePath+"\"></p>");
-    	}catch(Exception e) {
+    	}catch(NullPointerException e) {
     		System.out.println("ERROR: Adding the Sequence step " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current Sequence step " + innerLoopCounter + "</h2>");
     	}
@@ -157,7 +163,7 @@ public class HtmlSequenceReport implements Reporting{
     		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
     		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-    	}catch(Exception e) {
+    	}catch(NullPointerException e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
     	}
@@ -177,14 +183,16 @@ public class HtmlSequenceReport implements Reporting{
             		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             		write("<b>"+ escaped +"</b>  || ");
             	}
-            }catch(Exception e){}
+            }catch(NullPointerException e){
+                e.printStackTrace();
+            }
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
             write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
-            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(Exception e){}
-            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(Exception e){}
+            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(NullPointerException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(NullPointerException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(NullPointerException e){e.printStackTrace();}
+            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(NullPointerException e){e.printStackTrace();}
             write("</li>");
         }
         write("</ul>");
@@ -202,7 +210,7 @@ public class HtmlSequenceReport implements Reporting{
                 		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
                 		write("<b>" + escaped + "</b>");
                 	}
-                }catch(Exception e){}
+                }catch(NullPointerException e){}
 
                 write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -220,7 +228,7 @@ public class HtmlSequenceReport implements Reporting{
             			String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             			write("<b>" + escaped + "</b>");
             		}
-            	}catch(Exception e){}
+            	}catch(NullPointerException e){}
 
             	write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -240,7 +248,7 @@ public class HtmlSequenceReport implements Reporting{
             				String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             				write("<b>" + escaped + "</b>");
             			}
-            		}catch(Exception e){}
+            		}catch(NullPointerException e){}
 
             		write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
             		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
@@ -275,7 +283,7 @@ public class HtmlSequenceReport implements Reporting{
         		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
         		write(" || "+ escaped);
         	}
-        }catch(Exception e){}
+        }catch(NullPointerException e){}
 
         write("</h4>");
         if(actionPath.contains("./output")){

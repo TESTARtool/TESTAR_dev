@@ -22,9 +22,9 @@
 
     <!-- Checks for whitespace -->
     <!-- See http://checkstyle.org/config_whitespace.html -->
-	<module name="FileTabCharacter">
+	<!--module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
-    </module>
+    </module-->
 	
 	<module name="TreeWalker">
 	
@@ -52,19 +52,28 @@
 		<!-- Find more information about import moules -->
 		<!-- https://checkstyle.sourceforge.io/config_imports.html -->
 		
-		<module name="AvoidStarImport"/>
+		<!--module name="AvoidStarImport"/-->
 		
-		<!--
-		<module name="AvoidStarImport">
-			<property name="excludes" value="java.io,java.net,java.lang.Math"/>
+
+		<!--module name="AvoidStarImport">
+			<property name="excludes" value="org.testar.monkey.dialog,javax.swing,javax.awt,java.io,java.net,java.lang.Math,org.testar,java.util,org.testar.monkey.alayer,org.testar.monkey.alayer.linux,org.testar.monkey.alayer.windows"/>
 		</module>
-		-->
+
+		<module name="AvoidStaticImport">
+			<property name="excludes" value="org.testar.monkey.alayer.windows.UIARoles.*,org.testar.monkey.alayer.linux.AtSpiRolesWrapper.*"/>
+		</module-->
 		
 		<module name="IllegalImport"/>
 		
 		<module name="RedundantImport"/>
 		
-		<module name="UnusedImports"/>
+		<!--module name="UnusedImports"/-->
+
+		<module name="MissingOverride"/>
+
+		<module name="IllegalCatch"/>
+
+		<module name="PackageName"/>
 		
 	</module>
 	

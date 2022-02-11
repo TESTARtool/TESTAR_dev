@@ -1,4 +1,4 @@
-package org.testar.StateModel.ActionSelection;
+package org.testar.statemodel.actionselection;
 
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;

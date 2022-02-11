@@ -145,7 +145,7 @@ public class ProtocolEditor extends javax.swing.JDialog {
             				 System.getProperty("java.class.path")); //";./monkey.jar");
             // end bu urueda     
             console.setText(console.getText() + "OK");
-        } catch (Throwable t) {
+        } catch (IOException t) {
             console.setText(console.getText() + "\n" + t.getMessage());
         }
     }

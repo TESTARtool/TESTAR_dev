@@ -1,7 +1,7 @@
-package org.testar.StateModel.Sequence;
+package org.testar.statemodel.sequence;
 
-import org.testar.StateModel.ConcreteAction;
-import org.testar.StateModel.Persistence.Persistable;
+import org.testar.statemodel.ConcreteAction;
+import org.testar.statemodel.persistence.Persistable;
 
 import java.time.Instant;
 

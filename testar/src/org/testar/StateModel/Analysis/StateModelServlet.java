@@ -1,7 +1,7 @@
-package org.testar.StateModel.Analysis;
+package org.testar.statemodel.analysis;
 
-import org.testar.StateModel.Analysis.Representation.AbstractStateModel;
-import org.testar.StateModel.Analysis.Representation.ActionViz;
+import org.testar.statemodel.analysis.representation.AbstractStateModel;
+import org.testar.statemodel.analysis.representation.ActionViz;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -29,7 +29,9 @@ public class StateModelServlet extends HttpServlet {
             request.setAttribute("models", models);
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
             dispatcher.forward(request, response);
-        } catch (Exception e) {
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -50,7 +52,9 @@ public class StateModelServlet extends HttpServlet {
 
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/sequence.jsp");
             dispatcher.forward(request, response);
-        } catch (Exception e) {
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

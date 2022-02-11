@@ -95,7 +95,7 @@ public class SystemProcessHandling {
                 elapsed = System.currentTimeMillis() - now;
                 try {
                     NativeLinker.getNativeProcessHandle(pi.pid).kill();
-                } catch (Exception e){
+                } catch (SystemStopException e) {
                     System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
                     Util.pauseMs(500);
                 }

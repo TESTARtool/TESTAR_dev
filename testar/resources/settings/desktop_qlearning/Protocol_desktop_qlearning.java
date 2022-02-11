@@ -31,7 +31,7 @@
 
 import java.util.Set;
 
-import org.testar.SimpleGuiStateGraph.QLearningActionSelector;
+import org.testar.simpleguistategraph.QLearningActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;

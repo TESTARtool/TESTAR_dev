@@ -1,12 +1,12 @@
-package org.testar.StateModel.Persistence.OrientDB.Hydrator;
+package org.testar.statemodel.persistence.orientdb.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import org.testar.StateModel.ConcreteAction;
-import org.testar.StateModel.ConcreteState;
-import org.testar.StateModel.Exception.HydrationException;
-import org.testar.StateModel.Persistence.OrientDB.Entity.*;
-import org.testar.StateModel.Sequence.SequenceStep;
-import org.testar.StateModel.Util.HydrationHelper;
+import org.testar.statemodel.ConcreteAction;
+import org.testar.statemodel.ConcreteState;
+import org.testar.statemodel.exception.HydrationException;
+import org.testar.statemodel.persistence.orientdb.Entity.*;
+import org.testar.statemodel.sequence.SequenceStep;
+import org.testar.statemodel.util.HydrationHelper;
 
 import java.util.Date;
 

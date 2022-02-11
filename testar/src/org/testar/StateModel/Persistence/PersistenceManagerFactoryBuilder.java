@@ -1,6 +1,6 @@
-package org.testar.StateModel.Persistence;
+package org.testar.statemodel.persistence;
 
-import org.testar.StateModel.Persistence.OrientDB.OrientDBManagerFactory;
+import org.testar.statemodel.persistence.orientdb.OrientDBManagerFactory;
 
 /**
  * This class creates concrete factory classes following the abstract factory pattern.

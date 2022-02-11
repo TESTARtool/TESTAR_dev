@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.HtmlReporting;
+package org.testar.reporting;
 
 import org.testar.monkey.Assert;
 

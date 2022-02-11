@@ -1,6 +1,6 @@
-package org.testar.StateModel.Persistence.OrientDB.Extractor;
+package org.testar.statemodel.persistence.orientdb.Extractor;
 
-import org.testar.StateModel.Exception.ExtractionException;
+import org.testar.statemodel.exception.ExtractionException;
 
 import java.util.HashMap;
 import java.util.Map;

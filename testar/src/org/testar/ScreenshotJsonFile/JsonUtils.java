@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.ScreenshotJsonFile;
+package org.testar.screenshotjsonfile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.windows.UIATags;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class JsonUtils {
     	Rect sutRect;
     	try {
     		sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-    	}catch(Exception e){
+    	}catch(NullPointerException e){
     		System.out.println("ERROR: Reading State bounds for JSON file");
     		return;
     	}
@@ -92,7 +93,8 @@ public class JsonUtils {
             gson.toJson(screenshotWidgetJsonObject, fileWriter);
             fileWriter.flush(); //flush data to file   <---
             fileWriter.close(); //close write          <---
-        }catch(Exception e){
+        }catch(IOException e){
+            e.printStackTrace();
             System.out.println("ERROR: Writing JSON into file failed!");
         }
     }

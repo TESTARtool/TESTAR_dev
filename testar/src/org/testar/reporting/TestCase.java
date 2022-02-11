@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.HtmlReporting;
+package org.testar.reporting;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 

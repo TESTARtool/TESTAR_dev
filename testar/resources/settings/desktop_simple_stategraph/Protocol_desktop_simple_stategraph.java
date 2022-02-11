@@ -30,7 +30,7 @@
 
 
 import java.util.Set;
-import org.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import org.testar.simpleguistategraph.GuiStateGraphWithVisitedActions;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;

@@ -1,4 +1,4 @@
-package org.testar.StateModel.Sequence;
+package org.testar.statemodel.sequence;
 
 public enum SequenceVerdict {
 

@@ -1,6 +1,5 @@
-package org.testar.StateModel.Analysis.Representation;
+package org.testar.statemodel.analysis.representation;
 
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class TestSequence {

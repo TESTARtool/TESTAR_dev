@@ -1,14 +1,14 @@
-package org.testar.StateModel.Persistence;
+package org.testar.statemodel.persistence;
 
-import org.testar.StateModel.Event.StateModelEvent;
-import org.testar.StateModel.Event.StateModelEventListener;
-import org.testar.StateModel.Exception.InvalidEventException;
-import org.testar.StateModel.Sequence.Sequence;
-import org.testar.StateModel.Sequence.SequenceManager;
-import org.testar.StateModel.Sequence.SequenceNode;
-import org.testar.StateModel.Sequence.SequenceStep;
-import org.testar.StateModel.Util.EventHelper;
-import org.testar.StateModel.*;
+import org.testar.statemodel.event.StateModelEvent;
+import org.testar.statemodel.event.StateModelEventListener;
+import org.testar.statemodel.exception.InvalidEventException;
+import org.testar.statemodel.sequence.Sequence;
+import org.testar.statemodel.sequence.SequenceManager;
+import org.testar.statemodel.sequence.SequenceNode;
+import org.testar.statemodel.sequence.SequenceStep;
+import org.testar.statemodel.util.EventHelper;
+import org.testar.statemodel.*;
 
 import java.util.ArrayDeque;
 

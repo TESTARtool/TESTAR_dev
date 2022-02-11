@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-import org.testar.ScreenshotJsonFile.JsonUtils;
+import org.testar.screenshotjsonfile.JsonUtils;
 
 import java.util.Set;
 

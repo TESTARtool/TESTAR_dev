@@ -463,7 +463,9 @@ public class Settings extends TaggableBase implements Serializable {
 				}
 			}
 			
-		}catch(Exception e){System.out.println("Error trying to save current settings "+e);}
+		} catch (NoSuchTagException e) {
+			System.out.println("Error trying to save current settings "+e);
+		}
 
 		return sb.toString();
 	}

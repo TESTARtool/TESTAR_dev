@@ -1,6 +1,6 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.Persistence.Persistable;
+import org.testar.statemodel.persistence.Persistable;
 import org.testar.monkey.alayer.Tag;
 
 import java.util.Set;

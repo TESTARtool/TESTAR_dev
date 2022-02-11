@@ -1,4 +1,4 @@
-package org.testar.StateModel.Event;
+package org.testar.statemodel.event;
 
 public interface StateModelEventListener {
 

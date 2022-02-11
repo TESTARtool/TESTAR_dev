@@ -1,4 +1,4 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
 public class ConcreteAction extends Widget {
 

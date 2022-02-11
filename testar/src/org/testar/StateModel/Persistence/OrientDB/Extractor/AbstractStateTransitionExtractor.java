@@ -1,17 +1,17 @@
-package org.testar.StateModel.Persistence.OrientDB.Extractor;
+package org.testar.statemodel.persistence.orientdb.Extractor;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import org.testar.StateModel.AbstractAction;
-import org.testar.StateModel.AbstractState;
-import org.testar.StateModel.AbstractStateModel;
-import org.testar.StateModel.AbstractStateTransition;
-import org.testar.StateModel.Exception.ActionNotFoundException;
-import org.testar.StateModel.Exception.ExtractionException;
-import org.testar.StateModel.Exception.StateModelException;
-import org.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
-import org.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
-import org.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
-import org.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import org.testar.statemodel.AbstractAction;
+import org.testar.statemodel.AbstractState;
+import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.AbstractStateTransition;
+import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.exception.ExtractionException;
+import org.testar.statemodel.exception.StateModelException;
+import org.testar.statemodel.persistence.orientdb.Entity.DocumentEntity;
+import org.testar.statemodel.persistence.orientdb.Entity.EdgeEntity;
+import org.testar.statemodel.persistence.orientdb.Entity.PropertyValue;
+import org.testar.statemodel.persistence.orientdb.Entity.VertexEntity;
 
 public class AbstractStateTransitionExtractor implements EntityExtractor<AbstractStateTransition> {
 

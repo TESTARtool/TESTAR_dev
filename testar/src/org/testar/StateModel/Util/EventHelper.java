@@ -1,14 +1,14 @@
-package org.testar.StateModel.Util;
+package org.testar.statemodel.util;
 
-import org.testar.StateModel.AbstractState;
-import org.testar.StateModel.AbstractStateModel;
-import org.testar.StateModel.AbstractStateTransition;
-import org.testar.StateModel.Event.StateModelEvent;
-import org.testar.StateModel.Exception.InvalidEventException;
-import org.testar.StateModel.Sequence.Sequence;
-import org.testar.StateModel.Sequence.SequenceManager;
-import org.testar.StateModel.Sequence.SequenceNode;
-import org.testar.StateModel.Sequence.SequenceStep;
+import org.testar.statemodel.AbstractState;
+import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.AbstractStateTransition;
+import org.testar.statemodel.event.StateModelEvent;
+import org.testar.statemodel.exception.InvalidEventException;
+import org.testar.statemodel.sequence.Sequence;
+import org.testar.statemodel.sequence.SequenceManager;
+import org.testar.statemodel.sequence.SequenceNode;
+import org.testar.statemodel.sequence.SequenceStep;
 
 public class EventHelper {
 

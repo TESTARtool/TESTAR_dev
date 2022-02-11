@@ -1,4 +1,4 @@
-package org.testar.StateModel.Persistence;
+package org.testar.statemodel.persistence;
 
 public interface Persistable {
 

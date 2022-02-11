@@ -108,10 +108,11 @@ public class OutputStructure {
 					String sutName = sutConnectorValue.substring(startSUT, endSUT);
 					executedSUTname = sutName;
 				}
-			}catch(Exception e) {
-				System.out.println("Error: This run generation will be stored with empty name");
+			} catch (Exception e) {
+				// e.printStackTrace();
+				System.out.println("Warning: This run generation will be stored with empty name");
 			}
-			
+
 		}else {
 			executedSUTname = settings.get(ConfigTags.ApplicationName,"");
 		}

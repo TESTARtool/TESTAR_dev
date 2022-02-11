@@ -60,9 +60,9 @@ import java.util.zip.GZIPInputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.testar.*;
-import org.testar.HtmlReporting.Reporting;
-import org.testar.StateModel.StateModelManager;
-import org.testar.StateModel.StateModelManagerFactory;
+import org.testar.reporting.Reporting;
+import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.StateModelManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -232,15 +232,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 						Desktop.getDesktop().browse(file.toURI());
-					}catch (Exception e) {
+					} catch (IOException e) {
 						popupMessage("Exception: Check the path of the file, something is wrong");
 						System.out.println("Exception: Check the path of the file, something is wrong");
+					} catch (NoSuchTagException e) {
+						popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
+						System.out.println("Exception: ConfigTags.PathToReplaySequence is missing");
 					}
 				} else if (!findHTMLreport().contains("error")) {
 					try {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
-					}catch (Exception e) {
+					} catch (IOException e) {
 						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
 					}
@@ -302,10 +305,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.mode = Modes.Quit;
 		}
+		// can there be other kind of exceptions?
 
 		//allowing close-up in the end of test session:
 		closeTestSession();
@@ -682,7 +683,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
-				
+
 				//update state after begin sequence SUT modification
 				state = getState(system);
 
@@ -722,7 +723,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				sequenceCount++;
 
-			} catch (Exception e) {
+			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
 				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
 				System.out.println(message);
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
@@ -1824,7 +1825,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					GlobalScreen.unregisterNativeHook();
 				}
 			}
-		} catch(Exception e) {
+		} catch (NativeHookException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			// no ConfigTags
 			e.printStackTrace();
 		}
 

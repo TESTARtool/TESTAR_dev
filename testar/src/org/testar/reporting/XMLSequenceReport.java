@@ -28,10 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.HtmlReporting;
+package org.testar.reporting;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 import org.testar.monkey.alayer.Action;
@@ -85,7 +87,9 @@ public class XMLSequenceReport implements Reporting {
             // }
             // write("<h1>TESTAR execution sequence report for sequence
             /// "+OutputStructure.sequenceInnerLoopCount+"</h1>");
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }

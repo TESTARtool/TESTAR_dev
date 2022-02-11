@@ -1,7 +1,7 @@
-package org.testar.StateModel.Persistence.OrientDB.Util;
+package org.testar.statemodel.persistence.orientdb.Util;
 
 import com.orientechnologies.orient.core.metadata.schema.OClass;
-import org.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
+import org.testar.statemodel.persistence.orientdb.Entity.EntityClass;
 
 import java.util.Collection;
 import java.util.LinkedList;

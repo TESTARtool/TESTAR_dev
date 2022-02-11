@@ -1,8 +1,8 @@
-package org.testar.StateModel.Analysis.HttpServer;
+package org.testar.statemodel.analysis.httpserver;
 
-import org.testar.StateModel.Analysis.AnalysisManager;
-import org.testar.StateModel.Analysis.GraphServlet;
-import org.testar.StateModel.Analysis.StateModelServlet;
+import org.testar.statemodel.analysis.AnalysisManager;
+import org.testar.statemodel.analysis.GraphServlet;
+import org.testar.statemodel.analysis.StateModelServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -23,7 +23,7 @@ public class JettyServer {
      * @throws Exception
      */
     public void start(String resourceBase, AnalysisManager analysisManager) throws Exception {
-        server = new Server();
+        server = new Server(); // the plain Exception is coming from 3rd party code
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8090);
         server.setConnectors(new Connector[]{connector});

@@ -28,13 +28,13 @@
 *******************************************************************************************************/
 
 
-package org.testar.StateModel.Settings;
+package org.testar.statemodel.settings;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
-import org.testar.StateModel.Analysis.AnalysisManager;
-import org.testar.StateModel.Analysis.HttpServer.JettyServer;
-import org.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import org.testar.statemodel.analysis.AnalysisManager;
+import org.testar.statemodel.analysis.httpserver.JettyServer;
+import org.testar.statemodel.persistence.orientdb.Entity.Config;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -44,7 +44,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -393,9 +395,16 @@ public class StateModelPanel extends SettingsPanel {
             Desktop desktop = java.awt.Desktop.getDesktop();
             URI uri = new URI("http://localhost:8090/models");
             desktop.browse(uri);
-        }
-        catch (Exception ex) {
+        } catch (IOException e) {
             label14.setText("Please check your connection credentials.");
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            label14.setText("Please check your connection credentials.");
+            e.printStackTrace();
+        } catch (Exception e) {
+            // the plain Exception is coming from 3rd party code
+            label14.setText("Please check your connection credentials.");
+            e.printStackTrace();
         }
     }
 

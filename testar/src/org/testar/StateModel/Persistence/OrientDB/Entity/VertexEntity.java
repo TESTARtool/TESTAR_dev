@@ -1,4 +1,4 @@
-package org.testar.StateModel.Persistence.OrientDB.Entity;
+package org.testar.statemodel.persistence.orientdb.Entity;
 
 import java.util.HashSet;
 import java.util.Set;

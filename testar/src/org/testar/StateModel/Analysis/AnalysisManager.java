@@ -1,4 +1,4 @@
-package org.testar.StateModel.Analysis;
+package org.testar.statemodel.analysis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +13,14 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import org.testar.StateModel.Analysis.Json.Edge;
-import org.testar.StateModel.Analysis.Json.Element;
-import org.testar.StateModel.Analysis.Json.Vertex;
-import org.testar.StateModel.Analysis.Representation.AbstractStateModel;
-import org.testar.StateModel.Analysis.Representation.ActionViz;
-import org.testar.StateModel.Analysis.Representation.TestSequence;
-import org.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import org.testar.StateModel.Sequence.SequenceVerdict;
+import org.testar.statemodel.analysis.json.Edge;
+import org.testar.statemodel.analysis.json.Element;
+import org.testar.statemodel.analysis.json.Vertex;
+import org.testar.statemodel.analysis.representation.AbstractStateModel;
+import org.testar.statemodel.analysis.representation.ActionViz;
+import org.testar.statemodel.analysis.representation.TestSequence;
+import org.testar.statemodel.persistence.orientdb.Entity.Config;
+import org.testar.statemodel.sequence.SequenceVerdict;
 
 import java.io.*;
 import java.text.DateFormat;

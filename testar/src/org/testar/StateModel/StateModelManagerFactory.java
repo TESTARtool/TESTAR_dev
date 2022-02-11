@@ -1,13 +1,13 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
 import org.testar.CodingManager;
-import org.testar.StateModel.ActionSelection.ActionSelector;
-import org.testar.StateModel.ActionSelection.CompoundFactory;
-import org.testar.StateModel.Event.StateModelEventListener;
-import org.testar.StateModel.Persistence.PersistenceManager;
-import org.testar.StateModel.Persistence.PersistenceManagerFactory;
-import org.testar.StateModel.Persistence.PersistenceManagerFactoryBuilder;
-import org.testar.StateModel.Sequence.SequenceManager;
+import org.testar.statemodel.actionselection.ActionSelector;
+import org.testar.statemodel.actionselection.CompoundFactory;
+import org.testar.statemodel.event.StateModelEventListener;
+import org.testar.statemodel.persistence.PersistenceManager;
+import org.testar.statemodel.persistence.PersistenceManagerFactory;
+import org.testar.statemodel.persistence.PersistenceManagerFactoryBuilder;
+import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;

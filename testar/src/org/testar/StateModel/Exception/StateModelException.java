@@ -1,5 +1,4 @@
-package org.testar.StateModel.Exception;
-import java.lang.Exception;
+package org.testar.statemodel.exception;
 
 public class StateModelException extends Exception {
 }

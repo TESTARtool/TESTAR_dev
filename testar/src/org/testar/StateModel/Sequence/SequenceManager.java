@@ -1,10 +1,10 @@
-package org.testar.StateModel.Sequence;
+package org.testar.statemodel.sequence;
 
-import org.testar.StateModel.ConcreteAction;
-import org.testar.StateModel.ConcreteState;
-import org.testar.StateModel.Event.StateModelEvent;
-import org.testar.StateModel.Event.StateModelEventListener;
-import org.testar.StateModel.Event.StateModelEventType;
+import org.testar.statemodel.ConcreteAction;
+import org.testar.statemodel.ConcreteState;
+import org.testar.statemodel.event.StateModelEvent;
+import org.testar.statemodel.event.StateModelEventListener;
+import org.testar.statemodel.event.StateModelEventType;
 
 import java.util.Set;
 

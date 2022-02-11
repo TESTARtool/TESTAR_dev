@@ -1,6 +1,6 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.Util.ActionHelper;
+import org.testar.statemodel.util.ActionHelper;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;

@@ -1,4 +1,4 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;

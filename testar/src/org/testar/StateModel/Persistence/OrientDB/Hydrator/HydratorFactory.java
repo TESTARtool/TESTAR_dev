@@ -1,6 +1,6 @@
-package org.testar.StateModel.Persistence.OrientDB.Hydrator;
+package org.testar.statemodel.persistence.orientdb.Hydrator;
 
-import org.testar.StateModel.Exception.HydrationException;
+import org.testar.statemodel.exception.HydrationException;
 
 import java.util.HashMap;
 import java.util.Map;

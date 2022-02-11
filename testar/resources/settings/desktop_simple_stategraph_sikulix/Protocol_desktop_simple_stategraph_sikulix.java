@@ -33,7 +33,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.testar.ProtocolUtil;
-import org.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import org.testar.simpleguistategraph.GuiStateGraphWithVisitedActions;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;

@@ -1,4 +1,4 @@
-package org.testar.StateModel.Analysis.Json;
+package org.testar.statemodel.analysis.json;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 

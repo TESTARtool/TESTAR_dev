@@ -34,7 +34,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.testar.ProtocolUtil;
-import org.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import org.testar.simpleguistategraph.GuiStateGraphWithVisitedActions;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -45,6 +45,7 @@ import eye.Eye;
 import eye.Match;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -124,7 +125,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
 			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
-		}catch(Exception e){
+		}catch(NullPointerException e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
 			htmlReport.addActions(actions);
@@ -174,7 +175,6 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 					eye.click(match.getCenterLocation());
 				} catch (Exception e) {
 					e.printStackTrace();
-					return false;
 				}
 			}else if(action.toShortString().contains("ClickTypeInto(")){
 				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
@@ -193,7 +193,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 					Match match = eye.findImage(image);
 					eye.click(match.getCenterLocation());
 					eye.type(textToType);
-				} catch (Exception e) {
+				} catch (Exception e) { //TODO check what kind of exception
 					e.printStackTrace();
 					return false;
 				}
@@ -204,6 +204,9 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 				action.run(system, state, settings().get(ConfigTags.ActionDuration));
 			}return true;
 		}catch(ActionFailedException afe){
+			return false;
+		}catch (NoSuchTagException e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

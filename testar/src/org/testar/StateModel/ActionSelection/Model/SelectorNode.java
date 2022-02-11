@@ -1,7 +1,7 @@
-package org.testar.StateModel.ActionSelection.Model;
+package org.testar.statemodel.actionselection.model;
 
-import org.testar.StateModel.AbstractAction;
-import org.testar.StateModel.AbstractState;
+import org.testar.statemodel.AbstractAction;
+import org.testar.statemodel.AbstractState;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

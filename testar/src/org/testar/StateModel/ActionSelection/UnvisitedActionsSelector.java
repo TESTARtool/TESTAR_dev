@@ -1,10 +1,10 @@
-package org.testar.StateModel.ActionSelection;
+package org.testar.statemodel.actionselection;
 
-import org.testar.StateModel.AbstractAction;
-import org.testar.StateModel.AbstractState;
-import org.testar.StateModel.AbstractStateModel;
-import org.testar.StateModel.AbstractStateTransition;
-import org.testar.StateModel.Exception.ActionNotFoundException;
+import org.testar.statemodel.AbstractAction;
+import org.testar.statemodel.AbstractState;
+import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.AbstractStateTransition;
+import org.testar.statemodel.exception.ActionNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashSet;

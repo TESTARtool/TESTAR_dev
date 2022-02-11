@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.SimpleGuiStateGraph;
+package org.testar.simpleguistategraph;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;

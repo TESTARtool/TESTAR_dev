@@ -1,7 +1,7 @@
-package org.testar.StateModel;
+package org.testar.statemodel;
 
-import org.testar.StateModel.Event.StateModelEvent;
-import org.testar.StateModel.Event.StateModelEventListener;
+import org.testar.statemodel.event.StateModelEvent;
+import org.testar.statemodel.event.StateModelEventListener;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 
@@ -60,7 +60,7 @@ public abstract class AbstractEntity {
     public void addAttribute(Tag attribute, Object value) {
         try {
             attributes.set(attribute, value);
-        } catch (Exception e) {
+        } catch (Exception e) { //TODO check what kind of exceptions can happen
             System.out.println("Problem adding value for tag " + attribute.name() + " to abstract state");
         }
     }

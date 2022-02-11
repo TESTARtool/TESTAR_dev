@@ -1,4 +1,4 @@
-package org.testar.StateModel.Analysis;
+package org.testar.statemodel.analysis;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -44,7 +44,9 @@ public class GraphServlet  extends HttpServlet {
                 request.setAttribute("contentFolder", modelIdentifier);
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
                 dispatcher.forward(request, response);
-            } catch (Exception e) {
+            } catch (ServletException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -60,7 +62,9 @@ public class GraphServlet  extends HttpServlet {
                 request.setAttribute("contentFolder", concreteStateIdentifier);
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
                 dispatcher.forward(request, response);
-            } catch (Exception e) {
+            } catch (ServletException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
