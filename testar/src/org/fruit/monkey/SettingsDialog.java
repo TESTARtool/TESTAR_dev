@@ -73,6 +73,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
   static final String TESTAR_VERSION = "2.2.14 (7-Jan-2021) + experiments + tycho settings";
+  
+  static final String SETTINGS_FILENAME = "test.settings";
 
   private String settingsFile;
   private Settings settings;
@@ -195,7 +197,7 @@ public class SettingsDialog extends JFrame implements Observer {
     ExtendedSettingsFactory.SaveAll();
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(Main.SETTINGS_FILE)-1));
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(SETTINGS_FILENAME)-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
@@ -228,6 +230,13 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void populateInformation(Settings settings) {
+    try{
+      settings.get(ConfigTags.ExtendedSettingsFile);
+    } catch (NoSuchTagException e){
+      settings.set(ConfigTags.ExtendedSettingsFile, settingsFile.replace(SETTINGS_FILENAME, ExtendedSettingFile.FileName));
+    }
+    ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
+
     settingPanels.forEach((k,v) -> v.right().populateFrom(settings));
   }
 

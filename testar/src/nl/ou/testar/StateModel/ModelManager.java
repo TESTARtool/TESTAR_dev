@@ -5,7 +5,6 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
@@ -15,9 +14,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
-
-import com.orientechnologies.orient.core.sql.executor.OResult;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 import java.util.*;
 
@@ -281,39 +277,5 @@ public class ModelManager implements StateModelManager {
 
     public ConcreteState getCurrentConcreteState() {
         return currentConcreteState;
-    }
-
-    protected SequenceManager getSequenceManager() {
-        return sequenceManager;
-    }
-
-    @Override
-    public String queryStateModel(String query) {
-        EntityManager manager = persistenceManager.getEntityManager();
-        OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query);
-        while(resultSet.hasNext()) {
-            OResult result = resultSet.next();
-            return extractNumber(result.toString());
-        }
-        return "Empty";
-    }
-
-    private String extractNumber(final String str) {                
-
-        if(str == null || str.isEmpty()) return "";
-
-        StringBuilder sb = new StringBuilder();
-        boolean found = false;
-        for(char c : str.toCharArray()){
-            if(Character.isDigit(c)){
-                sb.append(c);
-                found = true;
-            } else if(found){
-                // If we already found a digit before and this char is not a digit, stop looping
-                break;                
-            }
-        }
-
-        return sb.toString();
     }
 }

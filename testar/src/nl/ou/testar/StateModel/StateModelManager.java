@@ -21,6 +21,4 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedByUser();
 
     void notifyTestSequenceInterruptedBySystem(String message);
-
-    String queryStateModel(String query);
 }

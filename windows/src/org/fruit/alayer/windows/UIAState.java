@@ -220,8 +220,6 @@ final class UIAState extends UIAWidget implements State {
 			returnObject = widget.uiaElement.acceleratorKey;
 		}else if(tag.equals(UIATags.UIAAccessKey)){
 			returnObject = widget.uiaElement.accessKey;
-		}else if(tag.equals(UIATags.UIAIsEnabled)){
-		    returnObject = widget.uiaElement.enabled;
 		}
 		
 		cacheTag(widget, tag, returnObject);

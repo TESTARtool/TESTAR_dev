@@ -42,9 +42,7 @@ public class SarsaQFunction implements QFunction {
         if (actionUnderExecution != null) {
             newQValue = actionUnderExecution.getAttributes().get(RLTags.SarsaValue, defaultQValue);
         }
-        final float qValue = oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
-        logger.info("For abstract action with abstractID={} q-value={} was found", previouslyExecutedAction == null? null : previouslyExecutedAction.getId(), qValue);
-        return qValue;
+        return oldQValue + alphaDiscount * (reward + gammaDiscount * newQValue - oldQValue);
     }
 }
 

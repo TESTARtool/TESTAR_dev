@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,6 +27,7 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
+
 
 package org.fruit.monkey;
 
@@ -361,7 +362,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# but that you do not want to test.\n"
 					+"#################################################################\n"
 					+"\n"
-					+"SUTProcesses = " + Util.lineSep()
+					+"SUTProcesses =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Protocolclass\n"
@@ -374,19 +375,19 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# State model inference settings\n"
 					+"#################################################################\n"
-					+"StateModelEnabled = " + Util.lineSep()
-					+"DataStore = " + Util.lineSep()
-					+"DataStoreType = " + Util.lineSep()
-					+"DataStoreServer = " + Util.lineSep()
-					+"DataStoreDirectory = " + Util.lineSep()
-					+"DataStoreDB = " + Util.lineSep()
-					+"DataStoreUser = " + Util.lineSep()
-					+"DataStorePassword = " + Util.lineSep()
-					+"DataStoreMode = " + Util.lineSep()
-					+"ApplicationName = " + Util.lineSep()
-					+"ApplicationVersion = " + Util.lineSep()
-					+"ActionSelectionAlgorithm = " + Util.lineSep()
-					+"StateModelStoreWidgets = " + Util.lineSep()
+					+"StateModelEnabled = false" + Util.lineSep()
+					+"DataStore = OrientDB" + Util.lineSep()
+					+"DataStoreType = remote" + Util.lineSep()
+					+"DataStoreServer = localhost" + Util.lineSep()
+					+"DataStoreDirectory =" + Util.lineSep()
+					+"DataStoreDB =" + Util.lineSep()
+					+"DataStoreUser =" + Util.lineSep()
+					+"DataStorePassword =" + Util.lineSep()
+					+"DataStoreMode = instant" + Util.lineSep()
+					+"ApplicationName = Buggy calculator" + Util.lineSep()
+					+"ApplicationVersion = 1.0.0" + Util.lineSep()
+					+"ActionSelectionAlgorithm =" + Util.lineSep()
+					+"StateModelStoreWidgets =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
@@ -394,18 +395,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
 					+"#################################################################\n"
-					+"AbstractStateAttributes = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# WebDriver features\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ClickableClasses = " + Util.lineSep()
-					+"DeniedExtensions = " + Util.lineSep()
-					+"DomainsAllowed = " + Util.lineSep()
-					+"FollowLinks = " + Util.lineSep()
-					+"BrowserFullScreen = " + Util.lineSep()
-					+"SwitchNewTabs = " + Util.lineSep()
+					+"AbstractStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Previous State model difference settings\n"
@@ -441,17 +431,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Values should be provided as doubles (1.5).\n"
 					+"#################################################################\n"
 					+"\n"
-					+"OverrideWebDriverDisplayScale = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Settings (string) that can be used for user specified protocols\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ProtocolSpecificSetting_1 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_2 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_3 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_4 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_5 = " + Util.lineSep()
+					+"OverrideWebDriverDisplayScale =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Extended settings file\n"

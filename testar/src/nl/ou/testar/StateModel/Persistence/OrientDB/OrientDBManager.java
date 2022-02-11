@@ -82,10 +82,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         this.entityManager = entityManager;
         init();
     }
-    
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
 
     /**
      * Initialization code goes here.

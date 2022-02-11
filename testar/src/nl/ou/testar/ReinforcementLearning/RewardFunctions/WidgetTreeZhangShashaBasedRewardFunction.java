@@ -9,11 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-import org.testar.protocols.experiments.WriterExperiments;
-import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.util.Deque;
-import java.util.function.Consumer;
 
 /**
  * This reward function is based on the article
@@ -22,8 +19,6 @@ import java.util.function.Consumer;
  * DOI: 10.1137/0218082
  */
 public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction {
-
-    public static Consumer<WriterExperimentsParams> WRITER_EXPERIMENTS_CONSUMER = WriterExperiments::writeMetrics;
 
     private static final Logger logger = LogManager.getLogger(WidgetTreeZhangShashaBasedRewardFunction.class);
     public static final float MIN_REWARD = 0.0001f;
@@ -81,21 +76,9 @@ public class WidgetTreeZhangShashaBasedRewardFunction implements RewardFunction 
         // This is returning the representation of the State = Widget process, not really informative
         logger.info("Reward for previous state:'{}' and current state '{}' is '{}'", previousState.getAbstractRepresentation(), state.getAbstractRepresentation(), reward);
         logger.info("Reward for Action Transition from Previous State to Current State is '{}'", reward);
-
+        
         previousState = state;
         treeDist.clear();
-
-        final String id = executedAction==null ? null : executedAction.getId();
-        logger.info("ID={} reward={}", id, reward);
-
-        // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
-        String information = String.format("ID | %s | reward | %s ",
-                id, reward);
-//        WRITER_EXPERIMENTS_CONSUMER.accept(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
-//                .setFilename("rlRewardMetrics")
-//                .setInformation(information)
-//                .setNewLine(true)
-//                .build());
 
         return reward;
     }

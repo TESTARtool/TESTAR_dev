@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,12 +86,24 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
-	// WedDriver settings from file:
-	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
+	// Classes that are deemed clickable by the web framework
+	protected List<String> clickableClasses = new ArrayList<>();
+
+	// Disallow links and pages with these extensions
+	// Set to null to ignore this feature
+	protected List<String> deniedExtensions = new ArrayList<>();
+
+	// Define a whitelist of allowed domains for links and pages
+	// An empty list will be filled with the domain from the sut connector
+	// Set to null to ignore this feature
+	protected List<String> domainsAllowed = new ArrayList<>();
+
+	// If true, follow links opened in new tabs
+	// If false, stay with the original (ignore links opened in new tabs)
+	protected boolean followLinks = true;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
-	//TODO web driver settings for login feature
 	protected Pair<String, String> login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
 	protected Pair<String, String> username = Pair.from("username", "");
 	protected Pair<String, String> password = Pair.from("password", "");
@@ -114,32 +127,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings){
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
-
-		// reads the settings from file:
+		
 		super.initialize(settings);
-
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = settings.get(ConfigTags.BrowserFullScreen);
-
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+	    
 	}
 	
     /**
@@ -369,29 +359,28 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     protected void stopSystem(SUT system) {
-        if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
-            try {
-                if(Settings.getSettingsPath() != null) {
-                    File folder = new File(Settings.getSettingsPath());
-                    File file = new File(folder, "existingCssClasses.txt");
-                    if(!file.exists())
-                        file.createNewFile();
+    		try {
+    			
+    			File folder = new File(Settings.getSettingsPath());
+    			File file = new File(folder, "existingCssClasses.txt");
+    			if(!file.exists())
+    				file.createNewFile();
 
-                    Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
-                    stream.forEach(line -> existingCssClasses.add(line));
-                    stream.close();
-
-                    PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
-                    for(String s : existingCssClasses)
-                        write.println(s);
-                    write.close();
-                }
-
-            } catch (Exception e) {System.out.println(e.getMessage());}
-        }
-
-        super.stopSystem(system);
+    			Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
+    			stream.forEach(line -> existingCssClasses.add(line));
+    			stream.close();
+    			
+    			PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
+    			for(String s : existingCssClasses)
+    			    write.println(s);
+    			write.close();
+    		
+    		} catch (IOException e) {System.out.println(e.getMessage());}
+    	}
+    	
+    	super.stopSystem(system);
     }
     
     @Override

@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_disconnect_rdp/Protocol_desktop_disconnect_rdp
+ProtocolClass = test_gradle_workflow_desktop_generic/Protocol_test_gradle_workflow_desktop_generic
 
 #################################################################
 # State identifier attributes
@@ -101,7 +101,7 @@ ProtocolClass = desktop_disconnect_rdp/Protocol_desktop_disconnect_rdp
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetValueValue,WidgetControlType
+AbstractStateAttributes = WidgetControlType
 
 #################################################################
 # Other more advanced settings

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class CounterBasedRewardFunctionTest {
 
     @Spy
-    private final CounterBasedRewardFunction rewardFunction = new CounterBasedRewardFunction();
+    private CounterBasedRewardFunction rewardFunction = new CounterBasedRewardFunction();
 
     @Mock
     private AbstractState currentAbstractState;
@@ -32,7 +32,6 @@ public class CounterBasedRewardFunctionTest {
 
     @Before
     public void setup () {
-        CounterBasedRewardFunction.WRITER_EXPERIMENTS_CONSUMER = x -> {};
         MockitoAnnotations.initMocks(this);
     }
 
@@ -48,26 +47,5 @@ public class CounterBasedRewardFunctionTest {
 
         // then
         assertEquals(1f, reward , 0f);
-    }
-
-    @Test
-    public void getReward_whenExecutedActionIsNull_returnDefaultReward() {
-        // when
-        float reward = rewardFunction.getReward(null, null, currentAbstractState, null);
-
-        // then
-        assertEquals(0f, reward , 0f);
-    }
-
-    @Test
-    public void getReward_whenExecutedActionGetAttributesIsNull_returnDefaultReward() {
-        // given
-        when(executedAction.getAttributes()).thenReturn(null);
-
-        // when
-        float reward = rewardFunction.getReward(null, null, currentAbstractState, executedAction);
-
-        // then
-        assertEquals(0f, reward , 0f);
     }
 }

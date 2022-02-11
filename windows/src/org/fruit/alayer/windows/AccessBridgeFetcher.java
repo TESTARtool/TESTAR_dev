@@ -31,6 +31,7 @@
 package org.fruit.alayer.windows;
 
 import java.util.ArrayList;
+
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tags;
 
@@ -105,13 +106,10 @@ public class AccessBridgeFetcher {
 				el.blocked = !accesibleStateSet.contains("showing");
 
 				parent.root.windowHandleMap.put(el.windowHandle, el);
-				
-				// Detect duplicated menu item and combo box panels to ignore them
-				if(isNonDesiredMenuItem(role, el) || isNonDesiredComboBox(role, el)) {
-				    parent.parent.ignore = true;
-				}
 
-				/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
+				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
+				if(!role.equals("menu") && !role.equals("combo box") && childrenCount != -1 && childrenCount != 0) {
+					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 					if (cc > 0){
 						el.children = new ArrayList<UIAElement>(cc);
 						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
@@ -119,31 +117,33 @@ public class AccessBridgeFetcher {
 							accessBridgeDescend(windowHandle,el,vmidAC[0],children[i]);
 					}*/
 
-				long childAC;
-				el.children = new ArrayList<UIAElement>(childrenCount);
-
-				//Swing Java Tables needs a custom descend to obtain properly cells values
-				if(swingJavaTableDescend && role.contains("table")) {
-				    // Tables have a viewport parent
-				    Rect visibleTable = parent.rect;
-				    Rect sizeTable = el.rect;
-				    int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
-				    int numberOfTotalRows = tableRowColumn[0];
-				    int numberOfTotalColumns = tableRowColumn[1];
-				    double rowSize = sizeTable.height() / numberOfTotalRows;
-				    int numberOfVisibleRows = (int) (visibleTable.height() / rowSize);
-
-				    if(sizeTable.height() > visibleTable.height()) {
-				        swingJavaTableDescend(hwnd, el, vmid, ac, numberOfVisibleRows, numberOfTotalColumns);
-				    } else {
-				        swingJavaTableDescend(hwnd, el, vmid, ac, numberOfTotalRows, numberOfTotalColumns);
-				    }
+					long childAC;
+					el.children = new ArrayList<UIAElement>(childrenCount);
+					
+					//Swing Java Tables needs a custom descend to obtain properly cells values
+					if(swingJavaTableDescend && role.contains("table")) {
+						// Tables have a viewport parent
+						Rect visibleTable = parent.rect;
+						Rect sizeTable = el.rect;
+						int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
+						int numberOfTotalRows = tableRowColumn[0];
+						int numberOfTotalColumns = tableRowColumn[1];
+						double rowSize = sizeTable.height() / numberOfTotalRows;
+						int numberOfVisibleRows = (int) (visibleTable.height() / rowSize);
+						
+						if(sizeTable.height() > visibleTable.height()) {
+							swingJavaTableDescend(hwnd, el, vmid, ac, numberOfVisibleRows, numberOfTotalColumns);
+						} else {
+							swingJavaTableDescend(hwnd, el, vmid, ac, numberOfTotalRows, numberOfTotalColumns);
+						}
+					}
+					
+					for (int i=0; i<childrenCount; i++){
+						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+						accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
+					}
 				}
 
-				for (int i=0; i<childrenCount; i++){
-				    childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-				    accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
-				}
 			}
 		}
 
@@ -165,32 +165,6 @@ public class AccessBridgeFetcher {
 			return true;
 		}
 		return false;
-	}
-	
-	private static boolean isNonDesiredMenuItem(String role, UIAElement el) {
-	    UIAElement parent = el.parent;
-	    return (role.equals("menu item") || role.equals("radio button") || role.equals("check box"))
-                && parent != null && parent.parent != null 
-                && parent.automationId.equals("popup menu") && parent.parent.automationId.equals("panel");
-	}
-
-	private static boolean isNonDesiredComboBox(String role, UIAElement el) {
-	    UIAElement parent = el.parent;
-	    boolean nonDesired = false;
-
-	    /*GOOD combobox: combo box - popup menu - scroll pane - viewport - list - label*/
-	    try {
-	        nonDesired = (role.equals("label")
-	                && parent.automationId.equals("list") 
-	                && parent.parent.automationId.equals("viewport")
-	                && parent.parent.parent.automationId.equals("scroll pane") 
-	                && parent.parent.parent.parent.automationId.equals("popup menu")
-	                && !parent.parent.parent.parent.parent.automationId.equals("combo box"));
-	    } catch(Exception e) {
-	        return false;
-	    }
-
-	    return nonDesired;
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel.Persistence;
 
 import nl.ou.testar.StateModel.*;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
@@ -107,7 +106,5 @@ public interface PersistenceManager {
      * @return
      */
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
-    
-    EntityManager getEntityManager();
 
 }

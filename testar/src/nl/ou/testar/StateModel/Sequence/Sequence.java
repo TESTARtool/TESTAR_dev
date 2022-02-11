@@ -219,11 +219,4 @@ public class Sequence implements Persistable {
     public String getTerminationMessage() {
         return terminationMessage;
     }
-
-    /**
-     * Returns the nodes in the current sequence
-     */
-    public List<SequenceNode>getNodes (){
-        return nodes;
-    }
 }
