@@ -479,7 +479,7 @@ task runTestWebdriverCorrectReplay(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverCorrectReplay'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
     doLast {
         String output = standardOutput.toString()
 
@@ -499,7 +499,7 @@ task runTestWebdriverUnreplayable(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverUnreplayable'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
     doLast {
         String output = standardOutput.toString()
 
