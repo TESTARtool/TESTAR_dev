@@ -38,6 +38,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
@@ -126,7 +127,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
-		        Action formFillingAction = new WdFillFormAction(ac, widget);
+		    	String protocol = settings.get(ConfigTags.ProtocolClass, "");
+		        Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
 		        if(((WdFillFormAction)formFillingAction).isHiddenForm()) {
 		            System.out.println("DEBUG: we derive a NOP action, but lets ignore");
 		            // do nothing with NOP actions - the form was not actionable
@@ -140,7 +142,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				actions.add(registrationFormFill(state, widget));
 			}
 			if(widget.get(WdTags.WebId, "").contains("login-form")) {
-				actions.add(loginFormFill(state, widget));
+//				actions.add(loginFormFill(state, widget));
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -168,7 +170,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 					// Ignore duplicated search bar text box
 					continue;
 				}
-				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
+//				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
 			}
 
 //			// left clicks, but ignore links outside domain
@@ -197,7 +199,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
 				} else {
-				    actions.add(ac.leftClickAt(widget));
+//				    actions.add(ac.leftClickAt(widget));
 				}
 			}
 		}

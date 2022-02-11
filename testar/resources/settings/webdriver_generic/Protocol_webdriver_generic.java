@@ -203,7 +203,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		for (Widget widget : state) {
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
-		        Action formFillingAction = new WdFillFormAction(ac, widget);
+				String protocol = settings.get(ConfigTags.ProtocolClass, "");
+		        Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
 		        if(formFillingAction instanceof NOP){
 		        	// do nothing with NOP actions - the form was not actionable
 				}else{
