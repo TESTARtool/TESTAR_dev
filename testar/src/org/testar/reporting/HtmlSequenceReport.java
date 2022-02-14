@@ -158,9 +158,6 @@ public class HtmlSequenceReport implements Reporting{
     		write("<h2>State "+innerLoopCounter+"</h2>");
     		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
     		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-    		//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-    		//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
     		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
     		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
@@ -191,9 +188,6 @@ public class HtmlSequenceReport implements Reporting{
             write(StringEscapeUtils.escapeHtml(action.toString()));
             write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
             try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
-            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
             write("</li>");
         }
         write("</ul>");

@@ -391,11 +391,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			ois.close();
 
 		} catch (ClassNotFoundException | IOException e) {
-			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
+		    popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
+		    System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
+		    e.printStackTrace();
 
-			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-
-			return false;
+		    return false;
 		}
 
 		return true;
