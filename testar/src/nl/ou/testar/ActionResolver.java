@@ -30,6 +30,30 @@ public interface ActionResolver {
     Action selectAction(State state, Set<Action> actions);
 
     /**
+     * StopCriteria for a sequence:
+     *
+     * TESTAR uses this method to determine when to stop the generation of actions for the
+     * current sequence. You can stop deriving more actions after:
+     * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
+     * - after a specific time, that is set in the MaxTime setting
+     *
+     * @return  if <code>true</code> continue generation, else stop
+     */
+    boolean moreActions(State state);
+
+    /**
+     * StopCriteria for a test session:
+     *
+     * TESTAR uses this method to determine when to stop the entire test sequence
+     * You could stop the test after:
+     * - a specified amount of sequences, which is specified through the Sequences setting, or
+     * - after a specific time, that is set in the MaxTime setting
+     *
+     * @return  if <code>true</code> continue test, else stop
+     */
+    boolean moreSequences();
+
+    /**
      * Next responder in chain
      */
     ActionResolver nextResolver();

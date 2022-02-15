@@ -81,6 +81,7 @@ public class OrientDbServiceImpl implements OrientDBService {
         dockerPoolService.startWithImage(imageId, "orientdb", hostConfig);
 
         try {
+            System.out.println();
             //TODO: Implement a better way to test the connection.
             Thread.sleep(15000);
         } catch (Exception ex) {

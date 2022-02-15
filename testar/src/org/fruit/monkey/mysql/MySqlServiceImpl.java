@@ -13,6 +13,8 @@ import org.testar.monkey.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MySqlServiceImpl implements MySqlService {
 
@@ -146,13 +148,14 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException {
-        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time) VALUES (?, ?, ?, ?, ?)");
+    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected) throws SQLException {
+        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time, selected) VALUES (?, ?, ?, ?, ?, ?)");
         addActionStatement.setString(1, name);
         addActionStatement.setString(2, description);
         addActionStatement.setString(3, status);
         addActionStatement.setString(4, screenshot);
         addActionStatement.setTimestamp(5, startTime);
+        addActionStatement.setBoolean(6, selected);
         addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -205,7 +208,7 @@ public class MySqlServiceImpl implements MySqlService {
 
     @Override
     public int getReportId(String reportTag) throws SQLException {
-        PreparedStatement selectReportIdStatement = connection.prepareStatement("SELECT id FROM report WHERE tag = ?");
+        PreparedStatement selectReportIdStatement = connection.prepareStatement("SELECT id FROM reports WHERE tag = ?");
         selectReportIdStatement.setString(1, reportTag);
 
         final ResultSet resultSet = selectReportIdStatement.executeQuery();
@@ -213,6 +216,60 @@ public class MySqlServiceImpl implements MySqlService {
             return resultSet.getInt(1);
         }
         return -1;
+    }
+
+    @Override
+    public List<IterationData> getAllIterations(int reportId) throws SQLException {
+        PreparedStatement selectAllIterationsStatement = connection.prepareStatement("SELECT id, info, severity FROM iterations WHERE report_id = ? ORDER BY id");
+        selectAllIterationsStatement.setInt(1, reportId);
+
+        final ResultSet resultSet = selectAllIterationsStatement.executeQuery();
+        List<IterationData> result = new LinkedList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            final String info = resultSet.getString(2);
+            double severity = resultSet.getDouble(3);
+            result.add(new IterationData(id, reportId, info, severity));
+        }
+        return result;
+    }
+
+    @Override
+    public List<ActionData> getAllActions(int iterationId) throws SQLException {
+        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? ORDER BY start_time");
+        selectAllActionsStatement.setInt(1, iterationId);
+
+        final ResultSet resultSet = selectAllActionsStatement.executeQuery();
+        List<ActionData> result = new LinkedList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            final String name = resultSet.getString(2);
+            final String description = resultSet.getString(3);
+            final String status = resultSet.getString(4);
+            final String screenshot = resultSet.getString(5);
+            final Timestamp startTime = resultSet.getTimestamp(6);
+            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime));
+        }
+        return result;
+    }
+
+    @Override
+    public List<ActionData> getSelectedActions(int iterationId) throws SQLException {
+        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? AND selected = TRUE ORDER BY start_time");
+        selectAllActionsStatement.setInt(1, iterationId);
+
+        final ResultSet resultSet = selectAllActionsStatement.executeQuery();
+        List<ActionData> result = new LinkedList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            final String name = resultSet.getString(2);
+            final String description = resultSet.getString(3);
+            final String status = resultSet.getString(4);
+            final String screenshot = resultSet.getString(5);
+            final Timestamp startTime = resultSet.getTimestamp(6);
+            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime));
+        }
+        return result;
     }
 
     @Override

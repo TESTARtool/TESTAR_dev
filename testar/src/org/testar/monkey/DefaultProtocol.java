@@ -141,6 +141,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	// TODO: re-assign action resolver if needed
 	protected ActionResolver actionResolver = this;
 
+	private TaggableBase fragment = new TaggableBase();
+
 	// Should not provide any action resolver next to itself
 	@Override
 	public ActionResolver nextResolver() {
@@ -210,6 +212,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		actionResolver = customActionResolver;
 	}
 
+	/**
+	 * Remove an action resolver from the top of the chain if not last
+	 *
+	 * @return true if resolver removed
+	 */
+	public boolean resignActionResolver() {
+		ActionResolver nextResolver = actionResolver.nextResolver();
+		if (nextResolver == null) {
+			return false;
+		}
+		actionResolver = nextResolver;
+		return true;
+	}
+
 	public  void setDelegate(ProtocolDelegate delegate) {
 		this.delegate = delegate;
 	}
@@ -272,7 +288,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
-			} else if (mode() == Modes.Replay && isValidFile()) {
+			} else if (mode() == Modes.Replay) {
 				runReplayLoop();
 			} else if (mode() == Modes.Spy) {
 				runSpyLoop();
@@ -509,7 +525,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 *
 	 * @return name of the generated sequence file
 	 */
-	private String getAndStoreGeneratedSequence() {
+	protected String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
@@ -545,7 +561,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 *
 	 * @return temporary file for saving the test sequence
 	 */
-	private File getAndStoreSequenceFile() {
+	protected File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
 
 		String sequenceObject = settings.get(ConfigTags.TempDir)
@@ -685,7 +701,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		/*
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
-		while (mode() != Modes.Quit && moreSequences()) {
+		while (mode() != Modes.Quit && actionResolver.moreSequences()) {
 			exceptionThrown = false;
 
 			synchronized(this){
@@ -789,13 +805,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		LogSerialiser.log("The test has ended...", LogSerialiser.LogLevel.Debug);
 	}
 
-	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
-		// Check if user wants to save or not the sequences without faults
-		if (settings.get(ConfigTags.OnlySaveFaultySequences, false) && finalVerdict.severity() == Verdict.OK.severity()) {
-			LogSerialiser.log("Skipped generated sequence OK (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
-		} else {
+	protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
+		if (!settings.get(ConfigTags.OnlySaveFaultySequences, false) ||
+				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
+
 			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
 			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
+		}
+		else {
+			LogSerialiser.log("Skipped generated sequence OK (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
 		}
 	}
 
@@ -814,7 +832,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state)) {
+		while (mode() != Modes.Quit && actionResolver.moreActions(state)) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
@@ -877,19 +895,31 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	}
 
 	/**
+	 * This method initializes the fragment for replayable sequence
+	 *
+	 * @param state
+	 */
+	protected void initFragmentForReplayableSequence(State state){
+		// Fragment is used for saving a replayable sequence:
+		fragment = new TaggableBase();
+		fragment.set(SystemState, state);
+		fragment.set(OracleVerdict, getVerdict(state));
+	}
+
+	/**
 	 * Saving the action into the fragment for replayable sequence
 	 *
 	 * @param action
 	 */
-	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+	protected void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 	    // create fragment
-		TaggableBase fragment = new TaggableBase();
+//		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);
 	    fragment.set(ActionSet, actions);
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdict, getVerdict(state));
+	    fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -898,31 +928,53 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 	    LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 	    TestSerialiser.write(fragment);
+		//resetting the fragment:
+		fragment = new TaggableBase();
+	}
+
+
+	/**
+	 * Saving the action into the fragment for replayable sequence
+	 *
+	 * @param state
+	 */
+	protected void saveStateIntoFragmentForReplayableSequence(State state) {
+		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
+		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
+		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+		TestSerialiser.write(fragment);
+		//resetting the fragment:
+		fragment =new TaggableBase();
 	}
 
 	/**
 	 * Wait until fragments have been written then close the test serialiser
 	 */
-	private void writeAndCloseFragmentForReplayableSequence() {
-	    //Wait since TestSerialiser and ScreenshotSerialiser write all fragments/src on sequence File
-	    while(!TestSerialiser.isSavingQueueEmpty() || !ScreenshotSerialiser.isSavingQueueEmpty()) {
-	        synchronized (this) {
-	            try {
-	                this.wait(1000);
-	            } catch (InterruptedException e) {
-	                e.printStackTrace();
-	            }
-	        }
-	    }
 
-	    //closing ScreenshotSerialiser and TestSerialiser
-	    ScreenshotSerialiser.finish();
-	    ScreenshotSerialiser.exit();
-	    TestSerialiser.finish();
-	    TestSerialiser.exit();
+	protected void writeAndCloseFragmentForReplayableSequence() {
+		//closing ScreenshotSerialiser:
+		ScreenshotSerialiser.finish();
+		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+		TestSerialiser.write(fragment);
 
-	    LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-	    LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
+		//Wait since TestSerialiser write all fragments on sequence File
+		while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
+			synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		TestSerialiser.finish();
+		LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
+
+		ScreenshotSerialiser.exit();
+		TestSerialiser.exit();
 	}
 
 	/**
@@ -932,7 +984,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * @param action
 	 * @param actionMode
 	 */
-	private void saveActionInfoInLogs(State state, Action action, String actionMode) {
+	protected void saveActionInfoInLogs(State state, Action action, String actionMode) {
 
 		//Obtain action information
 		String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
@@ -1791,7 +1843,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * @param state
 	 * @return
 	 */
-	protected boolean moreActions(State state) {
+
+	@Override
+	public boolean moreActions(State state) {
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
@@ -1803,7 +1857,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * STOP criteria deciding whether more sequences are required in a test run
 	 * @return
 	 */
-	protected boolean moreSequences() {
+	@Override
+	public boolean moreSequences() {
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
