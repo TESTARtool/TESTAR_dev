@@ -1,7 +1,7 @@
 package org.testar.statemodel.persistence.orientdb;
 
-import org.testar.statemodel.persistence.orientdb.Entity.Config;
-import org.testar.statemodel.persistence.orientdb.Entity.EntityManager;
+import org.testar.statemodel.persistence.orientdb.entity.Config;
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.persistence.PersistenceManagerFactory;
 import org.testar.statemodel.persistence.QueueManager;

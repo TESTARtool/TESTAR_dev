@@ -1,7 +1,7 @@
 package org.testar.statemodel.util;
 
-import org.testar.statemodel.persistence.orientdb.Entity.Property;
-import org.testar.statemodel.persistence.orientdb.Entity.TypeConvertor;
+import org.testar.statemodel.persistence.orientdb.entity.Property;
+import org.testar.statemodel.persistence.orientdb.entity.TypeConvertor;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 

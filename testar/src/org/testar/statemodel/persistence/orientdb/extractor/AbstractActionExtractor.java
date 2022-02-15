@@ -1,12 +1,12 @@
-package org.testar.statemodel.persistence.orientdb.Extractor;
+package org.testar.statemodel.persistence.orientdb.extractor;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.exception.ExtractionException;
-import org.testar.statemodel.persistence.orientdb.Entity.DocumentEntity;
-import org.testar.statemodel.persistence.orientdb.Entity.EdgeEntity;
-import org.testar.statemodel.persistence.orientdb.Entity.PropertyValue;
+import org.testar.statemodel.exceptions.ExtractionException;
+import org.testar.statemodel.persistence.orientdb.entity.DocumentEntity;
+import org.testar.statemodel.persistence.orientdb.entity.EdgeEntity;
+import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
 
 import java.util.Set;
 

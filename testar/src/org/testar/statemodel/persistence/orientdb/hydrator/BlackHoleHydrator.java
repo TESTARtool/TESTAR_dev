@@ -1,11 +1,11 @@
-package org.testar.statemodel.persistence.orientdb.Hydrator;
+package org.testar.statemodel.persistence.orientdb.hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.testar.statemodel.AbstractState;
-import org.testar.statemodel.exception.HydrationException;
-import org.testar.statemodel.persistence.orientdb.Entity.Property;
-import org.testar.statemodel.persistence.orientdb.Entity.PropertyValue;
-import org.testar.statemodel.persistence.orientdb.Entity.VertexEntity;
+import org.testar.statemodel.exceptions.HydrationException;
+import org.testar.statemodel.persistence.orientdb.entity.Property;
+import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
+import org.testar.statemodel.persistence.orientdb.entity.VertexEntity;
 import org.testar.statemodel.util.HydrationHelper;
 
 public class BlackHoleHydrator implements EntityHydrator<VertexEntity> {

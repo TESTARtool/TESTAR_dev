@@ -3,7 +3,7 @@ package org.testar.statemodel.actionselector;
 import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.exceptions.ActionNotFoundException;
 
 public interface ActionSelector {
 

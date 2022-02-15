@@ -2,7 +2,7 @@ package org.testar.statemodel.persistence;
 
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
-import org.testar.statemodel.exception.InvalidEventException;
+import org.testar.statemodel.exceptions.InvalidEventException;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.sequence.SequenceNode;

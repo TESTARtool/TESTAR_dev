@@ -13,13 +13,13 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import org.testar.statemodel.analysis.json.Edge;
-import org.testar.statemodel.analysis.json.Element;
-import org.testar.statemodel.analysis.json.Vertex;
+import org.testar.statemodel.analysis.jsonformat.Edge;
+import org.testar.statemodel.analysis.jsonformat.Element;
+import org.testar.statemodel.analysis.jsonformat.Vertex;
 import org.testar.statemodel.analysis.representation.AbstractStateModel;
 import org.testar.statemodel.analysis.representation.ActionViz;
 import org.testar.statemodel.analysis.representation.TestSequence;
-import org.testar.statemodel.persistence.orientdb.Entity.Config;
+import org.testar.statemodel.persistence.orientdb.entity.Config;
 import org.testar.statemodel.sequence.SequenceVerdict;
 
 import java.io.*;

@@ -1,8 +1,8 @@
 package org.testar.statemodel;
 
 import org.testar.statemodel.actionselector.ActionSelector;
-import org.testar.statemodel.exception.ActionNotFoundException;
-import org.testar.statemodel.exception.StateModelException;
+import org.testar.statemodel.exceptions.ActionNotFoundException;
+import org.testar.statemodel.exceptions.StateModelException;
 import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.sequence.SequenceError;
 import org.testar.statemodel.sequence.SequenceManager;

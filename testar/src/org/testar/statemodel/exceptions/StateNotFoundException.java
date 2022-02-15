@@ -1,4 +1,4 @@
-package org.testar.statemodel.exception;
+package org.testar.statemodel.exceptions;
 
 public class StateNotFoundException extends StateModelException {
 }

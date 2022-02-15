@@ -1,4 +1,4 @@
-package org.testar.statemodel.analysis.json;
+package org.testar.statemodel.analysis.jsonformat;
 
 public class Vertex extends Document {
 

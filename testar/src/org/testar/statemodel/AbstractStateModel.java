@@ -3,9 +3,9 @@ package org.testar.statemodel;
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
 import org.testar.statemodel.event.StateModelEventType;
-import org.testar.statemodel.exception.InvalidStateIdException;
-import org.testar.statemodel.exception.StateModelException;
-import org.testar.statemodel.exception.StateNotFoundException;
+import org.testar.statemodel.exceptions.InvalidStateIdException;
+import org.testar.statemodel.exceptions.StateModelException;
+import org.testar.statemodel.exceptions.StateNotFoundException;
 import org.testar.monkey.alayer.Tag;
 
 import java.util.HashSet;

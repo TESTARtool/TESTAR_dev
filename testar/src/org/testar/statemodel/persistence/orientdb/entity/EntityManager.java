@@ -1,4 +1,4 @@
-package org.testar.statemodel.persistence.orientdb.Entity;
+package org.testar.statemodel.persistence.orientdb.entity;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
@@ -16,8 +16,8 @@ import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import org.testar.statemodel.exception.EntityNotFoundException;
-import org.testar.statemodel.persistence.orientdb.Util.DependencyHelper;
+import org.testar.statemodel.exceptions.EntityNotFoundException;
+import org.testar.statemodel.persistence.orientdb.util.DependencyHelper;
 import org.testar.monkey.alayer.Visualizer;
 
 import java.util.*;

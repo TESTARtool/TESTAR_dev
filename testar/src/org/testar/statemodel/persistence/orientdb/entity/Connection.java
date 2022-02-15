@@ -1,4 +1,4 @@
-package org.testar.statemodel.persistence.orientdb.Entity;
+package org.testar.statemodel.persistence.orientdb.entity;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;

@@ -5,7 +5,7 @@ import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.actionselector.model.SelectorNode;
 import org.testar.statemodel.actionselector.model.SelectorTree;
-import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.exceptions.ActionNotFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;

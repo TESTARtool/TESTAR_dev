@@ -1,4 +1,4 @@
-package org.testar.statemodel.analysis.httpserver;
+package org.testar.statemodel.analysis.webserver;
 
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.GraphServlet;

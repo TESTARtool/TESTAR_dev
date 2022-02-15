@@ -1,13 +1,13 @@
-package org.testar.statemodel.persistence.orientdb.Hydrator;
+package org.testar.statemodel.persistence.orientdb.hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.testar.statemodel.ConcreteAction;
-import org.testar.statemodel.exception.HydrationException;
-import org.testar.statemodel.persistence.orientdb.Entity.EdgeEntity;
-import org.testar.statemodel.persistence.orientdb.Entity.Property;
-import org.testar.statemodel.persistence.orientdb.Entity.PropertyValue;
-import org.testar.statemodel.persistence.orientdb.Entity.TypeConvertor;
-import org.testar.statemodel.persistence.orientdb.Util.Validation;
+import org.testar.statemodel.exceptions.HydrationException;
+import org.testar.statemodel.persistence.orientdb.entity.EdgeEntity;
+import org.testar.statemodel.persistence.orientdb.entity.Property;
+import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
+import org.testar.statemodel.persistence.orientdb.entity.TypeConvertor;
+import org.testar.statemodel.persistence.orientdb.util.Validation;
 import org.testar.statemodel.util.HydrationHelper;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;

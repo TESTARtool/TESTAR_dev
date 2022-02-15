@@ -1,4 +1,4 @@
-package org.testar.statemodel.persistence.orientdb.Util;
+package org.testar.statemodel.persistence.orientdb.util;
 
 public abstract class Validation {
 

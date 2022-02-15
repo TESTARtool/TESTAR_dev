@@ -4,7 +4,7 @@ import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.AbstractStateTransition;
 import org.testar.statemodel.event.StateModelEvent;
-import org.testar.statemodel.exception.InvalidEventException;
+import org.testar.statemodel.exceptions.InvalidEventException;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.sequence.SequenceNode;

@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.simpleguistategraph;
+package org.testar.simplestategraph;
 
 public class GuiStateTransition {
     private String sourceStateAbstractCustomId;

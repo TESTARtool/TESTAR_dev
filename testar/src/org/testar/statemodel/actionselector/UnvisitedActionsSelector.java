@@ -4,7 +4,7 @@ import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.AbstractStateTransition;
-import org.testar.statemodel.exception.ActionNotFoundException;
+import org.testar.statemodel.exceptions.ActionNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashSet;

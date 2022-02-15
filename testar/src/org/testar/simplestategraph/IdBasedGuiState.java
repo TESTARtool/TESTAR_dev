@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.simpleguistategraph;
+package org.testar.simplestategraph;
 
 import java.util.HashSet;
 import java.util.Set;

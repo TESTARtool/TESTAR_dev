@@ -1,4 +1,4 @@
-package org.testar.statemodel.persistence.orientdb.Entity;
+package org.testar.statemodel.persistence.orientdb.entity;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
