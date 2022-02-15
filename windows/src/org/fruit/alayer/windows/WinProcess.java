@@ -61,6 +61,8 @@ public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = ""; // by wcoux
 
+	public static boolean java_execution = false;
+
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
 	}
@@ -127,7 +129,36 @@ public final class WinProcess extends SUTBase {
 		try{
 			Assert.notNull(path);
 
-			//Disabled with browsers, only allow it with desktop applications executed with command_line
+			// Force the execution of the SUT via Java
+			if(java_execution) {
+
+				System.out.println("Executing SUT via Java process...");
+
+				final Process process = Runtime.getRuntime().exec(path);
+				Field field = process.getClass().getDeclaredField("handle");
+				field.setAccessible(true);
+
+				long processHandle = field.getLong(process);
+
+				Util.pause(5);
+
+				long pid = Windows.GetProcessId(processHandle);
+
+				WinProcess returnProcess = fromPID(pid);
+
+				if(ProcessListenerEnabled) {
+					returnProcess.set(Tags.StdErr,process.getErrorStream());
+					returnProcess.set(Tags.StdOut, process.getInputStream());
+					returnProcess.set(Tags.StdIn, process.getOutputStream());
+				}
+
+				returnProcess.set(Tags.Path, path);
+				returnProcess.set(Tags.Desc, path);
+				return returnProcess;
+			}
+
+			// Execute the SUT via Windows API
+			// Disabled with browsers, only allow it with desktop applications executed with command_line
 			if(!ProcessListenerEnabled) {
 
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
@@ -140,8 +171,8 @@ public final class WinProcess extends SUTBase {
 				return ret;
 			}
 			
-			//Associate Output / Error from SUT
-
+			// Execute the SUT via Java
+			// And Associate Output / Error from SUT
 			final Process process = Runtime.getRuntime().exec(path);
 			Field field = process.getClass().getDeclaredField("handle");
 			field.setAccessible(true);
@@ -356,6 +387,22 @@ public final class WinProcess extends SUTBase {
 	public boolean isRunning() {
 		return hProcess != 0 && 
 				Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+	}
+
+	/**
+	 * Determines whether the Windows system considers that a specified application is not responding.
+	 * https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-ishungappwindow
+	 *
+	 * @param hwnd
+	 * @return if application window hung or not
+	 */
+	public static boolean isHungWindow(long hwnd) {
+		try {
+			return Windows.IsHungAppWindow(hwnd);
+		} catch(Exception e) {
+			System.out.println("Internal error with Windows.IsHungAppWindow API call");
+		}
+		return false;
 	}
 
 	public String toString(){
