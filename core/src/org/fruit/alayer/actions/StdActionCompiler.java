@@ -184,6 +184,8 @@ public class StdActionCompiler {
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
+		ret.set(Tags.Desc, "Left Double Click at " + w.get(Tags.Desc, "<no description>"));
 		return ret;
 	}
 

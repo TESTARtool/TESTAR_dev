@@ -411,6 +411,27 @@ public class Settings extends TaggableBase implements Serializable {
 					+"SwitchNewTabs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Previous State model difference settings\n"
+					+"#################################################################\n"
+					+"PreviousApplicationName =" + Util.lineSep()
+					+"PreviousApplicationVersion =" + Util.lineSep()
+					+"StateModelDifferenceAutomaticReport =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Reinforcement learning settings\n"
+					+"#################################################################\n"
+					+"Alpha = " + Util.lineSep()
+					+"Gamma = " + Util.lineSep()
+					+"DefaultValue = " + Util.lineSep()
+					+"DefaultReward = " + Util.lineSep()
+					+"Epsilon = " + Util.lineSep()
+					+"MaxQValue = " + Util.lineSep()
+					+"DecayRate = " + Util.lineSep()
+					+"Temperature = " + Util.lineSep()
+					+"RewardFunction = " + Util.lineSep()
+					+"Policy = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Override display scale\n"
 					+"#\n"
 					+"# Overrides the displayscale obtained from the system.\n"

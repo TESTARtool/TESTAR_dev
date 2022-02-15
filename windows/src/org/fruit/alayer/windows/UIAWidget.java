@@ -183,6 +183,7 @@ class UIAWidget implements Widget, Serializable {
 	 * @return Computes a string representation of the widget properties.
 	 * @author urueda
 	 */
+	// OLD IMPLEMENTATION
 	private String getPropertiesRepresentation(String tab){
 		StringBuffer pr = new StringBuffer();
 		Role role = this.get(Tags.Role, null);
@@ -207,6 +208,7 @@ class UIAWidget implements Widget, Serializable {
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
+	//OLD IMPLEMENTATION
 	public String getRepresentation(String tab){
 		StringBuffer repr = new StringBuffer();
 		repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
@@ -222,5 +224,19 @@ class UIAWidget implements Widget, Serializable {
 	public String toString(Tag<?>... tags){
 		return Util.treeDesc(this, 2, tags);
 	}
-		
+
+
+	// From master_experiments
+	@Override
+	public boolean equals(Object o) {
+		if(o == this) {
+			return true;
+		}
+
+		if(!(o instanceof UIAWidget)) {
+			return false;
+		}
+
+		return this.get(Tags.AbstractIDCustom, "one").equals(((UIAWidget) o).get(Tags.AbstractIDCustom, "two"));
+	}
 }

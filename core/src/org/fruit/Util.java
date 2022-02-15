@@ -36,6 +36,8 @@ import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
+
 import javax.tools.*;
 import java.io.*;
 import java.nio.channels.Channels;
@@ -46,6 +48,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Utility methods.
@@ -727,6 +731,70 @@ public final class Util {
     else {
       throw new IOException("Unable to copy " + fileOrDirectory);
     }
+  }
+
+  /**
+   * Compress specific folder in specific destination
+   * https://www.baeldung.com/java-compress-and-uncompress
+   * 
+   * @param folderName
+   * @param destFolder
+   * @return compressedCorrectly
+   */
+  public static boolean compressFolder(String folderToCompress, String destFolder, String destFolderName) {
+      try {
+          System.out.println("Compressing folder... " + folderToCompress);
+          System.out.println("Inside destination folder... " + destFolder);
+          System.out.println("With name... " + destFolderName);
+          
+          String compressedFile = destFolder + File.separator + destFolderName + ".zip";
+
+          FileOutputStream fos = new FileOutputStream(compressedFile);
+          ZipOutputStream zipOut = new ZipOutputStream(fos);
+          File fileToZip = new File(folderToCompress);
+
+          zipFile(fileToZip, fileToZip.getName(), zipOut);
+          zipOut.close();
+          fos.close();
+
+          System.out.println("OK! Compressed successfully : " + compressedFile);
+
+          return true;
+      } catch (Exception e) {
+          LogSerialiser.log("ERROR Compressing folder: " + folderToCompress, LogSerialiser.LogLevel.Info);
+          System.err.println("ERROR Compressing folder: " + folderToCompress);
+          e.printStackTrace();
+      }
+      return false;
+  }
+
+  private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+      if (fileToZip.isHidden()) {
+          return;
+      }
+      if (fileToZip.isDirectory()) {
+          if (fileName.endsWith("/")) {
+              zipOut.putNextEntry(new ZipEntry(fileName));
+              zipOut.closeEntry();
+          } else {
+              zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+              zipOut.closeEntry();
+          }
+          File[] children = fileToZip.listFiles();
+          for (File childFile : children) {
+              zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+          }
+          return;
+      }
+      FileInputStream fis = new FileInputStream(fileToZip);
+      ZipEntry zipEntry = new ZipEntry(fileName);
+      zipOut.putNextEntry(zipEntry);
+      byte[] bytes = new byte[1024];
+      int length;
+      while ((length = fis.read(bytes)) >= 0) {
+          zipOut.write(bytes, 0, length);
+      }
+      fis.close();
   }
 
   // refactored from testar -> ProtocolEditor (by urueda)

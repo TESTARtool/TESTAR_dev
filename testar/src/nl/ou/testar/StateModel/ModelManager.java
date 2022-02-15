@@ -1,29 +1,38 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.TreeDistHelper;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
 import java.util.*;
 
 public class ModelManager implements StateModelManager {
+
+    private static final Logger logger = LogManager.getLogger(ModelManager.class);
 
     // the abstract state model that this class is managing
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
-    private AbstractAction actionUnderExecution;
+    protected AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
@@ -189,18 +198,18 @@ public class ModelManager implements StateModelManager {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
+            logger.info("NotifyActionExecution action:'{}'", action.toShortString());
             actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
-        }
-        catch (ActionNotFoundException ex) {
-            System.out.println("Action not found in state model");
+        } catch (final NullPointerException | ActionNotFoundException ex) {
+            logger.info("Action not found in state model");
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
-        System.out.println("Executing action: " + action.get(Tags.Desc));
-        System.out.println("----------------------------------");
+        logger.info("Executing action: " + action.get(Tags.Desc));
+        logger.info("----------------------------------");
 
         // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
         if (errorMessages.length() > 0) {
@@ -270,4 +279,41 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
+
+    protected SequenceManager getSequenceManager() {
+        return sequenceManager;
+    }
+
+    @Override
+    public String queryStateModel(String query) {
+        EntityManager manager = persistenceManager.getEntityManager();
+        OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query);
+        while(resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            return extractNumber(result.toString());
+        }
+        return "Empty";
+    }
+
+    private String extractNumber(final String str) {                
+
+        if(str == null || str.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder();
+        boolean found = false;
+        for(char c : str.toCharArray()){
+            if(Character.isDigit(c)){
+                sb.append(c);
+                found = true;
+            } else if(found){
+                // If we already found a digit before and this char is not a digit, stop looping
+                break;                
+            }
+        }
+
+        return sb.toString();
+    }
 }

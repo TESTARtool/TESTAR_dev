@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
@@ -86,6 +87,11 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
         processRequest(() -> delegateManager.persistAbstractStateTransition(abstractStateTransition), abstractStateTransition);
     }
+    
+    @Override
+    public void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition) {
+    	processRequest(() -> delegateManager.persistAbstractActionAttributeUpdated(abstractStateTransition), abstractStateTransition);
+    }
 
     @Override
     public void persistConcreteState(ConcreteState concreteState) {
@@ -157,6 +163,10 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
             case ABSTRACT_ACTION_CHANGED:
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
+                
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+            	persistAbstractActionAttributeUpdated((AbstractStateTransition) (event.getPayload()));
+            	break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));
@@ -182,5 +192,10 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     @Override
     public void setListening(boolean listening) {
         this.listening = listening;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return null;
     }
 }

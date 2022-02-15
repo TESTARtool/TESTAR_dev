@@ -386,6 +386,7 @@ public class StateManagementTags {
             add(WidgetTransformPattern);
             add(WidgetTransformPattern2);
             add(WidgetValuePattern);
+            add(WidgetValueValue);
             add(WidgetVirtualizedItemPattern);
             add(WidgetWindowPattern);
             
@@ -480,6 +481,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetTransformPattern, "WidgetTransformPattern");
         settingsMap.put(WidgetTransformPattern2, "WidgetTransformPattern2");
         settingsMap.put(WidgetValuePattern, "WidgetValuePattern");
+        settingsMap.put(WidgetValueValue, "WidgetValueValue");
         settingsMap.put(WidgetVirtualizedItemPattern, "WidgetVirtualizedItemPattern");
         settingsMap.put(WidgetWindowPattern, "WidgetWindowPattern");
         

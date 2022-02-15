@@ -481,6 +481,12 @@ public class Main {
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
 			defaults.add(Pair.from(StateModelStoreWidgets, true));
+			
+			// state model difference
+			defaults.add(Pair.from(PreviousApplicationName, ""));
+			defaults.add(Pair.from(PreviousApplicationVersion, ""));
+			defaults.add(Pair.from(StateModelDifferenceAutomaticReport, false));
+			
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));

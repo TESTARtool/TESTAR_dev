@@ -84,8 +84,8 @@ public class HtmlSequenceReport implements Reporting{
     }
 
     /**
-     * Constructor for Replay mode. 
-     * 
+     * Constructor for Replay mode.
+     *
      * @param mode
      * @param pathReplayedSequence
      */
@@ -165,7 +165,6 @@ public class HtmlSequenceReport implements Reporting{
     	}
     	innerLoopCounter++;
     }
-
 
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
