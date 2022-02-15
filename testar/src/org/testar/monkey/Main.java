@@ -409,7 +409,7 @@ public class Main {
 			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
 		} finally {
-			System.out.println("Main: Exception caught");
+			// Closing TESTAR
 			if (loader != null) {
 				try {
 					loader.close();
