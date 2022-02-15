@@ -1,8 +1,8 @@
 package nl.ou.testar.parser;
 
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.actions.Type;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.actions.Type;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

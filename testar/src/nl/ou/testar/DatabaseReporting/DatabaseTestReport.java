@@ -79,12 +79,12 @@ public class DatabaseTestReport implements TestReport {
             iterationId = sqlService.registerIteration(reportId, verdict.info(), verdict.severity());
 
             for (Action pendingAction: pendingActions) {
-                int actionId = addAction(state, pendingAction);
+                int actionId = addAction(state, pendingAction, false);
                 actionIds.put(pendingAction, actionId);
             }
             for (Map.Entry<Action, State> pendingEntry: pendingSelectedActions.entrySet()) {
                 Action pendingAction = pendingEntry.getKey();
-                int actionId = addAction(pendingEntry.getValue(), pendingAction);
+                int actionId = addAction(pendingEntry.getValue(), pendingAction, true);
                 actionIds.put(pendingAction, actionId);
             }
 
@@ -129,7 +129,7 @@ public class DatabaseTestReport implements TestReport {
         }
     }
 
-    private int addAction(State state, Action action) throws SQLException {
+    private int addAction(State state, Action action, boolean selected) throws SQLException {
 
         Timestamp timestamp = null;
         if( state.get(Tags.TimeStamp, null) != null) {
@@ -139,7 +139,7 @@ public class DatabaseTestReport implements TestReport {
         // TODO: optimize actions saving
         int actionId = sqlService.registerAction(action.toShortString(), action.toString(),
                     state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
-                    timestamp);
+                    timestamp, selected);
         sqlService.addActionToIteration(actionId, iterationId);
         return actionId;
     }

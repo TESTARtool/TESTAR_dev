@@ -169,30 +169,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected abstract boolean executeAction(SUT system, State state, Action action);
 
 	/**
-	 * StopCriteria for a sequence:
-	 *
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You can stop deriving more actions after:
-	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 *
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	protected abstract boolean moreActions(State state);
-
-	/**
-	 * StopCriteria for a test session:
-	 *
-	 * TESTAR uses this method to determine when to stop the entire test sequence
-	 * You could stop the test after:
-	 * - a specified amount of sequences, which is specified through the Sequences setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 *
-	 * @return  if <code>true</code> continue test, else stop
-	 */
-	protected abstract boolean moreSequences();
-
-	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
 	 */

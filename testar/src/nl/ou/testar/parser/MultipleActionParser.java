@@ -1,7 +1,7 @@
 package nl.ou.testar.parser;
 
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
 
 public abstract class MultipleActionParser implements IActionParser {
 

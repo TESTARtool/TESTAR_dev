@@ -106,6 +106,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		return reportingDockerService;
 	}
 
+	private UnProc<Settings> protocol;
+	private String protocolClass;
+
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
 	 * @return A list of file names that have extension SUT_SETTINGS_EXT
@@ -455,17 +458,21 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			String pc = settings.get(ConfigTags.ProtocolClass);
 			String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
 
-			LogSerialiser.log("Trying to load TESTAR protocol in class '" +protocolClass +
-					"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
+			if (!protocolClass.equals(this.protocolClass)) {
 
-			@SuppressWarnings("unchecked")
-			UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
-			LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
+				this.protocolClass = protocolClass;
 
-			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
+				LogSerialiser.log("Trying to load TESTAR protocol in class '" + protocolClass +
+						"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
 
-			if (DefaultProtocol.class.isInstance(protocol)) {
-				((DefaultProtocol)protocol).setDelegate(this);
+				protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
+				LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
+
+				LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
+
+				if (DefaultProtocol.class.isInstance(protocol)) {
+					((DefaultProtocol) protocol).setDelegate(this);
+				}
 			}
 
 			//Run TESTAR protocol with the selected settings

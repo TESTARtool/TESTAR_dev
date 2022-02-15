@@ -6,6 +6,7 @@ import org.fruit.monkey.docker.DockerPoolService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface MySqlService {
 
@@ -93,7 +94,7 @@ public interface MySqlService {
     int registerReport(String tag) throws SQLException;
     int registerIteration(int reportId) throws SQLException;
     int registerIteration(int reportId, String info, Double severity) throws SQLException;
-    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime) throws SQLException;
+    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected) throws SQLException;
     int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException;
 
     void addActionToIteration(int actionId, int iterationId) throws SQLException;
@@ -110,6 +111,9 @@ public interface MySqlService {
     int getNextIterationId(int reportId, int iterationId) throws SQLException;
     ActionData getFirstAction(int iterationId) throws SQLException;
     ActionData getNextAction(int iterationId, Timestamp actionTime) throws SQLException;
+    List<IterationData> getAllIterations(int reportId) throws SQLException;
+    List<ActionData> getAllActions(int iterationId) throws SQLException;
+    List<ActionData> getSelectedActions(int iterationId) throws SQLException;
 
     DockerPoolService getDockerPoolService();
 }
