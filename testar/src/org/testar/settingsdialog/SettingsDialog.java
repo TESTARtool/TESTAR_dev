@@ -32,7 +32,6 @@
 package org.testar.settingsdialog;
 
 import org.testar.monkey.*;
-import org.testar.monkey.dialog.*;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settingsdialog.dialog.*;
 import org.testar.settingsdialog.dialog.StateModelPanel;
@@ -69,7 +68,7 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.3.5 (11-Dec-2021)";
+  static final String TESTAR_VERSION = "2.4.0 (15-Feb-2022)";
 
   private String settingsFile;
   private Settings settings;
@@ -89,7 +88,7 @@ public class SettingsDialog extends JFrame implements Observer {
    * Starts the settings Dialog.
    * @throws IOException when Icons cannot be found.
    */
-  SettingsDialog() throws IOException {
+  public SettingsDialog() throws IOException {
     getContentPane().setBackground(Color.WHITE);
     try {
       for (LookAndFeelInfo info : getInstalledLookAndFeels()) {
