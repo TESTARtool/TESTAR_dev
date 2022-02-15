@@ -231,7 +231,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  if <code>true</code> continue generation, else stop
 	 */
 	@Override
-	protected boolean moreActions(State state) {
+	public boolean moreActions(State state) {
 		return super.moreActions(state);
 	}
 
@@ -244,7 +244,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  if <code>true</code> continue test, else stop
 	 */
 	@Override
-	protected boolean moreSequences() {
+	public boolean moreSequences() {
 		return super.moreSequences();
 	}
 
@@ -276,7 +276,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * 
 	 * @param state
 	 */
-	@Override
+//	@Override
 	protected void buildStateIdentifiers(State state) {
 	    CodingManager.buildIDs(state);
 	}
@@ -290,7 +290,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @param state
 	 * @param actions
 	 */
-	@Override
+//	@Override
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 	    CodingManager.buildIDs(state, actions);
 	}
@@ -305,7 +305,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @param state
 	 * @param action
 	 */
-	@Override
+//	@Override
 	protected void buildEnvironmentActionIdentifiers(State state, Action action) {
 	    CodingManager.buildEnvironmentActionIDs(state, action);
 	}

@@ -1,9 +1,9 @@
 package nl.ou.testar.parser;
 
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.actions.MouseUp;
-import org.fruit.alayer.devices.MouseButtons;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.actions.MouseUp;
+import org.testar.monkey.alayer.devices.MouseButtons;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

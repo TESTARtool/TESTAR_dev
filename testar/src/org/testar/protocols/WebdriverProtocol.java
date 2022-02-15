@@ -59,6 +59,7 @@ import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
 import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 import nl.ou.testar.SequenceReport;
 import nl.ou.testar.TestReport;
+import nl.ou.testar.resolver.MySQLSerialResolver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.mysql.MySqlService;
@@ -70,6 +71,7 @@ import org.fruit.monkey.orientdb.OrientDbServiceImpl;
 import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
+import org.testar.CodingManager;
 import org.testar.OutputStructure;
 
 import org.openqa.selenium.logging.LogEntries;
@@ -120,7 +122,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Pair<String, String> username = Pair.from("username", "");
 	protected Pair<String, String> password = Pair.from("password", "");
 
-	private MySqlService sqlService;
+	public MySqlService sqlService;
 	private int reportId = -1;
 	private int iterationId = -1;
 
@@ -148,6 +150,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
 
@@ -210,6 +213,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 
 		 if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
+		 	System.out.println("*** Create a new SQL service ***");
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
 			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
 			final String databaseName = settings.get(ConfigTags.SQLReporting);
@@ -666,7 +670,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
     		Action histBackAction = new WdHistoryBackAction();
-    		buildEnvironmentActionIdentifiers(state, histBackAction);
+			CodingManager.buildEnvironmentActionIDs(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}
     	// super preSelectAction will not derive ESC action

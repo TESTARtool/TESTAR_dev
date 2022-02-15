@@ -1,9 +1,9 @@
 package nl.ou.testar.parser;
 
-import org.apache.commons.text.StringEscapeUtils;
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.actions.PasteText;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.actions.PasteText;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

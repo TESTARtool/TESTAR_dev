@@ -32,6 +32,7 @@ CREATE TABLE `actions` (
     `status` varchar(255),
     `screenshot` varchar(255),
     `start_time` datetime,
+    `selected` boolean,
     PRIMARY KEY (`id`)
     -- FOREIGN KEY(`iteration_id`) REFERENCES `iterations` (`id`)
 );

@@ -1,9 +1,9 @@
 package nl.ou.testar.parser;
 
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.actions.KeyUp;
-import org.fruit.alayer.devices.KBKeys;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.actions.KeyUp;
+import org.testar.monkey.alayer.devices.KBKeys;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
