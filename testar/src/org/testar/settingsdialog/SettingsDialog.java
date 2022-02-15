@@ -29,13 +29,15 @@
 *******************************************************************************************************/
 
 
-package org.testar.monkey;
+package org.testar.settingsdialog;
 
+import org.testar.monkey.*;
 import org.testar.monkey.dialog.*;
 import org.testar.serialisation.LogSerialiser;
-import org.testar.statemodel.settings.StateModelPanel;
+import org.testar.settingsdialog.dialog.*;
+import org.testar.settingsdialog.dialog.StateModelPanel;
 
-import org.testar.settings.ExtendedSettingsFactory;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

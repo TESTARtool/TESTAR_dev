@@ -30,7 +30,7 @@
 
 package org.testar.visualvalidation;
 
-import org.testar.settings.ExtendedSettingBase;
+import org.testar.extendedsettings.ExtendedSettingBase;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

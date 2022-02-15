@@ -28,11 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.extendedsettings;
 
-public interface IExtendedSetting {
+
+import java.io.Serializable;
+import java.util.Observable;
+
+public abstract class ExtendedSettingBase<T> extends Observable implements IExtendedSetting, Comparable<T>, Serializable {
     /**
-     * Save the setting to disk.
+     * Notify the {@link IExtendedSettingContainer} that the specialization of this class needs to be saved.
      */
-    void Save();
+    @Override
+    public void Save() {
+        setChanged();
+        notifyObservers();
+    }
 }

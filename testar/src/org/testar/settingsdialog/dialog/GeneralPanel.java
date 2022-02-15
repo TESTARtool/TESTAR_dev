@@ -29,9 +29,12 @@
 *******************************************************************************************************/
 
 
-package org.testar.monkey.dialog;
+package org.testar.settingsdialog.dialog;
 
 import org.testar.monkey.*;
+import org.testar.settingsdialog.ProtocolEditor;
+import org.testar.settingsdialog.SettingsDialog;
+import org.testar.settingsdialog.SettingsPanel;
 
 import javax.swing.*;
 import java.awt.*;

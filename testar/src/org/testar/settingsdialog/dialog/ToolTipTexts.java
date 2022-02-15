@@ -29,7 +29,7 @@
 *******************************************************************************************************/
 
 
-package org.testar.monkey.dialog;
+package org.testar.settingsdialog.dialog;
 
 public class ToolTipTexts {
 

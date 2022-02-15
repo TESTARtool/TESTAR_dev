@@ -32,7 +32,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-package org.testar.monkey;
+package org.testar.settingsdialog;
 
 import static org.testar.monkey.ConfigTags.PathToReplaySequence;
 
@@ -50,6 +50,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.testar.monkey.Assert;
+import org.testar.monkey.Settings;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Color;
@@ -69,7 +72,10 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 
-
+/**
+ * Depracated class?
+ */
+@Deprecated
 public class SequenceViewer extends javax.swing.JFrame{
 
 	private static final long serialVersionUID = -7545369239319448135L;
@@ -81,6 +87,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	private int sequenceViewIndex;
 	private static final int DIRECTION_NEXT = 1, DIRECTION_PREVIOUS = -1;
 
+	@Deprecated
 	public SequenceViewer(Settings settings) throws ClassNotFoundException, IOException{
 		this.settings = settings;
 		initComponents();

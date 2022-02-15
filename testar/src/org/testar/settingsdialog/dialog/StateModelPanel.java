@@ -28,7 +28,7 @@
 *******************************************************************************************************/
 
 
-package org.testar.statemodel.settings;
+package org.testar.settingsdialog.dialog;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
@@ -38,7 +38,7 @@ import org.testar.statemodel.persistence.orientdb.entity.Config;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
-import org.testar.monkey.SettingsPanel;
+import org.testar.settingsdialog.SettingsPanel;
 
 import javax.swing.*;
 import java.awt.*;

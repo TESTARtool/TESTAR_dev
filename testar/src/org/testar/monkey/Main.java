@@ -49,8 +49,9 @@ import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.settings.ExtendedSettingFile;
-import org.testar.settings.ExtendedSettingsFactory;
+import org.testar.extendedsettings.ExtendedSettingFile;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.settingsdialog.SettingsDialog;
 
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;

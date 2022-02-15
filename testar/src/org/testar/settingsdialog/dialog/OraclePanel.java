@@ -29,15 +29,15 @@
  *******************************************************************************************************/
 
 
-package org.testar.monkey.dialog;
+package org.testar.settingsdialog.dialog;
 
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
-import org.testar.monkey.SettingsPanel;
+import org.testar.settingsdialog.SettingsPanel;
 import org.testar.visualvalidation.VisualValidationSettings;
 
 import org.apache.commons.lang3.StringUtils;
-import org.testar.settings.ExtendedSettingsFactory;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
 
 import javax.swing.*;
 
