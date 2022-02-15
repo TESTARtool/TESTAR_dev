@@ -338,7 +338,7 @@ public class Protocol_webdriver_selenium extends WebdriverProtocol {
      * @return if <code>true</code> continue generation, else stop
      */
     @Override
-    protected boolean moreActions(State state) {
+    public boolean moreActions(State state) {
         return super.moreActions(state);
     }
 
@@ -358,7 +358,7 @@ public class Protocol_webdriver_selenium extends WebdriverProtocol {
      * @return if <code>true</code> continue test, else stop
      */
     @Override
-    protected boolean moreSequences() {
+    public boolean moreSequences() {
         return super.moreSequences();
     }
 }

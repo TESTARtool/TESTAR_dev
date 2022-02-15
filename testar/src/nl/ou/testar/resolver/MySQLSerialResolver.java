@@ -1,7 +1,9 @@
 package nl.ou.testar.resolver;
 
 import nl.ou.testar.ActionResolver;
+import nl.ou.testar.parser.ActionParseException;
 import nl.ou.testar.parser.ActionParser;
+import org.fruit.Pair;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -9,10 +11,7 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.mysql.MySqlService;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MySQLSerialResolver implements ActionResolver {
 
@@ -20,44 +19,37 @@ public class MySQLSerialResolver implements ActionResolver {
     private MySqlService service;
     private int reportId = -1;
 
-    private int currentIterationId = -1;
-    private int currentActionId = -1;
-    private Timestamp currentActionTime = null;
+    private MySqlService.ActionData currentActionData = null;
 
     private final ActionParser parser = new ActionParser();
+
+    private List<MySqlService.IterationData> iterations = null;
+    private List<MySqlService.ActionData> actions = null;
+    private Iterator<MySqlService.IterationData> outerIterator = null;
+    private Iterator<MySqlService.ActionData> innerIterator = null;
 
     public void startReplay(MySqlService service, String reportTag) throws SQLException {
         this.service = service;
         this.reportId = service.getReportId(reportTag);
-    }
 
-    public int startFirstIteration() throws SQLException {
-        if (reportId < 0) {
-            return -1;
-        }
-        currentIterationId = service.getFirstIterationId(reportId);
-        return currentIterationId;
+        iterations = service.getAllIterations(reportId);
+        outerIterator = iterations.listIterator();
     }
 
     @Override
     public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-        if (currentIterationId >= 0) try {
-            MySqlService.ActionData actionData =
-                    (currentActionId < 0 ? service.getFirstAction(currentIterationId) : service.getNextAction(currentIterationId, currentActionTime));
-            if (actionData != null) {
-                currentActionId = actionData.getId();
-                currentActionTime = actionData.getStartTime();
-                final Action action = parser.parse(actionData.getDescription()).left();
-                if (action != null) {
-                    return new HashSet<>(Collections.singletonList(action));
-                }
-            }
-            else {
-                currentActionId = -1;
-                currentActionTime = null;
+        if (currentActionData == null) {
+            return null;
+        }
+        try {
+            Pair<Action, String> parseResult = parser.parse(currentActionData.getDescription().replace("\n", " "));
+
+            final Action action = parseResult.left();
+            if (action != null) {
+                return new HashSet<>(Collections.singletonList(action));
             }
         }
-        catch (Exception e) {
+        catch (ActionParseException e) {
             throw new ActionBuildException(e.getMessage());
         }
         return null;
@@ -70,6 +62,32 @@ public class MySQLSerialResolver implements ActionResolver {
             return actions.iterator().next();
         }
         return null;
+    }
+
+    @Override
+    public boolean moreActions(State state) {
+        if (innerIterator == null || !innerIterator.hasNext()) {
+            return false;
+        }
+        currentActionData = innerIterator.next();
+        return true;
+    }
+
+    @Override
+    public boolean moreSequences() {
+        if (outerIterator == null || !outerIterator.hasNext()) {
+            return false;
+        }
+        MySqlService.IterationData iterationData = outerIterator.next();
+        try {
+            actions = service.getSelectedActions(iterationData.getId());
+            innerIterator = actions.listIterator();
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     @Override
