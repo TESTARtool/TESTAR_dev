@@ -31,7 +31,7 @@
 
 import java.util.Set;
 
-import org.testar.screenshotjsonfile.JsonUtils;
+import org.testar.screenshotjson.JsonUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
