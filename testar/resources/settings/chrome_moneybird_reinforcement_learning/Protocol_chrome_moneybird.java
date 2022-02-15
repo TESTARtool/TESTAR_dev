@@ -65,6 +65,8 @@ import org.testar.settings.ExtendedSettingsFactory;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -267,13 +269,6 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     }
     // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-    for(Widget w : state) {
-      if(w.get(WdTags.WebTextContent,"").contains("MB2: 500")) {
-        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-                "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'.");
-      }
-    }
-
     return Verdict.OK;
   }
 
@@ -312,6 +307,40 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
         e.printStackTrace();
       }
     }
+
+    for(Widget w : state) {
+      if(w.get(WdTags.WebTextContent,"").contains("MB2: 500") || w.get(WdTags.WebTextContent,"").contains("MB2: 500") || w.get(WdTags.WebTextContent,"").contains("Exception")  || w.get(WdTags.WebTextContent,"").contains("lib/middleware/moneybird_request_logger.rb")) {
+        // WE ARE ON A ERROR PAGE
+        Date date = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        String strDate = dateFormat.format(date);
+        writeErrorOccurred(w.get(WdTags.WebTextContent,"") + " " + strDate);
+
+        new CompoundAction.Builder()
+                .add(new KeyDown (KBKeys.VK_ALT) ,0.5)
+                .add(new KeyDown(KBKeys.VK_LEFT),0.5)
+                .add(new KeyUp (KBKeys.VK_LEFT) ,0.5)
+                .add(new KeyUp(KBKeys.VK_ALT),0.5).build()
+                .run(system, state ,2);
+
+        try {
+          TimeUnit.SECONDS.sleep(2);
+        }catch (InterruptedException e) {
+          System.out.println("An error occurred.");
+          e.printStackTrace();
+        }
+      }
+
+      if (w.get(WdTags.WebTextContent,"").contains("Weet je zeker")) {
+        new CompoundAction.Builder()
+                .add(new KeyDown (KBKeys.VK_TAB) ,0.5)
+                .add(new KeyUp(KBKeys.VK_TAB),0.5)
+                .add(new KeyDown (KBKeys.VK_ENTER) ,0.5)
+                .add(new KeyUp(KBKeys.VK_ENTER),0.5).build()
+                .run(system, state ,2);
+      }
+    }
+
 
     // Kill unwanted processes, force SUT to foreground
     Set<Action> actions = super.deriveActions(system, state);
@@ -652,7 +681,7 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
       JSONObject json = readJsonFromUrl(connectedURL + "/app/coverage");
       Double coverage = (Double) json.get("coverage_percentage");
       FileWriter myWriter = new FileWriter(reportDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt", true);
-      myWriter.write("Coverage: " + coverage.toString() + "%| \r\n");
+      myWriter.write("Coverage: " + coverage.toString() + "| \r\n");
       myWriter.close();
       System.out.println("Wrote time so far to file." + reportDir + File.separator + OutputStructure.outerLoopName + "_coverageMetrics.txt");
     } catch (IOException | JSONException e) {
@@ -661,6 +690,18 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     }
 
     return actionExecuted;
+  }
+
+  protected void writeErrorOccurred(String message){
+    try {
+      FileWriter myWriter = new FileWriter(reportDir + File.separator + OutputStructure.outerLoopName + "_errors.txt", true);
+      myWriter.write("Error: " + message + "\r\n");
+      myWriter.close();
+      System.out.println("Wrote an error to" + reportDir + File.separator + OutputStructure.outerLoopName + "_errors.txt");
+    } catch (IOException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
   }
 
   private static String readAll(Reader rd) throws IOException {

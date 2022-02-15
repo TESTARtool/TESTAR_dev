@@ -69,8 +69,8 @@ DefaultVValue = 0.0
 #
 # Relative path to extended settings file.
 #################################################################
-# ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
-ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLQVLearning.xml
+ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLDoubleQLearningPUR.xml
+# ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLQVLearning.xml
 # ExtendedSettingsFile = .\\settings\\chrome_moneybird_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
