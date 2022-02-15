@@ -33,7 +33,7 @@ package org.testar.monkey;
 
 import org.testar.monkey.dialog.*;
 import org.testar.serialisation.LogSerialiser;
-import org.testar.statemodelling.settings.StateModelPanel;
+import org.testar.statemodel.settings.StateModelPanel;
 
 import org.testar.settings.ExtendedSettingsFactory;
 
