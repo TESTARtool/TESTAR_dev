@@ -14,7 +14,7 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Logger name="org.fruit.monkey.AbstractProtocol" level="DEBUG" additivity="false">
+        <Logger name="org.testar.monkey.AbstractProtocol" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Logger>

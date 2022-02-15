@@ -1,8 +1,0 @@
-dependencies {
-    implementation project(':core')
-    implementation project(':windows')
-    implementation project(':webdriver')
-    implementation project(':linux')
-    implementation files('../linux/lib/libatspi.jar')
-}
-

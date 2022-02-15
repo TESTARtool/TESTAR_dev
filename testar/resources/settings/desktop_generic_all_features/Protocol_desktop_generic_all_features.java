@@ -30,16 +30,20 @@
 
 
 import java.util.Set;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+
+import org.testar.screenshotjson.JsonUtils;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
 
-import es.upv.staq.testar.CodingManager;
+import org.testar.CodingManager;
 
 /**
  * This protocol combines different functionalities of TESTAR for testing Windows desktop applications
@@ -86,7 +90,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		return super.startSystem();
 	}
 
@@ -114,7 +118,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
 		if(settings.get(ConfigTags.Mode) == Modes.Generate)
@@ -154,7 +158,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
