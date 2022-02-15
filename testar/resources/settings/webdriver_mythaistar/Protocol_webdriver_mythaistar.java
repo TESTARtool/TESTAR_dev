@@ -29,7 +29,6 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
@@ -45,36 +44,50 @@ import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_shopizer extends WebdriverProtocol {
+public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
 
-	// http://localhost:8080/shop/
-	// http://localhost:8080/admin/
-	// admin@shopizer.com
-	// password
+	//https://testar.org/images/development/experiments/mythaistar_all_dependencies.zip
 
-	// Custom email for registration and login
-	private String email = "testar@testar.com";
+	private static List<String> alwaysClickableClasses = Arrays.asList("owl-dt-control-button-content");
+
+	private static List<String> typeableClasses = Arrays.asList(
+			//Text input of Menu page
+			"mat-form-field-label-wrapper", //bookTable Page, Sign UP and Email
+			"owl-dt-timer-input" //Calendar dates
+			);
 
 	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void beginSequence(SUT system, State state) {
-		super.beginSequence(system, state);
-		// Cookies button
-		WdDriver.executeScript("document.getElementsByClassName('cc-btn cc-dismiss')[0].click();");
-		Util.pause(1);
-		// First time we load the page resources are not loaded correctly, we need to refresh the web page
-		WdDriver.getRemoteWebDriver().navigate().refresh();
+	protected void initialize(Settings settings){
+		super.initialize(settings);
+		// Disable security to disable CORS policy
+		WdDriver.disableSecurity = true;
 
-		// TODO: force Shopizer login?
-		// http://localhost:8080/shop/customer/customLogon.html
+		// Classes that are deemed clickable by the web framework
+		clickableClasses = Arrays.asList(
+				"v-menubar-menuitem", "v-menubar-menuitem-caption",
+				//Main page
+				"mat-button-ripple", "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content",
+				//Menu page
+				"mat-checkbox-label",
+				"mat-select-arrow",
+				"mat-expansion-panel-header-title",
+				"order",
+				//Sort by and options
+				"mat-select-placeholder", "mat-option-ripple",
+				//Calendar
+				"owl-dt-calendar-cell-content",
+				// Reservation cells
+				"mat-cell",
+				"ng-star-inserted",
+				// Login and register tab
+				"mat-ripple"
+				);
 	}
 
 	/**
@@ -120,25 +133,16 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			return forcedActions;
 		}
 
-		// TODO: Check how this affects the WdHistoryBackAction of empty states
-		// TODO: for example the 404 empty state of Shopizer after search an item
-		// TESTAR may find some empty states without actions when Shopizer is loading state content
-		// Always create the possibility to execute a NOP action in case no other actions are available
-		// Create this default NOP action also helps to deal with no determinism
-		// in the distributed shared algorithm
-		Action nop = new NOP();
-		nop.set(Tags.OriginWidget, state);
-		nop.set(Tags.Desc, "NOP action to wait");
-		actions.add(nop);
+		loginMyThaiStarAction(actions, state);
+
+		registerMyThaiStarAction(actions, state);
 
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
-				actions.add(registrationFormFill(state, widget));
-			}
-			if(widget.get(WdTags.WebId, "").contains("login-form")) {
-				actions.add(loginFormFill(state, widget));
+			// left clicks, but ignore links outside domain
+			if (isAlwaysClickable(widget)) {
+				actions.add(ac.leftClickAt(widget));
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -154,49 +158,17 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				continue;
 			}
 
-			// Ignore link widgets that do not contains informative properties to identify them
-			// English, My Account, Shopping cart
-			if(widget.get(WdTags.Desc, "").equals("a")) {
-				continue;
-			}
-
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-				if(widget.get(WdTags.WebCssClasses,"").contains("tt-hint")) {
-					// Ignore duplicated search bar text box
-					continue;
-				}
-				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
+				actions.add(ac.clickTypeInto(widget, getRandomMyThaiStarData(widget), true));
 			}
 
-//			// left clicks, but ignore links outside domain
-//			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-//				// Click on select web items opens the menu but does not allow TESTAR to select an item,
-//				// thats why we need a custom action selection
-//				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
-//					//actions.add(randomFromSelectList(widget));
-//				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")) {
-//					// dropdown-toggle widgets need a mouse movement but not a click, because a click will close the dropdown
-//					// Except multi language Home button :)
-//					if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
-//						actions.add(ac.leftClickAt(widget));
-//					} else {
-//						actions.add(ac.mouseMove(widget));
-//					}
-//				} else {
-//					actions.add(ac.leftClickAt(widget));
-//				}
-//			}
-//		}
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				// Click on select web items opens the menu but does not allow TESTAR to select an item,
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
-				} else if (widget.get(WdTags.WebCssClasses, "").contains("hidden-xs")) {
-					// span widgets that come from dropdown-toggle need a mouse movement but not a click, because a click will close the dropdown
-					actions.add(ac.mouseMove(widget));
 				} else {
 					actions.add(ac.leftClickAt(widget));
 				}
@@ -212,43 +184,12 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 	 * @param w
 	 * @return
 	 */
-	private String getRandomShopizerData(Widget w) {
+	private String getRandomMyThaiStarData(Widget w) {
 		String[] example = {"aaaa", "1234", "01-01-2021"};
 		if(w.get(WdTags.WebId, "").toLowerCase().contains("example")) {
 			return example[new Random().nextInt(example.length)];
 		}
 		return this.getRandomText(w);
-	}
-
-	/**
-	 * Create a specific action to fill the register user form. 
-	 * This only works if we are not logged all the sequence. 
-	 * 
-	 * @param state
-	 * @return
-	 */
-	private Action registrationFormFill(State state, Widget widget) {
-		// http://localhost:8080/shop/customer/registration.html
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		return new CompoundAction.Builder()
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.firstName", state), "testar", true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.lastName", state), "testar", true), 50)
-				// Ignore country and state, use default values
-				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "emailAddress", state), email, true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "password", state), "testar", true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "checkPassword", state), "testar", true), 50)
-				.add(ac.hitKey(KBKeys.VK_ENTER), 50)
-				.build(widget);
-	}
-
-	private Action loginFormFill(State state, Widget widget) {
-		// http://localhost:8080/shop/customer/customLogon.html
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		return new CompoundAction.Builder()
-				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "signin_userName", state), email, true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "signin_password", state), "testar", true), 50)
-				.add(ac.leftClickAt(getWidgetWithMatchingTag("WebId", "genericLogin-button", state)), 50)
-				.build(widget);
 	}
 
 	/**
@@ -319,23 +260,87 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
+	private boolean isAlwaysClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> clickSet = new HashSet<>(alwaysClickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
+	}
+
 	@Override
 	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Specific class="input" for parasoft SUT
-			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
-				return true;
-			}
-
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> clickSet = new HashSet<>(typeableClasses);
+		clickSet.retainAll(element.cssClasses);
+		if(clickSet.size() > 0)
 			return true;
+
+		return false;
+	}
+
+	/**
+	 * Check if current state contains the login form with username and password widgets. 
+	 * In that case derive a login actions using waiter credentials. 
+	 * 
+	 * @param actions
+	 * @param state
+	 */
+	private void loginMyThaiStarAction(Set<Action> actions, State state) {
+		// If current state does not contains the desired login widgets, do not add a login action
+		if(!stateContainsAllWebNameValues(state, Arrays.asList("username", "password"))) {
+			return;
 		}
 
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		Action loginAction = new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "username", state), "waiter", true), 1)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "password", state), "waiter", true), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 0.5)
+				.build(getWidgetWithMatchingTag("name", "username", state));
+
+		actions.add(loginAction);
+	}
+
+	/** 
+	 * Check if current state contains the register form with email, password and accept terms widgets. 
+	 * In that case derive a register actions using new email credentials. 
+	 * 
+	 * @param actions
+	 * @param state
+	 */
+	private void registerMyThaiStarAction(Set<Action> actions, State state) {
+		// If current state does not contains the desired register widgets, do not add a register action
+		if(!stateContainsAllWebNameValues(state, Arrays.asList("email", "password", "confirmPassword", "registerTerms"))) {
+			return;
+		}
+
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		Action registerAction = new CompoundAction.Builder()
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "email", state), "email@email.com", true), 1)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "password", state), "email", true), 1)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "confirmPassword", state), "email", true), 1)
+				.add(ac.leftClickAt(getWidgetWithMatchingTag("name", "registerTerms", state)), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 0.5)
+				.build(getWidgetWithMatchingTag("name", "email", state));
+
+		actions.add(registerAction);
+	}
+
+	private boolean stateContainsAllWebNameValues(State state, List<String> webNameValues) {
+		for(String value : webNameValues) {
+			if(!stateContainsWebNameValue(state, value)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean stateContainsWebNameValue(State state, String webNameValue) {
+		for(Widget w : state) {
+			if(w.get(WdTags.WebName,"").equals(webNameValue)) {
+				return true;
+			}
+		}
 		return false;
 	}
 }
