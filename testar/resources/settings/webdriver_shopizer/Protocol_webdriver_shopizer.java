@@ -430,7 +430,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
 			extractJacocoRunReport();
 			compressOutputRunFolder();
-//			copyOutputToNewFolderUsingIpAddress("N:");
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }
