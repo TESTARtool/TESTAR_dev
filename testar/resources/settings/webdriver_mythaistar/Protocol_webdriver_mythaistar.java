@@ -72,9 +72,8 @@ public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
 		clickableClasses = Arrays.asList(
 				"v-menubar-menuitem", "v-menubar-menuitem-caption",
 				//Main page
-				"mat-button-ripple", "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content",
+				"flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content",
 				//Menu page
-				"mat-checkbox-label",
 				"mat-select-arrow",
 				"mat-expansion-panel-header-title",
 				"order",
@@ -82,11 +81,8 @@ public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
 				"mat-select-placeholder", "mat-option-ripple",
 				//Calendar
 				"owl-dt-calendar-cell-content",
-				// Reservation cells
-				"mat-cell",
-				"ng-star-inserted",
-				// Login and register tab
-				"mat-ripple"
+				// Login and register arrow
+				"mat-tab-header-pagination-chevron"
 				);
 	}
 
@@ -142,6 +138,13 @@ public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
 
 			// left clicks, but ignore links outside domain
 			if (isAlwaysClickable(widget)) {
+				actions.add(ac.leftClickAt(widget));
+			}
+
+			// specific condition for buttons like login cancel and access
+			// if button disabled no action allowed
+			if (widget.get(WdTags.WebCssClasses,"").contains("mat-button-base")
+					&& !widget.get(WdTags.WebCssClasses,"").contains("mat-button-disabled")) {
 				actions.add(ac.leftClickAt(widget));
 			}
 
