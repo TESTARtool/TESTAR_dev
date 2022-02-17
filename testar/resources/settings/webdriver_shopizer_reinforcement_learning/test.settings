@@ -147,7 +147,7 @@ Policy = EpsilonGreedyPolicy
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\spaghetti_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # WebDriver features

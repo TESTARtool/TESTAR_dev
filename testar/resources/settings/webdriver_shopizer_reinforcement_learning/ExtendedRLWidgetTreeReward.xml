@@ -12,6 +12,8 @@
         <temperature>1.0</temperature>
         <rewardFunction>WidgetTreeBasedRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>
+        <tagName>QValue</tagName>
+        <qFunction>QlearningFunction</qFunction>
     </reinforcementLearningSettings>
 	
 	<!-- Visual ORACLE OCR -->
