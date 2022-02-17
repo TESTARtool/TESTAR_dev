@@ -35,9 +35,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 import org.apache.commons.text.StringEscapeUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 /**
  * Core coding manager.

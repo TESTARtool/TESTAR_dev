@@ -28,16 +28,16 @@
  *
  */
 
-package org.fruit.alayer.actions;
+package org.testar.monkey.alayer.actions;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 
 public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;

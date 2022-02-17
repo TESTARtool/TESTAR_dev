@@ -38,15 +38,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import org.fruit.Assert;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.testar.monkey.Assert;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 
 /**
  * An action that is composed of several other actions.
