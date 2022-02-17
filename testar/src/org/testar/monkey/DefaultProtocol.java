@@ -186,6 +186,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
+	// Creating a logger with log4j library:
+	private static Logger logger = LogManager.getLogger();
+
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -223,6 +226,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = null;
 
 		//initialize TESTAR with the given settings:
+		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 
 		try {
@@ -552,7 +556,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
+	//private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -839,7 +843,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 	    // create fragment
-	    fragment = new TaggableBase();
+		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);
 	    fragment.set(ActionSet, actions);
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
@@ -1166,7 +1170,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            Action actionToReplay;
 	            try {
 	                replayableFragment = (Taggable) ois.readObject();
-	                actionToReplay = replayableFragment.get(ExecutedAction); 
+	                actionToReplay = replayableFragment.get(ExecutedAction);
 	            } catch(IOException ioe){
 	                // Check if exception thrown because we finished replaying data
 	                if(fis.available() <= 0) {
@@ -1198,7 +1202,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            int tries = 0;
 	            double start = Util.time();
 
-	            while(!success && (Util.time() - start < rrt)){       
+	            while(!success && (Util.time() - start < rrt)){
 	                tries++;
 	                cv.begin(); Util.clear(cv);
 	                cv.end();
@@ -1222,7 +1226,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                        Widget w;
 	                        for (Finder f : targets){
 	                            w = f.apply(state);
-	                            if (w != null){			
+	                            if (w != null){
 	                                //Can be this the widget the one that we want to find?
 	                                if(widgetStringToFind.equals(w.get(Tags.Title, "")))
 	                                    widgetTitleFound = true;
@@ -1246,9 +1250,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                // In Replay-mode, we only show the red dot if visualizationOn is true:
 	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, actionToReplay);
 
-	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay)
 	                ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay)
 	                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
 
 	                try{
@@ -1330,7 +1334,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	        System.out.println(msg);
 	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){
 	        System.out.println(getReplayVerdict().info());
 	        LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
 
