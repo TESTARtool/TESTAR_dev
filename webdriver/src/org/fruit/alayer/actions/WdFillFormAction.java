@@ -20,14 +20,16 @@ import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class WdFillFormAction extends TaggableBase implements Action {
     private StdActionCompiler ac;
     private Widget widget;
     private Action formFillingAction;
     private boolean hidden = false;
-    private String formPath;
+    private String formFileFolder;
+    private static final Logger logger = LogManager.getLogger();
 
     /**
      * Function for automatically generating template XML file for the user to specify input values for a form
@@ -46,11 +48,18 @@ public class WdFillFormAction extends TaggableBase implements Action {
      * @param ac
      * @param widget
      */
-    public WdFillFormAction(StdActionCompiler ac, Widget widget, String path) {
+    public WdFillFormAction(StdActionCompiler ac, Widget widget, String formFileFolder) {
+        logger.debug("debug Form filling action created");
+        logger.error("error Form filling action created");
+        logger.info("info Form filling action created");
+        logger.trace("trace Form filling action created");
+        logger.fatal("fatal Form filling action created");
+        logger.warn("warn Form filling action created");
+
         this.ac=ac;
         this.widget=widget;
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
-        this.formPath = path;
+        this.formFileFolder = formFileFolder;
         //TODO unique name for form filling action
         this.set(Tags.Desc, "Fill a form based on XML file.");
         formFillingAction = fillForm(ac, widget);
@@ -115,7 +124,9 @@ public class WdFillFormAction extends TaggableBase implements Action {
             path = uriPath + "_" + widget.get(Tags.Path, "");
         }
         path = path.replace("/", "_").replace("?", "_") + ".xml";
-        String file_path = "settings/" + this.formPath + "/" + path;
+        String file_path = "settings/" + this.formFileFolder + "/" + path;
+        //Updating action description:
+        this.set(Tags.Desc, "Fill a form based on XML file: "+file_path);
         File f = new File(file_path);
         Map<String, String> fields = new HashMap<>();
         Boolean storeFile = true;
