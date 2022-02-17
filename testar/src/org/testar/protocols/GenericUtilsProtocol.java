@@ -31,18 +31,17 @@
 
 package org.testar.protocols;
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.OperatingSystems;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import nl.ou.testar.DerivedActions;
-import org.fruit.Drag;
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.monkey.ConfigTags;
+import org.testar.DerivedActions;
+import org.testar.monkey.Drag;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +83,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param state
      * @param system needed for updating the state between retries
@@ -149,7 +148,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it, the given text is typed into it, and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param textToType types the given text by replacing the existing text
      * @param state
@@ -215,7 +214,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it, the given text is pasted into it, and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param textToPaste paste the given text by replacing the existing text
      * @param state

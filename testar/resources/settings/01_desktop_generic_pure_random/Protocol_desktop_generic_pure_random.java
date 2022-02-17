@@ -30,22 +30,19 @@
  *******************************************************************************************************/
 
 
-import nl.ou.testar.DerivedActions;
-import nl.ou.testar.SutVisualization;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.Settings;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
-import java.util.HashSet;
 import java.util.Set;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.

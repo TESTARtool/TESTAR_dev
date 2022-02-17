@@ -30,7 +30,7 @@
 
 package org.testar.settings;
 
-import nl.ou.testar.visualvalidation.VisualValidationSettings;
+import org.testar.visualvalidation.VisualValidationSettings;
 
 import java.util.ArrayList;
 import java.util.List;
