@@ -41,8 +41,11 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.io.File;
 import java.util.*;
 import java.util.zip.CRC32;
 
@@ -140,6 +143,25 @@ public class Protocol_webdriver_parabank_statemodel extends WebdriverProtocol {
 		else return isSonOfSelect(widget.parent());
 	}
 
+    /**
+     * Called once during the life time of TESTAR
+     * This method can be used to perform initial setup work
+     * @param   settings  the current TESTAR settings as specified by the user.
+     */
+    @Override
+    protected void initialize(Settings settings){
+
+        // Disconnect from Windows Remote Desktop, without close the GUI session
+        // User will need to disable or accept UAC permission prompt message
+        //disconnectRDP();
+
+        super.initialize(settings);
+
+        // Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+        copyJacocoBuildFile();
+
+        startRunTime = System.currentTimeMillis();
+    }
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
      * This can be used for example for bypassing a login screen by filling the username and password
@@ -576,5 +598,66 @@ public class Protocol_webdriver_parabank_statemodel extends WebdriverProtocol {
     		retAction = RandomActionSelector.selectAction(actions);
     	}
     	return retAction;
+    }
+
+    /**
+     * Execute the selected action.
+     * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
+     */
+    @Override
+    protected boolean executeAction(SUT system, State state, Action action){
+        boolean actionExecuted = super.executeAction(system, state, action);
+
+        // Extract and create JaCoCo action coverage report for Generate Mode
+        if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+            extractJacocoActionReport();
+        }
+
+        return actionExecuted;
+    }
+
+    /**
+     * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
+     * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
+     */
+    @Override
+    protected void finishSequence() {
+
+        // Extract and create JaCoCo sequence coverage report for Generate Mode
+        if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+            extractJacocoSequenceReport();
+        }
+
+        super.finishSequence();
+    }
+
+    /**
+     * This methods stops the SUT
+     *
+     * @param system
+     */
+    @Override
+    protected void stopSystem(SUT system) {
+        super.stopSystem(system);
+
+        // This is the default JaCoCo generated file, we dumped our desired file with MBeanClient (finishSequence)
+        // In this protocol this one is residual, so just delete
+        if(new File("jacoco.exec").exists()) {
+            System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
+        }
+    }
+
+    /**
+     * This method is called after the last sequence, to allow for example handling the reporting of the session
+     */
+    @Override
+    protected void closeTestSession() {
+        super.closeTestSession();
+        // Extract and create JaCoCo run coverage report for Generate Mode
+        if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+            extractJacocoRunReport();
+            compressOutputRunFolder();
+            copyOutputToNewFolderUsingIpAddress("N:");
+        }
     }
 }
