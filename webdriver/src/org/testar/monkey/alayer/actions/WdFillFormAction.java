@@ -48,18 +48,12 @@ public class WdFillFormAction extends TaggableBase implements Action {
      * @param widget
      */
     public WdFillFormAction(StdActionCompiler ac, Widget widget, String formFileFolder) {
-        logger.debug("debug Form filling action created");
-        logger.error("error Form filling action created");
-        logger.info("info Form filling action created");
-        logger.trace("trace Form filling action created");
-        logger.fatal("fatal Form filling action created");
-        logger.warn("warn Form filling action created");
-
+        logger.debug("Form filling action created");
         this.ac=ac;
         this.widget=widget;
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
         this.formFileFolder = formFileFolder;
-        //TODO unique name for form filling action
+        // The desc of the form filling action will be updated with filename later:
         this.set(Tags.Desc, "Fill a form based on XML file.");
         formFillingAction = fillForm(ac, widget);
         this.set(Tags.OriginWidget, widget);
@@ -76,7 +70,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
 
     @Override
     public String toShortString() {
-        return "Fill a form based on XML file.";
+        return this.get(Tags.Desc, "Fill a form based on XML file.");
     }
 
     @Override
@@ -103,15 +97,26 @@ public class WdFillFormAction extends TaggableBase implements Action {
         } catch (Exception e) {
             System.out.println("ERROR: Exception obtaining URI, using empty path");
         }
+        logger.debug("uriPath="+uriPath);
+        if(uriPath.contains(";")){
+            logger.debug("Removing everything after ;");
+            uriPath = uriPath.substring(0, uriPath.indexOf(";"));
+        }else if(uriPath.contains("?")){
+            logger.debug("Removing everything after ?");
+            uriPath = uriPath.substring(0, uriPath.indexOf("?"));
+        }
+        logger.debug("uriPath="+uriPath);
 
         // WebName is sometimes empty, then the generated XML file has only the URL as its name
         String formName = widget.get(WdTags.WebName, "");
         String path = uriPath;
         if(formName.length()>0){
             path = uriPath + "_" + formName;
+            logger.debug("form name used for path="+path);
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
         }else if(widget.get(WdTags.WebId, "").length()>0){
             path = uriPath + "_" + widget.get(WdTags.WebId, "");
+            logger.debug("web id used for path="+path);
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
         }else{
             // System.out.println("DEBUG: Form name and ID are empty, using TESTAR widget path for the filename");
@@ -121,9 +126,11 @@ public class WdFillFormAction extends TaggableBase implements Action {
             // 2 forms without name or id would be using the same XML filename even if one of the them has more fields
             // Therefore, we add TESTAR widget path into the filename:
             path = uriPath + "_" + widget.get(Tags.Path, "");
+            logger.debug("widget path used for path="+path);
         }
         path = path.replace("/", "_").replace("?", "_") + ".xml";
         String file_path = "settings/" + this.formFileFolder + "/" + path;
+        logger.debug("file_path="+file_path);
         //Updating action description:
         this.set(Tags.Desc, "Fill a form based on XML file: "+file_path);
         File f = new File(file_path);
@@ -134,7 +141,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
         if (f.exists()) {
             storeFile = false;
             fields = readFormFile(file_path);
-            System.out.println("Derive FillForm Action : File exists, read the data from file");
+            logger.debug("Derive FillForm Action : File exists, reading the data from the file");
         }
 
         CompoundAction.Builder formBuilder = new CompoundAction.Builder();
@@ -146,22 +153,34 @@ public class WdFillFormAction extends TaggableBase implements Action {
             if (!formName.isEmpty()) {
                 // If we found a form with a name property, use this property to execute a script submit action
                 formBuilder.add(new WdSubmitAction(formName), 2);
+                logger.debug("Storing the file and creating WdSubmitAction with form name");
             } else {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                formBuilder.add(ac.leftClickAt(input), 2);
+                if(input!=null){
+                    formBuilder.add(ac.leftClickAt(input), 2);
+                    logger.debug("Storing the file and creating leftClickAt on the found submit button of the form");
+                }else{
+                    logger.error("Could not find submit button of the form, so the action does not click submit.");
+                }
             }
         } else if (fields != null && fields.containsKey("performSubmit")) {
             String submit = fields.get("performSubmit");
             if (submit.contains("true") && !formName.isEmpty()) {
                 // If we found a form with a name property, use this property to execute a script submit action
                 formBuilder.add(new WdSubmitAction(formName), 2);
+                logger.debug("File existed already, creating WdSubmitAction with form name");
             } else if(submit.contains("true")) {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                formBuilder.add(ac.leftClickAt(input), 2);
+                if(input!=null){
+                    formBuilder.add(ac.leftClickAt(input), 2);
+                    logger.debug("File existed already, creating leftClickAt on the found submit button of the form");
+                }else{
+                    logger.error("Could not find submit button of the form, so the action does not click submit.");
+                }
             }
         }
 
@@ -170,12 +189,14 @@ public class WdFillFormAction extends TaggableBase implements Action {
         // The NOP action should be filtered when calling this function
         Action formAction = new NOP();
         if (numberOfActions > 0) {
+            logger.debug("Actions found, creating a form action");
             formAction = formBuilder.build();
         } else {
+            logger.debug("Form is hidden, returning NOP action");
             // If the form does not contain fields, we mark as a hidden form
             hidden = true;
         }
-
+        logger.debug("Setting OriginWidget for the form action");
         formAction.set(Tags.OriginWidget, widget);
         return formAction;
     }
