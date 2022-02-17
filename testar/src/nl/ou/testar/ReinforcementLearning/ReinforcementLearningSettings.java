@@ -23,6 +23,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
     public Float decayRate;
     public Float temperature;
     public Float maxQValue;
+    public String tagName;
+    public String qFunction;
 
     @Override
     public int compareTo(ReinforcementLearningSettings other) {
@@ -35,7 +37,9 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
                 && this.policy.equals(other.policy)
                 && this.decayRate.equals(other.decayRate)
                 && this.temperature.equals(other.temperature)
-                && this.maxQValue.equals(other.maxQValue)) {
+                && this.maxQValue.equals(other.maxQValue)
+                && this.tagName.equals(other.tagName)
+                && this.qFunction.equals(other.qFunction)) {
             return 0;
         }
         return -1;
@@ -54,6 +58,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
                 "decayRate=" + decayRate +
                 "temperature=" + temperature +
                 "maxQValue=" + maxQValue +
+                "tagName=" + tagName +
+                "qFunction=" + qFunction +
                 '}';
     }
 
@@ -69,6 +75,8 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         DefaultInstance.temperature = (float)1.0;
         DefaultInstance.rewardFunction = "WidgetTreeBasedRewardFunction";
         DefaultInstance.policy = "EpsilonGreedyPolicy";
+        DefaultInstance.tagName = "qvalue";
+        DefaultInstance.qFunction = "QlearningFunction";
         return DefaultInstance;
     }
     
@@ -101,7 +109,11 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         System.out.println("Temperature value : " + settings.get(ConfigTags.Temperature));
         settings.set(ConfigTags.MaxQValue, this.maxQValue);
         System.out.println("MaxQValue value : " + settings.get(ConfigTags.MaxQValue));
-        
+        settings.set(ConfigTags.TagName, this.tagName);
+        System.out.println("TagName value : " + settings.get(ConfigTags.TagName));
+        settings.set(ConfigTags.QFunction, this.qFunction);
+        System.out.println("QFunction value : " + settings.get(ConfigTags.QFunction));
+
         // Force new Application Name adding the RL Extended Settings
         // This is being done to differentiate experiments results
         String extendedSettingFileName = new File(settings.get(ConfigTags.ExtendedSettingsFile)).getName().replace(".xml", "");

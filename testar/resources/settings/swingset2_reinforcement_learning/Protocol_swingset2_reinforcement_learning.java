@@ -80,7 +80,7 @@ public class Protocol_swingset2_reinforcement_learning extends SwingSet2Protocol
 		//disconnectRDP();
 	    
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
         
         // Extended settings framework, set ConfigTags settings with XML framework values 
         // test.setting -> ExtendedSettingsFile

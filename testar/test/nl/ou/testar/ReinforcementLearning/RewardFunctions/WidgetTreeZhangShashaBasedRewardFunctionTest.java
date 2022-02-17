@@ -1,11 +1,15 @@
 package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 
+import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This unit test is based on an example in the article
@@ -94,8 +98,11 @@ public class WidgetTreeZhangShashaBasedRewardFunctionTest {
         final WidgetTreeZhangShashaBasedRewardFunction widgetTreeZhangShashaBasedRewardFunction = new WidgetTreeZhangShashaBasedRewardFunction(lrKeyrootsHelper, treeDistHelper);
         WidgetTreeZhangShashaBasedRewardFunction.previousState = previousState;
 
+        // Empty for compilation, not used
+        Set<Action> actions = new HashSet<Action>();
+
         // when
-        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null);
+        float reward = widgetTreeZhangShashaBasedRewardFunction.getReward(state, null, null, null, null, null, actions);
 
         // then
         assertEquals(2f, reward, 0.00001);

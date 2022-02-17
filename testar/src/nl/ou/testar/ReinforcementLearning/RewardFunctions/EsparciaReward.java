@@ -17,23 +17,30 @@ import java.util.function.Consumer;
 /**
  * Implementation of the reward function based on a counter
  */
-public class CounterBasedRewardFunction implements RewardFunction {
+public class EsparciaReward implements RewardFunction {
 
     public static Consumer<WriterExperimentsParams> WRITER_EXPERIMENTS_CONSUMER = WriterExperiments::writeMetrics;
 
     private static final Logger logger = LogManager.getLogger(CounterBasedRewardFunction.class);
 
+    private final float R_max;
+
+    public EsparciaReward(float R_max){
+        this.R_max = R_max;
+    }
+
     @Override
     public float getReward(final State state, final ConcreteState currentConcreteState, final AbstractState currentAbstractState, final Action executedAction, final AbstractAction executedAbstractAction, final AbstractAction selectedAbstractAction, Set<Action> actions) {
+
         if (executedAbstractAction == null || executedAbstractAction.getAttributes() == null) {
             return 0f;
         }
 
-        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
-        executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
+        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0);
+        executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter + 1);
 
         logger.info("ID={} executionCounter={}", executedAbstractAction.getId(), executionCounter);
-        float reward = 1.0f / (float) executionCounter;
+        float reward = executionCounter != 0 ? 1.0f / (float) executionCounter : R_max;
         logger.info("ID={} reward={}", executedAbstractAction.getId(), reward);
 
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server

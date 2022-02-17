@@ -79,7 +79,7 @@ public class Protocol_rachota_reinforcement_learning extends RachotaProtocol {
 		//disconnectRDP();
 	    
         //Create Abstract Model with Reinforcement Learning Implementation
-        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, true);
+        settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
         
         // Extended settings framework, set ConfigTags settings with XML framework values 
         // test.setting -> ExtendedSettingsFile

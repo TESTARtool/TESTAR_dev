@@ -29,33 +29,44 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
-import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
+import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.Policy;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.webdriver.*;
+import org.fruit.alayer.webdriver.WdDriver;
+import org.fruit.alayer.webdriver.WdElement;
+import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_shopizer extends WebdriverProtocol {
+public class Protocol_webdriver_shopizer_reinforcement_learning extends WebdriverProtocol {
 
 	// Custom email for registration and login
 	private String email = "testar@testar.com";
+
+	private ActionSelector actionSelector = null;
+	private Policy policy = null;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -68,6 +79,17 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		// Disconnect from Windows Remote Desktop, without close the GUI session
 		// User will need to disable or accept UAC permission prompt message
 		//disconnectRDP();
+
+		//Create Abstract Model with Reinforcement Learning Implementation
+		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
+
+		// Extended settings framework, set ConfigTags settings with XML framework values
+		// test.setting -> ExtendedSettingsFile
+		ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+		settings = rlXmlSetting.updateXMLSettings(settings);
+
+		policy = PolicyFactory.getPolicy(settings);
+		actionSelector = new ReinforcementLearningActionSelector(policy);
 
 		super.initialize(settings);
 
@@ -379,6 +401,33 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Select one of the available actions using a reinforcement learning action selection algorithm
+	 *
+	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	 * overwrite it, not always running it, we have take care of the HTML report here
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(final State state, final Set<Action> actions) {
+		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		final Action preSelectedAction = preSelectAction(state, actions);
+		if (preSelectedAction != null) {
+			return preSelectedAction;
+		}
+		Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+		if(modelAction==null) {
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+			return RandomActionSelector.selectAction(actions);
+		}
+		return modelAction;
 	}
 
 	/**
