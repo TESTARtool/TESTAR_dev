@@ -23,6 +23,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class WdFillFormAction extends TaggableBase implements Action {
+    //TODO if this works well, put it into config file:
+    private boolean useOnlyWebNameForXmlFileName = true;
     private StdActionCompiler ac;
     private Widget widget;
     private Action formFillingAction;
@@ -35,14 +37,16 @@ public class WdFillFormAction extends TaggableBase implements Action {
      * If the XML file for the form exists, it reads the input values and creates clickAndType actions for them
      *
      * Issues/improvements:
-     * - naming of the XML file - now using full URL with domain also, sometimes the form properties are empty
+     * - naming of the XML file - if(useOnlyWebNameForXmlFileName) and web name is available, the URL is ignored
+     *      - otherwise URL is used in filename
+     *      - if web name and web id is missing, then we use widget path in filename
      * - only handles text fields of the form, not drop-down menus or other type of widgets
      * - uses WebName of the form widget for telling the user which field the input is used for,
      * could be better to use for example <name=address> or <id=54>
      * - not tested what happens if the form does not fit to the screen and scrolling is needed to press submit
-     * - change the path of the generated templates to the folder of the protocol in use
-     * - if the web page has 2 forms, this only handles the first one
-     * - deal with the pretty print XML or generate the XML in pretty format
+     * - generated templates are created into the folder of the protocol in use
+     * - if the web page has 2 forms, should handle both of them
+     * - pretty print XML seems to break the XML - we should generate the XML in pretty format to read with notepad
      *
      * @param ac
      * @param widget
@@ -101,38 +105,45 @@ public class WdFillFormAction extends TaggableBase implements Action {
         if(uriPath.contains(";")){
             logger.debug("Removing everything after ;");
             uriPath = uriPath.substring(0, uriPath.indexOf(";"));
-        }else if(uriPath.contains("?")){
+            logger.debug("uriPath="+uriPath);
+        }
+        if(uriPath.contains("?")){
             logger.debug("Removing everything after ?");
             uriPath = uriPath.substring(0, uriPath.indexOf("?"));
+            logger.debug("uriPath="+uriPath);
         }
-        logger.debug("uriPath="+uriPath);
 
-        // WebName is sometimes empty, then the generated XML file has only the URL as its name
+        // WebName is sometimes empty, then the generated XML file has URL and web id or widget path as its name
         String formName = widget.get(WdTags.WebName, "");
         String path = uriPath;
         if(formName.length()>0){
-            path = uriPath + "_" + formName;
-            logger.debug("form name used for path="+path);
-            // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
+            if(useOnlyWebNameForXmlFileName){
+                path = formName;
+                logger.debug("Only form name used for path="+path);
+            }else{
+                path = uriPath + "_" + formName;
+                logger.debug("URL and form name used for path="+path);
+            }
         }else if(widget.get(WdTags.WebId, "").length()>0){
             path = uriPath + "_" + widget.get(WdTags.WebId, "");
-            logger.debug("web id used for path="+path);
+            logger.debug("Form name empty, using URL and web id used for path="+path);
             // System.out.println("DEBUG: Derive FillForm Action : look for file " + path);
         }else{
-            // System.out.println("DEBUG: Form name and ID are empty, using TESTAR widget path for the filename");
+            // Form name and ID are empty, using TESTAR widget path for the filename
             // How to find an element that does not have name or ID? We want xPath from Selenium
             // TODO xPath for form element without attributes, instead of TESTAR widget path
             // WdDriver.getRemoteWebDriver().findElement()
             // 2 forms without name or id would be using the same XML filename even if one of the them has more fields
             // Therefore, we add TESTAR widget path into the filename:
             path = uriPath + "_" + widget.get(Tags.Path, "");
-            logger.debug("widget path used for path="+path);
+            logger.debug("Form name and ID are empty, using URL and TESTAR widget path used for path="+path);
         }
         path = path.replace("/", "_").replace("?", "_") + ".xml";
-        String file_path = "settings/" + this.formFileFolder + "/" + path;
+        String file_path = "settings\\" + this.formFileFolder + "\\" + path;
         logger.debug("file_path="+file_path);
         //Updating action description:
         this.set(Tags.Desc, "Fill a form based on XML file: "+file_path);
+        logger.debug("Form action Desc="+this.get(Tags.Desc, ""));
         File f = new File(file_path);
         Map<String, String> fields = new HashMap<>();
         Boolean storeFile = true;
@@ -140,15 +151,15 @@ public class WdFillFormAction extends TaggableBase implements Action {
         // If it exists, we read the XML file, and do not create a new one - storeFile = false
         if (f.exists()) {
             storeFile = false;
-            fields = readFormFile(file_path);
             logger.debug("Derive FillForm Action : File exists, reading the data from the file");
+            fields = readFormFile(file_path);
         }
 
         CompoundAction.Builder formBuilder = new CompoundAction.Builder();
         int numberOfActions = buildForm(formBuilder, (WdWidget)widget, fields, storeFile, ac);
 
         if (storeFile && numberOfActions > 0) {
-            storeToFile(path, fields);
+            storeToFile(file_path, fields);
             // By default create the performSubmit option as true and derive the submit action
             if (!formName.isEmpty()) {
                 // If we found a form with a name property, use this property to execute a script submit action
@@ -182,7 +193,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
                     logger.error("Could not find submit button of the form, so the action does not click submit.");
                 }
             }
-        }
+        } // else is handled with NOP action
 
         // Creating a NOP action as a default and overwriting it with formFillingAction
         // If the form is empty or we cannot create actions on it, we return NOP action instead.
