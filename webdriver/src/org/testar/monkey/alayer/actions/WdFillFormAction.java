@@ -1,5 +1,6 @@
 package org.testar.monkey.alayer.actions;
 
+import org.apache.logging.log4j.Level;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -378,11 +379,11 @@ public class WdFillFormAction extends TaggableBase implements Action {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(result);
+            logger.debug("Form file created, file name: "+fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("Derive FillForm Action : storeToFile: " + result);
+        // System.out.println("Derive FillForm Action : storeToFile: " + result);
     }
 
     private String writeFormData(String result, Map<String, String> fields) {
