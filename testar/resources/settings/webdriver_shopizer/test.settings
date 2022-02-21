@@ -105,7 +105,7 @@ ProtocolClass = webdriver_shopizer/Protocol_webdriver_shopizer
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer =
@@ -132,7 +132,7 @@ AbstractStateAttributes = WebWidgetId,WebWidgetTextContent
 #################################################################
 ClickableClasses = hidden-xs
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = aws-demo.shopizer.com
+DomainsAllowed = 
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = false

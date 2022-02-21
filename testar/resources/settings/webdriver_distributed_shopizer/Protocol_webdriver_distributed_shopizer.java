@@ -28,6 +28,7 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.RandomActionSelector;
 
@@ -53,6 +54,51 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
+
+	@Override
+	protected void buildStateIdentifiers(State state) {
+		CodingManager.buildIDs(state);
+		// Reset widgets AbstractIDCustom identifier values to empty
+		for(Widget w : state) { w.set(Tags.AbstractIDCustom, ""); }
+		// Custom the State AbstractIDCustom identifier
+		customBuildAbstractIDCustom(state);
+	}
+
+	private synchronized void customBuildAbstractIDCustom(Widget widget){
+		if (widget.parent() != null) {
+
+			// dropdown widgets that come from fa-angle-down do not have interesting properties that differentiate them from other dropdowns
+			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+				// Create the default String hash code using the abstract tags selected from the settings file (gh23483ghhk)
+				// All dropdown widgets will potentially have this same hash identifier (gh23483ghhk)
+				String dropdownWidgetAbstractId = CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId());
+				// Obtain the parent WebTextContent that will help to differentiate one dropdown from others (Products)
+				// This WebTextContent will help to differentiate dropdowns (Products, Account, ShopCart, etc)
+				String parentDescription = widget.parent() != null ? widget.parent().get(WdTags.WebTextContent,"") : "";
+				// Create a new String that contains the widget abstract id and the parent WebTextContent (gh23483ghhkProducts)
+				String mergedAbstractId = dropdownWidgetAbstractId + parentDescription;
+				// Then calculate the new hash id using new unique string (gh23483ghhkProducts)
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(mergedAbstractId));
+				// Also set new description using parent description
+				// TODO: Maybe only set a new description and use Tags.Desc in the settings file
+				widget.set(Tags.Desc, widget.get(Tags.Desc,"") + parentDescription);
+				return;
+			}
+
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId()));
+
+		} else if (widget instanceof State) {
+			StringBuilder abstractIdCustom;
+			abstractIdCustom = new StringBuilder();
+			for (Widget childWidget : (State) widget) {
+				if (childWidget != widget) {
+					customBuildAbstractIDCustom(childWidget);
+					abstractIdCustom.append(childWidget.get(Tags.AbstractIDCustom));
+				}
+			}
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(abstractIdCustom.toString()));
+		}
+	}
 
 	// http://localhost:8080/shop/
 	// http://localhost:8080/admin/
@@ -96,6 +142,15 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 
 		System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
 
+		for (Widget widget: state){
+			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
+					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")){
+				WdDriver.executeScript("window.history.back();");
+				Util.pause(1);
+				state = super.getState(system);
+			}
+		}
+
 		return state;
 	}
 
@@ -124,8 +179,24 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			return forcedActions;
 		}
 
+		// TODO: Check how this affects the WdHistoryBackAction of empty states
+		// TESTAR may find some empty states without actions when Shopizer is loading state content
+		// Always create the possibility to execute a NOP action in case no other actions are available
+		// Create this default NOP action also helps to deal with no determinism
+		// in the distributed shared algorithm
+		Action nop = new NOP();
+		nop.set(Tags.OriginWidget, state);
+		nop.set(Tags.Desc, "NOP action to wait");
+		actions.add(nop);
+
 		// iterate through all widgets
 		for (Widget widget : state) {
+
+			// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
+			// this is because a click will close the dropdown
+			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+				actions.add(ac.mouseMove(widget));
+			}
 
 			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
 				actions.add(registrationFormFill(state, widget));
@@ -153,6 +224,12 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				continue;
 			}
 
+			// Ignore widgets that contains a son dropdown widget
+			// because we are deriving a mouse movement action in the dropdown
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdA) && containsDropdownSon(widget)) {
+				continue;
+			}
+
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				if(widget.get(WdTags.WebCssClasses,"").contains("tt-hint")) {
@@ -162,50 +239,36 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
 			}
 
-//			// left clicks, but ignore links outside domain
-//			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-//				// Click on select web items opens the menu but does not allow TESTAR to select an item,
-//				// thats why we need a custom action selection
-//				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
-//					//actions.add(randomFromSelectList(widget));
-//				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")) {
-//					// dropdown-toggle widgets need a mouse movement but not a click, because a click will close the dropdown
-//					// Except multi language Home button :)
-//					if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
-//						actions.add(ac.leftClickAt(widget));
-//					} else {
-//						actions.add(ac.mouseMove(widget));
-//					}
-//				} else {
-//					actions.add(ac.leftClickAt(widget));
-//				}
-//			}
-//		}
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				// Click on select web items opens the menu but does not allow TESTAR to select an item,
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
-				} else if (widget.get(WdTags.WebCssClasses, "").contains("hidden-xs")) {
-					// span widgets that come from dropdown-toggle need a mouse movement but not a click, because a click will close the dropdown
-					actions.add(ac.mouseMove(widget));
 				} else {
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
 
-		if(actions.isEmpty()) {
-			System.out.println("Derive Actions Empty! Wait 2 second because maybe a menu is loading");
-			Util.pause(2);
-			Action nop = new NOP();
-			nop.set(Tags.OriginWidget, state);
-			nop.set(Tags.Desc, "NOP action to wait");
-			return new HashSet<>(Collections.singletonList(nop));
-		}
-
 		return actions;
+	}
+
+	/**
+	 * Check if current web widget contains a son dropdown widget. 
+	 * 
+	 * @param widget
+	 * @return
+	 */
+	private boolean containsDropdownSon(Widget widget) {
+		if(widget.childCount() > 0) {
+			for(int i = 0; i < widget.childCount(); i++){
+				if(widget.child(i).get(WdTags.WebCssClasses, "").contains("fa-angle-down")){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

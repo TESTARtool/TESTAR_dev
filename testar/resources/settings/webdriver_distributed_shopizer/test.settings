@@ -130,7 +130,7 @@ AbstractStateAttributes = WebWidgetId,WebWidgetTextContent
 #################################################################
 ClickableClasses = hidden-xs
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = aws-demo.shopizer.com
+DomainsAllowed = 
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = false
@@ -171,7 +171,7 @@ TimeToWaitAfterAction = 1
 ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 300
+MaxTime = 1800
 ShowSettingsAfterTest = false
 StartupTime = 2.0
 DrawWidgetInfo = false

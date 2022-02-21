@@ -58,7 +58,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		CodingManager.buildIDs(state);
 		// Reset widgets AbstractIDCustom identifier values to empty
 		for(Widget w : state) { w.set(Tags.AbstractIDCustom, ""); }
-		// Custom the State AbstractIDCustom identifier to ignore Format menu bar widgets
+		// Custom the State AbstractIDCustom identifier
 		customBuildAbstractIDCustom(state);
 	}
 
