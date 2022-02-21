@@ -37,12 +37,16 @@ dos2unix runImage
 ### Build a testar docker image
 docker build -t testar/testarstatemodel:latest .
 
+### Create output folder if does not exist, to avoid docker mount error
+mkdir -p /home/testar/qsamba/results/dockers_$number_dockers/output
+
 ### Number of dockers containers that run in parallel
 #for i in {1..$number_dockers}
 echo run $number_dockers docker containers
 for i in `seq 1 $number_dockers`
 do
-  docker run -d --add-host=host.docker.internal:host-gateway --shm-size=512m --mount type=bind,source=/home/testar/TESTAR_dev,target=/mnt testar/testarstatemodel:latest
+  #docker run -d --add-host=host.docker.internal:host-gateway --shm-size=512m --mount type=bind,source=/home/testar/TESTAR_dev,target=/mnt testar/testarstatemodel:latest
+  docker run -d --add-host=host.docker.internal:host-gateway --shm-size=512m --mount type=bind,source=/home/testar/TESTAR_dev,target=/mnt --mount type=bind,source=/home/testar/qsamba/results/dockers_$number_dockers/output,target=/testar/bin/output testar/testarstatemodel:latest
 done
 
 ### We move to dumper folder to have all the metrics in the same place
