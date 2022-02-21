@@ -194,4 +194,4 @@ TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 FlashFeedback = false
-ProtocolCompileDirectory = /tmp
+# ProtocolCompileDirectory = /tmp
