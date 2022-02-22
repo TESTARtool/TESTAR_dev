@@ -167,33 +167,43 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected SUT startSystem() throws SystemStartException {
     	// Add the domain from the SUTConnectorValue to domainsAllowed List
     	ensureDomainsAllowed();
-    	
+
     	SUT sut = super.startSystem();
 
-    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
-    	// webdriver in the constructor of WdDriver.
-    	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows 10")
-    			&& sut.get(Tags.HWND, null) == null) {
-    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
-    		// window handle. The running browser needs to be in the foreground when we reach this part.
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		// Safe to set breakpoints again.
-    		if (WinProcess.procName(pid).contains("chrome")) {
-    			sut.set(Tags.HWND, hwnd);
-    			sut.set(Tags.PID, pid);
-    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
-    		}
-    	}
+    	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
+    	setWindowHandleForWebdriverBrowser(sut);
 
-		double displayScale = getDisplayScale(sut);
+    	double displayScale = getDisplayScale(sut);
 
-		// See remarks in WdMouse
-        mouse = sut.get(Tags.StandardMouse);
-        mouse.setCursorDisplayScale(displayScale);
+    	// See remarks in WdMouse
+    	mouse = sut.get(Tags.StandardMouse);
+    	mouse.setCursorDisplayScale(displayScale);
 
     	return sut;
+    }
+
+    /**
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
+     * webdriver in the constructor of WdDriver. 
+     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     */
+    private void setWindowHandleForWebdriverBrowser(SUT sut) {
+    	try {
+    		if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
+    			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    			// window handle. The running browser needs to be in the foreground when we reach this part.
+    			long hwnd = Windows.GetForegroundWindow();
+    			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    			// Safe to set breakpoints again.
+    			if (WinProcess.procName(pid).contains("chrome")) {
+    				sut.set(Tags.HWND, hwnd);
+    				sut.set(Tags.PID, pid);
+    				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    			}
+    		}
+    	} catch (ExceptionInInitializerError | NoClassDefFoundError e) {
+    		System.out.println("INFO: We can not obtain the Windows 10 windows handle of WebDriver browser instance");
+    	}
     }
 
 	/**
@@ -203,6 +213,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * @return The display scale.
 	 */
 	private double getDisplayScale(SUT sut) {
+		// Call specific OS API to obtain the display scale value of the system
+		// Ex: windows - org.testar.monkey.alayer.windows.Windows10 calls MonitorFromWindow native function
+		// If something fails these specific getDisplayScale OS implementations must return a default value
 		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
 		// If the user has specified a scale override the display scale obtained from the system.
