@@ -96,9 +96,12 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                     logger.trace("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
                     return sut;
                 }else if(state == null){
-                    logger.warn("state == null");
+                    logger.debug("state == null");
                 }else if(state.childCount()==0){
-                    logger.warn("state.childCount() == 0");
+                    logger.debug("state.childCount() == 0");
+                    logger.fatal("TESTAR failed to detect any widgets in the SUT process - maybe the SUT starts multiple processes and another one is for the GUI." +
+                            "You can try using SUT_PROCESS_NAME or SUT_WINDOW_TITLE to connect to the process that handles the GUI of the SUT. " +
+                            "For example, Windows 10 Calculator uses ApplicationFrameHost.exe for the GUI.");
                 }
             }else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
