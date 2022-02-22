@@ -6,6 +6,8 @@ echo "Start Xvfb"
 /opt/bin/start-xvfb.sh 1> /dev/null &
 sleep 2
 cd /testar/bin
+# next command will redirect out and err message to /output/docker_id_debug file
+#./testar sse=webdriver_distributed_parabank > output/$(hostname)_debug.txt 2>&1
 #./testar sse=webdriver_statemodel_shared
 #./testar sse=webdriver_distributed_parabank
 ./testar sse=webdriver_distributed_shopizer
