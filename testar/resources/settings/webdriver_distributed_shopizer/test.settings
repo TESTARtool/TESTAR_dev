@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*tel:888-888-8888.*
-TagsToFilter = ValuePattern
+ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*tel:888-888-8888.*|.*locale=fr.*|.*[lL]ogout.*|.*[cC]errar.*
+TagsToFilter = ValuePattern;WebHref;WebTextContent
 
 #################################################################
 # Processfilter
@@ -128,7 +128,7 @@ AbstractStateAttributes = WebWidgetId,WebWidgetTextContent
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = hidden-xs
+ClickableClasses = 
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = 
 FollowLinks = true
@@ -167,7 +167,7 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
-TimeToWaitAfterAction = 1
+TimeToWaitAfterAction = 3
 ShowVisualSettingsDialogOnStartup = false
 ReplayRetryTime = 30.0
 Delete =

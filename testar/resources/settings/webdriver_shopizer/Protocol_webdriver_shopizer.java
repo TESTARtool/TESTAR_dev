@@ -81,6 +81,27 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				return;
 			}
 
+			// Register web page shows information about name, surname, password, etc.. in the text content of the registrationError web widget
+			// Because this web text content is dynamic, use only web id for the abstract id
+			if(widget.get(WdTags.WebId, "").equals("registrationError")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// Same for edit address form page http://localhost:8080/shop/customer/editAddress.html
+			if(widget.get(WdTags.WebId, "").equals("formError")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// For all widgets that are sons of My Account (customerAccount) widget
+			// Use only the web id to build the AbstractIDCustom
+			// TODO: Prob not a good idea because widgets from this dropdown are different, so this will provoke non determinism
+//			if(isSonOfCustomerAccount(widget)) {
+//				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+//				return;
+//			}
+
 			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId()));
 
 		} else if (widget instanceof State) {
@@ -96,14 +117,16 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		}
 	}
 
+	private boolean isSonOfCustomerAccount(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("customerAccount")) return true;
+		else return isSonOfCustomerAccount(widget.parent());
+	}
+
 	// http://localhost:8080/shop/
 	// http://localhost:8080/admin/
 	// admin@shopizer.com
 	// password
-
-	// Custom email for registration and login
-	private String email = "testar@testar.com";
-
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -116,11 +139,20 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		// Cookies button
 		WdDriver.executeScript("document.getElementsByClassName('cc-btn cc-dismiss')[0].click();");
 		Util.pause(1);
+
 		// First time we load the page resources are not loaded correctly, we need to refresh the web page
 		WdDriver.getRemoteWebDriver().navigate().refresh();
+		Util.pause(1);
 
-		// TODO: force Shopizer login?
-		// http://localhost:8080/shop/customer/customLogon.html
+		// Navigate to Shopizer login web url
+		WdDriver.getRemoteWebDriver().navigate().to("http://localhost:8080/shop/customer/customLogon.html");
+		Util.pause(2);
+
+		// Script login sequence
+		WdDriver.executeScript("document.getElementById('signin_userName').setAttribute('value','testar@testar.com');");
+		WdDriver.executeScript("document.getElementById('signin_password').setAttribute('value','testar');");
+		WdDriver.executeScript("document.getElementById('genericLogin-button').click();");
+		Util.pause(2);
 	}
 
 	/**
@@ -180,10 +212,10 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		// Always create the possibility to execute a NOP action in case no other actions are available
 		// Create this default NOP action also helps to deal with no determinism
 		// in the distributed shared algorithm
-		Action nop = new NOP();
-		nop.set(Tags.OriginWidget, state);
-		nop.set(Tags.Desc, "NOP action to wait");
-		actions.add(nop);
+//		Action nop = new NOP();
+//		nop.set(Tags.OriginWidget, state);
+//		nop.set(Tags.Desc, "NOP action to wait");
+//		actions.add(nop);
 
 		// iterate through all widgets
 		for (Widget widget : state) {
@@ -194,11 +226,25 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				actions.add(ac.mouseMove(widget));
 			}
 
-			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
-				actions.add(registrationFormFill(state, widget));
+			// We dont need to register if we force the login
+//			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
+//				actions.add(registrationFormFill(state, widget));
+//			}
+			// We dont need to login if we force the login in the beginsequence
+//			if(widget.get(WdTags.WebId, "").contains("login-form")) {
+//				actions.add(loginFormFill(state, widget));
+//			}
+			if(widget.get(WdTags.WebId, "").contains("searchField")) {
+				actions.add(new CompoundAction.Builder()
+						.add(ac.clickTypeInto(widget, "table", true), 10)
+						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+						.build(widget));
 			}
-			if(widget.get(WdTags.WebId, "").contains("login-form")) {
-				actions.add(loginFormFill(state, widget));
+			if(widget.get(WdTags.WebId, "").contains("contactForm")) {
+				actions.add(contactUsFormFill(state, widget));
+			}
+			if(widget.get(WdTags.WebId, "").contains("changeAddressForm")) {
+				actions.add(changeAddressFormFill(state, widget));
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -292,23 +338,58 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		// http://localhost:8080/shop/customer/registration.html
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		return new CompoundAction.Builder()
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.firstName", state), "testar", true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.lastName", state), "testar", true), 50)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.firstName", state), "testar", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "billing.lastName", state), "testar", true), 2)
 				// Ignore country and state, use default values
-				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "emailAddress", state), email, true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "password", state), "testar", true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "checkPassword", state), "testar", true), 50)
-				.add(ac.hitKey(KBKeys.VK_ENTER), 50)
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "emailAddress", state), "testar@testar.com", true), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("testar"), 2) // password may be out of the screen resolution
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("testar"), 2) // checkPassword may be out of the screen resolution
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1)
 				.build(widget);
 	}
-
 	private Action loginFormFill(State state, Widget widget) {
 		// http://localhost:8080/shop/customer/customLogon.html
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		return new CompoundAction.Builder()
-				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "signin_userName", state), email, true), 50)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "signin_password", state), "testar", true), 50)
-				.add(ac.leftClickAt(getWidgetWithMatchingTag("WebId", "genericLogin-button", state)), 50)
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("name", "signin_userName", state), "testar@testar.com", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("name", "signin_password", state), "testar", true), 2)
+				.add(ac.leftClickAt(getWidgetWithMatchingTag("WebId", "genericLogin-button", state)), 2)
+				.build(widget);
+	}
+	private Action contactUsFormFill(State state, Widget widget) {
+		// http://localhost:8080/shop/store/contactus.html
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "name", state), "SomeName", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "email@email.com", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "subject", state), "SomeSubject", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "comment", state), "blabla", true), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // We are not a robot
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // Send button using tabs and enter because may be out of screen resolution
+				.build(widget);
+	}
+	private Action changeAddressFormFill(State state, Widget widget) {
+		// http://localhost:8080/shop/customer/editAddress.html
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "firstName", state), "testar", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "lastName", state), "testar", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "address", state), "testar street", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "city", state), "testar city", true), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("testar prov"), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("01234"), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("0123456789"), 2)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // Send button using tabs and enter because may be out of screen resolution
 				.build(widget);
 	}
 
