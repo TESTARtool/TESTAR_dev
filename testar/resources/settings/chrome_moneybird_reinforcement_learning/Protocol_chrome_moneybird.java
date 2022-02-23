@@ -136,18 +136,18 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
 
-//    settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
-//
-//    // Extended settings framework, set ConfigTags settings with XML framework values
-//    // test.setting -> ExtendedSettingsFile
-//    ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
-//    settings = rlXmlSetting.updateXMLSettings(settings);
-//
+    settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
+
+    // Extended settings framework, set ConfigTags settings with XML framework values
+    // test.setting -> ExtendedSettingsFile
+    ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+    settings = rlXmlSetting.updateXMLSettings(settings);
+
     String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
     connectedURL = parts[parts.length - 1].replace("\"", "");
-//
-//    policy = PolicyFactory.getPolicy(settings);
-//    actionSelector = new ReinforcementLearningActionSelector(policy);
+
+    policy = PolicyFactory.getPolicy(settings);
+    actionSelector = new ReinforcementLearningActionSelector(policy);
 
     try {
       JSONObject json = readJsonFromUrl(connectedURL + "/app/clear_coverage");
