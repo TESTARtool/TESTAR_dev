@@ -149,7 +149,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		Util.pause(1);
 
 		// Navigate to Shopizer login web url
-		WdDriver.getRemoteWebDriver().navigate().to("http://localhost:8080/shop/customer/customLogon.html");
+		WdDriver.getRemoteWebDriver().navigate().to("http://host.docker.internal:8080/shop/customer/customLogon.html");
 		Util.pause(2);
 
 		// Script login sequence
