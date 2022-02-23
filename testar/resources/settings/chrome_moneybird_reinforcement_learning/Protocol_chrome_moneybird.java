@@ -358,6 +358,19 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
     // iterate through all widgets
     for (Widget widget : state) {
 
+      // fill forms actions
+      if (isAtBrowserCanvas(widget) && isForm(widget)) {
+        String protocol = settings.get(ConfigTags.ProtocolClass, "");
+        Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+        if(((WdFillFormAction)formFillingAction).isHiddenForm()) {
+          System.out.println("DEBUG: we derive a NOP action, but lets ignore");
+          // do nothing with NOP actions - the form was not actionable
+        } else {
+          System.out.println("DEBUG: form action found: ");
+          actions.add(formFillingAction);
+        }
+      }
+
     	// Skip Admin and logout page widget
     	if(widget.get(WdTags.WebHref,"").contains("admin.htm")
     			|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
