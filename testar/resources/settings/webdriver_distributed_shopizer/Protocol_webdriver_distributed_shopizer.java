@@ -98,6 +98,13 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				return;
 			}
 
+			// In Shopizer we have two home href buttons, but they are leading to two different states
+			// We need to use widget href in the abstraction level to differentiate them
+			if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebTextContent, WdTags.WebHref));
+				return;
+			}
+
 			// For all widgets that are sons of My Account (customerAccount) widget
 			// Use only the web id to build the AbstractIDCustom
 			// TODO: Prob not a good idea because widgets from this dropdown are different, so this will provoke non determinism
@@ -140,6 +147,8 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		moreSharedActions = true;
+
 		// Cookies button
 		WdDriver.executeScript("document.getElementsByClassName('cc-btn cc-dismiss')[0].click();");
 		Util.pause(1);
@@ -156,6 +165,10 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		WdDriver.executeScript("document.getElementById('signin_userName').setAttribute('value','testar@testar.com');");
 		WdDriver.executeScript("document.getElementById('signin_password').setAttribute('value','testar');");
 		WdDriver.executeScript("document.getElementById('genericLogin-button').click();");
+		Util.pause(2);
+
+		// Move the mouse to the corner because previous sequence mouse position may affect the model determinism
+		mouse.setCursor(10, 10);
 		Util.pause(2);
 	}
 
@@ -240,7 +253,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 //			}
 			if(widget.get(WdTags.WebId, "").contains("searchField")) {
 				actions.add(new CompoundAction.Builder()
-						.add(ac.clickTypeInto(widget, "table", true), 10)
+						.add(ac.clickTypeInto(widget, getRandomShopizerData(), true), 10)
 						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
 						.build(widget));
 			}
@@ -282,7 +295,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 					// Ignore duplicated search bar text box
 					continue;
 				}
-				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
+				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(), true));
 			}
 
 			// left clicks, but ignore links outside domain
@@ -323,12 +336,9 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 	 * @param w
 	 * @return
 	 */
-	private String getRandomShopizerData(Widget w) {
-		String[] example = {"aaaa", "1234", "01-01-2021"};
-		if(w.get(WdTags.WebId, "").toLowerCase().contains("example")) {
-			return example[new Random().nextInt(example.length)];
-		}
-		return this.getRandomText(w);
+	private String getRandomShopizerData() {
+		String[] example = {"aaaa", "1234", "01-01-2021","table","bag"};
+		return example[new Random().nextInt(example.length)];
 	}
 
 	/**
