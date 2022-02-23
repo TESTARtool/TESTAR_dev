@@ -33,20 +33,55 @@ package org.testar.action.priorization;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
+import org.fruit.alayer.windows.Windows;
 
 public class ActionTags extends TagsBase  {
+
+	public enum ActionGroupType {
+		UIAWidget, UIAAppBar, UIAButton, UIACalendar, UIACheckBox, UIAComboBox,
+		UIACustomControl, UIADataGrid, UIADataItem, UIADocument, UIAEdit,
+		UIAGroup, UIAHeader, UIAHeaderItem, UIAHyperlink, UIAImage, UIAList,
+		UIAListItem, UIAMenuBar, UIAMenu, UIAMenuItem, UIAPane, UIAProgressBar,
+		UIARadioButton, UIAScrollBar, UIASemanticZoom, UIASeparator, UIASlider,
+		UIASpinner, UIASplitButton, UIAStatusBar, UIATabControl, UIATabItem,
+		UIATable, UIAText, UIAThumb, UIATitleBar, UIAToolBar, UIAToolTip,
+		UIATree, UIATreeItem, UIAWindow;
+	}
 
 	private ActionTags() {}
 
 	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
 
-	private static Set<Tag<Integer>> actionTags;
-	static {
-		actionTags = new HashSet<Tag<Integer>>();
-		actionTags.add(SimilarityValue);
-	}
+	public static final Tag<Double> QLearning = from("QLearning", Double.class);
+
+	public static final Tag<Integer> ZIndex = from("ZIndex", Integer.class);
+
+	public static final Tag<ActionGroupType> ActionGroup = from("ActionGroup", ActionGroupType.class);
+	// <-- **
+
+	private static Set<Tag<Integer>> actionTags = new HashSet<Tag<Integer>>() {
+		{
+			add(SimilarityValue);
+			add(ZIndex);
+		}
+	};
+
+	// ** -->
+	private static Set<Tag<Double>> doubleActionTags = new HashSet<Tag<Double>>() {
+		{
+			add(QLearning);
+		}
+	};
+
+	private static Set<Tag<ActionGroupType>> StringActionTags = new HashSet<Tag<ActionGroupType>>() {
+		{
+			add(ActionGroup);
+		}
+	};
+	// <-- **
 
 	public static Set<Tag<Integer>> getActionTags() {
 		return actionTags;
