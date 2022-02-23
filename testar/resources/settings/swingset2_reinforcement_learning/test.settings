@@ -51,7 +51,7 @@ SequenceLength = 300
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -111,15 +111,15 @@ ProtocolClass = swingset2_reinforcement_learning/Protocol_swingset2_reinforcemen
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = plocal
-DataStoreDirectory = C:\\orientdb-3.0.34\\databases
+DataStoreType = remote
+DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = instant
+DataStoreMode = delayed
 ApplicationName = SwingSet2_RL
 ApplicationVersion = 1
-StateModelStoreWidgets = false
+DataStoreDirectory = D:\\orientdb-3.0.28\\databases
 
 #################################################################
 # State identifier attributes
@@ -134,27 +134,21 @@ AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 #################################################################
 Alpha = 1.0
 Gamma = 0.99
-Beta = 1.0
-DefaultVValue = 0.0
 DefaultValue = 0.0
 DefaultReward = 0.0
 Epsilon = 0.7
 MaxQValue = 1.0
 DecayRate = 0.0001
 Temperature = 1.0
-RewardFunction = BorjaReward2
-Policy = GreedyDoubleQPolicy
-TagName = defaultrl
-QFunction = QlearningFunction
+RewardFunction = WidgetTreeBasedRewardFunction
+Policy = EpsilonGreedyPolicy
 
 #################################################################
 # Extended settings file
 #
 # Relative path to extended settings file.
 #################################################################
-# ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQLearning.xml
-# ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLQVLearning.xml
-ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLDoubleQlearningCounter.xml
+ExtendedSettingsFile = .\\settings\\swingset2_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # Other more advanced settings

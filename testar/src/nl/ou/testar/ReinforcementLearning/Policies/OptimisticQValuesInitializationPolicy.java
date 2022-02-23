@@ -8,10 +8,10 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 import java.util.Set;
 
 public class OptimisticQValuesInitializationPolicy implements Policy {
-    private final GreedyPolicy<?> greedyPolicy;
+    private final GreedyPolicy greedyPolicy;
     private final float maxQValue;
 
-    public OptimisticQValuesInitializationPolicy(final GreedyPolicy<?> greedyPolicy, final float maxQValue) {
+    public OptimisticQValuesInitializationPolicy(final GreedyPolicy greedyPolicy, final float maxQValue) {
         this.greedyPolicy = greedyPolicy;
         this.maxQValue = maxQValue;
     }

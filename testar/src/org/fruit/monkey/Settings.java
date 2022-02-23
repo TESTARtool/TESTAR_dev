@@ -420,7 +420,6 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Reinforcement learning settings\n"
 					+"#################################################################\n"
-					+"StateModelReinforcementLearningEnabled = " + Util.lineSep()
 					+"Alpha = " + Util.lineSep()
 					+"Gamma = " + Util.lineSep()
 					+"DefaultValue = " + Util.lineSep()
@@ -431,8 +430,6 @@ public class Settings extends TaggableBase implements Serializable {
 					+"Temperature = " + Util.lineSep()
 					+"RewardFunction = " + Util.lineSep()
 					+"Policy = " + Util.lineSep()
-					+"TagName = " + Util.lineSep()
-					+"QFunction = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Override display scale\n"

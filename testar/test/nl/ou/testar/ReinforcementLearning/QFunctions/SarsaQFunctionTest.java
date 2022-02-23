@@ -24,11 +24,6 @@ public class SarsaQFunctionTest {
         final AbstractAction actionUnderExecution = new AbstractAction("actionId");
         actionUnderExecution.getAttributes().set(RLTags.SarsaValue, 2f);
         final float reward = 0f;
-        
-        // Empty for compilation, not used
-        Set<Action> actions = new HashSet<Action>();
-        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
-        final AbstractState abstractState = new AbstractState("stateId", abstractActions);
 
         // Empty for compilation, not used
         Set<Action> actions = new HashSet<Action>();
@@ -49,11 +44,6 @@ public class SarsaQFunctionTest {
         final AbstractAction actionUnderExecution = new AbstractAction("actionId");
         actionUnderExecution.getAttributes().set(RLTags.SarsaValue, 2f);
         final float reward = 0f;
-        
-        // Empty for compilation, not used
-        Set<Action> actions = new HashSet<Action>();
-        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
-        final AbstractState abstractState = new AbstractState("stateId", abstractActions);
 
         // Empty for compilation, not used
         Set<Action> actions = new HashSet<Action>();
