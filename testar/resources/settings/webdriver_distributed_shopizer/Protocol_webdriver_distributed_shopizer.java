@@ -105,6 +105,18 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				return;
 			}
 
+			// For shopping cart (number of bags) widget we should use only the id to avoid an state explosion
+			if(widget.get(WdTags.WebId, "").equals("miniCartSummary")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// Shopping cart widget that shows the price, is a dynamic widget that we have to ignore from the abstract id point of view
+			if(widget.get(WdTags.WebCssClasses, "").contains("pull-left")) { return; }
+
+			// Shopping cart may contains dynamic widgets if TESTAR buys stuff, we have to ignore these widgets from the abstract id point of view
+			if(isSonOfCartItems(widget)) { return; }
+
 			// In Shopizer we have two home href buttons, but they are leading to two different states
 			// We need to use widget href in the abstraction level to differentiate them
 			if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
@@ -151,6 +163,12 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		if(widget.parent() == null) return false;
 		else if (widget.parent().get(WdTags.WebId, "").equals("editShippingAddress_100")) return true;
 		else return isSonOfShopAddressBox(widget.parent());
+	}
+
+	private boolean isSonOfCartItems(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("miniCartDetails")) return true;
+		else return isSonOfCartItems(widget.parent());
 	}
 
 	// http://localhost:8080/shop/
@@ -205,14 +223,6 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		State state = super.getState(system);
 
 		for (Widget widget : state) {
-			// Execute a double search in Shopizer leads to Apache 404 error because custom error.jsp does not exists
-			// Because this page does not contain widgets, force back history
-			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
-					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")){
-				WdDriver.executeScript("window.history.back();");
-				Util.pause(2);
-				state = super.getState(system);
-			}
 			// If Shopizer is rendering products in the state, wait until everything is loaded
 			if(widget.get(WdTags.WebCssClasses, "").toLowerCase().contains("loadingoverlay")) {
 				waitShopizerLoadingOverlay(state, system);
@@ -289,6 +299,22 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				actions.add(ac.mouseMove(widget));
 			}
 
+			// If shopping cart contains some item to buy, derive an additional action to explore buy cart states
+			if(widget.get(WdTags.WebId, "").equals("miniCartSummary") && !widget.get(WdTags.WebTextContent, "").contains("0")) {
+				actions.add(ac.mouseMove(widget));
+			}
+
+			// Ignore action for shopping cart images and prices, because these are not doing nothing
+			// Then TESTAR will focus in Buy Cart button
+			if(widget.get(WdTags.WebCssClasses, "").contains("product-image") || widget.get(WdTags.WebCssClasses, "").contains("pull-left")) {
+				continue;
+			}
+			// Very specific condition to also ignore actions in bag name that do nothing
+			if(widget.parent() != null && widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdP) 
+					&& widget.parent().get(WdTags.WebCssClasses, "").contains("product-name")) {
+				continue;
+			}
+
 			// We dont need to register if we force the login
 //			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
 //				actions.add(registrationFormFill(state, widget));
@@ -299,7 +325,6 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 //			}
 			if(widget.get(WdTags.WebId, "").contains("searchField")) {
 				actions.add(new CompoundAction.Builder()
-						//.add(ac.clickTypeInto(widget, getRandomShopizerData(), true), 10)
 						.add(ac.clickTypeInto(widget, "bag", true), 10)
 						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
 						.build(widget));
@@ -431,12 +456,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "email@email.com", true), 2)
 				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "subject", state), "SomeSubject", true), 2)
 				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "comment", state), "blabla", true), 2)
-				.add(ac.hitKey(KBKeys.VK_TAB), 1)
-				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // We are not a robot
-				.add(ac.hitKey(KBKeys.VK_TAB), 1)
-				.add(ac.hitKey(KBKeys.VK_TAB), 1)
-				.add(ac.hitKey(KBKeys.VK_TAB), 1)
-				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // Send button using tabs and enter because may be out of screen resolution
+				.add(ac.leftClickAt(getWidgetWithMatchingTag("WebId", "submitContact", state)), 2)
 				.build(widget);
 	}
 	private Action changeAddressFormFill(State state, Widget widget) {
