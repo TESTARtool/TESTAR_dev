@@ -27,7 +27,7 @@ Mode = Generate
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Users\\worker\\Desktop\\chromedriver\\chromedriver.exe" "1920x900+0+0" "http://localhost:8080/shop"
+SUTConnectorValue = "C:\\Users\\worker\\Desktop\\chromedriver\\chromedriver.exe" "1920x900+0+0" "http://localhost:8080/parabank/index.htm"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Users\\worker\\Desktop\\chromedriver\\chromedriver.exe"
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -82,7 +82,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*tel:888-888-8888.*
+ClickFilter = .*[sS]ave.*|.*[pP]rint.*|.*[eE]mail.*|.*[fF]ile.*|.*[mM]inimize.*|.*[dD]isconnect.*|.*admin.*|.*logout.*|.*parasoft.com.*|.*api-docs.*
 TagsToFilter = ValuePattern
 
 #################################################################
@@ -100,21 +100,20 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_shopizer_reinforcement_learning/Protocol_webdriver_shopizer_reinforcement_learning
+ProtocolClass = webdriver_parabank_statemodel/Protocol_webdriver_parabank_statemodel
 
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
+DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = shopizer
+ApplicationName = parabank
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
@@ -125,7 +124,7 @@ StateModelStoreWidgets = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId,WebWidgetTextContent
+AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetTextContent
 
 #################################################################
 # Reinforcement learning settings
@@ -147,14 +146,14 @@ Policy = EpsilonGreedyPolicy
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\webdriver_parabank_statemodel_rl\\ExtendedRLWidgetTreeReward.xml
 
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = hidden-xs
-DeniedExtensions = pdf;jpg;png
-DomainsAllowed = aws-demo.shopizer.com
+ClickableClasses = 
+DeniedExtensions = pdf;jpg;png;wsdl;pfx
+DomainsAllowed = para.testar.org
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = false
@@ -200,19 +199,21 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
+TimeToWaitAfterAction = 1
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 1
+MaxTime = 3600
+ShowSettingsAfterTest = false
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
-VisualizeActions = true
-VisualizeSelectedAction = true
+VisualizeActions = false
+VisualizeSelectedAction = false
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
+FlashFeedback = false
+# ProtocolCompileDirectory = /tmp
