@@ -28,25 +28,22 @@
  *
  */
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.Pair;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.*;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
+import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 
 public class Protocol_webdriver_gwt extends WebdriverProtocol {
