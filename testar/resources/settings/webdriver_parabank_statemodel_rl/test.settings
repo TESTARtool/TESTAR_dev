@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_parabank_statemodel/Protocol_webdriver_parabank_statemodel
+ProtocolClass = webdriver_parabank_statemodel_rl/Protocol_webdriver_parabank_statemodel_rl
 
 #################################################################
 # State model inference settings
