@@ -63,6 +63,11 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 	private synchronized void customBuildAbstractIDCustom(Widget widget){
 		if (widget.parent() != null) {
 
+			// Account bill direction may be dynamically changed in the exploration process
+			// Ignore all properties to create widget id
+			// http://localhost:8080/shop/customer/billing.html
+			if(isSonOfBillAddressBox(widget) || isSonOfShopAddressBox(widget)) { return; }
+
 			// dropdown widgets that come from fa-angle-down do not have interesting properties that differentiate them from other dropdowns
 			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
 				// Create the default String hash code using the abstract tags selected from the settings file (gh23483ghhk)
@@ -126,10 +131,22 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		}
 	}
 
-	private boolean isSonOfCustomerAccount(Widget widget) {
+//	private boolean isSonOfCustomerAccount(Widget widget) {
+//		if(widget.parent() == null) return false;
+//		else if (widget.parent().get(WdTags.WebId, "").equals("customerAccount")) return true;
+//		else return isSonOfCustomerAccount(widget.parent());
+//	}
+
+	private boolean isSonOfBillAddressBox(Widget widget) {
 		if(widget.parent() == null) return false;
-		else if (widget.parent().get(WdTags.WebId, "").equals("customerAccount")) return true;
-		else return isSonOfCustomerAccount(widget.parent());
+		else if (widget.parent().get(WdTags.WebId, "").equals("editBillingAddress_100")) return true;
+		else return isSonOfBillAddressBox(widget.parent());
+	}
+
+	private boolean isSonOfShopAddressBox(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("editShippingAddress_100")) return true;
+		else return isSonOfShopAddressBox(widget.parent());
 	}
 
 	// http://localhost:8080/shop/
