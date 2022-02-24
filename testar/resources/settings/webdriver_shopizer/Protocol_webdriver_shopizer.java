@@ -88,7 +88,9 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				return;
 			}
 
-			// Same for edit address form page http://localhost:8080/shop/customer/editAddress.html
+			// Same for edit address or change password form pages
+			// http://localhost:8080/shop/customer/editAddress.html
+			// http://localhost:8080/shop/customer/password.html
 			if(widget.get(WdTags.WebId, "").equals("formError")) {
 				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
 				return;
@@ -179,18 +181,55 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
-		System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
-
-		for (Widget widget: state){
+		for (Widget widget : state) {
+			// Execute a double search in Shopizer leads to Apache 404 error because custom error.jsp does not exists
+			// Because this page does not contain widgets, force back history
 			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
 					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")){
 				WdDriver.executeScript("window.history.back();");
-				Util.pause(1);
+				Util.pause(2);
+				state = super.getState(system);
+			}
+			// If Shopizer is rendering products in the state, wait until everything is loaded
+			if(widget.get(WdTags.WebCssClasses, "").toLowerCase().contains("loadingoverlay")) {
+				waitShopizerLoadingOverlay(state, system);
 				state = super.getState(system);
 			}
 		}
 
+		System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
+
 		return state;
+	}
+
+	/**
+	 * Wait until Shopizer finishes loading web content. 
+	 * 
+	 * @param state
+	 */
+	private void waitShopizerLoadingOverlay(State state, SUT system) {
+		boolean wait = true;
+		while(wait) {
+			// If loadingoverlay widget still existing wait...
+			if(stateContainsCssClass(state, "loadingoverlay")) {
+				System.out.println("Shopizer State loading products, wait...");
+				Util.pause(2);
+				state = super.getState(system);
+			} 
+			// when finally disappeared, stop the loop
+			else {
+				wait = false;
+			}
+		}
+	}
+
+	private boolean stateContainsCssClass(State state, String cssClass) {
+		for (Widget widget : state) {
+			if(widget.get(WdTags.WebCssClasses, "").toLowerCase().contains(cssClass)) {
+				return true;
+			} 
+		}
+		return false;
 	}
 
 	/**
@@ -218,16 +257,6 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			return forcedActions;
 		}
 
-		// TODO: Check how this affects the WdHistoryBackAction of empty states
-		// TESTAR may find some empty states without actions when Shopizer is loading state content
-		// Always create the possibility to execute a NOP action in case no other actions are available
-		// Create this default NOP action also helps to deal with no determinism
-		// in the distributed shared algorithm
-//		Action nop = new NOP();
-//		nop.set(Tags.OriginWidget, state);
-//		nop.set(Tags.Desc, "NOP action to wait");
-//		actions.add(nop);
-
 		// iterate through all widgets
 		for (Widget widget : state) {
 
@@ -247,7 +276,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 //			}
 			if(widget.get(WdTags.WebId, "").contains("searchField")) {
 				actions.add(new CompoundAction.Builder()
-						.add(ac.clickTypeInto(widget, getRandomShopizerData(), true), 10)
+						//.add(ac.clickTypeInto(widget, getRandomShopizerData(), true), 10)
+						.add(ac.clickTypeInto(widget, "bag", true), 10)
 						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
 						.build(widget));
 			}
@@ -256,6 +286,10 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			}
 			if(widget.get(WdTags.WebId, "").contains("changeAddressForm")) {
 				actions.add(changeAddressFormFill(state, widget));
+			}
+			if(widget.get(WdTags.WebId, "").contains("changePasswordForm")) {
+				actions.add(changePasswordFormFill(state, widget));
+				actions.add(badPasswordFormFill(state, widget));
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -398,6 +432,26 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				.add(ac.hitKey(KBKeys.VK_TAB), 1)
 				.add(new Type("0123456789"), 2)
 				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // Send button using tabs and enter because may be out of screen resolution
+				.build(widget);
+	}
+	private Action changePasswordFormFill(State state, Widget widget) {
+		// http://localhost:8080/shop/customer/password.html
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "currentPassword", state), "testar", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "password", state), "testar", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "checkPassword", state), "testar", true), 2)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1)
+				.build(widget);
+	}
+	private Action badPasswordFormFill(State state, Widget widget) {
+		// http://localhost:8080/shop/customer/password.html
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "currentPassword", state), "123456", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "password", state), "aaabbb", true), 2)
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "checkPassword", state), "aaabbb", true), 2)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1)
 				.build(widget);
 	}
 
