@@ -28,6 +28,7 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.Util;
@@ -56,6 +57,116 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 
 	// Custom email for registration and login
 	private String email = "testar@testar.com";
+
+	@Override
+	protected void buildStateIdentifiers(State state) {
+		CodingManager.buildIDs(state);
+		// Reset widgets AbstractIDCustom identifier values to empty
+		for(Widget w : state) { w.set(Tags.AbstractIDCustom, ""); }
+		// Custom the State AbstractIDCustom identifier
+		customBuildAbstractIDCustom(state);
+	}
+
+	private synchronized void customBuildAbstractIDCustom(Widget widget){
+		if (widget.parent() != null) {
+
+			// Account bill direction may be dynamically changed in the exploration process
+			// Ignore all properties to create widget id
+			// http://localhost:8080/shop/customer/billing.html
+			if(isSonOfBillAddressBox(widget) || isSonOfShopAddressBox(widget)) { return; }
+
+			// dropdown widgets that come from fa-angle-down do not have interesting properties that differentiate them from other dropdowns
+			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+				// Create the default String hash code using the abstract tags selected from the settings file (gh23483ghhk)
+				// All dropdown widgets will potentially have this same hash identifier (gh23483ghhk)
+				String dropdownWidgetAbstractId = CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId());
+				// Obtain the parent WebTextContent that will help to differentiate one dropdown from others (Products)
+				// This WebTextContent will help to differentiate dropdowns (Products, Account, ShopCart, etc)
+				String parentDescription = widget.parent() != null ? widget.parent().get(WdTags.WebTextContent,"") : "";
+				// Create a new String that contains the widget abstract id and the parent WebTextContent (gh23483ghhkProducts)
+				String mergedAbstractId = dropdownWidgetAbstractId + parentDescription;
+				// Then calculate the new hash id using new unique string (gh23483ghhkProducts)
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(mergedAbstractId));
+				// Also set new description using parent description
+				// TODO: Maybe only set a new description and use Tags.Desc in the settings file
+				widget.set(Tags.Desc, widget.get(Tags.Desc,"") + parentDescription);
+				return;
+			}
+
+			// Register web page shows information about name, surname, password, etc.. in the text content of the registrationError web widget
+			// Because this web text content is dynamic, use only web id for the abstract id
+			if(widget.get(WdTags.WebId, "").equals("registrationError")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// Same for edit address or change password form pages
+			// http://localhost:8080/shop/customer/editAddress.html
+			// http://localhost:8080/shop/customer/password.html
+			if(widget.get(WdTags.WebId, "").equals("formError")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// For shopping cart (number of bags) widget we should use only the id to avoid an state explosion
+			if(widget.get(WdTags.WebId, "").equals("miniCartSummary")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
+			// Shopping cart widget that shows the price, is a dynamic widget that we have to ignore from the abstract id point of view
+			if(widget.get(WdTags.WebCssClasses, "").contains("pull-left")) { return; }
+
+			// Shopping cart may contains dynamic widgets if TESTAR buys stuff, we have to ignore these widgets from the abstract id point of view
+			if(isSonOfCartItems(widget)) { return; }
+
+			// In Shopizer we have two home href buttons, but they are leading to two different states
+			// We need to use widget href in the abstraction level to differentiate them
+			if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebTextContent, WdTags.WebHref));
+				return;
+			}
+
+			// For all widgets that are sons of My Account (customerAccount) widget
+			// Use only the web id to build the AbstractIDCustom
+			// TODO: Prob not a good idea because widgets from this dropdown are different, so this will provoke non determinism
+//			if(isSonOfCustomerAccount(widget)) {
+//				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+//				return;
+//			}
+
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, CodingManager.getCustomTagsForAbstractId()));
+
+		} else if (widget instanceof State) {
+			StringBuilder abstractIdCustom;
+			abstractIdCustom = new StringBuilder();
+			for (Widget childWidget : (State) widget) {
+				if (childWidget != widget) {
+					customBuildAbstractIDCustom(childWidget);
+					abstractIdCustom.append(childWidget.get(Tags.AbstractIDCustom));
+				}
+			}
+			widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(abstractIdCustom.toString()));
+		}
+	}
+
+	private boolean isSonOfBillAddressBox(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("editBillingAddress_100")) return true;
+		else return isSonOfBillAddressBox(widget.parent());
+	}
+
+	private boolean isSonOfShopAddressBox(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("editShippingAddress_100")) return true;
+		else return isSonOfShopAddressBox(widget.parent());
+	}
+
+	private boolean isSonOfCartItems(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("miniCartDetails")) return true;
+		else return isSonOfCartItems(widget.parent());
+	}
 
 	/**
 	 * Called once during the life time of TESTAR
