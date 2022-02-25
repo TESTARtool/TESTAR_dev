@@ -204,11 +204,11 @@ public class SharedProtocol extends WebdriverProtocol {
 	protected Action traversePath(State state, Set<Action> actions) {
 		// TODO: Check if have multiple state models in the same database is problematic for next queries
 		String destStateQuery = "";
-		if(traversePathType.equals(TraverseType.NON_DET)) {
+		if(traversePathType != null && traversePathType.equals(TraverseType.NON_DET)) {
 			// We want to navigate to the Abstract State that contains the non deterministic targetSharedAction (AbstractAction) to execute
 			destStateQuery = "select stateId from AbstractState where @rid in (select outV() from AbstractAction where actionId='" + targetSharedAction + "')";
 			System.out.println("Running traversePath to non deterministic targetSharedAction");
-		} else if (traversePathType.equals(TraverseType.UNV)) {
+		} else if (traversePathType != null && traversePathType.equals(TraverseType.UNV)) {
 			// We want to navigate to the Abstract State that contains the targetSharedAction (UnvisitedAbstractAction) to execute
 			destStateQuery = "select stateId from AbstractState where @rid in (select outV() from UnvisitedAbstractAction where actionId='" + targetSharedAction + "')";
 			System.out.println("Running traversePath to UnvisitedAbstractAction targetSharedAction");
@@ -341,9 +341,9 @@ public class SharedProtocol extends WebdriverProtocol {
 	}
 
 	private void returnActionToVertex() {
-		if(traversePathType.equals(TraverseType.NON_DET)) {
+		if(traversePathType != null && traversePathType.equals(TraverseType.NON_DET)) {
 			SharedNonDeterminism.returnActionToNonDeterministicHole(settings, targetSharedAction, database);
-		} else if (traversePathType.equals(TraverseType.UNV)) {
+		} else if (traversePathType != null && traversePathType.equals(TraverseType.UNV)) {
 			SharedUnvisitedActions.returnActionToBlackHole(settings, targetSharedAction, database);
 		} else {
 			// This should not happen
@@ -386,7 +386,7 @@ public class SharedProtocol extends WebdriverProtocol {
 		// If we have found the non deterministic action to restore the state model transitions
 		// We need to delete the non deterministic action edge from the model to do not interfere with next shortest path calculations
 		// This is done in selectAction method, so next executeAction will restore the transition 
-		if(traversePathType.equals(TraverseType.NON_DET)) {
+		if(traversePathType != null && traversePathType.equals(TraverseType.NON_DET)) {
 			SharedNonDeterminism.cleanNonDeterministicActionFromHole(settings, targetSharedAction, database);
 		} 
 		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
