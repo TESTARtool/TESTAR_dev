@@ -46,6 +46,8 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.SharedProtocol;
 import org.testar.protocols.WebdriverProtocol;
 
+import com.google.common.collect.Lists;
+
 import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -290,8 +292,20 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			return forcedActions;
 		}
 
+		// First try to derive actions from top level widgets (from open dropdown menus)
+		actions = deriveActionsFromWidgets(actions, ac, state, getTopWidgets(state));
+		// If no dropdown menu is open, or no available actions on these menus
+		if(actions.isEmpty()) {
+			// Derive actions for all the widgets of the state
+			actions = deriveActionsFromWidgets(actions, ac, state, Lists.newArrayList(state));
+		}
+
+		return actions;
+	}
+
+	private Set<Action> deriveActionsFromWidgets(Set<Action> actions, StdActionCompiler ac, State state, List<Widget> stateWidgets){
 		// iterate through all widgets
-		for (Widget widget : state) {
+		for (Widget widget : stateWidgets) {
 
 			// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
 			// this is because a click will close the dropdown
@@ -315,14 +329,6 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				continue;
 			}
 
-			// We dont need to register if we force the login
-//			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
-//				actions.add(registrationFormFill(state, widget));
-//			}
-			// We dont need to login if we force the login in the beginsequence
-//			if(widget.get(WdTags.WebId, "").contains("login-form")) {
-//				actions.add(loginFormFill(state, widget));
-//			}
 			if(widget.get(WdTags.WebId, "").contains("searchField")) {
 				actions.add(new CompoundAction.Builder()
 						.add(ac.clickTypeInto(widget, "bag", true), 10)
@@ -387,6 +393,29 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		}
 
 		return actions;
+	}
+
+	/**
+	 * Return a list of widgets that are childs of [dropdown, open] menus
+	 * @param state
+	 * @return
+	 */
+	protected List<Widget> getTopWidgets(State state){
+		List<Widget> topWidgets = new ArrayList<>();
+		for (Widget w : state) {
+			// Interesting top widgets are childs of dropdown menus, that are not the fa-angle-down interactive arrow
+			// We ignore this specific class because there may exists empty dropdown menus with only fa-angle-down arrows
+			if (isSonOfDropdownOpen(w) && !w.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+				topWidgets.add(w);
+			}
+		}
+		return topWidgets;
+	}
+
+	private boolean isSonOfDropdownOpen(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebCssClasses, "").equals("[dropdown, open]")) return true;
+		else return isSonOfDropdownOpen(widget.parent());
 	}
 
 	/**
