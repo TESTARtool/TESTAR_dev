@@ -38,7 +38,7 @@ import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.SharedProtocol;
+import org.testar.distributed.SharedProtocol;
 
 import nl.ou.testar.RandomActionSelector;
 import java.util.*;
@@ -162,7 +162,7 @@ public class Protocol_webdriver_statemodel_shared extends SharedProtocol {
 
 	@Override
 	protected boolean moreSequences() {
-		boolean result = (CountInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol;
+		boolean result = (countInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol;
 		System.out.println("moreSharedSequences ? " + result);
 		return result;
 	}

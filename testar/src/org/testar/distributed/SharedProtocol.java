@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.protocols;
+package org.testar.distributed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,20 +43,17 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.actions.WdHistoryBackAction;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.WebdriverProtocol;
 
-import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-
 import nl.ou.testar.StateModel.ModelManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManager;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManagerFactory;
@@ -104,121 +101,12 @@ public class SharedProtocol extends WebdriverProtocol {
 			Random r = new Random();
 			nodeName = System.getenv("HOSTNAME") + "_" + r.nextInt(10000);
 			System.out.println("nodeName = " + nodeName);
-			try (ODatabaseSession dbSession = createDatabaseConnection(settings)) {
-				ExecuteCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
+			try (ODatabaseSession dbSession = SharedDatabase.createDatabaseConnection(settings, database)) {
+				SharedDatabase.executeCommand(dbSession, "create vertex BeingExecuted set node = '" + nodeName + "'").close();
 			} catch (Exception e) {
 				System.out.println("Exception creating vertex BeingExecuted to set node = " + nodeName);
 			}
 		}
-	}
-
-	/**
-	 * Called once during the life time of TESTAR this method can be used to perform 
-	 * initial setup work.
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	private ODatabaseSession createDatabaseConnection(Settings settings) {
-		Config config = OrientDBManagerFactory.getDatabaseConfig(settings);
-		// Do I need this here? Probably not because global configuration set in Connection
-		OGlobalConfiguration.NETWORK_REQUEST_TIMEOUT.setValue(5000);
-		OGlobalConfiguration.NETWORK_SOCKET_RETRY.setValue(3);
-		ODatabaseSession dbSession = database.open(config.getDatabase(), config.getUser(), config.getPassword());
-		return dbSession;
-	}
-
-	/**
-	 * Execute a command in the OrientDB to create or update state model entities. 
-	 * 
-	 * @param db
-	 * @param command
-	 * @return
-	 */
-	private OResultSet ExecuteCommand(ODatabaseSession db, String command) {
-		System.out.println("Shared protocol ExecuteCommand: " + command);
-		// TODO: Probably add a max of tries
-		boolean repeat = false;
-		do {
-			repeat = false;
-			try {
-				//System.out.println("dbSession = " + db);
-				return db.command(command);
-			} catch (OConcurrentModificationException ex) {
-				repeat = true;
-				try {
-					Thread.sleep(1000);
-				} catch (Exception e) {}
-			}
-		} while (repeat);
-
-		return null;
-	}
-
-	/**
-	 * Execute a query in the OrientDB to obtain an entity information result. 
-	 * 
-	 * @param db
-	 * @param query
-	 * @return
-	 */
-	private OResultSet ExecuteQuery(ODatabaseSession db, String query) {
-		System.out.println("Shared protocol ExecuteQuery: " + query);
-		// TODO: Probably add a max of tries
-		boolean repeat = false;
-		do {
-			repeat = false;
-			try {
-				//System.out.println("dbSession = " + db);
-				return db.query(query);
-			} catch (OConcurrentModificationException ex) {
-				repeat = true;
-				try {
-					Thread.sleep(1000);
-				} catch (Exception e) {}
-			}
-		} while (repeat);
-
-		return null;
-	}
-
-	/**
-	 * Count the number of existing entities in the OrientDB. 
-	 * 
-	 * @param entity
-	 * @return
-	 */
-	protected long CountInDb(String entity) {
-		long number = 0;
-		String sql = "SELECT count(*) as number from " + entity;
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			OResultSet rs = ExecuteQuery(db, sql);
-			OResult item = rs.next();
-			number = item.getProperty("number");
-			rs.close();
-			System.out.println(sql + "  number =  " + number);
-		} catch (Exception e) {
-			System.out.println("Exception CountInDb database query");
-		}
-
-		return number;
-	}
-
-	/**
-	 * Create a String,Action Map. 
-	 * 
-	 * @param actions
-	 * @return
-	 */
-	protected HashMap<String, Action> ConvertActionSetToDictionary(Set<Action> actions) {
-		//System.out.println("SharedProtocol: Convert Set<Action> to HashMap containing actionIds as keys");
-		HashMap<String, Action> actionMap = new HashMap<>();
-		ArrayList<Action> actionList = new ArrayList<>(actions);
-		for (Action a : actionList) {
-			//System.out.println("Add action " + a.get(Tags.AbstractIDCustom) + " to actionMap; description = " + a.get(Tags.Desc));
-			actionMap.put(a.get(Tags.AbstractIDCustom), a);
-		}
-		//System.out.println("actionMap.size() = " + actionMap.size());
-		return actionMap;
 	}
 
 	protected String getNewTargetSharedAction(State state, Set<Action> actions) {
@@ -228,18 +116,22 @@ public class SharedProtocol extends WebdriverProtocol {
 		boolean availableAction = false;
 		do {
 			try {
-				ArrayList<String> availableActionsFromDb = GetUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom));
-				System.out.println("Number of shortest path actions available in database: " + availableActionsFromDb.size());
+				ArrayList<String> unvisitedActionsFromDb = GetUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom));
+				System.out.println("Number of shortest path actions available in database: " + unvisitedActionsFromDb.size());
 
-				if (availableActionsFromDb.size() >= 1) {
+				if (unvisitedActionsFromDb.size() >= 1) {
 					availableAction = true;
-					String action = selectRandomActionFromDB(availableActionsFromDb);
+					String action = SharedDatabase.selectRandomUnvisitedAction(unvisitedActionsFromDb, nodeName, settings, database);
+					if(action == null) {
+						System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
+						targetSharedAction = null;
+					}
 					System.out.println("Action from database selected: action = " + action);
 					return action;
 				}
 
 				// We have no unvisited actions to execute, but maybe because we are in the first action step
-				long numberAbstractStates = CountInDb("AbstractState");
+				long numberAbstractStates = countInDb("AbstractState");
 				System.out.println("No actions available in database; abstract states in database = " + numberAbstractStates);
 
 				if (numberAbstractStates == 0) {
@@ -285,8 +177,8 @@ public class SharedProtocol extends WebdriverProtocol {
 		// $to=(SELECT FROM BlackHole where blackHoleId='jp3leu283079445017') UNWIND path)
 
 		OResultSet rs = null;
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			rs = ExecuteQuery(db, sql);
+		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
+			rs = SharedDatabase.executeQuery(db, sql);
 
 			while (rs.hasNext()) {
 				OResult item = rs.next();
@@ -311,26 +203,6 @@ public class SharedProtocol extends WebdriverProtocol {
 		return result;
 	}
 
-	private String selectRandomActionFromDB(ArrayList<String> actions) {
-		long graphTime = System.currentTimeMillis();
-		Random rnd = new Random(graphTime);
-
-		String ac = actions.get(rnd.nextInt(actions.size()));
-		UpdateAbstractActionToBeingExecuted(ac);
-		System.out.println("Update action " + ac + " from BlackHole to BeingExecuted");
-		return ac;
-	}
-
-	private void UpdateAbstractActionToBeingExecuted(String actionId) {
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='" + nodeName + "') where actionId='" + actionId + "'";
-			ExecuteCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
-			targetSharedAction = null;
-		}
-	}
-
 	protected Action traversePath(State state, Set<Action> actions) {
 		if(nonDeterministicAction) {
 			// We need to calculate the path no the AbstractAction not the UnvisitedAbstractAction
@@ -343,8 +215,8 @@ public class SharedProtocol extends WebdriverProtocol {
 		// State Id of the final destination AbstractState that contains the desired UnvisitedAbstractAction to execute
 		String destinationStateId = "";
 
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			OResultSet destinationStatResultSet = ExecuteQuery(db, destStateQuery);
+		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
+			OResultSet destinationStatResultSet = SharedDatabase.executeQuery(db, destStateQuery);
 			if (destinationStatResultSet.hasNext()) {
 				OResult item = destinationStatResultSet.next();
 				destinationStateId = item.getProperty("stateId");
@@ -353,7 +225,7 @@ public class SharedProtocol extends WebdriverProtocol {
 			} else {
 				System.out.println("traversePath: State is stuck because no unvisited action found; set targetSharedAction to null; run historyback now");
 				destinationStatResultSet.close();
-				ReturnActionToBlackHole();
+				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
 				targetSharedAction = null;
 				Action histBackAction = new WdHistoryBackAction();
 				buildEnvironmentActionIdentifiers(state, histBackAction);
@@ -372,7 +244,7 @@ public class SharedProtocol extends WebdriverProtocol {
 					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
 					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
 
-			OResultSet pathResultSet = ExecuteQuery(db, stateRidQuery);
+			OResultSet pathResultSet = SharedDatabase.executeQuery(db, stateRidQuery);
 			Vector<TmpData> v = new Vector<>();
 
 			// @rid --- stateId
@@ -387,7 +259,7 @@ public class SharedProtocol extends WebdriverProtocol {
 
 			if (v.size() < 2) {
 				System.out.println("traversePath: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
-				ReturnActionToBlackHole();
+				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
 				targetSharedAction = null;
 				moreSharedActions = false;
 				db.close();
@@ -401,7 +273,7 @@ public class SharedProtocol extends WebdriverProtocol {
 
 			String abstractActionId = "";
 			HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-			OResultSet abstractActionResultSet = ExecuteQuery(db, abstActQuery);
+			OResultSet abstractActionResultSet = SharedDatabase.executeQuery(db, abstActQuery);
 			while (abstractActionResultSet.hasNext()) {
 				abstractActionId = abstractActionResultSet.next().getProperty("actionId");
 				System.out.println("traversePath: Check if " + abstractActionId + " is available");
@@ -421,7 +293,7 @@ public class SharedProtocol extends WebdriverProtocol {
 		}
 
 		System.out.println("traversePath: Action that needs to be made does not exist");
-		ReturnActionToBlackHole();
+		SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
 		targetSharedAction = null;
 
 		return super.selectAction(state, actions);
@@ -435,8 +307,8 @@ public class SharedProtocol extends WebdriverProtocol {
 
 		String destinationStateId = "";
 
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			OResultSet destinationStatResultSet = ExecuteQuery(db, destStateQuery);
+		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
+			OResultSet destinationStatResultSet = SharedDatabase.executeQuery(db, destStateQuery);
 			if (destinationStatResultSet.hasNext()) {
 				OResult item = destinationStatResultSet.next();
 				destinationStateId = item.getProperty("stateId");
@@ -454,7 +326,7 @@ public class SharedProtocol extends WebdriverProtocol {
 					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
 					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
 
-			OResultSet pathResultSet = ExecuteQuery(db, stateRidQuery);
+			OResultSet pathResultSet = SharedDatabase.executeQuery(db, stateRidQuery);
 			Vector<TmpData> v = new Vector<>();
 
 			while (pathResultSet.hasNext()) {
@@ -476,13 +348,17 @@ public class SharedProtocol extends WebdriverProtocol {
 
 			String abstractActionId = "";
 			HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-			OResultSet abstractActionResultSet = ExecuteQuery(db, abstActQuery);
+			OResultSet abstractActionResultSet = SharedDatabase.executeQuery(db, abstActQuery);
 			while (abstractActionResultSet.hasNext()) {
 				abstractActionId = abstractActionResultSet.next().getProperty("actionId");
 				System.out.println("traverseAbstractAction: Check if " + abstractActionId + " is available");
 
 				if (availableActions.containsKey(abstractActionId)) {
 					System.out.println("traverseAbstractAction: Action " + abstractActionId + " is available in the avilableActions; this is being executed");
+					// This "restoring" process (traverseAbstractAction) that navigates the path to a non determinism action, also can find non determinism
+					// To avoid a loop we need to check step by step
+					// Save the next traverse stateId to which TESTAR should navigate to detect non-determinism
+					nextTraverseState = v.get(1).stateId;
 					abstractActionResultSet.close();
 					db.close();
 					return availableActions.get(abstractActionId);
@@ -499,17 +375,6 @@ public class SharedProtocol extends WebdriverProtocol {
 		return super.selectAction(state, actions);
 	}
 
-	private void ReturnActionToBlackHole() {
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			// TODO: This query assumes that there is only one state model (one black hole) per database 
-			String sql = "update edge UnvisitedAbstractAction set in = (select from BlackHole) where actionId='" + targetSharedAction + "'";
-			System.out.println("Return action to BlackHole from BeingExecuted: " + targetSharedAction + " sql = " + sql);
-			ExecuteCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("Not possible to return targetSharedAction " + targetSharedAction + " to BlackHole : " + e);
-		}
-	}
-
 	protected void verifyTraversePathDeterminism(State state) {
 		// Check if last traverse action leads TESTAR to the correct expected state
 		// Or if we have a non-deterministic action
@@ -524,9 +389,9 @@ public class SharedProtocol extends WebdriverProtocol {
 				System.out.println("Non-deterministic Action: " + lastExecutedAction.get(Tags.AbstractIDCustom) + 
 						" leads to state: " + state.get(Tags.AbstractIDCustom) + " instead of expected nextTraverseState: " + nextTraverseState);
 				// Move targetSharedAction back to black hole
-				ReturnActionToBlackHole();
-				// Mark targetSharedAction as NonDeterministic but changing the uid
-				markActionAsNonDeterministic(lastExecutedAction.get(Tags.AbstractIDCustom), nextTraverseState);
+				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
+				// Mark executed Action as NonDeterministic but changing the uid
+				SharedDatabase.markActionAsNonDeterministic(lastExecutedAction.get(Tags.AbstractIDCustom), nextTraverseState, settings, database);
 				// Force to execute the non deterministic action to discover the destination state
 				nonDeterministicAction = true;
 				targetSharedAction = lastExecutedAction.get(Tags.AbstractIDCustom);
@@ -536,49 +401,16 @@ public class SharedProtocol extends WebdriverProtocol {
 		}
 	}
 
-	private void markActionAsNonDeterministic(String actionId, String expectedStateId) {
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			// CREATE VERTEX NonDeterministic SET stateId='SAC1kwnxuh4cf2567147868'
-			String sql = "create vertex NonDeterministic SET stateId='" + expectedStateId + "'";
-			ExecuteCommand(db, sql);
-			// update edge AbstractAction set in = (select from NonDeterministic where stateId='SAC1sp28jf63d3211669788') where actionId='AAC1ot1fnm353944349410'
-			sql = "update edge AbstractAction set in = (select from NonDeterministic where stateId='" + expectedStateId + "') where actionId='" + actionId + "'";
-			ExecuteCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("SharedProtocol: Not possible to create the NonDeterministic stateId " + expectedStateId + " for actionId : " + actionId);
-		}
-
-		// Now we need to change the uid properties of the non deterministic action to indicate that are non deterministic 
-		// This will allow to create future AbstractAction in the state model (because uid identifies source + target + actionId)
-		OResultSet rs = null;
-		try (ODatabaseSession db = createDatabaseConnection(settings)) {
-			String sql = "select uid from abstractaction where actionId='" + actionId + "'";
-			rs = ExecuteQuery(db, sql);
-
-			while (rs.hasNext()) {
-				String uid = rs.next().toString().replace("\n", "").trim();
-				// {uid: 16q1mx4113647030708} to 16q1mx4113647030708
-				uid = uid.replace("{", "").replace("}", "").trim().split(":")[1].trim();
-				String uidNonDet = "NonDet_" + uid;
-				if(!uid.contains("NonDet_")) {
-					try {
-						// Indicate that this abstract action is non deterministic (uid)
-						sql = "update AbstractAction SET uid='" + uidNonDet + "' WHERE uid='" + uid + "'";
-						ExecuteCommand(db, sql);
-					} catch (ORecordDuplicatedException orde) {
-						// If duplicated key detected, means that was already marked as non deterministic, just delete
-						System.out.println("Non deterministic uid action already exists : " + uidNonDet);
-						sql = "delete edge AbstractAction WHERE uid='" + uid + "'";
-						ExecuteCommand(db, sql);
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("SharedProtocol: Exception changing uid of non non deterministic actions");
-			e.printStackTrace();
-		} finally {
-			if(rs != null) rs.close();
-		}
+	/**
+	 * Count the number of existing entities in the OrientDB. 
+	 * 
+	 * @param entity
+	 * @param settings
+	 * @param database
+	 * @return
+	 */
+	protected long countInDb(String entity) {
+		return SharedDatabase.countInDb(entity, settings, database);
 	}
 
 	protected Action getTargetActionFound(HashMap<String, Action> actionMap) {
@@ -586,6 +418,24 @@ public class SharedProtocol extends WebdriverProtocol {
 		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
 		nonDeterministicAction = false; // We achieve the target action, so the execution is deterministic
 		return targetAction;
+	}
+
+	/**
+	 * Create a String, Action Map. 
+	 * 
+	 * @param actions
+	 * @return
+	 */
+	protected HashMap<String, Action> ConvertActionSetToDictionary(Set<Action> actions) {
+		//System.out.println("SharedProtocol: Convert Set<Action> to HashMap containing actionIds as keys");
+		HashMap<String, Action> actionMap = new HashMap<>();
+		ArrayList<Action> actionList = new ArrayList<>(actions);
+		for (Action a : actionList) {
+			//System.out.println("Add action " + a.get(Tags.AbstractIDCustom) + " to actionMap; description = " + a.get(Tags.Desc));
+			actionMap.put(a.get(Tags.AbstractIDCustom), a);
+		}
+		//System.out.println("actionMap.size() = " + actionMap.size());
+		return actionMap;
 	}
 
 	class TmpData {

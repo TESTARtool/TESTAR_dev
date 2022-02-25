@@ -42,7 +42,8 @@ import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
-import org.testar.protocols.SharedProtocol;
+import org.testar.distributed.SharedProtocol;
+
 import nl.ou.testar.RandomActionSelector;
 import java.util.*;
 import static org.fruit.alayer.Tags.Blocked;
@@ -552,7 +553,7 @@ public class Protocol_webdriver_distributed_parabank extends SharedProtocol {
 	@Override
 	protected boolean moreSequences() {
 		// For time budget experiments also check max time setting
-		boolean result = ((CountInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
+		boolean result = ((countInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
 		System.out.println("moreSharedSequences ? " + result);
 		return result;
 	}

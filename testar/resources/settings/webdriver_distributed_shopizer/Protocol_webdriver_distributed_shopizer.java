@@ -43,7 +43,7 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.SharedProtocol;
+import org.testar.distributed.SharedProtocol;
 import org.testar.protocols.WebdriverProtocol;
 
 import com.google.common.collect.Lists;
@@ -627,7 +627,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 	@Override
 	protected boolean moreSequences() {
 		// For time budget experiments also check max time setting
-		boolean result = ((CountInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
+		boolean result = ((countInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
 		System.out.println("moreSharedSequences ? " + result);
 		return result;
 	}
