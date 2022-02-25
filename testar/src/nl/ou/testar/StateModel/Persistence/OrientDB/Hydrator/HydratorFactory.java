@@ -34,6 +34,8 @@ public abstract class HydratorFactory {
     public static final int HYDRATOR_SEQUENCE_STEP = 13;
 
     public static final int HYDRATOR_FIRST_NODE = 14;
+    
+    public static final int HYDRATOR_NON_DETERMINISTIC_HOLE = 15;
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityHydrator> hydrators = new HashMap<>();
@@ -85,6 +87,10 @@ public abstract class HydratorFactory {
 
             case HYDRATOR_FIRST_NODE:
                 return createFirstNodeHydrator();
+
+            case HYDRATOR_NON_DETERMINISTIC_HOLE:
+                return createNonDeterministicHoleHydrator();
+
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
@@ -173,6 +179,12 @@ public abstract class HydratorFactory {
         FirstNodeHydrator firstNodeHydrator = new FirstNodeHydrator();
         hydrators.put(HYDRATOR_FIRST_NODE, firstNodeHydrator);
         return firstNodeHydrator;
+    }
+
+    private static NonDeterministicHoleHydrator createNonDeterministicHoleHydrator() {
+    	NonDeterministicHoleHydrator nonDeterministicHoleHydrator = new NonDeterministicHoleHydrator();
+    	hydrators.put(HYDRATOR_NON_DETERMINISTIC_HOLE, nonDeterministicHoleHydrator);
+    	return nonDeterministicHoleHydrator;
     }
 
 }

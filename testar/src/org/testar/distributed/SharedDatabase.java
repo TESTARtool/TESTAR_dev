@@ -30,9 +30,6 @@
 
 package org.testar.distributed;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.fruit.monkey.Settings;
 
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
@@ -41,8 +38,6 @@ import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.orientechnologies.orient.core.storage.ORecordDuplicatedException;
-
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManagerFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
@@ -139,104 +134,4 @@ public class SharedDatabase {
 
 		return number;
 	}
-
-	/**
-	 * From the detected available UnvisitedAbstractActions, select one of them randomly to be executed. 
-	 * Then mark this unvisited action as BeingExecuted to avoid other instances to select it. 
-	 * If something goes wrong trying to mark the action, return null. 
-	 * 
-	 * @param unvisitedActions
-	 * @param nodeName
-	 * @param settings
-	 * @param database
-	 * @return
-	 */
-	public static String selectRandomUnvisitedAction(ArrayList<String> unvisitedActions, String nodeName, Settings settings, OrientDB database) {
-		long graphTime = System.currentTimeMillis();
-		Random rnd = new Random(graphTime);
-
-		String actionId = unvisitedActions.get(rnd.nextInt(unvisitedActions.size()));
-		System.out.println("Update action " + actionId + " from BlackHole to BeingExecuted");
-		return UpdateUnvisitedActionToBeingExecuted(actionId, nodeName, settings, database);
-	}
-
-	private static String UpdateUnvisitedActionToBeingExecuted(String actionId, String nodeName, Settings settings, OrientDB database) {
-		try (ODatabaseSession db = createDatabaseConnection(settings, database)) {
-			String sql = "update edge UnvisitedAbstractAction set in = (SELECT FROM BeingExecuted WHERE node='" + nodeName + "') where actionId='" + actionId + "'";
-			executeCommand(db, sql);
-		} catch (Exception e) {
-			// We return null here to be checked in SharedProtocol, then we will need to set targetSharedAction to null
-			return null;
-		}
-		return actionId;
-	}
-
-	/**
-	 * Return the target shared action selected previously back to the black hole vertex. 
-	 * This will make the action an UnvisitedAbstractAction to be chosen by other instances. 
-	 * TODO: This method assumes that there is only one state model (one black hole) per database
-	 * 
-	 * @param settings
-	 * @param targetSharedAction
-	 * @param database
-	 */
-	public static void returnActionToBlackHole(Settings settings, String targetSharedAction, OrientDB database) {
-		try (ODatabaseSession db = createDatabaseConnection(settings, database)) {
-			// TODO: This query assumes that there is only one state model (one black hole) per database 
-			String sql = "update edge UnvisitedAbstractAction set in = (select from BlackHole) where actionId='" + targetSharedAction + "'";
-			System.out.println("Return action to BlackHole from BeingExecuted: " + targetSharedAction + " sql = " + sql);
-			executeCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("Not possible to return targetSharedAction " + targetSharedAction + " to BlackHole : " + e);
-		}
-	}
-
-	public static void markActionAsNonDeterministic(String actionId, String expectedStateId, Settings settings, OrientDB database) {
-		// TODO: Here we create one NonDeterministic State for the expected state
-		// TODO: But probably we also need to create a second NonDeterministic State for the current found state
-		try (ODatabaseSession db = createDatabaseConnection(settings, database)) {
-			// CREATE VERTEX NonDeterministic SET stateId='SAC1kwnxuh4cf2567147868'
-			String sql = "create vertex NonDeterministic SET stateId='" + expectedStateId + "'";
-			executeCommand(db, sql);
-			// update edge AbstractAction set in = (select from NonDeterministic where stateId='SAC1sp28jf63d3211669788') where actionId='AAC1ot1fnm353944349410'
-			sql = "update edge AbstractAction set in = (select from NonDeterministic where stateId='" + expectedStateId + "') where actionId='" + actionId + "'";
-			executeCommand(db, sql);
-		} catch (Exception e) {
-			System.out.println("SharedProtocol: Not possible to create the NonDeterministic stateId " + expectedStateId + " for actionId : " + actionId);
-		}
-
-		// Now we need to change the uid properties of the non deterministic action to indicate that are non deterministic 
-		// This will allow to create future AbstractAction in the state model (because uid identifies source + target + actionId)
-		OResultSet rs = null;
-		try (ODatabaseSession db = createDatabaseConnection(settings, database)) {
-			String sql = "select uid from abstractaction where actionId='" + actionId + "'";
-			rs = executeQuery(db, sql);
-
-			while (rs.hasNext()) {
-				String uid = rs.next().toString().replace("\n", "").trim();
-				// {uid: 16q1mx4113647030708} to 16q1mx4113647030708
-				uid = uid.replace("{", "").replace("}", "").trim().split(":")[1].trim();
-				String uidNonDet = "NonDet_" + uid;
-				if(!uid.contains("NonDet_")) {
-					try {
-						// Indicate that this abstract action is non deterministic (uid)
-						sql = "update AbstractAction SET uid='" + uidNonDet + "' WHERE uid='" + uid + "'";
-						executeCommand(db, sql);
-					} catch (ORecordDuplicatedException orde) {
-						// If duplicated key detected, means that was already marked as non deterministic, just delete
-						System.out.println("Non deterministic uid action already exists : " + uidNonDet);
-						sql = "delete edge AbstractAction WHERE uid='" + uid + "'";
-						executeCommand(db, sql);
-					}
-				}
-			}
-
-		} catch (Exception e) {
-			System.out.println("SharedProtocol: Exception changing uid of non non deterministic actions");
-			e.printStackTrace();
-		} finally {
-			if(rs != null) rs.close();
-		}
-	}
-
 }

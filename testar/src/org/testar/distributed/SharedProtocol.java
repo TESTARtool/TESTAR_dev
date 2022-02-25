@@ -32,7 +32,6 @@ package org.testar.distributed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
@@ -49,9 +48,6 @@ import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.record.ODirection;
-import com.orientechnologies.orient.core.record.OEdge;
-import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.ModelManager;
@@ -75,7 +71,9 @@ public class SharedProtocol extends WebdriverProtocol {
 	protected boolean moreSharedActions = true;
 	protected boolean stopSharedProtocol = false;
 	protected String nextTraverseState = "";
-	protected boolean nonDeterministicAction = false;
+
+	enum TraverseType { NON_DET, UNV }
+	private TraverseType traversePathType;
 
 	@Override
 	protected void initialize(Settings settings) {
@@ -109,27 +107,59 @@ public class SharedProtocol extends WebdriverProtocol {
 		}
 	}
 
+	/**
+	 * Select a new shared action to be executed. 
+	 * First, check if a non deterministic action must be selected to restore the state model transitions. 
+	 * Second, check if there are unvisited actions to execute and explore the SUT. 
+	 * If not, the exploration was completed and we do not have shared actions to execute. 
+	 * 
+	 * @param state
+	 * @param actions
+	 * @return
+	 */
 	protected String getNewTargetSharedAction(State state, Set<Action> actions) {
-		nonDeterministicAction = false; // Reset because new execution is starting
 		String result = null;
 		System.out.println("SharedProtocol: getNewTargetSharedAction state = " + state.get(Tags.AbstractIDCustom));
 		boolean availableAction = false;
 		do {
 			try {
-				ArrayList<String> unvisitedActionsFromDb = GetUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom));
-				System.out.println("Number of shortest path actions available in database: " + unvisitedActionsFromDb.size());
+				// OPTION 1 : Check and execute Non Deterministic AbstractAction to restore the State Model navigation
+				// Obtain a list of shortest AbstractActions that lead to NonDeterministicHole
+				ArrayList<String> nonDeterministicActionsFromDb = SharedNonDeterminism.getNonDeterministicActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
+				System.out.println("Number of shortest path NonDeterministicActions available in database: " + nonDeterministicActionsFromDb.size());
+
+				if (nonDeterministicActionsFromDb.size() >= 1) {
+					availableAction = true;
+					String action = SharedNonDeterminism.selectRandomNonDeterministicAction(nonDeterministicActionsFromDb, nodeName, settings, database);
+					if(action == null) {
+						System.out.println("Can not update nonDeterministicAction; set targetSharedAction to null");
+						targetSharedAction = null;
+					}
+					System.out.println("NonDeterministicAction from database selected: action = " + action);
+					// Mark that we need to calculate the traverse path to a Non Deterministic Action
+					traversePathType = TraverseType.NON_DET;
+					return action;
+				}
+
+				// OPTION 2 : Check and execute UnvisitedAbstractAction to explore the SUT to enrich the state model 
+				// Obtain a list of shortest UnvisitedAbstractActions that lead to the Black Hole
+				ArrayList<String> unvisitedActionsFromDb = SharedUnvisitedActions.getUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
+				System.out.println("Number of shortest path UnvisitedActions available in database: " + unvisitedActionsFromDb.size());
 
 				if (unvisitedActionsFromDb.size() >= 1) {
 					availableAction = true;
-					String action = SharedDatabase.selectRandomUnvisitedAction(unvisitedActionsFromDb, nodeName, settings, database);
+					String action = SharedUnvisitedActions.selectRandomUnvisitedAction(unvisitedActionsFromDb, nodeName, settings, database);
 					if(action == null) {
 						System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
 						targetSharedAction = null;
 					}
-					System.out.println("Action from database selected: action = " + action);
+					System.out.println("UnvisitedAction from database selected: action = " + action);
+					// Mark that we need to calculate the traverse path to an Unvisited Action
+					traversePathType = TraverseType.UNV;
 					return action;
 				}
 
+				// OPTION 3 : We are in the initial state
 				// We have no unvisited actions to execute, but maybe because we are in the first action step
 				long numberAbstractStates = countInDb("AbstractState");
 				System.out.println("No actions available in database; abstract states in database = " + numberAbstractStates);
@@ -141,6 +171,7 @@ public class SharedProtocol extends WebdriverProtocol {
 					return action;
 				}
 
+				// OPTION 4 : We are not in the initial state and no more actions to execute
 				// If we are here is because we have no more unvisited actions to execute
 				moreSharedActions = false;
 				stopSharedProtocol = true;
@@ -162,57 +193,33 @@ public class SharedProtocol extends WebdriverProtocol {
 		return result;
 	}
 
-	private ArrayList<String> GetUnvisitedActionsFromDatabase(String currentAbstractState) {
-		System.out.println("SharedProtocol: GetUnvisitedActionsFromDatabase");
-		ArrayList<String> result = new ArrayList<>();
-		// https://orientdb.org/docs/3.1.x/gettingstarted/demodb/queries/DemoDB-Queries-Shortest-Paths.html
-		// TODO: This query assumes that there is only one state model (one black hole) per database
-
-		// We only consider OUT edges to follow Action execution direction path
-		String sql = "SELECT expand(path) FROM (SELECT shortestPath($from, $to, 'OUT') AS path LET $from = (SELECT FROM AbstractState WHERE stateId='"+ currentAbstractState + "'), "
-				+ "$to = (SELECT FROM BlackHole) UNWIND path)";
-
-		// TODO: Add state model identifier or black hole identifier to fix this query
-		// SELECT expand(path) FROM (SELECT shortestPath($from, $to) AS path LET $from=(SELECT FROM abstractstate WHERE stateId='SACd588mu1b22740930749'), 
-		// $to=(SELECT FROM BlackHole where blackHoleId='jp3leu283079445017') UNWIND path)
-
-		OResultSet rs = null;
-		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
-			rs = SharedDatabase.executeQuery(db, sql);
-
-			while (rs.hasNext()) {
-				OResult item = rs.next();
-				if (item.isVertex()) {
-					Optional<OVertex> optionalVertex = item.getVertex();
-					OVertex nodeVertex = optionalVertex.get();
-
-					for (OEdge edge : nodeVertex.getEdges(ODirection.OUT, "UnvisitedAbstractAction")) {
-						result.add(edge.getProperty("actionId"));
-						//System.out.println("Edge " + edge + " found with ID = " + edge.getProperty("actionId"));
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("SharedProtocol: Exception during GetUnvisitedActionsFromDatabase");
-			e.printStackTrace();
-		} finally {
-			if(rs != null) { rs.close(); }
-		}
-
-		//System.out.println("SharedProtocol: DONE GetUnvisitedActionsFromDatabase");
-		return result;
-	}
-
+	/**
+	 * We have a targetSharedAction to execute, so now we need to navigate action by action 
+	 * until we reach the state that contains the targetSharedAction we want to execute. 
+	 * 
+	 * @param state
+	 * @param actions
+	 * @return
+	 */
 	protected Action traversePath(State state, Set<Action> actions) {
-		if(nonDeterministicAction) {
-			// We need to calculate the path no the AbstractAction not the UnvisitedAbstractAction
-			return traverseAbstractAction(state, actions);
+		// TODO: Check if have multiple state models in the same database is problematic for next queries
+		String destStateQuery = "";
+		if(traversePathType.equals(TraverseType.NON_DET)) {
+			// We want to navigate to the Abstract State that contains the non deterministic targetSharedAction (AbstractAction) to execute
+			destStateQuery = "select stateId from AbstractState where @rid in (select outV() from AbstractAction where actionId='" + targetSharedAction + "')";
+			System.out.println("Running traversePath to non deterministic targetSharedAction");
+		} else if (traversePathType.equals(TraverseType.UNV)) {
+			// We want to navigate to the Abstract State that contains the targetSharedAction (UnvisitedAbstractAction) to execute
+			destStateQuery = "select stateId from AbstractState where @rid in (select outV() from UnvisitedAbstractAction where actionId='" + targetSharedAction + "')";
+			System.out.println("Running traversePath to UnvisitedAbstractAction targetSharedAction");
+		} else {
+			// This should not happen
+			System.out.println("ERROR with traversePath: traversePathType does not match with non deterministic or unvisited types");
+			targetSharedAction = null;
+			return super.selectAction(state, actions);
 		}
 
-		// TODO: Check if this is a problematic query if multiple state models exists in the same database
-		String destStateQuery = "select stateId from AbstractState where @rid in (select outV() from UnvisitedAbstractAction where actionId = '" + targetSharedAction + "')";
-
-		// State Id of the final destination AbstractState that contains the desired UnvisitedAbstractAction to execute
+		// State Id of the final destination AbstractState that contains the desired targetSharedAction to execute
 		String destinationStateId = "";
 
 		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
@@ -225,7 +232,9 @@ public class SharedProtocol extends WebdriverProtocol {
 			} else {
 				System.out.println("traversePath: State is stuck because no unvisited action found; set targetSharedAction to null; run historyback now");
 				destinationStatResultSet.close();
-				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
+				// Because we were not able to follow the path to execute the targetSharedAction
+				// We need to return the targetSharedAction that is beingExecuted to the NonDeterministicHole or BlackHole vertex
+				returnActionToVertex();
 				targetSharedAction = null;
 				Action histBackAction = new WdHistoryBackAction();
 				buildEnvironmentActionIdentifiers(state, histBackAction);
@@ -259,7 +268,9 @@ public class SharedProtocol extends WebdriverProtocol {
 
 			if (v.size() < 2) {
 				System.out.println("traversePath: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
-				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
+				// Because we were not able to follow the path to execute the targetSharedAction
+				// We need to return the targetSharedAction that is beingExecuted to the NonDeterministic or BlackHole vertex
+				returnActionToVertex();
 				targetSharedAction = null;
 				moreSharedActions = false;
 				db.close();
@@ -267,7 +278,7 @@ public class SharedProtocol extends WebdriverProtocol {
 			}
 
 			// Find an AbstractAction to perform, that connects current state and next step state
-			// this next step state it can be the final destination state that contains the unvisited abstract actions
+			// this next step state it can be the final destination state that contains the target shared action
 			// or just an intermediate state
 			String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
 
@@ -293,91 +304,21 @@ public class SharedProtocol extends WebdriverProtocol {
 		}
 
 		System.out.println("traversePath: Action that needs to be made does not exist");
-		SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
+		// Because we were not able to follow the path to execute the targetSharedAction
+		// We need to return the targetSharedAction that is beingExecuted to the NonDeterministic or BlackHole vertex
+		returnActionToVertex();
 		targetSharedAction = null;
 
 		return super.selectAction(state, actions);
 	}
 
-	private Action traverseAbstractAction(State state, Set<Action> actions) {
-		// TODO: If traverse to AbstractAction fails, should we update the edge to BlackHole?
-		System.out.println("traverseAbstractAction: Calculating the path to a Non Deterministic AbstractAction");
-		// TODO: Check if this is a problematic query if multiple state models exists in the same database
-		String destStateQuery = "select stateId from AbstractState where @rid in (select outV() from AbstractAction where actionId = '" + targetSharedAction + "')";
-
-		String destinationStateId = "";
-
-		try (ODatabaseSession db = SharedDatabase.createDatabaseConnection(settings, database)) {
-			OResultSet destinationStatResultSet = SharedDatabase.executeQuery(db, destStateQuery);
-			if (destinationStatResultSet.hasNext()) {
-				OResult item = destinationStatResultSet.next();
-				destinationStateId = item.getProperty("stateId");
-				System.out.println("traverseAbstractAction: way to state " + destinationStateId);
-				destinationStatResultSet.close();
-			} else {
-				System.out.println("traverseAbstractAction: Path not possible return random action");
-				destinationStatResultSet.close();
-				db.close();
-				targetSharedAction = null;
-				return super.selectAction(state, actions);
-			}
-
-			String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to,'OUT','AbstractAction') "
-					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
-					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
-
-			OResultSet pathResultSet = SharedDatabase.executeQuery(db, stateRidQuery);
-			Vector<TmpData> v = new Vector<>();
-
-			while (pathResultSet.hasNext()) {
-				OResult item = pathResultSet.next();
-				v.add(new TmpData(item.getProperty("@rid"), item.getProperty("stateId")));
-			}
-			pathResultSet.close();
-
-			if (v.size() < 2) {
-				System.out.println("traverseAbstractAction: There is no path! Execute super.selectAction; Also end sequence by setting moreSharedActions=false");
-				targetSharedAction = null;
-				moreSharedActions = false;
-				db.close();
-				return super.selectAction(state, actions);
-			}
-
-			// Find an AbstractAction to perform
-			String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
-
-			String abstractActionId = "";
-			HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-			OResultSet abstractActionResultSet = SharedDatabase.executeQuery(db, abstActQuery);
-			while (abstractActionResultSet.hasNext()) {
-				abstractActionId = abstractActionResultSet.next().getProperty("actionId");
-				System.out.println("traverseAbstractAction: Check if " + abstractActionId + " is available");
-
-				if (availableActions.containsKey(abstractActionId)) {
-					System.out.println("traverseAbstractAction: Action " + abstractActionId + " is available in the avilableActions; this is being executed");
-					// This "restoring" process (traverseAbstractAction) that navigates the path to a non determinism action, also can find non determinism
-					// To avoid a loop we need to check step by step
-					// Save the next traverse stateId to which TESTAR should navigate to detect non-determinism
-					nextTraverseState = v.get(1).stateId;
-					abstractActionResultSet.close();
-					db.close();
-					return availableActions.get(abstractActionId);
-				}
-			}
-			abstractActionResultSet.close();
-		} catch (Exception e) {
-			System.out.println("Exception in the db connection when calculating traverseAbstractAction");
-		}
-
-		System.out.println("traverseAbstractAction: Action that needs to be made does not exist");
-		targetSharedAction = null;
-
-		return super.selectAction(state, actions);
-	}
-
+	/**
+	 * Check if last traverse action leads TESTAR to the correct expected state. 
+	 * Or if we have a non-deterministic action. 
+	 * 
+	 * @param state
+	 */
 	protected void verifyTraversePathDeterminism(State state) {
-		// Check if last traverse action leads TESTAR to the correct expected state
-		// Or if we have a non-deterministic action
 		if(!nextTraverseState.isEmpty()) {
 			// Expected nextTraverseState and new stateId match, lets continue
 			if(nextTraverseState.equals(state.get(Tags.AbstractIDCustom))) {
@@ -388,16 +329,25 @@ public class SharedProtocol extends WebdriverProtocol {
 				System.out.println("ISSUE with traversePath calculation!");
 				System.out.println("Non-deterministic Action: " + lastExecutedAction.get(Tags.AbstractIDCustom) + 
 						" leads to state: " + state.get(Tags.AbstractIDCustom) + " instead of expected nextTraverseState: " + nextTraverseState);
-				// Move targetSharedAction back to black hole
-				SharedDatabase.returnActionToBlackHole(settings, targetSharedAction, database);
+				// Move targetSharedAction back to NonDeterministicHole or blackHole
+				returnActionToVertex();
 				// Mark executed Action as NonDeterministic but changing the uid
-				SharedDatabase.markActionAsNonDeterministic(lastExecutedAction.get(Tags.AbstractIDCustom), nextTraverseState, settings, database);
-				// Force to execute the non deterministic action to discover the destination state
-				nonDeterministicAction = true;
-				targetSharedAction = lastExecutedAction.get(Tags.AbstractIDCustom);
+				SharedNonDeterminism.markActionAsNonDeterministic(lastExecutedAction.get(Tags.AbstractIDCustom), nextTraverseState, settings, database);
+				targetSharedAction = null; // Reset to null, then next iteration TESTAR will take a new shared action to execute
 				nextTraverseState = ""; // Reset to empty for next iteration
 				moreSharedActions = false; // Set to false to launch the SUT again
 			}
+		}
+	}
+
+	private void returnActionToVertex() {
+		if(traversePathType.equals(TraverseType.NON_DET)) {
+			SharedNonDeterminism.returnActionToNonDeterministicHole(settings, targetSharedAction, database);
+		} else if (traversePathType.equals(TraverseType.UNV)) {
+			SharedUnvisitedActions.returnActionToBlackHole(settings, targetSharedAction, database);
+		} else {
+			// This should not happen
+			System.out.println("ERROR with returnActionToVertex: traversePathType does not match with non deterministic or unvisited types");
 		}
 	}
 
@@ -411,13 +361,6 @@ public class SharedProtocol extends WebdriverProtocol {
 	 */
 	protected long countInDb(String entity) {
 		return SharedDatabase.countInDb(entity, settings, database);
-	}
-
-	protected Action getTargetActionFound(HashMap<String, Action> actionMap) {
-		Action targetAction = actionMap.get(targetSharedAction);
-		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
-		nonDeterministicAction = false; // We achieve the target action, so the execution is deterministic
-		return targetAction;
 	}
 
 	/**
@@ -436,6 +379,18 @@ public class SharedProtocol extends WebdriverProtocol {
 		}
 		//System.out.println("actionMap.size() = " + actionMap.size());
 		return actionMap;
+	}
+
+	protected Action getTargetActionFound(HashMap<String, Action> actionMap) {
+		Action targetAction = actionMap.get(targetSharedAction);
+		// If we have found the non deterministic action to restore the state model transitions
+		// We need to delete the non deterministic action edge from the model to do not interfere with next shortest path calculations
+		// This is done in selectAction method, so next executeAction will restore the transition 
+		if(traversePathType.equals(TraverseType.NON_DET)) {
+			SharedNonDeterminism.cleanNonDeterministicActionFromHole(settings, targetSharedAction, database);
+		} 
+		targetSharedAction = null; // Reset targetSharedAction so next time a new one will be chosen.
+		return targetAction;
 	}
 
 	class TmpData {
