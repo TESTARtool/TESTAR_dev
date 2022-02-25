@@ -70,6 +70,21 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			// http://localhost:8080/shop/customer/billing.html
 			if(isSonOfBillAddressBox(widget) || isSonOfShopAddressBox(widget)) { return; }
 
+			// If we found the Apache error page, we need to use the previous state to differentiate from the others
+			// If not, different states will lead to this central error state
+			// Then TESTAR may think that he can just come to the error state and execute back history action to reach different states
+			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
+					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")) {
+				// Only changing one widget we will be able to change all state id
+				if(lastState == null) {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + "InitialState");
+					return;
+				} else {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + lastState.get(Tags.AbstractIDCustom));
+					return;
+				}
+			}
+
 			// dropdown widgets that come from fa-angle-down do not have interesting properties that differentiate them from other dropdowns
 			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
 				// Create the default String hash code using the abstract tags selected from the settings file (gh23483ghhk)
