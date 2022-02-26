@@ -76,11 +76,11 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
 					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")) {
 				// Only changing one widget we will be able to change all state id
-				if(lastState == null) {
+				if(latestState == null) {
 					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + "InitialState");
 					return;
 				} else {
-					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + lastState.get(Tags.AbstractIDCustom));
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + latestState.get(Tags.AbstractIDCustom));
 					return;
 				}
 			}

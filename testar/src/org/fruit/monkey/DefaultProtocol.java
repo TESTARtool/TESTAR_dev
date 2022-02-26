@@ -120,7 +120,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File currentSeq;
 
 	protected Mouse mouse = AWTMouse.build();
-	protected State lastState = null;
 	protected int nonReactingActionNumber;
 
 	protected ProcessListener processListener = new ProcessListener();
