@@ -127,6 +127,9 @@ public class SharedProtocol extends WebdriverProtocol {
 				// Obtain a list of shortest AbstractActions that lead to NonDeterministicHole
 				ArrayList<String> nonDeterministicActionsFromDb = SharedNonDeterminism.getNonDeterministicActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
 				System.out.println("Number of shortest path NonDeterministicActions available in database: " + nonDeterministicActionsFromDb.size());
+				for(String nonDetActionId : nonDeterministicActionsFromDb) {
+					System.out.println("Available path to Non Deterministic Action Id: " + nonDetActionId);
+				}
 
 				if (nonDeterministicActionsFromDb.size() >= 1) {
 					availableAction = true;

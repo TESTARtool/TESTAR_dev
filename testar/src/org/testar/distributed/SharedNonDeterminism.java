@@ -69,9 +69,14 @@ public class SharedNonDeterminism {
 				if (item.isVertex()) {
 					Optional<OVertex> optionalVertex = item.getVertex();
 					OVertex nodeVertex = optionalVertex.get();
-
-					for (OEdge edge : nodeVertex.getEdges(ODirection.OUT, "AbstractAction")) {
-						result.add(edge.getProperty("actionId"));
+					// Only check the vertex of the path that is NonDeterministicHole (we use nonDeterministicHoleId property to identify NonDeterministicHole)
+					if(nodeVertex.getProperty("nonDeterministicHoleId") != null && !nodeVertex.getProperty("nonDeterministicHoleId").toString().isEmpty()) {
+						// Then check the AbstractActions that enter this NonDeterministicHole
+						for (OEdge edge : nodeVertex.getEdges(ODirection.IN, "AbstractAction")) {
+							// For non determinism actions we have duplicated actionIds because one action leads to two or more states
+							// So just add it if does not exist in the list
+							if(!result.contains(edge.getProperty("actionId"))) { result.add(edge.getProperty("actionId")); }
+						}
 					}
 				}
 			}
