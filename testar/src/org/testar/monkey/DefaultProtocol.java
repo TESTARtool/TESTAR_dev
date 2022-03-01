@@ -2147,16 +2147,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 			// Get the counter of the initial TestSequence we want to replay.
 			// Ex: maybe we need to replay 3 TestSequences from TS-7 to TS-9
-			int initialTestSequence = ReplayStateModelUtil.getReplayInitialTestSequence(stateModelManager, replayModelIdentifier, replayName, replayVersion);
-			int totalTestSequence = initialTestSequence + (numberTestSequences - 1);
-			System.out.println(String.format("ReplayStateModelOuterLoop... replaying TS from %s to %s", initialTestSequence, totalTestSequence));
+			Set<String> sequenceIdsToReplay = ReplayStateModelUtil.getReplayAllSequenceIdFromModel(stateModelManager, replayModelIdentifier, replayName, replayVersion);
 
 			// Iterate over all TestSequences to reproduce them
-			for(int testSeq = initialTestSequence; testSeq <= totalTestSequence; testSeq++) {
-			    // Get the sequence identifier of the test TestSequences to reproduce
-			    // Every iteration will get the next TestSequences identifier
-			    String sequenceIdentifier = ReplayStateModelUtil.getReplaySequenceIdentifierByCounter(stateModelManager, testSeq);
-			    runReplayStateModelInnerLoop(sequenceIdentifier, replayModelIdentifier);
+			for(String sequenceId : sequenceIdsToReplay) {
+				runReplayStateModelInnerLoop(sequenceId, replayModelIdentifier);
 			}
 		}
 
