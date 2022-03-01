@@ -168,8 +168,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Pattern suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 	
@@ -1598,9 +1596,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name
-					this.forceKillProcess = process.right();
+
+					String forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
-					return actions;
+
+					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
+					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
+					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
+					killProcessAction.set(Tags.OriginWidget, state);
+					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
 		}
@@ -1609,8 +1613,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			this.forceToForeground = true;
-			return actions;
+			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
+			Action foregroundAction = new ActivateSystem();
+			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+			foregroundAction.set(Tags.OriginWidget, state);
+			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
 
 		//Note this list is always empty in this deriveActions.
@@ -1629,35 +1636,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Action preSelectAction(State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
 
-		// If deriveActions indicated that there are processes that need to be killed
-		// because they are in the process filters
-		// Then here we will select the action to do that killing
-
-		if (this.forceKillProcess != null){
-			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
-			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
-			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			buildEnvironmentActionIdentifiers(state, killProcessAction);
-			this.forceKillProcess = null;
-			return killProcessAction;
-		}
-
-		// If deriveActions indicated that the SUT should be put back in the foreground
-		// Then here we will select the action to do that
-
-		else if (this.forceToForeground){
-			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action foregroundAction = new ActivateSystem();
-			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			buildEnvironmentActionIdentifiers(state, foregroundAction);
-			this.forceToForeground = false;
-			return foregroundAction;
-		}
-
 		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (actions.isEmpty()){
+		if (actions.isEmpty()){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);

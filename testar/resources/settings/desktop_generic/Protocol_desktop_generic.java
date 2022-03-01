@@ -167,6 +167,8 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		//Showing the grey dots for filtered actions if visualization is on:
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
+		if(actions.isEmpty()) { actions = retryDeriveAction(system, 5, 1); }
+
 		//return the set of derived actions
 		return actions;
 	}
