@@ -33,7 +33,6 @@ package org.testar.protocols;
 
 import org.testar.DerivedActions;
 import org.testar.reporting.Reporting;
-import org.testar.RandomActionSelector;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Environment;
 import org.testar.monkey.alayer.*;
@@ -128,28 +127,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @return
      */
     @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
-
-    /**
-     * Select one of the available actions (e.g. at random)
-     * @param state the SUT's current state
-     * @param actions the set of derived actions
-     * @return  the selected action (non-null!)
-     */
-    @Override
-    protected Action selectAction(State state, Set<Action> actions){
-        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-        //unwanted processes are killed and SUT is put into foreground.
-        Action retAction = preSelectAction(state, actions);
-        if (retAction == null) {
-            //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
-        }
-        return retAction;
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
     }
 
     /**

@@ -328,12 +328,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @param actions
      * @return
      */
-    @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
+	@Override
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+		actions = super.preSelectAction(system, state, actions);
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
+		return actions;
+	}
 
     /**
      * Execute the selected action.

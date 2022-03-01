@@ -791,7 +791,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
 				    buildEnvironmentActionIdentifiers(state, a);
-			
+
+			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
+			actions = preSelectAction(system, state, actions);
+
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
@@ -800,6 +803,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Selecting one of the available actions:
 			Action action = selectAction(state, actions);
+
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
@@ -1265,7 +1269,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
 	                    }
 
-	                    preSelectAction(state, actions);
+	                    preSelectAction(system, state, actions);
 
 	                    //before action execution, pass it to the state model manager
 	                    stateModelManager.notifyActionExecution(actionToReplay);
@@ -1633,7 +1637,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actions
 	 * @return null if no preSelected actions are needed.
 	 */
-	protected Action preSelectAction(State state, Set<Action> actions){
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
 
 		// TESTAR didn't find any actions in the State of the SUT
@@ -1643,10 +1647,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			buildEnvironmentActionIdentifiers(state, escAction);
-			return escAction;
+			return new HashSet<>(Collections.singletonList(escAction));
 		}
 
-		return null;
+		return actions;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
@@ -1739,18 +1743,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-
-		Action a = preSelectAction(state, actions);
-		if (a != null){
-			return a;
-		} else
-			return RandomActionSelector.selectAction(actions);
+		return RandomActionSelector.selectAction(actions);
 	}
 
 	protected String getRandomText(Widget w){
 		return DataManager.getRandomData();
 	}
-
 
 	/**
 	 * STOP criteria for selecting more actions for a sequence

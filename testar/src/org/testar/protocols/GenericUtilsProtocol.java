@@ -472,6 +472,14 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return false;
     }
 
+    @Override
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	if(actions.isEmpty()) { 
+    		actions = retryDeriveAction(system, 5, 1);
+    	}
+    	return super.preSelectAction(system, state, actions);
+    }
+
     /**
      * If SUT is slow rendering the GUI elements, this retry method may help to 
      * to wait and obtain the SUT state and derive SUT actions. 
