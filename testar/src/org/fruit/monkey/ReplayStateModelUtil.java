@@ -31,6 +31,8 @@
 package org.fruit.monkey;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fruit.alayer.Tag;
@@ -142,7 +144,7 @@ public class ReplayStateModelUtil {
 	}
 
 	/**
-	 * Get the counter of the initial TestSequence of the desired State Model to replay. 
+	 * Get all the TestSequence identifiers of the desired State Model to replay. 
 	 * 
 	 * @param stateModelManager
 	 * @param replayModelIdentifier
@@ -151,28 +153,19 @@ public class ReplayStateModelUtil {
 	 * @return
 	 * @throws StateModelException
 	 */
-	public static int getReplayInitialTestSequence(StateModelManager stateModelManager, String replayModelIdentifier, String replayName, String replayVersion) throws StateModelException {
-	    OResultSet resultSet = stateModelManager.queryStateModel("select counter from TestSequence where modelIdentifier='" + replayModelIdentifier + "'");
+	public static Set<String> getReplayAllSequenceIdFromModel(StateModelManager stateModelManager, String replayModelIdentifier, String replayName, String replayVersion) throws StateModelException {
+		OResultSet resultSet = stateModelManager.queryStateModel("select sequenceId from TestSequence where modelIdentifier='" + replayModelIdentifier + "'");
 
-	    int initialTestSequences = 0;
-	    if(resultSet.hasNext()) {
-	        try {
-	            initialTestSequences = extractNumber(resultSet.next().toString());
-	        } catch (Exception e) {
-	            String msg = String.format("getReplayInitialTestSequence: ERROR parsing the initial TestSequences counter for AbstractStateModel (%s, %s)", replayName, replayVersion);
-	            e.printStackTrace();
-	            throw new StateModelException(msg);
-	        }
-	    } else {
-	        String msg = String.format("getReplayInitialTestSequence: Initial TestSequence counter not found for AbstractStateModel with name: %s, version: %s", replayName, replayVersion);
-	        throw new StateModelException(msg);
-	    }
-	    if(initialTestSequences == 0) {
-	        String msg = String.format("getReplayInitialTestSequence: 0 initial TestSequences counter (this must not happen) for AbstractStateModel (%s, %s)", replayName, replayVersion);
-	        throw new StateModelException(msg);
-	    }
-
-	    return initialTestSequences;
+		Set<String> sequencesIds = new HashSet<>();
+		while(resultSet.hasNext()) {
+			// result set String is {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e}
+			String sequenceIdentifier = resultSet.next().toString().replace("\n", "").trim();
+			// {sequenceId: 215bd479-3d67-4093-826b-44807ae7323e} to 215bd479-3d67-4093-826b-44807ae7323e
+			sequenceIdentifier = sequenceIdentifier.replace("{", "").replace("}", "").trim().split(":")[1].trim();
+			sequencesIds.add(sequenceIdentifier);
+		}
+		System.out.println("Replaying sequencesIds: " + sequencesIds);
+		return sequencesIds;
 	}
 
 	/**
