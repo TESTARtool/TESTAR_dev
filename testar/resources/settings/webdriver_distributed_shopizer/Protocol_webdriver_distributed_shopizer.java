@@ -43,7 +43,7 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.SharedProtocol;
+import org.testar.distributed.SharedProtocol;
 import org.testar.protocols.WebdriverProtocol;
 
 import com.google.common.collect.Lists;
@@ -73,6 +73,18 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			// Ignore all properties to create widget id
 			// http://localhost:8080/shop/customer/billing.html
 			if(isSonOfBillAddressBox(widget) || isSonOfShopAddressBox(widget)) { return; }
+
+			// Shopping cart may contains dynamic widgets if TESTAR buys stuff, we have to ignore these widgets from the abstract id point of view
+			// cart item list, shopping cart table and shopping cart total money (http://localhost:8080/shop/cart/shoppingCart.html)
+			if(isSonOfCartItems(widget) || isSonOfCartTable(widget) || isSonOfCartTotalMoney(widget)) { return; }
+
+			// State to finish the payment also contains a container with dynamic widgets we need to ignore
+			// http://localhost:8080/shop/order/checkout.html
+			if(isSonOfPaymentOrder(widget)) { return; }
+
+			// After execute a payment, we navigate to a confirmation page that contains a dynamic order number we need to ignore
+			// http://localhost:8080/shop/order/confirmation.html
+			if(WdDriver.getCurrentUrl().contains("confirmation.html") && isSonOfDynamicCompleteOrderNumber(widget)) { return; }
 
 			// If we found the Apache error page, we need to use the previous state to differentiate from the others
 			// If not, different states will lead to this central error state
@@ -122,6 +134,13 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				return;
 			}
 
+			// Same for payment checkout error
+			// http://localhost:8080/shop/order/checkout.html
+			if(widget.get(WdTags.WebId, "").equals("checkoutError")) {
+				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				return;
+			}
+
 			// For shopping cart (number of bags) widget we should use only the id to avoid an state explosion
 			if(widget.get(WdTags.WebId, "").equals("miniCartSummary")) {
 				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
@@ -130,9 +149,6 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 
 			// Shopping cart widget that shows the price, is a dynamic widget that we have to ignore from the abstract id point of view
 			if(widget.get(WdTags.WebCssClasses, "").contains("pull-left")) { return; }
-
-			// Shopping cart may contains dynamic widgets if TESTAR buys stuff, we have to ignore these widgets from the abstract id point of view
-			if(isSonOfCartItems(widget)) { return; }
 
 			// In Shopizer we have two home href buttons, but they are leading to two different states
 			// We need to use widget href in the abstraction level to differentiate them
@@ -186,6 +202,30 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		if(widget.parent() == null) return false;
 		else if (widget.parent().get(WdTags.WebId, "").equals("miniCartDetails")) return true;
 		else return isSonOfCartItems(widget.parent());
+	}
+
+	private boolean isSonOfCartTable(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("mainCartTable")) return true;
+		else return isSonOfCartTable(widget.parent());
+	}
+
+	private boolean isSonOfCartTotalMoney(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebCssClasses, "").contains("cart_totals")) return true;
+		else return isSonOfCartTotalMoney(widget.parent());
+	}
+
+	private boolean isSonOfPaymentOrder(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebCssClasses, "").contains("your-order")) return true;
+		else return isSonOfPaymentOrder(widget.parent());
+	}
+
+	private boolean isSonOfDynamicCompleteOrderNumber(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebCssClasses, "").contains("lead")) return true;
+		else return isSonOfDynamicCompleteOrderNumber(widget.parent());
 	}
 
 	// http://localhost:8080/shop/
@@ -322,6 +362,11 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		// iterate through all widgets
 		for (Widget widget : stateWidgets) {
 
+			// checkout payment page widgets are out of screen, derive always a payment order
+			if(WdDriver.getCurrentUrl().contains("checkout.html")) {
+				return new HashSet<>(Collections.singletonList(paymentOrderFormFill(state, widget)));
+			}
+
 			// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
 			// this is because a click will close the dropdown
 			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
@@ -390,6 +435,9 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				if(widget.get(WdTags.WebCssClasses,"").contains("tt-hint")) {
 					// Ignore duplicated search bar text box
+					continue;
+				} else if(widget.get(WdTags.WebName,"").equals("quantity")) {
+					// In shopping cart table do not derive type quantity action, because is a dynamic widget
 					continue;
 				}
 				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(), true));
@@ -541,6 +589,31 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 				.add(ac.hitKey(KBKeys.VK_ENTER), 1)
 				.build(widget);
 	}
+	private Action paymentOrderFormFill(State state, Widget widget) {
+		// http://localhost:8080/shop/order/checkout.html
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new CompoundAction.Builder()
+				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "customer.billing.address", state), "testar street", true), 2)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("testar city"), 2) // customer.billing.city may be out of screen
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // customer.billing.country may be out of screen
+				.add(ac.hitKey(KBKeys.VK_DOWN), 1) // open list, key down to select Australia, enter to accept
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("01234"), 2) // billingPostalCode may be out of screen
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(new Type("123456789"), 2) // customer.billing.phone may be out of screen
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_TAB), 1)
+				.add(ac.hitKey(KBKeys.VK_ENTER), 1) // five tabs to move to submit order button
+				.build(widget);
+	}
 
 	/**
 	 * Randomly select one item from the select list widget. 
@@ -642,7 +715,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 	@Override
 	protected boolean moreSequences() {
 		// For time budget experiments also check max time setting
-		boolean result = ((CountInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
+		boolean result = ((countInDb("UnvisitedAbstractAction") > 0) || !stopSharedProtocol) && (timeElapsed() < settings().get(ConfigTags.MaxTime));
 		System.out.println("moreSharedSequences ? " + result);
 		return result;
 	}

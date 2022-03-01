@@ -38,7 +38,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted, NonDeterministic}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted, NonDeterministicAction, NonDeterministicHole}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -50,7 +50,8 @@ public class EntityClassFactory {
 
     static {
         classNameMap = new HashMap<>();
-        classNameMap.put("NonDeterministic", EntityClassName.NonDeterministic);
+        classNameMap.put("NonDeterministicAction", EntityClassName.NonDeterministicAction);
+        classNameMap.put("NonDeterministicHole", EntityClassName.NonDeterministicHole);
         classNameMap.put("BeingExecuted", EntityClassName.BeingExecuted);
         classNameMap.put("AbstractState", EntityClassName.AbstractState);
         classNameMap.put("AbstractAction", EntityClassName.AbstractAction);
@@ -90,8 +91,11 @@ public class EntityClassFactory {
         }
 
         switch (className) {
-            case NonDeterministic:
-                return createNonDeterministicClass();
+            case NonDeterministicAction:
+                return createNonDeterministicActionClass();
+
+            case NonDeterministicHole:
+                return createNonDeterministicHoleClass();
 
             case BeingExecuted:
                 return createBeingExecutedClass();
@@ -147,18 +151,6 @@ public class EntityClassFactory {
             default:
                 return null;
         }
-    }
-
-    private static EntityClass createNonDeterministicClass() {
-    	EntityClass nonDeterministic = new EntityClass("NonDeterministic", EntityClass.EntityType.Vertex);
-    	entityClasses.put(EntityClassName.NonDeterministic, nonDeterministic);
-    	Property stateId = new Property("stateId", OType.STRING);
-
-    	stateId.setIdentifier(true);
-    	stateId.setMandatory(true);
-    	stateId.setNullable(false);
-    	nonDeterministic.addProperty(stateId);
-    	return nonDeterministic;
     }
 
     private static EntityClass createBeingExecutedClass() {
@@ -434,6 +426,29 @@ public class EntityClassFactory {
         entityClass.addProperty(blackHoleId);
         entityClasses.put(EntityClassName.BlackHole, entityClass);
         return entityClass;
+    }
+
+    private static EntityClass createNonDeterministicHoleClass() {
+    	EntityClass entityClass = new EntityClass("NonDeterministicHole", EntityClass.EntityType.Vertex);
+    	Property nonDeterministicHoleId = new Property("nonDeterministicHoleId", OType.STRING);
+    	nonDeterministicHoleId.setMandatory(true);
+    	nonDeterministicHoleId.setNullable(false);
+    	nonDeterministicHoleId.setIdentifier(true);
+    	nonDeterministicHoleId.setIndexAble(true);
+    	entityClass.addProperty(nonDeterministicHoleId);
+    	entityClasses.put(EntityClassName.NonDeterministicHole, entityClass);
+    	return entityClass;
+    }
+
+    private static EntityClass createNonDeterministicActionClass() {
+    	EntityClass nonDeterministicAction = new EntityClass("NonDeterministicAction", EntityClass.EntityType.Vertex);
+    	entityClasses.put(EntityClassName.NonDeterministicAction, nonDeterministicAction);
+    	Property stateId = new Property("stateId", OType.STRING);
+    	stateId.setIdentifier(true);
+    	stateId.setMandatory(true);
+    	stateId.setNullable(false);
+    	nonDeterministicAction.addProperty(stateId);
+    	return nonDeterministicAction;
     }
 
     private static EntityClass createUnvisitedAbstractActionClass() {

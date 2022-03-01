@@ -101,7 +101,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.Accessed, 
             EntityClassFactory.EntityClassName.FirstNode,
             EntityClassFactory.EntityClassName.BeingExecuted,
-            EntityClassFactory.EntityClassName.NonDeterministic));
+            EntityClassFactory.EntityClassName.NonDeterministicAction,
+            EntityClassFactory.EntityClassName.NonDeterministicHole));
 
     /**
      * Constructor
@@ -130,6 +131,24 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             entityManager.createClass(entityClass);
         }
         System.out.println("All EntityClasses created");
+        persistNonDeterministicHole();
+    }
+
+    private void persistNonDeterministicHole() {
+    	// create an entity to persist to the database
+    	EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.NonDeterministicHole);
+    	VertexEntity nonDeterministicHoleEntity = new VertexEntity(entityClass);
+    	try {
+    		EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_NON_DETERMINISTIC_HOLE);
+    		hydrator.hydrate(nonDeterministicHoleEntity, null);
+    	} catch (HydrationException | NullPointerException ex) {
+    		System.out.println("ERROR creating the NonDeterministicHole entity in the database");
+    		ex.printStackTrace();
+    		exit(1);
+    	}
+
+    	// save the entity!
+    	entityManager.saveEntity(nonDeterministicHoleEntity);
     }
 
     @Override
