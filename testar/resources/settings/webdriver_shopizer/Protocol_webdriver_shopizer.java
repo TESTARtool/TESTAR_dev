@@ -364,6 +364,16 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
 			// this is because a click will close the dropdown
 			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+				// Skip dropdown widget that changes the language
+				if(widget.parent() != null && 
+						(widget.parent().get(WdTags.WebTextContent, "").contains("Ingl") || (widget.parent().get(WdTags.WebTextContent, "").contains("English")))) {
+					continue;
+				}
+				// Skip dropdown widget without functionality that creates a new state
+				if(widget.parent() != null && 
+						(widget.parent().get(WdTags.WebTextContent, "").contains("Anuncios") || (widget.parent().get(WdTags.WebTextContent, "").contains("Page")))) {
+					continue;
+				}
 				actions.add(ac.mouseMove(widget));
 			}
 

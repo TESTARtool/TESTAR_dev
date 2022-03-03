@@ -123,7 +123,25 @@ public class SharedProtocol extends WebdriverProtocol {
 		boolean availableAction = false;
 		do {
 			try {
-				// OPTION 1 : Check and execute Non Deterministic AbstractAction to restore the State Model navigation
+				// OPTION 1 : Check and execute UnvisitedAbstractAction to explore the SUT to enrich the state model 
+				// Obtain a list of shortest UnvisitedAbstractActions that lead to the Black Hole
+				ArrayList<String> unvisitedActionsFromDb = SharedUnvisitedActions.getUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
+				System.out.println("Number of shortest path UnvisitedActions available in database: " + unvisitedActionsFromDb.size());
+
+				if (unvisitedActionsFromDb.size() >= 1) {
+					availableAction = true;
+					String action = SharedUnvisitedActions.selectRandomUnvisitedAction(unvisitedActionsFromDb, nodeName, settings, database);
+					if(action == null) {
+						System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
+						targetSharedAction = null;
+					}
+					System.out.println("UnvisitedAction from database selected: action = " + action);
+					// Mark that we need to calculate the traverse path to an Unvisited Action
+					traversePathType = TraverseType.UNV;
+					return action;
+				}
+
+				// OPTION 2 : Check and execute Non Deterministic AbstractAction to restore the State Model navigation
 				// Obtain a list of shortest AbstractActions that lead to NonDeterministicHole
 				ArrayList<String> nonDeterministicActionsFromDb = SharedNonDeterminism.getNonDeterministicActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
 				System.out.println("Number of shortest path NonDeterministicActions available in database: " + nonDeterministicActionsFromDb.size());
@@ -141,24 +159,6 @@ public class SharedProtocol extends WebdriverProtocol {
 					System.out.println("NonDeterministicAction from database selected: action = " + action);
 					// Mark that we need to calculate the traverse path to a Non Deterministic Action
 					traversePathType = TraverseType.NON_DET;
-					return action;
-				}
-
-				// OPTION 2 : Check and execute UnvisitedAbstractAction to explore the SUT to enrich the state model 
-				// Obtain a list of shortest UnvisitedAbstractActions that lead to the Black Hole
-				ArrayList<String> unvisitedActionsFromDb = SharedUnvisitedActions.getUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
-				System.out.println("Number of shortest path UnvisitedActions available in database: " + unvisitedActionsFromDb.size());
-
-				if (unvisitedActionsFromDb.size() >= 1) {
-					availableAction = true;
-					String action = SharedUnvisitedActions.selectRandomUnvisitedAction(unvisitedActionsFromDb, nodeName, settings, database);
-					if(action == null) {
-						System.out.println("Can not update unvisitedAbstractAction; set targetSharedAction to null");
-						targetSharedAction = null;
-					}
-					System.out.println("UnvisitedAction from database selected: action = " + action);
-					// Mark that we need to calculate the traverse path to an Unvisited Action
-					traversePathType = TraverseType.UNV;
 					return action;
 				}
 

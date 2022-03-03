@@ -250,10 +250,17 @@ public class WdElement extends TaggableBase implements Serializable {
     return visibleAt(x, y);
   }
   
+  // We only really need to click in the middle of the widget
   private boolean isFullVisibleAtCanvasBrowser() {
-	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
-	           rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+	  return rect.x() >= 0 && rect.x() + (rect.width()*0.7) <= CanvasDimensions.getCanvasWidth() &&
+			  rect.y() >= 0 && rect.y() + (rect.height()*0.7) <= CanvasDimensions.getInnerHeight();
   }
+
+  // Widget dimensions are completely visible in the browser canvas
+//  private boolean isFullVisibleAtCanvasBrowser() {
+//	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
+//			  rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+//  }
 
   @SuppressWarnings("unchecked")
   /*
