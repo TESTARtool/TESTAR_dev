@@ -148,17 +148,39 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected) throws SQLException {
-        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time, selected) VALUES (?, ?, ?, ?, ?, ?)");
+    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId) throws SQLException {
+        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time, selected, sequence_item_id, target_sequence_item_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         addActionStatement.setString(1, name);
         addActionStatement.setString(2, description);
         addActionStatement.setString(3, status);
         addActionStatement.setString(4, screenshot);
         addActionStatement.setTimestamp(5, startTime);
         addActionStatement.setBoolean(6, selected);
+        addActionStatement.setInt(7, stateId);
+        addActionStatement.setInt(8, targetStateId);
         addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
+        resultSet.next();
+        return resultSet.getInt(1);
+    }
+
+    public void registerTargetState(int actionId, int stateId) throws SQLException {
+        PreparedStatement updateActionStatement = connection.prepareStatement("UPDATE actions SET target_sequence_item_id=? WHERE id=?");
+        updateActionStatement.setInt(1, stateId);
+        updateActionStatement.setInt(2, actionId);
+
+        updateActionStatement.executeUpdate();
+    }
+
+    public synchronized int registerStateAction(int stateId, int actionId, boolean visited) throws SQLException {
+        PreparedStatement addStateActionStatement = connection.prepareStatement("INSERT INTO sequence_item_actions (sequence_item_id, action_id, visited) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE visited = ?");
+        addStateActionStatement.setInt(1, stateId);
+        addStateActionStatement.setInt(2, actionId);
+        addStateActionStatement.setBoolean(3, visited);
+        addStateActionStatement.setBoolean(4, visited);
+
+        final ResultSet resultSet = addStateActionStatement.executeQuery();
         resultSet.next();
         return resultSet.getInt(1);
     }

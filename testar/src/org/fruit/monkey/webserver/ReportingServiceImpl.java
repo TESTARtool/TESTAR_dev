@@ -8,7 +8,6 @@ import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.Main;
-import sun.net.www.http.HttpClient;
 
 import java.io.File;
 import java.io.IOException;
