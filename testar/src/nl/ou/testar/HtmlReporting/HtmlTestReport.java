@@ -438,4 +438,9 @@ public class HtmlTestReport implements TestReport {
         this.curActions = new ArrayList<>();
         this.sequences++;
     }
+
+    @Override
+    public void setTargetState(Action action, State state) {
+        // STUB
+    }
 }

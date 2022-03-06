@@ -11,5 +11,6 @@ public interface TestReport {
     void addActions(Set<Action> actions); //not used
     void addSelectedAction(State state, Action action);
     void addTestVerdict(Verdict verdict, Action action, State state);
+    void setTargetState(Action action, State state);
     void saveReport(final int actionsPerSequence, final int totalSequences, final String url);
 }

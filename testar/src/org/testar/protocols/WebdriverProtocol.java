@@ -70,6 +70,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
@@ -210,6 +211,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			sqlService.setDelegate(new MySqlServiceDelegate() {
 				@Override
 				public void onStateChanged(State state, String description) {
+
 					// TODO: Re-enable progress dialog
 //					progressDialog.setStatusString(description);
 				}
@@ -529,7 +531,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         //adding state to the HTML sequence report:
         sequenceReport.addState(latestState);
         testReport.addState(latestState);
-        return latestState;
+
+        if (lastExecutedAction != null && latestState != null) {
+			testReport.setTargetState(lastExecutedAction, latestState);
+		}
+
+		return latestState;
     }
 
 	/**
@@ -550,6 +557,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 
 		return super.selectAction(state, actions);
+	}
+
+	protected void saveDerivedActions(State state, Set<Action> actions) {
+		int stateId = -1;
+		try {
+			stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
+		} catch (SQLException e) {
+			System.err.println("Invalid state when saving actions: " + e.getMessage());
+		}
+
+		for (Action action: actions) {
+//			sqlService.registerAction(action.)
+		}
 	}
 
     /**

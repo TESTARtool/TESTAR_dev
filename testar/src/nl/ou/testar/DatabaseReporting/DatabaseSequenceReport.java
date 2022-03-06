@@ -32,6 +32,16 @@ public class DatabaseSequenceReport implements SequenceReport {
         }
     }
 
+    public void addActionToState(int stateId, int actionId, boolean visited) {
+        try {
+            sqlService.registerStateAction(stateId, actionId, visited);
+        }
+        catch (SQLException e) {
+            System.err.println("Could not add action to state: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void addActions(Set<Action> actions) {
         //TODO

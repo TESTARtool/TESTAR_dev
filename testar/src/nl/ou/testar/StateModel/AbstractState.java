@@ -102,7 +102,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
         return concreteStateIds;
     }
 
-    /**
+    /** 
      * This method returns the actions that have not yet been visited from this state
      * @return
      */

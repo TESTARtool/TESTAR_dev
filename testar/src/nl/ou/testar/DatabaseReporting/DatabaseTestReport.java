@@ -26,6 +26,7 @@ public class DatabaseTestReport implements TestReport {
 
     private Map<Action, Integer> actionIds;
     private Map<State, Integer> stateIds;
+    private Map<Action, State> actionTargets;
 
     private Set<Action> pendingActions;
     private Map<Action, State> pendingSelectedActions;
@@ -37,6 +38,7 @@ public class DatabaseTestReport implements TestReport {
 
         actionIds = new HashMap<>();
         stateIds = new HashMap<>();
+        actionTargets = new HashMap<>();
 
         pendingActions = new HashSet<>();
         pendingSelectedActions = new HashMap<>();
@@ -133,16 +135,40 @@ public class DatabaseTestReport implements TestReport {
 
     private int addAction(State state, Action action, boolean selected) throws SQLException {
 
+        int stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
+
         Timestamp timestamp = null;
         if( state.get(Tags.TimeStamp, null) != null) {
             timestamp = new Timestamp(state.get(Tags.TimeStamp));
         }
 
         // TODO: optimize actions saving
+        int targetStateId = -1;
+        State targetState = actionTargets.get(action);
+        if (targetState != null) {
+            targetStateId = stateIds.get(targetState);
+        }
         int actionId = sqlService.registerAction(action.toShortString(), action.toString(),
                     state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
-                    timestamp, selected);
+                    timestamp, selected, stateId, targetStateId);
+        System.out.println("Action added");
         sqlService.addActionToIteration(actionId, iterationId);
         return actionId;
+    }
+
+    public void setTargetState(Action action, State state) {
+
+        actionTargets.put(action, state);
+        System.out.println("Target added");
+
+//        int actionId = actionIds.get(action);
+//        int stateId = stateIds.get(state);
+//        if (actionId >= 0 && stateId >= 0) try {
+//            sqlService.registerTargetState(actionId, stateId);
+//        }
+//        catch (SQLException e) {
+//            System.err.println("Cannot set target state: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 }
