@@ -59,7 +59,6 @@ import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
 import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 import nl.ou.testar.SequenceReport;
 import nl.ou.testar.TestReport;
-import nl.ou.testar.resolver.MySQLSerialResolver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.mysql.MySqlService;
@@ -227,6 +226,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			sqlService.setDelegate(new MySqlServiceDelegate() {
 				@Override
 				public void onStateChanged(State state, String description) {
+
 					// TODO: Re-enable progress dialog
 //					progressDialog.setStatusString(description);
 				}
@@ -576,7 +576,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         //adding state to the HTML sequence report:
         sequenceReport.addState(latestState);
         testReport.addState(latestState);
-        return latestState;
+
+        if (lastExecutedAction != null && latestState != null) {
+			testReport.setTargetState(lastExecutedAction, latestState);
+		}
+
+		return latestState;
     }
 
 	/**
@@ -597,6 +602,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 
 		return super.selectAction(system, state, actions);
+	}
+
+	protected void saveDerivedActions(State state, Set<Action> actions) {
+		int stateId = -1;
+		try {
+			stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
+		} catch (SQLException e) {
+			System.err.println("Invalid state when saving actions: " + e.getMessage());
+		}
+
+		for (Action action: actions) {
+//			sqlService.registerAction(action.)
+		}
 	}
 
     /**
