@@ -94,9 +94,11 @@ public interface MySqlService {
     int registerReport(String tag) throws SQLException;
     int registerIteration(int reportId) throws SQLException;
     int registerIteration(int reportId, String info, Double severity) throws SQLException;
-    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected) throws SQLException;
+    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId) throws SQLException;
     int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException;
+    int registerStateAction(int stateId, int actionId, boolean visited) throws SQLException;
 
+    void registerTargetState(int actionId, int stateId) throws SQLException;
     void addActionToIteration(int actionId, int iterationId) throws SQLException;
     void setSelectionInIteration(int iterationId, int lastExecutedActionId, int lastStateId) throws SQLException;
     void storeVerdict(int iterationId, String info, Double severity) throws SQLException;

@@ -728,51 +728,75 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			startTestSequence(system);
 
 			try {
+				System.out.println("(0)");
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+				System.out.println("(0.5)");
 				State state = getState(system);
 
+				System.out.println("(1)");
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
 
 				//update state after begin sequence SUT modification
+				System.out.println("(2)");
 				state = getState(system);
 
+				//initializing fragment for recording replayable test sequence:
+				System.out.println("(3)");
+				initFragmentForReplayableSequence(state);
+
 				// notify the statemodelmanager
+				System.out.println("(4)");
 				stateModelManager.notifyTestSequencedStarted();
 
 				/*
 				 ***** starting the INNER LOOP:
 				 */
+				System.out.println("(5)");
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
+				//Saving the last state into replayable test sequence:
+				System.out.println("(6)");
+				saveStateIntoFragmentForReplayableSequence(state);
+
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
+				System.out.println("(7)");
 				finishSequence();
 
 				// notify the state model manager of the sequence end
+				System.out.println("(8)");
 				stateModelManager.notifyTestSequenceStopped();
 
+				System.out.println("(9)");
 				writeAndCloseFragmentForReplayableSequence();
 
+				System.out.println("(10)");
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
+				System.out.println("(11)");
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				//Copy sequence file into proper directory:
+				System.out.println("(12)");
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
+				System.out.println("(13)");
 				postSequenceProcessing();
 
 				//Ending test sequence of TESTAR:
+				System.out.println("(14)");
 				endTestSequence();
 
+				System.out.println("(15)");
 				LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
+				System.out.println("(16)");
 				sequenceCount++;
 
 			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
@@ -1537,36 +1561,57 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
+		System.out.println("<0>");
 		Assert.notNull(system);
+		System.out.println("<1>");
 		State state = builder.apply(system);
 
+		System.out.println("<2>");
 		buildStateIdentifiers(state);
+		System.out.println("<3>");
 		state = ProtocolUtil.calculateZIndices(state);
-		
+
+		System.out.println("<4>");
 		setStateForClickFilterLayerProtocol(state);
 
+		System.out.println("<5>");
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
-		
+
+		System.out.println("<6>");
 		Verdict verdict = getVerdict(state);
+		System.out.println("<7>");
 		state.set(Tags.OracleVerdict, verdict);
 
+		System.out.println("<8>");
 		setStateScreenshot(state);
 
-		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
+		System.out.println("<9>");
+		double severity = verdict.severity();
+		System.out.println("<A>");
+		double faultThreshold = settings().get(ConfigTags.FaultThreshold);
+		System.out.println("<B>");
+		if (mode() != Modes.Spy && severity >= faultThreshold){
+			System.out.println("<10>");
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
+			System.out.println("<11>");
 			if(verdict.severity()==Verdict.SEVERITY_NOT_RESPONDING){
 				//if the SUT is frozen, we should kill it!
+				System.out.println("<12>");
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
+				System.out.println("<13>");
 				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
-		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
+		} else if (severity != Verdict.SEVERITY_OK && severity > passSeverity){
+			System.out.println("<14>");
 			passSeverity = verdict.severity();
+			System.out.println("<15>");
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		
+		System.out.println("<16>");
+
 		return state;
 	}
 

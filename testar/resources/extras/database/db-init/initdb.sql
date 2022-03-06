@@ -33,6 +33,8 @@ CREATE TABLE `actions` (
     `screenshot` varchar(255),
     `start_time` datetime,
     `selected` boolean,
+    `sequence_item_id` int,
+    `target_sequence_item_id` int,
     PRIMARY KEY (`id`)
     -- FOREIGN KEY(`iteration_id`) REFERENCES `iterations` (`id`)
 );
@@ -49,5 +51,24 @@ CREATE TABLE `sequence_items` (
     PRIMARY KEY (`id`)
 );
 
--- ALTER TABLE `iterations` ADD FOREIGN KEY (`last_executed_action_id`) REFERENCES `actions`(`id`);
--- ALTER TABLE `iterations` ADD FOREIGN KEY (`last_state_id`) REFERENCES `sequence_items`(`id`);
+DROP TABLE IF EXISTS `sequence_item_actions`;
+CREATE TABLE `sequence_item_actions` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `sequence_item_id` int,
+    `action_id` int,
+    `visited` boolean,
+    PRIMARY KEY (`id`)
+    -- CONSTRAINT UC_Relation UNIQUE (`sequence_item_id`, `action_id)
+);
+
+ALTER TABLE `iterations` ADD FOREIGN KEY (`report_id`) REFERENCES `reports` (`id`);
+ALTER TABLE `iterations` ADD FOREIGN KEY (`last_executed_action_id`) REFERENCES `actions`(`id`);
+ALTER TABLE `iterations` ADD FOREIGN KEY (`last_state_id`) REFERENCES `sequence_items`(`id`);
+
+ALTER TABLE `actions` ADD FOREIGN KEY (`iteration_id`) REFERENCES `iterations` (`id`);
+ALTER TABLE `actions` ADD FOREIGN KEY (`sequence_item_id`) REFERENCES `sequence_items` (`id`);
+-- ALTER TABLE `actions` ADD FOREIGN KEY (`target_sequence_item_id`) REFERENCES `sequence_items` (`id`);
+
+ALTER TABLE `sequence_item_actions` ADD FOREIGN KEY (`sequence_item_id`) REFERENCES `sequence_items` (`id`);
+ALTER TABLE `sequence_item_actions` ADD FOREIGN KEY (`action_id`) REFERENCES `actions` (`id`);
+ALTER TABLE `sequence_item_actions` ADD CONSTRAINT UC_Relation UNIQUE (`sequence_item_id`, `action_id`);

@@ -82,6 +82,9 @@ public class SequenceManager {
     }
 
     public void notifyInterruptionBySystem(String message) {
+        if (currentSequence == null) {
+            System.out.println("Current sequence is null");
+        }
         currentSequence.setSequenceVerdict(SequenceVerdict.INTERRUPTED_BY_ERROR);
         currentSequence.setTerminationMessage(message);
         currentSequence.stop();
