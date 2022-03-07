@@ -37,6 +37,8 @@ public abstract class HydratorFactory {
     
     public static final int HYDRATOR_NON_DETERMINISTIC_HOLE = 15;
 
+    public static final int HYDRATOR_PREDICTED_ACTION = 16;
+
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityHydrator> hydrators = new HashMap<>();
 
@@ -91,6 +93,8 @@ public abstract class HydratorFactory {
             case HYDRATOR_NON_DETERMINISTIC_HOLE:
                 return createNonDeterministicHoleHydrator();
 
+            case HYDRATOR_PREDICTED_ACTION:
+            	return createPredictedActionHydrator();
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
@@ -185,6 +189,12 @@ public abstract class HydratorFactory {
     	NonDeterministicHoleHydrator nonDeterministicHoleHydrator = new NonDeterministicHoleHydrator();
     	hydrators.put(HYDRATOR_NON_DETERMINISTIC_HOLE, nonDeterministicHoleHydrator);
     	return nonDeterministicHoleHydrator;
+    }
+
+    private static PredictedActionHydrator createPredictedActionHydrator() {
+    	PredictedActionHydrator predictedActionHydrator = new PredictedActionHydrator();
+    	hydrators.put(HYDRATOR_PREDICTED_ACTION, predictedActionHydrator);
+    	return predictedActionHydrator;
     }
 
 }

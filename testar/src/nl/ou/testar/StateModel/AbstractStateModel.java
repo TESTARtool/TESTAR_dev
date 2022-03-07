@@ -33,6 +33,10 @@ public class AbstractStateModel {
     private Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
     private Map<String, Set<AbstractStateTransition>> stateTransitionsByTarget;
 
+    private Set<PredictedTransition> predictedTransitions;
+    private Map<String, Set<PredictedTransition>> predictedTransitionsBySource;
+    private Map<String, Set<PredictedTransition>> predictedTransitionsByTarget;
+
     // the states in the model
     private Map<String, AbstractState> states;
 
@@ -62,6 +66,9 @@ public class AbstractStateModel {
         stateTransitions = new HashSet<>();
         stateTransitionsBySource = new HashMap<>();
         stateTransitionsByTarget = new HashMap<>();
+        predictedTransitions = new HashSet<>();
+        predictedTransitionsBySource = new HashMap<>();
+        predictedTransitionsByTarget = new HashMap<>();
         states = new HashMap<>();
         initialStates = new HashMap<>();
         this.eventListeners = new HashSet<>();
@@ -136,6 +143,79 @@ public class AbstractStateModel {
             stateTransitionsByTarget.put(newTransition.getTargetStateId(), new HashSet<>());
         }
         stateTransitionsByTarget.get(newTransition.getTargetStateId()).add(newTransition);
+    }
+
+    /**
+     * This method adds a predicted not executed transition to the model
+     * 
+     * @param sourceState
+     * @param executedAction
+     * @throws StateModelException
+     */
+    public void addPredictedTransition(AbstractState sourceState, PredictedAction predictedAction) throws StateModelException{
+    	checkStateId(sourceState.getStateId());
+
+    	// the predicted action already exists in the database,
+    	// check existing transitions and obtain the predictedTargetState
+    	predictedAction.setModelIdentifier(modelIdentifier);
+
+    	// Ideally one executed action or predicted action will have a unique target state
+    	// But it exists the possibility to find non deterministic actions (executed and predicted)
+    	// Thus we need to add as many predicted transitions as target states found in the model (more than one if non deterministic)
+    	if(!stateTransitions.isEmpty()) {
+    		for(AbstractStateTransition existingTransition : stateTransitions) {
+    			if(existingTransition.getActionId().equals(predictedAction.getActionId())) {
+
+    				AbstractState predictedTargetState = existingTransition.getTargetState();
+    				checkStateId(predictedTargetState.getStateId());
+
+    				// check if the predicted transition already exists
+    				if (predictedTransitionsBySource.containsKey(sourceState.getStateId())) {
+    					// loop through all the predicted transitions that have the same source state and check for matches
+    					for(PredictedTransition predictedTransition : predictedTransitionsBySource.get(sourceState.getStateId())) {
+    						if (predictedTargetState.getStateId().equals(predictedTransition.getTargetStateId()) && predictedAction.getActionId().equals(predictedTransition.getActionId())) {
+    							// the transition already exists. We send an update event to deal with changes in the states and actions
+    							// now we notify our listeners of the possible update
+    							emitEvent(new StateModelEvent(StateModelEventType.PREDICTED_TRANSITION_CHANGED, predictedTransition));
+    							return;
+    						}
+    					}
+    				}
+
+    				// new transition
+    				PredictedTransition newPredictedTransition = new PredictedTransition(sourceState, predictedTargetState, predictedAction);
+    				// temporarily tell the state model not to emit events. We do not want to give double updates.
+    				deactivateEvents();
+
+    				addPredictedTransition(newPredictedTransition);
+    				addState(sourceState);
+    				addState(predictedTargetState);
+
+    				activateEvents();
+    				emitEvent(new StateModelEvent(StateModelEventType.PREDICTED_TRANSITION_ADDED, newPredictedTransition));
+    			}
+    		}
+    	}
+    }
+
+    /**
+     * Helper method to add a predicted transition to several storage attributes
+     * 
+     * @param newTransition
+     */
+    private void addPredictedTransition(PredictedTransition newPredictedTransition) {
+    	predictedTransitions.add(newPredictedTransition);
+    	// add the predicted transitions to the source map
+    	if (!predictedTransitionsBySource.containsKey(newPredictedTransition.getSourceStateId())) {
+    		predictedTransitionsBySource.put(newPredictedTransition.getSourceStateId(), new HashSet<>());
+    	}
+    	predictedTransitionsBySource.get(newPredictedTransition.getSourceStateId()).add(newPredictedTransition);
+
+    	// and then to the target map
+    	if (!predictedTransitionsByTarget.containsKey(newPredictedTransition.getTargetStateId())) {
+    		predictedTransitionsByTarget.put(newPredictedTransition.getTargetStateId(), new HashSet<>());
+    	}
+    	predictedTransitionsByTarget.get(newPredictedTransition.getTargetStateId()).add(newPredictedTransition);
     }
 
     /**

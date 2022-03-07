@@ -88,6 +88,11 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
+    public void persistPredictedTransition(PredictedTransition predictedTransition) {
+    	processRequest(() -> delegateManager.persistPredictedTransition(predictedTransition), predictedTransition);
+    }
+
+    @Override
     public void persistConcreteState(ConcreteState concreteState) {
         processRequest(() -> delegateManager.persistConcreteState(concreteState), concreteState);
     }
@@ -157,6 +162,11 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
             case ABSTRACT_ACTION_CHANGED:
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
+
+            case PREDICTED_TRANSITION_ADDED:
+            case PREDICTED_TRANSITION_CHANGED:
+            	persistPredictedTransition((PredictedTransition) (event.getPayload()));
+            	break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));

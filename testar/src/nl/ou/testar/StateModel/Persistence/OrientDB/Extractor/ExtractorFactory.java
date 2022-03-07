@@ -37,6 +37,8 @@ public abstract class ExtractorFactory {
             case EXTRACTOR_ABSTRACT_STATE_TRANSITION:
                 return createAbstractStateTransitionExtractor();
 
+            //TODO: Add an Extractor for predicted transitions
+
             default: throw new ExtractionException("Illegal extractor type specified");
         }
     }

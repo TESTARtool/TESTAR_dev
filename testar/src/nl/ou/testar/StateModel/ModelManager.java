@@ -140,6 +140,18 @@ public class ModelManager implements StateModelManager {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
 
+        // Here we have created the discovered abstract state in memory
+        // But we did not save the executed abstract action information in the database (done in the transition)
+        // For this reason we need to use the actionUnderExecution to update possible predicted actions
+        if (actionUnderExecution != null && currentAbstractState != null
+        		// Only if actionUnderExecution existed in previous state
+        		// If not this will create predicted actions constantly
+        		&& currentAbstractState.getActionIds().contains(actionUnderExecution.getActionId())) {
+        	// Indicate that actionUnderExecution was visited in (previous)currentAbstractState
+        	currentAbstractState.addVisitedAction(actionUnderExecution);
+        	newAbstractState.updatePredictedActions(actionUnderExecution);
+        }
+
         // add the concrete state id to the abstract state
         newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
 
@@ -170,6 +182,17 @@ public class ModelManager implements StateModelManager {
             }
             // we reset the executed action to await the next one.
             actionUnderExecution = null;
+        }
+
+        // Previous creation of an abstract state or abstract transition updates the information of visited, unvisited and predicted actions
+        // Then, Iterate through the predicted actions of the current to create the predicted transitions
+        for(PredictedAction predAct : newAbstractState.getPredictedActions()) {
+        	try {
+        		abstractStateModel.addPredictedTransition(newAbstractState, predAct);
+        	} catch (StateModelException e) {
+        		e.printStackTrace();
+        		throw new RuntimeException("Encountered a problem adding a predicted action transition into the statemodel");
+        	}
         }
 
         // we now store this state to be the current abstract state

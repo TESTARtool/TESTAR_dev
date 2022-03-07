@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Util;
 
 import nl.ou.testar.StateModel.AbstractAction;
+import nl.ou.testar.StateModel.PredictedTransition;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.AbstractStateTransition;
@@ -33,6 +34,13 @@ public class EventHelper {
                     throw new InvalidEventException();
                 }
                 break;
+
+            case PREDICTED_TRANSITION_ADDED:
+            case PREDICTED_TRANSITION_CHANGED:
+            	if (!(event.getPayload() instanceof PredictedTransition)) {
+            		throw new InvalidEventException();
+            	}
+            	break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 if (!(event.getPayload() instanceof AbstractStateModel)) {

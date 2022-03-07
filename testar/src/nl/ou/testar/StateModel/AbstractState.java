@@ -51,6 +51,9 @@ public class AbstractState extends AbstractEntity implements Persistable {
     private Map<String, AbstractAction> unvisitedActions;
     // a list of actions that have been visited in this state
     private Map<String, AbstractAction> visitedActions;
+    // a list of actions that have not yet been executed in the mode but not in this specific state
+    // this is possible if the action id is not dependent from the state id
+    private Map<String, PredictedAction> predictedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
     // is this an initial state?
@@ -69,6 +72,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
+        predictedActions = new HashMap<>();
         connection = EntityManager.getNewConnection(); 
 
         if (actions != null) {
@@ -76,6 +80,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
                 this.actions.put(action.getActionId(), action);
                 if (!actionExistsInDatabase(action)) {
                     unvisitedActions.put(action.getActionId(), action);
+                } else if (actionExistsInDatabase(action) && !visitedActions.containsKey(action.getActionId())) {
+                    System.out.println("PREDICTED: Adding predicted action : " + action.getActionId());
+                    PredictedAction predictedAction = new PredictedAction(action.getActionId());
+                    predictedActions.put(action.getActionId(), predictedAction);
                 } else {
                     System.out.println(action.getActionId() + " already existed in abstract state; do not add to unvisited");
                 }
@@ -119,6 +127,21 @@ public class AbstractState extends AbstractEntity implements Persistable {
     public void addVisitedAction(AbstractAction action) {
         unvisitedActions.remove(action.getActionId());
         visitedActions.put(action.getActionId(), action);
+        //TODO: Should we remove from predictedActions if executed?
+    }
+
+    /**
+     * This method checks if previous executed action is an unvisited action for this state. 
+     * In that case is not an unvisited but a predicted action
+     * @param action
+     */
+    public void updatePredictedActions(AbstractAction previousExecutedAction) {
+    	if(unvisitedActions.containsKey(previousExecutedAction.getActionId())) {
+    		System.out.println("PREDICTED: Update from UNVISITED to PREDICTED : " + previousExecutedAction.getActionId());
+    		unvisitedActions.remove(previousExecutedAction.getActionId());
+    		PredictedAction predictedAction = new PredictedAction(previousExecutedAction.getActionId());
+    		predictedActions.put(previousExecutedAction.getActionId(), predictedAction);
+    	}
     }
 
     /**
@@ -206,6 +229,14 @@ public class AbstractState extends AbstractEntity implements Persistable {
     }
 
     /**
+     * This method returns all the predicted actions of this abstract state
+     * @return
+     */
+    public Set<PredictedAction> getPredictedActions() {
+    	return new HashSet<>(predictedActions.values());
+    }
+
+    /**
      * Returns true if this is one of the starting states of the model. False otherwise.
      */
     public boolean isInitial() {
@@ -237,11 +268,19 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action
      */
     public void addNewAction(AbstractAction action) {
-        if (!this.actions.containsKey(action.getActionId())) {
-            action.setModelIdentifier(this.getModelIdentifier());
-            actions.put(action.getActionId(), action);
-            unvisitedActions.put(action.getActionId(), action);
-        }
+    	if (!this.actions.containsKey(action.getActionId())) {
+    		action.setModelIdentifier(this.getModelIdentifier());
+    		actions.put(action.getActionId(), action);
+    		if (!actionExistsInDatabase(action)) {
+    			unvisitedActions.put(action.getActionId(), action);
+    		} else if (actionExistsInDatabase(action) && !visitedActions.containsKey(action.getActionId())) {
+    			System.out.println("PREDICTED: Adding predicted action : " + action.getActionId());
+    			PredictedAction predictedAction = new PredictedAction(action.getActionId());
+    			predictedActions.put(action.getActionId(), predictedAction);
+    		} else {
+    			System.out.println(action.getActionId() + " already existed in abstract state; do not add to unvisited");
+    		}
+    	}
     }
 
     @Override

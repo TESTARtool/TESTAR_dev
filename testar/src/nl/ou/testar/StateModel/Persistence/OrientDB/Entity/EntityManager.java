@@ -585,7 +585,11 @@ public class EntityManager {
             // now create the new edge, set the properties and save
             edge = sourceVertex.addEdge(targetVertex, entity.getEntityClass().getClassName());
             for (String propertyName : entity.getPropertyNames()) {
-                setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
+            	if(entity.getPropertyValue(propertyName).getValue() == null) {
+            		System.out.println("EntityManager propertyName : " + propertyName);
+            		System.out.println("EntityManager getPropertyValue : " + entity.getPropertyValue(propertyName).getValue());
+            	}
+            	setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
             }
 
             // check if one of the properties is an auto-increment field.

@@ -44,6 +44,12 @@ public interface PersistenceManager {
     void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition);
 
     /**
+     * This method persists an abstract predicted transition
+     * @param PredictedTransition
+     */
+    void persistPredictedTransition(PredictedTransition predictedTransition);
+
+    /**
      * This method persists a concrete state.
      * @param concreteState
      */

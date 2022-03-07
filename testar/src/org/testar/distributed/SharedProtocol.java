@@ -126,6 +126,7 @@ public class SharedProtocol extends WebdriverProtocol {
 				// OPTION 1 : Check and execute UnvisitedAbstractAction to explore the SUT to enrich the state model 
 				// Obtain a list of shortest UnvisitedAbstractActions that lead to the Black Hole
 				ArrayList<String> unvisitedActionsFromDb = SharedUnvisitedActions.getUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
+				System.out.println("UnvisitedActions available in database: " + countInDb("UnvisitedAbstractAction"));
 				System.out.println("Number of shortest path UnvisitedActions available in database: " + unvisitedActionsFromDb.size());
 
 				if (unvisitedActionsFromDb.size() >= 1) {
@@ -252,7 +253,12 @@ public class SharedProtocol extends WebdriverProtocol {
 			// $to,'OUT','AbstractAction') AS path LET $from = (SELECT FROM abstractstate
 			// WHERE stateId='SAC1jp4oysed31697927673'), $to = (SELECT FROM abstractstate
 			// Where stateId='SACwpszr27b61710690312') UNWIND path))
+			/*
 			String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to,'OUT','AbstractAction') "
+					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
+					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
+			 */
+			String stateRidQuery = "SELECT @rid, stateId from (SELECT expand(path) FROM (SELECT shortestPath($from, $to, 'OUT') "
 					+ "AS path LET $from = (SELECT FROM AbstractState WHERE stateId='" + state.get(Tags.AbstractIDCustom) + "'), "
 					+ "$to = (SELECT FROM AbstractState Where stateId='" + destinationStateId + "') UNWIND path))";
 
@@ -280,14 +286,19 @@ public class SharedProtocol extends WebdriverProtocol {
 				return super.selectAction(state, actions);
 			}
 
-			// Find an AbstractAction to perform, that connects current state and next step state
+			// Find an AbstractAction or PredictedAction to perform, that connects current state and next step state
 			// this next step state it can be the final destination state that contains the target shared action
 			// or just an intermediate state
-			String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+			//String abstActQuery = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+			String abstractActionPart = "select from AbstractAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+			String predictedActionPart = "select from PredictedAction where out = " + v.get(0).rid + " and in = " + v.get(1).rid;
+			// The path to follow may be abstract action or predicted action
+			//SELECT EXPAND( $c ) LET $a = ( SELECT FROM AbstractAction ), $b = ( SELECT FROM PredictedAction ), $c = UNIONALL( $a, $b )
+			String unionQuery = "select expand($c) let $a=(" + abstractActionPart + "), $b=(" + predictedActionPart + "), $c=UNIONALL($a,$b)";
 
 			String abstractActionId = "";
 			HashMap<String, Action> availableActions = ConvertActionSetToDictionary(actions);
-			OResultSet abstractActionResultSet = SharedDatabase.executeQuery(db, abstActQuery);
+			OResultSet abstractActionResultSet = SharedDatabase.executeQuery(db, unionQuery);
 			while (abstractActionResultSet.hasNext()) {
 				abstractActionId = abstractActionResultSet.next().getProperty("actionId");
 				System.out.println("traversePath: Check if " + abstractActionId + " is available");

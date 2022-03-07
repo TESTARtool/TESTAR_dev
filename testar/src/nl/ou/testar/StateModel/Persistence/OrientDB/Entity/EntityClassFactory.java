@@ -37,8 +37,9 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted, NonDeterministicAction, NonDeterministicHole}
+	public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
+		BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, BeingExecuted, 
+		NonDeterministicAction, NonDeterministicHole, PredictedAction}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -50,6 +51,7 @@ public class EntityClassFactory {
 
     static {
         classNameMap = new HashMap<>();
+        classNameMap.put("PredictedAction", EntityClassName.PredictedAction);
         classNameMap.put("NonDeterministicAction", EntityClassName.NonDeterministicAction);
         classNameMap.put("NonDeterministicHole", EntityClassName.NonDeterministicHole);
         classNameMap.put("BeingExecuted", EntityClassName.BeingExecuted);
@@ -91,6 +93,9 @@ public class EntityClassFactory {
         }
 
         switch (className) {
+            case PredictedAction:
+                return createPredictedActionClass();
+
             case NonDeterministicAction:
                 return createNonDeterministicActionClass();
 
@@ -627,6 +632,28 @@ public class EntityClassFactory {
         entityClass.addProperty(counter);
         entityClasses.put(EntityClassName.FirstNode, entityClass);
         return entityClass;
+    }
+
+    private static EntityClass createPredictedActionClass() {
+    	EntityClass predictedActionClass = new EntityClass("PredictedAction", EntityClass.EntityType.Edge);
+    	Property uniqueId = new Property("uid", OType.STRING);
+    	uniqueId.setMandatory(true);
+    	uniqueId.setNullable(false);
+    	uniqueId.setIdentifier(true);
+    	uniqueId.setIndexAble(true);
+    	predictedActionClass.addProperty(uniqueId);
+    	Property actionId = new Property("actionId", OType.STRING);
+    	actionId.setMandatory(true);
+    	actionId.setNullable(false);
+    	actionId.setIdentifier(false);
+    	predictedActionClass.addProperty(actionId);
+    	Property modelIdentifier = new Property("modelIdentifier", OType.STRING);
+    	modelIdentifier.setMandatory(true);
+    	modelIdentifier.setNullable(false);
+    	modelIdentifier.setIndexAble(true);
+    	predictedActionClass.addProperty(modelIdentifier);
+    	entityClasses.put(EntityClassName.PredictedAction, predictedActionClass);
+    	return predictedActionClass;
     }
 
 }
