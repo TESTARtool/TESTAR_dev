@@ -85,6 +85,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				String parentDescription = widget.parent() != null ? widget.parent().get(WdTags.WebTextContent,"") : "";
 				// Create a new String that contains the widget abstract id and the parent WebTextContent (gh23483ghhkProducts)
 				String mergedAbstractId = dropdownWidgetAbstractId + parentDescription;
+				System.out.println(mergedAbstractId);
 				// Then calculate the new hash id using new unique string (gh23483ghhkProducts)
 				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(mergedAbstractId));
 				// Also set new description using parent description
