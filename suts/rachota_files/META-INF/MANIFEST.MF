@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Implementation-Title: rachota
+Implementation-Version: 2.5-SNAPSHOT
+Archiver-Version: Plexus Archiver
+Built-By: testar
+Specification-Title: rachota
+Implementation-Vendor-Id: org.cesilko
+Created-By: Apache Maven 3.6.3
+Build-Jdk: 1.8.0_144
+Specification-Version: 2.5-SNAPSHOT
+Main-Class: org.cesilko.rachota.gui.MainWindow
+

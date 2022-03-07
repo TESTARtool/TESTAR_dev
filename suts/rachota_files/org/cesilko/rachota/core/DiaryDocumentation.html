@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>DTD Grammar Documentation</title>
+<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
+</head>
+
+<!-- Generated on Jul 15, 2005 by NetBeans XML module. -->
+<body>
+
+<hr />
+<h2>Element Index</h2>
+<ul><li><tt><a href="#day">day</a></tt></li>
+<li><tt><a href="#description">description</a></tt></li>
+<li><tt><a href="#keyword">keyword</a></tt></li>
+<li><tt><a href="#notes">notes</a></tt></li>
+<li><tt><a href="#notification">notification</a></tt></li>
+<li><tt><a href="#priority">priority</a></tt></li>
+<li><tt><a href="#private">private</a></tt></li>
+<li><tt><a href="#repetition">repetition</a></tt></li>
+<li><tt><a href="#task">task</a></tt></li>
+<li><tt><a href="#week">week</a></tt></li>
+</ul>
+
+<hr />
+<h2>Element Details</h2>
+
+
+<hr />
+<h2><a name="week"></a>week</h2>
+<div>One week of working plan.
+(id - number of week in year,
+year - calendar year)</div>
+<p><b>Declared Attributes</b></p>
+<ul><li><tt>#IMPLIED CDATA id</tt></li>
+<li><tt>#IMPLIED CDATA year</tt></li>
+</ul>
+<p><b>Element Content Model</b></p>
+<p><tt>(<a href="#day">day</a>)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt></tt></p>
+
+
+<hr />
+<h2><a name="day"></a>day</h2>
+<div>Day of week.
+(finish - time when user finished to work,
+start - time when user started to work,
+id - number of day in week)</div>
+<p><b>Declared Attributes</b></p>
+<ul><li><tt>#IMPLIED CDATA finish</tt></li>
+<li><tt>#IMPLIED CDATA start</tt></li>
+<li><tt>#IMPLIED CDATA id</tt></li>
+</ul>
+<p><b>Element Content Model</b></p>
+<p><tt>(<a href="#task">task</a>)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#week">week</a></tt></p>
+
+
+<hr />
+<h2><a name="task"></a>task</h2>
+<div>Task planned for a day.
+(duration - total time how long user worked on task so far,
+state - information about progress on task)</div>
+<p><b>Declared Attributes</b></p>
+<ul><li><tt>#IMPLIED CDATA duration</tt></li>
+<li><tt>#IMPLIED CDATA state</tt></li>
+</ul>
+<p><b>Element Content Model</b></p>
+<p><tt>(<a href="#repetition">repetition</a>&nbsp;| <a href="#notification">notification</a>&nbsp;| <a href="#notes">notes</a>&nbsp;| <a href="#keyword">keyword</a>&nbsp;| <a href="#description">description</a>&nbsp;| <a href="#priority">priority</a>&nbsp;| <a href="#private">private</a>)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#day">day</a></tt></p>
+
+
+<hr />
+<h2><a name="priority"></a>priority</h2>
+<div>Priority of a task.</div>
+<p><b>Element Content Model</b></p>
+<p><tt>(#PCDATA)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="description"></a>description</h2>
+<div>Short description of a task.</div>
+<p><b>Element Content Model</b></p>
+<p><tt>(#PCDATA)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="keyword"></a>keyword</h2>
+<div>Category of a task.</div>
+<p><b>Element Content Model</b></p>
+<p><tt>(#PCDATA)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="notes"></a>notes</h2>
+<div>Long description of a task.</div>
+<p><b>Element Content Model</b></p>
+<p><tt>(#PCDATA)*</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="notification"></a>notification</h2>
+<div>Notification about a task at specified time.
+(switch - whether task should start automatically,
+time - when user should start working on a task)</div>
+<p><b>Declared Attributes</b></p>
+<ul><li><tt>#IMPLIED CDATA switch</tt></li>
+<li><tt>#IMPLIED CDATA time</tt></li>
+</ul>
+<p><b>Element Content Model</b></p>
+<p><tt>EMPTY</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="private"></a>private</h2>
+<div>Identification of private task.</div>
+<p><b>Element Content Model</b></p>
+<p><tt>EMPTY</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+
+
+<hr />
+<h2><a name="repetition"></a>repetition</h2>
+<div>Identification of regular task.
+(frequency - type of repetition)</div>
+<p><b>Declared Attributes</b></p>
+<ul><li><tt>#IMPLIED CDATA frequency</tt></li>
+</ul>
+<p><b>Element Content Model</b></p>
+<p><tt>EMPTY</tt></p>
+<p><b>Referenced by</b></p>
+<p><tt><a href="#task">task</a></tt></p>
+</body></html>

@@ -1,7 +1,4 @@
 Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.10.4
-Created-By: 1.8.0_181-b13 (Oracle Corporation)
-Class-Path: 
-X-COMMENT: Main-Class will be added automatically by build
+Class-Path: .
 Main-Class: TestGUI
 

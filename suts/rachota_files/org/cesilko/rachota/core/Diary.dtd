@@ -1,0 +1,73 @@
+<?xml version='1.1' encoding='UTF-8'?>
+
+<!--- One week of working plan.
+(id - number of week in year,
+os - identification of operating system e.g. Linux 3.0.0-12-generic
+year - calendar year)
+-->
+<!ELEMENT week (day)*>
+<!ATTLIST week
+    id CDATA #REQUIRED
+    year CDATA #REQUIRED
+    os CDATA #IMPLIED
+  >
+
+<!--- Day of week.
+(finish - time when user finished to work,
+date - textual identification of day in format MM-dd-yyyy e.g. 12-31-2013
+start - time when user started to work,
+id - number of day in week)
+-->
+<!ELEMENT day (task)*>
+<!ATTLIST day
+    finish CDATA #IMPLIED
+    date CDATA #IMPLIED
+    start CDATA #IMPLIED
+    id CDATA #REQUIRED
+  >
+
+<!--- Task planned for a day.
+(duration - total time how long user worked on task so far,
+state - information about progress on task)
+-->
+<!ELEMENT task (repetition|notification|notes|keyword|description|priority|private|idle)*>
+<!ATTLIST task
+    duration CDATA #REQUIRED
+    state CDATA #IMPLIED
+  >
+
+<!--- Priority of a task. -->
+<!ELEMENT priority (#PCDATA)>
+
+<!--- Short description of a task. -->
+<!ELEMENT description (#PCDATA)>
+
+<!--- Category of a task. -->
+<!ELEMENT keyword (#PCDATA)>
+
+<!--- Long description of a task. -->
+<!ELEMENT notes (#PCDATA)>
+
+<!--- Identification of an idle task. -->
+<!ELEMENT idle EMPTY>
+
+<!--- Notification about a task at specified time.
+(switch - whether task should start automatically,
+time - when user should start working on a task)
+-->
+<!ELEMENT notification EMPTY>
+<!ATTLIST notification
+    switch CDATA #IMPLIED
+    time CDATA #IMPLIED
+  >
+
+<!--- Identification of private task. -->
+<!ELEMENT private EMPTY>
+
+<!--- Identification of regular task.
+(frequency - type of repetition)
+-->
+<!ELEMENT repetition EMPTY>
+<!ATTLIST repetition
+    frequency CDATA #IMPLIED
+  >
