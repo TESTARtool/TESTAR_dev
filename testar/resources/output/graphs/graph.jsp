@@ -85,6 +85,7 @@
             <div class="extra-margin-left">
                 <div class="stats-text" id="stats-abstract-states"></div>
                 <div class="stats-text" id="stats-abstract-actions"></div>
+				<div class="stats-text" id="stats-predicted-actions"></div>
                 <div class="stats-text" id="stats-concrete-states"></div>
                 <div class="stats-text" id="stats-concrete-actions"></div>
             </div>
@@ -173,6 +174,14 @@
                 style: {
                     'line-color': '#1c9099',
                     'target-arrow-color': '#1c9099'
+                }
+
+            },
+            {
+                selector: '.PredictedAction',
+                style: {
+                    'line-color': '#a600ff',
+                    'target-arrow-color': '#a600ff'
                 }
 
             },
@@ -784,7 +793,7 @@
     });
 
     // when edges get selected, we also open the side panel, but show just the close button and the data
-    cy.on('tap', 'edge.ConcreteAction,edge.AbstractAction,edge.SequenceStep', function(evt) {
+    cy.on('tap', 'edge.ConcreteAction,edge.AbstractAction,edge.PredictedAction,edge.SequenceStep', function(evt) {
         let targetEdge = evt.target;
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
@@ -948,6 +957,7 @@
         appStatus.nrOfConcreteStates = cy.$('node.ConcreteState').size();
         appStatus.nrOfSequenceNodes = cy.$('node.SequenceNode').size();
         appStatus.nrOfAbstractActions = cy.$('edge.AbstractAction').size();
+		appStatus.nrOfPredictedActions = cy.$('edge.PredictedAction').size();
         appStatus.nrOfConcreteActions = cy.$('edge.ConcreteAction').size();
         appStatus.nrOfUnvisitedAbstractActions = cy.$('edge.UnvisitedAbstractAction').size();
         appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
@@ -1040,6 +1050,10 @@
 
         div = document.getElementById('stats-abstract-actions');
         text = document.createTextNode("Nr of abstract actions: " + appStatus.nrOfAbstractActions);
+        div.append(text);
+
+        div = document.getElementById('stats-predicted-actions');
+        text = document.createTextNode("Nr of predicted actions: " + appStatus.nrOfPredictedActions);
         div.append(text);
 
         div = document.getElementById('stats-concrete-states');

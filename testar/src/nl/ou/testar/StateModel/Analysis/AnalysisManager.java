@@ -379,12 +379,17 @@ public class AnalysisManager {
         elements.addAll(fetchEdges(resultSet, "AbstractAction"));
         resultSet.close();
 
+        // predicted actions
+        stmt = "SELECT FROM PredictedAction WHERE modelIdentifier = :identifier";
+        resultSet = db.query(stmt, params);
+        elements.addAll(fetchEdges(resultSet, "PredictedAction"));
+        resultSet.close();
+
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
         resultSet.close();
-
 
         // unvisited abstract actions
         stmt = "SELECT FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
