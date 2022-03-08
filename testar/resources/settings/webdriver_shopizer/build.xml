@@ -26,9 +26,9 @@
                 <!-- all filetests here -->
 
             </structure>
+            <html destdir="${reportCoverageDir}" />
             <csv destfile="${reportCoverageDir}/report_jacoco.csv" />
-            <!-- <html destdir="${reportCoverageDir}" /> -->
-            <!-- <xml destfile="${reportCoverageDir}/reportjacoco.xml" /> -->
+            <xml destfile="${reportCoverageDir}/reportjacoco.xml" />
         </jacoco:report>
     </target>
 
