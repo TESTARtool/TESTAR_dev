@@ -70,6 +70,18 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			// http://localhost:8080/shop/customer/billing.html
 			if(isSonOfBillAddressBox(widget) || isSonOfShopAddressBox(widget)) { return; }
 
+			// In Edit bill and shop address
+			// Edit buttons from bill and shop address may to use "onclick" property to differentiate each one
+			// But this property is not accessible, then use the id + parent web text
+			if(widget.get(WdTags.WebTextContent, "").trim().equals("Edit") && widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdA)) {
+				// Check this just in case
+				if(widget.parent() != null) {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+							+ CodingManager.codify(widget, WdTags.WebId) + widget.parent().get(WdTags.WebTextContent, ""));
+					return;
+				}
+			}
+
 			// Shopping cart may contains dynamic widgets if TESTAR buys stuff, we have to ignore these widgets from the abstract id point of view
 			// cart item list, shopping cart table and shopping cart total money (http://localhost:8080/shop/cart/shoppingCart.html)
 			if(isSonOfCartItems(widget) || isSonOfCartTable(widget) || isSonOfCartTotalMoney(widget)) { return; }
@@ -139,7 +151,12 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 
 			// For shopping cart (number of bags) widget we should use only the id to avoid an state explosion
 			if(widget.get(WdTags.WebId, "").equals("miniCartSummary")) {
-				widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId));
+				// We need to differentiate 0 items from 1 or more items
+				if(widget.get(WdTags.WebTextContent, "").trim().equals("0")) {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId) + "0");
+				} else {
+					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, WdTags.WebId) + "1");
+				}
 				return;
 			}
 
@@ -184,13 +201,13 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 
 	private boolean isSonOfBillAddressBox(Widget widget) {
 		if(widget.parent() == null) return false;
-		else if (widget.parent().get(WdTags.WebId, "").equals("editBillingAddress_100")) return true;
+		else if (widget.parent().get(WdTags.WebId, "").contains("editBillingAddress")) return true;
 		else return isSonOfBillAddressBox(widget.parent());
 	}
 
 	private boolean isSonOfShopAddressBox(Widget widget) {
 		if(widget.parent() == null) return false;
-		else if (widget.parent().get(WdTags.WebId, "").equals("editShippingAddress_100")) return true;
+		else if (widget.parent().get(WdTags.WebId, "").contains("editShippingAddress")) return true;
 		else return isSonOfShopAddressBox(widget.parent());
 	}
 
@@ -378,7 +395,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			}
 
 			// If shopping cart contains some item to buy, derive an additional action to explore buy cart states
-			if(widget.get(WdTags.WebId, "").equals("miniCartSummary") && !widget.get(WdTags.WebTextContent, "").contains("0")) {
+			if(widget.get(WdTags.WebId, "").equals("miniCartSummary") && !widget.get(WdTags.WebTextContent, "").trim().equals("0")) {
 				actions.add(ac.mouseMove(widget));
 			}
 
