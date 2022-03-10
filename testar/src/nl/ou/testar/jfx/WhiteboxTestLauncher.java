@@ -77,7 +77,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
         parentStage.hide();
         whiteboxStage = new Stage(StageStyle.UNDECORATED);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/whitebox_test_status.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/progress_monitor.fxml"));
         view = loader.load();
 
         stageLabel = (Label) view.lookup("#procStage");

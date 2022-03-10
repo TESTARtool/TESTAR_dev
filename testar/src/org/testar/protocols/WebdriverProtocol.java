@@ -155,6 +155,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		Thread orientdbThread = null;
 
 		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
+			if (progressMonitor != null) {
+				progressMonitor.beginTask("Prepare database instance(s)", 0);
+			}
 			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();
