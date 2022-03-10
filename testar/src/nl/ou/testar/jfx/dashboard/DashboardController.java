@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import nl.ou.testar.jfx.StartupProgressMonitor;
 import nl.ou.testar.jfx.WhiteboxTestLauncher;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
@@ -45,7 +46,10 @@ public class DashboardController extends ViewController {
             settings.set(ConfigTags.Mode, mode);
             System.out.println("Start testing...");
             if (delegate != null) {
-                Platform.runLater(() -> new Thread(() -> delegate.startTesting(settings)).start());
+                Platform.runLater(() -> {
+                    StartupProgressMonitor progressMonitor = new StartupProgressMonitor();
+                    new Thread(() -> delegate.startTesting(settings, progressMonitor)).start();
+                });
 
                 final Stage stage = (Stage) view.getScene().getWindow();
             }

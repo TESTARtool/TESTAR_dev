@@ -63,6 +63,7 @@ import javafx.scene.control.Alert;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
+import nl.ou.testar.jfx.StartupProgressMonitor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.Assert;
@@ -98,6 +99,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 	public static boolean faultySequence;
 	private State stateForClickFilterLayerProtocol;
+
+	//TODO: progress monitor shouldn't depend on JavaFX
+	protected StartupProgressMonitor progressMonitor;
+
+	public StartupProgressMonitor getProgressMonitor() {
+		return progressMonitor;
+	}
+
+	public void setProgressMonitor(StartupProgressMonitor progressMonitor) {
+		this.progressMonitor = progressMonitor;
+	}
 
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
@@ -254,6 +266,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 */
 	public final void run(final Settings settings) {
 
+		if (progressMonitor != null) {
+			progressMonitor.setTitle("Getting ready");
+			progressMonitor.beginTask("Preparing for test", 0);
+		}
+
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;
 
@@ -261,8 +278,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 		//initialize TESTAR with the given settings:
 		initialize(settings);
+		if (progressMonitor != null) {
+			progressMonitor.setTitle("Testing");
+		}
 		if (delegate != null) try {
 			if (mode() == Modes.View) {
+
+				if (progressMonitor != null) {
+					progressMonitor.beginTask("View in progress", 0);
+				}
+
 				if(isHtmlFile() || isLogFile()) {
 					File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 					delegate.openURI(file.toURI());
@@ -278,12 +303,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
 				}
 			} else if (mode() == Modes.Replay) {
+				if (progressMonitor != null) {
+					progressMonitor.beginTask("Replay in progress", 0);
+				}
 				runReplayLoop();
 			} else if (mode() == Modes.Spy) {
+				if (progressMonitor != null) {
+					progressMonitor.beginTask("Spy in progress", 0);
+				}
 				runSpyLoop();
 			} else if(mode() == Modes.Record) {
+				if (progressMonitor != null) {
+					progressMonitor.beginTask("Record in progress", 0);
+				}
 				runRecordLoop(system);
 			} else if (mode() == Modes.Generate) {
+				if (progressMonitor != null) {
+					progressMonitor.beginTask("Generate in progress", 0);
+				}
 				runGenerateOuterLoop(system);
 			}
 
@@ -343,6 +380,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.mode = Modes.Quit;
+		}
+
+		//Hide progress monitor
+		if (progressMonitor != null) {
+			progressMonitor.stop();
 		}
 
 		System.out.println("Protocol finished");

@@ -52,6 +52,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import nl.ou.testar.jfx.MainController;
 import nl.ou.testar.jfx.MainControllerDelegate;
+import nl.ou.testar.jfx.StartupProgressMonitor;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
@@ -180,7 +181,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("<<< 2 >>>");
 			initOperatingSystem();
 			System.out.println("<<< 3 >>>");
-			startTestar(settings);
+			startTestar(settings, new StartupProgressMonitor());
 			System.out.println("<<< 4 >>>");
 			System.out.println("<<< 5 >>>");
 		}
@@ -198,11 +199,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	@Override
-	public void startTesting(Settings settings) {
+	public void startTesting(Settings settings, StartupProgressMonitor progressMonitor) {
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
-		startTestar(settings);
+		startTestar(settings, progressMonitor);
 	}
 
 	private static void shutdown() {
@@ -423,7 +424,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 *
 	 * @param settings
 	 */
-	private void startTestar(Settings settings) {
+	private void startTestar(Settings settings, StartupProgressMonitor progressMonitor) {
 
 //		launch();
 
@@ -462,6 +463,12 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				if (DefaultProtocol.class.isInstance(protocol)) {
 					((DefaultProtocol) protocol).setDelegate(this);
 				}
+			}
+
+			//Set progress monitor if applicable
+			if (DefaultProtocol.class.isInstance(protocol)) {
+				((DefaultProtocol)protocol).setProgressMonitor(progressMonitor);
+				progressMonitor.start(primaryStage, settings);
 			}
 
 			//Run TESTAR protocol with the selected settings
