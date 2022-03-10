@@ -164,7 +164,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				delegate.popupMessage(TestarServiceException.DOCKER_UNAVAILABLE);
 				return;
 			}
-
+			if (progressMonitor != null) {
+				progressMonitor.beginTask("Prepare database instance(s)", 0);
+			}
 			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();

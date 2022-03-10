@@ -4,6 +4,12 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.ConfigTags;
@@ -12,6 +18,8 @@ import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class OrientDbServiceImpl implements OrientDBService {
 
@@ -19,11 +27,12 @@ public class OrientDbServiceImpl implements OrientDBService {
     private final DockerPoolService dockerPoolService;
     private final Settings settings;
     private OrientDBServiceDelegate delegate;
-
+    private HttpClient httpClient;
 
     public OrientDbServiceImpl(DockerPoolService dockerPoolService, Settings settings) {
         this.settings = settings;
         this.dockerPoolService = dockerPoolService;
+        httpClient = HttpClientBuilder.create().build();
     }
 
 
@@ -84,14 +93,48 @@ public class OrientDbServiceImpl implements OrientDBService {
                 );
         dockerPoolService.startWithImage(imageId, "orientdb", hostConfig);
 
-        try {
-            System.out.println();
-            //TODO: Implement a better way to test the connection.
-            Thread.sleep(15000);
-        } catch (Exception ex) {
-            // Ignore
+//        try {
+//            System.out.println();
+//            //TODO: Implement a better way to test the connection.
+//            Thread.sleep(15000);
+//        } catch (Exception ex) {
+//            // Ignore
+//        }
+
+//        URL url = new URL("http://localhost:2480/connect/" + database);
+//        String credentials = Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes(StandardCharsets.UTF_8);
+//
+//        URLConnection connection = url.openConnection();
+//        connection.
+
+        int status = HttpStatus.SC_NOT_FOUND;
+
+        final HttpGet checkRequest = new HttpGet("http://localhost:2480/connect/" + database);
+        checkRequest.setHeader(HttpHeaders.AUTHORIZATION, "Basic " +
+                Base64.getEncoder().encodeToString(String.format("%s:%s", username, password).getBytes(StandardCharsets.UTF_8)));
+        HttpResponse checkResponse = null;
+        while (status >= 400 && status < 500) {
+            try {
+                checkResponse = httpClient.execute(checkRequest);
+                status = checkResponse.getCode();
+            } catch (Exception e) {
+                System.out.println("Not yet ready: " + e);
+            } finally {
+                checkRequest.reset();
+            }
+
+            if (status != HttpStatus.SC_OK && status != HttpStatus.SC_NO_CONTENT) {
+                System.out.println("Status: " + status);
+            }
+            try {
+                Thread.sleep(5000);
+            }
+            catch (Exception e) {}
         }
 
+        if (status != HttpStatus.SC_OK && status != HttpStatus.SC_NO_CONTENT) {
+            System.out.println("Failed to initialize OrientDB: " + status);
+        }
 
         if (delegate != null) {
             delegate.onServiceReady();
