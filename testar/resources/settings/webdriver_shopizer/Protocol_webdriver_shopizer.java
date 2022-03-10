@@ -98,7 +98,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			// If not, different states will lead to this central error state
 			// Then TESTAR may think that he can just come to the error state and execute back history action to reach different states
 			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
-					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")) {
+					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")
+					|| widget.get(WdTags.WebTextContent, "").toLowerCase().contains("error ocurred")) {
 				// Only changing one widget we will be able to change all state id
 				if(latestState == null) {
 					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + "InitialState");
@@ -378,53 +379,60 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				return new HashSet<>(Collections.singletonList(paymentOrderFormFill(state, widget)));
 			}
 
-			// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
-			// this is because a click will close the dropdown
-			if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
-				// Skip dropdown widget that changes the language
-				if(widget.parent() != null && 
-						(widget.parent().get(WdTags.WebTextContent, "").contains("Ingl") || (widget.parent().get(WdTags.WebTextContent, "").contains("English")))) {
+			if(isAtBrowserCanvas(widget)) {
+				// dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
+				// this is because a click will close the dropdown
+				if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
+					// Skip dropdown widget that changes the language
+					if(widget.parent() != null && 
+							(widget.parent().get(WdTags.WebTextContent, "").contains("Ingl") || (widget.parent().get(WdTags.WebTextContent, "").contains("English")))) {
+						continue;
+					}
+					// Skip dropdown widget without functionality that creates a new state
+					if(widget.parent() != null && 
+							(widget.parent().get(WdTags.WebTextContent, "").contains("Anuncios") || (widget.parent().get(WdTags.WebTextContent, "").contains("Page")))) {
+						continue;
+					}
+					actions.add(ac.mouseMove(widget));
+				}
+
+				// If shopping cart contains some item to buy, derive an additional action to explore buy cart states
+				//if(widget.get(WdTags.WebId, "").equals("miniCartSummary") && !widget.get(WdTags.WebTextContent, "").trim().equals("0")) {
+					//actions.add(ac.mouseMove(widget));
+				//}
+
+				//Derive action for shopping cart menu to remove a product
+				if(widget.get(WdTags.WebCssClasses, "").contains("removeProductIcon")) {
+					actions.add(ac.leftClickAt(widget));
+				}
+
+				// Ignore action for shopping cart images and prices, because these are not doing nothing
+				// Then TESTAR will focus in Buy Cart button
+				if(widget.get(WdTags.WebCssClasses, "").contains("product-image") || widget.get(WdTags.WebCssClasses, "").contains("pull-left")) {
 					continue;
 				}
-				// Skip dropdown widget without functionality that creates a new state
-				if(widget.parent() != null && 
-						(widget.parent().get(WdTags.WebTextContent, "").contains("Anuncios") || (widget.parent().get(WdTags.WebTextContent, "").contains("Page")))) {
+				// Very specific condition to also ignore actions in bag name that do nothing
+				if(widget.parent() != null && widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdP) 
+						&& widget.parent().get(WdTags.WebCssClasses, "").contains("product-name")) {
 					continue;
 				}
-				actions.add(ac.mouseMove(widget));
-			}
 
-			// If shopping cart contains some item to buy, derive an additional action to explore buy cart states
-			if(widget.get(WdTags.WebId, "").equals("miniCartSummary") && !widget.get(WdTags.WebTextContent, "").trim().equals("0")) {
-				actions.add(ac.mouseMove(widget));
-			}
-
-			// Ignore action for shopping cart images and prices, because these are not doing nothing
-			// Then TESTAR will focus in Buy Cart button
-			if(widget.get(WdTags.WebCssClasses, "").contains("product-image") || widget.get(WdTags.WebCssClasses, "").contains("pull-left")) {
-				continue;
-			}
-			// Very specific condition to also ignore actions in bag name that do nothing
-			if(widget.parent() != null && widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdP) 
-					&& widget.parent().get(WdTags.WebCssClasses, "").contains("product-name")) {
-				continue;
-			}
-
-			if(widget.get(WdTags.WebId, "").contains("searchField")) {
-				actions.add(new CompoundAction.Builder()
-						.add(ac.clickTypeInto(widget, "bag", true), 10)
-						.add(ac.hitKey(KBKeys.VK_ENTER), 10)
-						.build(widget));
-			}
-			if(widget.get(WdTags.WebId, "").contains("contactForm")) {
-				actions.add(contactUsFormFill(state, widget));
-			}
-			if(widget.get(WdTags.WebId, "").contains("changeAddressForm")) {
-				actions.add(changeAddressFormFill(state, widget));
-			}
-			if(widget.get(WdTags.WebId, "").contains("changePasswordForm")) {
-				actions.add(changePasswordFormFill(state, widget));
-				actions.add(badPasswordFormFill(state, widget));
+				if(widget.get(WdTags.WebId, "").contains("searchField")) {
+					actions.add(new CompoundAction.Builder()
+							.add(ac.clickTypeInto(widget, "bag", true), 10)
+							.add(ac.hitKey(KBKeys.VK_ENTER), 10)
+							.build(widget));
+				}
+				if(widget.get(WdTags.WebId, "").contains("contactForm")) {
+					actions.add(contactUsFormFill(state, widget));
+				}
+				if(widget.get(WdTags.WebId, "").contains("changeAddressForm")) {
+					actions.add(changeAddressFormFill(state, widget));
+				}
+				if(widget.get(WdTags.WebId, "").contains("changePasswordForm")) {
+					actions.add(changePasswordFormFill(state, widget));
+					actions.add(badPasswordFormFill(state, widget));
+				}
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -470,6 +478,9 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
+				} else if (widget.get(WdTags.WebCssClasses,"").contains("addToCart") && !stateCartIsEmpty(state)) {
+					// We only want to add an item to the cart if the cart is empty without products
+					continue;
 				} else {
 					actions.add(ac.leftClickAt(widget));
 				}
@@ -514,6 +525,22 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				if(widget.child(i).get(WdTags.WebCssClasses, "").contains("fa-angle-down")){
 					return true;
 				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check if the shopizer cart of current state is empty. 
+	 * We dont have any product to buy yet. 
+	 * 
+	 * @param state
+	 * @return
+	 */
+	private boolean stateCartIsEmpty(State state) {
+		for(Widget w : state) {
+			if(w.get(WdTags.WebId, "").equals("miniCartSummary") && w.get(WdTags.WebTextContent, "").trim().equals("0")) {
+				return true;
 			}
 		}
 		return false;
