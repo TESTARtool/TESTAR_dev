@@ -164,7 +164,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				return;
 			}
 
-			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
+			if (progressMonitor != null) {
+				progressMonitor.beginTask("Prepare database instance(s)", 0);
+			}
+			OrientDbServiceImpl			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();
 //			progressDialog.setStatusString("Preparing OrientDB");

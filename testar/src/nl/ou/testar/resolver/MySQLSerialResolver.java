@@ -56,7 +56,7 @@ public class MySQLSerialResolver implements ActionResolver {
     }
 
     @Override
-    public Action selectAction(State state, Set<Action> actions) {
+    public Action selectAction(SUT system, State state, Set<Action> actions) {
         // A single action supposed here
         if (actions != null) {
             return actions.iterator().next();
