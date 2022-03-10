@@ -102,8 +102,7 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			// If not, different states will lead to this central error state
 			// Then TESTAR may think that he can just come to the error state and execute back history action to reach different states
 			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")
-					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")
-					|| widget.get(WdTags.WebTextContent, "").toLowerCase().contains("error ocurred")) {
+					|| widget.get(WdTags.WebTextContent, "").contains("Estado HTTP 404")) {
 				// Only changing one widget we will be able to change all state id
 				if(latestState == null) {
 					widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + "InitialState");
@@ -301,6 +300,14 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 			// If Shopizer is rendering products in the state, wait until everything is loaded
 			if(widget.get(WdTags.WebCssClasses, "").toLowerCase().contains("loadingoverlay")) {
 				waitShopizerLoadingOverlay(state, system);
+				state = super.getState(system);
+			}
+			// Execute a search when we are editing the address leads to a error page that may provoke a loop
+			// Because this page does not contain widgets, force back history
+			if(widget.get(WdTags.WebTextContent, "").contains("error occurred")
+					|| widget.get(WdTags.WebTextContent, "").contains("producido un error")){
+				WdDriver.executeScript("window.history.back();");
+				Util.pause(2);
 				state = super.getState(system);
 			}
 		}
@@ -599,9 +606,9 @@ public class Protocol_webdriver_distributed_shopizer extends SharedProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		return new CompoundAction.Builder()
 				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "name", state), "SomeName", true), 2)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "email", state), "email@email.com", true), 2)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "subject", state), "SomeSubject", true), 2)
-				.add(ac.clickTypeInto(getWidgetWithMatchingTag("WebId", "comment", state), "blabla", true), 2)
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "email", state), "email@email.com", true), 2)
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "subject", state), "SomeSubject", true), 2)
+				.add(ac.pasteTextInto(getWidgetWithMatchingTag("WebId", "comment", state), "blabla", true), 2)
 				.add(ac.leftClickAt(getWidgetWithMatchingTag("WebId", "submitContact", state)), 2)
 				.build(widget);
 	}

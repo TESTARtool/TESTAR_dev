@@ -75,6 +75,9 @@ public class SharedProtocol extends WebdriverProtocol {
 	enum TraverseType { NON_DET, UNV }
 	private TraverseType traversePathType;
 
+	private int MAX_RANDOM_TRIES = 5;
+	private int random_tries_count = 0;
+
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
@@ -123,6 +126,9 @@ public class SharedProtocol extends WebdriverProtocol {
 		boolean availableAction = false;
 		do {
 			try {
+				System.out.println("UnvisitedActions in database: " + countInDb("UnvisitedAbstractAction"));
+				System.out.println("NonDeterministicActions in database: " + countInDb("AbstractAction where in.@class='NonDeterministicHole'"));
+
 				// OPTION 1 : Check and execute UnvisitedAbstractAction to explore the SUT to enrich the state model 
 				// Obtain a list of shortest UnvisitedAbstractActions that lead to the Black Hole
 				ArrayList<String> unvisitedActionsFromDb = SharedUnvisitedActions.getUnvisitedActionsFromDatabase(state.get(Tags.AbstractIDCustom), settings, database);
@@ -174,10 +180,22 @@ public class SharedProtocol extends WebdriverProtocol {
 					return action;
 				}
 
-				// OPTION 4 : We are not in the initial state and no more actions to execute
+				// OPTION 4 : We are not in the initial state, we don not have a path to an unvisited but there are unvisited in the database
+				// Maybe something wrong created an incorrect transition that we need to restore
+				// Randomly explore the system in order to restore model transitions
+//				if (random_tries_count < MAX_RANDOM_TRIES && countInDb("UnvisitedAbstractAction") > 0) {
+//					Action a = super.selectAction(state, actions);
+//					String action = a.get(Tags.AbstractIDCustom);
+//					System.out.println("No unvisited path found, random exploration try : " + random_tries_count);
+//					random_tries_count ++;
+//					return action;
+//				}
+
+				// OPTION 5 : We are not in the initial state and no more actions to execute
 				// If we are here is because we have no more unvisited actions to execute
 				moreSharedActions = false;
 				stopSharedProtocol = true;
+				random_tries_count = 0; // restore random tries for next iteration
 				Action a = super.selectAction(state, actions);
 				String action = a.get(Tags.AbstractIDCustom);
 				System.out.println("Just return random action and stop; action = " + action);
