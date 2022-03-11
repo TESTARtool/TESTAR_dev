@@ -55,7 +55,7 @@ public class CompareScreenshotsByPixelsHelper {
         float differentPixels = differentPixelsInOverlap + sizeDisjunctAreaBufImg1 + sizeDisjunctAreaBufImg2;
         double totalPixels = sizeIntersectionRect + sizeDisjunctAreaBufImg1 + sizeDisjunctAreaBufImg2;
         float diff = (float) (differentPixels / totalPixels);
-        final float reward = - (1 - diff);
+        final float reward = diff;
 
         logger.info("*********");
         logger.info("Current differentPixelsInOverlap: " + differentPixelsInOverlap);

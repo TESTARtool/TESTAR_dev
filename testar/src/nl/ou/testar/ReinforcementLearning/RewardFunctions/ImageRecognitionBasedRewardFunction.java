@@ -55,7 +55,7 @@ public class ImageRecognitionBasedRewardFunction implements RewardFunction {
             logger.debug("Match found between screenshots with " + (1 - match.getScore()));
             screenImagePreviouslyExecutedAction = screenshot;
             finder.destroy();
-            final float reward = (float) ((-1.0) * match.getScore());
+            final float reward = (float) (1 - match.getScore());
             logger.info("ID={} reward={}", id, reward);
 
             // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server
