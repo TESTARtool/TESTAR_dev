@@ -40,6 +40,7 @@ public class GreedyPolicy implements Policy {
 
         final float maxValue = Collections.max(qValues);
         final Collection<AbstractAction> actionsSelected = qValuesActionsMultimap.get(maxValue);
+        System.out.println("Selecting action with highest Q value: " + maxValue);
         return ReinforcementLearningUtil.selectAction(actionsSelected);
     }
 }

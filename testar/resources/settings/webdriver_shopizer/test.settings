@@ -105,19 +105,18 @@ ProtocolClass = webdriver_shopizer/Protocol_webdriver_shopizer
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\worker\\Desktop\\orientdb-3.0.4\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = shopizer
 ApplicationVersion = 1
-ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
+
 
 #################################################################
 # State identifier attributes

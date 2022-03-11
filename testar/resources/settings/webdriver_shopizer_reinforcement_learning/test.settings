@@ -105,18 +105,16 @@ ProtocolClass = webdriver_shopizer_reinforcement_learning/Protocol_webdriver_sho
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\worker\\Desktop\\orientdb-3.0.4\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = shopizer
 ApplicationVersion = 1
-ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################
@@ -147,7 +145,7 @@ Policy = EpsilonGreedyPolicy
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLWidgetTreeReward.xml
+ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLABT.xml
 
 #################################################################
 # WebDriver features

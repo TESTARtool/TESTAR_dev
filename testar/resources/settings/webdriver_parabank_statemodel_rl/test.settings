@@ -107,15 +107,14 @@ ProtocolClass = webdriver_parabank_statemodel_rl/Protocol_webdriver_parabank_sta
 #################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
+DataStoreType = plocal
+DataStoreDirectory = C:\\Users\\worker\\Desktop\\orientdb-3.0.4\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
 ApplicationName = parabank
 ApplicationVersion = 1
-ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 
 #################################################################

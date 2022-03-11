@@ -3,18 +3,20 @@ package nl.ou.testar.ReinforcementLearning.RewardFunctions;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.ConcreteState;
-import nl.ou.testar.StateModel.Widget;
+//import nl.ou.testar.StateModel.Widget;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.webdriver.enums.WdTags;
 
 import java.util.*;
 
 public class ABTBasedRewardFunction implements RewardFunction {
 
     Map<Tag<?>, Object>  attributesInPreviousState = new HashMap<>();
-    ConcreteState previousState = null;
+    State previousState = null;
 
     /**K
      * Gets the reward by dividing the number of new actions in a state by the total number of actions
@@ -47,25 +49,25 @@ public class ABTBasedRewardFunction implements RewardFunction {
 //        System.out.println("*****------------------------------\n");
 
 
-        final float reward = diff_state(currentConcreteState, currentAbstractState);
+        final float reward = diff_state(state, currentAbstractState);
 
-        previousState = currentConcreteState;
+        previousState = state;
         System.out.println("reward determined: " + reward);
         return Float.isNaN(reward) ? 0 : reward;
     }
 
-    private List<Widget> getChildren(Widget w){
+    private List<Widget> getChildren(State w){
         List<Widget> listWidgets = new ArrayList<>();
         Deque<Widget> queueWidgets = new ArrayDeque<>();
         System.out.println("---- Traversing state ------");
-        System.out.println(w.getChildren().size());
+        System.out.println(w.childCount());
         queueWidgets.add(w);
 
         while (!queueWidgets.isEmpty()) {
             Widget queued = queueWidgets.peek();
-            for (Widget subw : queued.getChildren()) {
-                listWidgets.add(subw);
-                queueWidgets.add(subw);
+            for (int i=0; i < queued.childCount(); i++) {
+                listWidgets.add(queued.child(i));
+                queueWidgets.add(queued.child(i));
             }
             queueWidgets.remove(queued);
         }
@@ -74,52 +76,66 @@ public class ABTBasedRewardFunction implements RewardFunction {
     }
 
     public float diff_widget(Widget w1, Widget w2){
-        System.out.println("Comparing widget" + w1.getAttributes().get(Tags.Title, "unknown") + " and " + w2.getAttributes().get(Tags.Title, "unknown"));
-        final Map<Tag<?>, Object>  newTags = w1.getAttributes().getTagValues();
-        final Map<Tag<?>, Object>  oldTags = w2.getAttributes().getTagValues();
-        double diff = newTags.keySet().stream()
-                .mapToInt(key -> attNotEqual(key, newTags, oldTags))
-                .sum();
-        diff += oldTags.keySet().stream()
-                .mapToInt(key -> attNotEqual(key, oldTags, newTags))
-                .sum();
+        System.out.println("Comparing widget" + w1.get(Tags.Title, "unknown") + " and " + w2.get(Tags.Title, "unknown"));
+        final Iterable<Tag<?>>  newTags = w1.tags();
+        final Iterable<Tag<?>>  oldTags = w2.tags();
+        double diff = 0;
+        int newTagsSize = 0;
+        int oldTagsSize = 0;
+
+        for (Tag<?> tag: newTags) {
+            diff+=attNotEqual(tag,  w1, w2);
+            newTagsSize += 1;
+        }
+
+        for (Tag<?> tag: oldTags) {
+            diff+=attNotEqual(tag,  w2, w1);
+            oldTagsSize += 1;
+        }
+
         System.out.println("New: " + diff);
 //        System.out.println("Lost: " + noOfLostElements);
-        System.out.println("Diff ratio: " + (float) (diff) / (newTags.size() + oldTags.size()));
-        System.out.println(newTags.size());
-        System.out.println(oldTags.size());
-        return (float) (diff) / (newTags.size() + oldTags.size());
+        System.out.println("Diff ratio: " + (float) (diff) / (newTagsSize + oldTagsSize));
+        System.out.println(newTagsSize);
+        System.out.println(oldTagsSize);
+        return (float) (diff) / (newTagsSize + oldTagsSize);
     }
 
     public boolean same_abstract_widget(Widget w1, Widget w2){
 
         // Temporal
-        return w1.getAttributes().get(Tags.AbstractIDCustom, null).equals(w2.getAttributes().get(Tags.AbstractIDCustom, null));
+        return w1.get(Tags.AbstractIDCustom).equals(w2.get(Tags.AbstractIDCustom));
     }
 
-    public float diff_state(final ConcreteState currentConcreteState, final AbstractState currentAbstractState){
+    public float diff_state(final State currentConcreteState, final AbstractState currentAbstractState){
         if(previousState==null){
             return 0;
         }
         else{
             float diff = 0;
             System.out.println(currentConcreteState);
-            System.out.println(currentConcreteState.getChildren());
-            System.out.println(currentConcreteState.getAttributes());
+            System.out.println(currentConcreteState.childCount());
+//            System.out.println(currentConcreteState.getAttributes());
             List<Widget> currentChildChildren = getChildren(currentConcreteState);
             List<Widget> previousChildChildren = getChildren(previousState);
             for(Widget currentWidget : currentChildChildren){
                 boolean found_widget = false;
                 for(Widget previousWidget : previousChildChildren) {
                     if (same_abstract_widget(currentWidget, previousWidget)){
-                        System.out.println("Same widgets: " + currentWidget.getAttributes().get(Tags.Title, "unknown" + " and " + previousWidget.getAttributes().get(Tags.Title, "unknown")));
+                        System.out.println(previousWidget.get(Tags.AbstractIDCustom));
+                        System.out.println(currentWidget.get(Tags.AbstractIDCustom));
+                        System.out.println(previousWidget.get(WdTags.WebTextContent));
+                        System.out.println(currentWidget.get(WdTags.WebTextContent));
+                        System.out.println(previousWidget.get(WdTags.WebId));
+                        System.out.println(currentWidget.get(WdTags.WebId));
+                        System.out.println("Same widgets: " + currentWidget.get(Tags.Title, "unknown" + " and " + previousWidget.get(Tags.Title, "unknown")));
                         found_widget = true;
                         diff += diff_widget(currentWidget, previousWidget);
                         break;
                     }
                 }
                 if(!found_widget){
-                    System.out.println("New widget!: " + currentWidget.getAttributes().get(Tags.Title));
+                    System.out.println("New widget!: " + currentWidget.get(Tags.Title));
                     diff += 1;
                 }
             }
@@ -127,10 +143,10 @@ public class ABTBasedRewardFunction implements RewardFunction {
         }
     }
 
-    private int attNotEqual(final Object key, final Map<Tag<?>, Object> newTagValues, final Map<Tag<?>, Object> OldTagValues) {
-        final Object newAttributeObject = newTagValues.getOrDefault(key, null);
-        final Object oldAttributeObject = OldTagValues.getOrDefault(key, null);
-        if(!OldTagValues.containsKey(key) || !newTagValues.get(key).equals(OldTagValues.get(key))){
+    private int attNotEqual(final Tag<?> key, final Widget w1, final Widget w2) {
+        final Object newAttributeObject = w1.get(key, null);
+        final Object oldAttributeObject = w2.get(key, null);
+        if(!newAttributeObject.equals(oldAttributeObject)){
             return 1;
         }
         else{
