@@ -140,7 +140,9 @@ public class WdFillFormAction extends TaggableBase implements Action {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                formBuilder.add(ac.leftClickAt(input), 2);
+                if(input!=null) {
+                    formBuilder.add(ac.leftClickAt(input), 2);
+                }
             }
         } else if (fields != null && fields.containsKey("performSubmit")) {
             String submit = fields.get("performSubmit");
@@ -151,7 +153,9 @@ public class WdFillFormAction extends TaggableBase implements Action {
                 // If the form does not contains a name property, derive a GUI click action
                 // in the first submit widget of the form
                 Widget input = findSubmitButtonOfForm(widget);
-                formBuilder.add(ac.leftClickAt(input), 2);
+                if(input != null) {
+                    formBuilder.add(ac.leftClickAt(input), 2);
+                }
             }
         }
 
