@@ -31,7 +31,6 @@
 
 import es.upv.staq.testar.NativeLinker;
 import org.fruit.alayer.*;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.webdriver.*;
@@ -192,14 +191,14 @@ public class Protocol_webdriver_statemodel_shared extends SharedProtocol {
 
 			// Check if the target shared action to execute is in the current state
 			if (actionMap.containsKey(targetSharedAction)) {
-				System.out.println("Target Shared Action is in the current state, just select it");
 				Action targetAction = getTargetActionFound(actionMap);
+				System.out.println("TargetSharedAction is in the current state, just select it : " + targetAction.get(Tags.AbstractIDCustom) + " , " + targetAction.get(Tags.Desc));
 				return targetAction;
 			} 
 			// Target shared action to execute is not in the current state, calculate the path to reach our desired target action
 			else {
-				System.out.println("Needed Target Shared Action is unavailable, select from path to be followed");
 				Action nextStepAction = traversePath(state, actions);
+				System.out.println("Unavailable TargetSharedAction, select from path to be followed : " + nextStepAction.get(Tags.AbstractIDCustom) + " , " + nextStepAction.get(Tags.Desc));
 				return nextStepAction;
 			}
 		}
