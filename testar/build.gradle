@@ -81,6 +81,7 @@ dependencies {
     implementation files('./lib/gson-2.8.5.jar')
     implementation jnativehook
     implementation 'com.google.guava:guava:26.0-jre'
+    implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.3'
     implementation group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     implementation group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
