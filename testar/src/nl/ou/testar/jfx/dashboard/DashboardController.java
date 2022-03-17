@@ -60,11 +60,16 @@ public class DashboardController extends ViewController {
 
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
+        final WhiteboxTestStatus testStatus = new WhiteboxTestStatus();
 
         try {
-            new WhiteboxTestStatus().start(stage, settings);
+            testStatus.start(stage, settings);
         }
-        catch(IOException e) {
+        catch(Exception e) {
+            testStatus.stop();
+            final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot analyse code\n" + e.getMessage());
+            alert.show();
+
             e.printStackTrace();
         }
     }

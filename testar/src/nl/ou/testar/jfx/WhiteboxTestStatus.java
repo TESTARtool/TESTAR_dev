@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
@@ -109,6 +110,9 @@ public class WhiteboxTestStatus implements ProgressMonitor {
                         contentBox.getChildren().add(itemView);
                     }
                 } catch (IOException e) {
+                    final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot start code analysis\n" + e.getMessage());
+                    alert.show();
+                    stop();
                     e.printStackTrace();
                 }
 
