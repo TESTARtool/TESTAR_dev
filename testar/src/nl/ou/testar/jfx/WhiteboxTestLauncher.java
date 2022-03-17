@@ -146,6 +146,9 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
                         contentBox.getChildren().add(itemView);
                     }
                 } catch (IOException e) {
+                    final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot start code analysis\n" + e.getMessage());
+                    alert.show();
+                    stop();
                     e.printStackTrace();
                 }
             });

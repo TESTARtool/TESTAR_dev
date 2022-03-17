@@ -377,9 +377,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
+			delegate.popupMessage(SystemStartException.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.mode = Modes.Quit;
+			delegate.popupMessage(e.getMessage());
 		}
 
 		//Hide progress monitor
@@ -577,6 +579,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
+			popupMessage("Failed to store generated sequence");
 			e3.printStackTrace();
 		}
 
@@ -605,6 +608,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeqObject, true))));
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
+			popupMessage("I/O exception creating new sequence file");
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
 		}
 
@@ -679,7 +683,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		try {
 			Util.delete(currentSeq);
 		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+			final String errorMessage = "I/O exception deleting <" + currentSeq + ">";
+			popupMessage(errorMessage);
+			LogSerialiser.log(errorMessage + "\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -711,7 +717,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		try {
 			Util.delete(currentSeq);
 		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+			final String popupMessage = "I/O exception deleting <" + currentSeq + ">";
+			LogSerialiser.log(popupMessage + "a\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 

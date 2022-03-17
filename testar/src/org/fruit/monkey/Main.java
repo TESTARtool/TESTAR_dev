@@ -214,7 +214,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		LogSerialiser.exit();
 	}
 
-	private static boolean isValidJavaEnvironment() {
+	private boolean isValidJavaEnvironment() {
 
 		try {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
@@ -222,9 +222,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
-				+"Check if JAVA_HOME system variable is correctly defined \n \n"
-				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
+		}catch(Exception e) {
+			final String errorMessage = "Exception: Something is wrong with your JAVA_HOME \n"
+					+"Check if JAVA_HOME system variable is correctly defined \n \n"
+					+"GO TO: https://testar.org/faq/ to obtain more details \n \n";
+			System.out.println(errorMessage);
+			popupMessage(errorMessage);
+		}
 
 		return true;
 	}
@@ -272,7 +276,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 *
 	 * @param parameters
 	 */
-	private static void initTestarSSE(Parameters parameters, List<String> rawParameters){
+	private void initTestarSSE(Parameters parameters, List<String> rawParameters){
 
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -288,7 +292,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			if(sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
-				}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
+				}catch(Exception e) {
+					final String errorMessage = "Error trying to modify sse from command line";
+					System.out.println(errorMessage);
+					popupMessage(errorMessage);
+				}
 		}
 
 		String[] files = getSSE();
@@ -318,7 +326,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	/**
 	 *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
 	 */
-	private static void settingsSelection() {
+	private void settingsSelection() {
 
 		Set<String> sutSettings = new HashSet<String>();
 		for (File f : new File(settingsDir).listFiles()) {
@@ -355,7 +363,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 					return;
 				}
 			} catch (IOException e) {
-				System.out.println("Exception creating <" + sseFile + "> file");
+				final String errorMessage = "Exception creating <" + sseFile + "> file";
+				System.out.println(errorMessage);
+				popupMessage(errorMessage);
 			}
 
 		}
@@ -370,7 +380,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * @param testSettingsFileName
 	 * @return settings
 	 */
-	private static Settings loadTestarSettings(List<String> args, String testSettingsFileName){
+	private Settings loadTestarSettings(List<String> args, String testSettingsFileName){
 
 		Settings settings = null;
 		try {
@@ -476,9 +486,14 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 		}catch (Throwable t) {
 			LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + t.getMessage() + "\n");
 			System.out.println("Main: Exception caught");
+			popupMessage(t.getMessage());
 			t.printStackTrace();
-			t.printStackTrace(LogSerialiser.getLogStream());
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				t.printStackTrace(LogSerialiser.getLogStream());
+			}
 		}
 		finally {
 			if (loader != null) {
@@ -486,6 +501,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 					loader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					popupMessage(e.getMessage());
 				}
 			}
 
@@ -505,7 +521,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * @return An instance of Settings
 	 * @throws ConfigException
 	 */
-	public static Settings loadSettings(List<String> args, String file) throws ConfigException {
+	public Settings loadSettings(List<String> args, String file) throws ConfigException {
 		Assert.notNull(file);
 		try {
 			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
@@ -657,9 +673,12 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				try {
 					settings = Settings.fromFileCmd(defaults, file, args.toArray(argArray));
 				}catch(Exception e) {
-					System.out.println("Error with command line properties. Examples:");
-					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
-					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
+					final String errorMessage = "Error with command line properties. Examples:\n" +
+							"testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*\n" +
+							"SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"";
+
+					System.out.println(errorMessage);
+					popupMessage(errorMessage);
 				}
 				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
 				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
@@ -874,7 +893,8 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 */
 	public void popupMessage(String message) {
 		Platform.runLater(() -> {
-			final Alert alert = new Alert(Alert.AlertType.ERROR, message);
+			final Alert alert = new Alert(Alert.AlertType.ERROR,
+					(message == null || message.length() == 0 ? "Unknown error" : message));
 			alert.show();
 		});
 	}

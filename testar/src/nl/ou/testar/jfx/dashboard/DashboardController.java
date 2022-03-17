@@ -67,13 +67,18 @@ public class DashboardController extends ViewController {
 
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
+        final WhiteboxTestLauncher testStatus = new WhiteboxTestLauncher();
 
         try {
-            final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
-            whiteboxTestLauncher.setDashboardDelegate(delegate);
-            whiteboxTestLauncher.start(stage, settings);
+            testStatus.setDashboardDelegate(delegate);
+            testStatus.start(stage, settings);
         }
-        catch(IOException e) {
+        catch(Exception e) {
+            testStatus.stop();
+            final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot analyse code\n" + e.getMessage());
+            alert.show();
+
+            e.printStackTrace();
         }
     }
 

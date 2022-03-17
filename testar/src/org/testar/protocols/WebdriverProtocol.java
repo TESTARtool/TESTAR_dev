@@ -493,6 +493,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	try {
     		WdDriver.waitDocumentReady();
     	} catch(org.openqa.selenium.WebDriverException wde) {
+    		delegate.popupMessage("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!");
     		LogSerialiser.log("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!\n", LogSerialiser.LogLevel.Critical);
     		System.out.println("******************************************************************");
     		System.out.println("** WEBDRIVER ERROR: Selenium Chromedriver seems not to respond! **");
@@ -900,8 +901,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
 		} catch(Exception e) {
-			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
-			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
+			final String errorMessage = "WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List\nPlease review domainsAllowed List inside Webdriver Java Protocol";
+			delegate.popupMessage(errorMessage);
+			System.out.println(errorMessage);
 		}
 	}
 	
