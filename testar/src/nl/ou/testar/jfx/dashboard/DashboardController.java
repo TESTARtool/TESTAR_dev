@@ -64,6 +64,7 @@ public class DashboardController extends ViewController {
 
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
+        final WhiteboxTestLauncher testStatus = new WhiteboxTestLauncher();
 
         final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
         try {
