@@ -14,7 +14,7 @@ public class GeneralSettings {
     private final static String TEMPLATE = "\"([^\"]*)\"\\s+\"(\\d+)x(\\d+)\\+(\\d+)\\+(\\d+)\"\\s+\"([^\"]*)\"";
     private final static String FORMAT = "\"%s\" \"%dx%d+%d+%d\" \"%s\"";
 
-    public GeneralSettings(String source) {
+    public GeneralSettings(String source, DisplayMode fallbackDisplayMode) {
         this.source = source;
         Pattern pattern = Pattern.compile(TEMPLATE);
         Matcher matcher = pattern.matcher(source);
@@ -27,6 +27,11 @@ public class GeneralSettings {
             int bitDepth = Integer.parseInt(matcher.group(4));
             int refreshRate = Integer.parseInt(matcher.group(5));
             displayMode = new DisplayMode(width, height, bitDepth, refreshRate);
+        }
+        else {
+            driver = "";
+            location = "";
+            displayMode = fallbackDisplayMode;
         }
     }
 
