@@ -19,7 +19,7 @@ public abstract class FieldBinding<T> extends AbstractControlBinding<TextField, 
     abstract protected T valueFromText(String text);
 
     protected String valueToText(T value) {
-        return value.toString();
+        return value == null ? "" : value.toString();
     }
 
     @Override
