@@ -420,8 +420,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				stage.setScene(new Scene(view));
 				stage.sizeToScene();
 				stage.show();
-//				stage.setMinWidth(stage.getWidth());
-//				stage.setMinHeight(stage.getHeight());
 			}
 		});
 	}
