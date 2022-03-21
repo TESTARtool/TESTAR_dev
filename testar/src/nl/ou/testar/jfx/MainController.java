@@ -2,6 +2,7 @@ package nl.ou.testar.jfx;
 
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
@@ -25,6 +26,8 @@ public class MainController extends ViewController {
     private SettingsController settingsController;
     private MiscController miscController;
 
+    private Stage stage = null;
+
     public DashboardController getDashboardController() {
         return dashboardController;
     }
@@ -38,6 +41,7 @@ public class MainController extends ViewController {
     }
 
     private void setupMode(Parent view, Mode mode) {
+
         if (mode != this.mode) {
 //            final Label titleLabel = (Label) view.lookup("#titleLabel");
 //            final Button btnBack = (Button) view.lookup("#btnBack");
@@ -67,9 +71,17 @@ public class MainController extends ViewController {
                     AnchorPane.setTopAnchor(view, 0.0);
                     AnchorPane.setRightAnchor(view, 0.0);
                     AnchorPane.setBottomAnchor(view, 0.0);
-//                    btnBack.setVisible(navigationController.isBackAvailable());
-//                    contentPane.getChildren().removeAll();
-//                    contentPane.getChildren().add(view);
+
+                    if (stage != null) {
+                        double width = stage.getWidth();
+                        double height = stage.getHeight();
+
+                        view.setVisible(false);
+                        stage.sizeToScene();
+                        stage.setWidth(Math.max(width, stage.getWidth()));
+                        stage.setHeight(Math.max(height, stage.getHeight()));
+                        view.setVisible(true);
+                    }
                 }
             });
 
@@ -89,6 +101,7 @@ public class MainController extends ViewController {
 
         btnHome.setOnAction(event -> {
             setupMode(view, Mode.HOME);
+
         });
 
         btnSettings.setOnAction(event -> {
@@ -100,5 +113,10 @@ public class MainController extends ViewController {
 //        });
 
         setupMode(view, Mode.HOME);
+    }
+
+    @Override
+    public void viewDidAppear(Parent view) {
+        stage = (Stage) view.getScene().getWindow();
     }
 }
