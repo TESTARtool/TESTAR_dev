@@ -101,6 +101,7 @@ public class MainController extends ViewController {
 
         btnHome.setOnAction(event -> {
             setupMode(view, Mode.HOME);
+
         });
 
         btnSettings.setOnAction(event -> {
