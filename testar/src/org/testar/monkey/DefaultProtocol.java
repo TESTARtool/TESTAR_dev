@@ -168,8 +168,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Pattern suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 	
@@ -185,6 +183,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+
+	// Creating a logger with log4j library:
+	private static Logger logger = LogManager.getLogger();
 
 
 	/**
@@ -223,6 +224,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = null;
 
 		//initialize TESTAR with the given settings:
+		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 
 		try {
@@ -552,7 +554,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
+	//private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -789,7 +791,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
 				    buildEnvironmentActionIdentifiers(state, a);
-			
+
+			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
+			actions = preSelectAction(system, state, actions);
+
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
@@ -798,6 +803,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Selecting one of the available actions:
 			Action action = selectAction(state, actions);
+
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
@@ -839,7 +845,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 	    // create fragment
-	    fragment = new TaggableBase();
+		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);
 	    fragment.set(ActionSet, actions);
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
@@ -1166,7 +1172,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            Action actionToReplay;
 	            try {
 	                replayableFragment = (Taggable) ois.readObject();
-	                actionToReplay = replayableFragment.get(ExecutedAction); 
+	                actionToReplay = replayableFragment.get(ExecutedAction);
 	            } catch(IOException ioe){
 	                // Check if exception thrown because we finished replaying data
 	                if(fis.available() <= 0) {
@@ -1198,7 +1204,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	            int tries = 0;
 	            double start = Util.time();
 
-	            while(!success && (Util.time() - start < rrt)){       
+	            while(!success && (Util.time() - start < rrt)){
 	                tries++;
 	                cv.begin(); Util.clear(cv);
 	                cv.end();
@@ -1222,7 +1228,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                        Widget w;
 	                        for (Finder f : targets){
 	                            w = f.apply(state);
-	                            if (w != null){			
+	                            if (w != null){
 	                                //Can be this the widget the one that we want to find?
 	                                if(widgetStringToFind.equals(w.get(Tags.Title, "")))
 	                                    widgetTitleFound = true;
@@ -1246,9 +1252,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                // In Replay-mode, we only show the red dot if visualizationOn is true:
 	                if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, actionToReplay);
 
-	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay)
 	                ? replayableFragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) 
+	                double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay)
 	                ? replayableFragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
 
 	                try{
@@ -1263,7 +1269,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	                            LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
 	                    }
 
-	                    preSelectAction(state, actions);
+	                    preSelectAction(system, state, actions);
 
 	                    //before action execution, pass it to the state model manager
 	                    stateModelManager.notifyActionExecution(actionToReplay);
@@ -1330,7 +1336,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	        System.out.println(msg);
 	        LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+	    }else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){
 	        System.out.println(getReplayVerdict().info());
 	        LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
 
@@ -1594,9 +1600,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name
-					this.forceKillProcess = process.right();
+
+					String forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
-					return actions;
+
+					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
+					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
+					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
+					killProcessAction.set(Tags.OriginWidget, state);
+					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
 		}
@@ -1605,8 +1617,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			this.forceToForeground = true;
-			return actions;
+			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
+			Action foregroundAction = new ActivateSystem();
+			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
+			foregroundAction.set(Tags.OriginWidget, state);
+			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
 
 		//Note this list is always empty in this deriveActions.
@@ -1622,46 +1637,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actions
 	 * @return null if no preSelected actions are needed.
 	 */
-	protected Action preSelectAction(State state, Set<Action> actions){
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
 		//Assert.isTrue(actions != null && !actions.isEmpty());
-
-		// If deriveActions indicated that there are processes that need to be killed
-		// because they are in the process filters
-		// Then here we will select the action to do that killing
-
-		if (this.forceKillProcess != null){
-			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
-			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action killProcessAction = KillProcess.byName(this.forceKillProcess, 0);
-			killProcessAction.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			buildEnvironmentActionIdentifiers(state, killProcessAction);
-			this.forceKillProcess = null;
-			return killProcessAction;
-		}
-
-		// If deriveActions indicated that the SUT should be put back in the foreground
-		// Then here we will select the action to do that
-
-		else if (this.forceToForeground){
-			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action foregroundAction = new ActivateSystem();
-			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			buildEnvironmentActionIdentifiers(state, foregroundAction);
-			this.forceToForeground = false;
-			return foregroundAction;
-		}
 
 		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (actions.isEmpty()){
+		if (actions.isEmpty()){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			buildEnvironmentActionIdentifiers(state, escAction);
-			return escAction;
+			return new HashSet<>(Collections.singletonList(escAction));
 		}
 
-		return null;
+		return actions;
 	}
 
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
@@ -1754,18 +1743,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-
-		Action a = preSelectAction(state, actions);
-		if (a != null){
-			return a;
-		} else
-			return RandomActionSelector.selectAction(actions);
+		return RandomActionSelector.selectAction(actions);
 	}
 
 	protected String getRandomText(Widget w){
 		return DataManager.getRandomData();
 	}
-
 
 	/**
 	 * STOP criteria for selecting more actions for a sequence

@@ -30,6 +30,8 @@
 
 package org.testar.monkey;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.FlashFeedback;
 import org.testar.SystemProcessHandling;
 import org.testar.monkey.alayer.SUT;
@@ -49,6 +51,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
     private StateBuilder builder;
     private boolean tryToKillIfRunning = true; //set to false after 1st re-try
     private boolean flashFeedback;
+    private static final Logger logger = LogManager.getLogger();
 
     public WindowsCommandLineSutConnector(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
         this.SUTConnectorValue = SUTConnectorValue;
@@ -86,12 +89,19 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                     printSutInfo = "SUT is READY";
                     FlashFeedback.flash(printSutInfo,2000);
                 }
-                System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
+                logger.trace("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
                 if (state != null && state.childCount() > 0){
                     long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-                    System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+                    logger.trace("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
                     return sut;
+                }else if(state == null){
+                    logger.debug("state == null");
+                }else if(state.childCount()==0){
+                    logger.debug("state.childCount() == 0");
+                    logger.fatal("TESTAR failed to detect any widgets in the SUT process - maybe the SUT starts multiple processes and another one is for the GUI." +
+                            "You can try using SUT_PROCESS_NAME or SUT_WINDOW_TITLE to connect to the process that handles the GUI of the SUT. " +
+                            "For example, Windows 10 Calculator uses ApplicationFrameHost.exe for the GUI.");
                 }
             }else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
@@ -110,7 +120,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
 
         // issue starting the SUT
         if (tryToKillIfRunning){
-            System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
+            logger.error("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
             tryToKillIfRunning = false;
             killSutProcesses(sut, ENGAGE_TIME);
             return startOrConnectSut();
@@ -120,9 +130,9 @@ public class WindowsCommandLineSutConnector implements SutConnector {
 
     private void killSutProcesses(SUT sut, long pendingEngageTime) throws SystemStartException {
         // kill running SUT processes
-        System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
+        logger.trace("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
         if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
-            System.out.println("Running SUT processes killed.");
+            logger.trace("Running SUT processes killed.");
         } else // unable to kill SUT
             throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc, "No SUT Desc available") + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
     }

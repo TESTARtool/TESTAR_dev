@@ -44,6 +44,7 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -469,5 +470,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	if(actions.isEmpty()) { 
+    		actions = retryDeriveAction(system, 5, 1);
+    	}
+    	return super.preSelectAction(system, state, actions);
+    }
+
+    /**
+     * If SUT is slow rendering the GUI elements, this retry method may help to 
+     * to wait and obtain the SUT state and derive SUT actions. 
+     * User can indicate the number of retries and seconds to wait. 
+     * 
+     * @param system
+     * @param maxRetries
+     * @param waitingSeconds
+     * @return
+     */
+    protected Set<Action> retryDeriveAction(SUT system, int maxRetries, int waitingSeconds){
+    	for(int i = 0; i < maxRetries; i++) {
+    		System.out.println("DEBUG: retryDeriveAction");
+    		Util.pause(waitingSeconds);
+    		State newState = getState(system);
+    		Set<Action> newActions = deriveActions(system, newState);
+    		if(!newActions.isEmpty()) {
+    			return newActions;
+    		}
+    	}
+    	return new HashSet<>();
     }
 }

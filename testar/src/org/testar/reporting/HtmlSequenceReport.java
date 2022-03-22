@@ -156,9 +156,9 @@ public class HtmlSequenceReport implements Reporting{
     			imagePath = imagePath.replace(replaceString,"../");
     		}
     		write("<h2>State "+innerLoopCounter+"</h2>");
-    		write("<h4>concreteID="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")+"</h4>");
-    		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-    		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+    		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
+    		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
+    		write("<p><img src=\""+imagePath+"\"></p>");
     		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
     		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
     	}catch(NullPointerException | NoSuchTagException e) {
@@ -168,14 +168,11 @@ public class HtmlSequenceReport implements Reporting{
     	innerLoopCounter++;
     }
 
-
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
-//            try{if(action.get(Tags.Role)!=null) write("--Role="+action.get(Tags.Role));}catch(Exception e){}
-//            try{if(action.get(Tags.Targets)!=null) write("--Targets="+action.get(Tags.Targets));}catch(Exception e){}
             try{
             	if(action.get(Tags.Desc)!=null) {
             		String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -186,8 +183,8 @@ public class HtmlSequenceReport implements Reporting{
             }
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
-            write(" || ConcreteId="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
-            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
+            write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
+            try{if(action.get(Tags.AbstractIDCustom)!=null) write(" || AbstractIDCustom="+action.get(Tags.AbstractIDCustom));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
             write("</li>");
         }
         write("</ul>");
@@ -207,7 +204,7 @@ public class HtmlSequenceReport implements Reporting{
                 	}
                 }catch(NullPointerException | NoSuchTagException e){}
 
-                write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+                write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
                 
                 write("</li>");
@@ -225,7 +222,7 @@ public class HtmlSequenceReport implements Reporting{
             		}
             	}catch(NullPointerException | NoSuchTagException e){}
 
-            	write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+            	write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
             	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             	write("</li>");
@@ -234,7 +231,7 @@ public class HtmlSequenceReport implements Reporting{
         }else{
             write("<h4>"+concreteIdsOfUnvisitedActions.size()+" out of "+actions.size()+" actions have not been visited yet:</h4><ul>");
             for(Action action:actions){
-            	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"))){
+            	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"))){
             		//action is unvisited -> showing:
             		write("<li>");
 
@@ -245,7 +242,7 @@ public class HtmlSequenceReport implements Reporting{
             			}
             		}catch(NullPointerException | NoSuchTagException e){}
 
-            		write(" || ConcreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable")
+            		write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
             		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             		write("</li>");
@@ -268,10 +265,10 @@ public class HtmlSequenceReport implements Reporting{
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
-        		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable") + ".png";
+        		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + ".png";
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
-        write("<h4>concreteID="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+        write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
 
         try{
         	if(action.get(Tags.Desc)!=null) {
@@ -284,7 +281,7 @@ public class HtmlSequenceReport implements Reporting{
         if(actionPath.contains("./output")){
             actionPath = actionPath.replace("./output","..");
         }
-        write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+        write("<p><img src=\""+actionPath+"\"></p>");
     }
 
     public void addTestVerdict(Verdict verdict){
@@ -296,7 +293,6 @@ public class HtmlSequenceReport implements Reporting{
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
 
-    
     public void close() {
         for(String s:HTMLReporter.FOOTER){
             write(s);

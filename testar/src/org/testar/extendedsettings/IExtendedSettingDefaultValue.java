@@ -28,31 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
+package org.testar.extendedsettings;
 
-import javax.swing.*;
-
-/**
- * Abstract class for all common functionality for a SettingsPanel.
- */
-public abstract class SettingsPanel extends JPanel {
+public interface IExtendedSettingDefaultValue<T> {
     /**
-     * Populate the fields from Settings structure.
+     * Functor to create an initialized object T with default values.
+     * Should not be implemented by specializations of {@link ExtendedSettingFile}.
      *
-     * @param settings The settings to load.
+     * @return Object T initialized with default values.
      */
-    public abstract void populateFrom(final Settings settings);
-
-    /**
-     * Retrieve information from the GUI.
-     *
-     * @param settings reference to the object where the settings will be stored.
-     */
-    public abstract void extractInformation(final Settings settings);
-
-    /**
-     * Validate that the settings are valid.
-     */
-    public void checkSettings() {
-    }
+    ExtendedSettingBase<T> CreateDefault();
 }

@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.extendedsettings;
 
 import org.testar.visualvalidation.VisualValidationSettings;
 
