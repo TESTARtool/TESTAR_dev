@@ -392,20 +392,38 @@ public class StateModelPanel extends SettingsPanel {
             AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
             JettyServer jettyServer = new JettyServer();
             jettyServer.start(outputDir, analysisManager);
-            Desktop desktop = java.awt.Desktop.getDesktop();
-            URI uri = new URI("http://localhost:8090/models");
-            desktop.browse(uri);
         } catch (IOException e) {
-            label14.setText("Please check your connection credentials.");
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            label14.setText("Please check your connection credentials.");
-            e.printStackTrace();
+        	// If the exception is because the server is already running, just catch and connect
+        	if(e.getCause() != null && e.getCause().getMessage() != null && e.getCause().getMessage().contains("Address already in use")) {
+        		System.out.println(e.getCause().getMessage());
+        		// Continue and try to open the browser to the running server
+        	} else {
+        		label14.setText("Please check your connection credentials.");
+        		e.printStackTrace();
+        		// Something wrong with the database connection, return because we don't want to open the browser
+        		return;
+        	}
         } catch (Exception e) {
             // the plain Exception is coming from 3rd party code
             label14.setText("Please check your connection credentials.");
             e.printStackTrace();
+            // Something wrong with the database connection, return because we don't want to open the browser
+            return;
         }
+
+        openBrowser();
+    }
+
+    private void openBrowser() {
+    	try {
+    		Desktop desktop = java.awt.Desktop.getDesktop();
+    		URI uri = new URI("http://localhost:8090/models");
+    		desktop.browse(uri);
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	} catch (URISyntaxException e) {
+    		e.printStackTrace();
+    	}
     }
 
     private void openStateTagSelection() {
