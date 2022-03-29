@@ -31,6 +31,9 @@ async function myfunction(performanceFiles) {
 	const allDataCpu = [];
 	const allDataMem = [];
 	
+	const dataForAverageCpu = [];
+	const dataForAverageMem = [];
+	
 	//create a line chart
 	var chartCpu = anychart.line();
 	var chartMem = anychart.line();
@@ -60,12 +63,14 @@ async function myfunction(performanceFiles) {
 			// Time | 2022_01_26_20_19_35 | Dockers | 1 | CPU | 203.6 | MEM | 22.4
 			singleDataCpu.push( parseFloat( arrLines[line].split(" | ")[5] ) );
 			singleDataMem.push( parseFloat( arrLines[line].split(" | ")[7] ) );
+			dataForAverageCpu.push( parseFloat( arrLines[line].split(" | ")[5] ) );
+			dataForAverageMem.push( parseFloat( arrLines[line].split(" | ")[7] ) );
         }
         allDataCpu.push(singleDataCpu)
         allDataMem.push(singleDataMem)
         console.log(performanceFiles[i].name);
-        chartCpu.line(allDataCpu[i]).name(performanceFiles[i].name);
-        chartMem.line(allDataMem[i]).name(performanceFiles[i].name);
+        chartCpu.line(allDataCpu[i]).name(performanceFiles[i].name).stroke({thickness: 0.03});
+        chartMem.line(allDataMem[i]).name(performanceFiles[i].name).stroke({thickness: 0.03});
 		
 	}
 
@@ -76,7 +81,23 @@ async function myfunction(performanceFiles) {
 	// Enable legend colours
 	chartCpu.legend().enabled(true)
 	chartMem.legend().enabled(true)
-
+	
+	const average = (array) => array.reduce((a, b) => a + b) / array.length;
+    //create average line chart
+	var marker1 = chartCpu.lineMarker(0);
+	marker1.value(average(dataForAverageCpu));
+	marker1.layout("horizontal");
+	marker1.stroke("#D00");
+	marker1.axis(chartCpu.yAxis());
+	console.log(average(dataForAverageCpu));
+	
+	var marker2 = chartMem.lineMarker(1);
+	marker2.value(average(dataForAverageMem));
+	marker2.layout("horizontal");
+	marker2.stroke("#D00");
+	marker2.axis(chartMem.yAxis());
+	console.log(average(dataForAverageMem));
+	
 	//draw the chart on the page
 	chartCpu.draw();
 	chartMem.draw();
