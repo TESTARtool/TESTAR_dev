@@ -154,4 +154,27 @@ public final class ConfigTags {
   public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   */
+
+  // Tags for DockerizedSUTWebdriverProtocol
+
+  public static final Tag<String> DockerComposeDirectory = Tag.from("DockerComposeDirectory", String.class);
+  public static final Tag<Boolean> ResetSUTAfterSequence = Tag.from("ResetSUTAfterSequence", Boolean.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> VolumesToResetAfterSequence = Tag.from("VolumesToResetAfterSequence", (Class<List<String>>) (Class<?>) List.class);
+
+  // Tags for CodeAnalysisWebDriverProtocol
+
+  public static final Tag<String> ApplicationBaseURL = Tag.from("ApplicationBaseURL", String.class);
+  public static final Tag<String> CoverageContext = Tag.from("CoverageContext", String.class);
+  public static final Tag<String> LogContextPrefix = Tag.from("LogContextPrefix", String.class);
+  public static final Tag<Boolean> SetLogContext = Tag.from("SetLogContext", Boolean.class);
+  public static final Tag<Boolean> SetCoverageContext = Tag.from("SetCoverageContext", Boolean.class);
+  public static final Tag<Boolean> ProcessDataAfterAction = Tag.from("ProcessDataAfterAction", Boolean.class);
+  public static final Tag<String> ActionGetDataEndpoint = Tag.from("ActionGetDataEndpoint", String.class);
+
+  // Tags for CKAN protocol
+
+  public static final Tag<String> ApplicationUsername = Tag.from("ApplicationUsername", String.class);
+  public static final Tag<String> ApplicationPassword = Tag.from("ApplicationPassword", String.class);
+
 }

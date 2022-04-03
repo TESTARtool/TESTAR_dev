@@ -21,6 +21,7 @@ subprojects {
         mavenCentral()
     }
     dependencies {
+        implementation 'org.json:json:20211205'
         testImplementation group:'junit', name:'junit', version:'4.12'
     }
 
