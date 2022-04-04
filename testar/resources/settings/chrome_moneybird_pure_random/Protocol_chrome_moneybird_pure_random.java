@@ -69,7 +69,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_chrome_moneybird extends WebdriverProtocol {
+public class Protocol_chrome_moneybird_pure_random extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "_2ZNy4w8Nfa58d1", "_1hc34_9rc6xcjf", "_3e31E0yvd2UNDE");
@@ -126,18 +126,9 @@ public class Protocol_chrome_moneybird extends WebdriverProtocol {
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
 
-    settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "BorjaModelManager");
-
-    // Extended settings framework, set ConfigTags settings with XML framework values
-    // test.setting -> ExtendedSettingsFile
-    ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
-    settings = rlXmlSetting.updateXMLSettings(settings);
 
     String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
     connectedURL = parts[parts.length - 1].replace("\"", "");
-
-    policy = PolicyFactory.getPolicy(settings);
-    actionSelector = new ReinforcementLearningActionSelector(policy);
 
     try {
       JSONObject json = readJsonFromUrl(connectedURL + "/app/clear_coverage");

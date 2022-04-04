@@ -104,7 +104,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = chrome_moneybird_pure_random/Protocol_chrome_moneybird
+ProtocolClass = chrome_moneybird_pure_random/Protocol_chrome_moneybird_pure_random
 
 #################################################################
 # State identifier attributes
