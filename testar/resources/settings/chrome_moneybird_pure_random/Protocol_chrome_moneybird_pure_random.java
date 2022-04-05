@@ -1,4 +1,4 @@
-package chrome_moneybird_pure_random; /**
+/**
  * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
  * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
  *
