@@ -42,7 +42,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
     final private Tag<String> defaultTag;
     private final boolean _loggingEnabled;
     /**
-     * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because the don't contain
+     * A blacklist for {@link Widget}'s which should be ignored based on their {@code Role} because they don't contain
      * readable text. Optional when the value (which represents the ancestor path) is set, the {@link Widget} should
      * only be ignored when the ancestor path is equal with the {@link Widget} under investigation.
      */

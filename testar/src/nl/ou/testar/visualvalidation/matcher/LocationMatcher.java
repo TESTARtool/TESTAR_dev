@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class LocationMatcher implements VisualMatcher {
+public class LocationMatcher implements VisualMatcherInterface {
     static final String TAG = "Matcher";
     private final MatcherConfiguration config;
 

@@ -7,7 +7,7 @@ import nl.ou.testar.visualvalidation.extractor.ExtractorFactory;
 import nl.ou.testar.visualvalidation.extractor.TextExtractorInterface;
 import nl.ou.testar.visualvalidation.matcher.ContentMatchResult;
 import nl.ou.testar.visualvalidation.matcher.MatcherResult;
-import nl.ou.testar.visualvalidation.matcher.VisualMatcher;
+import nl.ou.testar.visualvalidation.matcher.VisualMatcherInterface;
 import nl.ou.testar.visualvalidation.matcher.VisualMatcherFactory;
 import nl.ou.testar.visualvalidation.ocr.OcrConfiguration;
 import nl.ou.testar.visualvalidation.ocr.OcrEngineFactory;
@@ -37,7 +37,7 @@ import static nl.ou.testar.visualvalidation.VisualValidationVerdict.*;
 public class VisualValidator implements VisualValidationManager, OcrResultCallback, ExpectedTextCallback {
     static final Color darkOrange = new Color(255, 128, 0);
     private final String TAG = "VisualValidator";
-    private final VisualMatcher _matcher;
+    private final VisualMatcherInterface _matcher;
     private final OcrEngineInterface _ocrEngine;
     private final Object _ocrResultSync = new Object();
     private final AtomicBoolean _ocrResultReceived = new AtomicBoolean();

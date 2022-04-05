@@ -5,7 +5,7 @@ import nl.ou.testar.visualvalidation.ocr.RecognizedElement;
 
 import java.util.List;
 
-public interface VisualMatcher {
+public interface VisualMatcherInterface {
     MatcherResult Match(List<RecognizedElement> ocrResult, List<ExpectedElement> expectedText);
     
     void destroy();
