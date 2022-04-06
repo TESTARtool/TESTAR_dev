@@ -31,12 +31,16 @@
 
 import java.util.Set;
 
-import nl.ou.testar.DerivedActions;
-import nl.ou.testar.SutVisualization;
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.Settings;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -77,7 +81,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		return super.startSystem();
 	}
 
@@ -104,7 +108,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		return super.getState(system);
 	}
 
@@ -139,7 +143,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.

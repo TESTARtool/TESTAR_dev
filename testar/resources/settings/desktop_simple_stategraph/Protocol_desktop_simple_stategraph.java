@@ -30,15 +30,11 @@
 
 
 import java.util.Set;
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 
@@ -100,7 +96,7 @@ public class Protocol_desktop_simple_stategraph extends DesktopProtocol {
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
-			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
@@ -108,7 +104,7 @@ public class Protocol_desktop_simple_stategraph extends DesktopProtocol {
 		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
+		Action retAction = super.selectAction(state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:

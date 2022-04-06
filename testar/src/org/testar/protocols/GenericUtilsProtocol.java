@@ -31,20 +31,20 @@
 
 package org.testar.protocols;
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.OperatingSystems;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import nl.ou.testar.DerivedActions;
-import org.fruit.Drag;
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.monkey.ConfigTags;
+import org.testar.DerivedActions;
+import org.testar.monkey.Drag;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -84,7 +84,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param state
      * @param system needed for updating the state between retries
@@ -149,7 +149,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it, the given text is typed into it, and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param textToType types the given text by replacing the existing text
      * @param state
@@ -215,7 +215,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * If a matching widget is found, left mouse button is clicked on it, the given text is pasted into it, and return value is true.
      * Else returns false
      *
-     * @param tag for example: org.fruit.alayer.Tags.Title
+     * @param tag for example: org.testar.alayer.Tags.Title
      * @param value
      * @param textToPaste paste the given text by replacing the existing text
      * @param state
@@ -470,5 +470,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	if(actions.isEmpty()) { 
+    		actions = retryDeriveAction(system, 5, 1);
+    	}
+    	return super.preSelectAction(system, state, actions);
+    }
+
+    /**
+     * If SUT is slow rendering the GUI elements, this retry method may help to 
+     * to wait and obtain the SUT state and derive SUT actions. 
+     * User can indicate the number of retries and seconds to wait. 
+     * 
+     * @param system
+     * @param maxRetries
+     * @param waitingSeconds
+     * @return
+     */
+    protected Set<Action> retryDeriveAction(SUT system, int maxRetries, int waitingSeconds){
+    	for(int i = 0; i < maxRetries; i++) {
+    		System.out.println("DEBUG: retryDeriveAction");
+    		Util.pause(waitingSeconds);
+    		State newState = getState(system);
+    		Set<Action> newActions = deriveActions(system, newState);
+    		if(!newActions.isEmpty()) {
+    			return newActions;
+    		}
+    	}
+    	return new HashSet<>();
     }
 }

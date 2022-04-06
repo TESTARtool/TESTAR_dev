@@ -31,11 +31,12 @@
 
 package org.testar.protocols;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,32 +51,32 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
-import org.fruit.Environment;
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.WdDriver;
-import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.alayer.windows.WinProcess;
-import org.fruit.alayer.windows.Windows;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.testar.Logger;
+import org.testar.monkey.Environment;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinProcess;
+import org.testar.monkey.alayer.windows.Windows;
+import org.testar.plugin.NativeLinker;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.Reporting;
+import org.testar.serialisation.LogSerialiser;
+import org.testar.reporting.Reporting;
+import org.testar.Logger;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     private static final String TAG = "WebdriverProtocol";
@@ -168,33 +169,43 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected SUT startSystem() throws SystemStartException {
     	// Add the domain from the SUTConnectorValue to domainsAllowed List
     	ensureDomainsAllowed();
-    	
+
     	SUT sut = super.startSystem();
 
-    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
-    	// webdriver in the constructor of WdDriver.
-    	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows 10")
-    			&& sut.get(Tags.HWND, null) == null) {
-    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
-    		// window handle. The running browser needs to be in the foreground when we reach this part.
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		// Safe to set breakpoints again.
-    		if (WinProcess.procName(pid).contains("chrome")) {
-    			sut.set(Tags.HWND, hwnd);
-    			sut.set(Tags.PID, pid);
-    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
-    		}
-    	}
+    	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
+    	setWindowHandleForWebdriverBrowser(sut);
 
-		double displayScale = getDisplayScale(sut);
+    	double displayScale = getDisplayScale(sut);
 
-		// See remarks in WdMouse
-        mouse = sut.get(Tags.StandardMouse);
-        mouse.setCursorDisplayScale(displayScale);
+    	// See remarks in WdMouse
+    	mouse = sut.get(Tags.StandardMouse);
+    	mouse.setCursorDisplayScale(displayScale);
 
     	return sut;
+    }
+
+    /**
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
+     * webdriver in the constructor of WdDriver. 
+     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     */
+    private void setWindowHandleForWebdriverBrowser(SUT sut) {
+    	try {
+    		if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
+    			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    			// window handle. The running browser needs to be in the foreground when we reach this part.
+    			long hwnd = Windows.GetForegroundWindow();
+    			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    			// Safe to set breakpoints again.
+    			if (WinProcess.procName(pid).contains("chrome")) {
+    				sut.set(Tags.HWND, hwnd);
+    				sut.set(Tags.PID, pid);
+    				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    			}
+    		}
+    	} catch (ExceptionInInitializerError | NoClassDefFoundError e) {
+    		System.out.println("INFO: We can not obtain the Windows 10 windows handle of WebDriver browser instance");
+    	}
     }
 
 	/**
@@ -204,6 +215,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * @return The display scale.
 	 */
 	private double getDisplayScale(SUT sut) {
+		// Call specific OS API to obtain the display scale value of the system
+		// Ex: windows - org.testar.monkey.alayer.windows.Windows10 calls MonitorFromWindow native function
+		// If something fails these specific getDisplayScale OS implementations must return a default value
 		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
 		// If the user has specified a scale override the display scale obtained from the system.
@@ -316,12 +330,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @param actions
      * @return
      */
-    @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
+	@Override
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+		actions = super.preSelectAction(system, state, actions);
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
+		return actions;
+	}
 
     /**
      * Execute the selected action.
@@ -369,9 +384,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         String sequencesPath = getGeneratedSequenceName();
         try {
             sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
 
-        statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
+		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
 
     	//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
     	Logger.log(Level.INFO, TAG, OutputStructure.executedSUTname
@@ -408,8 +425,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
                     write.close();
                 }
 
-            } catch (Exception e) {System.out.println(e.getMessage());}
-        }
+            } catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
         super.stopSystem(system);
     }
@@ -631,6 +650,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
+		//TODO try-catch for nullpointer if sut connector missing
 		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
 		String url = parts[parts.length - 1].replace("\"", "");
 
@@ -641,7 +661,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
-		} catch(Exception e) {
+		} catch(Exception e) { //TODO check what kind of exception can happen
 			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
 			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
