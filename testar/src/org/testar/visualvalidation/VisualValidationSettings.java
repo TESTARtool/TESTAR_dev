@@ -49,7 +49,7 @@ public class VisualValidationSettings extends ExtendedSettingBase<VisualValidati
 
     public static VisualValidationSettings CreateDefault() {
         VisualValidationSettings defaultInstance = new VisualValidationSettings();
-        defaultInstance.enabled = true;
+        defaultInstance.enabled = false;
         defaultInstance.ocrConfiguration = OcrConfiguration.CreateDefault();
         defaultInstance.matcherConfiguration = MatcherConfiguration.CreateDefault();
         return defaultInstance;
