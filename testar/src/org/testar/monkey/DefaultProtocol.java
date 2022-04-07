@@ -332,7 +332,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     					+ "<br>Surely exists a residual process \"chromedriver.exe\" running."
     					+ "<br>You can use Task Manager to finish it.";
 
-    			popupMessage(msg);
+				chromeDriverMissing(msg);
     			System.out.println(msg);
     			System.out.println(e.getMessage());
     		}else {
