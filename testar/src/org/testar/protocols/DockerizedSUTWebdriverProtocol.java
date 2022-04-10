@@ -34,6 +34,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.IOException;
+
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+
 import java.util.List;
 
 import org.testar.monkey.alayer.Action;
@@ -59,7 +66,7 @@ import org.testar.monkey.Settings;
 
 public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 
-	protected String dockerComposeDirectory;
+	protected String dockerComposeDirectory,applicationBaseURL;
 	protected boolean resetSUTAfterSequence = false;
 	protected List<String> volumesToResetAfterSequence;
 
@@ -71,15 +78,15 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		super.initialize(settings);
-
 		this.dockerComposeDirectory = settings.get(ConfigTags.DockerComposeDirectory);
 		this.resetSUTAfterSequence = settings.get(ConfigTags.ResetSUTAfterSequence);
 		this.volumesToResetAfterSequence = settings.get(ConfigTags.VolumesToResetAfterSequence);
+		this.applicationBaseURL = settings.get(ConfigTags.ApplicationBaseURL);
 
 		initializeSUTDockerImages();
 	    fullResetDockerSUT();
 
+		super.initialize(settings);
 	}
 
 	/** Pull latest version of SUT Docker images */
@@ -103,13 +110,18 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 
 	@Override
 	protected SUT startSystem() throws SystemStartException {
+		System.out.println("DS protocol starting SUT");
 		startDockerSUT();
+		System.out.println("DS protocol starting call super");
 		return super.startSystem();
 	}
 
 	protected void startDockerSUT() {
 		String[] command = {"docker-compose", "up", "--force-recreate", "--build", "-d"};
 		runDockerCommand(command);
+		if (! waitForURL(this.applicationBaseURL, 300, 5, 200) ) {
+			System.out.println("Error: did not succeed in bringing up SUT.");
+		}
 	}
 
 	protected void stopDockerSUT() {
@@ -159,5 +171,59 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 					+ " " + ie.toString());
 		}
 	}
+
+/**
+     * Waits for requests to a particular URL to return a particular status code, with multiple retries.
+     *
+     * @param urlString URL to send requests to
+     * @param maxWaitTime Approximate maximum time to wait, in seconds
+     * @param retryTime Approximate time between retries, in seconds
+     * @param expectedStatusCode return
+     * @return boolean value that shows whether the requests
+     * @throws MalformedURLException
+     * @throws IOException
+     * @throws ProtocolException
+     */
+    public static boolean waitForURL(String urlString, int maxWaitTime, int retryTime, int expectedStatusCode) {
+        long beginTime = System.currentTimeMillis() / 1000L;
+        long currentTime = beginTime;
+        while ( ( currentTime = System.currentTimeMillis() / 1000L ) < ( beginTime + maxWaitTime) ) {
+        try {
+                URL url = new URL(urlString);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setConnectTimeout(retryTime*1000);
+                con.setReadTimeout(retryTime*1000);
+                int status = con.getResponseCode();
+                System.out.println("Status is " + status);
+            if ( status == expectedStatusCode ) {
+                System.out.println("Waiting for " + urlString + " finished.");
+                return true;
+            }
+            else
+            {  System.out.println("Info: unexpected status code " + Integer.toString(status) +
+                    " while waiting for " + urlString);
+            }
+        }
+        catch ( SocketTimeoutException ste) {
+            System.out.println("info: waiting for " + urlString + " ...");
+            continue;
+        }
+        catch ( Exception e) {
+            System.out.println("info: generic exception while waiting for " + urlString +
+                    ": " + e.toString() );
+            System.out.println(Long.toString(currentTime));
+        }
+        System.out.println("info: sleeping between retries for " + urlString + " ...");
+        try {
+         Thread.sleep(retryTime*1000);
+        }
+        catch (InterruptedException ie) {
+         System.out.println("Sleep between retries for " + urlString + " was interrupted.");
+        }
+        }
+        System.out.println("info: max wait time expired while waiting for " + urlString + " ...");
+        return false;
+    }
 
 }

@@ -78,7 +78,7 @@ import org.testar.monkey.Settings;
 
 public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtocol {
 
-	protected String coverageContext,logContextPrefix,applicationBaseURL,actionGetDataEndpoint;
+	protected String coverageContext,logContextPrefix,actionGetDataEndpoint;
     protected boolean setCoverageContext=false,setLogContext=false,processDataAfterAction=false;
     protected int sequenceNumber = -1, actionNumber = -1;
 
@@ -97,7 +97,6 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 
 		this.coverageContext = settings.get(ConfigTags.CoverageContext);
         this.logContextPrefix = settings.get(ConfigTags.LogContextPrefix);
-        this.applicationBaseURL = settings.get(ConfigTags.ApplicationBaseURL);
         this.setLogContext = settings.get(ConfigTags.SetLogContext);
         this.setCoverageContext = settings.get(ConfigTags.SetCoverageContext);
         this.processDataAfterAction = settings.get(ConfigTags.ProcessDataAfterAction);

@@ -525,13 +525,13 @@ public class Main {
 			defaults.add(Pair.from(SetLogContext, false));
 			defaults.add(Pair.from(ProcessDataAfterAction, false));
 			defaults.add(Pair.from(ActionGetDataEndpoint, ""));
-			defaults.add(Pair.from(ApplicationBaseURL, "http://localhost:8080"));
 			// End defaults CodeAnalysisWebdriverProtocol
 
 			// Defaults for DockerizedSUTWebdriverProtocol
 			defaults.add(Pair.from(DockerComposeDirectory, "/docker"));
 			defaults.add(Pair.from(ResetSUTAfterSequence, true));
 			defaults.add(Pair.from(VolumesToResetAfterSequence, new ArrayList<String>()));
+			defaults.add(Pair.from(ApplicationBaseURL, "http://localhost:8080"));
 			// End defaults DockerizedSUTWebdriverProtocol
 
 			// Defaults for CKAN / Indico Webdriver protocols
