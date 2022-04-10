@@ -518,6 +518,27 @@ public class Main {
 			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
 			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
 
+                        // Defaults for CodeAnalysisWebdriverProtocol
+			defaults.add(Pair.from(CoverageContext, "default"));
+			defaults.add(Pair.from(LogContextPrefix, "default"));
+			defaults.add(Pair.from(SetCoverageContext, false));
+			defaults.add(Pair.from(SetLogContext, false));
+			defaults.add(Pair.from(ProcessDataAfterAction, false));
+			defaults.add(Pair.from(ActionGetDataEndpoint, ""));
+			defaults.add(Pair.from(ApplicationBaseURL, "http://localhost:8080"));
+			// End defaults CodeAnalysisWebdriverProtocol
+
+			// Defaults for DockerizedSUTWebdriverProtocol
+			defaults.add(Pair.from(DockerComposeDirectory, "/docker"));
+			defaults.add(Pair.from(ResetSUTAfterSequence, true));
+			defaults.add(Pair.from(VolumesToResetAfterSequence, new ArrayList<String>()));
+			// End defaults DockerizedSUTWebdriverProtocol
+
+			// Defaults for CKAN / Indico Webdriver protocols
+			defaults.add(Pair.from(ApplicationUsername, "user"));
+			defaults.add(Pair.from(ApplicationPassword, "password"));
+			// End defaults for CKAN / Indico Webdriver protocols
+
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
 					add("WidgetControlType");
