@@ -76,7 +76,7 @@ import org.testar.monkey.Settings;
  *   returns JSON data.
 */
 
-public class CodeAnalysisWebdriverProtocol extends GenericWebdriverProtocol {
+public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtocol {
 
 	protected String coverageContext,logContextPrefix,applicationBaseURL,actionGetDataEndpoint;
     protected boolean setCoverageContext=false,setLogContext=false,processDataAfterAction=false;
