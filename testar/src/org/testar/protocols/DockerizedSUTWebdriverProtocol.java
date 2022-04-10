@@ -124,6 +124,12 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 		}
 	}
 
+	/* Method for logging in to the SUT (override in subclass to add SUT-specific logic, leave
+	 * empty if logging in is not needed).
+	 */
+	protected void loginSUT() {
+	}
+
 	protected void stopDockerSUT() {
 		String[] command = {"docker-compose", "down"};
 		runDockerCommand(command);
