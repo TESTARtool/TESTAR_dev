@@ -399,22 +399,28 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         for (Widget widget : state) {
             Vector<String> tagsFound = new Vector<String>();
 
+            HashMap<String, String> webTagValues = new HashMap<>();
+            webTagValues.putAll(tagValues);
+
             for (String tagName : tagValues.keySet()) {
 
-                if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) &&
-                    ! tagName.startsWith("Web") ) {
-                        tagName = "Web" + tagName;
-                }
+            	if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) &&
+            			! tagName.startsWith("Web") ) {
+            		String value = tagValues.get(tagName);
+            		webTagValues.remove(tagName);
+            		tagName = "Web" + tagName;
+            		webTagValues.put(tagName, value);
+            	}
 
                 Tag tag = tagLookup.get(tagName);
-                String value = tagValues.get(tagName);
+                String value = webTagValues.get(tagName);
                 if (    widget.get(tag, null) != null &&
                         widget.get(tag, null).toString().equals(value) )  {
                     tagsFound.add(tagName);
                 }
             }
 
-            if ( tagsFound.size() == tagValues.keySet().size() ) {
+            if ( tagsFound.size() == webTagValues.keySet().size() ) {
                 return widget;
             }
         }
