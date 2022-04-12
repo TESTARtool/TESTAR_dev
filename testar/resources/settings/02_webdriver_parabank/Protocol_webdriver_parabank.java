@@ -97,26 +97,38 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected void beginSequence(SUT system, State state) {
-      super.beginSequence(system, state);
+	  super.beginSequence(system, state);
 
-    // Add your login sequence here
+	  // Add your login sequence here
+	  /*
+	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
-/*
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
+	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
-    waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
+	  waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+	  */
 
-    waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-*/
-	  
-	/*
-	 * If you have issues typing special characters
-	 * 
-	 * Try to use Paste Action with method:
-	 * waitLeftClickAndPasteIntoWidgetWithMatchingTag
-	 */
+	  /*
+	   * If you have issues typing special characters
+	   * 
+	   * Try to use Paste Action with method:
+	   * waitLeftClickAndPasteIntoWidgetWithMatchingTag
+	   */
+	  //waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
 
-	// waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
+
+	  /*
+	   * You can also use multiple Tags to find the correct widget. 
+	   * This is because some widgets have common Tags Values.  
+	   */
+	  /*
+	  Map<String, String> mapParabank = new HashMap<String, String>();
+	  mapParabank.put("Href", "about.htm");
+	  mapParabank.put("TextContent", "About Us");
+	  mapParabank.put("Display", "inline");
+
+	  waitAndLeftClickWidgetWithMatchingTags(mapParabank, state, system, 5, 1.0);
+	  */
   }
 
   /**
