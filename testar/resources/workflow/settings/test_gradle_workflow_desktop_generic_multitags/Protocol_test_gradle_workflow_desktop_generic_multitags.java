@@ -60,10 +60,11 @@ public class Protocol_test_gradle_workflow_desktop_generic_multitags extends Des
 	@Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
-		Map<String, String> mapParabank = new HashMap<String, String>();
-		mapParabank.put("Role", "UIAMenuItem");
-		mapParabank.put("Title", "Format");
+		Map<String, String> mapNotepad= new HashMap<String, String>();
+		mapNotepad.put("Role", "UIAMenuItem");
+		mapNotepad.put("Title", "Format");
 
+		// Verify that Font widget is not in the GUI before clicking matching tag
 		boolean formatWidgetFound = false;
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").contains("Font")) {
@@ -72,8 +73,12 @@ public class Protocol_test_gradle_workflow_desktop_generic_multitags extends Des
 		}
 		Assert.isTrue(!formatWidgetFound);
 
-		waitAndLeftClickWidgetWithMatchingTags(mapParabank, state, system, 5, 1.0);
+		waitAndLeftClickWidgetWithMatchingTags(mapNotepad, state, system, 5, 1.0);
 
+		// Update the state to obtain the new widgets
+		state = getState(system);
+
+		// Verify that now Font widget is in the GUI because matching tag feature works
 		for(Widget w : state) {
 			if(w.get(Tags.Title, "").contains("Font")) {
 				formatWidgetFound = true;
