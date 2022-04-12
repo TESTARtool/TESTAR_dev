@@ -29,14 +29,13 @@
  *******************************************************************************************************/
 
 
-import java.util.HashSet;
 import java.util.Set;
 
-import nl.ou.testar.ActionSelectionUtils;
-import nl.ou.testar.PrioritizeNewActionsSelector;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.Settings;
+import org.testar.PrioritizeNewActionsSelector;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -60,7 +59,7 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.

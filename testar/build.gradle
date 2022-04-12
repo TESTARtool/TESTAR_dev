@@ -71,10 +71,9 @@ task customZipDistribution(type: Zip) {
 
 dependencies {
     implementation project(':core')
-    implementation project(':native')
-    implementation project(':graphdb')
     implementation project(':webdriver')
     implementation project(':windows')
+    implementation project(':linux')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/sikulixapi.jar')
     implementation files('./lib/eye2.jar')
@@ -195,7 +194,7 @@ task buildWindows(type: Exec) {
 }
 buildWindows.dependsOn classes
 
-mainClassName='org.fruit.monkey.Main'
+mainClassName='org.testar.monkey.Main'
 
 
 /**
@@ -217,6 +216,26 @@ task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
     description ='runTestDesktopGenericCommandLineOk'
     workingDir 'target/install/testar/bin'
     commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Default COMMAND_LINE execution to run Notepad and check that waitAndLeftClickWidgetWithMatchingTags feature works
+task runTestDesktopGenericMultiTags(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericMultiTags'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_multitags AlwaysCompile=true ApplicationName="notepad_multitags" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=1'
     doLast {
         String output = standardOutput.toString()
 
@@ -432,42 +451,9 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
     }
 }
 
-// Download last win32 chromedriver 
-task downloadChromedriver(type: Download, dependsOn: installDist) {
-    group = 'test_testar_workflow'
-    description ='downloadChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
-    Process process = builder.start();
-    process.waitFor()
-    
-    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
-    dest 'target/install/testar/bin'
-    overwrite false
-}
-
-// Extract Chromedriver from downloaded file
-task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
-    group = 'test_testar_workflow'
-    description ='downloadAndUnzipChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
-    into downloadChromedriver.dest
-}
-
 // Verify that TESTAR correctly executes chromedriver
 // To be sure, connect to ou.nl and detect Onderwijs suspicious title
-task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverSuspiciousTitle(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -487,7 +473,7 @@ task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChro
 }
 
 // Connect to para.testar.org and make a login
-task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverParabankLogin(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
@@ -507,13 +493,13 @@ task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChrome
 }
 
 // Verify that TESTAR correctly replays a sequence
-task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverCorrectReplay(type: Exec) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestWebdriverCorrectReplay'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
     doLast {
         String output = standardOutput.toString()
 
@@ -527,18 +513,18 @@ task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChrome
 }
 
 // Verify that TESTAR correctly detects a not replayable sequence
-task runTestWebdriverUnreplayable(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
+task runTestWebdriverUnreplayable(type: Exec) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestWebdriverUnreplayable'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
     doLast {
         String output = standardOutput.toString()
 
         // Check that TESTAR detects not replayable button
-        if(output.readLines().any{line->line.contains("Left Click at 'ParisThree' of the replayed sequence can not been replayed")}) {
+        if(output.readLines().any{line->line.contains("Left Click at 'ParisTwo' of the replayed sequence can not been replayed")}) {
             println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
         } else {
             throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")

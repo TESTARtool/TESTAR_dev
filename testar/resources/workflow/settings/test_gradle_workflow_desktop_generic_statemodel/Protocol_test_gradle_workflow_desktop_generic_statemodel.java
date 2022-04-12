@@ -33,11 +33,13 @@ import java.io.File;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.OutputStructure;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -48,7 +50,7 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_test_gradle_workflow_desktop_generic_statemodel extends DesktopProtocol {
 
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.

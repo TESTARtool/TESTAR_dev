@@ -28,15 +28,15 @@
  *
  */
 
-import es.upv.staq.testar.NativeLinker;
-import org.fruit.Pair;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.webdriver.*;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
 import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.SimilarityDetection;
 import org.testar.action.priorization.WeightedAction;
@@ -44,10 +44,10 @@ import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 /**
  * Sample protocol that tries to detect similar Actions between previous and current State,
