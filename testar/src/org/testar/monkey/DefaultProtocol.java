@@ -245,7 +245,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					try {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
-					}catch (Exception e) {
+					} catch (IOException e) {
 						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
@@ -396,9 +396,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		} catch (ClassNotFoundException | IOException e) {
 			popupMessage("ERROR: File is not readable, please select a correct TESTAR sequence file");
-
 			System.out.println("ERROR: File is not readable, please select a correct file (output/sequences)");
-		    e.printStackTrace();
+			e.printStackTrace();
 
 		    return false;
 		}

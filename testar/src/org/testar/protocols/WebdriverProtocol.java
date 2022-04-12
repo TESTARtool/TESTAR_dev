@@ -34,7 +34,9 @@ package org.testar.protocols;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,6 +53,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.testar.monkey.Environment;
+import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -265,6 +268,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(wde.getMessage());
     		system.set(Tags.IsRunning, false);
     	}
+
+    	updateCssClassesFromTestSettingsFile();
 
     	State state = super.getState(system);
 
@@ -676,5 +681,42 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	/**
+	 * Read the ClickableClasses property from test.settings file 
+	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 */
+	private void updateCssClassesFromTestSettingsFile() {
+		// Feature only for Spy mode
+		if(settings.get(ConfigTags.Mode) != Modes.Spy) {
+			return;
+		}
+
+		try {
+			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
+				for(String line; (line = br.readLine()) != null; ) {
+					if(line.contains(ConfigTags.ClickableClasses.name())){
+						List<String> fileClickableClasses =  Arrays.asList(line.split("=")[1].trim().split(";"));
+						// Check if user added new Css Classes from test settings file to update the clickableClasses
+						for(String webClass : fileClickableClasses) {
+							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
+								System.out.println("Adding new clickable class from settings file: " + webClass);
+								clickableClasses.add(webClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+						// Check if user removed Css Classes from test settings file to update the clickableClasses
+						for(String clickClass : clickableClasses) {
+							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
+								System.out.println("Removing the clickable class: " + clickClass);
+								clickableClasses.remove(clickClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {}
 	}
 }
