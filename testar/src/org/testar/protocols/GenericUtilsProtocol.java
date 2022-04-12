@@ -73,7 +73,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitAndLeftClickWidgetWithMatchingTag(tag,value,state,system,maxNumberOfRetries,waitBetween);
             }
@@ -166,7 +166,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitLeftClickAndTypeIntoWidgetWithMatchingTag(tag,value,textToType,state,system,maxNumberOfRetries,waitBetween);
             }
@@ -262,7 +262,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitLeftClickAndPasteIntoWidgetWithMatchingTag(tag,value,textToPaste,state,system,maxNumberOfRetries,waitBetween);
             }
@@ -353,7 +353,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return getWidgetWithMatchingTag(tag, value, state);
             }
@@ -381,7 +381,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             boolean tagFound = false;
 
-            for ( Tag tag : state.tags() ) {
+            for ( Tag tag : state.child(0).tags() ) {
                 if ( tag.name().equalsIgnoreCase(tagName) ) {
                     tagLookup.put(tagName,tag);
                     tagFound = true;

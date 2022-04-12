@@ -228,6 +228,26 @@ task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
     }
 }
 
+// Default COMMAND_LINE execution to run Notepad and check that waitAndLeftClickWidgetWithMatchingTags feature works
+task runTestDesktopGenericMultiTags(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopGenericMultiTags'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_multitags AlwaysCompile=true ApplicationName="notepad_multitags" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=1'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
 // Default COMMAND_LINE execution to run Notepad
 // Test TagsForSuspiciousOracle feature using the UIATags.UIAAutomationId
 // Force TESTAR to find a Suspicious Title (MenuBar widget)
