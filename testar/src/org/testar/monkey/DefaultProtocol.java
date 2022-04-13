@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -115,8 +115,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File currentSeq;
 
 	protected Mouse mouse = AWTMouse.build();
-	protected State lastState = null;
-	protected int nonReactingActionNumber;
 
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
@@ -145,7 +143,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return sequenceCount;
 	}
 
-	protected int firstSequenceActionNumber;
 	protected int lastSequenceActionNumber;
 	double startTime;
 
@@ -160,7 +157,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static Action lastExecutedAction = null;
 
-	protected long lastStamp = -1;
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
@@ -168,8 +164,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Pattern suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	protected int testFailTimes = 0;
-	protected boolean nonSuitableAction = false;
 	
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
@@ -178,11 +172,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
-
-	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-			BluePen = Pen.newPen().setColor(Color.Blue).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
@@ -249,10 +238,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
-				}
-				/*else if(isValidFile())
-					new SequenceViewer(settings);*/
-				else {
+				} else {
 					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
@@ -370,7 +356,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 
-
 		} catch (NativeHookException e) {
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
@@ -464,7 +449,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void initGenerateMode() {
 		//TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
 		sequenceCount = 1;
-		lastStamp = System.currentTimeMillis();
 		escAttempts = 0;
 	}
 
@@ -556,22 +540,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	//private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
-	private long tStart;
-
 	/**
 	 * This method is initializing TESTAR for the start of test sequence
 	 *
 	 * @param system
 	 */
 	private void startTestSequence(SUT system) {
-		//for measuring the time of one sequence:
-		tStart = System.currentTimeMillis();
-
 		actionCount = 1;
-		this.testFailTimes = 0;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-		firstSequenceActionNumber = actionCount;
 		passSeverity = Verdict.SEVERITY_OK;
 		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
@@ -744,7 +720,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// the user initiated the shutdown
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
-
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
@@ -1396,7 +1371,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		nonReactingActionNumber = 0;
+
 	}
 
 	@Override
@@ -1529,11 +1504,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
-		if (this.nonSuitableAction){
-			this.nonSuitableAction = false;
-			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
-		}
-
 		// if everything was OK ...
 		return Verdict.OK;
 	}
@@ -1570,6 +1540,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			if (m.matches()){
 				Visualizer visualizer = Util.NullVisualizer;
+				Pen RedPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
 					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
