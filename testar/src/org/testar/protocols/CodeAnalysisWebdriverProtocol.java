@@ -30,6 +30,7 @@
 
 package org.testar.protocols;
 
+import java.io.ObjectInputFilter.Config;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -80,6 +81,8 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 
 	protected String coverageContext,logContextPrefix,actionGetDataEndpoint;
     protected boolean setCoverageContext=false,setLogContext=false,processDataAfterAction=false;
+    protected float fullStringRate=0.0f, typeMatchRate = 1.0f;
+    protected int maxInputStrings = 1;
     protected int sequenceNumber = -1, actionNumber = -1;
 
     // This boolean value can be used by the protocol to temporarily disable calls to the
@@ -101,6 +104,15 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         this.setCoverageContext = settings.get(ConfigTags.SetCoverageContext);
         this.processDataAfterAction = settings.get(ConfigTags.ProcessDataAfterAction);
         this.actionGetDataEndpoint = settings.get(ConfigTags.ActionGetDataEndpoint);
+        this.maxInputStrings = settings.get(ConfigTags.MaxInputStrings);
+        this.fullStringRate = settings.get(ConfigTags.FullStringRate);
+        this.typeMatchRate = settings.get(ConfigTags.TypeMatchRate);
+
+        assert(this.fullStringRate >= 0.0);
+        assert(this.fullStringRate <= 1.0);
+        assert(this.typeMatchRate >= 0.0);
+        assert(this.typeMatchRate <= 1.0);
+        assert(this.maxInputStrings >= 2);
 
         super.initialize(settings);
 

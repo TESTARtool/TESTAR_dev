@@ -86,7 +86,7 @@ public class Main {
 	/**
 	 * According to the TESTAR directory and SSE file (settings and protocol to run)
 	 * return the path of the selected settings
-	 * 
+	 *
 	 * @return test.settings path
 	 */
 	public static String getTestSettingsFile() {
@@ -95,14 +95,14 @@ public class Main {
 
 	/**
 	 * Main method to run TESTAR
-	 * 
+	 *
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
-		
+
 		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
@@ -166,7 +166,7 @@ public class Main {
 
 		return true;
 	}
-	
+
 	/**
 	 * Verify the initial directory of TESTAR
 	 * If this directory didn't contain testar.bat file inform the user
@@ -207,7 +207,7 @@ public class Main {
 
 	/**
 	 * Find or create the .sse file, to known with what settings and protocol start TESTAR
-	 * 
+	 *
 	 * @param args
 	 */
 	private static void initTestarSSE(String[] args){
@@ -298,7 +298,7 @@ public class Main {
 	//TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
 	/**
 	 * Load the settings of the selected test.settings file
-	 * 
+	 *
 	 * @param args
 	 * @param testSettingsFileName
 	 * @return settings
@@ -324,7 +324,7 @@ public class Main {
 
 	/**
 	 * Open TESTAR GUI to allow the users modify the settings and the protocol with which the want run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
@@ -344,18 +344,18 @@ public class Main {
 
 	/**
 	 * Start TESTAR protocol with the selected settings
-	 * 
+	 *
 	 * This method get the specific protocol class of the selected settings to run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));
 		}
-		
+
 
 		URLClassLoader loader = null;
 
@@ -518,13 +518,16 @@ public class Main {
 			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
 			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
 
-                        // Defaults for CodeAnalysisWebdriverProtocol
+            // Defaults for CodeAnalysisWebdriverProtocol
 			defaults.add(Pair.from(CoverageContext, "default"));
 			defaults.add(Pair.from(LogContextPrefix, "default"));
 			defaults.add(Pair.from(SetCoverageContext, false));
 			defaults.add(Pair.from(SetLogContext, false));
 			defaults.add(Pair.from(ProcessDataAfterAction, false));
 			defaults.add(Pair.from(ActionGetDataEndpoint, ""));
+			defaults.add(Pair.from(MaxInputStrings, 3));
+			defaults.add(Pair.from(FullStringRate, 0.0f));
+			defaults.add(Pair.from(TypeMatchRate, 1.0f));
 			// End defaults CodeAnalysisWebdriverProtocol
 
 			// Defaults for DockerizedSUTWebdriverProtocol
@@ -640,7 +643,7 @@ public class Main {
 	/**
 	 * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
 	 * @param sett
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
 		String sseName = sett.substring(sett.indexOf("=")+1);
@@ -661,7 +664,7 @@ public class Main {
 			//Obtain previous sse file and delete it (if exist)
 			String[] files = getSSE();
 			if (files != null) {
-				for (String f : files) 
+				for (String f : files)
 					new File(settingsDir+f).delete();
 
 			}
@@ -678,9 +681,9 @@ public class Main {
 	}
 
 	/**
-	 * This method allow us to define and use settings as JVM arguments. 
+	 * This method allow us to define and use settings as JVM arguments.
 	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {

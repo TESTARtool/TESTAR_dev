@@ -171,6 +171,9 @@ public final class ConfigTags {
   public static final Tag<Boolean> SetCoverageContext = Tag.from("SetCoverageContext", Boolean.class);
   public static final Tag<Boolean> ProcessDataAfterAction = Tag.from("ProcessDataAfterAction", Boolean.class);
   public static final Tag<String> ActionGetDataEndpoint = Tag.from("ActionGetDataEndpoint", String.class);
+  public static final Tag<Integer> MaxInputStrings = Tag.from("MaxInputStrings", Integer.class);
+  public static final Tag<Float> FullStringRate = Tag.from("FullStringRate", Float.class);
+  public static final Tag<Float> TypeMatchRate = Tag.from("TypeMatchRate", Float.class);
 
   // Tags for CKAN protocol
 
