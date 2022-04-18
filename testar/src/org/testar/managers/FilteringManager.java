@@ -111,7 +111,7 @@ public class FilteringManager
       PEN_PRECISE_BLUE = Pen.newPen().setColor(Color.from(0, 0, 255, PEN_ALPHA)).
           setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
-  private class WidgetInfo
+  protected class WidgetInfo
   {
     String idType; // CodingManager.*ID
     String role, parentRole;
@@ -133,7 +133,7 @@ public class FilteringManager
   }
 
   // key = widget ID; value = filter type
-  private HashMap<String, WidgetInfo> widgetsFilterList = new HashMap<String, WidgetInfo>();
+  protected HashMap<String, WidgetInfo> widgetsFilterList = new HashMap<String, WidgetInfo>();
 
   public FilteringManager ()
   {

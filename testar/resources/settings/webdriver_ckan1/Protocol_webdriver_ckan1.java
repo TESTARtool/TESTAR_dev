@@ -5,9 +5,12 @@ import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONTokener;
 
+import org.testar.managers.InterestingStringsDataManager;
+import org.testar.managers.InterestingStringsFilteringManager;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.KeyDown;
@@ -44,6 +47,17 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
 	}
 
+    protected void initializeDataManager() {
+        dataManager = new InterestingStringsDataManager(this.fullStringRate, this.maxInputStrings, this.typeMatchRate);
+        dataManager.loadInputValues();
+    }
+
+    @Override
+    protected void initializeFilteringManager() {
+        filteringManager = new InterestingStringsFilteringManager((InterestingStringsDataManager)this.dataManager);
+        filteringManager.loadFilters();
+    }
+
     @Override
 	protected SUT startSystem() throws SystemStartException {
         this.loggedIn=false;
@@ -75,6 +89,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
     }
 
 
+    @Override
     protected void processSUTDataAfterAction(JSONTokener tokener) {
         JSONArray root = new JSONArray(tokener);
 
@@ -91,10 +106,11 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
             output.add(innerMap);
         }
 
+        if ( output.size() > 0 ) {
+            ((InterestingStringsDataManager)(dataManager)).loadInput(output);
+        }
+
         // TODO: store extracted string data in the state model
     }
-
-
-
 
 }

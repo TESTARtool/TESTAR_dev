@@ -48,7 +48,7 @@ import org.testar.managers.FilteringManager;
 
 /**
  * Testing protocol enhancements to ease tester work.
- * 
+ *
  * To be developed: actions ordering
  *
  */
@@ -68,19 +68,27 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     private double mouseX = Double.MIN_VALUE;
     private double mouseY = Double.MIN_VALUE;
     private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
-    
-    private FilteringManager filteringManager;
-    private DataManager dataManager;
-    
+
+    protected FilteringManager filteringManager;
+    protected DataManager dataManager;
+
     /**
      * Constructor.
      */
 	public ClickFilterLayerProtocol(){
 		super();
+		initializeDataManager();
+		initializeFilteringManager();
+	}
+
+	protected void initializeFilteringManager() {
 		filteringManager = new FilteringManager();
-		dataManager = new DataManager();
 		filteringManager.loadFilters();
-		dataManager.loadInputValues();		
+	}
+
+	protected void initializeDataManager() {
+		dataManager = new DataManager();
+		dataManager.loadInputValues();
 	}
 
 	/**
@@ -88,9 +96,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	 * @param key
 	 */
     @Override
-    public void keyDown(KBKeys key) {    	
-        super.keyDown(key);        
-        if (mode() == Modes.Spy){ 
+    public void keyDown(KBKeys key) {
+        super.keyDown(key);
+        if (mode() == Modes.Spy){
         	if (key == KBKeys.VK_CAPS_LOCK)
         		displayWhiteTabu = !displayWhiteTabu;
         	else if (key == KBKeys.VK_TAB)
@@ -109,7 +117,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     }
 
     @Override
-    public void keyUp(KBKeys key) {    	
+    public void keyUp(KBKeys key) {
     	super.keyUp(key);
         if (mode() == Modes.Spy){
         	if (key == KBKeys.VK_SHIFT) {
@@ -125,7 +133,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    	}
         }
     }
-    	
+
 	@Override
 	public void mouseMoved(double x, double y) {
 		mouseX = x;

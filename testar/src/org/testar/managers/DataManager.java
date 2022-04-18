@@ -52,15 +52,15 @@ import org.xml.sax.SAXException;
 
 /**
  * A management utility for SUT UI input values data.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class DataManager {
 
 	public static final String XML_UI_FILTER_VERSION = "1.0.20170322";
-    public static final String DATA_FILE = "input_values.xml";	
-	
+    public static final String DATA_FILE = "input_values.xml";
+
 	// Widget filter types / data types
 	public static final int WIDGET_ACTION_TABU_FILTER =		Integer.MIN_VALUE,
 							WIDGET_ACTION_WHITE_FILTER = 	Integer.MIN_VALUE + 1,
@@ -70,54 +70,54 @@ public class DataManager {
 							BASIC_DATA_TYPE_DATE = 			-13451473,
 							BASIC_DATA_TYPE_WEBURL =		-134513313,
 							BASIC_DATA_TYPE_EMAIL =			-1345133417;
-	
+
     public static LinkedHashMap<String,Integer> DATA_TYPES;
 	public static HashMap<Integer,Set<String>> INPUT_VALUES;
 	private static Integer[] INPUT_VALUES_ARRAY;
-        
+
 	private static final String XML_TAG_DATA = 			"data",
 								XML_TAG_INPUT = 		"input",
 								XML_ATTRIBUTE_TYPE = 	"type",
 								XML_ATTRIBUTE_DESC = 	"desc",
 								XML_ATTRIBUTE_EXAMPLE = "example",
 								XML_ATTRIBUTE_VALUE = 	"value";
-    
+
 	private DocumentBuilderFactory docFactory;
-	private DocumentBuilder docBuilder;  
-	
+	private DocumentBuilder docBuilder;
+
 	private static Random rnd = new Random(System.currentTimeMillis());
-	private static final int MAX_TEXT_LENGTH = 16, // 64
+	protected static final int MAX_TEXT_LENGTH = 16, // 64
     						 LETTER_COUNT = 'z' - 'a' + 1;
-	
+
 	/**
 	 * Computes a random number
 	 * @return The random number.
 	 */
 	public static String getRandomPrimitiveDataTypeNumber(){
-		return new Integer(rnd.nextInt()).toString();		
+		return new Integer(rnd.nextInt()).toString();
 	}
-	
+
 	/**
-	 * Computes a random text. 
+	 * Computes a random text.
 	 * @return The random text.
 	 */
 	public static String getRandomPrimitiveDataTypeText(){
     	int textLength = rnd.nextInt(MAX_TEXT_LENGTH) + 1;
     	StringBuffer sb = new StringBuffer(textLength);
     	for (int i=0; i<textLength; i++)
-    		sb.append((char)('a' + rnd.nextInt(LETTER_COUNT)));    				
+    		sb.append((char)('a' + rnd.nextInt(LETTER_COUNT)));
     	return sb.toString();
 	}
-	
+
 	/**
 	 * Gets a random data.
 	 * @param data Data sample from which to select randomly.
 	 * @return The selected random data.
 	 */
     public static String getRandom(Set<String> data){
-    	return (String) data.toArray()[rnd.nextInt(data.size())];    	
+    	return (String) data.toArray()[rnd.nextInt(data.size())];
     }
-    
+
     /**
      * Computes a random text data from the available data types.
      * @return The random data.
@@ -132,7 +132,7 @@ public class DataManager {
     		return DataManager.getRandom(INPUT_VALUES.get(INPUT_VALUES_ARRAY[rnd.nextInt(INPUT_VALUES_ARRAY.length)]));
     	}
     }
-	
+
 	public DataManager(){
 		populateDefaultData();
 		try{
@@ -140,9 +140,9 @@ public class DataManager {
 			docBuilder = docFactory.newDocumentBuilder();
 		} catch(ParserConfigurationException e){
 			e.printStackTrace();
-		}    	
+		}
 	}
-	
+
 	@SuppressWarnings("serial")
 	private void populateDefaultData(){
 		DATA_TYPES = new LinkedHashMap<String,Integer>();
@@ -151,7 +151,7 @@ public class DataManager {
 		DATA_TYPES.put("PRIMITIVE_NUMBER", 	PRIMITIVE_DATA_TYPE_NUMBER);
 		DATA_TYPES.put("BASIC_DATE", 		BASIC_DATA_TYPE_DATE);
 		DATA_TYPES.put("BASIC_EMAIL", 		BASIC_DATA_TYPE_EMAIL);
-		DATA_TYPES.put("BASIC_WEBURL",		BASIC_DATA_TYPE_WEBURL);		
+		DATA_TYPES.put("BASIC_WEBURL",		BASIC_DATA_TYPE_WEBURL);
 		INPUT_VALUES = new HashMap<Integer,Set<String>>();
 		INPUT_VALUES.put(BASIC_DATA_TYPE_DATE, new HashSet<String>(){{
     		add("22-03-2017");
@@ -184,14 +184,14 @@ public class DataManager {
     	}});
     	INPUT_VALUES_ARRAY = INPUT_VALUES.keySet().toArray(new Integer[INPUT_VALUES.size()]);
 	}
-		
+
 	public void loadInputValues(){
 		File f = new File(DATA_FILE);
 		if (f.exists()){
 			BufferedInputStream stream = null;
 			try {
 				stream = new BufferedInputStream(new FileInputStream(f));
-				Document doc = docBuilder.parse(stream);					
+				Document doc = docBuilder.parse(stream);
 		        Node node; Element element;
 
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_DATA);
@@ -210,7 +210,7 @@ public class DataManager {
 		        			System.out.println("DataManager: WRONG DATA TYPE");
 		        	}
 				}
-		        		        
+
 		        nList = doc.getElementsByTagName(XML_TAG_INPUT);
 		        Integer key;
 		        Set<String> typeValues;
@@ -226,14 +226,14 @@ public class DataManager {
 		        			typeValues = INPUT_VALUES.get(key);
 		        			if (typeValues == null){
 		        				typeValues = new HashSet<String>();
-		        				INPUT_VALUES.put(key, typeValues);		        				
+		        				INPUT_VALUES.put(key, typeValues);
 		        			}
 		        			typeValues.add(valueS);
 		        		} else
 		        			System.out.println("DataManager: WRONG INPUT VALUE");
 		        	}
 		        }
-				printData();		        
+				printData();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (SAXException e) {
@@ -246,7 +246,7 @@ public class DataManager {
 			}
 		}
 	}
-	
+
 	public static void printData(){
 		System.out.println("DATA TYPES (description x type_number):");
 		for (String key : DATA_TYPES.keySet())
@@ -259,5 +259,5 @@ public class DataManager {
 				System.out.println("\t" + key + ": " + v);
 		}
 	}
-	
+
 }

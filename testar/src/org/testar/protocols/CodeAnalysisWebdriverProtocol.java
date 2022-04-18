@@ -140,7 +140,11 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 		if (this.instrumentationEnabled && this.setLogContext) {
             setLogContext();
         }
-		return super.executeAction(system, state, action);
+		boolean result =  super.executeAction(system, state, action);
+        if (this.instrumentationEnabled && this.processDataAfterAction ) {
+            retrieveSUTDataAfterAction();
+        }
+        return result;
     }
 
     private void setLogContext() {
@@ -163,9 +167,6 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
     @Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		this.actionNumber++;
-        if (this.instrumentationEnabled && this.processDataAfterAction ) {
-            retrieveSUTDataAfterAction();
-        }
         return super.selectAction(state, actions);
     }
 
