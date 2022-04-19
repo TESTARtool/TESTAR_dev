@@ -74,7 +74,7 @@ import java.util.*;
 public class WdDriver extends SUTBase {
   private static WdDriver wdDriver = null;
   private static RemoteWebDriver remoteWebDriver = null;
-  private static List<String> windowHandles = new ArrayList<>();
+  private static List<String> windowHandles = Collections.synchronizedList(new ArrayList<>());
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
@@ -391,7 +391,7 @@ public class WdDriver extends SUTBase {
    * Update the list of handles with added handles (new tabs)
    * Remove handles from closed tabs
    */
-  private static void updateHandlesList() {
+  private synchronized static void updateHandlesList() {
     Set<String> currentHandles = remoteWebDriver.getWindowHandles();
 
     // Remove handles not present anymore (closed tabs)
