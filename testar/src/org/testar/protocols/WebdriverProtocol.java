@@ -695,10 +695,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		try {
 			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
-				for(String line; (line = br.readLine()) != null; ) {
+				for(String line; (line = br.readLine()) != null;) {
 					if(line.contains(ConfigTags.ClickableClasses.name())){
-						List<String> fileClickableClasses =  Arrays.asList(line.split("=")[1].trim().split(";"));
-						// Check if user added new Css Classes from test settings file to update the clickableClasses
+						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
+						// Check if user added new CSS Classes from test settings file to update the clickableClasses
 						for(String webClass : fileClickableClasses) {
 							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
 								System.out.println("Adding new clickable class from settings file: " + webClass);
@@ -706,7 +706,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 								settings.set(ConfigTags.ClickableClasses, clickableClasses);
 							}
 						}
-						// Check if user removed Css Classes from test settings file to update the clickableClasses
+						// Check if user removed CSS Classes from test settings file to update the clickableClasses
 						for(String clickClass : clickableClasses) {
 							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
 								System.out.println("Removing the clickable class: " + clickClass);
