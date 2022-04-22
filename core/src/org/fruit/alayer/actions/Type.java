@@ -35,7 +35,10 @@ package org.fruit.alayer.actions;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.Collections;
+import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -55,6 +58,13 @@ public final class Type extends TaggableBase implements Action {
 	private static final long serialVersionUID = 2555715152455716781L;
 	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
 	private final String text;
+
+	private final static Map<Character, Character> lowerCaseCharacters =
+			ImmutableMap.<Character, Character>builder()
+					.put('_', '-')
+					.put('+', '=')
+			.build();
+
 	
 	public Type(String text){
 		Assert.hasText(text);
@@ -82,6 +92,13 @@ public final class Type extends TaggableBase implements Action {
 						c = Character.toUpperCase(c);
 					else
 						shift = true;
+				}
+				else {
+					Character lowerCase = lowerCaseCharacters.get(c);
+					if (lowerCase != null) {
+						c = lowerCase;
+						shift = true;
+					}
 				}
 
 				KBKeys key = getKey(c);
