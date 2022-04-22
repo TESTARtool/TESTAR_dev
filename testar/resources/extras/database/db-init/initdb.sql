@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `actions`;
 CREATE TABLE `actions` (
     `id` int NOT NULL AUTO_INCREMENT,
     `iteration_id` int,
-    `description` varchar(255),
+    `description` varchar(2048),
     `name` varchar(255),
     `status` varchar(255),
     `screenshot` varchar(255),
