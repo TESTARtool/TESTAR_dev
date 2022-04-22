@@ -79,9 +79,9 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
-import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -114,12 +114,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	// WedDriver settings from file:
 	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
 
-	// URL + form name, username input id + value, password input id + value
-	// Set login to null to disable this feature
-	//TODO web driver settings for login feature
-	protected Pair<String, String> login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-	protected Pair<String, String> username = Pair.from("username", "");
-	protected Pair<String, String> password = Pair.from("password", "");
+	protected String loginURL;
+	protected String loginFormID;
+	protected String loginInputKeyAttribute;
+	protected String loginUsernameInputName;
+	protected String loginUsername;
+	protected String loginPasswordInputName;
+	protected String loginPassword;
 
 	public MySqlService sqlService;
 	private int reportId = -1;
@@ -128,6 +129,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	private OrientDBService orientService;
 
 	private boolean isLocalDatabaseActive = false;
+	private boolean isForcedLoginInProgress = false;
 
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
@@ -149,6 +151,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+
+		loginURL = settings.get(ConfigTags.ForcedLoginUrl, null);
+		loginFormID = settings.get(ConfigTags.ForcedLoginFormId, null);
+		loginInputKeyAttribute = settings.get(ConfigTags.ForcedLoginInputKeyAttribute, "id");
+		loginUsernameInputName = settings.get(ConfigTags.ForcedLoginUsernameInputName, null);
+		loginUsername = settings.get(ConfigTags.ForcedLoginUsername, null);
+		loginPasswordInputName = settings.get(ConfigTags.ForcedLoginPasswordInputName, null);
+		loginPassword = settings.get(ConfigTags.ForcedLoginPassword, null);
 
 		// Indicate to TESTAR we want to use webdriver package implementation
 		NativeLinker.addWdDriverOS();
@@ -837,15 +847,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Detect and perform login if defined
 	 */
 	protected Set<Action> detectForcedLogin(State state) {
-		if (login == null || username == null || password == null) {
+		if (loginURL == null ||
+			loginUsernameInputName == null ||
+			loginUsername == null ||
+			loginPasswordInputName == null ||
+			loginPassword == null) {
 			return null;
 		}
 
 		// Check if the current page is a login page
 		String currentUrl = WdDriver.getCurrentUrl();
 		if (this.firstNonNullUrl == null) this.firstNonNullUrl = currentUrl;
-		if (currentUrl.startsWith(login.left())) {
+		StdActionCompiler actionCompiler = new StdActionCompiler();
+		if (currentUrl.startsWith(loginURL)) {
+			if (isForcedLoginInProgress) {
+				return null;
+			}
+
 			CompoundAction.Builder builder = new CompoundAction.Builder();
+			WdWidget usernameWidget = null;
+			WdWidget passwordWidget = null;
 			// Set username and password
 			for (Widget widget : state) {
 				WdWidget wdWidget = (WdWidget) widget;
@@ -854,21 +875,32 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					continue;
 				}
 
-				if (username.left().equals(wdWidget.getAttribute("id"))) {
-					builder.add(new WdAttributeAction(
-							username.left(), "value", username.right()), 1);
+				String widgetName = wdWidget.getAttribute(loginInputKeyAttribute);
+				if (loginUsernameInputName.equals(widgetName)) {
+					usernameWidget = wdWidget;
 				}
-				else if (password.left().equals(wdWidget.getAttribute("id"))) {
-					builder.add(new WdAttributeAction(
-							password.left(), "value", password.right()), 1);
+				else if (loginPasswordInputName.equals(wdWidget.getAttribute("id"))) {
+					passwordWidget = wdWidget;
 				}
 			}
 			// Submit form, but only if user and pass are filled
-			builder.add(new WdSubmitAction(login.right()), 2);
-			CompoundAction actions = builder.build();
-			if (actions.getActions().size() >= 3) {
+			if (usernameWidget != null && passwordWidget != null) {
+				builder.add(actionCompiler.clickTypeInto(usernameWidget, loginUsername, true), 1);
+				builder.add(actionCompiler.clickTypeInto(passwordWidget, loginPassword, true), 1);
+				if (loginFormID == null) {
+					builder.add(actionCompiler.hitKey(KBKeys.VK_ENTER), 1);
+				}
+				else {
+					builder.add(new WdSubmitAction(loginFormID), 2);
+				}
+
+				isForcedLoginInProgress = true;
+				CompoundAction actions = builder.build();
 				return new HashSet<>(Collections.singletonList(actions));
 			}
+		}
+		else {
+			isForcedLoginInProgress = false;
 		}
 
 		return null;

@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "file:///Users/michaeltikhonenko/work/TESTAR_dev/suts/web_calculator.html"
+SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/login"
 
 #################################################################
 # Sequences
@@ -204,3 +204,10 @@ SonarProjectName = Demo
 SonarProjectKey = demo
 GitUrl = https://github.com/crystal-lang/crystal
 GitAuthRequired = false
+
+ForcedLoginUrl = https://tst.yoho.marviq.net/web/login
+ForcedLoginUsernameInputName = mat-input-0
+ForcedLoginUsername = +48500000014
+ForcedLoginPasswordInputName = mat-input-1
+ForcedLoginPassword = password
+
