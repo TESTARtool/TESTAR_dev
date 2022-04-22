@@ -186,6 +186,14 @@ public final class ConfigTags {
   public static final Tag<String> SonarProjectName = Tag.from("SonarProjectName", String.class);
   public static final Tag<String> SonarProjectKey = Tag.from("SonarProjectKey", String.class);
 
+  public static final Tag<String> ForcedLoginUrl = Tag.from("ForcedLoginUrl", String.class);
+  public static final Tag<String> ForcedLoginFormId = Tag.from("ForcedLoginFormId", String.class);
+  public static final Tag<String> ForcedLoginInputKeyAttribute = Tag.from("ForcedLoginInputKeyAttribute", String.class);
+  public static final Tag<String> ForcedLoginUsernameInputName = Tag.from("ForcedLoginUsernameInputName", String.class);
+  public static final Tag<String> ForcedLoginUsername = Tag.from("ForcedLoginUsername", String.class);
+  public static final Tag<String> ForcedLoginPasswordInputName = Tag.from("ForcedLoginPasswordInputName", String.class);
+  public static final Tag<String> ForcedLoginPassword = Tag.from("ForcedLoginPassword", String.class);
+
   /*
   //TODO web driver settings for login feature
   public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);

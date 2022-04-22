@@ -13,7 +13,7 @@ public class ActionParser extends MultipleActionParser {
                 new TypeParser(),
                 new PasteTextParser(),
                 new WaitParser(),
-                new WaitParser()
+                new NOPParser()
         };
         return parsers;
     }
