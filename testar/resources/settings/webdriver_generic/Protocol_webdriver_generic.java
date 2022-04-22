@@ -95,13 +95,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		WdDriver.forceActivateTab = true;
 		*/
 
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		// TODO: getting from the settings file, not sure if this works:
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
 		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
 		//TODO put into settings file

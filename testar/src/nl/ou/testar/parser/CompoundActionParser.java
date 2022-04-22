@@ -24,7 +24,7 @@ public class CompoundActionParser implements IActionParser {
                     new TypeParser(),
                     new PasteTextParser(),
                     new WaitParser(),
-                    new WaitParser()
+                    new NOPParser()
             };
             return parsers;
         }
