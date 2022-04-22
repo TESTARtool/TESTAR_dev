@@ -35,6 +35,7 @@ package org.testar.monkey.alayer.actions;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.Map;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
@@ -46,6 +47,7 @@ import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * An action that types a given text on the StandardKeyboard of the SUT.
@@ -55,6 +57,13 @@ public final class Type extends TaggableBase implements Action {
 	private static final long serialVersionUID = 2555715152455716781L;
 	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
 	private String text;
+
+	private final static Map<Character, Character> lowerCaseCharacters =
+			ImmutableMap.<Character, Character>builder()
+					.put('_', '-')
+					.put('+', '=')
+			.build();
+
 	
 	public Type(String text){
 		Assert.hasText(text);
@@ -88,6 +97,13 @@ public final class Type extends TaggableBase implements Action {
 						c = Character.toUpperCase(c);
 					else
 						shift = true;
+				}
+				else {
+					Character lowerCase = lowerCaseCharacters.get(c);
+					if (lowerCase != null) {
+						c = lowerCase;
+						shift = true;
+					}
 				}
 
 				KBKeys key = getKey(c);
