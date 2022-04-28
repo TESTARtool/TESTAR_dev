@@ -141,7 +141,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   @Override
   protected State getState(SUT system) throws StateBuildException {
       // parabank wsdl pages have no widgets, we need to force a webdriver history back action
-      if(WdDriver.getCurrentUrl().contains("wsdl")) {
+      if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
           WdDriver.executeScript("window.history.back();");
           Util.pause(1);
       }
