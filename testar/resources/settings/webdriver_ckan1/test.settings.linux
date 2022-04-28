@@ -191,6 +191,10 @@ FullStringRate = 0.2
 TypeMatchRate = 0.5
 MaxInputStrings = 5
 
+LogOracleEnabled = true
+LogOracleCommands = /data/studie/af/lightweight-codeanalysis/suts/ckan/run/save-logs.sh
+LogOracleFiles    = /data/studie/af/lightweight-codeanalysis/suts/ckan/run/ckan.log
+
 ResetSUTAfterSequence = true
 VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;runpg_data;run_solr_data
 ProcessDataAfterAction = true
