@@ -82,6 +82,8 @@ import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.log.LogOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.managers.DataManager;
@@ -95,6 +97,8 @@ import org.openqa.selenium.SessionNotCreatedException;
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
+	public boolean logOracleEnabled;
+	public Oracle logOracle;
 	private State stateForClickFilterLayerProtocol;
 
 	protected Reporting htmlReport;
@@ -121,7 +125,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
-	
+
 	private Verdict replayVerdict;
 
 	public Verdict getReplayVerdict() {
@@ -170,7 +174,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private StateBuilder builder;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
-	
+
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
 
@@ -294,7 +298,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}
 		}catch (IllegalStateException e) {
 			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-				
+
 				String msg = "Exception: Check if chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists or if is a correct definition";
@@ -338,6 +342,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
+		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled);
+		if ( logOracleEnabled ) {
+			logOracle = createLogOracle(settings);
+			logOracle.initialize();
+		}
+
 		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
@@ -373,6 +383,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
 		}
+	}
+
+	/**
+ 	*  Method for creating the LogOracle. Can optionally be overridden in subclasses.
+ 	* @param settings
+ 	* @return
+ 	*/
+	public Oracle createLogOracle (Settings settings) {
+		return new LogOracle(settings);
 	}
 
 	/**
@@ -832,7 +851,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		for(Action a : actions)
 			if(a.get(Tags.AbstractIDCustom, null) == null)
 			    buildEnvironmentActionIdentifiers(state, a);
-		
+
 		stateModelManager.notifyNewStateReached(state, actions);
 
 		return getVerdict(state);
@@ -932,17 +951,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
-			
+
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
 
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
-			
+
 			cv.end();
 
 			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
-			
+
 			synchronized (this) {
 				try {
 					this.wait(msRefresh);
@@ -960,7 +979,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
-		
+
 		//finishSequence() content, but SPY mode is not a sequence
 		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
 			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
@@ -988,7 +1007,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			preSequencePreparations();
-			
+
 			//reset the faulty variable because we started a new execution
 			faultySequence = false;
 
@@ -1452,12 +1471,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		buildStateIdentifiers(state);
 		state = ProtocolUtil.calculateZIndices(state);
-		
+
 		setStateForClickFilterLayerProtocol(state);
 
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
-		
+
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
@@ -1476,7 +1495,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		return state;
 	}
 
@@ -1511,6 +1530,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(state.get(Tags.NotResponding, false)){
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
+
 		//------------------------
 		// ORACLES ALMOST FOR FREE
 		//------------------------
@@ -1527,6 +1547,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
+		if ( logOracleEnabled ) {
+			Verdict logVerdict = logOracle.getVerdict(state);
+			if ( logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG ) {
+				return logVerdict;
+			}
+		}
+
 		if (this.nonSuitableAction){
 			this.nonSuitableAction = false;
 			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
@@ -1535,7 +1562,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// if everything was OK ...
 		return Verdict.OK;
 	}
-	
+
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
 
@@ -1665,7 +1692,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
-		
+
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
 		try{
@@ -1690,7 +1717,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return false;
 		}
 	}
-	
+
 	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
 	    // Get an action screenshot based on the NativeLinker platform
 	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
@@ -1897,10 +1924,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Widget and State identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
-	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID 
-	 * 
+	 * Use CodingManager to create the Widget and State identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+	 *
 	 * @param state
 	 */
 	protected void buildStateIdentifiers(State state) {
@@ -1908,9 +1935,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Actions identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the Actions identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
 	 * @param state
 	 * @param actions
 	 */
@@ -1919,9 +1946,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the specific environment Action identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the specific environment Action identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
 	 * @param state
 	 * @param action
 	 */

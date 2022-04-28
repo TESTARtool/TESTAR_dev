@@ -155,6 +155,12 @@ public final class ConfigTags {
   public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   */
 
+  // Tags for LogOracle
+  public static final Tag<Boolean> LogOracleEnabled  = Tag.from("LogOracleEnabled", Boolean.class);
+  public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class);
+  public static final Tag<List<String>> LogOracleCommands = Tag.from("LogOracleCommands", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<List<String>> LogOracleFiles = Tag.from("LogOracleFiles", (Class<List<String>>) (Class<?>) List.class);
+
   // Tags for DockerizedSUTWebdriverProtocol
 
   public static final Tag<String> DockerComposeDirectory = Tag.from("DockerComposeDirectory", String.class);

@@ -600,6 +600,12 @@ public class Main {
 			defaults.add(Pair.from(Password, ""));
 			*/
 
+			// Settings for LogOracle
+			defaults.add(Pair.from(LogOracleEnabled, false));
+			defaults.add(Pair.from(LogOracleRegex, ".*([Ee]xception|[Ee]rror).*"));
+			defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
+			defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
+
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
 
