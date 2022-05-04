@@ -33,16 +33,25 @@ package org.testar.protocols;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.UIATags;
-import org.testar.protocols.GenericUtilsProtocol;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.junit.Assume;
+import org.junit.BeforeClass;
+
 public class GetWidgetMatchingTag {
 
-	final private GenericUtilsProtocol protocol = new GenericUtilsProtocol();
+	private static GenericUtilsProtocol protocol;
+
+	@BeforeClass
+	public static void setup() {
+		// To avoid issues with java awt robot, we only execute this unit tests in windows environments.
+		Assume.assumeTrue(System.getProperty("os.name").toLowerCase().contains("windows"));
+		protocol = new GenericUtilsProtocol();
+	}
 
 	@Test
 	public void find_widget_by_WdTag() {
