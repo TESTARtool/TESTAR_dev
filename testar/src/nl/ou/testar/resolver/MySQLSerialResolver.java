@@ -4,10 +4,9 @@ import nl.ou.testar.ActionResolver;
 import nl.ou.testar.parser.ActionParseException;
 import nl.ou.testar.parser.ActionParser;
 import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.monkey.mysql.MySqlService;
 
 import java.sql.SQLException;
@@ -43,8 +42,15 @@ public class MySQLSerialResolver implements ActionResolver {
         }
         try {
             Pair<Action, String> parseResult = parser.parse(currentActionData.getDescription().replace("\n", " "));
-
             final Action action = parseResult.left();
+            final String widgetPath = currentActionData.getWidgetPath();
+            if (widgetPath != null && widgetPath.length() > 0) {
+                for (Widget widget: state) {
+                    if (widgetPath.equals(widget.get(Tags.Path))) {
+                        action.set(Tags.OriginWidget, widget);
+                    }
+                }
+            }
             if (action != null) {
                 return new HashSet<>(Collections.singletonList(action));
             }
