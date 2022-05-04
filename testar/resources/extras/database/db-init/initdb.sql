@@ -35,6 +35,7 @@ CREATE TABLE `actions` (
     `selected` boolean,
     `sequence_item_id` int,
     `target_sequence_item_id` int,
+    `widget_path` varchar (2048),
     PRIMARY KEY (`id`)
     -- FOREIGN KEY(`iteration_id`) REFERENCES `iterations` (`id`)
 );

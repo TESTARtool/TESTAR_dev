@@ -204,3 +204,9 @@ SonarProjectName = Demo
 SonarProjectKey = demo
 GitUrl = https://github.com/crystal-lang/crystal
 GitAuthRequired = false
+
+ApplicationName = yoho
+ApplicationVersion = 1.7
+ReplayApplicationName = yoho
+ReplayApplicationVersion = 1.7
+
