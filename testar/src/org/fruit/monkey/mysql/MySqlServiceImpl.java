@@ -153,8 +153,8 @@ public class MySqlServiceImpl implements MySqlService {
         return resultSet.getInt(1);
     }
 
-    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId) throws SQLException {
-        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time, selected, sequence_item_id, target_sequence_item_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    public synchronized int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId, String widgetPath) throws SQLException {
+        PreparedStatement addActionStatement = connection.prepareStatement("INSERT INTO actions (name, description, status, screenshot, start_time, selected, sequence_item_id, target_sequence_item_id, widget_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         addActionStatement.setString(1, name);
         addActionStatement.setString(2, description);
         addActionStatement.setString(3, status);
@@ -163,6 +163,7 @@ public class MySqlServiceImpl implements MySqlService {
         addActionStatement.setBoolean(6, selected);
         addActionStatement.setInt(7, stateId);
         addActionStatement.setInt(8, targetStateId);
+        addActionStatement.setString(9, widgetPath);
         addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -263,7 +264,7 @@ public class MySqlServiceImpl implements MySqlService {
 
     @Override
     public List<ActionData> getAllActions(int iterationId) throws SQLException {
-        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? ORDER BY start_time");
+        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time, widget_path FROM actions WHERE iteration_id = ? ORDER BY start_time");
         selectAllActionsStatement.setInt(1, iterationId);
 
         final ResultSet resultSet = selectAllActionsStatement.executeQuery();
@@ -275,14 +276,15 @@ public class MySqlServiceImpl implements MySqlService {
             final String status = resultSet.getString(4);
             final String screenshot = resultSet.getString(5);
             final Timestamp startTime = resultSet.getTimestamp(6);
-            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime));
+            final String widgetPath = resultSet.getString(7);
+            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime, widgetPath));
         }
         return result;
     }
 
     @Override
     public List<ActionData> getSelectedActions(int iterationId) throws SQLException {
-        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? AND selected = TRUE ORDER BY start_time");
+        PreparedStatement selectAllActionsStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time, widget_path FROM actions WHERE iteration_id = ? AND selected = TRUE ORDER BY start_time");
         selectAllActionsStatement.setInt(1, iterationId);
 
         final ResultSet resultSet = selectAllActionsStatement.executeQuery();
@@ -294,7 +296,8 @@ public class MySqlServiceImpl implements MySqlService {
             final String status = resultSet.getString(4);
             final String screenshot = resultSet.getString(5);
             final Timestamp startTime = resultSet.getTimestamp(6);
-            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime));
+            final String widgetPath = resultSet.getString(7);
+            result.add(new ActionData(id, iterationId, name, description, status, screenshot, startTime, widgetPath));
         }
         return result;
     }
@@ -337,15 +340,16 @@ public class MySqlServiceImpl implements MySqlService {
             final String status = resultSet.getString(4);
             final String screenshot = resultSet.getString(5);
             final Timestamp startTime = resultSet.getTimestamp(6);
+            final String widgetPath = resultSet.getString(7);
 
-            return new ActionData(id, iterationId, name, description, status, screenshot, startTime);
+            return new ActionData(id, iterationId, name, description, status, screenshot, startTime, widgetPath);
         }
         return null;
     }
 
     @Override
     public ActionData getNextAction(int iterationId, Timestamp actionTime) throws SQLException {
-        PreparedStatement selectNextActionStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time FROM actions WHERE iteration_id = ? AND start_time > ? ORDER BY start_time LIMIT 1");
+        PreparedStatement selectNextActionStatement = connection.prepareStatement("SELECT id, name, description, status, screenshot, start_time, widget_path FROM actions WHERE iteration_id = ? AND start_time > ? ORDER BY start_time LIMIT 1");
         selectNextActionStatement.setInt(1, iterationId);
         selectNextActionStatement.setTimestamp(2, actionTime);
 
@@ -357,8 +361,9 @@ public class MySqlServiceImpl implements MySqlService {
             final String status = resultSet.getString(4);
             final String screenshot = resultSet.getString(5);
             final Timestamp startTime = resultSet.getTimestamp(6);
+            final String widgetPath = resultSet.getString(7);
 
-            return new ActionData(id, iterationId, name, description, status, screenshot, startTime);
+            return new ActionData(id, iterationId, name, description, status, screenshot, startTime, widgetPath);
         }
         return null;
     }

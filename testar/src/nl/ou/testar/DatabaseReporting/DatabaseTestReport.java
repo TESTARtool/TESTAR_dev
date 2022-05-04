@@ -2,10 +2,7 @@ package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.TestReport;
 import org.fruit.monkey.mysql.MySqlService;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.*;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -92,11 +89,19 @@ public class DatabaseTestReport implements TestReport {
 
             int actionId = -1;
             if (action != null) {
-                actionId = actionIds.get(action);
+                Integer storedActionId = actionIds.get(action);
+                if (storedActionId != null) {
+                    System.out.println(String.format("=== Lost action: %s ===", action.toString()));
+                    actionId = storedActionId;
+                }
             }
             int stateId = -1;
             if (state != null) {
-                stateId = stateIds.get(state);
+                Integer storedStateId = stateIds.get(state);
+                if (storedStateId != null) {
+                    System.out.println(String.format("=== Lost state: %s ===", state.toString()));
+                    stateId = storedStateId;
+                }
             }
 
             sqlService.setSelectionInIteration(iterationId, actionId, stateId);
@@ -146,9 +151,14 @@ public class DatabaseTestReport implements TestReport {
         if (targetState != null) {
             targetStateId = stateIds.get(targetState);
         }
+        String widgetPath = "";
+        final Widget widget = action.get(Tags.OriginWidget);
+        if (widget != null) {
+            widgetPath = widget.get(Tags.Path, "");
+        }
         int actionId = sqlService.registerAction(action.toShortString(), action.toString(),
                     state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
-                    timestamp, selected, stateId, targetStateId);
+                    timestamp, selected, stateId, targetStateId, widgetPath);
         System.out.println("Action added");
         sqlService.addActionToIteration(actionId, iterationId);
         return actionId;

@@ -44,8 +44,9 @@ public interface MySqlService {
         private String status;
         private String screenshot;
         private Timestamp startTime;
+        private String widgetPath;
 
-        public ActionData(int id, int iterationId, String name, String description, String status, String screenshot, Timestamp startTime) {
+        public ActionData(int id, int iterationId, String name, String description, String status, String screenshot, Timestamp startTime, String widgetPath) {
             this.id = id;
             this.iterationId = iterationId;
             this.name = name;
@@ -53,6 +54,7 @@ public interface MySqlService {
             this.status = status;
             this.screenshot = screenshot;
             this.startTime = startTime;
+            this.widgetPath = widgetPath;
         }
 
         public int getId() {
@@ -82,6 +84,10 @@ public interface MySqlService {
         public Timestamp getStartTime() {
             return startTime;
         }
+
+        public String getWidgetPath() {
+            return widgetPath;
+        }
     }
 
     MySqlServiceDelegate getDelegate();
@@ -94,7 +100,7 @@ public interface MySqlService {
     int registerReport(String tag) throws SQLException;
     int registerIteration(int reportId) throws SQLException;
     int registerIteration(int reportId, String info, Double severity) throws SQLException;
-    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId) throws SQLException;
+    int registerAction(String name, String description, String status, String screenshot, Timestamp startTime, boolean selected, int stateId, int targetStateId, String widgetPath) throws SQLException;
     int registerState(String concreteIdCustom, String abstractId, String abstractRId, String abstractRTId, String abstractRTPId) throws SQLException;
     int registerStateAction(int stateId, int actionId, boolean visited) throws SQLException;
 
