@@ -1,10 +1,13 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.json.JSONArray;
 import org.json.JSONTokener;
 
+import org.testar.SutVisualization;
 import org.testar.managers.InterestingStringsDataManager;
 import org.testar.managers.InterestingStringsFilteringManager;
 import org.testar.monkey.alayer.Action;
@@ -17,9 +20,16 @@ import org.testar.monkey.alayer.actions.KeyDown;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.devices.KBKeys;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.protocols.CodeAnalysisWebdriverProtocol;
@@ -112,5 +122,126 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
         // TODO: store extracted string data in the state model
     }
+
+    /**
+     *
+     * This method has been overridden for the CKAN protocol to filter out clicks on links
+     * to API endpoints, as well as logout actions.
+     *
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 *
+	 * @param system the SUT
+	 * @param state  the SUT's current state
+	 * @return a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+		// Kill unwanted processes, force SUT to foreground
+
+        // CKAN Customization: start with empty actions HashSet, so that we only rely
+        // on this method definition for deriving actions.
+		Set<Action> actions = new HashSet<>();
+		Set<Action> filteredActions = new HashSet<>();
+
+		// create an action compiler, which helps us create actions
+		// such as clicks, drag&drop, typing ...
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+
+		// Check if forced actions are needed to stay within allowed domains
+		Set<Action> forcedActions = detectForcedActions(state, ac);
+
+		// iterate through all widgets
+		for (Widget widget : state) {
+
+            /* CKAN Customization to skip various elements:
+             * - Don't click on links to API endpoints. They aren't in HTML and don't have any actions on them.
+             *   so TESTAR gets stuck.
+             * - Don't click on the Logout button, because there isn't much functionality we can test if we're
+             *   not logged in anymore.
+             * - Don't switch languages. This would change some of the properties of the widgets, so it would
+             *   become more difficult to avoid actions we don't want.
+             * - Don't upload stuff, because of high risk that TESTAR gets stuck performing actions in the upload
+             *   dialog for a long time.
+             */
+
+
+            if( widget.get(WdTags.WebHref,"").contains("/api/")
+                || widget.get(WdTags.WebHref,"").endsWith("/_logout")
+                || widget.get(WdTags.WebName,"").equals("Upload")
+                || widget.get(WdTags.WebName,"").equals("English")
+                || widget.get(WdTags.WebTextContent,"").equals("English")
+                || widget.get(WdTags.WebCssClasses,"").contains("fa-sign-out") ) {
+                //System.out.println("DeriveActions ignored href = " + widget.get(WdTags.WebHref,"") + " / CSS class = " + widget.get(WdTags.WebCssClasses,"") );
+                continue;
+            }
+
+			// only consider enabled and non-tabu widgets
+			if (!widget.get(Enabled, true)) {
+				continue;
+			}
+			// The blackListed widgets are those that have been filtered during the SPY mode with the
+			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+			if(blackListed(widget)){
+				if(isTypeable(widget)){
+					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				} else {
+					filteredActions.add(ac.leftClickAt(widget));
+				}
+				continue;
+			}
+
+			// slides can happen, even though the widget might be blocked
+			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+
+			// If the element is blocked, Testar can't click on or type in the widget
+			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+				continue;
+			}
+
+			// type into text boxes
+			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				}else{
+					// filtered and not white listed:
+					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				}
+			}
+
+			// left clicks, but ignore links outside domain
+			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					if (!isLinkDenied(widget)) {
+						actions.add(ac.leftClickAt(widget));
+					}else{
+						// link denied:
+						filteredActions.add(ac.leftClickAt(widget));
+					}
+				}else{
+					// filtered and not white listed:
+					filteredActions.add(ac.leftClickAt(widget));
+				}
+			}
+		}
+
+		//if(actions.isEmpty()) {
+		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		//}
+
+		// If we have forced actions, prioritize and filter the other ones
+		if (forcedActions != null && forcedActions.size() > 0) {
+			filteredActions = actions;
+			actions = forcedActions;
+		}
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+
+		return actions;
+	}
 
 }
