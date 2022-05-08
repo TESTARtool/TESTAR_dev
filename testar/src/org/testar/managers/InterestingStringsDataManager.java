@@ -5,6 +5,9 @@ package org.testar.managers;
  * would have typically been captured by SUT instrumentation.
  */
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,9 @@ public class InterestingStringsDataManager extends DataManager {
     float maxInputStrings = 5;
     float typeMatchRate = 1.0f;
     List<Map<String,String>> data = new Vector<Map<String,String>>();
-    Map<String,List<String>> typeCache = new HashMap<String,List<String>>() ;
+    Map<String,List<String>> typeCache = new HashMap<String,List<String>>();
+    private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
+
     Random rnd=new Random();
 
     public InterestingStringsDataManager (float fullStringRate, float maxInputStrings, float typeMatchRate) {
@@ -48,8 +53,21 @@ public class InterestingStringsDataManager extends DataManager {
       * Load input data from interesting string data collected by instrumentation
       */
       public void loadInput(List<Map<String,String>> data) {
-        this.data = data;
+
+        // Add all elements with ASCII values (typing non-ASCII values into a
+        // text field using WebDriver won't work).
+        for ( Map<String,String> interestingString: data ) {
+             if ( isAscii(interestingString.getOrDefault(this.KEY_VALUE, "¡") ) )  {
+                  this.data.add(interestingString);
+             }
+        }
+
+        // Reset the type cache
         this.typeCache = new HashMap<String,List<String>>();
+   }
+
+   private boolean isAscii(String input) {
+        return asciiEncoder.canEncode(input);
    }
 
    /**
