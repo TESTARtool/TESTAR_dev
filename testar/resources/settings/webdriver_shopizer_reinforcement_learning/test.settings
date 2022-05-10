@@ -108,7 +108,7 @@ ProtocolClass = webdriver_shopizer_reinforcement_learning/Protocol_webdriver_sho
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
-DataStoreDirectory = C:\\Users\\worker\\Desktop\\orientdb-3.0.4\\databases
+DataStoreDirectory = D:\\Work\\Testar\\Experiments\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -145,7 +145,7 @@ Policy = EpsilonGreedyPolicy
 #
 # Relative path to extended settings file.
 #################################################################
-ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLABT.xml
+ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\ExtendedRLImageComparison.xml
 
 #################################################################
 # WebDriver features

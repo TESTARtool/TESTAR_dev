@@ -16,12 +16,12 @@
 
                 <!-- Folder directory of jedit.jar classes -->
                 <classfiles>
-                    <fileset dir="C:/Users/worker/Desktop/shopizer_classes">
+                    <fileset dir="D:/Work/Testar/Experiments/shopizer_classes">
                         <include name="**/*.class" />
                     </fileset>
                 </classfiles>
                 <sourcefiles encoding="UTF-8">
-                    <fileset file="C:/Users/worker/Desktop/shopizer_jar/lib/*.jar"/>
+                    <fileset file="D:/Work/Testar/Experiments/shopizer_jar/lib/*.jar"/>
                 </sourcefiles>
                 <!-- all filetests here -->
 
