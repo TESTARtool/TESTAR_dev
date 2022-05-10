@@ -168,10 +168,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
+    	SUT sut = super.startSystem();
+
     	// Add the domain from the SUTConnectorValue to domainsAllowed List
     	ensureDomainsAllowed();
-
-    	SUT sut = super.startSystem();
 
     	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
     	setWindowHandleForWebdriverBrowser(sut);
@@ -653,15 +653,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		//TODO try-catch for nullpointer if sut connector missing
-		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-		String url = parts[parts.length - 1].replace("\"", "");
-
 		try{
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+			// Adding default domain from SUTConnectorValue if is not included in the domainsAllowed list
+			//TODO try-catch for nullpointer if sut connector missing
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(sutConnectorUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to domainsAllowed List", getDomain(sutConnectorUrl)));
 				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(sutConnectorUrl)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+
+			// Also add the default starting domain of the SUT if is not included in the domainsAllowed list
+			String initialUrl = WdDriver.getCurrentUrl();
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(initialUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to domainsAllowed List", getDomain(initialUrl)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(initialUrl)));
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
 		} catch(Exception e) { //TODO check what kind of exception can happen
@@ -669,7 +680,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
-	
+
 	/*
 	 * We need to check if click position is within the canvas
 	 */
