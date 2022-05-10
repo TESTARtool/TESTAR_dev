@@ -32,9 +32,7 @@ import org.testar.SutVisualization;
 
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.actions.WdHistoryBackAction;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -143,7 +141,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   @Override
   protected State getState(SUT system) throws StateBuildException {
       // parabank wsdl pages have no widgets, we need to force a webdriver history back action
-      if(WdDriver.getCurrentUrl().contains("wsdl")) {
+      if(WdDriver.getCurrentUrl().contains("wsdl") || WdDriver.getCurrentUrl().contains("wadl")) {
           WdDriver.executeScript("window.history.back();");
           Util.pause(1);
       }

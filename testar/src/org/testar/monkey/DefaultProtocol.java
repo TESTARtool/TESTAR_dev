@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -115,8 +115,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File currentSeq;
 
 	protected Mouse mouse = AWTMouse.build();
-	protected State lastState = null;
-	protected int nonReactingActionNumber;
 
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
@@ -145,7 +143,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return sequenceCount;
 	}
 
-	protected int firstSequenceActionNumber;
 	protected int lastSequenceActionNumber;
 	double startTime;
 
@@ -160,7 +157,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static Action lastExecutedAction = null;
 
-	protected long lastStamp = -1;
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected Pattern clickFilterPattern = null;
@@ -168,8 +164,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Pattern suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	protected int testFailTimes = 0;
-	protected boolean nonSuitableAction = false;
 	
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
@@ -178,11 +172,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
-
-	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-			BluePen = Pen.newPen().setColor(Color.Blue).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
@@ -246,15 +235,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
 					} catch (IOException e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
-						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
+						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
+						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
-				}
-				/*else if(isValidFile())
-					new SequenceViewer(settings);*/
-				else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
-					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
+				} else {
+					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
+					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				runReplayLoop();
@@ -267,8 +253,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is a correct definition";
+			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is correctly defined";
 
 			popupMessage(msg);
 			System.out.println(msg);
@@ -280,10 +266,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
-    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
-    					+ "You can use Task Manager to finish it.";
+						//TODO check when implementing other webdriver than chromedriver
+						//TODO remove when automatically killing webdriver process when creating the session fails
+    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
+    					+ "Please use Windows Task Manager to stop that process.";
 
     			popupMessage(msg);
     			System.out.println(msg);
@@ -295,9 +283,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}catch (IllegalStateException e) {
 			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
 				
-				String msg = "Exception: Check if chromedriver.exe path: \n"
+				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
-				+"\n exists or if is a correct definition";
+				+"\n exists and is correctly defined";
 
 				popupMessage(msg);
 				System.out.println(msg);
@@ -368,7 +356,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 
-
 		} catch (NativeHookException e) {
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
@@ -393,9 +380,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			ois.close();
 
 		} catch (ClassNotFoundException | IOException e) {
-		    popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
-		    System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-		    e.printStackTrace();
+			popupMessage("ERROR: File is not readable, please select a correct TESTAR sequence file");
+			System.out.println("ERROR: File is not readable, please select a correct file (output/sequences)");
+			e.printStackTrace();
 
 		    return false;
 		}
@@ -462,7 +449,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void initGenerateMode() {
 		//TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
 		sequenceCount = 1;
-		lastStamp = System.currentTimeMillis();
 		escAttempts = 0;
 	}
 
@@ -554,22 +540,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	//private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
-	private long tStart;
-
 	/**
 	 * This method is initializing TESTAR for the start of test sequence
 	 *
 	 * @param system
 	 */
 	private void startTestSequence(SUT system) {
-		//for measuring the time of one sequence:
-		tStart = System.currentTimeMillis();
-
 		actionCount = 1;
-		this.testFailTimes = 0;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-		firstSequenceActionNumber = actionCount;
 		passSeverity = Verdict.SEVERITY_OK;
 		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
@@ -742,7 +720,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// the user initiated the shutdown
 			stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
-
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
@@ -1394,7 +1371,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		nonReactingActionNumber = 0;
+
 	}
 
 	@Override
@@ -1527,11 +1504,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
-		if (this.nonSuitableAction){
-			this.nonSuitableAction = false;
-			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
-		}
-
 		// if everything was OK ...
 		return Verdict.OK;
 	}
@@ -1544,7 +1516,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
 			for(Tag tag : w.tags()){
 				if(tag.name().equals(tagForSuspiciousOracle)){
-					tagValue = w.get(tag, "");
+					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
+					tagValue = w.get(tag, "").toString().replace("\n", " ").replace("\r", " ");
 					break;
 					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
@@ -1567,6 +1540,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			if (m.matches()){
 				Visualizer visualizer = Util.NullVisualizer;
+				Pen RedPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
 					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);

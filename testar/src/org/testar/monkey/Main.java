@@ -479,9 +479,6 @@ public class Main {
 			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
 			defaults.add(Pair.from(DrawWidgetTree, false));
 			defaults.add(Pair.from(ExplorationSampleInterval, 1));
-			defaults.add(Pair.from(GraphsActivated, true));
-			defaults.add(Pair.from(PrologActivated, false));
-			defaults.add(Pair.from(GraphResuming, true));
 			defaults.add(Pair.from(ForceToSequenceLength, true));
 			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
 			defaults.add(Pair.from(OfflineGraphConversion, true));
@@ -591,12 +588,6 @@ public class Main {
 				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
 			}
 
-			//Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
-			//Need this during refactoring process of getting Prolog code out. Refactoring will assume that
-			//PrologActivated is ALWAYS false.
-			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
-			settings.set(ConfigTags.PrologActivated, false);
-
 			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
 				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
@@ -697,16 +688,6 @@ public class Main {
 			} catch (NumberFormatException e) {
 				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
 			}
-		}
-		// GraphResumingActivated
-		pS = ConfigTags.GraphResuming.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("GRA", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.GraphResuming, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
 		// ForceToSequenceLength
 		pS = ConfigTags.ForceToSequenceLength.name();

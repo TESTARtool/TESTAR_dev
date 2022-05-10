@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -68,6 +68,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitAndLeftClickWidgetWithMatchingTag(String tagName, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
@@ -161,6 +167,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(String tagName, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
@@ -257,6 +269,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitLeftClickAndPasteIntoWidgetWithMatchingTag(String tagName, String value, String textToPaste, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
@@ -348,6 +366,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected Widget getWidgetWithMatchingTag(String tagName, String value, State state){
+    	// If the state has no children return null
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return null;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
@@ -369,6 +393,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected Widget getWidgetWithMatchingTags(Map<String,String> tagValues, State state) {
+    	// If the state has no children return null
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return null;
+    	}
 
         // First make a lookup table to find Tags for each tag name
         Map<String,Tag<?>> tagLookup = new HashMap<String,Tag<?>>();

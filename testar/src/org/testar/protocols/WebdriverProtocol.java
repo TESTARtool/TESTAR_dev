@@ -34,7 +34,9 @@ package org.testar.protocols;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,6 +53,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.testar.monkey.Environment;
+import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -165,10 +168,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
+    	SUT sut = super.startSystem();
+
     	// Add the domain from the SUTConnectorValue to domainsAllowed List
     	ensureDomainsAllowed();
-
-    	SUT sut = super.startSystem();
 
     	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
     	setWindowHandleForWebdriverBrowser(sut);
@@ -265,6 +268,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(wde.getMessage());
     		system.set(Tags.IsRunning, false);
     	}
+
+    	updateCssClassesFromTestSettingsFile();
 
     	State state = super.getState(system);
 
@@ -648,15 +653,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		//TODO try-catch for nullpointer if sut connector missing
-		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-		String url = parts[parts.length - 1].replace("\"", "");
-
 		try{
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+			// Adding default domain from SUTConnectorValue if is not included in the domainsAllowed list
+			//TODO try-catch for nullpointer if sut connector missing
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(sutConnectorUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to domainsAllowed List", getDomain(sutConnectorUrl)));
 				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(sutConnectorUrl)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+
+			// Also add the default starting domain of the SUT if is not included in the domainsAllowed list
+			String initialUrl = WdDriver.getCurrentUrl();
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(initialUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to domainsAllowed List", getDomain(initialUrl)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(initialUrl)));
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
 		} catch(Exception e) { //TODO check what kind of exception can happen
@@ -664,7 +680,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
-	
+
 	/*
 	 * We need to check if click position is within the canvas
 	 */
@@ -676,5 +692,42 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	/**
+	 * Read the ClickableClasses property from test.settings file 
+	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 */
+	private void updateCssClassesFromTestSettingsFile() {
+		// Feature only for Spy mode
+		if(settings.get(ConfigTags.Mode) != Modes.Spy) {
+			return;
+		}
+
+		try {
+			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
+				for(String line; (line = br.readLine()) != null;) {
+					if(line.contains(ConfigTags.ClickableClasses.name())){
+						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
+						// Check if user added new CSS Classes from test settings file to update the clickableClasses
+						for(String webClass : fileClickableClasses) {
+							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
+								System.out.println("Adding new clickable class from settings file: " + webClass);
+								clickableClasses.add(webClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+						// Check if user removed CSS Classes from test settings file to update the clickableClasses
+						for(String clickClass : clickableClasses) {
+							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
+								System.out.println("Removing the clickable class: " + clickClass);
+								clickableClasses.remove(clickClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {}
 	}
 }

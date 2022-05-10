@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,7 @@ import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdHistoryBackAction;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.webdriver.WdElement;
@@ -39,66 +40,20 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.SutVisualization;
+import org.testar.monkey.Main;
 import org.testar.protocols.WebdriverProtocol;
 
-import com.google.common.base.Strings;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-
+/**
+ * Customize the clickable css classes using TESTAR Spy mode + Control button over widget. 
+ */
 public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
-	/**
-	 * Customize the clickable css classes using TESTAR Spy mode + Control button over widget
-	 * The file "settings/webdriver_spy_custom/customizedCssClasses.txt"
-	 * Will act as input/reader of clickable css classes
-	 */
-	protected Set<String> customizedCssClasses = new HashSet<>();
-	protected File fileCustomizedCssClasses;
-
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings) {
-		super.initialize(settings);
-
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "iAgreeButton");
-		}};
-
-		try {
-			File folder = new File(settings.getSettingsPath());
-			fileCustomizedCssClasses = new File(folder, "customizedCssClasses.txt");
-			if(!fileCustomizedCssClasses.exists())
-				fileCustomizedCssClasses.createNewFile();
-
-			Stream<String> stream = Files.lines(Paths.get(fileCustomizedCssClasses.getCanonicalPath()));
-			stream.forEach(line -> customizedCssClasses.add(line));
-			stream.close();
-
-			customizedCssClasses.removeIf(Strings::isNullOrEmpty);
-		} catch (IOException e) {
-			System.out.println("ERROR reading customizedCssClasses.txt file");
-		}
-
-	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -112,10 +67,10 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state)
-			throws ActionBuildException {
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
+		Set<Action> filteredActions = new HashSet<>();
 
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
@@ -123,20 +78,26 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 
 		// Check if forced actions are needed to stay within allowed domains
 		Set<Action> forcedActions = detectForcedActions(state, ac);
-		if (forcedActions != null && forcedActions.size() > 0) {
-			return forcedActions;
-		}
 
 		// iterate through all widgets
 		for (Widget widget : state) {
 			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true) || blackListed(widget)) {
+			if (!widget.get(Enabled, true)) {
+				continue;
+			}
+			// The blackListed widgets are those that have been filtered during the SPY mode with the
+			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+			if(blackListed(widget)){
+				if(isTypeable(widget)){
+					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				} else {
+					filteredActions.add(ac.leftClickAt(widget));
+				}
 				continue;
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,
-			//     state);
+			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -144,17 +105,43 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 			}
 
 			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				}else{
+					// filtered and not white listed:
+					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				}
 			}
 
 			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				if (!isLinkDenied(widget)) {
-					actions.add(ac.leftClickAt(widget));
+			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					if (!isLinkDenied(widget)) {
+						actions.add(ac.leftClickAt(widget));
+					}else{
+						// link denied:
+						filteredActions.add(ac.leftClickAt(widget));
+					}
+				}else{
+					// filtered and not white listed:
+					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
 		}
+
+		if(actions.isEmpty()) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
+
+		// If we have forced actions, prioritize and filter the other ones
+		if (forcedActions != null && forcedActions.size() > 0) {
+			filteredActions = actions;
+			actions = forcedActions;
+		}
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
 	}
@@ -176,11 +163,9 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 			return true;
 		}
 
-		for(String s : element.cssClasses)
-			if (customizedCssClasses.contains(s))
-				return true;
-
-		return false;
+		Set<String> clickSet = new HashSet<>(clickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
 	}
 
 	@Override
@@ -199,7 +184,7 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 	}
 
 	/**
-	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the filtering of actions by clicking on them
+	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the CSS clickable customization of widgets. 
 	 * @param key
 	 */
 	@Override
@@ -208,47 +193,35 @@ public class Protocol_webdriver_spy_custom extends WebdriverProtocol {
 		if (mode() == Modes.Spy){ 
 			if (key == KBKeys.VK_RIGHT) {
 				try {
-
+					// Obtain the widget aimed with the mouse cursor
 					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
-
+					// Add the widget web CSS class property as clickable
 					WdElement element = ((WdWidget) w).element;
 					for(String s : element.cssClasses)
 						if(s!=null && !s.isEmpty())
-							customizedCssClasses.add(s);
-
-				}catch(Exception e) {
-					System.out.println("ERROR reading and adding the widget from point: "
-							+ "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+							clickableClasses.add(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
 				}
 			}
 
 			if (key == KBKeys.VK_LEFT) {
 				try {
+					// Obtain the widget aimed with the mouse cursor
 					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
-
+					// Remove the widget web CSS class property from all clickables
 					WdElement element = ((WdWidget) w).element;
 					for(String s : element.cssClasses)
 						if(s!=null && !s.isEmpty())
-							customizedCssClasses.remove(s);
-				}catch(Exception e) {
-					System.out.println("ERROR reading and removing the widget from point: "
-							+ "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+							clickableClasses.remove(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
 				}
 			}
 		}
-	}
-
-	@Override
-	protected void stopSystem(SUT system) {
-		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-			try (PrintWriter write = new PrintWriter(new FileWriter(fileCustomizedCssClasses.getCanonicalPath()))){
-				for(String s : customizedCssClasses)
-					if(s!=null && !s.isEmpty())
-						write.println(s);
-			}catch(Exception e) {
-				System.out.println("ERROR writing customizedCssClasses.txt file");
-			}
-		}
-		super.stopSystem(system);
 	}
 }

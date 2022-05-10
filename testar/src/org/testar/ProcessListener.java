@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -103,9 +103,6 @@ public class ProcessListener{
 		//Process Logs use ProcessLogs regular expression from test settings file
 		Pattern processLogs= Pattern.compile(settings.get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
 
-		//Create File to save the logs of these oracles
-		File dir = new File(OutputStructure.processListenerDir);
-		
 		String logProcessListenerName = OutputStructure.processListenerDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
