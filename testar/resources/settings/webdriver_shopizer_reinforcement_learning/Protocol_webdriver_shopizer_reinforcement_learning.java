@@ -49,7 +49,10 @@ import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import java.io.File;
@@ -551,6 +554,13 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
+		String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
+				" | actionnr | " + actionCount +
+				" | url | " + WdDriver.getCurrentUrl();
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("urlData")
+				.setInformation(information)
+				.build());
 
 		// Extract and create JaCoCo action coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {

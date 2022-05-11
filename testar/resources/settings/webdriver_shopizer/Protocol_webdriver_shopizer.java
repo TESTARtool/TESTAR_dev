@@ -43,7 +43,10 @@ import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.io.File;
 import java.util.*;
@@ -500,6 +503,14 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
+		System.out.println(WdDriver.getCurrentUrl());
+		String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
+				" | actionnr | " + actionCount +
+				" | url | " + WdDriver.getCurrentUrl();
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("urlData")
+				.setInformation(information)
+				.build());
 
 		// Extract and create JaCoCo action coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
