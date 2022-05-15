@@ -772,75 +772,57 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			startTestSequence(system);
 
 			try {
-				System.out.println("(0)");
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-				System.out.println("(0.5)");
 				State state = getState(system);
 
-				System.out.println("(1)");
 				// beginSequence() - a script to interact with GUI, for example login screen
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
 
 				//update state after begin sequence SUT modification
-				System.out.println("(2)");
 				state = getState(system);
 
 				//initializing fragment for recording replayable test sequence:
-				System.out.println("(3)");
 				initFragmentForReplayableSequence(state);
 
 				// notify the statemodelmanager
-				System.out.println("(4)");
 				stateModelManager.notifyTestSequencedStarted();
 
 				/*
 				 ***** starting the INNER LOOP:
 				 */
-				System.out.println("(5)");
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
 				//Saving the last state into replayable test sequence:
-				System.out.println("(6)");
 				saveStateIntoFragmentForReplayableSequence(state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
-				System.out.println("(7)");
 				finishSequence();
 
 				// notify the state model manager of the sequence end
-				System.out.println("(8)");
 				stateModelManager.notifyTestSequenceStopped();
 
-				System.out.println("(9)");
 				writeAndCloseFragmentForReplayableSequence();
 
-				System.out.println("(10)");
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
-				System.out.println("(11)");
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				//Copy sequence file into proper directory:
-				System.out.println("(12)");
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
-				System.out.println("(13)");
 				postSequenceProcessing();
 
 				//Ending test sequence of TESTAR:
-				System.out.println("(14)");
 				endTestSequence();
 
-				System.out.println("(15)");
 				LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
 				stopSystem(system);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
-				System.out.println("(16)");
 				sequenceCount++;
 
 			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
@@ -954,12 +936,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 		// notify to state model the last state
 		Set<Action> actions = actionResolver.deriveActions(system, state);
-		buildStateActionsIdentifiers(state, actions);
-		for(Action a : actions)
-			if(a.get(Tags.AbstractIDCustom, null) == null)
-			    buildEnvironmentActionIdentifiers(state, a);
-		
-		stateModelManager.notifyNewStateReached(state, actions);
+		if (actions != null) {
+			buildStateActionsIdentifiers(state, actions);
+			for (Action a : actions)
+				if (a.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildEnvironmentActionIDs(state, a);
+
+			stateModelManager.notifyNewStateReached(state, actions);
+		}
 
 		return getVerdict(state);
 	}
@@ -1324,6 +1308,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					fragment = (TaggableBase) ois.readObject();
 				} catch(IOException ioe){
 					success = true;
+					System.out.println("<< Success reached >");
 					break;
 				}
 
@@ -1337,6 +1322,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
+
 					Action action = fragment.get(ExecutedAction, new NOP());
 
     				/**
@@ -1375,7 +1361,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     					+ " the State " + state.get(Tags.ConcreteID, state.toString());
 
 						setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
-    					
     					break;
     				}
     				
@@ -1405,7 +1390,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 					Util.pause(actionDelay);
 
-					if(mode() == Modes.Quit) break;
+					if(mode() == Modes.Quit) {
+						break;
+					}
 					state = getState(system);
 				}
 

@@ -121,10 +121,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Pair<String, String> password = Pair.from("password", "");
 
 	public MySqlService sqlService;
-	private int reportId = -1;
-	private int iterationId = -1;
 
-	private OrientDBService orientService;
+	protected OrientDBService orientService;
 
 	private boolean isLocalDatabaseActive = false;
 
