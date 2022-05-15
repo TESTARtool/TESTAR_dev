@@ -2,6 +2,7 @@ import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.resolver.MySQLSerialResolver;
+import nl.ou.testar.resolver.OrientDBSerialResolver;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -31,7 +32,8 @@ public class Protocol_replay extends WebdriverProtocol {
     protected boolean isPlayableRecordEnabled = true;
     protected boolean isLogSerializerEnabled = true;
 
-    protected MySQLSerialResolver databaseReplayResolver = new MySQLSerialResolver();
+    protected MySQLSerialResolver databaseReplayResolver;
+    protected OrientDBSerialResolver orientDbSerialResolver;
 
     @Override
     protected void initialize(Settings settings) {
@@ -126,14 +128,16 @@ public class Protocol_replay extends WebdriverProtocol {
             isLogSerializerEnabled = true;
             isPlayableRecordEnabled = true;
 
-            databaseReplayResolver = new MySQLSerialResolver();
+//            databaseReplayResolver = new MySQLSerialResolver(sqlService, settings);
+            orientDbSerialResolver = new OrientDBSerialResolver(orientService, settings, stateModelManager);
+
             try {
-                databaseReplayResolver.startReplay(sqlService, settings.get(ConfigTags.SQLReporting));
-                assignActionResolver(databaseReplayResolver);
+                orientDbSerialResolver.startReplay(settings.get(ConfigTags.SQLReporting));
+                assignActionResolver(orientDbSerialResolver);
                 runGenerateOuterLoop(null);
                 resignActionResolver();
             }
-            catch (SQLException e) {
+            catch (Exception e) {
                 System.err.println("Failed to replay from a database");
                 System.err.println(e.getMessage());
             }

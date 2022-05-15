@@ -7,12 +7,13 @@ import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.webdriver.WdDriver;
+import org.fruit.monkey.Settings;
 import org.fruit.monkey.mysql.MySqlService;
 
 import java.sql.SQLException;
 import java.util.*;
 
-public class MySQLSerialResolver implements ActionResolver {
+public class MySQLSerialResolver extends SerialResolver {
 
     private ActionResolver nextResolver;
     private MySqlService service;
@@ -27,8 +28,11 @@ public class MySQLSerialResolver implements ActionResolver {
     private Iterator<MySqlService.IterationData> outerIterator = null;
     private Iterator<MySqlService.ActionData> innerIterator = null;
 
-    public void startReplay(MySqlService service, String reportTag) throws SQLException {
-        this.service = service;
+    public MySQLSerialResolver(MySqlService service, Settings settings) {
+        super(service, settings);
+    }
+
+    public void startReplay(String reportTag) throws SQLException {
         this.reportId = service.getReportId(reportTag);
 
         iterations = service.getAllIterations(reportId);
@@ -36,7 +40,8 @@ public class MySQLSerialResolver implements ActionResolver {
     }
 
     @Override
-    public Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+    protected Action nextAction(SUT system, State state) {
+        final MySqlService.ActionData currentActionData = innerIterator.next();
         if (currentActionData == null) {
             return null;
         }
@@ -51,23 +56,11 @@ public class MySQLSerialResolver implements ActionResolver {
                     }
                 }
             }
-            if (action != null) {
-                return new HashSet<>(Collections.singletonList(action));
-            }
+            return action;
         }
         catch (ActionParseException e) {
             throw new ActionBuildException(e.getMessage());
         }
-        return null;
-    }
-
-    @Override
-    public Action selectAction(State state, Set<Action> actions) {
-        // A single action supposed here
-        if (actions != null) {
-            return actions.iterator().next();
-        }
-        return null;
     }
 
     @Override
@@ -75,7 +68,6 @@ public class MySQLSerialResolver implements ActionResolver {
         if (innerIterator == null || !innerIterator.hasNext()) {
             return false;
         }
-        currentActionData = innerIterator.next();
         return true;
     }
 
@@ -94,15 +86,5 @@ public class MySQLSerialResolver implements ActionResolver {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public ActionResolver nextResolver() {
-        return nextResolver;
-    }
-
-    @Override
-    public void setNextResolver(ActionResolver nextResolver) {
-        this.nextResolver = nextResolver;
     }
 }

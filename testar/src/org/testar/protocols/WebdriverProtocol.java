@@ -34,12 +34,10 @@ package org.testar.protocols;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-//import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -58,7 +56,6 @@ import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.HtmlReporting.HtmlTestReport;
 import nl.ou.testar.SequenceReport;
 import nl.ou.testar.TestReport;
-import nl.ou.testar.resolver.MySQLSerialResolver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.Environment;
 import org.fruit.Pair;
@@ -70,7 +67,6 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
@@ -82,7 +78,6 @@ import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
-//import org.fruit.monkey.dialog.ProgressDialog;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceDelegate;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
@@ -92,7 +87,6 @@ import org.fruit.monkey.orientdb.OrientDbServiceImpl;
 import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
-import org.fruit.monkey.webserver.ReportingServiceImpl;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
@@ -121,10 +115,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Pair<String, String> password = Pair.from("password", "");
 
 	public MySqlService sqlService;
-	private int reportId = -1;
-	private int iterationId = -1;
 
-	private OrientDBService orientService;
+	protected OrientDBService orientService;
 
 	private boolean isLocalDatabaseActive = false;
 
