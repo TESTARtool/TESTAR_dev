@@ -204,3 +204,9 @@ SonarProjectName = Demo
 SonarProjectKey = demo
 GitUrl = https://github.com/crystal-lang/crystal
 GitAuthRequired = false
+
+ApplicationName = calculator
+ApplicationVersion = 1.0
+ReplayApplicationName = calculator
+ReplayApplicationVersion = 1.0
+
