@@ -82,9 +82,6 @@ public final class ConfigTags {
   public static final Tag<Integer> TypingTextsForExecutedAction = Tag.from("TypingTextsForExecutedAction", Integer.class);
   public static final Tag<Boolean> DrawWidgetTree = Tag.from("DrawWidgetTree", Boolean.class);
   public static final Tag<Integer> ExplorationSampleInterval = Tag.from("ExplorationSampleInterval", Integer.class);
-  public static final Tag<Boolean> GraphsActivated = Tag.from("GraphsActivated", Boolean.class);
-  public static final Tag<Boolean> PrologActivated = Tag.from("PrologActivated", Boolean.class);
-  public static final Tag<Boolean> GraphResuming = Tag.from("GraphResuming", Boolean.class);
   public static final Tag<Boolean> ForceToSequenceLength = Tag.from("ForceToSequenceLength", Boolean.class);
   public static final Tag<Integer> NonReactingUIThreshold = Tag.from("NonReactingUIThreshold", Integer.class);
   public static final Tag<Boolean> OfflineGraphConversion = Tag.from("OfflineGraphConversion", Boolean.class);

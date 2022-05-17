@@ -29,13 +29,13 @@
  *******************************************************************************************************/
 
 
-package org.testar.monkey.dialog;
+package org.testar.settingsdialog.dialog;
 
 import org.testar.monkey.Pair;
 import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
-import org.testar.monkey.SettingsPanel;
+import org.testar.settingsdialog.SettingsPanel;
 
 import javax.swing.*;
 
@@ -49,8 +49,6 @@ import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
-import static org.testar.monkey.dialog.ToolTipTexts.copyFilesTTT;
-import static org.testar.monkey.dialog.ToolTipTexts.deleteFiles;
 
 public class MiscPanel extends SettingsPanel {
 
@@ -74,11 +72,11 @@ public class MiscPanel extends SettingsPanel {
     jScrollPane5.setViewportView(tblCopyFromTo);
 
     JLabel jLabel16 = new JLabel("Copy Files on SUT Startup:");
-    jLabel16.setToolTipText(copyFilesTTT);
+    jLabel16.setToolTipText(ToolTipTexts.copyFilesTTT);
     JLabel jLabel8 = new JLabel("Output Directory:");
     JLabel jLabel9 = new JLabel("Temp Directory:");
     JLabel jLabel20 = new JLabel("Delete Files on SUT Startup:");
-    jLabel20.setToolTipText(deleteFiles);
+    jLabel20.setToolTipText(ToolTipTexts.deleteFiles);
 
     JButton btnSetOutputDir = new JButton("Select");
     btnSetOutputDir.addActionListener(this::btnSetOutputDirActionPerformed);

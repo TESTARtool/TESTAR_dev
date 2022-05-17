@@ -33,7 +33,10 @@ package org.testar.protocols;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,6 +52,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testar.monkey.Environment;
+import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -157,35 +161,45 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
-    	// Add the domain from the SUTConnectorValue to domainsAllowed List
-    	ensureDomainsAllowed();
-    	
     	SUT sut = super.startSystem();
 
-    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
-    	// webdriver in the constructor of WdDriver.
-    	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows 10")
-    			&& sut.get(Tags.HWND, null) == null) {
-    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
-    		// window handle. The running browser needs to be in the foreground when we reach this part.
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		// Safe to set breakpoints again.
-    		if (WinProcess.procName(pid).contains("chrome")) {
-    			sut.set(Tags.HWND, hwnd);
-    			sut.set(Tags.PID, pid);
-    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
-    		}
-    	}
+    	// Add the domain from the SUTConnectorValue to domainsAllowed List
+    	ensureDomainsAllowed();
 
-		double displayScale = getDisplayScale(sut);
+    	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
+    	setWindowHandleForWebdriverBrowser(sut);
 
-		// See remarks in WdMouse
-        mouse = sut.get(Tags.StandardMouse);
-        mouse.setCursorDisplayScale(displayScale);
+    	double displayScale = getDisplayScale(sut);
+
+    	// See remarks in WdMouse
+    	mouse = sut.get(Tags.StandardMouse);
+    	mouse.setCursorDisplayScale(displayScale);
 
     	return sut;
+    }
+
+    /**
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
+     * webdriver in the constructor of WdDriver. 
+     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     */
+    private void setWindowHandleForWebdriverBrowser(SUT sut) {
+    	try {
+    		if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
+    			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    			// window handle. The running browser needs to be in the foreground when we reach this part.
+    			long hwnd = Windows.GetForegroundWindow();
+    			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    			// Safe to set breakpoints again.
+    			if (WinProcess.procName(pid).contains("chrome")) {
+    				sut.set(Tags.HWND, hwnd);
+    				sut.set(Tags.PID, pid);
+    				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    			}
+    		}
+    	} catch (ExceptionInInitializerError | NoClassDefFoundError e) {
+    		System.out.println("INFO: We can not obtain the Windows 10 windows handle of WebDriver browser instance");
+    	}
     }
 
 	/**
@@ -195,6 +209,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * @return The display scale.
 	 */
 	private double getDisplayScale(SUT sut) {
+		// Call specific OS API to obtain the display scale value of the system
+		// Ex: windows - org.testar.monkey.alayer.windows.Windows10 calls MonitorFromWindow native function
+		// If something fails these specific getDisplayScale OS implementations must return a default value
 		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
 		// If the user has specified a scale override the display scale obtained from the system.
@@ -244,6 +261,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(wde.getMessage());
     		system.set(Tags.IsRunning, false);
     	}
+
+    	updateCssClassesFromTestSettingsFile();
 
     	State state = super.getState(system);
 
@@ -310,12 +329,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @param actions
      * @return
      */
-    @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
+	@Override
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+		actions = super.preSelectAction(system, state, actions);
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
+		return actions;
+	}
 
     /**
      * Execute the selected action.
@@ -629,15 +649,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		//TODO try-catch for nullpointer if sut connector missing
-		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-		String url = parts[parts.length - 1].replace("\"", "");
-
 		try{
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+			// Adding default domain from SUTConnectorValue if is not included in the domainsAllowed list
+			//TODO try-catch for nullpointer if sut connector missing
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(sutConnectorUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to domainsAllowed List", getDomain(sutConnectorUrl)));
 				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(sutConnectorUrl)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+
+			// Also add the default starting domain of the SUT if is not included in the domainsAllowed list
+			String initialUrl = WdDriver.getCurrentUrl();
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(initialUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to domainsAllowed List", getDomain(initialUrl)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(initialUrl)));
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
 		} catch(Exception e) { //TODO check what kind of exception can happen
@@ -645,7 +676,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
-	
+
 	/*
 	 * We need to check if click position is within the canvas
 	 */
@@ -679,5 +710,40 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		return false;
 	}
 
+	/**
+	 * Read the ClickableClasses property from test.settings file 
+	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 */
+	private void updateCssClassesFromTestSettingsFile() {
+		// Feature only for Spy mode
+		if(settings.get(ConfigTags.Mode) != Modes.Spy) {
+			return;
+		}
 
+		try {
+			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
+				for(String line; (line = br.readLine()) != null;) {
+					if(line.contains(ConfigTags.ClickableClasses.name())){
+						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
+						// Check if user added new CSS Classes from test settings file to update the clickableClasses
+						for(String webClass : fileClickableClasses) {
+							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
+								System.out.println("Adding new clickable class from settings file: " + webClass);
+								clickableClasses.add(webClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+						// Check if user removed CSS Classes from test settings file to update the clickableClasses
+						for(String clickClass : clickableClasses) {
+							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
+								System.out.println("Removing the clickable class: " + clickClass);
+								clickableClasses.remove(clickClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {}
+	}
 }

@@ -32,6 +32,9 @@
 import java.util.Set;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.FillPattern;
+import org.testar.monkey.alayer.Pen;
 import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
@@ -42,6 +45,7 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.StrokePattern;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -72,6 +76,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	static int browser; // BROWSER_*
 	static Role webController, webText; // browser dependent
 	static double browser_toolbar_filter;	
+	private Pen BluePen = Pen.newPen().setColor(Color.Blue).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	// check browser
 	private void initBrowser(){

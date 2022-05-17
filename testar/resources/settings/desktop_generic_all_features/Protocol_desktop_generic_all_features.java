@@ -194,7 +194,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	protected Action selectAction(State state, Set<Action> actions){
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
+		Action retAction = super.selectAction(state, actions);
 		if (retAction == null) {
 			//if no preSelected actions are needed, then implement your own strategy
 			//using the action selector of the state model:

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.stub;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Iterator;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class ExampleSetting extends ExtendedSettingBase<ExampleSetting> {
-    public String test;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.WidgetIterator;
 
-    public static ExampleSetting CreateDefault() {
-        ExampleSetting instance = new ExampleSetting();
-        instance.test = "Hello";
-        return instance;
-    }
+public class StateStub extends WidgetStub implements State {
+	private static final long serialVersionUID = -2972642849689796355L;
 
-    @Override
-    public int compareTo(ExampleSetting other) {
-        if (test.contentEquals(other.test)){
-            return 0;
-        }
-        return -1;
-    }
+	@Override
+	public Iterator<Widget> iterator() {
+		return new WidgetIterator(this);
+	}
 }

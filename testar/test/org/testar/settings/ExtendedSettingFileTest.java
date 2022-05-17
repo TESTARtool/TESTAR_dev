@@ -33,6 +33,7 @@ package org.testar.settings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.testar.extendedsettings.ExtendedSettingFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -3,6 +3,8 @@ package org.testar.statemodel.analysis;
 import org.testar.statemodel.analysis.representation.AbstractStateModel;
 import org.testar.statemodel.analysis.representation.ActionViz;
 
+import com.orientechnologies.orient.core.exception.OCommandExecutionException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -23,16 +25,25 @@ public class StateModelServlet extends HttpServlet {
         // todo: this needs proper error handling
         // fetch a list of the generated models from the analysismanager
         AnalysisManager analysisManager = (AnalysisManager)servletContext.getAttribute("analysisManager");
-        List<AbstractStateModel> models = analysisManager.fetchModels();
 
         try {
-            request.setAttribute("models", models);
-            RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
-            dispatcher.forward(request, response);
+        	List<AbstractStateModel> models = analysisManager.fetchModels();
+        	request.setAttribute("models", models);
+        	RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
+        	dispatcher.forward(request, response);
         } catch (ServletException e) {
-            e.printStackTrace();
+        	e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+        	e.printStackTrace();
+        } catch (OCommandExecutionException e) {
+        	// If user tried to analyze an OrientDB database without models, launch an info web page
+        	if(e.getMessage() != null && e.getMessage().contains("Class not found: AbstractStateModel")) {
+        		System.out.println("Database does not contain any model to visualize");
+        		RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/warning.jsp");
+        		dispatcher.forward(request, response);
+        	} else {
+        		e.printStackTrace();
+        	}
         }
 
     }

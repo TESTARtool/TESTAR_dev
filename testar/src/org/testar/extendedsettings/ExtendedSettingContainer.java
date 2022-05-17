@@ -28,31 +28,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
+package org.testar.extendedsettings;
 
-import javax.swing.*;
+import java.util.Observable;
+import java.util.Observer;
 
-/**
- * Abstract class for all common functionality for a SettingsPanel.
- */
-public abstract class SettingsPanel extends JPanel {
-    /**
-     * Populate the fields from Settings structure.
-     *
-     * @param settings The settings to load.
-     */
-    public abstract void populateFrom(final Settings settings);
+public class ExtendedSettingContainer<S extends ExtendedSettingBase<S>> implements Observer {
+    // Access to the resource file which also holds the old value in case we need to update the settings.
+    private final ExtendedSettingFile _file;
+    // The actual settings.
+    private final ExtendedSettingBase<S> _setting;
 
-    /**
-     * Retrieve information from the GUI.
-     *
-     * @param settings reference to the object where the settings will be stored.
-     */
-    public abstract void extractInformation(final Settings settings);
+    public ExtendedSettingContainer(ExtendedSettingFile file, Class<S> clazz,
+                                    IExtendedSettingDefaultValue<S> defaultFunctor) {
+        _file = file;
+        _setting = _file.load(clazz, defaultFunctor);
+        _setting.addObserver(this);
+    }
 
     /**
-     * Validate that the settings are valid.
+     * Get the settings.
+     * @return The actual settings.
      */
-    public void checkSettings() {
+    ExtendedSettingBase<S> GetSettings() {
+        return _setting;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o.equals(_setting)) {
+            _file.save(_setting);
+        }
     }
 }

@@ -40,7 +40,15 @@ jobs:
       with:
         name: runTestDesktopGenericCommandLineOk-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_ok
-    
+
+    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
+      run: ./gradlew runTestDesktopGenericMultiTags
+    - name: Save runTestDesktopGenericMultiTags HTML report artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: runTestDesktopGenericMultiTags-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_multitags
+
     - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
     - name: Save runTestDesktopGenericCommandLineSuspiciousTitle HTML report artifact

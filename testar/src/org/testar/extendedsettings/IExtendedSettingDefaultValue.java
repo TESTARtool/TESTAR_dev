@@ -28,38 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.visualvalidation;
+package org.testar.extendedsettings;
 
-import org.testar.extendedsettings.ExtendedSettingBase;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class VisualValidationSettings extends ExtendedSettingBase<VisualValidationSettings> {
-    public Boolean enabled;
-
-    @Override
-    public int compareTo(VisualValidationSettings other) {
-        int res = -1;
-        if (this.enabled.equals(other.enabled)) {
-            res = 0;
-        }
-        return res;
-    }
-
-    @Override
-    public String toString() {
-        return "VisualValidationSettings{" +
-                "enabled=" + enabled +
-                '}';
-    }
-
-    public static VisualValidationSettings CreateDefault() {
-        VisualValidationSettings DefaultInstance = new VisualValidationSettings();
-        DefaultInstance.enabled = false;
-        return DefaultInstance;
-    }
+public interface IExtendedSettingDefaultValue<T> {
+    /**
+     * Functor to create an initialized object T with default values.
+     * Should not be implemented by specializations of {@link ExtendedSettingFile}.
+     *
+     * @return Object T initialized with default values.
+     */
+    ExtendedSettingBase<T> CreateDefault();
 }

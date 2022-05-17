@@ -31,7 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-package org.testar.monkey;
+package org.testar.settingsdialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jsyntaxpane.DefaultSyntaxKit;
+import org.testar.monkey.Util;
 
 public class ProtocolEditor extends javax.swing.JDialog {
     private static final long serialVersionUID = 5922037291232012481L;

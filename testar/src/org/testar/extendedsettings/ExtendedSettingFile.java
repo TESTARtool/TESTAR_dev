@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.extendedsettings;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.SerializationUtils;
@@ -108,7 +108,7 @@ public class ExtendedSettingFile implements Serializable {
      * @param fileLocation    The absolute path the the XML file.
      * @param fileAccessMutex Mutex for thread-safe access.
      */
-    protected ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
+	public ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
         _fileAccessMutex = fileAccessMutex;
         _absolutePath = System.getProperty("user.dir") +
                 (fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)

@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2016 - 2022 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -52,9 +53,6 @@ import org.xml.sax.SAXException;
 
 /**
  * A management utility for SUT UI input values data.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class DataManager {
 
