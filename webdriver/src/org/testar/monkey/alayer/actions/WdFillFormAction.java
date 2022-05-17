@@ -139,7 +139,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
             path = uriPath + "_" + widget.get(Tags.Path, "");
             logger.debug("Form name and ID are empty, using URL and TESTAR widget path used for path="+path);
         }
-        path = path.replace("/", "_").replace("?", "_") + ".xml";
+        path = path.replaceAll("[\\/?:*\"|><]", "_") + ".xml";
         String file_path = "settings\\" + this.formFileFolder + "\\" + path;
         logger.debug("file_path="+file_path);
         //Updating action description:
