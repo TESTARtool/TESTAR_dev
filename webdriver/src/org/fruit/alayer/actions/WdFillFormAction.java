@@ -114,7 +114,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
             // Therefore, we add TESTAR widget path into the filename:
             path = uriPath + "_" + widget.get(Tags.Path, "");
         }
-        path = path.replace("/", "_").replace("?", "_") + ".xml";
+        path = path.replaceAll("[\\/?:*\"|><]", "_") + ".xml";
         String file_path = "settings/" + this.formPath + "/" + path;
         File f = new File(file_path);
         Map<String, String> fields = new HashMap<>();
