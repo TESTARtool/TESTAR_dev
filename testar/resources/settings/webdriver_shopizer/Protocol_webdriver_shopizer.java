@@ -306,7 +306,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 
 			// Ignore link widgets that do not contains informative properties to identify them
 			// English, My Account, Shopping cart
-			if(widget.get(WdTags.Desc, "").equals("a")) {
+			if(widget.get(WdTags.Desc, "").equals("a") && !widget.get(WdTags.WebCssClasses, "").contains("listing-product-name")) {
 				continue;
 			}
 

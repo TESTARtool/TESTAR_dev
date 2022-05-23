@@ -327,13 +327,15 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 
 			// Ignore link widgets that do not contains informative properties to identify them
 			// English, My Account, Shopping cart
-			if(widget.get(WdTags.Desc, "").equals("a")) {
+			if(widget.get(WdTags.Desc, "").equals("a") && !widget.get(WdTags.WebCssClasses, "").contains("listing-product-name")) {
 				continue;
 			}
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				if(widget.get(WdTags.WebCssClasses,"").contains("tt-hint")) {
+					System.out.println("-------------------- 1");
+					System.out.println(widget.get(WdTags.Desc, ""));
 					// Ignore duplicated search bar text box
 					continue;
 				}
@@ -361,6 +363,8 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 //		}
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+				System.out.println("-------------------- 2");
+				System.out.println(widget.get(WdTags.Desc, ""));
 				// Click on select web items opens the menu but does not allow TESTAR to select an item,
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
