@@ -337,7 +337,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 					actions.add(ac.leftClickAt(widget));
 				}
 			}
-		}
+//		}
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				// Click on select web items opens the menu but does not allow TESTAR to select an item,
