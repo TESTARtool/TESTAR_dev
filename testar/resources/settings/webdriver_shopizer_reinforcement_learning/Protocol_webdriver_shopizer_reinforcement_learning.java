@@ -289,7 +289,7 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		    // dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
 		    // this is because a click will close the dropdown
 		    if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
-//		        actions.add(ac.mouseMove(widget));
+		        actions.add(ac.mouseMove(widget));
 		    }
 
 		    // fill forms actions
@@ -380,6 +380,9 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 			nop.set(Tags.Desc, "NOP action to wait");
 			return new HashSet<>(Collections.singletonList(nop));
 		}
+
+		actions.add(ac.hitKey(KBKeys.VK_PAGE_DOWN));
+		actions.add(ac.hitKey(KBKeys.VK_PAGE_UP));
 
 		return actions;
 	}

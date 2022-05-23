@@ -285,7 +285,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		    }
 
 			if(widget.get(WdTags.WebId, "").contains("registrationForm")) {
-				actions.add(registrationFormFill(state, widget));
+//				actions.add(registrationFormFill(state, widget));
 			}
 			if(widget.get(WdTags.WebId, "").contains("login-form")) {
 //				actions.add(loginFormFill(state, widget));
@@ -319,25 +319,25 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 //				actions.add(ac.clickTypeInto(widget, getRandomShopizerData(widget), true));
 			}
 
-//			// left clicks, but ignore links outside domain
-//			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-//				// Click on select web items opens the menu but does not allow TESTAR to select an item,
-//				// thats why we need a custom action selection
-//				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
-//					//actions.add(randomFromSelectList(widget));
-//				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")) {
-//					// dropdown-toggle widgets need a mouse movement but not a click, because a click will close the dropdown
-//					// Except multi language Home button :)
-//					if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
-//						actions.add(ac.leftClickAt(widget));
-//					} else {
-//						actions.add(ac.mouseMove(widget));
-//					}
-//				} else {
-//					actions.add(ac.leftClickAt(widget));
-//				}
-//			}
-//		}
+			// left clicks, but ignore links outside domain
+			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+				// Click on select web items opens the menu but does not allow TESTAR to select an item,
+				// thats why we need a custom action selection
+				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+					//actions.add(randomFromSelectList(widget));
+				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")) {
+					// dropdown-toggle widgets need a mouse movement but not a click, because a click will close the dropdown
+					// Except multi language Home button :)
+					if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
+						actions.add(ac.leftClickAt(widget));
+					} else {
+						actions.add(ac.mouseMove(widget));
+					}
+				} else {
+					actions.add(ac.leftClickAt(widget));
+				}
+			}
+		}
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
 				// Click on select web items opens the menu but does not allow TESTAR to select an item,
@@ -359,6 +359,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			nop.set(Tags.Desc, "NOP action to wait");
 			return new HashSet<>(Collections.singletonList(nop));
 		}
+		actions.add(ac.hitKey(KBKeys.VK_PAGE_DOWN));
+		actions.add(ac.hitKey(KBKeys.VK_PAGE_UP));
 
 		return actions;
 	}
