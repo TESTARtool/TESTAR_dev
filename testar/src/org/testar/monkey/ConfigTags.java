@@ -181,6 +181,14 @@ public final class ConfigTags {
   public static final Tag<Float> FullStringRate = Tag.from("FullStringRate", Float.class);
   public static final Tag<Float> TypeMatchRate = Tag.from("TypeMatchRate", Float.class);
 
+  // Tags for compound text input logic
+
+  public static final Tag<Boolean> CompoundTextActionLogicEnabled = Tag.from("CompoundTextActionLogicEnabled", Boolean.class);
+  public static final Tag<Float> CompoundTextActionInitialProbability = Tag.from("CompoundTextActionInitialProbability", Float.class);
+  public static final Tag<Float> CompoundTextActionResetProbability = Tag.from("CompoundTextActionResetProbability", Float.class);
+  public static final Tag<Float> CompoundTextActionGrowthRate = Tag.from("CompoundTextActionGrowthRate", Float.class);
+
+
   // Tags for CKAN protocol
 
   public static final Tag<String> ApplicationUsername = Tag.from("ApplicationUsername", String.class);

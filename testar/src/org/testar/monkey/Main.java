@@ -530,6 +530,13 @@ public class Main {
 			defaults.add(Pair.from(TypeMatchRate, 1.0f));
 			// End defaults CodeAnalysisWebdriverProtocol
 
+			// Defaults for compound text input logic
+			defaults.add(Pair.from(CompoundTextActionLogicEnabled, true));
+			defaults.add(Pair.from(CompoundTextActionInitialProbability, 0.8f));
+			defaults.add(Pair.from(CompoundTextActionResetProbability, 0.1f));
+			defaults.add(Pair.from(CompoundTextActionGrowthRate, 2.0f));
+			// End defaults for compound text input logic
+
 			// Defaults for DockerizedSUTWebdriverProtocol
 			defaults.add(Pair.from(DockerComposeDirectory, "/docker"));
 			defaults.add(Pair.from(ResetSUTAfterSequence, true));

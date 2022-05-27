@@ -1,5 +1,8 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -7,18 +10,25 @@ import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONTokener;
 
+import org.testar.CompoundTextActionSelector;
+import org.testar.RandomActionSelector;
 import org.testar.SutVisualization;
+import org.testar.action.priorization.ActionTags;
 import org.testar.managers.InterestingStringsDataManager;
 import org.testar.managers.InterestingStringsFilteringManager;
+import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.KeyDown;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdHistoryBackAction;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -30,6 +40,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
+import org.testar.statemodel.sequence.Sequence;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.protocols.CodeAnalysisWebdriverProtocol;
@@ -40,6 +51,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
     protected String applicationUsername, applicationPassword;
     protected boolean loggedIn=false;
+	protected CompoundTextActionSelector selector;
 
     	/**
 	 * Called once during the life time of TESTAR
@@ -55,6 +67,13 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
         this.applicationUsername = settings.get(ConfigTags.ApplicationUsername);
 		this.applicationPassword = settings.get(ConfigTags.ApplicationPassword);
 
+		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled) ) {
+			selector = new CompoundTextActionSelector(
+				settings.get(ConfigTags.CompoundTextActionInitialProbability),
+				settings.get(ConfigTags.CompoundTextActionResetProbability),
+				settings.get(ConfigTags.CompoundTextActionGrowthRate)
+			);
+		}
 	}
 
     protected void initializeDataManager() {
@@ -151,6 +170,9 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
+		// This variable is used when for building a compound text action
+		List<Action> textActions = new ArrayList<>();
+
 		// Check if forced actions are needed to stay within allowed domains
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 
@@ -202,10 +224,16 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				continue;
 			}
 
-			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+			// type into text boxes ( either as a single action, or as a compound action, depending on settings)
+			if ( isAtBrowserCanvas(widget) && isTypeable(widget) ) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled ) ) {
+						textActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					}
+					else {
+						actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					}
+
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
@@ -228,9 +256,17 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 			}
 		}
 
-		//if(actions.isEmpty()) {
-		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		//}
+		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled ) && textActions.size() > 0 ) {
+			Action textAction = new CompoundAction(textActions);
+			textAction.set(ActionTags.CompoundTextAction, true);
+			textAction.set(Tags.Role, Roles.Text);
+			textAction.set(Tags.Desc, "Compound text action to enter text into all text widgets");
+			actions.add(textAction);
+		}
+
+		if(actions.isEmpty()) {
+			return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+		}
 
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
@@ -243,5 +279,17 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
 		return actions;
 	}
+
+	protected Action selectAction(State state, Set<Action> actions){
+		Assert.isTrue(actions != null && !actions.isEmpty());
+		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled) ) {
+			return selector.selectAction(actions);
+		}
+		else {
+			return RandomActionSelector.selectAction(actions);
+		}
+
+}
+
 
 }

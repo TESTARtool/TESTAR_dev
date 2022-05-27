@@ -101,6 +101,18 @@ public final class CompoundAction extends TaggableBase implements Action {
 		for(int i = 0; i < actions.length; i++)
 			relativeDurations.add(1.0 / actions.length);
 	}
+
+	public CompoundAction(List<Action> actions) {
+		Assert.notNull(actions);
+		this.actions = actions;
+
+		this.relativeDurations = Util.newArrayList();
+
+                for ( Action action: actions ) {
+			relativeDurations.add(1.0 / actions.size() );
+		}
+
+	}
 	
 	public List<Action> getActions() {
 		return Collections.unmodifiableList(actions);
