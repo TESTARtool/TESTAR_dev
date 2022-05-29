@@ -182,7 +182,6 @@ public final class ConfigTags {
   public static final Tag<Float> TypeMatchRate = Tag.from("TypeMatchRate", Float.class);
 
   // Tags for compound text input logic
-
   public static final Tag<Boolean> CompoundTextActionLogicEnabled = Tag.from("CompoundTextActionLogicEnabled", Boolean.class);
   public static final Tag<Float> CompoundTextActionInitialProbability = Tag.from("CompoundTextActionInitialProbability", Float.class);
   public static final Tag<Float> CompoundTextActionResetProbability = Tag.from("CompoundTextActionResetProbability", Float.class);
@@ -190,7 +189,9 @@ public final class ConfigTags {
   public static final Tag<Float> CompoundTextActionLowPriorityInitialFactor = Tag.from("CompoundTextActionLowPriorityInitialFactor", Float.class);
   public static final Tag<Float> CompoundTextActionLowPriorityResetFactor = Tag.from("CompoundTextActionLowPriorityResetFactor", Float.class);
   public static final Tag<Float> CompoundTextActionLowPriorityGrowthRate = Tag.from("CompoundTextActionLowPriorityGrowthRate", Float.class);
-
+  public static final Tag<Float> CompoundTextActionHighPriorityInitialFactor = Tag.from("CompoundTextActionHighPriorityInitialFactor", Float.class);
+  public static final Tag<Float> CompoundTextActionHighPriorityResetFactor = Tag.from("CompoundTextActionHighPriorityResetFactor", Float.class);
+  public static final Tag<Float> CompoundTextActionHighPriorityShrinkRate = Tag.from("CompoundTextActionHighPriorityShrinkRate", Float.class);
   // Tags for CKAN protocol
 
   public static final Tag<String> ApplicationUsername = Tag.from("ApplicationUsername", String.class);

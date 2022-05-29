@@ -74,7 +74,10 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				settings.get(ConfigTags.CompoundTextActionGrowthRate),
 				settings.get(ConfigTags.CompoundTextActionLowPriorityInitialFactor),
 				settings.get(ConfigTags.CompoundTextActionLowPriorityResetFactor),
-				settings.get(ConfigTags.CompoundTextActionLowPriorityGrowthRate)
+				settings.get(ConfigTags.CompoundTextActionLowPriorityGrowthRate),
+				settings.get(ConfigTags.CompoundTextActionHighPriorityInitialFactor),
+				settings.get(ConfigTags.CompoundTextActionHighPriorityResetFactor),
+				settings.get(ConfigTags.CompoundTextActionHighPriorityShrinkRate)
 			);
 		}
 	}
@@ -204,8 +207,8 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
                 continue;
             }
 
-			/** CKAN customization to tag known navigation widgets in the web interface, so
-			 *  that the action selector van prioritize their action separately from the other actions.
+			/** CKAN customization to tag widgets that should be assigned
+			 *  low probability after entering text datta.
 			 *  This is currently only applied to clickable widgets.
 			 */
 			boolean isLowPriorityWidget = false;
@@ -221,6 +224,19 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				|| widget.get(WdTags.WebCssClasses,"").contains("fa-tachometer")
 				|| widget.get(WdTags.WebCssClasses,"").contains("fa-cog") ) {
 				isLowPriorityWidget = true;
+			}
+
+			/** CKAN customization to tag widgets that should be assigned
+			 *  high probability after entering text data.
+			 *  This is currently only applied to clickable widgets.
+			 */
+			boolean isHighPriorityWidget = false;
+			if ((! isLowPriorityWidget ) &&
+				( widget.get(WdTags.WebName,"").equals("save")
+				|| widget.get(WdTags.WebType,"").equals("submit")
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-search") ) ) {
+				System.out.println("Found high priority!");
+				isHighPriorityWidget = true;
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -266,7 +282,11 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				Action clickAction = ac.leftClickAt(widget);
 				if ( isLowPriorityWidget ) {
-					clickAction.set(ActionTags.CompoundTextLowPriorityWidget, true)					;
+					clickAction.set(ActionTags.CompoundTextLowPriorityWidget, true);
+				}
+				else if ( isHighPriorityWidget ) {
+					clickAction.set(ActionTags.CompoundTextHighPriorityWidget, true);
+					System.out.println("Set high priority!");
 				}
 
 				if(whiteListed(widget) || isUnfiltered(widget)){
