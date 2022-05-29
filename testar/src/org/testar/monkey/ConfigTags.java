@@ -187,7 +187,9 @@ public final class ConfigTags {
   public static final Tag<Float> CompoundTextActionInitialProbability = Tag.from("CompoundTextActionInitialProbability", Float.class);
   public static final Tag<Float> CompoundTextActionResetProbability = Tag.from("CompoundTextActionResetProbability", Float.class);
   public static final Tag<Float> CompoundTextActionGrowthRate = Tag.from("CompoundTextActionGrowthRate", Float.class);
-
+  public static final Tag<Float> CompoundTextActionLowPriorityInitialFactor = Tag.from("CompoundTextActionLowPriorityInitialFactor", Float.class);
+  public static final Tag<Float> CompoundTextActionLowPriorityResetFactor = Tag.from("CompoundTextActionLowPriorityResetFactor", Float.class);
+  public static final Tag<Float> CompoundTextActionLowPriorityGrowthRate = Tag.from("CompoundTextActionLowPriorityGrowthRate", Float.class);
 
   // Tags for CKAN protocol
 

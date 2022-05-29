@@ -42,6 +42,7 @@ public class ActionTags extends TagsBase  {
 
 	public static final Tag<Integer> SimilarityValue = from("SimilarityValue", Integer.class);
 	public static final Tag<Boolean> CompoundTextAction = from("CompoundTextAction", Boolean.class);
+	public static final Tag<Boolean> CompoundTextLowPriorityWidget = from("CompoundTextLowPriorityWidget", Boolean.class);
 
 
 	private static Set<Tag<Integer>> actionTags;

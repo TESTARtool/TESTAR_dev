@@ -71,7 +71,10 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 			selector = new CompoundTextActionSelector(
 				settings.get(ConfigTags.CompoundTextActionInitialProbability),
 				settings.get(ConfigTags.CompoundTextActionResetProbability),
-				settings.get(ConfigTags.CompoundTextActionGrowthRate)
+				settings.get(ConfigTags.CompoundTextActionGrowthRate),
+				settings.get(ConfigTags.CompoundTextActionLowPriorityInitialFactor),
+				settings.get(ConfigTags.CompoundTextActionLowPriorityResetFactor),
+				settings.get(ConfigTags.CompoundTextActionLowPriorityGrowthRate)
 			);
 		}
 	}
@@ -201,6 +204,25 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
                 continue;
             }
 
+			/** CKAN customization to tag known navigation widgets in the web interface, so
+			 *  that the action selector van prioritize their action separately from the other actions.
+			 *  This is currently only applied to clickable widgets.
+			 */
+			boolean isLowPriorityWidget = false;
+			if ( widget.get(WdTags.WebName,"").equals("Datasets")
+				|| widget.get(WdTags.WebName,"").equals("Organizations")
+				|| widget.get(WdTags.WebName,"").equals("Groups")
+				|| widget.get(WdTags.WebName,"").equals("Showcases")
+				|| widget.get(WdTags.WebName,"").equals("About")
+				|| widget.get(WdTags.WebName,"").equals("CKAN")
+				|| widget.get(WdTags.WebName,"").equals("About CKAN")
+				|| widget.get(WdTags.WebAlt,"").equals("Gravatar")
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-gavel")
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-tachometer")
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-cog") ) {
+				isLowPriorityWidget = true;
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
@@ -242,16 +264,21 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+				Action clickAction = ac.leftClickAt(widget);
+				if ( isLowPriorityWidget ) {
+					clickAction.set(ActionTags.CompoundTextLowPriorityWidget, true)					;
+				}
+
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						actions.add(clickAction);
 					}else{
 						// link denied:
-						filteredActions.add(ac.leftClickAt(widget));
+						filteredActions.add(clickAction);
 					}
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.leftClickAt(widget));
+					filteredActions.add(clickAction);
 				}
 			}
 		}
