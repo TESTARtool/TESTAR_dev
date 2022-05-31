@@ -114,6 +114,9 @@ public class GetWidgetMatchingTags {
 		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect1, state));
 		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect2, state));
 		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect3, state));
+		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect4, state));
+		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect5, state));
+		assertNull(protocol.getWidgetWithMatchingTags(tagValuesNotCorrect6, state));
 	}
 
 	@Test
