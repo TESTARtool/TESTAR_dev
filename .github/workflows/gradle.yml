@@ -158,6 +158,12 @@ jobs:
     - name: Run TESTAR dialog
       run: ./gradlew runTestRunGUI
 
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+
+    - name: Run webdriver to login in parabank app
+      run: ./gradlew runTestWebdriverParabankLogin
+
   windows_java_17:
     runs-on: windows-latest
     timeout-minutes: 10
@@ -183,6 +189,12 @@ jobs:
 
     - name: Run TESTAR dialog
       run: ./gradlew runTestRunGUI
+
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+
+    - name: Run webdriver to login in parabank app
+      run: ./gradlew runTestWebdriverParabankLogin
 
   linux:
     runs-on: ubuntu-latest
