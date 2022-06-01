@@ -29,7 +29,13 @@ jobs:
     
     - name: Build TESTAR with Gradle
       run: ./gradlew build
-    
+
+    - name: Save JUnit test results
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: saveJunitTests-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/reports/tests
+
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
 
