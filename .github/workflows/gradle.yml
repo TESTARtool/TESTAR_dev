@@ -5,12 +5,12 @@ name: TESTAR CI - build with Gradle
 
 on:
   push:
-    branches: [ master, master_gradle_workflow ]
+    branches: [ master, master_gradle_workflow, master_workflow ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  windows:
+  windows_java_8:
     runs-on: windows-latest
     timeout-minutes: 30
 
@@ -32,7 +32,10 @@ jobs:
     
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
-    
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
+
     - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
@@ -128,6 +131,58 @@ jobs:
       with:
         name: runTestWebdriverUnreplayable-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
+
+  windows_java_11:
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+    
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+    
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
+
+  windows_java_17:
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+    
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+    
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
 
   linux:
     runs-on: ubuntu-latest

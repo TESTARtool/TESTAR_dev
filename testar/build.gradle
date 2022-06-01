@@ -206,6 +206,26 @@ task init_workflow_test(type: Copy) {
     into 'target/scripts/settings'
 }
 
+// Execute a protocol to test that the GUI starts correctly
+task runTestRunGUI(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestRunGUI'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_run_gui AlwaysCompile=true ShowVisualSettingsDialogOnStartup=false'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("Saved current settings")}) {
+            println "\n${output} \nTESTAR GUI launched successfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Launching TESTAR GUI")
+        }
+    }
+}
+
 // Default COMMAND_LINE execution to run Notepad, execute 2 actions and verdict should be OK
 task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
 	// Read command line output
