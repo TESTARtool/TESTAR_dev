@@ -49,9 +49,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
@@ -108,6 +113,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 	};
 
+	// Verdict obtained from messages coming from the web browser console
+	protected Verdict webConsoleVerdict = Verdict.OK;
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -145,14 +153,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 	}
 	
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-    }
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = getReporter();
+		// reset web browser console verdict
+		webConsoleVerdict = Verdict.OK;
+	}
     
     /**
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -305,7 +315,31 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
-    
+
+    /**
+     * The getVerdict methods implements the online state oracles that
+     * examine the SUT's current state and returns an oracle verdict.
+     *
+     * @return oracle verdict, which determines whether the state is erroneous and why.
+     */
+    @Override
+    protected Verdict getVerdict(State state) {
+    	Verdict stateVerdict = super.getVerdict(state);
+
+    	// Check Severe messages in the WebDriver logs
+    	RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    	LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    	for(LogEntry logEntry : logEntries) {
+    		if(logEntry.getLevel().equals(Level.SEVERE)) {
+    			webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + logEntry.getMessage());
+    		}
+    	}
+    	// Join GUI verdict with WebDriver console verdict
+    	stateVerdict = stateVerdict.join(webConsoleVerdict);
+
+    	return stateVerdict;
+    }
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 *
