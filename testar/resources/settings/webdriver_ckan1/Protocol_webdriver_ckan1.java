@@ -222,7 +222,8 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				|| widget.get(WdTags.WebAlt,"").equals("Gravatar")
 				|| widget.get(WdTags.WebCssClasses,"").contains("fa-gavel")
 				|| widget.get(WdTags.WebCssClasses,"").contains("fa-tachometer")
-				|| widget.get(WdTags.WebCssClasses,"").contains("fa-cog") ) {
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-cog")
+				|| widget.get(WdTags.WebCssClasses,"").contains("fa-home") ) {
 				isLowPriorityWidget = true;
 			}
 
@@ -235,7 +236,6 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				( widget.get(WdTags.WebName,"").equals("save")
 				|| widget.get(WdTags.WebType,"").equals("submit")
 				|| widget.get(WdTags.WebCssClasses,"").contains("fa-search") ) ) {
-				System.out.println("Found high priority!");
 				isHighPriorityWidget = true;
 			}
 
