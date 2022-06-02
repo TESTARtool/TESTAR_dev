@@ -326,16 +326,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
     	Verdict stateVerdict = super.getVerdict(state);
 
-    	// Check Severe messages in the WebDriver logs
-    	RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    	LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-    	for(LogEntry logEntry : logEntries) {
-    		if(logEntry.getLevel().equals(Level.SEVERE)) {
-    			webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + logEntry.getMessage());
+    	if(settings.get(ConfigTags.WebBrowserConsoleOracle, false)) {
+    		// Check Severe messages in the WebDriver logs
+    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    		for(LogEntry logEntry : logEntries) {
+    			if(logEntry.getLevel().equals(Level.SEVERE)) {
+    				webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + logEntry.getMessage());
+    			}
     		}
+    		// Join GUI verdict with WebDriver console verdict
+    		stateVerdict = stateVerdict.join(webConsoleVerdict);
     	}
-    	// Join GUI verdict with WebDriver console verdict
-    	stateVerdict = stateVerdict.join(webConsoleVerdict);
 
     	return stateVerdict;
     }

@@ -119,6 +119,7 @@ DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
+WebBrowserConsoleOracle = false
 
 #################################################################
 # Override display scale

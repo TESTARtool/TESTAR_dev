@@ -119,6 +119,7 @@ DomainsAllowed = www.smartclient.com
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
+WebBrowserConsoleOracle = false
 
 #################################################################
 # Override display scale

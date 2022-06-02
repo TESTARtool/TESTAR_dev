@@ -119,6 +119,7 @@ DomainsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
+WebBrowserConsoleOracle = false
 
 #################################################################
 # Override display scale

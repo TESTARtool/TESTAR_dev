@@ -59,6 +59,7 @@ public class OraclePanel extends SettingsPanel {
 
     private JCheckBox processCheckBox;
     private JSpinner spnFreezeTime;
+    private JCheckBox enableWebBrowserConsoleOracle;
     private JCheckBox enableVisualValidationCheckBox;
 
     public OraclePanel() {
@@ -99,6 +100,11 @@ public class OraclePanel extends SettingsPanel {
         suspiciousProcessPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(suspiciousProcessPane);
 
+        enableWebBrowserConsoleOracle = new JCheckBox("Enable Web Browser Console Oracle");
+        enableWebBrowserConsoleOracle.setBounds(10, 300, 300, 27);
+        enableWebBrowserConsoleOracle.setToolTipText("Enable Web Browser Console Oracle");
+        add(enableWebBrowserConsoleOracle);
+
         enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
         enableVisualValidationCheckBox.setBounds(10, 330, 180, 27);
         enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
@@ -125,6 +131,7 @@ public class OraclePanel extends SettingsPanel {
         processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
         txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
         spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
+        enableWebBrowserConsoleOracle.setSelected(settings.get(ConfigTags.WebBrowserConsoleOracle));
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
     }
@@ -140,6 +147,7 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
         settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
         settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
+        settings.set(ConfigTags.WebBrowserConsoleOracle, enableWebBrowserConsoleOracle.isSelected());
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
     }

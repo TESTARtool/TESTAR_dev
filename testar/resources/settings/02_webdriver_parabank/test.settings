@@ -136,6 +136,7 @@ DomainsAllowed = para.testar.org
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
+WebBrowserConsoleOracle = false
 
 #################################################################
 # Override display scale

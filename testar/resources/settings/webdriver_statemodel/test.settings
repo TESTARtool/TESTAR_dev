@@ -131,6 +131,7 @@ DomainsAllowed = www.w3schools.com
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
+WebBrowserConsoleOracle = false
 
 #################################################################
 # Override display scale
