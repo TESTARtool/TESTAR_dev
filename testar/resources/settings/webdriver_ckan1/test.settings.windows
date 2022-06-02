@@ -113,7 +113,7 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption;btn;btn-default;btn-primary;fa-search
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = localhost:8080
 FollowLinks = true
