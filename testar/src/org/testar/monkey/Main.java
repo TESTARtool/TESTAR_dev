@@ -539,7 +539,7 @@ public class Main {
 			defaults.add(Pair.from(CompoundTextActionLowPriorityResetFactor, 0.1f));
 			defaults.add(Pair.from(CompoundTextActionLowPriorityGrowthRate, 2.0f));
 			defaults.add(Pair.from(CompoundTextActionHighPriorityInitialFactor, 1.0f));
-			defaults.add(Pair.from(CompoundTextActionHighPriorityResetFactor, 5.0f));
+			defaults.add(Pair.from(CompoundTextActionHighPriorityResetFactor, 30.0f));
 			defaults.add(Pair.from(CompoundTextActionHighPriorityShrinkRate, 0.5f));
 			// End defaults for compound text input logic
 
