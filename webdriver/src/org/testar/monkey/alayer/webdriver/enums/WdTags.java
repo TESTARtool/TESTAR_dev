@@ -197,7 +197,6 @@ public class WdTags extends TagsBase {
    * Bounding rectangle of a widget.
    */
   public static final Tag<Rect> WebBoundingRectangle = from("WebBoundingRectangle", Rect.class);
-  public static final Tag<String> WebBoundary = from("WebBoundary", String.class);
 
   /**
    * Whether this widget is currently enabled or disabled (e.g. "greyed out")
