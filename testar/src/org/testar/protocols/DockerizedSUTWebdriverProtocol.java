@@ -43,6 +43,9 @@ import java.net.URL;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.SUT;
@@ -69,6 +72,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 	protected String dockerComposeDirectory,applicationBaseURL;
 	protected boolean resetSUTAfterSequence = false;
 	protected List<String> volumesToResetAfterSequence;
+	protected Logger logger = LogManager.getLogger();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -110,9 +114,9 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 
 	@Override
 	protected SUT startSystem() throws SystemStartException {
-		System.out.println("DS protocol starting SUT");
+		logger.info("DS protocol starting SUT");
 		startDockerSUT();
-		System.out.println("DS protocol starting call super");
+		logger.info("DS protocol starting call super");
 		return super.startSystem();
 	}
 
@@ -120,7 +124,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 		String[] command = {"docker-compose", "up", "--force-recreate", "--build", "-d"};
 		runDockerCommand(command);
 		if (! waitForURL(this.applicationBaseURL, 300, 5, 200) ) {
-			System.out.println("Error: did not succeed in bringing up SUT.");
+			logger.error("Error: did not succeed in bringing up SUT.");
 		}
 	}
 
@@ -157,7 +161,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 	/** Runs a docker command in the Docker Compose Directory */
 	protected void runDockerCommand(String[] command) {
 		ProcessBuilder builder = new ProcessBuilder(command);
-		System.out.println("Protocol executing command: " + String.join(" ", command));
+		logger.info("Protocol executing command: " + String.join(" ", command));
 		builder = builder.directory(new File(dockerComposeDirectory));
 		builder.redirectErrorStream(true);
 		try {
@@ -166,14 +170,14 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				String line;
 				while ((line = reader.readLine()) != null)
-					System.out.println("Command output: " + line);
+					logger.info("Command output: " + line);
 				p.waitFor();
 			}
 		} catch (IOException ioe) {
-			System.out.println("Exception when starting command" + String.join(" ", command)
+			logger.error("Exception when starting command" + String.join(" ", command)
 					+ " " + ioe.toString());
 		} catch (InterruptedException ie) {
-			System.out.println("Exception when waiting for command" + String.join(" ", command)
+			logger.error("Exception when waiting for command" + String.join(" ", command)
 					+ " " + ie.toString());
 		}
 	}
@@ -193,6 +197,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
     public static boolean waitForURL(String urlString, int maxWaitTime, int retryTime, int expectedStatusCode) {
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
+		Logger logger = LogManager.getLogger();
         while ( ( currentTime = System.currentTimeMillis() / 1000L ) < ( beginTime + maxWaitTime) ) {
         try {
                 URL url = new URL(urlString);
@@ -201,34 +206,33 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
                 con.setConnectTimeout(retryTime*1000);
                 con.setReadTimeout(retryTime*1000);
                 int status = con.getResponseCode();
-                System.out.println("Status is " + status);
+                logger.info("Status is " + status);
             if ( status == expectedStatusCode ) {
-                System.out.println("Waiting for " + urlString + " finished.");
+                logger.info("Waiting for " + urlString + " finished.");
                 return true;
             }
             else
-            {  System.out.println("Info: unexpected status code " + Integer.toString(status) +
+            {  logger.error("Unexpected status code " + Integer.toString(status) +
                     " while waiting for " + urlString);
             }
         }
         catch ( SocketTimeoutException ste) {
-            System.out.println("info: waiting for " + urlString + " ...");
+            logger.info("info: waiting for " + urlString + " ...");
             continue;
         }
         catch ( Exception e) {
-            System.out.println("info: generic exception while waiting for " + urlString +
-                    ": " + e.toString() );
-            System.out.println(Long.toString(currentTime));
+            logger.error("generic exception while waiting for " + urlString +
+                    ": " + e.toString() + "@" + Long.toString(currentTime));
         }
-        System.out.println("info: sleeping between retries for " + urlString + " ...");
+        logger.info("info: sleeping between retries for " + urlString + " ...");
         try {
          Thread.sleep(retryTime*1000);
         }
         catch (InterruptedException ie) {
-         System.out.println("Sleep between retries for " + urlString + " was interrupted.");
+         logger.error("Sleep between retries for " + urlString + " was interrupted.");
         }
         }
-        System.out.println("info: max wait time expired while waiting for " + urlString + " ...");
+        logger.info("info: max wait time expired while waiting for " + urlString + " ...");
         return false;
     }
 

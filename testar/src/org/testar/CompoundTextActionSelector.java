@@ -1,5 +1,8 @@
 package org.testar;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.testar.action.priorization.ActionTags;
 import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.Action;
@@ -45,6 +48,7 @@ public class CompoundTextActionSelector {
     protected float initialProbability, resetProbability, currentProbability, growthRate;
     protected float initialLowPriorityFactor, resetLowPriorityFactor, currentLowPriorityFactor, lowPriorityGrowthRate;
     protected float initialHighPriorityFactor, resetHighPriorityFactor, currentHighPriorityFactor, highPriorityShrinkRate;
+    protected Logger logger;
     protected Random rnd;
 
     public CompoundTextActionSelector ( float initialProbability, float resetProbability, float growthRate,
@@ -81,6 +85,7 @@ public class CompoundTextActionSelector {
         this.currentHighPriorityFactor = initialHighPriorityFactor;
 
         rnd = new Random(System.currentTimeMillis());
+        logger = LogManager.getLogger();
     }
 
     public Action selectAction(Set<Action> actions) {
@@ -117,32 +122,32 @@ public class CompoundTextActionSelector {
         float standardProbability = standardWeight / totalWeight;
 
 
-        System.out.println("Compound text action probability is now " + String.valueOf(currentProbability));
-        System.out.println("Probability standard: " + String.valueOf(standardProbability));
-        System.out.println("Probability low: " + String.valueOf(lowPriorityProbability));
-        System.out.println("Probability high: " + String.valueOf(highPriorityProbability));
+        logger.info("Compound text action probability is now " + String.valueOf(currentProbability));
+        logger.info("Probability standard: " + String.valueOf(standardProbability));
+        logger.info("Probability low: " + String.valueOf(lowPriorityProbability));
+        logger.info("Probability high: " + String.valueOf(highPriorityProbability));
 
         float prioritySelector = rnd.nextFloat();
 
         if (compoundTextAction == null ) {
-            System.out.println("No compound text action found ...");
+            logger.info("No compound text action found ...");
         }
 
         if ( compoundTextAction != null && rnd.nextFloat() < currentProbability ) {
-            System.out.println("Selected compound text action ... ");
+            logger.info("Selected compound text action ... ");
             selectedAction =  compoundTextAction;
             selectedCompoundTextAction = true;
         }
         else if ( prioritySelector < lowPriorityProbability ) {
-            System.out.println("Selected low priority action ... ");
+            logger.info("Selected low priority action ... ");
             selectedAction = lowPriorityActions.get(rnd.nextInt(lowPriorityActions.size()));
         }
         else if ( prioritySelector < lowPriorityProbability + highPriorityProbability ) {
-            System.out.println("Selected high priority action ... ");
+            logger.info("Selected high priority action ... ");
             selectedAction = highPriorityActions.get(rnd.nextInt(highPriorityActions.size()));
         }
         else {
-            System.out.println("Selected standard action ... ");
+            logger.info("Selected standard action ... ");
             selectedAction = standardActions.get(rnd.nextInt(standardActions.size()));
         }
 

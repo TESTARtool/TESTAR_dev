@@ -27,9 +27,7 @@ public class InterestingStringsFilteringManager extends FilteringManager {
     @Override
     public String getRandomText (Widget w)
     {
-      System.out.println("getRandomText");
       return dataManager.generateTextInput();
-
     }
 
 

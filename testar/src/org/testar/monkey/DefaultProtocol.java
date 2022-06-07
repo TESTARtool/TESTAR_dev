@@ -189,7 +189,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	// Creating a logger with log4j library:
-	private static Logger logger = LogManager.getLogger();
+	protected static Logger logger = LogManager.getLogger();
 
 
 	/**

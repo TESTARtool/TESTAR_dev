@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.testar.managers.DataManager;
 
 public class InterestingStringsDataManager extends DataManager {
@@ -141,7 +144,7 @@ public class InterestingStringsDataManager extends DataManager {
                   result.add(getSubstringPreferredType(this.TYPE_FRAGMENT));
              }
         }
-        System.out.println("Result random is: " + concatenateList(result));
+        LogManager.getLogger().info("Result random is: " + concatenateList(result));
         return concatenateList(result);
    }
 

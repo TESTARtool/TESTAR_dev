@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.json.JSONArray;
 import org.json.JSONTokener;
 
@@ -61,7 +64,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-        System.out.println("CKAN protocol calls super.init");
+        logger.info("CKAN protocol calls super.init");
  		super.initialize(settings);
 
         this.applicationUsername = settings.get(ConfigTags.ApplicationUsername);
@@ -134,7 +137,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
             JSONArray inner = root.getJSONArray(i);
             String type = inner.getString(0);
             String value = inner.getString(1);
-            System.out.println("Extracted string " + type + " / " + value);
+            logger.info("Extracted string " + type + " / " + value);
             Map<String, String> innerMap = new HashMap<>();
             innerMap.put("type", type);
             innerMap.put("value", value);
@@ -203,7 +206,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
                 || widget.get(WdTags.WebName,"").equals("English")
                 || widget.get(WdTags.WebTextContent,"").equals("English")
                 || widget.get(WdTags.WebCssClasses,"").contains("fa-sign-out") ) {
-                //System.out.println("DeriveActions ignored href = " + widget.get(WdTags.WebHref,"") + " / CSS class = " + widget.get(WdTags.WebCssClasses,"") );
+                //logger.info("DeriveActions ignored href = " + widget.get(WdTags.WebHref,"") + " / CSS class = " + widget.get(WdTags.WebCssClasses,"") );
                 continue;
             }
 
@@ -286,7 +289,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				}
 				else if ( isHighPriorityWidget ) {
 					clickAction.set(ActionTags.CompoundTextHighPriorityWidget, true);
-					System.out.println("Set high priority!");
+					logger.info("Set high priority for widget ...");
 				}
 
 				if(whiteListed(widget) || isUnfiltered(widget)){

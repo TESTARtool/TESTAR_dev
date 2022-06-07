@@ -42,6 +42,9 @@ import java.util.Vector;
 
 import org.json.JSONTokener;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.SUT;
@@ -131,7 +134,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 		String setContextURL = this.applicationBaseURL + "/testar-covcontext/" + this.coverageContext;
 
 		if (! waitForURL(setContextURL, 60, 5, 200) )  {
-			System.out.println("Error: did not succeed in setting coverage context.");
+			logger.info("Error: did not succeed in setting coverage context.");
 		}
 	}
 
@@ -152,7 +155,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 			Integer.toString(actionNumber);
 		String setContextURL = applicationBaseURL + "/testar-logcontext/" + context;
 		if ( ! waitForURL(setContextURL, 60, 5, 200) )  {
-			System.out.println("Error: did not succeed in setting log context for context "
+			logger.info("Error: did not succeed in setting log context for context "
 				+ context + ".");
 		}
 	}
@@ -181,7 +184,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
             processSUTDataAfterAction(tokener);
         }
         catch (Exception e) {
-			System.out.println("Error during extracting action data from SUT: " + e.toString());
+			logger.info("Error during extracting action data from SUT: " + e.toString());
 		}
 
     }
@@ -207,6 +210,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
     public static boolean waitForURL(String url_string, int maxWaitTime, int retryTime, int expectedStatusCode) {
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
+        Logger logger = LogManager.getLogger();
         while ( ( currentTime = System.currentTimeMillis() / 1000L ) < ( beginTime + maxWaitTime) ) {
         try {
                 URL url = new URL(url_string);
@@ -215,34 +219,34 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                 con.setConnectTimeout(retryTime*1000);
                 con.setReadTimeout(retryTime*1000);
                 int status = con.getResponseCode();
-                System.out.println("Status is " + status);
+                logger.info("Status is " + status);
             if ( status == expectedStatusCode ) {
-                System.out.println("Waiting for " + url_string + " finished.");
+                logger.info("Waiting for " + url_string + " finished.");
                 return true;
             }
             else
-            {  System.out.println("Info: unexpected status code " + Integer.toString(status) +
+            {  logger.info("Info: unexpected status code " + Integer.toString(status) +
                     " while waiting for " + url_string);
             }
         }
         catch ( SocketTimeoutException ste) {
-            System.out.println("info: waiting for " + url_string + " ...");
+            logger.info("info: waiting for " + url_string + " ...");
             continue;
         }
         catch ( Exception e) {
-            System.out.println("info: generic exception while waiting for " + url_string +
+            logger.info("info: generic exception while waiting for " + url_string +
                     ": " + e.toString() );
-            System.out.println(Long.toString(currentTime));
+            logger.info(Long.toString(currentTime));
         }
-        System.out.println("info: sleeping between retries for " + url_string + " ...");
+        logger.info("info: sleeping between retries for " + url_string + " ...");
         try {
          Thread.sleep(retryTime*1000);
         }
         catch (InterruptedException ie) {
-         System.out.println("Sleep between retries for " + url_string + " was interrupted.");
+            logger.info("Sleep between retries for " + url_string + " was interrupted.");
         }
         }
-        System.out.println("info: max wait time expired while waiting for " + url_string + " ...");
+        logger.info("info: max wait time expired while waiting for " + url_string + " ...");
         return false;
     }
 

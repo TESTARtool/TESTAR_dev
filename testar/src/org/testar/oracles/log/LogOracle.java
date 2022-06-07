@@ -2,6 +2,9 @@ package org.testar.oracles.log;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.State;
@@ -38,7 +41,7 @@ public class LogOracle implements Oracle {
             return new Verdict(Verdict.SEVERITY_OK, "OK");
         }
         else {
-            System.out.println("LogOracle verdict ERROR" + String.join(";", errors) );
+            LogManager.getLogger().info("LogOracle verdict ERROR" + String.join(";", errors) );
             return new Verdict(Verdict.SEVERITY_SUSPICIOUS_LOG, String.join(";", errors));
         }
     }
