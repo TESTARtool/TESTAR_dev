@@ -104,12 +104,33 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
     @Override
 	protected void beginSequence(SUT system, State state) {
+		logger.info("Begin sequence @ " + String.valueOf(System.currentTimeMillis()));
         super.beginSequence(system,state);
         if ( ! this.loggedIn ) {
             loginSUT(system,state);
             this.loggedIn=true;
         }
     }
+
+	@Override
+	protected void finishSequence(){
+			super.finishSequence();
+			logger.info("End sequence @ " + String.valueOf(System.currentTimeMillis()));
+	}
+
+	@Override
+	protected void initTestSession() {
+		logger.info("Begin experiment (TS) @ " + String.valueOf(System.currentTimeMillis()));
+		super.initTestSession();
+	}
+
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		logger.info("End experiment (TS) @ " + String.valueOf(System.currentTimeMillis()));
+	}
+
+
 
     protected void loginSUT(SUT system, State state) {
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","login", this.applicationUsername, state, system, 1, 0.5);
