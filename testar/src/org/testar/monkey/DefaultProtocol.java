@@ -728,11 +728,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
-		if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
-				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-
+		// Check if user wants to save or not the sequences without faults
+		if (settings.get(ConfigTags.OnlySaveFaultySequences, false) && finalVerdict.severity() == Verdict.OK.severity()) {
+			LogSerialiser.log("Skipped generated sequence OK (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
+		} else {
 			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
-
 			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 		}
 	}
