@@ -405,7 +405,14 @@ public class Settings extends TaggableBase implements Serializable {
 					+"FollowLinks = " + Util.lineSep()
 					+"BrowserFullScreen = " + Util.lineSep()
 					+"SwitchNewTabs = " + Util.lineSep()
-					+"WebBrowserConsoleOracle = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# WebDriver Browser Console Oracles\n"
+					+"#################################################################\n"
+					+"WebConsoleErrorOracle = " + Util.lineSep()
+					+"WebConsoleErrorPattern = " + Util.lineSep()
+					+"WebConsoleWarningOracle = " + Util.lineSep()
+					+"WebConsoleWarningPattern = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Override display scale\n"

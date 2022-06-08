@@ -134,7 +134,14 @@ DomainsAllowed = www.smartclient.com
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
-WebBrowserConsoleOracle = false
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Other more advanced settings

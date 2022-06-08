@@ -59,7 +59,12 @@ public class OraclePanel extends SettingsPanel {
 
     private JCheckBox processCheckBox;
     private JSpinner spnFreezeTime;
-    private JCheckBox enableWebBrowserConsoleOracle;
+
+    private JCheckBox enableWebConsoleErrorOracle;
+    private JTextArea txtWebConsoleErrorPattern = new JTextArea();
+    private JCheckBox enableWebConsoleWarningOracle;
+    private JTextArea txtWebConsoleWarningPattern = new JTextArea();
+
     private JCheckBox enableVisualValidationCheckBox;
 
     public OraclePanel() {
@@ -100,15 +105,21 @@ public class OraclePanel extends SettingsPanel {
         suspiciousProcessPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(suspiciousProcessPane);
 
-        enableWebBrowserConsoleOracle = new JCheckBox("Enable Web Browser Console Oracle");
-        enableWebBrowserConsoleOracle.setBounds(10, 300, 300, 27);
-        enableWebBrowserConsoleOracle.setToolTipText("Enable Web Browser Console Oracle");
-        add(enableWebBrowserConsoleOracle);
+        enableWebConsoleErrorOracle = new JCheckBox("Enable Web Console Error Oracle");
+        enableWebConsoleErrorOracle.setBounds(10, 300, 300, 27);
+        enableWebConsoleErrorOracle.setToolTipText("Enable Web Console Error Oracle");
+        add(enableWebConsoleErrorOracle);
 
-        enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
-        enableVisualValidationCheckBox.setBounds(10, 330, 180, 27);
-        enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
-        add(enableVisualValidationCheckBox);
+        enableWebConsoleWarningOracle = new JCheckBox("Enable Web Console Warning Oracle");
+        enableWebConsoleWarningOracle.setBounds(10, 330, 300, 27);
+        enableWebConsoleWarningOracle.setToolTipText("Enable Web Console Warning Oracle");
+        add(enableWebConsoleWarningOracle);
+
+        // Disable the visualization until the implementation is ready
+        //enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
+        //enableVisualValidationCheckBox.setBounds(10, 330, 180, 27);
+        //enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
+        //add(enableVisualValidationCheckBox);
 
         freezeTimeLabel.setBounds(300, 330, 80, 27);
         add(freezeTimeLabel);
@@ -131,9 +142,15 @@ public class OraclePanel extends SettingsPanel {
         processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
         txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
         spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
-        enableWebBrowserConsoleOracle.setSelected(settings.get(ConfigTags.WebBrowserConsoleOracle));
+        // Web Browser Console Oracles elements
+        enableWebConsoleErrorOracle.setSelected(settings.get(ConfigTags.WebConsoleErrorOracle));
+        txtWebConsoleErrorPattern.setText(settings.get(ConfigTags.WebConsoleErrorPattern));
+        enableWebConsoleWarningOracle.setSelected(settings.get(ConfigTags.WebConsoleWarningOracle));
+        txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
+        // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
+        // Disable the visualization until the implementation is ready
+        //enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
     }
 
     /**
@@ -147,8 +164,14 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
         settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
         settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
-        settings.set(ConfigTags.WebBrowserConsoleOracle, enableWebBrowserConsoleOracle.isSelected());
+        // Web Browser Console Oracles elements
+        settings.set(ConfigTags.WebConsoleErrorOracle, enableWebConsoleErrorOracle.isSelected());
+        settings.set(ConfigTags.WebConsoleErrorPattern, txtWebConsoleErrorPattern.getText());
+        settings.set(ConfigTags.WebConsoleWarningOracle, enableWebConsoleWarningOracle.isSelected());
+        settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
+        // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
+        // Disable the visualization until the implementation is ready
+        //visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
     }
 }

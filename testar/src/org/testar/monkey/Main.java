@@ -505,7 +505,13 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
-			defaults.add(Pair.from(WebBrowserConsoleOracle, false));
+
+			// Oracles for webdriver browser console
+			defaults.add(Pair.from(WebConsoleErrorOracle, false));
+			defaults.add(Pair.from(WebConsoleErrorPattern, ".*.*"));
+			defaults.add(Pair.from(WebConsoleWarningOracle, false));
+			defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
+
 			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
