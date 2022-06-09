@@ -67,20 +67,22 @@ public class HtmlSequenceReport implements Reporting{
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_MID ="_sequence_";
+    private static final String REPORT_FILENAME_MID = "_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
-    
+    private static String htmlFilename;
+    private static String FINAL_VERDICT_FILENAME = "OK";
+
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+        	htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
                     + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
                     + REPORT_FILENAME_AFT;
 
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            out = new PrintWriter(htmlFilename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
             }
@@ -315,6 +317,8 @@ public class HtmlSequenceReport implements Reporting{
         write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
         write("</div>"); // Close verdict block container
+
+        FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();
     }
 
     public void close() {
@@ -323,6 +327,11 @@ public class HtmlSequenceReport implements Reporting{
     		write(s);
     	}
     	out.close();
+
+    	// Finally rename the HTML report by indicating the final Verdict
+    	// sequence_1.html to sequence_1_OK.html
+    	String htmlFilenameVerdict = htmlFilename.replace(".html", "_" + FINAL_VERDICT_FILENAME + ".html");
+    	new File(htmlFilename).renameTo(new File (htmlFilenameVerdict));
     }
 
     private void write(String s) {
