@@ -192,9 +192,9 @@ public final class ConfigTags {
   public static final Tag<Float> CompoundTextActionHighPriorityInitialFactor = Tag.from("CompoundTextActionHighPriorityInitialFactor", Float.class);
   public static final Tag<Float> CompoundTextActionHighPriorityResetFactor = Tag.from("CompoundTextActionHighPriorityResetFactor", Float.class);
   public static final Tag<Float> CompoundTextActionHighPriorityShrinkRate = Tag.from("CompoundTextActionHighPriorityShrinkRate", Float.class);
-  // Tags for CKAN protocol
 
+  // Tags for CKAN / Indico protocol
   public static final Tag<String> ApplicationUsername = Tag.from("ApplicationUsername", String.class);
   public static final Tag<String> ApplicationPassword = Tag.from("ApplicationPassword", String.class);
-
+  public static final Tag<String> ExpCondition = Tag.from("ExpCondition", String.class);
 }

@@ -553,6 +553,7 @@ public class Main {
 			// Defaults for CKAN / Indico Webdriver protocols
 			defaults.add(Pair.from(ApplicationUsername, "user"));
 			defaults.add(Pair.from(ApplicationPassword, "password"));
+			defaults.add(Pair.from(ExpCondition, "baseline"));
 			// End defaults for CKAN / Indico Webdriver protocols
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {

@@ -199,3 +199,6 @@ ResetSUTAfterSequence = true
 VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;runpg_data;run_solr_data
 ProcessDataAfterAction = true
 ActionGetDataEndpoint = /testar-extractstrings
+
+# Condition can be: baseline or experimental
+ExpCondition = experimental

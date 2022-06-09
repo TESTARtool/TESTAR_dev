@@ -52,7 +52,7 @@ import org.testar.protocols.CodeAnalysisWebdriverProtocol;
 
 public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
-    protected String applicationUsername, applicationPassword;
+    protected String applicationUsername, applicationPassword, expCondition;
     protected boolean loggedIn=false;
 	protected CompoundTextActionSelector selector;
 
@@ -69,6 +69,12 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
         this.applicationUsername = settings.get(ConfigTags.ApplicationUsername);
 		this.applicationPassword = settings.get(ConfigTags.ApplicationPassword);
+		this.expCondition = settings.get(ConfigTags.ApplicationPassword);
+
+		if ( ! ( expCondition.equals("baseline") || expCondition.equals("experimental")) ) {
+			logger.error("ExpCondition does not have valid value.");
+			System.exit(1);
+		}
 
 		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled) ) {
 			selector = new CompoundTextActionSelector(
