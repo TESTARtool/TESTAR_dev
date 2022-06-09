@@ -51,12 +51,19 @@ public class HtmlSequenceReport implements Reporting{
     private boolean firstActionsAdded = false;
 
     private static final String[] HEADER = new String[] {
-            "<!DOCTYPE html>",
-            "<html>",
-            "<head>",
-            "<title>TESTAR execution sequence report</title>",
-            "</head>",
-            "<body>"
+    		"<!DOCTYPE html>",
+    		"<html>",
+    		// Script function that allows to reverse the order of the states
+    		"<script>",
+    		"function reverse(){",
+    		"let direction = document.getElementById('main').style.flexDirection;",
+    		"if(direction === 'column') document.getElementById('main').style.flexDirection = 'column-reverse';",
+    		"else document.getElementById('main').style.flexDirection = 'column';}",
+    		"</script>",
+    		"<head>",
+    		"<title>TESTAR execution sequence report</title>",
+    		"</head>",
+    		"<body>"
     };
 
     private PrintWriter out;
@@ -79,6 +86,10 @@ public class HtmlSequenceReport implements Reporting{
             }
 
             write("<h1>TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount + "</h1>");
+            // HTML button to invoke reverse function
+            write("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
+            // Initialize the main div container to apply the reverse order
+            write("<div id='main' style='display:flex;flex-direction:column'>");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -116,6 +127,7 @@ public class HtmlSequenceReport implements Reporting{
         write("<h"+h+">"+text+"</h"+h+">");
     }
 
+    //TODO: This method is not used, check and delete
     public void addSequenceStep(State state, String actionImagePath){
     	try {
     		String imagePath = state.get(Tags.ScreenshotPath);
@@ -155,12 +167,12 @@ public class HtmlSequenceReport implements Reporting{
     			String replaceString = imagePath.substring(indexStart,indexScrn);
     			imagePath = imagePath.replace(replaceString,"../");
     		}
+    		write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
     		write("<h2>State "+innerLoopCounter+"</h2>");
     		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
     		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
-    		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-    		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
+    		write("</div>"); // Close state block container
     	}catch(NullPointerException | NoSuchTagException e) {
     		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
     		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
@@ -170,6 +182,7 @@ public class HtmlSequenceReport implements Reporting{
 
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
+        write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
@@ -188,11 +201,13 @@ public class HtmlSequenceReport implements Reporting{
             write("</li>");
         }
         write("</ul>");
+        write("</div>"); // Close derived actions block container
     }
 
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
         if(!firstActionsAdded) firstActionsAdded = true;
         if(actions.size()==concreteIdsOfUnvisitedActions.size()){
+        	write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
             for(Action action:actions){
                 write("<li>");
@@ -210,7 +225,9 @@ public class HtmlSequenceReport implements Reporting{
                 write("</li>");
             }
             write("</ul>");
+            write("</div>"); // Close derived actions block container
         }else if(concreteIdsOfUnvisitedActions.size()==0){
+        	write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
             write("<h4>All actions have been visited, set of available actions:</h4><ul>");
             for(Action action:actions){
             	write("<li>");
@@ -228,7 +245,9 @@ public class HtmlSequenceReport implements Reporting{
             	write("</li>");
             }
             write("</ul>");
+            write("</div>"); // Close derived actions block container
         }else{
+        	write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
             write("<h4>"+concreteIdsOfUnvisitedActions.size()+" out of "+actions.size()+" actions have not been visited yet:</h4><ul>");
             for(Action action:actions){
             	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"))){
@@ -249,24 +268,26 @@ public class HtmlSequenceReport implements Reporting{
             	}
             }
             write("</ul>");
+            write("</div>"); // Close derived actions block container
         }
     }
 
     public void addSelectedAction(State state, Action action){
     	String screenshotDir = OutputStructure.screenshotsOutputDir;
-//        System.out.println("path="+state_path);
+
     	if(screenshotDir.contains("./output")){
         	int indexStart = screenshotDir.indexOf("./output");
         	int indexScrn = screenshotDir.indexOf("scrshots");
         	String replaceString = screenshotDir.substring(indexStart,indexScrn);
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
-//        System.out.println("path="+actionPath);
+
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
         		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + ".png";
-//        System.out.println("path="+actionPath);
+
+        write("<div id='block' style='display:flex;flex-direction:column'>"); // Open executed action block container
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
 
@@ -282,22 +303,26 @@ public class HtmlSequenceReport implements Reporting{
             actionPath = actionPath.replace("./output","..");
         }
         write("<p><img src=\""+actionPath+"\"></p>");
+        write("</div>"); // Close executed action block container
     }
 
     public void addTestVerdict(Verdict verdict){
     	String verdictInfo = verdict.info();
     	if(verdict.severity() > Verdict.OK.severity())
     		verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
-    	
+
+        write("<div id='block' style='display:flex;flex-direction:column'>"); // Open verdict block container
         write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
+        write("</div>"); // Close verdict block container
     }
 
     public void close() {
-        for(String s:HTMLReporter.FOOTER){
-            write(s);
-        }
-        out.close();
+    	write("</div>"); // Close the main div container
+    	for(String s:HTMLReporter.FOOTER){
+    		write(s);
+    	}
+    	out.close();
     }
 
     private void write(String s) {
