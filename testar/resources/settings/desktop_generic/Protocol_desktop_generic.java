@@ -29,6 +29,8 @@
  *******************************************************************************************************/
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.testar.DerivedActions;
@@ -43,6 +45,9 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
 
+import com.sun.jna.platform.win32.Advapi32Util.EventLogIterator;
+import com.sun.jna.platform.win32.Advapi32Util.EventLogRecord;
+
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
  *
@@ -50,14 +55,19 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
 
+	private List<EventLogRecord> initialEventLog = new ArrayList<>();
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		super.initialize(settings);
+
+		EventLogIterator eventLog = new EventLogIterator("Application");
+		eventLog.forEachRemaining(initialEventLog::add);
 	}
 
 	/**
@@ -91,9 +101,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -128,6 +138,22 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
 		//--------------------------------------------------------
+		EventLogIterator eventLog = new EventLogIterator("Application");
+		while (eventLog.hasNext()) {
+			EventLogRecord postEventRecord = eventLog.next();
+			boolean isNew = true;
+
+			for (EventLogRecord ini : initialEventLog) {
+				if (postEventRecord.getRecordNumber() == ini.getRecordNumber()) {
+					isNew = false;
+					break;
+				}
+			}
+
+			if(isNew && postEventRecord.getType().toString().contains("Error")) {
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Windows Event Error : " + postEventRecord.getSource());
+			}
+		}
 
 		return verdict;
 	}
