@@ -202,7 +202,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
      * @param maxWaitTime Approximate maximum time to wait, in seconds
      * @param retryTime Approximate time between retries, in seconds
      * @param expectedStatusCode return
-     * @return boolean value that shows whether the requests
+     * @return boolean value that shows whether the request returned the expected status code
      * @throws MalformedURLException
      * @throws IOException
      * @throws ProtocolException
