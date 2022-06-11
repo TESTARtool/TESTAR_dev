@@ -64,19 +64,16 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-        logger.info("CKAN protocol calls super.init");
+
+	    this.applicationUsername = settings.get(ConfigTags.ApplicationUsername);
+        this.applicationPassword = settings.get(ConfigTags.ApplicationPassword);
+		this.expCondition = settings.get(ConfigTags.ExpCondition);
+		expConditionChecks(settings);
+
+		logger.info("CKAN protocol calls super.init");
  		super.initialize(settings);
 
-        this.applicationUsername = settings.get(ConfigTags.ApplicationUsername);
-		this.applicationPassword = settings.get(ConfigTags.ApplicationPassword);
-		this.expCondition = settings.get(ConfigTags.ApplicationPassword);
-
-		if ( ! ( expCondition.equals("baseline") || expCondition.equals("experimental")) ) {
-			logger.error("ExpCondition does not have valid value.");
-			System.exit(1);
-		}
-
-		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled) ) {
+		if ( useCustomActionSelection() ) {
 			selector = new CompoundTextActionSelector(
 				settings.get(ConfigTags.CompoundTextActionInitialProbability),
 				settings.get(ConfigTags.CompoundTextActionResetProbability),
@@ -89,6 +86,57 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 				settings.get(ConfigTags.CompoundTextActionHighPriorityShrinkRate)
 			);
 		}
+	}
+
+	/**
+	 * Verify that settings related to experiment condition are valid. Exit with error
+	 * message if condition settings are incorrect
+	 */
+	protected void expConditionChecks(Settings settings) {
+
+		boolean shouldSetLogContext=false,shouldProcessDataAfterAction=false, shouldUseCompoundTextAction=false;
+
+		if ( expCondition.equals("control-defaultactionselection") ) {
+			shouldSetLogContext = false;
+			shouldProcessDataAfterAction = false;
+			shouldUseCompoundTextAction = false;
+		}
+		else if ( expCondition.equals("control-customactionselection") ) {
+			shouldSetLogContext = false;
+			shouldProcessDataAfterAction = false;
+			shouldUseCompoundTextAction = true;
+		}
+		else if ( expCondition.equals("experimental")) {
+			shouldSetLogContext = true;
+			shouldProcessDataAfterAction = true;
+			shouldUseCompoundTextAction = true;
+		}
+		else {
+			logger.error("ExpCondition does not have valid value.");
+			System.exit(1);
+		}
+
+		boolean setLogContext = settings.get(ConfigTags.SetLogContext);
+		if ( setLogContext != shouldSetLogContext ) {
+			logger.error("Error: Experimental condition setting mismatch for SetLogContext");
+			System.exit(1);
+		}
+
+		boolean processDataAfterAction = settings.get(ConfigTags.ProcessDataAfterAction);
+		if ( shouldProcessDataAfterAction != processDataAfterAction ) {
+			logger.error("Error: Experimental condition setting mismatch for ProcessDataAfterAction");
+			System.exit(1);
+		}
+
+		boolean compoundTextActionLogicEnabled = settings.get(ConfigTags.CompoundTextActionLogicEnabled);
+		if ( compoundTextActionLogicEnabled != shouldUseCompoundTextAction ) {
+			logger.error("Error: Experimental condition setting mismatch for CompoundTextActionLogicEnabled");
+			System.exit(1);
+		}
+	}
+
+	protected boolean useCustomActionSelection () {
+		return this.expCondition.equals("experimental") || this.expCondition.equals("control-customactionselection");
 	}
 
     protected void initializeDataManager() {
@@ -201,6 +249,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
         // on this method definition for deriving actions.
 		Set<Action> actions = new HashSet<>();
 		Set<Action> filteredActions = new HashSet<>();
+		boolean useCustomActionSelection = useCustomActionSelection();
 
 		// create an action compiler, which helps us create actions
 		// such as clicks, drag&drop, typing ...
@@ -311,10 +360,10 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				Action clickAction = ac.leftClickAt(widget);
-				if ( isLowPriorityWidget ) {
+				if ( useCustomActionSelection && isLowPriorityWidget) {
 					clickAction.set(ActionTags.CompoundTextLowPriorityWidget, true);
 				}
-				else if ( isHighPriorityWidget ) {
+				else if ( useCustomActionSelection && isHighPriorityWidget ) {
 					clickAction.set(ActionTags.CompoundTextHighPriorityWidget, true);
 					logger.info("Set high priority for widget ...");
 				}
@@ -359,7 +408,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-		if ( settings.get(ConfigTags.CompoundTextActionLogicEnabled) ) {
+		if ( useCustomActionSelection()  ) {
 			return selector.selectAction(actions);
 		}
 		else {

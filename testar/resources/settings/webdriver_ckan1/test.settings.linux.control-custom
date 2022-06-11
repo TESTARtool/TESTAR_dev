@@ -185,7 +185,7 @@ ApplicationBaseURL = http://localhost:5000
 DockerComposeDirectory = /data/studie/af/lightweight-codeanalysis/suts/ckan/run
 LogContextPrefix = tryout
 CoverageContext = tryout
-SetLogContext = true
+SetLogContext = false
 SetCoverageContext = true
 FullStringRate = 0.2
 TypeMatchRate = 0.5
@@ -197,8 +197,10 @@ LogOracleFiles    = /data/studie/af/lightweight-codeanalysis/suts/ckan/run/ckan.
 
 ResetSUTAfterSequence = true
 VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;runpg_data;run_solr_data
-ProcessDataAfterAction = true
+ProcessDataAfterAction = false
 ActionGetDataEndpoint = /testar-extractstrings
 
-# Condition can be: baseline or experimental
-ExpCondition = experimental
+CompoundTextActionLogicEnabled = true
+
+# Condition can be: experimental, control-defaultactionselection or control-customactionselection
+ExpCondition = control-customactionselection

@@ -196,5 +196,5 @@ VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;run
 ProcessDataAfterAction = true
 ActionGetDataEndpoint = /testar-extractstrings
 
-# Condition can be: baseline or experimental
+# Condition can be: experimental, control-defaultactionselection or control-customactionselection
 ExpCondition = experimental
