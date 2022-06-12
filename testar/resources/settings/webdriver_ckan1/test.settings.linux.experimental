@@ -196,7 +196,7 @@ LogOracleCommands = /data/studie/af/lightweight-codeanalysis/suts/ckan/run/save-
 LogOracleFiles    = /data/studie/af/lightweight-codeanalysis/suts/ckan/run/ckan.log
 
 ResetSUTAfterSequence = true
-VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;runpg_data;run_solr_data
+VolumesToResetAfterSequence = run_ckan_config;run_ckan_home;run_ckan_storage;run_pg_data;run_solr_data
 ProcessDataAfterAction = true
 ActionGetDataEndpoint = /testar-extractstrings
 
