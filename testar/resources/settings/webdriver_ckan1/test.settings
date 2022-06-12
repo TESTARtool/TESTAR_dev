@@ -187,6 +187,7 @@ LogContextPrefix = tryout
 CoverageContext = tryout
 SetLogContext = true
 SetCoverageContext = true
+CoverageExportDirectory = /data/studie/af/export-coverage
 FullStringRate = 0.2
 TypeMatchRate = 0.5
 MaxInputStrings = 5
