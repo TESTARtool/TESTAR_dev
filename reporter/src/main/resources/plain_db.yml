@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:13306/testar?autoReconnect=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8
+    username: testar
+    password: testar
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
