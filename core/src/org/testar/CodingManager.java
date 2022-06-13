@@ -202,8 +202,10 @@ public class CodingManager {
 	         * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
 	         * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
 	         */
+			Widget originWidget = a.get(Tags.OriginWidget, null);
+			String originWidgetId = (originWidget == null ? "" : originWidget.get(Tags.AbstractIDCustom));
 	        a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-	                lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+	                lowCollisionID(state.get(Tags.AbstractIDCustom) + originWidgetId + a.get(Tags.Role, ActionRoles.Action)));
 
 	        // For the ConcreteIDCustom use all core-StateManagementTags properties of the origin widget
 	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
