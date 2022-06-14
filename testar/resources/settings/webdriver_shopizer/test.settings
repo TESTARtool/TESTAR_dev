@@ -129,7 +129,7 @@ AbstractStateAttributes = WebWidgetId,WebWidgetTextContent
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = hidden-xs
+ClickableClasses = hidden-xs;listing-product-name
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = aws-demo.shopizer.com
 FollowLinks = true
