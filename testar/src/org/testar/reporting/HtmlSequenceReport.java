@@ -107,11 +107,11 @@ public class HtmlSequenceReport implements Reporting{
      */
     public HtmlSequenceReport(String pathReplayedSequence) {
         try {
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+        	htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
                     + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
                     + REPORT_FILENAME_AFT;
 
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            out = new PrintWriter(htmlFilename, HTMLReporter.CHARSET);
             for(String s:HEADER) {
                 write(s);
             }
