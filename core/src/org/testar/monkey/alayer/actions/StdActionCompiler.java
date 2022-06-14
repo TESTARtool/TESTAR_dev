@@ -160,6 +160,7 @@ public class StdActionCompiler {
 		Action ret = leftTripleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets,  Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 	
@@ -183,6 +184,7 @@ public class StdActionCompiler {
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 
@@ -202,6 +204,7 @@ public class StdActionCompiler {
 		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 	
@@ -210,7 +213,9 @@ public class StdActionCompiler {
 	}
 
 	public Action dragFromTo(Widget from, Widget to){
-		return dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
+		Action ret = dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
+		ret.set(Tags.OriginWidget, from);
+		return ret;
 	}
 
 	public Action dragFromTo(Widget from, double fromRelX, double fromRelY, Widget to, double toRelX, double toRelY){
