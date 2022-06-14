@@ -29,10 +29,13 @@
  */
 
 import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdFillFormAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -43,9 +46,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
-
 import java.util.*;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
@@ -201,6 +202,17 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+		    // fill forms actions
+		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
+				String protocol = settings.get(ConfigTags.ProtocolClass, "");
+		        Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+		        if(formFillingAction instanceof NOP){
+		        	// do nothing with NOP actions - the form was not actionable
+				}else{
+		        	actions.add(formFillingAction);
+				}
+		    }
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
@@ -288,20 +300,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Select one of the possible actions (e.g. at random)

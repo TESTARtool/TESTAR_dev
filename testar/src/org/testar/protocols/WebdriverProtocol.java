@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
@@ -62,19 +61,14 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
@@ -82,7 +76,6 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
-
 import org.testar.serialisation.LogSerialiser;
 import org.testar.reporting.Reporting;
 
@@ -387,7 +380,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
 			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
 			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
-			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+			// Create and build the id of the HistoryBackAction
+			Action histBackAction = new WdHistoryBackAction();
+			buildEnvironmentActionIdentifiers(state, histBackAction);
+			actions = new HashSet<>(Collections.singletonList(histBackAction));
 		}
 		
 		return super.selectAction(state, actions);
@@ -759,6 +755,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	protected boolean isForm(Widget widget) {
+	    Role role = widget.get(Tags.Role, Roles.Widget);
+	    return role.equals(WdRoles.WdFORM);
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

@@ -350,7 +350,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		  // Input type are special...
 		  if (role.equals(WdRoles.WdINPUT)) {
 			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type);
+			  return WdRoles.typeableInputTypes().contains(type.toLowerCase());
 		  }
 		  return true;
 	  }
