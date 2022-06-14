@@ -150,7 +150,7 @@ ExtendedSettingsFile = .\\settings\\webdriver_shopizer_reinforcement_learning\\E
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = hidden-xs
+ClickableClasses = hidden-xs;listing-product-name
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = aws-demo.shopizer.com
 FollowLinks = true
