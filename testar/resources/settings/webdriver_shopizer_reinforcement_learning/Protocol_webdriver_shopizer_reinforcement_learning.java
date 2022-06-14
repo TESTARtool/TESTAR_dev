@@ -301,7 +301,7 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		            // do nothing with NOP actions - the form was not actionable
 		        } else {
 		            System.out.println("DEBUG: form action found: ");
-//		            actions.add(formFillingAction);
+		            actions.add(formFillingAction);
 		        }
 		    }
 
@@ -327,7 +327,7 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 
 			// Ignore link widgets that do not contains informative properties to identify them
 			// English, My Account, Shopping cart
-			if(widget.get(WdTags.Desc, "").equals("a") && !widget.get(WdTags.WebCssClasses, "").contains("listing-product-name")) {
+			if(widget.get(WdTags.Desc, "").equals("a") && !widget.get(WdTags.WebCssClasses, "").contains("listing-product-name") && !widget.get(WdTags.WebCssClasses, "").contains("current")) {
 				continue;
 			}
 
