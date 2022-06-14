@@ -97,6 +97,8 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    // Import Nashorn Engine to be used in JDK higher than version 15
+    implementation group: 'org.openjdk.nashorn', name: 'nashorn-core', version: '15.4'
 }
 
 task prepareSettings(type: Copy) {
