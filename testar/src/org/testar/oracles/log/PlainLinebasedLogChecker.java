@@ -22,6 +22,7 @@ class PlainLinebasedLogChecker extends LogChecker {
     protected Map<String,Long> logCommandPtr, logFilePtr;
     protected int numberEntries;
     protected LogErrorDetector detector;
+    protected Logger logger;
 
     /**
      * Create a new PlainLinebasedLogChecker.
@@ -34,6 +35,7 @@ class PlainLinebasedLogChecker extends LogChecker {
         this.commands = commands;
         this.files = files;
         this.detector = detector;
+        this.logger = LogManager.getLogger();
 
         this.logCommandPtr = new HashMap<String,Long>();
         for ( String command : commands ) {
@@ -60,7 +62,7 @@ class PlainLinebasedLogChecker extends LogChecker {
                 List<String> out = readNewLines(getCommandBufferedReader(command), this.logCommandPtr, command);
             }
             catch ( IOException e) {
-                LogManager.getLogger().error("Warning: LogChecker could not run command " + command + ":" + e.toString());
+                logger.error("Warning: LogChecker could not run command " + command + ":" + e.toString());
             }
         }
 
@@ -69,7 +71,7 @@ class PlainLinebasedLogChecker extends LogChecker {
                 List<String> out = readNewLines(getFileBufferedReader(file), this.logFilePtr, file);
             }
             catch ( IOException e ) {
-                LogManager.getLogger().error("Warning: LogChecker could not read file " + file + ":" + e.toString());
+                logger.error("Warning: LogChecker could not read file " + file + ":" + e.toString());
             }
         }
     }
@@ -100,7 +102,7 @@ class PlainLinebasedLogChecker extends LogChecker {
 
             }
             catch (IOException e) {
-                LogManager.getLogger().error("Warning: LogChecker could not run command " + command + ":" + e.toString());
+                logger.error("Warning: LogChecker could not run command " + command + ":" + e.toString());
             }
         }
 
@@ -125,7 +127,7 @@ class PlainLinebasedLogChecker extends LogChecker {
 
             }
             catch ( IOException e ) {
-                LogManager.getLogger().error("Warning: LogChecker could not read file " + file + ":" + e.toString());
+                logger.error("Warning: LogChecker could not read file " + file + ":" + e.toString());
             }
         }
 
@@ -156,7 +158,7 @@ class PlainLinebasedLogChecker extends LogChecker {
         }
 
         if ( currentLine + 1 < startLine ) {
-            LogManager.getLogger().warn("Warning log file / log command returned fewer lines than before. LogChecker is resetting counter. ");
+            logger.warn("Warning log file / log command returned fewer lines than before. LogChecker is resetting counter. ");
         }
 
         startLineMap.put(startLineId, currentLine + 1);
