@@ -17,11 +17,14 @@ import org.testar.oracles.Oracle;
  *  LogOracleRegex: a regular expression that matches suspicious messages
  *  LogOracleFiles: a list of absolute paths of log files to monitor
  *  LogOracleCommands: a list of commands of which standard output should be monitored.
- *
+ *  LogOracleLogLines: whether to log all log lines that are processed by the Oracle
+ *  LogOracleRestartSequence: whether to reinitialize the LogOracle at the start of each sequence. This is
+ *  useful if SUT log data is deleted after each sequence.
  */
 
 public class LogOracle implements Oracle {
     LogChecker checker;
+    boolean restartEachSequence = false;
 
     public LogOracle (Settings settings) {
         String regex = settings.get(ConfigTags.LogOracleRegex);
@@ -29,10 +32,17 @@ public class LogOracle implements Oracle {
         List<String> commands = settings.get(ConfigTags.LogOracleCommands);
         LogErrorDetector detector = new RegexLogErrorDetector(settings.get(ConfigTags.LogOracleRegex));
         this.checker = new PlainLinebasedLogChecker(commands, files, detector, settings.get(ConfigTags.LogOracleLogLines));
+        restartEachSequence = settings.get(ConfigTags.LogOracleRestartSequence);
     }
 
     public void initialize() {
         checker.initialRead();
+    }
+
+    public void notifyBeginSequence() {
+        if ( restartEachSequence )  {
+            this.initialize();
+        }
     }
 
     public Verdict getVerdict(State state) {

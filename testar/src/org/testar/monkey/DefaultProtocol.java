@@ -98,7 +98,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
 	public boolean logOracleEnabled;
-	public Oracle logOracle;
+	public LogOracle logOracle;
 	private State stateForClickFilterLayerProtocol;
 
 	protected Reporting htmlReport;
@@ -390,7 +390,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
  	* @param settings
  	* @return
  	*/
-	public Oracle createLogOracle (Settings settings) {
+	public LogOracle createLogOracle (Settings settings) {
 		return new LogOracle(settings);
 	}
 
@@ -1413,6 +1413,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
+		if ( settings.get(ConfigTags.LogOracleEnabled) ) {
+			logOracle.notifyBeginSequence();
+		}
 		nonReactingActionNumber = 0;
 	}
 

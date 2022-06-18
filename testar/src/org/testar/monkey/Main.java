@@ -620,6 +620,7 @@ public class Main {
 			defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
 			defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 			defaults.add(Pair.from(LogOracleLogLines, true));
+			defaults.add(Pair.from(LogOracleRestartSequence, true));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

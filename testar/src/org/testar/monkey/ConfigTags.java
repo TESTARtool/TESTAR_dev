@@ -161,6 +161,7 @@ public final class ConfigTags {
   public static final Tag<List<String>> LogOracleCommands = Tag.from("LogOracleCommands", (Class<List<String>>) (Class<?>) List.class);
   public static final Tag<List<String>> LogOracleFiles = Tag.from("LogOracleFiles", (Class<List<String>>) (Class<?>) List.class);
   public static final Tag<Boolean> LogOracleLogLines  = Tag.from("LogOracleLogLines", Boolean.class);
+  public static final Tag<Boolean> LogOracleRestartSequence  = Tag.from("LogOracleRestartSequence", Boolean.class);
 
   // Tags for DockerizedSUTWebdriverProtocol
 
