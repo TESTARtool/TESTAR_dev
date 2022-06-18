@@ -21,6 +21,7 @@ class PlainLinebasedLogChecker extends LogChecker {
     protected List<String> commands, files;
     protected Map<String,Long> logCommandPtr, logFilePtr;
     protected int numberEntries;
+    protected boolean logLines=false;
     protected LogErrorDetector detector;
     protected Logger logger;
 
@@ -30,11 +31,13 @@ class PlainLinebasedLogChecker extends LogChecker {
      * @param commands A list of commands of which the standard output is to be checked
      * @param files A list of log files to check for newly appended lines.
      * @param detector a LogErrorDetector to find errors (if any) in new lines
+     * @param logLines whether to log all lines processed by the checker
      */
-    public PlainLinebasedLogChecker(List<String> commands, List<String> files, LogErrorDetector detector) {
+    public PlainLinebasedLogChecker(List<String> commands, List<String> files, LogErrorDetector detector, boolean logLines) {
         this.commands = commands;
         this.files = files;
         this.detector = detector;
+        this.logLines = logLines;
         this.logger = LogManager.getLogger();
 
         this.logCommandPtr = new HashMap<String,Long>();
@@ -154,6 +157,9 @@ class PlainLinebasedLogChecker extends LogChecker {
             currentLine++;
             if ( currentLine >= startLine ) {
                 output.add(line);
+                if ( this.logLines ) {
+                    logger.info("Logoracle processed line: "+ line);
+                }
             }
         }
 

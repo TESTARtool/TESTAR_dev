@@ -28,7 +28,7 @@ public class LogOracle implements Oracle {
         List<String> files = settings.get(ConfigTags.LogOracleFiles);
         List<String> commands = settings.get(ConfigTags.LogOracleCommands);
         LogErrorDetector detector = new RegexLogErrorDetector(settings.get(ConfigTags.LogOracleRegex));
-        this.checker = new PlainLinebasedLogChecker(commands, files, detector);
+        this.checker = new PlainLinebasedLogChecker(commands, files, detector, settings.get(ConfigTags.LogOracleLogLines));
     }
 
     public void initialize() {
