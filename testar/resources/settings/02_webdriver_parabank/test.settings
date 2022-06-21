@@ -138,6 +138,14 @@ BrowserFullScreen = true
 SwitchNewTabs = true
 
 #################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
+
+#################################################################
 # Override display scale
 #
 # Overrides the displayscale obtained from the system. 

@@ -67,7 +67,7 @@ public class WdMapping {
 			put(WidgetControlType, WdTags.WebTagName);
 			put(WidgetTitle, WdTags.WebGenericTitle);
 			put(WidgetIsEnabled, WdTags.WebIsEnabled);
-			put(WidgetBoundary, WdTags.WebBoundary);
+			put(WidgetBoundary, WdTags.WebBoundingRectangle);
 			put(WidgetPath, Tags.Path);
 			put(WidgetIsContentElement, WdTags.WebIsContentElement);
 			put(WidgetIsControlElement, WdTags.WebIsControlElement);

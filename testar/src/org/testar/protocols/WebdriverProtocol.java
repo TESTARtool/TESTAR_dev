@@ -49,25 +49,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.ArrayUtils;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
@@ -75,7 +76,6 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
-
 import org.testar.serialisation.LogSerialiser;
 import org.testar.reporting.Reporting;
 
@@ -107,6 +107,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 		}
 	};
+
+	// Verdict obtained from messages coming from the web browser console
+	protected Verdict webConsoleVerdict = Verdict.OK;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -145,14 +148,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 	}
 	
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-    }
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = getReporter();
+		// reset web browser console verdict
+		webConsoleVerdict = Verdict.OK;
+	}
     
     /**
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -305,26 +310,61 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
-    
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
-		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
-		if(actions == null || actions.isEmpty()) {
-			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
-			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
-			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
-			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		}
-		
-		return super.selectAction(state, actions);
-	}
+
+    /**
+     * The getVerdict methods implements the online state oracles that
+     * examine the SUT's current state and returns an oracle verdict.
+     *
+     * @return oracle verdict, which determines whether the state is erroneous and why.
+     */
+    @Override
+    protected Verdict getVerdict(State state) {
+    	Verdict stateVerdict = super.getVerdict(state);
+
+    	// If Web Console Error Oracle is enabled and we have some pattern to match
+    	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
+    		// Load the web console error pattern
+    		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
+    		// Check Severe messages in the WebDriver logs
+    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    		for(LogEntry logEntry : logEntries) {
+    			if(logEntry.getLevel().equals(Level.SEVERE)) {
+    				// Check if the severe error message matches with the web console error pattern
+    				String consoleErrorMsg = logEntry.getMessage();
+    				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
+    				if(matcherError.matches()) {
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + consoleErrorMsg);
+    				}
+    			}
+    		}
+    		// Join GUI verdict with WebDriver console verdict
+    		stateVerdict = stateVerdict.join(webConsoleVerdict);
+    	}
+
+    	// If Web Console Warning Oracle is enabled and we have some pattern to match
+    	if(settings.get(ConfigTags.WebConsoleWarningOracle, false) && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
+    		// Load the web console warning pattern
+    		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
+    		// Check Warning messages in the WebDriver logs
+    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    		for(LogEntry logEntry : logEntries) {
+    			if(logEntry.getLevel().equals(Level.WARNING)) {
+    				// Check if the warning message matches with the web console error pattern
+    				String consoleWarningMsg = logEntry.getMessage();
+    				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
+    				if(matcherWarning.matches()) {
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Warning: " + consoleWarningMsg);
+    				}
+    			}
+    		}
+    		// Join GUI verdict with WebDriver console verdict
+    		stateVerdict = stateVerdict.join(webConsoleVerdict);
+    	}
+
+    	return stateVerdict;
+    }
 
     /**
      * Overwriting to add HTML report writing into it
@@ -333,13 +373,36 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @param actions
      * @return
      */
-	@Override
-	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-		actions = super.preSelectAction(system, state, actions);
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
-		return actions;
-	}
+    @Override
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+    	if(actions == null || actions.isEmpty()) {
+    		System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+    		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+    		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+    		// Create and build the id of the HistoryBackAction
+    		Action histBackAction = new WdHistoryBackAction();
+    		buildEnvironmentActionIdentifiers(state, histBackAction);
+    		actions = new HashSet<>(Collections.singletonList(histBackAction));
+    	}
+    	// super preSelectAction will not derive ESC action
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
+    }
+
+    /**
+     * Select one of the possible actions (e.g. at random)
+     *
+     * @param state   the SUT's current state
+     * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+     * @return the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions) {
+    	return super.selectAction(state, actions);
+    }
 
     /**
      * Execute the selected action.
@@ -692,6 +755,26 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	protected boolean isForm(Widget widget) {
+	    Role role = widget.get(Tags.Role, Roles.Widget);
+	    return role.equals(WdRoles.WdFORM);
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

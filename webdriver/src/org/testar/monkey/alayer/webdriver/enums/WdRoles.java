@@ -205,6 +205,6 @@ public class WdRoles {
 
   public static List<String> typeableInputTypes() {
     return Arrays.asList("text", "password", "email",
-        "date", "datetime-local", "month", "number");
+        "date", "datetime-local", "month", "number", "search", "url", "tel");
   }
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,19 +30,46 @@
 
 package org.testar.monkey.alayer.actions;
 
+import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 
-public class WdActionRoles {
-	private WdActionRoles(){}
+public class WdSelectListAction extends TaggableBase implements Action {
+    private static final long serialVersionUID = -5522966388178892530L;
 
-	public static final Role
-	
-	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
-	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
-	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
-	SubmitScript = Role.from("SubmitScript", ExecuteScript),
-	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
-	FormFillingAction = Role.from("FormFillingAction", ActionRoles.CompoundAction),
-	SelectListAction = Role.from("SelectListAction", ExecuteScript);
-	
+    private String elementId;
+    private String value;
+
+    public WdSelectListAction(String elementId, String value, Widget widget) {
+        this.elementId = elementId;
+        this.value = value;
+        this.set(Tags.Role, WdActionRoles.SelectListAction);
+        this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.set(Tags.OriginWidget, widget);
+    }
+
+    @Override
+    public void run(SUT system, State state, double duration) {
+        WdDriver.executeScript(String.format("document.getElementById('%s').value='%s'", elementId, value));
+    }
+
+    @Override
+    public String toShortString() {
+        return "Set select list on id '" + elementId + "' to '" + value + "'";
+    }
+
+    @Override
+    public String toParametersString() {
+        return toShortString();
+    }
+
+    @Override
+    public String toString(Role... discardParameters) {
+        return toShortString();
+    }
 }
