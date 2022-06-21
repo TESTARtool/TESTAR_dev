@@ -366,29 +366,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	return stateVerdict;
     }
 
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
-		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
-		if(actions == null || actions.isEmpty()) {
-			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
-			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
-			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
-			// Create and build the id of the HistoryBackAction
-			Action histBackAction = new WdHistoryBackAction();
-			buildEnvironmentActionIdentifiers(state, histBackAction);
-			actions = new HashSet<>(Collections.singletonList(histBackAction));
-		}
-		
-		return super.selectAction(state, actions);
-	}
-
     /**
      * Overwriting to add HTML report writing into it
      *
@@ -396,13 +373,36 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @param actions
      * @return
      */
-	@Override
-	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-		actions = super.preSelectAction(system, state, actions);
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
-		return actions;
-	}
+    @Override
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+    	if(actions == null || actions.isEmpty()) {
+    		System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+    		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+    		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+    		// Create and build the id of the HistoryBackAction
+    		Action histBackAction = new WdHistoryBackAction();
+    		buildEnvironmentActionIdentifiers(state, histBackAction);
+    		actions = new HashSet<>(Collections.singletonList(histBackAction));
+    	}
+    	// super preSelectAction will not derive ESC action
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
+    }
+
+    /**
+     * Select one of the possible actions (e.g. at random)
+     *
+     * @param state   the SUT's current state
+     * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+     * @return the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions) {
+    	return super.selectAction(state, actions);
+    }
 
     /**
      * Execute the selected action.

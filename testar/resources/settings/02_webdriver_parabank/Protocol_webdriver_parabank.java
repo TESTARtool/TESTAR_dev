@@ -298,10 +298,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
           }
       }
     }
-
-	if(actions.isEmpty()) {
-		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-	}
 	
 	// If we have forced actions, prioritize and filter the other ones
 	if (forcedActions != null && forcedActions.size() > 0) {
