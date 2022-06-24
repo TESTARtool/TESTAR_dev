@@ -268,7 +268,7 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 		    // dropdown widgets that come from fa-angle-down class need a mouse movement but not a click, 
 		    // this is because a click will close the dropdown
 		    if (widget.get(WdTags.WebCssClasses, "").contains("fa-angle-down")) {
-		        actions.add(ac.mouseMove(widget));
+		        continue;
 		    }
 
 		    // fill forms actions
@@ -325,7 +325,8 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 				// thats why we need a custom action selection
 				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
 					//actions.add(randomFromSelectList(widget));
-				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")) {
+				} else if (widget.get(WdTags.WebCssClasses, "").contains("dropdown-toggle")||
+						widget.get(WdTags.WebCssClasses, "").contains("hidden-xs")) {
 					// dropdown-toggle widgets need a mouse movement but not a click, because a click will close the dropdown
 					// Except multi language Home button :)
 					if(widget.get(WdTags.WebTextContent, "").contains("Inicio") || widget.get(WdTags.WebTextContent, "").contains("Home")) {
@@ -339,15 +340,15 @@ public class Protocol_webdriver_shopizer extends WebdriverProtocol {
 			}
 //		}
 			// left clicks, but ignore links outside domain
-			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
-				// Click on select web items opens the menu but does not allow TESTAR to select an item,
-				// thats why we need a custom action selection
-				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
-					//actions.add(randomFromSelectList(widget));
-				} else {
-				    actions.add(ac.leftClickAt(widget));
-				}
-			}
+//			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+//				// Click on select web items opens the menu but does not allow TESTAR to select an item,
+//				// thats why we need a custom action selection
+//				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+//					//actions.add(randomFromSelectList(widget));
+//				} else {
+//				    actions.add(ac.leftClickAt(widget));
+//				}
+//			}
 		}
 
 		// TODO: Check how this affects the Shared Algorithm, move to default derived actions
