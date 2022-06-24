@@ -7,6 +7,9 @@
         <defaultValue>0.0</defaultValue>
         <defaultReward>0.0</defaultReward>
         <epsilon>0.7</epsilon>
+        <minEpsilon>0.2</minEpsilon>
+        <maxEpsilon>0.8</maxEpsilon>
+        <totalActions>10</totalActions>
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>

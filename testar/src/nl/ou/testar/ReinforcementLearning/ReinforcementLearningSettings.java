@@ -17,6 +17,9 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
     public Float gamma;
     public Float defaultValue;
     public Float epsilon;
+    public Float minEpsilon;
+    public Float maxEpsilon;
+    public Integer totalActions;
     public Float defaultReward;
     public String rewardFunction;
     public String policy;
@@ -97,6 +100,12 @@ public class ReinforcementLearningSettings extends ExtendedSettingBase<Reinforce
         System.out.println("DefaultValue value : " + settings.get(ConfigTags.DefaultValue));
         settings.set(ConfigTags.Epsilon, this.epsilon);
         System.out.println("Epsilon value : " + settings.get(ConfigTags.Epsilon));
+        settings.set(ConfigTags.MinEpsilon, this.minEpsilon);
+        System.out.println("MinEpsilon value : " + settings.get(ConfigTags.MinEpsilon));
+        settings.set(ConfigTags.MaxEpsilon, this.maxEpsilon);
+        System.out.println("MaxEpsilon value : " + settings.get(ConfigTags.MaxEpsilon));
+        settings.set(ConfigTags.TotalActions, this.totalActions);
+        System.out.println("TotalActions value : " + settings.get(ConfigTags.TotalActions));
         settings.set(ConfigTags.DefaultReward, this.defaultReward);
         System.out.println("DefaultReward value : " + settings.get(ConfigTags.DefaultReward));
         settings.set(ConfigTags.RewardFunction, this.rewardFunction);

@@ -116,6 +116,9 @@ public final class ConfigTags {
   public static final Tag<Float> Gamma = Tag.from("Gamma", Float.class);
   public static final Tag<Float> DefaultValue = Tag.from("DefaultValue", Float.class);
   public static final Tag<Float> Epsilon = Tag.from("Epsilon", Float.class);
+  public static final Tag<Float> MinEpsilon = Tag.from("MinEpsilon", Float.class);
+  public static final Tag<Float> MaxEpsilon = Tag.from("MaxEpsilon", Float.class);
+  public static final Tag<Integer> TotalActions = Tag.from("TotalActions", Integer.class);
   public static final Tag<Float> DefaultReward = Tag.from("DefaultReward", Float.class);
   public static final Tag<String> RewardFunction = Tag.from("RewardFunction", String.class);
   public static final Tag<String> Policy = Tag.from("Policy", String.class);

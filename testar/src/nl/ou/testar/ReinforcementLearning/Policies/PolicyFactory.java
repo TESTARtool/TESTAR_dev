@@ -19,6 +19,9 @@ public class PolicyFactory {
             case "EpsilonGreedyPolicy":
                 selectedPolicy = getEpsilonGreedyPolicy(settings);
                 break;
+            case "DecayedEpsilonGreedyPolicy":
+                selectedPolicy = getDecayedEpsilonGreedyPolicy(settings);
+                break;
             case "OptimisticQValuesInitializationPolicy":
                 selectedPolicy = getOptimisticQValuesInitializationPolicy(settings);
                 break;
@@ -42,6 +45,15 @@ public class PolicyFactory {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new EpsilonGreedyPolicy(new GreedyPolicy(defaultQValue, tag), epsilon);
+    }
+
+    private static Policy getDecayedEpsilonGreedyPolicy(final Settings settings) {
+        final float min_epsilon = settings.get(ConfigTags.MinEpsilon, 0.1f);
+        final float max_epsilon = settings.get(ConfigTags.MaxEpsilon, 0.9f);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        final int totalActions = settings.get(ConfigTags.TotalActions, 3000);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
+        return new DecayedEpsilonGreedyPolicy(new GreedyPolicy(defaultQValue, tag), min_epsilon, max_epsilon, totalActions);
     }
 
     private static Policy getGreedyPolicy(final Settings settings) {
