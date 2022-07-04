@@ -108,6 +108,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
 
 	protected String loginURL;
+	protected String loginButtonName;
 	protected String loginFormID;
 	protected String loginInputKeyAttribute;
 	protected String loginUsernameInputName;
@@ -141,6 +142,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void initialize(Settings settings){
 
 		loginURL = settings.get(ConfigTags.ForcedLoginUrl, null);
+		loginButtonName = settings.get(ConfigTags.ForcedLoginButtonName, null);
 		loginFormID = settings.get(ConfigTags.ForcedLoginFormId, null);
 		loginInputKeyAttribute = settings.get(ConfigTags.ForcedLoginInputKeyAttribute, "id");
 		loginUsernameInputName = settings.get(ConfigTags.ForcedLoginUsernameInputName, null);
@@ -204,7 +206,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		 if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 		 	System.out.println("*** Create a new SQL service ***");
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
-			sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
+				sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
 			final String databaseName = settings.get(ConfigTags.SQLReporting);
 			final String userName = settings.get(ConfigTags.SQLReportingUser);
 			final String userPassword = settings.get(ConfigTags.SQLReportingPassword);
@@ -244,9 +246,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						System.err.println("Cannot initialize a database");
 						e.printStackTrace();
 					}
+					System.out.println("OrientDB docker image finished.");
 				}
 			};
-			 mysqlThread.start();
+			mysqlThread.start();
 
 
 			// TODO: Re-enable progress dialog
@@ -545,6 +548,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		return latestState;
     }
 
+    @Override
+	protected void runGenerateOuterLoop(SUT system) {
+    	isForcedLoginInProgress = false;
+    	super.runGenerateOuterLoop(system);
+	}
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 *
@@ -615,6 +624,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void postSequenceProcessing() {
 
+		System.out.println("*** Postprocessing a sequence ***");
+
     	String sequencesPath = getGeneratedSequenceName();
     	try {
     		sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
@@ -624,12 +635,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
 
         if(mode() == Modes.Replay || mode() == Modes.ReplayModel) {
+			System.out.println("*** Adding a test verdict from replay ***");
             sequenceReport.addTestVerdict(getReplayVerdict().join(processVerdict));
             testReport.addTestVerdict(getReplayVerdict().join(processVerdict), lastExecutedAction, latestState);
             status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
+        	System.out.println("*** Adding a test verdict ***");
 			sequenceReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
 			testReport.addTestVerdict(getVerdict(latestState), lastExecutedAction, latestState);
             status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
@@ -691,22 +704,33 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check the state if we need to force an action
 	 */
 	protected Set<Action> detectForcedActions(State state, WidgetActionCompiler ac) {
+		Set<Action> forcedActions = null;
 		Set<Action> actions = detectForcedDeniedUrl();
 		if (actions != null && actions.size() > 0) {
-			return actions;
+			forcedActions = actions;
+		}
+		else {
+			actions = detectForcedLogin(state);
+			if (actions != null && actions.size() > 0) {
+				System.out.println("--- Forced login prepared ---");
+				forcedActions = actions;
+			}
+			else {
+				actions = detectForcedPopupClick(state, ac);
+				if (actions != null && actions.size() > 0) {
+					forcedActions = actions;
+				}
+			}
 		}
 
-		actions = detectForcedLogin(state);
-		if (actions != null && actions.size() > 0) {
-			return actions;
+		if (forcedActions != null) {
+			for (Action action: forcedActions) {
+				System.out.println(String.format("*** Action %s is forced ***", action.toShortString()));
+				action.set(WdTags.WebIsForced, true);
+			}
 		}
 
-		actions = detectForcedPopupClick(state, ac);
-		if (actions != null && actions.size() > 0) {
-			return actions;
-		}
-
-		return null;
+		return forcedActions;
 	}
 
 	/*
@@ -733,32 +757,60 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			CompoundAction.Builder builder = new CompoundAction.Builder();
 			WdWidget usernameWidget = null;
 			WdWidget passwordWidget = null;
+			WdWidget buttonWidget = null;
 			// Set username and password
+//			System.out.println(String.format("--- %s ---", loginInputKeyAttribute));
 			for (Widget widget : state) {
 				WdWidget wdWidget = (WdWidget) widget;
 				// Only enabled, visible widgets
-				if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
-					continue;
-				}
+//				if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+//					continue;
+//				}
 
 				String widgetName = wdWidget.getAttribute(loginInputKeyAttribute);
-				if (loginUsernameInputName.equals(widgetName)) {
+				System.out.println(String.format("+++ %s, %s, %s +++", wdWidget.element.tagName, widgetName, wdWidget.element.textContent));
+//				System.out.println(String.format("+++ Attributes available: %s +++", String.join(", ", wdWidget.getAllAttributes().keySet())));
+				if (loginUsernameInputName.equals(widgetName)/*wdWidget.element.getElementDescription().equals(loginUsernameInputName)*/) {
 					usernameWidget = wdWidget;
 				}
-				else if (loginPasswordInputName.equals(wdWidget.getAttribute("id"))) {
+				else if (loginPasswordInputName.equals(widgetName)/*wdWidget.element.getElementDescription().equals(loginPasswordInputName)*/) {
 					passwordWidget = wdWidget;
+				}
+				else if (loginButtonName != null && wdWidget.element.getElementDescription().equals(loginButtonName)) {
+					buttonWidget = wdWidget;
 				}
 			}
 			// Submit form, but only if user and pass are filled
 			if (usernameWidget != null && passwordWidget != null) {
-				builder.add(actionCompiler.clickTypeInto(usernameWidget, loginUsername, true), 1);
-				builder.add(actionCompiler.clickTypeInto(passwordWidget, loginPassword, true), 1);
-				if (loginFormID == null) {
-					builder.add(actionCompiler.hitKey(KBKeys.VK_ENTER), 1);
+				System.out.println("--- Widgets found ---");
+				final Action usernameTypeAction = actionCompiler.clickTypeInto(usernameWidget, loginUsername, true);
+				usernameTypeAction.set(Tags.OriginWidget, usernameWidget);
+				final Action passwordTypeAction = actionCompiler.clickTypeInto(passwordWidget, loginPassword, true);
+				passwordTypeAction.set(Tags.OriginWidget, passwordWidget);
+				builder.add(usernameTypeAction, 1);
+				builder.add(new Wait(0.2), 1);
+				builder.add(passwordTypeAction, 1);
+				builder.add(new Wait(0.2), 1);
+//				Action customLoginAction = generateCustomLoginAction(state, actionCompiler);
+				Action submitAction = generateCustomLoginAction(state, actionCompiler);
+				if (submitAction == null) {
+					if (buttonWidget != null) {
+						System.out.println("--- Button found ---");
+						submitAction = actionCompiler.leftClickAt(buttonWidget);
+						submitAction.set(Tags.OriginWidget, buttonWidget);
+					}
+//				else if (customLoginAction != null) {
+//					builder.add(customLoginAction, 1);
+//				}
+					else/* if (loginFormID == null)*/ {
+						submitAction = actionCompiler.hitKey(KBKeys.VK_ENTER);
+						submitAction.set(Tags.OriginWidget, passwordWidget);
+					}
 				}
-				else {
-					builder.add(new WdSubmitAction(loginFormID), 2);
-				}
+//				else {
+//					builder.add(new WdSubmitAction(loginFormID), 2);
+//				}
+				builder.add(submitAction, 1);
 
 				isForcedLoginInProgress = true;
 				CompoundAction actions = builder.build();
@@ -769,6 +821,23 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			isForcedLoginInProgress = false;
 		}
 
+		return null;
+	}
+
+	@Override
+	public boolean moreActions(State state) {
+		if (!isForcedLoginInProgress && WdDriver.getCurrentUrl().startsWith(loginURL)) {
+			// Forced login expected
+			return true;
+		}
+		return super.moreActions(state);
+	}
+
+	/*
+	 * Locate and press login button, etc.
+	 */
+	protected Action generateCustomLoginAction(State state, WidgetActionCompiler ac) {
+		// Override if needed
 		return null;
 	}
 

@@ -13,10 +13,9 @@ import org.fruit.monkey.mysql.MySqlService;
 import java.sql.SQLException;
 import java.util.*;
 
-public class MySQLSerialResolver extends SerialResolver {
+public class MySQLSerialResolver extends SerialResolver<MySqlService> {
 
     private ActionResolver nextResolver;
-    private MySqlService service;
     private int reportId = -1;
 
     private MySqlService.ActionData currentActionData = null;
@@ -32,7 +31,9 @@ public class MySQLSerialResolver extends SerialResolver {
         super(service, settings);
     }
 
-    public void startReplay(String reportTag) throws SQLException {
+    public void startReplay(String reportTag) throws Exception {
+        super.startReplay(reportTag);
+        System.out.println(String.format("*** Service: %s, tag: %s ***", service, reportTag));
         this.reportId = service.getReportId(reportTag);
 
         iterations = service.getAllIterations(reportId);
@@ -41,6 +42,9 @@ public class MySQLSerialResolver extends SerialResolver {
 
     @Override
     protected Action nextAction(SUT system, State state) {
+        if(!innerIterator.hasNext()) {
+            return null;
+        }
         final MySqlService.ActionData currentActionData = innerIterator.next();
         if (currentActionData == null) {
             return null;

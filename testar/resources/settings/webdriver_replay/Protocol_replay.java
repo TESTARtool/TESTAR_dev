@@ -1,5 +1,4 @@
 import es.upv.staq.testar.NativeLinker;
-import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.resolver.MySQLSerialResolver;
 import nl.ou.testar.resolver.OrientDBSerialResolver;

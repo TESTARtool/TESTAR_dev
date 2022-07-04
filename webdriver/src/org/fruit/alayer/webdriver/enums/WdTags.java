@@ -211,7 +211,10 @@ public class WdTags extends TagsBase {
    * Whether this widget is currently blocked.
    */
   public static final Tag<Boolean> WebIsBlocked = from("WebIsBlocked", Boolean.class);
-  
+
+  /** Whether this action is forced (typically it's not to be replayed) */
+  public static final Tag<Boolean> WebIsForced = from("WebIsForced", Boolean.class);
+
   /**
    * Whether this widget is currently clickable.
    */

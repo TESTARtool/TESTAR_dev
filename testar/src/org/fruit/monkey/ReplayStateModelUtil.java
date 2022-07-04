@@ -282,7 +282,7 @@ public class ReplayStateModelUtil {
 	 * @throws StateModelException
 	 */
 	public static String getReplayConcreteActionStep(StateModelManager stateModelManager, String actionSequence) throws StateModelException {
-		OResultSet resultSet = stateModelManager.queryStateModel("select concreteActionId from SequenceStep where stepId='" + actionSequence + "'");
+		OResultSet resultSet = stateModelManager.queryStateModel("select concreteActionId from SequenceStep where stepId='" + actionSequence + " and not WebIsForced=true");
 
 		String concreteActionId = ""; // result set String is {concreteActionId: AACje7hg01f4180421590}
 		if(resultSet.hasNext()) {
@@ -350,7 +350,7 @@ public class ReplayStateModelUtil {
 	 * @throws StateModelException
 	 */
 	public static String getReplayAbstractActionIdFromConcreteAction(StateModelManager stateModelManager, String replayModelIdentifier, String concreteActionId) throws StateModelException {
-		OResultSet resultSet = stateModelManager.queryStateModel("select actionId from AbstractAction where modelIdentifier='" + replayModelIdentifier + "' and concreteActionIds.asString() containstext '" + concreteActionId + "'");
+		OResultSet resultSet = stateModelManager.queryStateModel("select actionId from AbstractAction where modelIdentifier='" + replayModelIdentifier + "' and concreteActionIds.asString() containstext '" + concreteActionId + " and not '");
 
 		String abstractActionReplayId = ""; // result set String is {actionId: AACje7hg01f4180421590}
 		if(resultSet.hasNext()) {
