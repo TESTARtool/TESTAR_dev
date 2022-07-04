@@ -21,9 +21,12 @@ public abstract class SerialResolver<S> implements ActionResolver {
     public SerialResolver(S service, Settings settings) {
         this.service = service;
         this.settings = settings;
+        System.out.println(String.format("*** Initialized with service %s ***", this.service));
     }
 
-    public abstract void startReplay(String reportTag) throws Exception;
+    public void startReplay(String reportTag) throws Exception {
+        System.out.println(String.format("* Starting replay on service %s ***", service));
+    }
 
     protected abstract Action nextAction(SUT system, State state);
 

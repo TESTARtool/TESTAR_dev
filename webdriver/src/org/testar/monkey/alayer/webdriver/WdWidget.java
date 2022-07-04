@@ -60,6 +60,10 @@ public class WdWidget implements Widget, Serializable {
     }
   }
 
+  public Map<String, String> getAllAttributes() {
+    return element.attributeMap;
+  }
+
   public String getAttribute(String key) {
     return element.attributeMap.get(key);
   }

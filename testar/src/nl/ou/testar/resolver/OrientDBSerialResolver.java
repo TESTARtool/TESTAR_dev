@@ -86,6 +86,7 @@ public class OrientDBSerialResolver extends SerialResolver<OrientDBService> {
             String concreteActionId = ReplayStateModelUtil.getReplayConcreteActionStep(stateModelManager, actionSequence);
             String actionDescriptionReplay = ReplayStateModelUtil.getReplayActionDescription(stateModelManager, actionSequence);
 
+            System.out.println(String.format("??? Processing action (%s) ???", actionDescriptionReplay));
 
             // Now we get the AbstractActionId of the model that contains this counter action step
             // This is the action we want to replay and we need to search in the state
@@ -106,6 +107,12 @@ public class OrientDBSerialResolver extends SerialResolver<OrientDBService> {
                     }
                     break;
                 }
+            }
+            if (actionToReplay == null) {
+                System.out.println(String.format("!!! Action (%s) not applicable !!!", actionDescriptionReplay));
+            }
+            else {
+                System.out.println(String.format("*** Action (%s) approved to replay ***", actionDescriptionReplay));
             }
             return actionToReplay;
         } catch (StateModelException e) {

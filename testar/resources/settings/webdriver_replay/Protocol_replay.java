@@ -1,5 +1,3 @@
-package webdriver_replay;
-
 import nl.ou.testar.resolver.MySQLSerialResolver;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
