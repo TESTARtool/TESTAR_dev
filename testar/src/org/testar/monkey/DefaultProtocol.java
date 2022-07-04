@@ -893,6 +893,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			cv.begin(); Util.clear(cv);
 
 			//Deriving actions from the state:
+			System.out.println("--- Deriving actions (1) ---");
 			Set<Action> actions = actionResolver.deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
 			for(Action a : actions)
@@ -910,6 +911,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 			//Selecting one of the available actions:
 			Action action = actionResolver.selectAction(system, state, actions);
+			System.out.println("--- Action selected ---");
+			System.out.println(action.toString());
+			System.out.println("-------");
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
@@ -935,6 +939,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		}
 
 		// notify to state model the last state
+		System.out.println("--- Deriving actions (2) ---");
 		Set<Action> actions = actionResolver.deriveActions(system, state);
 		if (actions != null) {
 			buildStateActionsIdentifiers(state, actions);
@@ -1573,7 +1578,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		double faultThreshold = settings().get(ConfigTags.FaultThreshold);
 		System.out.println("<B>");
 		if (mode() != Modes.Spy && severity >= faultThreshold){
-			System.out.println("<10>");
+			System.out.println(String.format("<Severity: %f>", severity));
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
@@ -1873,6 +1878,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 	@Override
 	public boolean moreActions(State state) {
+		System.out.println(String.format("<<< Faulty sequence: %s >>>", faultySequence ? "YES" : "NO"));
+		System.out.println(String.format("<<< Is running: %s >>>" , state.get(Tags.IsRunning, false) ? "YES" : "NO"));
+		System.out.println(String.format("<<< Not respoiding: %s >>>" , state.get(Tags.NotResponding, false) ? "YES" : "NO"));
+		System.out.println(String.format("<<< Action: %d of %d >>>", actionCount(), lastSequenceActionNumber));
+		System.out.println(String.format("<<< Time: %f of %f >>>", timeElapsed(), settings().get(ConfigTags.MaxTime)));
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&

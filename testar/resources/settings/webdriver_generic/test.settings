@@ -202,7 +202,7 @@ RefreshSpyCanvas = 1.0
 SonarDockerize = true
 SonarProjectName = Demo
 SonarProjectKey = demo
-GitUrl = https://github.com/ICTU/quality-time
+GitUrl = https://github.com/stsnel/ckan
 GitAuthRequired = false
 
 ForcedLoginUrl = https://tst.yoho.marviq.net/web/login

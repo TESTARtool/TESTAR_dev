@@ -78,10 +78,12 @@ public class DatabaseTestReport implements TestReport {
             iterationId = sqlService.registerIteration(reportId, verdict.info(), verdict.severity());
 
             for (Action pendingAction: pendingActions) {
+                System.out.println("*** Storing regular action ***");
                 int actionId = addAction(state, pendingAction, false);
                 actionIds.put(pendingAction, actionId);
             }
             for (Map.Entry<Action, State> pendingEntry: pendingSelectedActions.entrySet()) {
+                System.out.println("*** Storing selected action ***");
                 Action pendingAction = pendingEntry.getKey();
                 int actionId = addAction(pendingEntry.getValue(), pendingAction, true);
                 actionIds.put(pendingAction, actionId);
@@ -152,7 +154,8 @@ public class DatabaseTestReport implements TestReport {
             targetStateId = stateIds.get(targetState);
         }
         String widgetPath = "";
-        final Widget widget = action.get(Tags.OriginWidget);
+        System.out.println(String.format("*** Action: %s ***", action.getClass().getSimpleName()));
+        final Widget widget = action.get(Tags.OriginWidget, null);
         if (widget != null) {
             widgetPath = widget.get(Tags.Path, "");
         }

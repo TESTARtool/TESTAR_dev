@@ -187,6 +187,7 @@ public final class ConfigTags {
   public static final Tag<String> SonarProjectKey = Tag.from("SonarProjectKey", String.class);
 
   public static final Tag<String> ForcedLoginUrl = Tag.from("ForcedLoginUrl", String.class);
+  public static final Tag<String> ForcedLoginButtonName = Tag.from("ForcedLoginButtonName", String.class);
   public static final Tag<String> ForcedLoginFormId = Tag.from("ForcedLoginFormId", String.class);
   public static final Tag<String> ForcedLoginInputKeyAttribute = Tag.from("ForcedLoginInputKeyAttribute", String.class);
   public static final Tag<String> ForcedLoginUsernameInputName = Tag.from("ForcedLoginUsernameInputName", String.class);

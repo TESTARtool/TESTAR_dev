@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class WaitParser implements IActionParser {
 
-    private final static String TEMPLATE = "Wait\\s+for\\s+(exactly\\s+)?([+-]?\\d*\\.?\\d+)\\s*(.*)";
+    private final static String TEMPLATE = "Wait\\s+for\\s+(exactly\\s+)?([+-]?\\d*\\.?\\d+)(\\s+seconds)?\\s*(.*)";
 
     @Override
     public Pair<Action, String> parse(String src) {
@@ -18,9 +18,9 @@ public class WaitParser implements IActionParser {
         if (matcher.matches()) {
             int groupCount = matcher.groupCount();
             if (groupCount >= 2) {
-                boolean isExact = (groupCount == 3);
+                boolean isExact = (groupCount >= 3);
                 final String secondsString = matcher.group(isExact ? 2 : 1);
-                final String rest = matcher.group(isExact ? 3: 2);
+                final String rest = matcher.group(matcher.groupCount());
                 return new Pair<>(new Wait(Double.parseDouble(secondsString), isExact), rest);
             }
         }
