@@ -18,7 +18,6 @@ JAVA_CLASS = org.testar.monkey.alayer.windows.Windows
 # up to jdk 8:
 JAVA_CLASS = org.fruit.alayer.windows.Windows
 # > jdk 8:
-#JAVA_SOURCE = ..\src\org\fruit\alayer\windows\Windows.java
 JAVA_SOURCE = ..\src\org\testar\monkey\alayer\windows\Windows.java
 
 OBJFILES= main_w10.obj\
