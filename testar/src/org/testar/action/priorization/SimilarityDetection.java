@@ -32,8 +32,8 @@ package org.testar.action.priorization;
 
 import java.util.Set;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Tags;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tags;
 
 public class SimilarityDetection {
 

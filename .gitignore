@@ -13,4 +13,8 @@ build.bat
 *.sse
 *.class
 *.log
+<<<<<<< HEAD
 workspace.code-workspace
+=======
+/logs
+>>>>>>> master
