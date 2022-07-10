@@ -4,7 +4,7 @@
         <classpath path="lib/jacocoant.jar" />
     </taskdef>
 
-    <!-- Use the jacoco.exec and the jedit.jar classes to create the coverage report -->
+    <!-- Use the jacoco.exec and the SUT jar classes to create the coverage report -->
     <target name="report" description="Create a coverage report">
         <property name="jacocoFile" value="../jacoco.exec" />
         <property name="reportCoverageDir" value="reports" />
@@ -14,15 +14,15 @@
             </executiondata>
             <structure name="${ant.project.name}">
 
-                <!-- Folder directory of jedit.jar classes -->
+                <!-- Folder directory of SUT jar classes -->
                 <classfiles>
                     <fileset dir="C:/Users/worker/Desktop/mts_classes">
                         <include name="**/*.class" />
                     </fileset>
                 </classfiles>
-<!--                <sourcefiles encoding="UTF-8">-->
-<!--                    <fileset file="C:/Users/worker/Desktop/shopizer_jar/lib/*.jar"/>-->
-<!--                </sourcefiles>-->
+                <sourcefiles encoding="UTF-8">-->
+                    <fileset file="C:/Users/worker/Desktop/mts_classes/*.jar"/>-->
+                </sourcefiles>-->
                 <!-- all filetests here -->
 
             </structure>

@@ -72,9 +72,9 @@ public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
 
         // Classes that are deemed clickable by the web framework
         clickableClasses = Arrays.asList(
-                "v-menubar-menuitem", "v-menubar-menuitem-caption",
                 //Main page
-                "flag-icon", "mat-menu-ripple", "mat-icon", "mat-tab-label-content",
+                //"flag-icon", // Ignore language to avoid state abstraction problems
+                "mat-menu-ripple", "mat-icon", "mat-tab-label-content",
                 //Menu page
                 "mat-select-arrow",
                 "mat-expansion-panel-header-title",
@@ -143,13 +143,16 @@ public class Protocol_webdriver_mythaistar extends WebdriverProtocol {
         for (Widget widget : state) {
 
             // left clicks, but ignore links outside domain
-            if (isAlwaysClickable(widget)) {
+            if (isAtBrowserCanvas(widget) && isAlwaysClickable(widget)) {
                 actions.add(ac.leftClickAt(widget));
             }
 
             // specific condition for buttons like login cancel and access
+            // but ignoring icon button to do not detect background buttons when login panel opened
             // if button disabled no action allowed
-            if (widget.get(WdTags.WebCssClasses,"").contains("mat-button-base")
+            if (isAtBrowserCanvas(widget)
+            		&& widget.get(WdTags.WebCssClasses,"").contains("mat-button-base")
+            		&& !widget.get(WdTags.WebCssClasses,"").contains("mat-icon-button")
                     && !widget.get(WdTags.WebCssClasses,"").contains("mat-button-disabled")) {
                 actions.add(ac.leftClickAt(widget));
             }
