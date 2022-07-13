@@ -36,10 +36,10 @@ public class EsparciaReward implements RewardFunction {
             return 0f;
         }
 
-        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0);
-        executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter + 1);
-
-        logger.info("ID={} executionCounter={}", executedAbstractAction.getId(), executionCounter);
+        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.ExCounter, 0);
+        executedAbstractAction.getAttributes().set(RLTags.ExCounter, executionCounter + 1);
+        logger.info("ID={} executionCounter={}", executedAbstractAction.getId(), executedAbstractAction.getAttributes().get(RLTags.ExCounter, -1));
+        logger.info("ID={} executionCounter2={}", executedAbstractAction.getId(), executionCounter);
         float reward = executionCounter != 0 ? 1.0f / (float) executionCounter : R_max;
         logger.info("ID={} reward={}", executedAbstractAction.getId(), reward);
 
