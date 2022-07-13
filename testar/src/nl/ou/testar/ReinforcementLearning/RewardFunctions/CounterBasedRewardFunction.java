@@ -29,11 +29,11 @@ public class CounterBasedRewardFunction implements RewardFunction {
             return 0f;
         }
 
-        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0) + 1;
+        int executionCounter = executedAbstractAction.getAttributes().get(RLTags.Counter, 0);
         executedAbstractAction.getAttributes().set(RLTags.Counter, executionCounter);
 
         logger.info("ID={} executionCounter={}", executedAbstractAction.getId(), executionCounter);
-        float reward = 1.0f / (float) executionCounter;
+        float reward = 1.0f / ((float) executionCounter + 1.0f);
         logger.info("ID={} reward={}", executedAbstractAction.getId(), reward);
 
         // Write metrics information inside rlRewardMetrics.txt file to be stored in the centralized file server

@@ -32,6 +32,9 @@ public class RewardFunctionFactory {
                 final float Rmax = settings.get(ConfigTags.DefaultReward, 1.0f);
                 selectedRewardFunction = new EsparciaReward(Rmax);
                 break;
+            case "StateActionUtilityRewardFunction":
+                selectedRewardFunction = new StateActionUtilityRewardFunction();
+                break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();
         }

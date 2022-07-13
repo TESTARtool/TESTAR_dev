@@ -41,6 +41,7 @@ import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
@@ -56,10 +57,7 @@ import org.testar.protocols.experiments.WriterExperimentsParams;
 import org.testar.settings.ExtendedSettingsFactory;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -80,6 +78,37 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		// Custom the State AbstractIDCustom identifier
 		customBuildAbstractIDCustom(state);
 	}
+
+//	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+//		CodingManager.buildIDs(state, actions);
+//		for(Action a : actions) { a.set(Tags.AbstractIDCustom, ""); }
+//		// Custom the State AbstractIDCustom identifier
+//		customActionBuildAbstractIDCustom(actions);
+//	}
+//
+//	private synchronized void customActionBuildAbstractIDCustom(Set<Action> actions) {
+//		actions.stream().
+//				filter(action -> {
+//					try {
+//						action.get(Tags.OriginWidget).get(Tags.Path);
+//						return true;
+//					}
+//					catch (NoSuchTagException ex) {
+//						System.out.println("No origin widget found for action role: ");
+//						System.out.println(action.get(Tags.Role));
+//						System.out.println(action.get(Tags.Desc));
+//						return false;
+//					}
+//				}).
+//				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
+//				forEach(
+//						action -> {
+//							CodingManager.updateRoleCounter(action, roleCounter);
+//							action.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
+//									CodingManager.codify(getAbstractActionIdentifier(action, roleCounter)));
+//						}
+//				);
+//	}
 
 	private synchronized void customBuildAbstractIDCustom(Widget widget){
 		if (widget.parent() != null) {
