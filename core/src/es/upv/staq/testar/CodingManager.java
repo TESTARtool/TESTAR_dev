@@ -193,7 +193,7 @@ public class CodingManager {
 	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
 	                CodingManager.codify(state.get(Tags.ConcreteIDCustom), a));
 	        a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-	                CodingManager.codify("", a, ROLES_ABSTRACT_ACTION));
+	                CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
 	    }
 
 		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
@@ -217,7 +217,7 @@ public class CodingManager {
 					action -> {
 						updateRoleCounter(action, roleCounter);
 						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-							lowCollisionID(getAbstractActionIdentifier(action, roleCounter)));
+							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
 				}
 		);
 	}

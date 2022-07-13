@@ -46,7 +46,7 @@ public class RLTags extends TagsBase  {
 	 */
 	public static final Tag<Float> SarsaValue = from("sarsaValue", Float.class);
 
-	public static final Tag<Integer> Counter = from("counter", Integer.class);
+	public static final Tag<Integer> ExCounter = from("exCounter", Integer.class);
 
 	public static final Tag<Integer> ActionCounter = from("actionCounter", Integer.class);
 
@@ -55,7 +55,7 @@ public class RLTags extends TagsBase  {
 	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
 		{
 			add(SarsaValue);
-			add(Counter);
+			add(ExCounter);
 			add(ActionCounter);
 			add(QLearningValue);
 		}

@@ -277,7 +277,7 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
 
 		for (Widget widget: state){
-			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404")){
+			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404") || widget.get(WdTags.WebTextContent, "").contains("An error occurred in the request")){
 				WdDriver.executeScript("window.history.back();");
 				Util.pause(1);
 				state = super.getState(system);

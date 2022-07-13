@@ -45,8 +45,8 @@ public class CounterBasedRewardFunctionTest {
     public void getReward() {
         // given
         when(executedAction.getAttributes()).thenReturn(taggableBase);
-        taggableBase.set(RLTags.Counter, 0); //this is an final method, therefore it can not be mocked
-        doNothing().when(taggableBase).set(eq(RLTags.Counter), anyInt());
+        taggableBase.set(RLTags.ExCounter, 0); //this is an final method, therefore it can not be mocked
+        doNothing().when(taggableBase).set(eq(RLTags.ExCounter), anyInt());
 
         // Empty for compilation, not used
         Set<Action> actions = new HashSet<Action>();

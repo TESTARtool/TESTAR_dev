@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
 
@@ -34,9 +35,15 @@ public class StateActionUtilityRewardFunction extends CounterBasedRewardFunction
         float actionReward = super.getReward(state, currentConcreteState, currentAbstractState, executedAction, executedAbstractAction, selectedAbstractAction, actions);
 
         final Set<AbstractAction> abstractActions = currentAbstractState.getActions();
-        float stateReward = abstractActions.stream().reduce(0, (subtotal, action) -> action.getAttributes().get(RLTags.Counter, 0) > 0 ? subtotal + 1: subtotal, Integer::sum) / (float)abstractActions.size();
+        float stateReward = abstractActions.stream().reduce(0, (subtotal, action) ->
+        {
+            if(action.getAttributes().get(RLTags.ExCounter, 0) > 0){
+                logger.info("Visited action: " + action.getAttributes().get(Tags.Desc, ""));
+            }
+            return action.getAttributes().get(RLTags.ExCounter, 0) > 0 ? subtotal: subtotal + 1;
+        }, Integer::sum) / (float)abstractActions.size();
         final Multimap<Integer, AbstractAction> counterActionsMultimap = ArrayListMultimap.create();
-        abstractActions.forEach(action -> counterActionsMultimap.put(action.getAttributes().get(RLTags.Counter, 0), action));
+        abstractActions.forEach(action -> counterActionsMultimap.put(action.getAttributes().get(RLTags.ExCounter, 0), action));
         logger.info(counterActionsMultimap);
         logger.info(abstractActions.size());
         logger.info(counterActionsMultimap.keySet());
