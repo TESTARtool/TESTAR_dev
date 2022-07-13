@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb #4d8acb #4d8acb #4d8acb #4d8acb #4d8acb #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+  <columnConstraints>
+    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="64.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="64.0" />
+      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="ALWAYS" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+  </rowConstraints>
+   <children>
+      <Label text="Action duration" textFill="WHITE">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+         <padding>
+            <Insets left="2.0" />
+         </padding>
+         <GridPane.margin>
+            <Insets left="8.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="SUT startup time" textFill="WHITE" GridPane.rowIndex="1">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label text="Action wait time" textFill="WHITE" GridPane.columnIndex="3">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label text="Max. test time" textFill="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="1">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label text="Sec." textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+         <padding>
+            <Insets left="2.0" />
+         </padding>
+         <GridPane.margin>
+            <Insets left="8.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Sec." textFill="WHITE" GridPane.columnIndex="5">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+         <padding>
+            <Insets left="2.0" />
+         </padding>
+         <GridPane.margin>
+            <Insets left="8.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Sec." textFill="WHITE" GridPane.columnIndex="5" GridPane.rowIndex="1">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+         <padding>
+            <Insets left="2.0" />
+         </padding>
+         <GridPane.margin>
+            <Insets left="8.0" />
+         </GridPane.margin>
+      </Label>
+      <JFXCheckBox id="useRecordTiming" text="Use recording action timing during replay" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnSpan="4" GridPane.rowIndex="2">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </JFXCheckBox>
+      <TextField id="actionDuration" GridPane.columnIndex="1" />
+      <TextField id="startupTime" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField id="waitTime" GridPane.columnIndex="4" />
+      <TextField id="maxTestTime" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+   </children>
+</GridPane>

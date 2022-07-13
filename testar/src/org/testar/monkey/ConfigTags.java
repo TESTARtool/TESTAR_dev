@@ -3,7 +3,7 @@
 * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
 * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
 *
-* Redistribution and use in source and binary forms, with or without
+* Redistribution an d use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
 *
 * 1. Redistributions of source code must retain the above copyright notice,
@@ -150,6 +150,21 @@ public final class ConfigTags {
   public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class);
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
+  public static final Tag<String> GitUrl = Tag.from("GitUrl", String.class);
+  public static final Tag<String> GitUsername = Tag.from("GitUsername", String.class);
+  public static final Tag<String> GitToken = Tag.from("GitToken", String.class);
+  public static final Tag<String> GitBranch = Tag.from("GitBranch", String.class);
+  public static final Tag<Boolean> GitAuthRequired = Tag.from("GitAuthRequired", Boolean.class);
+
+  public static final Tag<String> SonarUrl = Tag.from("SonarUrl", String.class);
+  public static final Tag<String> SonarUsername = Tag.from("SonarUsername", String.class);
+  public static final Tag<String> SonarPassword = Tag.from("SonarPassword", String.class);
+  public static final Tag<Boolean> SonarDockerize = Tag.from("SonarDockerize", Boolean.class);
+  public static final Tag<Boolean> SonarSaveResult = Tag.from("SonarSaveResult", Boolean.class);
+
+  public static final Tag<String> SonarProjectProperties = Tag.from("SonarProjectProperties", String.class);
+  public static final Tag<String> SonarProjectName = Tag.from("SonarProjectName", String.class);
+  public static final Tag<String> SonarProjectKey = Tag.from("SonarProjectKey", String.class);
 
   /*
   //TODO web driver settings for login feature

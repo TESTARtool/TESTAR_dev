@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+
+<JFXButton id="btnBack" buttonType="RAISED" contentDisplay="RIGHT" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Some filter" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <graphic>
+      <JFXButton contentDisplay="GRAPHIC_ONLY">
+         <graphic>
+            <ImageView id="btnClose" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@icons/close.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+   </graphic>
+   <padding>
+      <Insets left="8.0" />
+   </padding>
+</JFXButton>

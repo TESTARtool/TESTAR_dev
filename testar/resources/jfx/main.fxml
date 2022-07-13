@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane id="main" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <Label prefHeight="42.0" text="TEST*" textFill="WHITE" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="Arial Bold" size="24.0" />
+         </font>
+      </Label>
+   </top>
+   <left>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox alignment="TOP_CENTER" prefWidth="64.0" style="-fx-spacing: 28;" HBox.hgrow="ALWAYS">
+               <children>
+                  <JFXButton id="btnHome" contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView>
+                           <image>
+                              <Image url="@icons/home.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView id="btnSettings">
+                           <image>
+                              <Image url="@icons/settings.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+                  <JFXButton id="btnSettings" contentDisplay="GRAPHIC_ONLY" scaleX="0.33" scaleY="0.33" />
+               </children>
+            </VBox>
+            <VBox id="separatorBox" alignment="CENTER" prefWidth="2.0" style="-fx-background-color: #ffffff;" HBox.hgrow="ALWAYS">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets bottom="24.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+   </left>
+   <center>
+      <AnchorPane id="contentPane" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

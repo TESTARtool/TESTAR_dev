@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="TOP_RIGHT" VBox.vgrow="ALWAYS">
+         <children>
+            <VBox id="contentBox" alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </VBox>
+            <JFXButton id="btnBack" buttonType="RAISED" prefHeight="36.0" prefWidth="80.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Back">
+               <graphic>
+                  <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/back.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets right="32.0" top="12.0" />
+               </HBox.margin>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="BOTTOM_RIGHT" VBox.vgrow="NEVER">
+         <children>
+            <JFXButton id="btnSave" buttonType="RAISED" prefHeight="36.0" prefWidth="80.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Save">
+               <HBox.margin>
+                  <Insets bottom="8.0" right="32.0" />
+               </HBox.margin>
+            </JFXButton>
+         </children>
+      </HBox>
+   </children>
+</VBox>

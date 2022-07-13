@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <columnConstraints>
+      <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+   </rowConstraints>
+   <children>
+      <Label text="URL" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets right="8.0" />
+         </padding>
+      </Label>
+      <Label text="Username" textFill="WHITE" GridPane.columnIndex="2">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets right="8.0" />
+         </padding>
+      </Label>
+      <Label text="Access Token" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets right="8.0" />
+         </padding>
+      </Label>
+      <Label text="Branch" textFill="WHITE" GridPane.rowIndex="1">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets right="8.0" />
+         </padding>
+      </Label>
+      <TextField id="gitUrl" GridPane.columnIndex="1" />
+      <TextField id="gitUsername" GridPane.columnIndex="3" />
+      <TextField id="gitBranch" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <JFXCheckBox id="authorizationRequired" text="Authorization required" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="2">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </JFXCheckBox>
+      <PasswordField id="gitToken" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+   </children>
+</GridPane>

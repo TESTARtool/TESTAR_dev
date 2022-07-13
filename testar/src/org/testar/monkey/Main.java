@@ -30,6 +30,8 @@
 
 package org.testar.monkey;
 
+import javafx.application.Platform;
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
 import org.testar.serialisation.LogSerialiser;
@@ -37,10 +39,22 @@ import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.monkey.alayer.Tag;
 
-import javax.swing.*;
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceDialog;
+import javafx.stage.Stage;
+import nl.ou.testar.jfx.MainController;
+import nl.ou.testar.jfx.core.NavigationController;
+import nl.ou.testar.jfx.core.NavigationDelegate;
+import nl.ou.testar.jfx.core.ViewController;
+import nl.ou.testar.jfx.dashboard.DashboardDelegate;
+
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -51,12 +65,11 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.extendedsettings.ExtendedSettingFile;
 import org.testar.extendedsettings.ExtendedSettingsFactory;
-import org.testar.settingsdialog.SettingsDialog;
 
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
 
-public class Main {
+public class Main extends Application implements DashboardDelegate, ProtocolDelegate {
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -69,6 +82,7 @@ public class Main {
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
 
+	private Stage primaryStage;
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
@@ -86,7 +100,7 @@ public class Main {
 	/**
 	 * According to the TESTAR directory and SSE file (settings and protocol to run)
 	 * return the path of the selected settings
-	 * 
+	 *
 	 * @return test.settings path
 	 */
 	public static String getTestSettingsFile() {
@@ -95,77 +109,102 @@ public class Main {
 
 	/**
 	 * Main method to run TESTAR
-	 * 
+	 *
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
 
+	public static void main(String[] args) {
+		launch();
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		this.primaryStage = primaryStage;
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				shutdown();
+			}
+		});
+
+		System.out.println("(0)");
 		isValidJavaEnvironment();
-		
+
+		System.out.println("(1)");
 		verifyTestarInitialDirectory();
 
-		initTestarSSE(args);
+		System.out.println("(2)");
+		initTestarSSE(getParameters(), null);
 
+		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
-		Settings settings = loadTestarSettings(args, testSettingsFileName);
+		Settings settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
-
+			System.out.println("<<< 0 >>>");
 			setTestarDirectory(settings);
-
+			System.out.println("<<< 1 >>>");
 			initCodingManager(settings);
-
+			System.out.println("<<< 2 >>>");
 			initOperatingSystem();
-
+			System.out.println("<<< 3 >>>");
 			startTestar(settings);
+			System.out.println("<<< 4 >>>");
+			System.out.println("<<< 5 >>>");
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
-		else{
-			while(startTestarDialog(settings, testSettingsFileName)) {
-
-				testSettingsFileName = getTestSettingsFile();
-				settings = loadTestarSettings(args, testSettingsFileName);
-
-				setTestarDirectory(settings);
-
-				initCodingManager(settings);
-
-				initOperatingSystem();
-
-				startTestar(settings);
-			}
+		else {
+			System.out.println("(9)");
+			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
+	}
 
+	@Override
+	public void stop() throws Exception {
+		super.stop();
+		System.exit(0);
+	}
+
+	@Override
+	public void startTesting(Settings settings) {
+		setTestarDirectory(settings);
+		initCodingManager(settings);
+		initOperatingSystem();
+		startTestar(settings);
+	}
+
+	private static void shutdown() {
 		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
-
-		System.exit(0);
-
 	}
 
-	private static boolean isValidJavaEnvironment() {
+	private boolean isValidJavaEnvironment() {
 
 		try {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			System.out.println("Detected Java version is : " + System.getenv("JAVA_HOME"));
-		}catch(Exception e) { //TODO check what kind of exceptions are possible
-			System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
-				+"Check if JAVA_HOME system variable is correctly defined \n \n"
-				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");
+			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
+				System.out.println("Java version is not JDK 1.8, please install ");
+		}catch(Exception e) {
+			final String errorMessage = "Exception: Something is wrong with your JAVA_HOME \n"
+					+"Check if JAVA_HOME system variable is correctly defined \n \n"
+					+"GO TO: https://testar.org/faq/ to obtain more details \n \n";
+			System.out.println(errorMessage);
+			popupMessage(errorMessage);
 		}
 
 		return true;
 	}
-	
+
 	/**
 	 * Verify the initial directory of TESTAR
 	 * If this directory didn't contain testar.bat file inform the user
@@ -206,10 +245,10 @@ public class Main {
 
 	/**
 	 * Find or create the .sse file, to known with what settings and protocol start TESTAR
-	 * 
-	 * @param args
+	 *
+	 * @param parameters
 	 */
-	private static void initTestarSSE(String[] args){
+	private void initTestarSSE(Parameters parameters, List<String> rawParameters){
 
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -218,11 +257,19 @@ public class Main {
 		// and that there is exactly one.
 
 		//Allow users to use command line to choose a protocol modifying sse file
-		for(String sett : args) {
+		System.out.println("[0]");
+		if (rawParameters == null) {
+			rawParameters = parameters.getRaw();
+		}
+		for(String sett : rawParameters) {
 			if(sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
-				}catch(IOException e) {System.out.println("Error trying to modify sse from command line");}
+				}catch(Exception e) {
+					final String errorMessage = "Error trying to modify sse from command line";
+					System.out.println(errorMessage);
+					popupMessage(errorMessage);
+				}
 		}
 
 		String[] files = getSSE();
@@ -252,7 +299,7 @@ public class Main {
 	/**
 	 *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
 	 */
-	private static void settingsSelection() {
+	private void settingsSelection() {
 
 		Set<String> sutSettings = new HashSet<String>();
 		for (File f : new File(settingsDir).listFiles()) {
@@ -268,26 +315,30 @@ public class Main {
 		else {
 			Object[] options = sutSettings.toArray();
 			Arrays.sort(options);
-			JFrame settingsSelectorDialog = new JFrame();
-			settingsSelectorDialog.setAlwaysOnTop(true);
-			String sseSelected = (String) JOptionPane.showInputDialog(settingsSelectorDialog,
-					"Select the desired setting:", "TESTAR settings", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-			if (sseSelected == null) {
+			ChoiceDialog settingsSelectorDialog = new ChoiceDialog(options[0], options);
+			settingsSelectorDialog.setTitle("TESTAR settings");
+			settingsSelectorDialog.setHeaderText("Welcome to TESTAR!");
+			settingsSelectorDialog.setContentText("Select the desired setting:");
+			Optional<String> sseSelected = settingsSelectorDialog.showAndWait();
+
+			if (!sseSelected.isPresent()) {
 				SSE_ACTIVATED = null;
 				return;
 			}
 
-			final String sseFile = sseSelected + SUT_SETTINGS_EXT;
+			final String sseFile = sseSelected.get() + SUT_SETTINGS_EXT;
 
 			try {
 				File f = new File(settingsDir + File.separator + sseFile);
 				if (f.createNewFile()) {
-					SSE_ACTIVATED = sseSelected;
+					SSE_ACTIVATED = sseSelected.get();
 					return;
 				}
 			} catch (IOException e) {
-				System.out.println("Exception creating <" + sseFile + "> file");
+				final String errorMessage = "Exception creating <" + sseFile + "> file";
+				System.out.println(errorMessage);
+				popupMessage(errorMessage);
 			}
 
 		}
@@ -297,12 +348,12 @@ public class Main {
 	//TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
 	/**
 	 * Load the settings of the selected test.settings file
-	 * 
+	 *
 	 * @param args
 	 * @param testSettingsFileName
 	 * @return settings
 	 */
-	private static Settings loadTestarSettings(String[] args, String testSettingsFileName){
+	private Settings loadTestarSettings(List<String> args, String testSettingsFileName){
 
 		Settings settings = null;
 		try {
@@ -313,7 +364,7 @@ public class Main {
 
 		//TODO: Understand what this exactly does?
 		overrideWithUserProperties(settings);
-		Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+		Float SST = null;//settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 		if (SST != null) {
 			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
 		}
@@ -323,32 +374,40 @@ public class Main {
 
 	/**
 	 * Open TESTAR GUI to allow the users modify the settings and the protocol with which the want run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 * @param testSettingsFileName
 	 * @return true if users starts TESTAR, or false is users close TESTAR
 	 */
-	public static boolean startTestarDialog(Settings settings, String testSettingsFileName) {
-		// Start up the TESTAR Dialog
-		try {
-			if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
-				return false;
+	public void startTestarDialog(Stage stage, Settings settings, String testSettingsFileName) {
+		System.out.println("Starting TESTARne4dfx dialog");
+		final String settingsPath = getTestSettingsFile();
+
+		MainController mainController = new MainController(settings, settingsPath);
+		mainController.getDashboardController().setDelegate(this);
+		NavigationController navigationController = new NavigationController(mainController);
+		navigationController.startWithDelegate(new NavigationDelegate() {
+			@Override
+			public void onViewControllerActivated(ViewController viewController, Parent view) {
+				stage.setTitle(viewController.getTitle());
+				stage.setScene(new Scene(view));
+				stage.sizeToScene();
+				stage.show();
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return true;
+		});
 	}
 
 	/**
 	 * Start TESTAR protocol with the selected settings
-	 * 
+	 *
+	 *
 	 * This method get the specific protocol class of the selected settings to run TESTAR
-	 * 
+	 *
 	 * @param settings
 	 */
-	private static void startTestar(Settings settings) {
+	private void startTestar(Settings settings) {
+
+//		launch();
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
@@ -381,40 +440,81 @@ public class Main {
 
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
 
+			if (DefaultProtocol.class.isInstance(protocol)) {
+				((DefaultProtocol)protocol).setDelegate(this);
+			}
+
 			//Run TESTAR protocol with the selected settings
 			protocol.run(settings);
 
 		} catch (InstantiationException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
-		} finally {
-			// Closing TESTAR
+			System.err.println("An unexpected error occurred: " + e.getMessage() + "\n");
+			System.out.println("Main: Exception caught");
+			popupMessage(e.getMessage());
+			e.printStackTrace();
+			final PrintStream logStream = LogSerialiser.getLogStream();
+			if (logStream != null) {
+				e.printStackTrace(LogSerialiser.getLogStream());
+			}
+		}
+		finally {
 			if (loader != null) {
 				try {
 					loader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					popupMessage(e.getMessage());
 				}
 			}
 
@@ -428,12 +528,12 @@ public class Main {
 	/**
 	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
 	 * This is needed because the user might not have set all the possible settings in the test.settings file.
-	 * @param argv
+	 * @param args
 	 * @param file
 	 * @return An instance of Settings
 	 * @throws ConfigException
 	 */
-	public static Settings loadSettings(String[] argv, String file) throws ConfigException {
+	public Settings loadSettings(List<String> args, String file) throws ConfigException {
 		Assert.notNull(file);
 		try {
 			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
@@ -583,13 +683,19 @@ public class Main {
 			Settings settings = Settings.fromFile(defaults, file);
 
 			//If user use command line to input properties, mix file settings with cmd properties
-			if(argv.length>0) {
+
+			int size = args.size();
+			if(size>0) {
+				String argArray[] = new String[size];
 				try {
-					settings = Settings.fromFileCmd(defaults, file, argv);
-				}catch(IOException e) {
-					System.out.println("Error with command line properties. Examples:");
-					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
-					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
+					settings = Settings.fromFileCmd(defaults, file, args.toArray(argArray));
+				}catch(Exception e) {
+					final String errorMessage = "Error with command line properties. Examples:\n" +
+							"testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*\n" +
+							"SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"";
+
+					System.out.println(errorMessage);
+					popupMessage(errorMessage);
 				}
 				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
 				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
@@ -616,7 +722,7 @@ public class Main {
 	/**
 	 * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
 	 * @param sett
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
 		String sseName = sett.substring(sett.indexOf("=")+1);
@@ -637,7 +743,7 @@ public class Main {
 			//Obtain previous sse file and delete it (if exist)
 			String[] files = getSSE();
 			if (files != null) {
-				for (String f : files) 
+				for (String f : files)
 					new File(settingsDir+f).delete();
 
 			}
@@ -780,5 +886,29 @@ public class Main {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
+	}
+
+	/**
+	 * Shows the error message dialog
+	 *
+	 * @param message
+	 */
+	public void popupMessage(String message) {
+		Platform.runLater(() -> {
+			final Alert alert = new Alert(Alert.AlertType.ERROR,
+					(message == null || message.length() == 0 ? "Unknown error" : message));
+			alert.show();
+		});
+	}
+
+	/**
+	 * Opens link in a browser
+	 *
+	 * @param uri
+	 */
+	public void openURI(URI uri) {
+		Platform.runLater(() -> {
+			getHostServices().showDocument(uri.toString());
+		});
 	}
 }

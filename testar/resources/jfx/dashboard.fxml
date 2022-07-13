@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Dashboard" textFill="WHITE" VBox.vgrow="NEVER">
+         <font>
+            <Font name="Arial Black" size="18.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <VBox.margin>
+            <Insets left="32.0" />
+         </VBox.margin>
+      </Label>
+      <HBox VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER" style="-fx-spacing: 24;" VBox.vgrow="NEVER">
+         <children>
+            <JFXButton id="btnSpyMode" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="SPY Mode" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/spy.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnAutoTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius-fx-background-radius: 12;" text="Start automated test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/auto.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnRecTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Record test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/rec.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" style="-fx-spacing: 24;" VBox.vgrow="NEVER">
+         <children>
+            <JFXButton id="btnWhiteboxTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Static analysis" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView id="btnWhiteboxTest" fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/source.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnReplayTest" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="Replay test" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/replay.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+            <JFXButton id="btnViewReports" contentDisplay="TOP" graphicTextGap="24.0" prefHeight="128.0" prefWidth="128.0" style="-fx-border-color: #ffffff; -fx-border-radius: 12; -fx-background-radius: 12;" text="View reports" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/view.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </JFXButton>
+         </children>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox alignment="CENTER" minHeight="48.0" style="-fx-spacing: 40;" VBox.vgrow="ALWAYS">
+         <children>
+            <JFXButton id="btnDownloads" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: a8cbe8; -fx-background-radius: 18;" text="Visit downloads" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton id="btnUpdate" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Update software">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+            <JFXButton id="btnManual" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="User manual">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </JFXButton>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label text="Our partners" textFill="WHITE">
+               <font>
+                  <Font name="Arial Bold" size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <HBox id="carouselBox" alignment="CENTER" minHeight="60.0" prefHeight="120.0" VBox.vgrow="NEVER" />
+   </children>
+</VBox>

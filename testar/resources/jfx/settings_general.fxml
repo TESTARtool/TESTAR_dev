@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+        <columnConstraints>
+          <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="64.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="194.0" minWidth="10.0" prefWidth="58.0" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="216.0" minWidth="10.0" prefWidth="136.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="1.7976931348623157E308" vgrow="ALWAYS" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="CENTER_RIGHT">
+               <children>
+                  <Label text="SUT Connector" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="1">
+               <children>
+                  <Label text="Webdriver" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="2">
+               <children>
+                  <Label text="Resolution" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="3">
+               <children>
+                  <Label text="Location" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <JFXButton contentDisplay="GRAPHIC_ONLY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/info.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <JFXComboBox id="sutConnectorSelection" focusColor="#4d8acb" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" />
+            <JFXComboBox id="resolutionSelection" focusColor="#4d8acb" maxWidth="1.7976931348623157E308" prefHeight="28.0" style="-fx-background-color: ffffff; -fx-border-color: #bfbfbf;" unFocusColor="#4d8acb" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <JFXButton id="btnSelectDriver" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <graphic>
+                  <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/attach.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </JFXButton>
+            <TextField id="locationInput" promptText="URL" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <JFXButton id="btnSelectLocation" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="36.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select file" GridPane.columnIndex="3" GridPane.rowIndex="3">
+               <graphic>
+                  <ImageView fitHeight="15.0" fitWidth="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/attach.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </JFXButton>
+            <Label text="Or" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <JFXButton buttonType="RAISED" prefHeight="36.0" prefWidth="205.0" style="-fx-background-color: f7f7f7 f7f7f7; -fx-background-radius: 18;" text="Select SUT" visible="false" GridPane.columnIndex="3" />
+            <TextField id="driverPath" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+      <HBox alignment="CENTER_LEFT" style="-fx-spacing: 8;" VBox.vgrow="NEVER">
+         <children>
+            <Label text="Number of sequences" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextField id="numSequences" prefHeight="26.0" prefWidth="100.0" />
+            <Label text="Sequence actions" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="32.0" />
+               </HBox.margin>
+            </Label>
+            <TextField id="numActions" prefHeight="26.0" prefWidth="100.0" />
+         </children>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </HBox>
+      <JFXCheckBox id="alwaysCompile" text="Always compile protocol" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </JFXCheckBox>
+   </children>
+</VBox>

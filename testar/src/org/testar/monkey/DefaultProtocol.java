@@ -40,7 +40,7 @@ import static org.testar.monkey.alayer.Tags.IsRunning;
 import static org.testar.monkey.alayer.Tags.OracleVerdict;
 import static org.testar.monkey.alayer.Tags.SystemState;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,17 +52,22 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.*;
+import org.testar.monkey.alayer.Canvas;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.Shape;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -176,6 +181,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
 
+	protected ProtocolDelegate delegate;
+
+	public ProtocolDelegate getDelegate() {
+		return delegate;
+	}
+
+	public  void setDelegate(ProtocolDelegate delegate) {
+		this.delegate = delegate;
+	}
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -215,19 +229,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
-
-		try {
-
+		if (delegate != null) try {
 			if (mode() == Modes.View) {
 				if(isHtmlFile() || isLogFile()) {
 					try {
 						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
 						Desktop.getDesktop().browse(file.toURI());
 					} catch (IOException e) {
-						popupMessage("Exception: Check the path of the file, something is wrong");
+						delegate.popupMessage("Exception: Check the path of the file, something is wrong");
 						System.out.println("Exception: Check the path of the file, something is wrong");
 					} catch (NoSuchTagException e) {
-						popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
+						delegate.popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
 						System.out.println("Exception: ConfigTags.PathToReplaySequence is missing");
 					}
 				} else if (!findHTMLreport().contains("error")) {
@@ -235,11 +247,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						File htmlFile = new File(findHTMLreport());
 						Desktop.getDesktop().browse(htmlFile.toURI());
 					} catch (IOException e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
+						delegate.popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
 				} else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
+					delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
@@ -252,11 +264,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runGenerateOuterLoop(system);
 			}
 
-		}catch(WinApiException we) {
-			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is correctly defined";
+		} catch(WinApiException we) {
 
-			popupMessage(msg);
+			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition";
+
+			delegate.popupMessage(msg);
+
 			System.out.println(msg);
 			we.printStackTrace();
 
@@ -268,40 +282,55 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     					+ "Please verify your Chrome browser version: chrome://settings/help \n"
     					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
     					+ "\n"
-						//TODO check when implementing other webdriver than chromedriver
-						//TODO remove when automatically killing webdriver process when creating the session fails
-    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-    					+ "Please use Windows Task Manager to stop that process.";
-
-    			popupMessage(msg);
+				//TODO check when implementing other webdriver than chromedriver
+				//TODO remove when automatically killing webdriver process when creating the session fails
+				+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
+						+ "Please use Windows Task Manager to stop that process.";
+    			
+    			delegate.popupMessage(msg);
+    			
     			System.out.println(msg);
     			System.out.println(e.getMessage());
-    		}else {
-    			System.out.println("ERROR starting Selenium WebDriver");
-    			e.printStackTrace();
+    			
+    		} else {
+    			String msg = "********** ERROR starting Selenium WebDriver ********";
+				delegate.popupMessage(msg);
+
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
     		}
-		}catch (IllegalStateException e) {
-			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-				
+    		
+		} catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+
 				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists and is correctly defined";
 
-				popupMessage(msg);
+				delegate.popupMessage(msg);
+
 				System.out.println(msg);
 			}else {
 				e.printStackTrace();
 			}
-		}catch(SystemStartException SystemStartException) {
+
+		} catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
+			delegate.popupMessage(SystemStartException.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.mode = Modes.Quit;
+			delegate.popupMessage(e.getMessage());
 		}
 		// can there be other kind of exceptions?
 
+		System.out.println("Protocol finished");
 		//allowing close-up in the end of test session:
 		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
+		System.out.println("All closed");
 	}
 
 	/**
@@ -343,6 +372,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
+//				GlobalScreen.setEventDispatcher(new SwingDispatchService());
 
 				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
@@ -437,9 +467,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Only if GUI option is enabled (disabled for CI)
 	 */
 	private void popupMessage(String message) {
+		System.out.println("An exception occurred: " + message);
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
+			Platform.runLater(() -> {
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				alert.setContentText(message);
+				alert.showAndWait();
+			});
 		}
 	}
 
@@ -479,6 +513,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					logFileName), true))),
 					settings.get(ConfigTags.LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
+			popupMessage("Failed to store generated sequence");
 			e3.printStackTrace();
 		}
 
@@ -507,6 +542,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeqObject, true))));
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
+			popupMessage("I/O exception creating new sequence file");
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
 		}
 
@@ -573,7 +609,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			Util.delete(currentSeq);
 		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+			final String errorMessage = "I/O exception deleting <" + currentSeq + ">";
+			popupMessage(errorMessage);
+			LogSerialiser.log(errorMessage + "\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -605,7 +643,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 			Util.delete(currentSeq);
 		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+			final String popupMessage = "I/O exception deleting <" + currentSeq + ">";
+			LogSerialiser.log(popupMessage + "a\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -707,7 +746,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
 				System.out.println(message);
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
-				stackTrace.add(message);
+//				stackTrace.add(message);
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;
@@ -715,6 +754,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
 
 		if (mode() == Modes.Quit && !exceptionThrown) {
 			// the user initiated the shutdown
@@ -1763,7 +1803,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				ac.releaseCachedAutomationElements();
 		}
 		if(system !=null){
+			System.out.println("System class: " + system.getClass().getSimpleName());
 			system.stop();
+			SystemProcessHandling.killRunningProcesses(system, 0);
 		}
 	}
 

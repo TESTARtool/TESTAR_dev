@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" style="-fx-background-color: #4d8acb; -fx-spacing: 8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXCheckBox text="Start local service with Docker" textFill="WHITE" unCheckedColor="WHITE" />
+      <HBox>
+         <children>
+            <Label prefHeight="26.0" prefWidth="117.0" text="Sonar service URL" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets right="8.0" />
+               </padding>
+            </Label>
+            <TextField id="sonarUrl" prefHeight="26.0" prefWidth="462.0" />
+         </children>
+      </HBox>
+      <HBox prefWidth="200.0">
+         <children>
+            <Label prefHeight="25.0" prefWidth="69.0" text="Username" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets right="8.0" />
+               </padding>
+            </Label>
+            <TextField id="sonarUsername" prefHeight="26.0" prefWidth="203.0" />
+            <Label prefHeight="26.0" prefWidth="66.0" text="Password" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets right="8.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets left="24.0" />
+               </HBox.margin>
+            </Label>
+            <TextField id="sonarPassword" prefHeight="26.0" prefWidth="217.0" />
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+   </children>
+</VBox>

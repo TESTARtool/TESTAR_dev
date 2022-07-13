@@ -34,9 +34,10 @@ package org.testar.monkey;
 import org.testar.EventHandler;
 import org.testar.FlashFeedback;
 import org.testar.IEventListener;
+import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
-import org.testar.monkey.alayer.devices.MouseButtons;
+
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -71,7 +72,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     /**
      * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
      * Show the flashfeedback in the upperleft corner of the screen
-     * @param forward is set in keyDown method
      */
     private synchronized void nextMode() {
     	switch(mode){
@@ -92,7 +92,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
         if (settings.get(ConfigTags.FlashFeedback)) {
-    	    FlashFeedback.flash(modeNfo, 1000);
+//    	    FlashFeedback.flash(modeNfo, 1000);
         }
     	
     }

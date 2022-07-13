@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="418.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label id="procStage" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="603.0" text="Stage" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <HBox prefWidth="371.0">
+         <children>
+            <Label id="procStatus" alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="453.0" text="Process Status" textAlignment="RIGHT" textFill="WHITE">
+               <HBox.margin>
+                  <Insets right="16.0" />
+               </HBox.margin></Label>
+            <ProgressBar id="procProgressBar" prefHeight="26.0" prefWidth="512.0" progress="0.0" />
+         </children>
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </HBox>
+      <VBox id="contentBox" style="-fx-spacing: 16;">
+         <VBox.margin>
+            <Insets top="16.0" />
+         </VBox.margin>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+   </padding>
+</VBox>

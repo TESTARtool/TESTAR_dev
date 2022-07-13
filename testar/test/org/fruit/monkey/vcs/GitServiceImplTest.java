@@ -53,8 +53,8 @@ public class GitServiceImplTest {
 
     @Test
     public void cloneRepository() {
-        Path resultSuccess = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor());
-        Path resultDirectoryExistsError = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor());
+        Path resultSuccess = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor(), null);
+        Path resultDirectoryExistsError = gitService.cloneRepository(PUBLIC_REPOSITORY_URL, new TextProgressMonitor(), null);
         assertNotNull(resultSuccess);
         assertNull(resultDirectoryExistsError);
     }
@@ -64,9 +64,9 @@ public class GitServiceImplTest {
         GitCredentials wrongCredentials = new GitCredentials(PRIVATE_REPOSITORY_USERNAME, PRIVATE_REPOSITORY_WRONG_PASSWORD);
         GitCredentials correctCredentials = new GitCredentials(PRIVATE_REPOSITORY_USERNAME, PRIVATE_REPOSITORY_CORRECT_PASSWORD);
 
-        Path resultAuthError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, wrongCredentials, new TextProgressMonitor());
-        Path resultAuthSuccess = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor());
-        Path resultDirectoryExistsError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor());
+        Path resultAuthError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, wrongCredentials, new TextProgressMonitor(), null);
+        Path resultAuthSuccess = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor(), null);
+        Path resultDirectoryExistsError = gitService.cloneRepository(PRIVATE_REPOSITORY_URL, correctCredentials, new TextProgressMonitor(), null);
 
         assertNull(resultAuthError);
         assertNotNull(resultAuthSuccess);

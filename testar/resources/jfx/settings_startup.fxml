@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="Copy" textFill="WHITE">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <TableView id="copyTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="32.0" minWidth="32.0" prefHeight="32.0" prefWidth="32.0" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn prefWidth="265.0" text="Source File / Directory" />
+            <TableColumn prefWidth="301.0" text="Destination Directory" />
+            <TableColumn prefWidth="116.0" />
+         </columns>
+      </TableView>
+      <Label text="Delete" textFill="WHITE">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </Label>
+      <TableView id="deleteTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="32.0" minWidth="32.0" prefHeight="32.0" prefWidth="32.0" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn prefWidth="571.0" text="File / Directory" />
+            <TableColumn prefWidth="112.0" />
+         </columns>
+      </TableView>
+   </children>
+</VBox>

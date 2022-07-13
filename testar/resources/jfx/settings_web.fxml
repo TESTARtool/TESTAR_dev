@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" style="-fx-background-color: #4d8acb; -fx-spacing: 64;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXCheckBox id="webFollowLinks" text="Follow links" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox id="webBrowserFullscreen" text="Browser fullscreen" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </JFXCheckBox>
+      <JFXCheckBox id="webSwitchNewTabs" text="Switch new tabs" textFill="WHITE" unCheckedColor="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </JFXCheckBox>
+   </children>
+</HBox>
