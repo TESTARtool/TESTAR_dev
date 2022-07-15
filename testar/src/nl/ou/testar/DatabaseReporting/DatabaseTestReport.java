@@ -1,13 +1,11 @@
 package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.TestReport;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.monkey.Settings;
 import org.fruit.monkey.mysql.MySqlService;
-import org.fruit.monkey.mysql.MySqlServiceImpl;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;

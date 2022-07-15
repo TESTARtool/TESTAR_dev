@@ -1,8 +1,8 @@
 package nl.ou.testar.jfx.settings.bindings;
 
 import javafx.scene.control.TextInputControl;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Tag;
 
 public class TextInputBinding extends ConfigTagBinding<TextInputControl, String> {
 

@@ -13,8 +13,8 @@ import nl.ou.testar.jfx.settings.bindings.control.StringFieldBinding;
 import nl.ou.testar.jfx.settings.bindings.data.DataSource;
 import nl.ou.testar.jfx.utils.DisplayModeWrapper;
 import nl.ou.testar.jfx.utils.GeneralSettings;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -51,16 +51,6 @@ public class GeneralSettingsController extends SettingsEditController {
                 .getDefaultScreenDevice();
         availableDisplayModes = dev.getDisplayModes();
 
-//        TextField webDriverPathField = (TextField) generalSection.lookup("#driverPath");
-//        TextField locationInputField = (TextField) generalSection.lookup("#locationInput");
-//
-//        Button btnSelectDriver = (Button) generalSection.lookup("#btnSelectDriver");
-//        Button btnSelectLocation = (Button) generalSection.lookup("#btnSelectLocation");
-//
-//        TextField numSequencesField = (TextField) generalSection.lookup("#numSequences");
-//        TextField numActionsField = (TextField) generalSection.lookup("#numActions");
-//        CheckBox alwaysCompileCheckBox = (CheckBox) generalSection.lookup("#alwaysCompile");
-
         ComboBox sutComboBox = (ComboBox) generalSection.lookup("#sutConnectorSelection");
         if (sutComboBox == null) {
             System.out.println("Failed to lookup SUT combo box");
@@ -77,10 +67,14 @@ public class GeneralSettingsController extends SettingsEditController {
                 .collect(Collectors.toList());
         ComboBox<DisplayModeWrapper> resolutionComboBox = (ComboBox<DisplayModeWrapper>) generalSection.lookup("#resolutionSelection");
         DisplayMode currentDisplayMode = dev.getDisplayMode();
+        System.out.println("Current display mode: " + currentDisplayMode);
         System.out.println(String.format("Current dislpay mode: %dx%d+%d+%d", currentDisplayMode.getWidth(), currentDisplayMode.getHeight(), currentDisplayMode.getBitDepth(), currentDisplayMode.getRefreshRate()));
-        generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue, ""));
+        generalSettings = new GeneralSettings(settings.get(ConfigTags.SUTConnectorValue, ""), currentDisplayMode);
 
         DisplayMode selectedDisplayMode = generalSettings.getDisplayMode();
+        if (selectedDisplayMode == null) {
+            selectedDisplayMode = currentDisplayMode;
+        }
 
         if (!isModeAvailable(selectedDisplayMode)) {
             availableResolutions.add(new DisplayModeWrapper(selectedDisplayMode, false));
@@ -205,6 +199,9 @@ public class GeneralSettingsController extends SettingsEditController {
             @Override
             public DisplayModeWrapper getData() {
                 DisplayMode displayMode = generalSettings.getDisplayMode();
+                if (displayMode == null) {
+                    displayMode = currentDisplayMode;
+                }
                 return new DisplayModeWrapper(displayMode, isModeAvailable(displayMode));
             }
 
@@ -225,6 +222,12 @@ public class GeneralSettingsController extends SettingsEditController {
     }
 
     private boolean isModeAvailable(DisplayMode displayMode) {
+        if (availableDisplayModes == null) {
+            System.out.println("Available display modes set is null");
+        }
+        if (displayMode == null) {
+            System.out.println("Display mode is null");
+        }
         return Arrays.stream(availableDisplayModes).anyMatch(displayMode::equals);
     }
 

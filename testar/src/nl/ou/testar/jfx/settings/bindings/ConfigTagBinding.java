@@ -1,8 +1,8 @@
 package nl.ou.testar.jfx.settings.bindings;
 
 import javafx.scene.control.*;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Tag;
 
 public abstract class ConfigTagBinding<C extends Control, T> extends AbstractConfigBinding<C, T> {
 

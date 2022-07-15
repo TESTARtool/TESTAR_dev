@@ -2,8 +2,8 @@ package nl.ou.testar.jfx.settings.bindings;
 
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Tag;
 
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;

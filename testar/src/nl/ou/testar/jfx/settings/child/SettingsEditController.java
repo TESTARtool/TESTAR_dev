@@ -1,20 +1,19 @@
 package nl.ou.testar.jfx.settings.child;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 import nl.ou.testar.jfx.settings.bindings.ConfigBindingException;
-import org.fruit.Util;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.Settings;
-import org.testar.settings.ExtendedSettingsFactory;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.monkey.Main;
+import org.testar.monkey.Settings;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.Tag;
+import org.testar.serialisation.LogSerialiser;
 
 import java.io.IOException;
 import java.util.HashSet;

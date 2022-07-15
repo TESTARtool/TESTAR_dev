@@ -4,9 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
-import org.apache.commons.lang.math.NumberUtils;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.io.IOException;
 

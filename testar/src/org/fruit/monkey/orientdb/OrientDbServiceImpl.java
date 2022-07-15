@@ -4,10 +4,10 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.Settings;
 import org.fruit.monkey.docker.DockerPoolService;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;

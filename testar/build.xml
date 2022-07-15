@@ -63,7 +63,7 @@
         <mkdir dir="${target}"/>
         <jar basedir="${bin}" destfile="${target}/intermediate.jar">
             <manifest>
-                <attribute name="Main-Class" value="org.fruit.monkey.Main"/>
+                <attribute name="Main-Class" value="Main"/>
             </manifest>
         </jar>
     	<zip destfile="${target}/${jarfile}">

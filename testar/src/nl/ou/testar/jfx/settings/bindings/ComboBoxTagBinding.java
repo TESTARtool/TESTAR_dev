@@ -1,8 +1,8 @@
 package nl.ou.testar.jfx.settings.bindings;
 
 import javafx.scene.control.ComboBox;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Tag;
 
 public class ComboBoxTagBinding<T> extends ConfigTagBinding<ComboBox<T>, T> {
     public ComboBoxTagBinding(Settings settings, ComboBox<T> control, Tag<T> tag) {

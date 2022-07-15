@@ -1,8 +1,11 @@
 package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.SequenceReport;
-import org.fruit.alayer.*;
 import org.fruit.monkey.mysql.MySqlService;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
 
 import java.sql.SQLException;
 import java.util.Set;

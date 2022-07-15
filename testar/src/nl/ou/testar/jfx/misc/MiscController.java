@@ -1,7 +1,7 @@
 package nl.ou.testar.jfx.misc;
 
 import nl.ou.testar.jfx.core.ViewController;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
 
 public class MiscController extends ViewController {
     public MiscController(String title, Settings settings) {

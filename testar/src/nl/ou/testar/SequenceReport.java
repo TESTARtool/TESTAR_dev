@@ -1,8 +1,8 @@
 package nl.ou.testar;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
 
 import java.util.Set;
 

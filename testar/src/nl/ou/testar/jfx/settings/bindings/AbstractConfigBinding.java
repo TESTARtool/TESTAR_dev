@@ -1,7 +1,6 @@
 package nl.ou.testar.jfx.settings.bindings;
 
 import javafx.scene.control.Control;
-import org.fruit.monkey.Settings;
 
 public abstract class AbstractConfigBinding<C extends Control, T> {
 

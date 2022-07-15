@@ -144,6 +144,14 @@ BrowserFullScreen = true
 SwitchNewTabs = true
 
 #################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
+
+#################################################################
 # Other more advanced settings
 #################################################################
 

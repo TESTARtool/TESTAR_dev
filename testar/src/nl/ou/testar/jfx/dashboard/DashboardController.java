@@ -10,9 +10,9 @@ import javafx.stage.Stage;
 import nl.ou.testar.jfx.WhiteboxTestLauncher;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.RuntimeControlsProtocol;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.RuntimeControlsProtocol;
+import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,20 +56,22 @@ public class DashboardController extends ViewController {
             final Alert alert = new Alert(Alert.AlertType.ERROR, ise.getMessage());
             alert.show();
         }
-//        finally {
-//            Platform.exit();
-//        }
     }
 
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
 
+        final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
         try {
-            final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
             whiteboxTestLauncher.setDashboardDelegate(delegate);
             whiteboxTestLauncher.start(stage, settings);
         }
         catch(IOException e) {
+            whiteboxTestLauncher.stop();
+            final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot analyse code\n" + e.getMessage());
+            alert.show();
+
+            e.printStackTrace();
         }
     }
 

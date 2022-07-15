@@ -8,8 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import nl.ou.testar.jfx.controls.TagControl;
 import nl.ou.testar.jfx.controls.TagInput;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 import java.io.IOException;
 import java.util.Collections;

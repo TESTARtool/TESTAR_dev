@@ -1,12 +1,11 @@
 package nl.ou.testar.jfx.settings.bindings;
 
-import com.jfoenix.controls.JFXTextArea;
 import javafx.scene.control.*;
 import nl.ou.testar.jfx.settings.bindings.control.*;
 import nl.ou.testar.jfx.settings.bindings.data.DataSource;
 import nl.ou.testar.jfx.settings.bindings.data.TagDataSource;
-import org.fruit.alayer.Tag;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Tag;
 
 public class ConfigBinding<T> {
 

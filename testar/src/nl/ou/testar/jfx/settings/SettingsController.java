@@ -4,10 +4,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.settings.child.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 
-import java.io.File;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 
 public class SettingsController extends ViewController {
 

@@ -77,7 +77,7 @@
 	<!-- test -->
 	<!--
     <target name="test" depends="jar">
-        <java classname="org.fruit.Test" dir="${bin}" classpath="${target}/${jarfile};${coreJarFile};${bin}" failonerror="true" fork="true">
+        <java classname="Test" dir="${bin}" classpath="${target}/${jarfile};${coreJarFile};${bin}" failonerror="true" fork="true">
         	<jvmarg value="-server"/>
         	<jvmarg value="-ea"/>
         </java>

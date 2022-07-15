@@ -1,20 +1,17 @@
 package org.fruit.monkey.webserver;
 
 import com.github.dockerjava.api.model.*;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.fruit.monkey.Main;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.fruit.monkey.docker.DockerPoolService;
+import org.testar.monkey.Main;
+import sun.net.www.http.HttpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public class ReportingServiceImpl implements ReportingService {
 
@@ -68,7 +65,7 @@ public class ReportingServiceImpl implements ReportingService {
             delegate.onStateChanged(ReportingServiceDelegate.State.CONNECTING, "Connecting to report service");
         }
 
-        final HttpClient httpClient = HttpClientBuilder.create().build();
+        final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         final String url = "http://localhost:" + port;
         final HttpGet testRequest = new HttpGet(url);
         HttpResponse testResponse;
@@ -78,12 +75,12 @@ public class ReportingServiceImpl implements ReportingService {
             boolean isError = false;
             try {
                 testResponse = httpClient.execute(testRequest);
-                status = testResponse.getStatusLine().getStatusCode();
+                status = testResponse.getCode();
             } catch (Exception e) {
                 System.out.println("Not yet ready: " + e);
                 isError = true;
-            } finally {
-                testRequest.releaseConnection();
+//            } finally {
+//                testRequest.releaseConnection();
             }
 
             if (!isError && status != HttpStatus.SC_OK) {

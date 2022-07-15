@@ -30,33 +30,38 @@
 
 
 import java.util.Set;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.PasteText;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.AWTKeyboard;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Keyboard;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.alayer.Tags;
-import es.upv.staq.testar.NativeLinker;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.FillPattern;
+import org.testar.monkey.alayer.Pen;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.Roles;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
+import org.testar.plugin.NativeLinker;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.StrokePattern;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.CompoundAction;
+import org.testar.monkey.alayer.actions.KeyDown;
+import org.testar.monkey.alayer.actions.PasteText;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.devices.AWTKeyboard;
+import org.testar.monkey.alayer.devices.KBKeys;
+import org.testar.monkey.alayer.devices.Keyboard;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Title;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
@@ -71,6 +76,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	static int browser; // BROWSER_*
 	static Role webController, webText; // browser dependent
 	static double browser_toolbar_filter;	
+	private Pen BluePen = Pen.newPen().setColor(Color.Blue).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	// check browser
 	private void initBrowser(){
@@ -227,7 +233,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 
 		State state = super.getState(system);
 
@@ -325,7 +331,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!

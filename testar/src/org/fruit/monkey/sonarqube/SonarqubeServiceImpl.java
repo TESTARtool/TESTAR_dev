@@ -2,17 +2,14 @@ package org.fruit.monkey.sonarqube;
 
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.*;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.docker.DockerPoolService;
@@ -203,16 +200,16 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         final HttpPost newTokenRequest = new HttpPost("http://localhost:9000/api/user_tokens/generate");
         newTokenRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         newTokenRequest.setEntity(new UrlEncodedFormEntity(form, StandardCharsets.UTF_8));
-        HttpResponse newTokenResponse = null;
+        ClassicHttpResponse newTokenResponse = null;
 
         while (status >= 400 && status < 500) {
             try {
-                newTokenResponse = httpClient.execute(newTokenRequest);
-                status = newTokenResponse.getStatusLine().getStatusCode();
+                newTokenResponse = (ClassicHttpResponse) httpClient.execute(newTokenRequest);
+                status = newTokenResponse.getCode();
             } catch (Exception e) {
                 System.out.println("Not yet ready: " + e);
-            } finally {
-                newTokenRequest.releaseConnection();
+//            } finally {
+//                newTokenRequest.releaseConnection();
             }
 
             if (status != HttpStatus.SC_OK) {
@@ -230,10 +227,16 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             return null;
         }
 
-        final String responseString = EntityUtils.toString(newTokenResponse.getEntity());
-        System.out.println(responseString);
+        final String responseString;
+        try {
+            responseString = EntityUtils.toString(newTokenResponse.getEntity());
+            System.out.println(responseString);
+            return new JSONObject(responseString).getString("token");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-        return new JSONObject(responseString).getString("token");
+        return null;
     }
 
     private String createAndStartScanner(String sourcePath, String projectKey, String projectName, String token) throws IOException {
@@ -272,10 +275,14 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         String report = null;
         while (total == 0 && tries < 10) {
             System.out.println("Try " + tries);
-            HttpResponse issuesResponse = httpClient.execute(issuesRequest);
-            if (issuesResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                report = EntityUtils.toString(issuesResponse.getEntity());
-                total = new JSONObject(report).getInt("total");
+            ClassicHttpResponse issuesResponse = (ClassicHttpResponse) httpClient.execute(issuesRequest);
+            if (issuesResponse.getCode() == HttpStatus.SC_OK) {
+                try {
+                    report = EntityUtils.toString(issuesResponse.getEntity());
+                    total = new JSONObject(report).getInt("total");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
             if (total == 0) {
                 try {
@@ -285,7 +292,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
                 tries++;
             }
-            issuesRequest.releaseConnection();
+//            issuesRequest.releaseConnection();
         }
         return report;
     }

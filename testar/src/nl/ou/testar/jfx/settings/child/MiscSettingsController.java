@@ -8,9 +8,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
-import org.fruit.Pair;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Pair;
+import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
