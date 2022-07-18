@@ -38,6 +38,18 @@ SUTConnectorValue = "/usr/local/bin/chromedriver" "1920x900+0+0" "http://localho
 Sequences = 3
 SequenceLength = 100
 
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = root
+DataStorePassword = testar
+DataStoreMode = instant
+
 #################################################################
 # Oracles based on suspicious titles
 #

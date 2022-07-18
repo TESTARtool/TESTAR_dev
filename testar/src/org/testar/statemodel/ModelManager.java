@@ -271,4 +271,19 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+    @Override
+    public void associateTextInputs(AbstractState state, Set<Map<String,String>> textInputs) {
+        state.mergeTextInputs(textInputs);
+    }
+
+    @Override
+    public Set<Map<String,String>> getTextInputs(AbstractState state) {
+        return state.getTextInputs();
+    }
+
+    @Override
+    public AbstractState getCurrentAbstractState() {
+        return currentAbstractState;
+    }
+
 }

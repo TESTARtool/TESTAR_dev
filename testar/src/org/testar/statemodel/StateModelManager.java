@@ -3,6 +3,7 @@ package org.testar.statemodel;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface StateModelManager {
@@ -21,4 +22,10 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedByUser();
 
     void notifyTestSequenceInterruptedBySystem(String message);
+
+    void associateTextInputs(AbstractState state, Set<Map<String,String>> textInputs);
+
+    AbstractState getCurrentAbstractState();
+
+    Set<Map<String,String>> getTextInputs(AbstractState state);
 }

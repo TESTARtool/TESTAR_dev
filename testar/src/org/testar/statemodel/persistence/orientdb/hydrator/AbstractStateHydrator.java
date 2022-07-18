@@ -77,6 +77,15 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
             target.addPropertyValue(concreteStateIds.getPropertyName(), new PropertyValue(concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds()));
         }
 
+        // Add the textInputs for the code analysis experiments
+        Property textInputs = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "textInputs");
+        if (textInputs == null) {
+            throw new HydrationException();
+        }
+        if (!((AbstractState) source).getTextInputs().isEmpty()) {
+            target.addPropertyValue(textInputs.getPropertyName(), new PropertyValue(textInputs.getPropertyType(), ((AbstractState) source).getTextInputs()));
+        }
+
     }
 
 

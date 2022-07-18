@@ -43,6 +43,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
+import org.testar.statemodel.AbstractState;
+import org.testar.statemodel.ConcreteState;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -206,7 +208,7 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
     protected void processSUTDataAfterAction(JSONTokener tokener) {
         JSONArray root = new JSONArray(tokener);
 
-        Vector<Map<String,String>> output = new Vector<>();
+        Set<Map<String,String>> output = new HashSet<>();
 
         for (int i = 0; i < root.length(); i++) {
             JSONArray inner = root.getJSONArray(i);
@@ -219,11 +221,8 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
             output.add(innerMap);
         }
 
-        if ( output.size() > 0 ) {
-            ((InterestingStringsDataManager)(dataManager)).loadInput(output);
-        }
 
-        // TODO: store extracted string data in the state model
+		stateModelManager.associateTextInputs(((ConcreteState)(this.lastState)).getAbstractState(), output);
     }
 
     /**
@@ -243,7 +242,17 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-		// Kill unwanted processes, force SUT to foreground
+		// Load text inputs
+		AbstractState abstractState = stateModelManager.getCurrentAbstractState();
+		Set<Map<String,String>> textInputs = null;
+		if ( abstractState == null ) {
+				logger.info("Abstract state is null. Passing empty text input set to data manager.");
+				textInputs = new HashSet<Map<String,String>> ();
+		}
+		else {
+		 	textInputs = stateModelManager.getTextInputs(abstractState);
+		}
+        ((InterestingStringsDataManager)(dataManager)).loadInput(textInputs);
 
         // CKAN Customization: start with empty actions HashSet, so that we only rely
         // on this method definition for deriving actions.

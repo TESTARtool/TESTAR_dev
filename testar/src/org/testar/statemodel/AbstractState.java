@@ -18,6 +18,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
     private Map<String, AbstractAction> visitedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
+    // Set of text inputs for the code analysis experiments
+    private Set<Map<String,String>> textInputs;
     // is this an initial state?
     private boolean isInitial = false;
 
@@ -38,6 +40,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
             }
         }
         concreteStateIds = new HashSet<>();
+        textInputs = new HashSet<>();
     }
 
     /**
@@ -160,5 +163,34 @@ public class AbstractState extends AbstractEntity implements Persistable {
     @Override
     public boolean canBeDelayed() {
         return false;
+    }
+
+    /**
+     * This method merges a given set of text inputs for the code analysis experiment into the
+     * object text inputs.
+     * @param newValues the new inputs to merge
+     */
+    public void mergeTextInputs(Set<Map<String,String>> newInputs) {
+        for (Map<String,String> input : newInputs ) {
+            textInputs.add(input);
+        }
+    }
+
+    /**
+     * This method returns a set of the current relevant text inputs for the code analysis experiment
+     * stored in this action
+     * @return set of text inputs
+     */
+    public Set<Map<String,String>> getTextInputs() {
+        return textInputs;
+    }
+
+    /**
+     * This method sets the current relevant text inputs for the code analysis experiment
+     * stored in this action
+     * @param textInputs set of text inputs
+     */
+    public void setTextInputs(Set<Map<String,String>> textInputs) {
+        this.textInputs = textInputs;
     }
 }

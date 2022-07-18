@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,7 +56,7 @@ public class InterestingStringsDataManager extends DataManager {
         /**
       * Load input data from interesting string data collected by instrumentation
       */
-      public void loadInput(List<Map<String,String>> data) {
+      public void loadInput(Set<Map<String,String>> data) {
 
         // Add all elements with ASCII values (typing non-ASCII values into a
         // text field using WebDriver won't work).
