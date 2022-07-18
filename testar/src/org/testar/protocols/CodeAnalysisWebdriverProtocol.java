@@ -30,12 +30,21 @@
 
 package org.testar.protocols;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputFilter.Config;
+import java.io.OutputStream;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -87,6 +96,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
     protected float fullStringRate=0.0f, typeMatchRate = 1.0f;
     protected int maxInputStrings = 1;
     protected int sequenceNumber = -1, actionNumber = -1;
+    protected StringBuffer coverageData=null;
 
     // This boolean value can be used by the protocol to temporarily disable calls to the
     // instrumentation, e.g. during initial login actions.
@@ -155,7 +165,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 			Integer.toString(actionNumber);
 		String setContextURL = applicationBaseURL + "/testar-logcontext/" + context;
 		if ( ! waitForURL(setContextURL, 60, 5, 200) )  {
-			logger.info("Error: did not succeed in setting log context for context "
+			logger.error("Error: did not succeed in setting log context for context "
 				+ context + ".");
 		}
 	}
@@ -164,7 +174,60 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 	protected void beginSequence(SUT system, State state) {
         this.sequenceNumber++;
         this.actionNumber = 0;
+
+        logger.info("Sequence " + String.valueOf(sequenceNumber + " starting."));
+
         super.beginSequence(system, state);
+
+        if ( settings.get(ConfigTags.CarryOverCoverage) ) {
+            if ( coverageData == null ) {
+                logger.info("No coverage data available. Not loading it into SUT.");
+            }
+            else {
+                if ( ! postRequest( applicationBaseURL + "/testar-importdata", 60, 5, 200, coverageData) ) {
+                    logger.error("Error: did not succeed in loading coverage data.");
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void finishSequence(){
+
+        logger.info("Sequence " + String.valueOf(sequenceNumber ) + " finishing.");
+
+        if ( settings.get(ConfigTags.CarryOverCoverage) || settings.get(ConfigTags.ExportCoverage ) ) {
+            coverageData = getRequest ( applicationBaseURL + "/testar-clearlog-exportdata", 60, 5, 200);
+            if (coverageData == null ) {
+                logger.error("Failed to import coverage data at end of sequence.");
+            }
+        }
+
+        if ( settings.get(ConfigTags.ExportCoverage ) ) {
+            if ( coverageData == null ) {
+                logger.error("Cannot export coverage data. No data available.");
+            }
+            else {
+                try {
+                    exportCoverageData();
+                }
+                catch (IOException e) {
+                    logger.error("Unable to export coverage data. Exception: " + e.toString());
+                }
+            }
+
+        }
+        super.finishSequence();
+    }
+
+    protected void exportCoverageData() throws IOException {
+        String filename = settings.get(ConfigTags.CoverageExportDirectory ) + "/coverage-" +
+            String.valueOf(sequenceNumber) + "-" + String.valueOf (System.currentTimeMillis()) + ".dump";
+        BufferedWriter w = new BufferedWriter(new FileWriter(new File(filename)));
+        w.write(coverageData.toString());
+        w.flush();
+        w.close();
+        logger.info("Exported coverage data to " + filename + ".");
     }
 
     @Override
@@ -249,5 +312,106 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         logger.info("info: max wait time expired while waiting for " + url_string + " ...");
         return false;
     }
+
+    public static StringBuffer getRequest(String url_string, int maxWaitTime, int retryTime, int expectedStatusCode) {
+        long beginTime = System.currentTimeMillis() / 1000L;
+        long currentTime = beginTime;
+        Logger logger = LogManager.getLogger();
+        while ( ( currentTime = System.currentTimeMillis() / 1000L ) < ( beginTime + maxWaitTime) ) {
+        try {
+                URL url = new URL(url_string);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setConnectTimeout(retryTime*1000);
+                con.setReadTimeout(retryTime*1000);
+                int status = con.getResponseCode();
+                logger.info("Status is " + status);
+                if ( status == expectedStatusCode ) {
+                    BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+                    String line;
+                    StringBuffer content = new StringBuffer();
+                    while ((line = in.readLine()) != null) {
+                        logger.info("Read line from url " + url + ":" + line + "\n");
+                        content.append(line+"\n");
+                    }
+                    in.close();
+                    return content;
+                }
+                else
+                {  logger.info("Info: unexpected status code " + Integer.toString(status) +
+                        " while waiting for " + url_string);
+                }
+        }
+        catch ( SocketTimeoutException ste) {
+            logger.info("info: waiting for " + url_string + " ...");
+            continue;
+        }
+        catch ( Exception e) {
+            logger.info("info: generic exception while waiting for " + url_string +
+                    ": " + e.toString() );
+            logger.info(Long.toString(currentTime));
+        }
+        logger.info("info: sleeping between retries for " + url_string + " ...");
+        try {
+         Thread.sleep(retryTime*1000);
+        }
+        catch (InterruptedException ie) {
+            logger.info("Sleep between retries for " + url_string + " was interrupted.");
+        }
+        }
+        logger.info("info: max wait time expired while waiting for " + url_string + " ...");
+        return null;
+
+    }
+
+    public static boolean postRequest(String url_string, int maxWaitTime,  int retryTime, int expectedStatusCode, StringBuffer content) {
+
+        long beginTime = System.currentTimeMillis() / 1000L;
+        long currentTime = beginTime;
+        Logger logger = LogManager.getLogger();
+        while ( ( currentTime = System.currentTimeMillis() / 1000L ) < ( beginTime + maxWaitTime) ) {
+        try {
+                URL url = new URL(url_string);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setConnectTimeout(retryTime*1000);
+                con.setReadTimeout(retryTime*1000);
+                con.setDoOutput(true);
+                con.setRequestProperty( "Content-Type", "text/plain" );
+                con.setRequestProperty( "Content-Length", String.valueOf(content.length()));
+                OutputStream os = con.getOutputStream();
+                os.write(content.toString().getBytes());
+                int status = con.getResponseCode();
+                logger.info("Status is " + status);
+                if ( status == expectedStatusCode ) {
+                    return true;
+                }
+                else
+                {  logger.info("Info: unexpected status code " + Integer.toString(status) +
+                        " while waiting for " + url_string);
+                }
+        }
+        catch ( SocketTimeoutException ste) {
+            logger.info("info: waiting for " + url_string + " ...");
+            continue;
+        }
+        catch ( Exception e) {
+            logger.info("info: generic exception while waiting for " + url_string +
+                    ": " + e.toString() );
+            logger.info(Long.toString(currentTime));
+        }
+        logger.info("info: sleeping between retries for " + url_string + " ...");
+        try {
+         Thread.sleep(retryTime*1000);
+        }
+        catch (InterruptedException ie) {
+            logger.info("Sleep between retries for " + url_string + " was interrupted.");
+        }
+        }
+        logger.info("info: max wait time expired while waiting for " + url_string + " ...");
+        return false;
+    }
+
 
 }

@@ -528,6 +528,9 @@ public class Main {
 			defaults.add(Pair.from(MaxInputStrings, 3));
 			defaults.add(Pair.from(FullStringRate, 0.0f));
 			defaults.add(Pair.from(TypeMatchRate, 1.0f));
+			defaults.add(Pair.from(CarryOverCoverage, true));
+			defaults.add(Pair.from(ExportCoverage, true));
+			defaults.add(Pair.from(CoverageExportDirectory, "/tmp"));
 			// End defaults CodeAnalysisWebdriverProtocol
 
 			// Defaults for compound text input logic

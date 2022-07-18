@@ -182,6 +182,9 @@ public final class ConfigTags {
   public static final Tag<Integer> MaxInputStrings = Tag.from("MaxInputStrings", Integer.class);
   public static final Tag<Float> FullStringRate = Tag.from("FullStringRate", Float.class);
   public static final Tag<Float> TypeMatchRate = Tag.from("TypeMatchRate", Float.class);
+  public static final Tag<Boolean> CarryOverCoverage = Tag.from("CarryOverCoverage", Boolean.class);
+  public static final Tag<Boolean> ExportCoverage = Tag.from("ExportCoverage", Boolean.class);
+  public static final Tag<String> CoverageExportDirectory = Tag.from("CoverageExportDirectory", String.class);
 
   // Tags for compound text input logic
   public static final Tag<Boolean> CompoundTextActionLogicEnabled = Tag.from("CompoundTextActionLogicEnabled", Boolean.class);
