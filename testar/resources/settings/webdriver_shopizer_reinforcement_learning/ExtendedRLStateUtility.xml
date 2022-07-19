@@ -13,7 +13,7 @@
         <maxQValue>1.0</maxQValue>
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
-        <rewardFunction>StateActionUtilityRewardFunction</rewardFunction>
+        <rewardFunction>CombinedUtilityRewardFunction</rewardFunction>
         <policy>EpsilonGreedyPolicy</policy>
         <tagName>QValue</tagName>
         <qFunction>QlearningFunction</qFunction>
