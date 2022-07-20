@@ -14,7 +14,7 @@
         <decayRate>0.0001</decayRate>
         <temperature>1.0</temperature>
         <rewardFunction>CombinedUtilityRewardFunction</rewardFunction>
-        <policy>EpsilonGreedyPolicy</policy>
+        <policy>ProtocolEpsilonGreedyPolicy</policy>
         <tagName>QValue</tagName>
         <qFunction>QlearningFunction</qFunction>
     </reinforcementLearningSettings>

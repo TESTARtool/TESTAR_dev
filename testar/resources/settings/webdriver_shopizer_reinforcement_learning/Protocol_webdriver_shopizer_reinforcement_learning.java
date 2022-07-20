@@ -31,6 +31,7 @@
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ProtocolAction;
 import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
 import nl.ou.testar.ReinforcementLearning.Policies.Policy;
 import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
@@ -420,6 +421,9 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 
 		actions.add(ac.hitKey(KBKeys.VK_PAGE_DOWN));
 		actions.add(ac.hitKey(KBKeys.VK_PAGE_UP));
+		Action protocol = getProtocolAction(state);
+		if(protocol!=null)
+			actions.add(protocol);
 
 		return actions;
 	}
@@ -582,6 +586,18 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 			return RandomActionSelector.selectAction(actions);
 		}
 		return modelAction;
+	}
+
+	protected Action getProtocolAction(final State state){
+		Widget widget = getWidgetWithMatchingTag(Tags.Desc,"Products", state);
+		if (widget == null){
+			return null;
+		}
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		ProtocolAction protocol = new ProtocolAction(ac.mouseMove(widget));
+		protocol.set(Tags.OriginWidget, widget);
+		protocol.set(Tags.Desc, "Shopizer Protocol Action");
+		return protocol;
 	}
 
 	/**

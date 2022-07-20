@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ProtocolAction;
 import nl.ou.testar.ReinforcementLearning.RewardFunctions.TreeDistHelper;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
@@ -235,6 +236,14 @@ public class ModelManager implements StateModelManager {
         try {
             String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
             System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
+            if (abstractIdCustom.equals("ProtocolAction")) {
+                System.out.println("Action is delegated to protocol : " +abstractIdCustom);
+                for(Action action : actions) {
+                    if (action instanceof ProtocolAction)
+                        return action;
+                }
+                return null;
+            }
             for(Action action : actions) {
             	try {
                 if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {

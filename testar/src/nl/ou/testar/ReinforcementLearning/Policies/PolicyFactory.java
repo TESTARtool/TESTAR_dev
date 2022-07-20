@@ -31,6 +31,9 @@ public class PolicyFactory {
             case "BoltzmannDistributedExplorationPolicy":
                 selectedPolicy = getBoltzmannDistributedExplorationPolicy(settings);
                 break;
+            case "ProtocolEpsilonGreedyPolicy":
+                selectedPolicy = getProtocolEpsilonGreedyPolicy(settings);
+                break;
             default:
                 selectedPolicy = getGreedyPolicy(settings);
         }
@@ -45,6 +48,13 @@ public class PolicyFactory {
         final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
         Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
         return new EpsilonGreedyPolicy(new GreedyPolicy(defaultQValue, tag), epsilon);
+    }
+
+    private static Policy getProtocolEpsilonGreedyPolicy(final Settings settings) {
+        final float epsilon = settings.get(ConfigTags.Epsilon, 0.7f);
+        final float defaultQValue = settings.get(ConfigTags.DefaultValue, 0f);
+        Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
+        return new ProtocolEpsilonGreedyPolicy(new GreedyPolicy(defaultQValue, tag), epsilon);
     }
 
     private static Policy getDecayedEpsilonGreedyPolicy(final Settings settings) {

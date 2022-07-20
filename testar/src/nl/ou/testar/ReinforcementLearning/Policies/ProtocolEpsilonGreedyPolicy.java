@@ -7,14 +7,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Set;
 
-public class EpsilonGreedyPolicy implements Policy {
-    private static final Logger logger = LogManager.getLogger(EpsilonGreedyPolicy.class);
+public class ProtocolEpsilonGreedyPolicy implements Policy {
+    private static final Logger logger = LogManager.getLogger(ProtocolEpsilonGreedyPolicy.class);
 
-    protected final float epsilon; //The epsilon parameter should be between 0 and 1
+    private final float epsilon; //The epsilon parameter should be between 0 and 1
 
-    protected final GreedyPolicy greedyPolicy;
+    private final GreedyPolicy greedyPolicy;
 
-    public EpsilonGreedyPolicy(final GreedyPolicy greedyPolicy, final float epsilon) {
+    public ProtocolEpsilonGreedyPolicy(final GreedyPolicy greedyPolicy, final float epsilon) {
         logger.info("EpsilonGreedyPolicy initialized with epsilon='{}'", epsilon);
         this.greedyPolicy = greedyPolicy;
         this.epsilon = epsilon;
@@ -26,11 +26,13 @@ public class EpsilonGreedyPolicy implements Policy {
      */
     @Override
     public AbstractAction applyPolicy(Set<AbstractAction> actions) {
-        if (getRandomValue() < 1 - epsilon) {
+        float randomValue = getRandomValue();
+        if (randomValue < 1 - epsilon) {
             return greedyPolicy.applyPolicy(actions);
         }
-
-        return RandomActionSelector.selectAbstractAction(actions);
+        if (randomValue < (1 - epsilon) + 0.25 * epsilon)
+            return RandomActionSelector.selectAbstractAction(actions);
+        return new AbstractAction("ProtocolAction");
     }
 
     float getRandomValue() {
