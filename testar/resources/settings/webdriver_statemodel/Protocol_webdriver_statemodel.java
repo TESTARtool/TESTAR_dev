@@ -148,20 +148,6 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
@@ -175,7 +161,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
+		Action retAction = super.selectAction(state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			//using the action selector of the state model:

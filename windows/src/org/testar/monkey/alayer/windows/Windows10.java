@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,20 +36,25 @@ import org.testar.monkey.IEnvironment;
  * A Windows 10 specific environment implementation.
  */
 public final class Windows10 implements IEnvironment {
-    @Override
-    public double getDisplayScale(long windowHandle) {
-        double result = 1.0;
-        long monitorHandle = Windows.MonitorFromWindow(windowHandle, Windows.MONITOR_DEFAULTTONULL);
-        if (monitorHandle == 0){
-            System.out.printf("WARNING: Could not find monitor handle for window handle:%d\n",windowHandle);
-            return result;
-        }
-        long res[] = Windows.GetScaleFactorForMonitor(monitorHandle);
-        if (res.length == 2 )
-        {
-            return res[1] / 100.0;
-        }
-        System.out.printf("WARNING Failed to requested scale factor for display:%d res:%d \n",monitorHandle,res[0]);
-        return result;
-    }
+	@Override
+	public double getDisplayScale(long windowHandle) {
+		double result = 1.0;
+		try {
+			long monitorHandle = Windows.MonitorFromWindow(windowHandle, Windows.MONITOR_DEFAULTTONULL);
+			if (monitorHandle == 0){
+				System.out.printf("WARNING: Could not find monitor handle for window handle:%d\n",windowHandle);
+				return result;
+			}
+			long res[] = Windows.GetScaleFactorForMonitor(monitorHandle);
+			if (res.length == 2 )
+			{
+				return res[1] / 100.0;
+			}
+			System.out.printf("WARNING Failed to requested scale factor for display:%d res:%d \n",monitorHandle,res[0]);
+		} catch(NoClassDefFoundError nce) {
+			System.out.println("WARNING: TESTAR was not able to obtain Windows10 environment displayScale value");
+		}
+
+		return result;
+	}
 }

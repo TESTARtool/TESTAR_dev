@@ -82,9 +82,6 @@ public final class ConfigTags {
   public static final Tag<Integer> TypingTextsForExecutedAction = Tag.from("TypingTextsForExecutedAction", Integer.class);
   public static final Tag<Boolean> DrawWidgetTree = Tag.from("DrawWidgetTree", Boolean.class);
   public static final Tag<Integer> ExplorationSampleInterval = Tag.from("ExplorationSampleInterval", Integer.class);
-  public static final Tag<Boolean> GraphsActivated = Tag.from("GraphsActivated", Boolean.class);
-  public static final Tag<Boolean> PrologActivated = Tag.from("PrologActivated", Boolean.class);
-  public static final Tag<Boolean> GraphResuming = Tag.from("GraphResuming", Boolean.class);
   public static final Tag<Boolean> ForceToSequenceLength = Tag.from("ForceToSequenceLength", Boolean.class);
   public static final Tag<Integer> NonReactingUIThreshold = Tag.from("NonReactingUIThreshold", Integer.class);
   public static final Tag<Boolean> OfflineGraphConversion = Tag.from("OfflineGraphConversion", Boolean.class);
@@ -143,6 +140,13 @@ public final class ConfigTags {
   public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class);
   public static final Tag<Boolean> BrowserFullScreen = Tag.from("BrowserFullScreen", Boolean.class);
   public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class);
+
+  // Oracles for webdriver browser console
+  public static final Tag<Boolean> WebConsoleErrorOracle = Tag.from("WebConsoleErrorOracle", Boolean.class);
+  public static final Tag<String> WebConsoleErrorPattern = Tag.from("WebConsoleErrorPattern", String.class);
+  public static final Tag<Boolean> WebConsoleWarningOracle = Tag.from("WebConsoleWarningOracle", Boolean.class);
+  public static final Tag<String> WebConsoleWarningPattern = Tag.from("WebConsoleWarningPattern", String.class);
+
   public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class);
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);

@@ -87,6 +87,11 @@ public class WdElement extends TaggableBase implements Serializable {
 
   public transient Map<String, String> attributeMap;
 
+  public WdElement(WdRootElement root, WdElement parent) {
+	  this.root = root;
+	  this.parent = parent;
+  }
+
   @SuppressWarnings("unchecked")
   public WdElement(Map<String, Object> packedElement,
 		  			WdRootElement root, WdElement parent) {

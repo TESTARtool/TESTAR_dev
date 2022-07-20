@@ -65,7 +65,7 @@ public class WdStateFetcher implements Callable<WdState> {
       packedBody = (Map<String, Object>) result;
     }
     else {
-      return null;
+    	return emptyRootState(system);
     }
 
     WdRootElement wdRoot = new WdRootElement(packedBody);
@@ -76,6 +76,19 @@ public class WdStateFetcher implements Callable<WdState> {
     wdRoot.pid = system.get(Tags.PID);
 
     return wdRoot;
+  }
+
+  /**
+   * Create and return an empty state
+   */
+  private static WdRootElement emptyRootState(SUT system) {
+	  WdRootElement emptyRootState = new WdRootElement();
+	  emptyRootState.isRunning = system.isRunning();
+	  emptyRootState.timeStamp = System.currentTimeMillis();
+	  emptyRootState.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
+	  emptyRootState.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;
+	  emptyRootState.pid = system.get(Tags.PID);
+	  return emptyRootState;
   }
 
   @SuppressWarnings("unchecked")
