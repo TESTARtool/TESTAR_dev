@@ -1,3 +1,5 @@
+package desktop_generic_action_selection;
+
 /***************************************************************************************************
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
@@ -27,7 +29,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
-
 
 import java.util.Set;
 

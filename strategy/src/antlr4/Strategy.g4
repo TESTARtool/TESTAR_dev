@@ -1,0 +1,126 @@
+grammar Strategy;
+
+strategy_file:      strategy EOF;
+
+strategy:           IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
+
+bool_expr:
+                            NOT             expr=bool_expr                   #notExpr
+|   LP                      NOT             expr=bool_expr           RP      #notExpr
+|       left=bool_expr      AND             right=bool_expr             #andExpr
+|   LP  left=bool_expr      AND             right=bool_expr     RP      #andExpr
+|       left=bool_expr      XOR             right=bool_expr             #xorExpr
+|   LP  left=bool_expr      XOR             right=bool_expr     RP      #xorExpr
+|       left=bool_expr      OR              right=bool_expr             #orExpr
+|   LP  left=bool_expr      OR              right=bool_expr     RP      #orExpr
+|       left=number_expr    GT              right=number_expr           #greaterThanExpr
+|   LP  left=number_expr    GT              right=number_expr   RP      #greaterThanExpr
+|       left=number_expr    GE              right=number_expr           #greaterEqualThanExpr
+|   LP  left=number_expr    GE              right=number_expr   RP      #greaterEqualThanExpr
+|       left=number_expr    LT              right=number_expr           #lessThanExpr
+|   LP  left=number_expr    LT              right=number_expr   RP      #lessThanExpr
+|       left=number_expr    LE              right=number_expr           #lessEqualThanExpr
+|   LP  left=number_expr    LE              right=number_expr   RP      #lessEqualThanExpr
+|       left=number_expr    EQ              right=number_expr           #equalExpr
+|   LP  left=number_expr    EQ              right=number_expr   RP      #notEqualExpr
+|       left=number_expr    NE              right=number_expr           #notEqualExpr
+|   LP  left=number_expr    NE              right=number_expr   RP      #equalExpr
+|                           state_boolean                               #stateBool
+|   LP                      state_boolean                       RP      #stateBool
+|                           BOOLEAN                                     #baseBool
+;
+
+state_boolean:
+    'available-actions-of-type'     ACTION_TYPE         #availableActionsOftype
+|   'sut-type-is'                   SUT_TYPE            #sutType
+|   'state-unchanged'                                   #stateUnchanged
+;
+
+number_expr:        number_of_actions | NUMBER;
+
+number_of_actions:  NUM_ACTIONS | COMPOUND_NUM_ACTIONS ACTION_TYPE;
+
+action_expr:        strategy | action+;
+
+action: NUMBER? (ACTION | COMPOUND_ACTION ACTION_TYPE);
+
+NUM_ACTIONS:
+    'total-number-of-actions'                       | 'total-num-of-actions'
+|   'total-number-of-unexecuted-actions'            | 'total-num-of-unex-actions'
+|   'total-number-of-previous-executed-actions'     | 'total-num-of-prev-exe-actions';
+
+COMPOUND_NUM_ACTIONS: //pair with ACTION_TYPE
+    'number-of-previous-executed-actions-of-type'   | 'num-prev-exe-actions-of-type'
+|   'number-of-actions-of-type'                     | 'num-actions-of-type'
+|   'number-of-unexecuted-actions-of-type'          | 'num-unex-actions-of-type';
+
+ACTION:
+    'random-action'
+|   'previous-action'
+|   'random-unexecuted-action'                      | 'rand-unex-action'
+|   'random-least-executed-action'                  | 'rand-least-exe-action'
+|   'random-most-executed-action'                   | 'rand-most-exe-action';
+
+COMPOUND_ACTION: //pair with ACTION_TYPE
+    'random-action-of-type'                         | 'rand-action-of-type'
+|   'random-unexecuted-action-of-type'              | 'rand-unex-action-of-type'
+|   'random-action-other-than-of-type'              | 'rand-action-other-than-type'
+|   'random-unexecuted-action-other-than-of-type'   | 'rand-unex-action-other-than-type';
+
+ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
+SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
+
+NOT:                N O T   | '!'   | '~';
+AND:                A N D   | '&&'  | '&';
+XOR:                X O R   | '^';
+OR:                 O R     | '||'  | '|';
+
+GT                  : '>';
+GE                  : '>=';
+LT                  : '<';
+LE                  : '<=';
+EQ                  : '==' | '=';
+NE                  : '!=';
+
+IF:                 I F;
+THEN:               T H E N;
+ELSE:               E L S E;
+
+NUMBER:             [1-9][0-9]*;
+BOOLEAN:            TRUE | FALSE;
+LP:                 '(';
+RP:                 ')';
+COMMENT:            '/*' .*? '*/'                   -> skip;
+WHITESPACE:         (' ' | '\t' | '\r' | '\n')+     -> skip;
+
+fragment TRUE:      T R U E;
+fragment FALSE:     F A L S E;
+
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];
+
+ANY: . ; //for error-catching purposes

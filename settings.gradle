@@ -1,2 +1,3 @@
 include 'core', 'windows', 'testar', 'linux', 'webdriver'
+include 'strategy'
 
