@@ -54,6 +54,8 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
 public class Protocol_webdriver_parabank extends WebdriverProtocol {
+	
+	private List<String> listErrorVerdictInfo = new ArrayList<>();
 
   /**
    * Called once during the life time of TESTAR
@@ -69,6 +71,15 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     // Set to null to disable this feature
     policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
   }
+  
+	/**
+	 * This method is called before the first test sequence, allowing for example setting up the test environment
+	 */
+	@Override
+	protected void initTestSession() {
+		super.initTestSession();
+		listErrorVerdictInfo = new ArrayList<>();
+	}
 
   /**
    * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -98,13 +109,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 	  super.beginSequence(system, state);
 
 	  // Add your login sequence here
-	  /*
+	  
 	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
 	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 	  waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-	  */
+	  
 
 	  /*
 	   * If you have issues typing special characters
@@ -165,10 +176,16 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     for(Widget w : state) {
       if(w.get(WdTags.WebTextContent,"").contains("internal error")) {
-        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-                "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'.");
+        verdict = verdict.join(new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'."));
       }
     }
+
+	// If the final Verdict is not OK but was already detected in a previous sequence
+    String currentVerdictInfo = verdict.info().replace("\n", " ");
+    if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
+		// Consider as OK to continue testing
+		verdict = Verdict.OK;
+	}
 
     return verdict;
   }
@@ -391,13 +408,18 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     return super.moreActions(state);
   }
 
-  /**
-   * This method is invoked each time after TESTAR finished the generation of a sequence.
-   */
-  @Override
-  protected void finishSequence() {
-    super.finishSequence();
-  }
+	/**
+	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 */
+	@Override
+	protected void finishSequence() {
+		super.finishSequence();
+		// If the final Verdict is not OK and the verdict is not saved in the list
+		// This is a new run fail verdict
+		if(getFinalVerdict().severity() > Verdict.SEVERITY_OK && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
+			listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
+		}
+	}
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

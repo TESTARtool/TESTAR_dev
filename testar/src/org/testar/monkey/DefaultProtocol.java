@@ -130,6 +130,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.replayVerdict = replayVerdict;
 	}
 
+	private Verdict finalVerdict = Verdict.OK;
+	public Verdict getFinalVerdict() {
+		return finalVerdict;
+	}
+
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
 
@@ -547,6 +552,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void startTestSequence(SUT system) {
 		actionCount = 1;
+		lastExecutedAction = null;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 		passSeverity = Verdict.SEVERITY_OK;
 		processVerdict = Verdict.OK;
@@ -675,6 +681,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
+				finalVerdict = stateVerdict.join(processVerdict);
+
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
 				finishSequence();
 
@@ -685,8 +693,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-
-				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				//Copy sequence file into proper directory:
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
@@ -792,15 +798,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			lastExecutedAction = action;
 			actionCount++;
 
-			//Saving the actions and the executed action into replayable test sequence:
-			saveActionIntoFragmentForReplayableSequence(action, state, actions);
-
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
 
 			// fetch the new state
             state = getState(system);
+
+			//Saving the actions and the executed action into replayable test sequence:
+			saveActionIntoFragmentForReplayableSequence(action, state, actions);
 		}
 
 		// notify to state model the last state
@@ -1371,7 +1377,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-
+		// Reset the final verdict for the new sequence
+		finalVerdict = Verdict.OK;
 	}
 
 	@Override

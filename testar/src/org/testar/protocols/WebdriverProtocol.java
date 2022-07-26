@@ -442,9 +442,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getFinalVerdict());
+            status = getFinalVerdict().verdictSeverityTitle();
+            statusInfo = getFinalVerdict().info();
         }
 
         String sequencesPath = getGeneratedSequenceName();
