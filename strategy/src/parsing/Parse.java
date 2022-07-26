@@ -8,25 +8,36 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.StrategyNode;
+
+import java.io.IOException;
 import java.util.Set;
 
-public class Main
+public class Parse
 {
-    public static void main(String[] args) throws Exception
+    private StrategyNode astTree;
+    
+    public Parse()
     {
-        CharStream chars  = CharStreams.fromFileName("strategy\\src\\parsing\\test_strategy.txt");
+        CharStream chars  = null;
+        try
+        {
+            chars = CharStreams.fromFileName("strategy\\src\\parsing\\test_strategy.txt");
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
         StrategyLexer                       lexer  = new StrategyLexer(chars);
         CommonTokenStream                   tokens = new CommonTokenStream(lexer);
         StrategyParser                      parser = new StrategyParser(tokens);
         StrategyParser.Strategy_fileContext tree   = parser.strategy_file();
         
         ASTBuilder   visitor = new ASTBuilder();
-        StrategyNode ast     = visitor.visitStrategy_file(tree);
-        System.out.println(ast.toString());
+        astTree = visitor.visitStrategy_file(tree); //create AST tree
     }
     
-    private Action selectAction(State state, Set<Action> actions, StrategyNode ast)
+    public Action selectAction(State state, Set<Action> actions)
     {
-        return ast.GetResult(state, actions);
+        return astTree.GetResult(state, actions);
     }
 }

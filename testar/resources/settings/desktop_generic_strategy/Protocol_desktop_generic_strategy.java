@@ -1,11 +1,14 @@
-package desktop_generic_strategy;
-
-import org.testar.PrioritizeNewActionsSelector;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
 import org.testar.monkey.Settings;
-import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
+import parsing.Parse;
 
 import java.util.Set;
 
@@ -41,5 +44,47 @@ import java.util.Set;
 
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {
-
+	private Parse parseStrategy;
+	
+	@Override
+	protected void initialize(Settings settings)
+	{
+		super.initialize(settings);
+		parseStrategy = new Parse();
+	}
+	
+	@Override
+	protected State getState(SUT system) throws StateBuildException
+	{
+		String previousStateID = latestState.get(Tags.AbstractIDCustom);
+		State state = super.getState(system);
+		boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
+		state.set(Tags.StateChanged, stateChanged);
+		
+		return state;
+	}
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException
+	{
+		Set<Action> actions = super.deriveActions(system,state);
+		
+		DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
+		
+		if(derived.getAvailableActions().isEmpty())
+			derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
+		
+		Set<Action> filteredActions = derived.getFilteredActions();
+		actions = derived.getAvailableActions();
+		
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+		
+		return actions;
+	}
+	
+	@Override
+	protected Action selectAction(State state, Set<Action> actions)
+	{
+//		return super.selectAction(state, actions);
+		return parseStrategy.selectAction(state, actions);
+	}
 }
