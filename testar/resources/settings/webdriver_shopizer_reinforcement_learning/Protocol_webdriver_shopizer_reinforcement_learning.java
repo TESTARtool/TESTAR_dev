@@ -424,7 +424,6 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		Action protocol = getProtocolAction(state);
 		if(protocol!=null)
 			actions.add(protocol);
-
 		return actions;
 	}
 
@@ -600,6 +599,32 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		return protocol;
 	}
 
+	protected void getFullProtocolAction(final SUT system, final State state){
+		State new_state = getState(system);
+			List<String> options = Arrays.asList(
+				"Compra / Venta",
+				"Contactos",
+				"Clases / Cursos",
+				"Empleos",
+				"Autos",
+				"Servicios",
+				"Vivienda",
+				"Computadoras");
+		Random rand = new Random();
+		String randomElement = options.get(rand.nextInt(options.size()));
+		Widget widget = getWidgetWithMatchingTag(WdTags.WebTextContent,randomElement, new_state);
+//		if (widget == null){
+//			return null;
+//		}
+		System.out.println(widget);
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		ac.leftClickAt(widget).run(system, new_state, 1);
+//		ProtocolAction protocol = new ProtocolAction(ac.mouseMove(widget));
+//		protocol.set(Tags.OriginWidget, widget);
+//		protocol.set(Tags.Desc, "Shopizer Protocol Action");
+//		return protocol;
+	}
+
 	/**
 	 * Execute the selected action.
 	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
@@ -607,6 +632,12 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
+
+		if (action instanceof ProtocolAction){
+			System.out.println("Finishing protocol action");
+			getFullProtocolAction(system, state);
+		}
+
 		String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
 				" | actionnr | " + actionCount +
 				" | url | " + WdDriver.getCurrentUrl();
