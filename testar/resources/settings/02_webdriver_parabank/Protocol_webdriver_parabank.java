@@ -109,13 +109,13 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 	  super.beginSequence(system, state);
 
 	  // Add your login sequence here
-	  
+	  /*
 	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
 	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 	  waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-	  
+	  */
 
 	  /*
 	   * If you have issues typing special characters
@@ -185,6 +185,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
 		// Consider as OK to continue testing
 		verdict = Verdict.OK;
+		webConsoleVerdict = Verdict.OK;
 	}
 
     return verdict;
