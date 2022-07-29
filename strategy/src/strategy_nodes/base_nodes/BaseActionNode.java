@@ -4,6 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public abstract class BaseActionNode extends BaseStrategyNode<Action>
     protected int WEIGHT;
     
     @Override
-    public abstract Action GetResult(State state, Set<Action> actions);
+    public abstract Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
     
     @Override
     public String toString() {return String.valueOf(WEIGHT) + " " + name;}

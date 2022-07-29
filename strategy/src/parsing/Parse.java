@@ -10,6 +10,7 @@ import org.testar.monkey.alayer.State;
 import strategy_nodes.StrategyNode;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 public class Parse
@@ -39,8 +40,8 @@ public class Parse
         System.out.println(astTree.toString());
     }
     
-    public Action selectAction(State state, Set<Action> actions)
+    public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return astTree.GetResult(state, actions);
+        return astTree.GetResult(state, actions, actionsExecuted);
     }
 }

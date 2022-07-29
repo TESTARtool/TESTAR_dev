@@ -4,6 +4,8 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseBooleanNode;
 import strategy_nodes.base_nodes.BaseIntegerNode;
+
+import java.util.Map;
 import java.util.Set;
 
 public class GreaterThanOprNode extends BaseBooleanNode
@@ -14,9 +16,9 @@ public class GreaterThanOprNode extends BaseBooleanNode
     public GreaterThanOprNode(BaseIntegerNode left, BaseIntegerNode right) {this.left = left;this.right = right;}
     
     @Override
-    public Boolean GetResult(State state, Set<Action> actions)
+    public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return left.GetResult(state, actions) > right.GetResult(state, actions);
+        return left.GetResult(state, actions, actionsExecuted) > right.GetResult(state, actions, actionsExecuted);
     }
     
     @Override

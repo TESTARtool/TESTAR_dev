@@ -1,12 +1,10 @@
 package strategy_nodes.terminals;
 
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.actions.ActionRoles;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public enum ActionType
 {
@@ -34,7 +32,7 @@ public enum ActionType
             case NONE:
                 break;
             case CLICK:
-                if(action.get(Tags.Role, null) == ActionRoles.Click)
+                if(action.get(Tags.Role,  null) == ActionRoles.ClickAt || action.get(Tags.Role, null) == ActionRoles.LeftClickAt)
                     return true;
                 break;
             case TYPING:
@@ -42,7 +40,7 @@ public enum ActionType
                     return true;
                 break;
             case DRAG:
-                if(action.get(Tags.Role,  null) == ActionRoles.Drag)
+                if(action.get(Tags.Role,  null) == ActionRoles.Drag || action.get(Tags.Role, null) == ActionRoles.LeftDrag)
                     return true;
                 break;
             case SCROLL:

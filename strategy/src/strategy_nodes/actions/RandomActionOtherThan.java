@@ -2,12 +2,11 @@ package strategy_nodes.actions;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.actions.ActionRoles;
 import strategy_nodes.base_nodes.BaseActionNode;
 import strategy_nodes.terminals.ActionType;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 public class RandomActionOtherThan extends BaseActionNode
@@ -22,7 +21,7 @@ public class RandomActionOtherThan extends BaseActionNode
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         ArrayList<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)

@@ -11,6 +11,8 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
 import parsing.Parse;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /***************************************************************************************************
@@ -46,6 +48,7 @@ import java.util.Set;
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {
 	private Parse parseStrategy;
+	private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
 	
 	@Override
 	protected void initialize(Settings settings)
@@ -90,11 +93,15 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	@Override
 	protected Action selectAction(State state, Set<Action> actions)
 	{
-//		return super.selectAction(state, actions);
-//		return parseStrategy.selectAction(state, actions);
 		Action selectedAction = parseStrategy.selectAction(state, actions);
+		
 		System.out.println(selectedAction.toString());
 		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
+		
+		String actionID = selectedAction.get(Tags.AbstractIDCustom);
+		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
+		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
+		
 		return selectedAction;
 	}
 }

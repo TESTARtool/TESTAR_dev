@@ -4,8 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseActionNode;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.Map;
 import java.util.Set;
 
 public class RandomAction extends BaseActionNode
@@ -16,7 +15,7 @@ public class RandomAction extends BaseActionNode
         this.WEIGHT = weight;
     }
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
 //        long   graphTime = System.currentTimeMillis();
 //        Random rnd       = new Random(graphTime);

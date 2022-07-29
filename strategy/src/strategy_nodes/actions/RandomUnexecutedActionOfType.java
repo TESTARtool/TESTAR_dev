@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseActionNode;
 import strategy_nodes.terminals.ActionType;
 
+import java.util.Map;
 import java.util.Set;
 
 public class RandomUnexecutedActionOfType extends BaseActionNode
@@ -19,7 +20,7 @@ public class RandomUnexecutedActionOfType extends BaseActionNode
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         return null; //todo
     }

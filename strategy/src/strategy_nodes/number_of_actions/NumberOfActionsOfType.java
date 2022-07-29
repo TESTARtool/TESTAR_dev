@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseIntegerNode;
 import strategy_nodes.terminals.ActionType;
 
+import java.util.Map;
 import java.util.Set;
 
 public class NumberOfActionsOfType extends BaseIntegerNode
@@ -15,7 +16,7 @@ public class NumberOfActionsOfType extends BaseIntegerNode
     public NumberOfActionsOfType(ActionType actionType) {this.actionType = actionType;}
     
     @Override
-    public Integer GetResult(State state, Set<Action> actions)
+    public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         int numberOfActions = 0;
         for(Action action : actions)

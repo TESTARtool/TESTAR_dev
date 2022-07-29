@@ -14,10 +14,10 @@ public class ActionListNode extends BaseStrategyNode<Action>
     public ActionListNode(List<BaseActionNode> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         if(actions.size() == 1)
-            return actionStrategies.get(0).GetResult(state, actions);
+            return actionStrategies.get(0).GetResult(state, actions, actionsExecuted);
         else
         {
             int totalWeights = 0;
@@ -31,7 +31,7 @@ public class ActionListNode extends BaseStrategyNode<Action>
                 if(i >= actionStrategy.GetWeight())
                     t -= actionStrategy.GetWeight();
                 else
-                    return actionStrategy.GetResult(state, actions);
+                    return actionStrategy.GetResult(state, actions, actionsExecuted);
             }
         }
         return null; //something went wrong

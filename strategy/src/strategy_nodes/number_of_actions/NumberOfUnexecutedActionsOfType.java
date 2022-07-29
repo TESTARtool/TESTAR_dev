@@ -3,9 +3,9 @@ package strategy_nodes.number_of_actions;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseIntegerNode;
-import strategy_nodes.base_nodes.BaseStrategyNode;
 import strategy_nodes.terminals.ActionType;
 
+import java.util.Map;
 import java.util.Set;
 
 public class NumberOfUnexecutedActionsOfType extends BaseIntegerNode
@@ -16,7 +16,7 @@ public class NumberOfUnexecutedActionsOfType extends BaseIntegerNode
     public NumberOfUnexecutedActionsOfType(ActionType actionType) {this.actionType = actionType;}
     
     @Override
-    public Integer GetResult(State state, Set<Action> actions)
+    public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         return null; //todo
     }

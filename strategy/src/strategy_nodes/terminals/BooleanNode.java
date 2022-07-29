@@ -3,6 +3,8 @@ package strategy_nodes.terminals;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseBooleanNode;
+
+import java.util.Map;
 import java.util.Set;
 
 public class BooleanNode extends BaseBooleanNode
@@ -12,7 +14,7 @@ public class BooleanNode extends BaseBooleanNode
     public BooleanNode(boolean bool) {this.BOOL = bool;}
     
     @Override
-    public Boolean GetResult(State state, Set<Action> actions) { return BOOL; }
+    public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) { return BOOL; }
     
     @Override
     public String toString() {return Boolean.toString(BOOL);}

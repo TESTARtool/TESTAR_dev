@@ -6,6 +6,7 @@ import strategy_nodes.base_nodes.BaseActionNode;
 import strategy_nodes.terminals.ActionType;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 public class RandomActionOfType extends BaseActionNode
@@ -20,7 +21,7 @@ public class RandomActionOfType extends BaseActionNode
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         ArrayList<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)

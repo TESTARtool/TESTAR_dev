@@ -4,6 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseActionNode;
 
+import java.util.Map;
 import java.util.Set;
 
 public class RandomMostExecutedAction extends BaseActionNode
@@ -15,7 +16,7 @@ public class RandomMostExecutedAction extends BaseActionNode
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         return null; //todo
     }

@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.State;
 import strategy_nodes.base_nodes.BaseBooleanNode;
 import strategy_nodes.base_nodes.BaseStrategyNode;
 
+import java.util.Map;
 import java.util.Set;
 
 public class StrategyNode extends BaseStrategyNode<Action>
@@ -21,12 +22,12 @@ public class StrategyNode extends BaseStrategyNode<Action>
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions)
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        if(ifChild.GetResult(state, actions))
-            return (Action) thenChild.GetResult(state, actions);
+        if(ifChild.GetResult(state, actions, actionsExecuted))
+            return (Action) thenChild.GetResult(state, actions, actionsExecuted);
         else
-            return (Action) elseChild.GetResult(state, actions);
+            return (Action) elseChild.GetResult(state, actions, actionsExecuted);
     }
     
     @Override
