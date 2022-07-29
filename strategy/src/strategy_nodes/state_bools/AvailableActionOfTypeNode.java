@@ -1,9 +1,13 @@
 package strategy_nodes.state_bools;
 
-import strategy_nodes.BaseStrategyNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseBooleanNode;
 import strategy_nodes.terminals.ActionType;
 
-public class AvailableActionOfTypeNode extends BaseStrategyNode
+import java.util.Set;
+
+public class AvailableActionOfTypeNode extends BaseBooleanNode
 {
     private ActionType actionType;
     
@@ -13,7 +17,10 @@ public class AvailableActionOfTypeNode extends BaseStrategyNode
     }
     
     @Override
-    public Boolean GetResult(){return null;}
+    public Boolean GetResult(State state, Set<Action> actions)
+    {
+        return null; //todo
+    }
     
     @Override
     public String toString() {return "available-actions-of-type" + actionType.toString();}

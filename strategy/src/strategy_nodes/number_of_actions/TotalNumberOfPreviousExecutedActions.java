@@ -1,13 +1,20 @@
 package strategy_nodes.number_of_actions;
 
-import strategy_nodes.BaseStrategyNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseIntegerNode;
 
-public class TotalNumberOfPreviousExecutedActions extends BaseStrategyNode
+import java.util.Set;
+
+public class TotalNumberOfPreviousExecutedActions extends BaseIntegerNode
 {
     private String name = "total-number-of-previous-executed-actions";
     
     @Override
-    public Integer GetResult(){return null;}
+    public Integer GetResult(State state, Set<Action> actions)
+    {
+        return null; //todo
+    }
     
     @Override
     public String toString() {return name;}

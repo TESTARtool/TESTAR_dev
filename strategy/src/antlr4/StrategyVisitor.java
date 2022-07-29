@@ -121,12 +121,12 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code stateUnchanged}
+	 * Visit a parse tree produced by the {@code stateChanged}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStateUnchanged(StrategyParser.StateUnchangedContext ctx);
+	T visitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link StrategyParser#number_expr}.
 	 * @param ctx the parse tree

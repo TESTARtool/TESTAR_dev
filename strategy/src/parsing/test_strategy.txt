@@ -1,6 +1,0 @@
-IF
-    state-unchanged AND NOT total-number-of-actions != 8
-THEN
-    random-action
-ELSE
-    random-unexecuted-action

@@ -1,5 +1,6 @@
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -50,16 +51,21 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
-		parseStrategy = new Parse();
+		parseStrategy = new Parse(settings.get(ConfigTags.StrategyFile));
 	}
 	
 	@Override
 	protected State getState(SUT system) throws StateBuildException
 	{
-		String previousStateID = latestState.get(Tags.AbstractIDCustom);
 		State state = super.getState(system);
-		boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
-		state.set(Tags.StateChanged, stateChanged);
+		if(latestState == null)
+			state.set(Tags.StateChanged, true);
+		else
+		{
+			String previousStateID = latestState.get(Tags.AbstractIDCustom);
+			boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
+			state.set(Tags.StateChanged, stateChanged);
+		}
 		
 		return state;
 	}
@@ -85,6 +91,10 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	protected Action selectAction(State state, Set<Action> actions)
 	{
 //		return super.selectAction(state, actions);
-		return parseStrategy.selectAction(state, actions);
+//		return parseStrategy.selectAction(state, actions);
+		Action selectedAction = parseStrategy.selectAction(state, actions);
+		System.out.println(selectedAction.toString());
+		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
+		return selectedAction;
 	}
 }

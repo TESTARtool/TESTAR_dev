@@ -1,7 +1,11 @@
 package strategy_nodes.actions;
 
-import strategy_nodes.BaseActionNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseActionNode;
 import strategy_nodes.terminals.ActionType;
+
+import java.util.Set;
 
 public class RandomUnexecutedActionOfType extends BaseActionNode
 {
@@ -15,5 +19,11 @@ public class RandomUnexecutedActionOfType extends BaseActionNode
     }
     
     @Override
-    public Integer GetResult(){return null;}
+    public Action GetResult(State state, Set<Action> actions)
+    {
+        return null; //todo
+    }
+    
+    @Override
+    public String toString() {return String.valueOf(WEIGHT) + " " + name + " " + actionType.toString();}
 }

@@ -4,8 +4,13 @@ import antlr4.StrategyBaseVisitor;
 import antlr4.StrategyParser;
 import strategy_nodes.*;
 import strategy_nodes.actions.*;
+import strategy_nodes.base_nodes.BaseActionNode;
+import strategy_nodes.base_nodes.BaseBooleanNode;
+import strategy_nodes.base_nodes.BaseIntegerNode;
+import strategy_nodes.base_nodes.BaseStrategyNode;
 import strategy_nodes.number_of_actions.*;
-import strategy_nodes.operators.*;
+import strategy_nodes.bool_operators.*;
+import strategy_nodes.number_operators.*;
 import strategy_nodes.state_bools.*;
 import strategy_nodes.terminals.*;
 
@@ -23,70 +28,70 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public StrategyNode visitStrategy(StrategyParser.StrategyContext ctx)
     {
-        return new StrategyNode(visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr));
+        return new StrategyNode((BaseBooleanNode) visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr));
     }
     //boolean expressions
     @Override
     public NotOprNode visitNotExpr(StrategyParser.NotExprContext ctx)
     {
-        return new NotOprNode(visit(ctx.expr));
+        return new NotOprNode((BaseBooleanNode) visit(ctx.expr));
     }
     @Override
     public AndOprNode visitAndExpr(StrategyParser.AndExprContext ctx)
     {
-        return new AndOprNode(visit(ctx.left), visit(ctx.right));
+        return new AndOprNode((BaseBooleanNode) visit(ctx.left), (BaseBooleanNode) visit(ctx.right));
     }
     @Override
     public XorOprNode visitXorExpr(StrategyParser.XorExprContext ctx)
     {
-        return new XorOprNode(visit(ctx.left), visit(ctx.right));
+        return new XorOprNode((BaseBooleanNode) visit(ctx.left), (BaseBooleanNode) visit(ctx.right));
     }
     @Override
     public OrOprNode visitOrExpr(StrategyParser.OrExprContext ctx)
     {
         return new OrOprNode(visit(ctx.left), visit(ctx.right));
     }
-    public TerminalBoolNode visitBaseBool(StrategyParser.BaseBoolContext ctx)
+    public BooleanNode visitBaseBool(StrategyParser.BaseBoolContext ctx)
     {
-        return new TerminalBoolNode(Boolean.valueOf(ctx.BOOLEAN().getText()));
+        return new BooleanNode(Boolean.valueOf(ctx.BOOLEAN().getText()));
     }
     // number expressions
     @Override
     public LessThanOprNode visitLessThanExpr(StrategyParser.LessThanExprContext ctx)
     {
-        return new LessThanOprNode(visit(ctx.left), visit(ctx.right));
+        return new LessThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     @Override
     public LessEqualThanOprNode visitLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx)
     {
-        return new LessEqualThanOprNode(visit(ctx.left), visit(ctx.right));
+        return new LessEqualThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     @Override
     public GreaterThanOprNode visitGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx)
     {
-        return new GreaterThanOprNode(visit(ctx.left), visit(ctx.right));
+        return new GreaterThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     @Override
     public GreaterEqualThanOprNode visitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx)
     {
-        return new GreaterEqualThanOprNode(visit(ctx.left), visit(ctx.right));
+        return new GreaterEqualThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     
     @Override
     public EqualOprNode visitEqualExpr(StrategyParser.EqualExprContext ctx)
     {
-        return new EqualOprNode(visit(ctx.left), visit(ctx.right));
+        return new EqualOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     @Override
     public NotEqualOprNode visitNotEqualExpr(StrategyParser.NotEqualExprContext ctx)
     {
-        return new NotEqualOprNode(visit(ctx.left), visit(ctx.right));
+        return new NotEqualOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
     }
     @Override
     public BaseStrategyNode visitNumber_expr(StrategyParser.Number_exprContext ctx)
     {
         if(ctx.NUMBER() != null)
-            return new TerminalNumNode(Integer.valueOf(ctx.NUMBER().getText()));
+            return new IntegerNode(Integer.valueOf(ctx.NUMBER().getText()));
         else
             return visit(ctx.number_of_actions());
     }
@@ -129,9 +134,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         return new SutTypeIsNode(SutType.valueOfLabel(ctx.SUT_TYPE().getText()));
     }
     @Override
-    public StateUnchangedNode visitStateUnchanged(StrategyParser.StateUnchangedContext ctx)
+    public StateChangedNode visitStateChanged(StrategyParser.StateChangedContext ctx)
     {
-        return new StateUnchangedNode();
+        return new StateChangedNode();
     }
     //action expressions
     @Override

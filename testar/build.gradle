@@ -74,6 +74,7 @@ dependencies {
     implementation project(':webdriver')
     implementation project(':windows')
     implementation project(':linux')
+    implementation project(':strategy')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/sikulixapi.jar')
     implementation files('./lib/eye2.jar')

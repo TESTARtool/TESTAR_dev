@@ -35,7 +35,7 @@ public class StrategyParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'available-actions-of-type'", "'sut-type-is'", "'state-unchanged'", 
+			null, "'available-actions-of-type'", "'sut-type-is'", "'state-changed'", 
 			null, null, null, null, null, null, null, null, null, null, "'>'", "'>='", 
 			"'<'", "'<='", null, "'!='", null, null, null, null, null, "'('", "')'"
 		};
@@ -955,19 +955,19 @@ public class StrategyParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class StateUnchangedContext extends State_booleanContext {
-		public StateUnchangedContext(State_booleanContext ctx) { copyFrom(ctx); }
+	public static class StateChangedContext extends State_booleanContext {
+		public StateChangedContext(State_booleanContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterStateUnchanged(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterStateChanged(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitStateUnchanged(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitStateChanged(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitStateUnchanged(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitStateChanged(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1000,7 +1000,7 @@ public class StrategyParser extends Parser {
 				}
 				break;
 			case T__2:
-				_localctx = new StateUnchangedContext(_localctx);
+				_localctx = new StateChangedContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(138);

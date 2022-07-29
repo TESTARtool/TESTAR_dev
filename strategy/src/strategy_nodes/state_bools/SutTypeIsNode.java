@@ -1,9 +1,13 @@
 package strategy_nodes.state_bools;
 
-import strategy_nodes.BaseStrategyNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseBooleanNode;
 import strategy_nodes.terminals.SutType;
 
-public class SutTypeIsNode extends BaseStrategyNode
+import java.util.Set;
+
+public class SutTypeIsNode extends BaseBooleanNode
 {
     private SutType sutType;
     
@@ -13,15 +17,11 @@ public class SutTypeIsNode extends BaseStrategyNode
     }
     
     @Override
-    public Boolean GetResult(){return null;}
-    
-//    public Boolean GetResult(State state, Set<Action> actions)
-//    {
-//        state.
-//        long   graphTime = System.currentTimeMillis();
-//        Random rnd       = new Random(graphTime);
-//        return new ArrayList<>(actions).get(rnd.nextInt(actions.size()));
-//    }
+    public Boolean GetResult(State state, Set<Action> actions)
+    {
+//        state.get(Tag.)
+        return null; //todo
+    }
     
     @Override
     public String toString() {return "sut-type-is " + sutType.toString();}

@@ -1,46 +1,48 @@
 package strategy_nodes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.StringJoiner;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseActionNode;
+import strategy_nodes.base_nodes.BaseStrategyNode;
 
-public class ActionListNode extends BaseStrategyNode
+import java.util.*;
+
+public class ActionListNode extends BaseStrategyNode<Action>
 {
-    private List<BaseActionNode> actions = new ArrayList<BaseActionNode>();
+    private List<BaseActionNode> actionStrategies = new ArrayList<BaseActionNode>();
     
-    public ActionListNode(List<BaseActionNode> actions) {this.actions.addAll(actions);}
+    public ActionListNode(List<BaseActionNode> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
     
     @Override
-    public Object GetResult() //todo: deal with result
+    public Action GetResult(State state, Set<Action> actions)
     {
         if(actions.size() == 1)
-            return actions.get(0).GetResult();
+            return actionStrategies.get(0).GetResult(state, actions);
         else
         {
             int totalWeights = 0;
-            for(BaseActionNode action : this.actions)
+            for(BaseActionNode action : this.actionStrategies)
                 totalWeights += action.GetWeight();
             Random r = new Random();
             int t = totalWeights;
-            for(BaseActionNode action : this.actions)
+            for(BaseActionNode actionStrategy : this.actionStrategies)
             {
                 int i = r.nextInt(totalWeights);
-                if(i >= action.GetWeight())
-                    t -= action.GetWeight();
+                if(i >= actionStrategy.GetWeight())
+                    t -= actionStrategy.GetWeight();
                 else
-                    return action.GetResult();
+                    return actionStrategy.GetResult(state, actions);
             }
         }
-        return null;
+        return null; //something went wrong
     }
     
     @Override
     public String toString()
     {
         StringJoiner actionJoiner = new StringJoiner(" ");
-        for(BaseActionNode action : this.actions)
-            actionJoiner.add(action.toString());
+        for(BaseActionNode actionStrategy : this.actionStrategies)
+            actionJoiner.add(actionStrategy.toString());
         return actionJoiner.toString();
     }
 }

@@ -1,7 +1,14 @@
 package strategy_nodes.actions;
 
-import strategy_nodes.BaseActionNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.actions.ActionRoles;
+import strategy_nodes.base_nodes.BaseActionNode;
 import strategy_nodes.terminals.ActionType;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 public class RandomActionOtherThan extends BaseActionNode
 {
@@ -15,5 +22,23 @@ public class RandomActionOtherThan extends BaseActionNode
     }
     
     @Override
-    public Integer GetResult(){return null;}
+    public Action GetResult(State state, Set<Action> actions)
+    {
+        ArrayList<Action> filteredActions = new ArrayList<>();
+        for(Action action : actions)
+        {
+            if(ActionType.RoleMatchesType(action, actionType))
+                filteredActions.add(action);
+        }
+        
+        if(filteredActions.size() == 0)
+            return selectRandomAction(actions);
+        else if (filteredActions.size() == 1)
+            return new ArrayList<>(actions).get(0);
+        else
+            return selectRandomAction(filteredActions);
+    }
+    
+    @Override
+    public String toString() {return String.valueOf(WEIGHT) + " " + name + " " + actionType.toString();}
 }

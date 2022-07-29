@@ -2,16 +2,18 @@ package strategy_nodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseBooleanNode;
+import strategy_nodes.base_nodes.BaseStrategyNode;
 
 import java.util.Set;
 
-public class StrategyNode extends BaseStrategyNode
+public class StrategyNode extends BaseStrategyNode<Action>
 {
-    private BaseStrategyNode ifChild;
+    private BaseBooleanNode  ifChild;
     private BaseStrategyNode thenChild; //StrategyNode or ActionListNode
     private BaseStrategyNode elseChild; //StrategyNode or ActionListNode
     
-    public StrategyNode(BaseStrategyNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
+    public StrategyNode(BaseBooleanNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
     {
         this.ifChild = ifChild;
         this.thenChild = thenChild;
@@ -19,22 +21,19 @@ public class StrategyNode extends BaseStrategyNode
     }
     
     @Override
-    public Object GetResult()
-    {
-        if((boolean)ifChild.GetResult())    return thenChild.GetResult();
-        else                                return elseChild.GetResult();
-    }
     public Action GetResult(State state, Set<Action> actions)
     {
-        if((boolean)ifChild.GetResult())    return (Action) thenChild.GetResult();
-        else                                return (Action) elseChild.GetResult();
+        if(ifChild.GetResult(state, actions))
+            return (Action) thenChild.GetResult(state, actions);
+        else
+            return (Action) elseChild.GetResult(state, actions);
     }
     
     @Override
     public String toString()
     {
-        return "IF " +      ifChild.toString() +
-               " THEN " +   thenChild.toString() +
-               " ELSE " +   elseChild.toString();
+        return "IF "    +   ifChild.toString()      + "\n" +
+               "THEN "  +   thenChild.toString()    + "\n" +
+               "ELSE "  +   elseChild.toString();
     }
 }

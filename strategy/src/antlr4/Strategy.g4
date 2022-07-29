@@ -5,8 +5,8 @@ strategy_file:      strategy EOF;
 strategy:           IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
 
 bool_expr:
-                            NOT             expr=bool_expr                   #notExpr
-|   LP                      NOT             expr=bool_expr           RP      #notExpr
+                            NOT             expr=bool_expr              #notExpr
+|   LP                      NOT             expr=bool_expr      RP      #notExpr
 |       left=bool_expr      AND             right=bool_expr             #andExpr
 |   LP  left=bool_expr      AND             right=bool_expr     RP      #andExpr
 |       left=bool_expr      XOR             right=bool_expr             #xorExpr
@@ -33,7 +33,7 @@ bool_expr:
 state_boolean:
     'available-actions-of-type'     ACTION_TYPE         #availableActionsOftype
 |   'sut-type-is'                   SUT_TYPE            #sutType
-|   'state-unchanged'                                   #stateUnchanged
+|   'state-changed'                                     #stateChanged
 ;
 
 number_expr:        number_of_actions | NUMBER;
@@ -45,27 +45,27 @@ action_expr:        strategy | action+;
 action: NUMBER? (ACTION | COMPOUND_ACTION ACTION_TYPE);
 
 NUM_ACTIONS:
-    'total-number-of-actions'                       | 'total-num-of-actions'
-|   'total-number-of-unexecuted-actions'            | 'total-num-of-unex-actions'
-|   'total-number-of-previous-executed-actions'     | 'total-num-of-prev-exe-actions';
+    'total-number-of-actions'
+|   'total-number-of-unexecuted-actions'
+|   'total-number-of-previous-executed-actions';
 
 COMPOUND_NUM_ACTIONS: //pair with ACTION_TYPE
-    'number-of-previous-executed-actions-of-type'   | 'num-prev-exe-actions-of-type'
-|   'number-of-actions-of-type'                     | 'num-actions-of-type'
-|   'number-of-unexecuted-actions-of-type'          | 'num-unex-actions-of-type';
+    'number-of-previous-executed-actions-of-type'
+|   'number-of-actions-of-type'
+|   'number-of-unexecuted-actions-of-type';
 
 ACTION:
     'random-action'
 |   'previous-action'
-|   'random-unexecuted-action'                      | 'rand-unex-action'
-|   'random-least-executed-action'                  | 'rand-least-exe-action'
-|   'random-most-executed-action'                   | 'rand-most-exe-action';
+|   'random-unexecuted-action'
+|   'random-least-executed-action'
+|   'random-most-executed-action';
 
 COMPOUND_ACTION: //pair with ACTION_TYPE
-    'random-action-of-type'                         | 'rand-action-of-type'
-|   'random-unexecuted-action-of-type'              | 'rand-unex-action-of-type'
-|   'random-action-other-than-of-type'              | 'rand-action-other-than-type'
-|   'random-unexecuted-action-other-than-of-type'   | 'rand-unex-action-other-than-type';
+    'random-action-of-type'
+|   'random-unexecuted-action-of-type'
+|   'random-action-other-than-of-type'
+|   'random-unexecuted-action-other-than-of-type';
 
 ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
 SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
@@ -86,7 +86,7 @@ IF:                 I F;
 THEN:               T H E N;
 ELSE:               E L S E;
 
-NUMBER:             [1-9][0-9]*;
+NUMBER:             [0-9]+; //[1-9][0-9]* for non-zero
 BOOLEAN:            TRUE | FALSE;
 LP:                 '(';
 RP:                 ')';

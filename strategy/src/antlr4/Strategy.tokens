@@ -29,7 +29,7 @@ WHITESPACE=28
 ANY=29
 'available-actions-of-type'=1
 'sut-type-is'=2
-'state-unchanged'=3
+'state-changed'=3
 '>'=14
 '>='=15
 '<'=16

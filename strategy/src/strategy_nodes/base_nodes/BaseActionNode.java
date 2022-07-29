@@ -1,0 +1,36 @@
+package strategy_nodes.base_nodes;
+
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Set;
+
+public abstract class BaseActionNode extends BaseStrategyNode<Action>
+{
+    protected String name;
+    protected int WEIGHT;
+    
+    @Override
+    public abstract Action GetResult(State state, Set<Action> actions);
+    
+    @Override
+    public String toString() {return String.valueOf(WEIGHT) + " " + name;}
+    
+    public int GetWeight() {return WEIGHT;}
+    
+    protected Action selectRandomAction(Set<Action> actions)
+    {
+        long   graphTime = System.currentTimeMillis();
+        Random rnd       = new Random(graphTime);
+        return new ArrayList<>(actions).get(rnd.nextInt(actions.size())); //return a random action
+    }
+    
+    protected Action selectRandomAction(ArrayList<Action> actions)
+    {
+        long   graphTime = System.currentTimeMillis();
+        Random rnd       = new Random(graphTime);
+        return actions.get(rnd.nextInt(actions.size())); //return a random action
+    }
+}

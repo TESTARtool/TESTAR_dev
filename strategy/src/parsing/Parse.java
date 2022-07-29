@@ -16,12 +16,12 @@ public class Parse
 {
     private StrategyNode astTree;
     
-    public Parse()
+    public Parse(String filePath)
     {
         CharStream chars  = null;
         try
         {
-            chars = CharStreams.fromFileName("strategy\\src\\parsing\\test_strategy.txt");
+            chars = CharStreams.fromFileName(filePath);
         }
         catch(IOException e)
         {
@@ -34,6 +34,9 @@ public class Parse
         
         ASTBuilder   visitor = new ASTBuilder();
         astTree = visitor.visitStrategy_file(tree); //create AST tree
+        
+        System.out.println("Debug:");
+        System.out.println(astTree.toString());
     }
     
     public Action selectAction(State state, Set<Action> actions)

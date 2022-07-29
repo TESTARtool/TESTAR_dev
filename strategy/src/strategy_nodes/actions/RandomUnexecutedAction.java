@@ -1,6 +1,10 @@
 package strategy_nodes.actions;
 
-import strategy_nodes.BaseActionNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseActionNode;
+
+import java.util.Set;
 
 public class RandomUnexecutedAction extends BaseActionNode
 {
@@ -11,5 +15,8 @@ public class RandomUnexecutedAction extends BaseActionNode
     }
     
     @Override
-    public Integer GetResult(){return null;}
+    public Action GetResult(State state, Set<Action> actions)
+    {
+        return null; //todo
+    }
 }

@@ -1,5 +1,10 @@
 package strategy_nodes.terminals;
 
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.actions.ActionRoles;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,4 +26,34 @@ public enum ActionType
     static {for (ActionType e: values()) {BY_LABEL.put(e.label, e);}}
     
     public String toString() {return this.label;}
+    
+    public static boolean RoleMatchesType(Action action, ActionType actionType)
+    {
+        switch(actionType)
+        {
+            case NONE:
+                break;
+            case CLICK:
+                if(action.get(Tags.Role, null) == ActionRoles.Click)
+                    return true;
+                break;
+            case TYPING:
+                if(action.get(Tags.Role,  null) == ActionRoles.Type || action.get(Tags.Role, null) == ActionRoles.ClickTypeInto)
+                    return true;
+                break;
+            case DRAG:
+                if(action.get(Tags.Role,  null) == ActionRoles.Drag)
+                    return true;
+                break;
+            case SCROLL:
+                if(action.get(Tags.Slider, null) != null)
+                    return true;
+                break;
+            case HIT_KEY:
+                if(action.get(Tags.Role,  null) == ActionRoles.HitKey)
+                    return true;
+                break;
+        }
+        return false;
+    }
 }

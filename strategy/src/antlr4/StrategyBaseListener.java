@@ -208,13 +208,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStateUnchanged(StrategyParser.StateUnchangedContext ctx) { }
+	@Override public void enterStateChanged(StrategyParser.StateChangedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStateUnchanged(StrategyParser.StateUnchangedContext ctx) { }
+	@Override public void exitStateChanged(StrategyParser.StateChangedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

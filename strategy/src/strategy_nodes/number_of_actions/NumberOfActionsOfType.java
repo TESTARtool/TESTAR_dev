@@ -1,9 +1,13 @@
 package strategy_nodes.number_of_actions;
 
-import strategy_nodes.BaseStrategyNode;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import strategy_nodes.base_nodes.BaseIntegerNode;
 import strategy_nodes.terminals.ActionType;
 
-public class NumberOfActionsOfType extends BaseStrategyNode
+import java.util.Set;
+
+public class NumberOfActionsOfType extends BaseIntegerNode
 {
     private String name = "number-of-actions-of-type";
     private ActionType actionType;
@@ -11,8 +15,20 @@ public class NumberOfActionsOfType extends BaseStrategyNode
     public NumberOfActionsOfType(ActionType actionType) {this.actionType = actionType;}
     
     @Override
-    public Integer GetResult(){return null;}
+    public Integer GetResult(State state, Set<Action> actions)
+    {
+        int numberOfActions = 0;
+        for(Action action : actions)
+        {
+            if(ActionType.RoleMatchesType(action, actionType))
+                numberOfActions++;
+        }
+        
+        System.out.println("number of actions (" + actionType.toString() + ") : " + numberOfActions);
+        
+        return numberOfActions;
+    }
     
     @Override
-    public String toString() {return name;}
+    public String toString() {return name + " " + actionType.toString();}
 }

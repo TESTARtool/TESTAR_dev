@@ -2,7 +2,7 @@ token literal names:
 null
 'available-actions-of-type'
 'sut-type-is'
-'state-unchanged'
+'state-changed'
 null
 null
 null

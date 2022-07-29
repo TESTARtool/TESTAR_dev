@@ -196,17 +196,17 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code stateUnchanged}
+	 * Enter a parse tree produced by the {@code stateChanged}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterStateUnchanged(StrategyParser.StateUnchangedContext ctx);
+	void enterStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code stateUnchanged}
+	 * Exit a parse tree produced by the {@code stateChanged}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitStateUnchanged(StrategyParser.StateUnchangedContext ctx);
+	void exitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link StrategyParser#number_expr}.
 	 * @param ctx the parse tree

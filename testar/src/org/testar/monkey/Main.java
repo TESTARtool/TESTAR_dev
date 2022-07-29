@@ -581,7 +581,8 @@ public class Main {
 			defaults.add(Pair.from(FollowLinks, true));
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
-
+			defaults.add(Pair.from(StrategyFile, "test_strategy.txt"));
+			
 			/*
 			//TODO web driver settings for login feature
 			defaults.add(Pair.from(Login, null)); // null = feature not enabled
