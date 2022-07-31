@@ -71,7 +71,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         // we need to add the concrete state ids
         Property concreteStateIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteStateIds");
         if (concreteStateIds == null) {
-            throw new HydrationException();
+            throw new HydrationException("Property `concreteStateIds` was not found in abstract state class");
         }
         if (!((AbstractState) source).getConcreteStateIds().isEmpty()) {
             target.addPropertyValue(concreteStateIds.getPropertyName(), new PropertyValue(concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds()));
@@ -80,7 +80,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         // Add the textInputs for the code analysis experiments
         Property textInputs = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "textInputs");
         if (textInputs == null) {
-            throw new HydrationException();
+            throw new HydrationException("Property `textInputs` was not found in abstract state class");
         }
         if (!((AbstractState) source).getTextInputs().isEmpty()) {
             target.addPropertyValue(textInputs.getPropertyName(), new PropertyValue(textInputs.getPropertyType(), ((AbstractState) source).getTextInputs()));
