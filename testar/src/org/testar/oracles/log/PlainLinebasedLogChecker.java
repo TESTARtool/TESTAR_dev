@@ -158,7 +158,7 @@ class PlainLinebasedLogChecker extends LogChecker {
             if ( currentLine >= startLine ) {
                 output.add(line);
                 if ( this.logLines ) {
-                    logger.info("Logoracle processed line: "+ line);
+                    logger.info("LogOracle processed line: "+ line);
                 }
             }
         }
