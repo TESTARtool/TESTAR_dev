@@ -333,7 +333,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                     String line;
                     StringBuffer content = new StringBuffer();
                     while ((line = in.readLine()) != null) {
-                        logger.info("Read line from url " + url + ":" + line + "\n");
+                        //logger.info("Read line from url " + url + ":" + line + "\n");
                         content.append(line+"\n");
                     }
                     in.close();
