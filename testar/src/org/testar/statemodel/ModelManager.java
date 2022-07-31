@@ -274,6 +274,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void associateTextInputs(AbstractState state, Set<Map<String,String>> textInputs) {
         state.mergeTextInputs(textInputs);
+        persistenceManager.persistAbstractState(state);
     }
 
     @Override

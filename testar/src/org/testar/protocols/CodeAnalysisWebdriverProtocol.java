@@ -247,7 +247,8 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
             processSUTDataAfterAction(tokener);
         }
         catch (Exception e) {
-			logger.info("Error during extracting action data from SUT: " + e.toString());
+			logger.info("Error during extracting action data from SUT: ");
+            e.printStackTrace(System.out);
 		}
 
     }

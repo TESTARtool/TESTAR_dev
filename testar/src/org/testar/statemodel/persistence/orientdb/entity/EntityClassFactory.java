@@ -143,6 +143,10 @@ public class EntityClassFactory {
         counter.setAutoIncrement(true);
         abstractStateClass.addProperty(counter);
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
+        Property textInputs = new Property("textInputs", OType.EMBEDDEDSET, OType.STRING);
+        concreteStateIds.setMandatory(false);
+        concreteStateIds.setNullable(false);
+        abstractStateClass.addProperty(textInputs);
         return abstractStateClass;
     }
 

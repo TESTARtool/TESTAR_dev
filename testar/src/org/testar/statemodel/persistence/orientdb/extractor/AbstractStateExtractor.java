@@ -94,30 +94,21 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
         // load text input values
         PropertyValue textInputs = entity.getPropertyValue("textInputs");
-        Set<Map<String,String>> extractedTextInputs = new HashSet<>();
+        Set<String> extractedTextInputs = new HashSet<>();
         if (textInputs != null && textInputs.getValue() != null) {
 
             if (textInputs.getType() != OType.EMBEDDEDSET) {
-                throw new ExtractionException("Embedded set was expected for text input values. " + textInputs.getType().toString() + " was given.");
+                throw new ExtractionException("Set was expected type for text input values. " + textInputs.getType().toString() + " was given.");
             }
-
 
             if (!Set.class.isAssignableFrom(textInputs.getValue().getClass())) {
                 throw new ExtractionException("Set expected for value of textInputs");
             }
 
-            for (PropertyValue textInput : (Set<PropertyValue>)textInputs.getValue()) {
-                if (textInput.getType() != OType.EMBEDDEDMAP) {
-                    throw new ExtractionException("Embedded map was expected for text input value. " + textInput.getType().toString() + " was given.");
-                }
-                if ( ! Map.class.isAssignableFrom(textInput.getValue().getClass()) ) {
-                    throw new ExtractionException("Map expected for value of textInput");
-                }
-                extractedTextInputs.add((Map<String,String>)(textInput));
-            }
-
-            abstractState.setTextInputs(extractedTextInputs);
+            extractedTextInputs = (Set<String>)textInputs.getValue();
         }
+
+        abstractState.setTextInputs(extractedTextInputs);
 
         return abstractState;
     }

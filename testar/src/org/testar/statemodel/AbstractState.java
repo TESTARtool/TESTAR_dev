@@ -19,7 +19,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
     // Set of text inputs for the code analysis experiments
-    private Set<Map<String,String>> textInputs;
+    private Set<String> textInputs;
     // is this an initial state?
     private boolean isInitial = false;
 
@@ -171,26 +171,46 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param newValues the new inputs to merge
      */
     public void mergeTextInputs(Set<Map<String,String>> newInputs) {
-        for (Map<String,String> input : newInputs ) {
-            textInputs.add(input);
-        }
+        System.out.println("AS: merge text inputs of size" + newInputs.size());
+        textInputs.addAll(textInputToSetStringFormat(newInputs));
+        System.out.println("AS: text input size is now " + textInputs.size());
     }
 
     /**
      * This method returns a set of the current relevant text inputs for the code analysis experiment
      * stored in this action
-     * @return set of text inputs
+     * @return text inputs, in set of maps format
      */
     public Set<Map<String,String>> getTextInputs() {
-        return textInputs;
+       return(textInputToSetMapFormat(textInputs));
     }
 
     /**
      * This method sets the current relevant text inputs for the code analysis experiment
      * stored in this action
-     * @param textInputs set of text inputs
+     * @param textInputs text inputs, in set-of-string format
      */
-    public void setTextInputs(Set<Map<String,String>> textInputs) {
+    public void setTextInputs(Set<String> textInputs) {
         this.textInputs = textInputs;
+    }
+
+    private Set<Map<String,String>> textInputToSetMapFormat (Set<String> input) {
+        Set<Map<String,String>> result = new HashSet();
+        for ( String element: input) {
+            Map<String, String> innerMap = new HashMap<>();
+            int sepIndex = element.indexOf(":");
+            innerMap.put("type", element.substring(0,sepIndex));
+            innerMap.put("value", element.substring(sepIndex+1));
+            result.add(innerMap);
+        }
+        return result;
+    }
+
+    private Set<String> textInputToSetStringFormat ( Set<Map<String,String>> input ) {
+        Set<String> result = new HashSet();
+        for ( Map<String,String> map : input) {
+            result.add(map.get("type") + ":" + map.get("value"));
+        }
+        return result;
     }
 }

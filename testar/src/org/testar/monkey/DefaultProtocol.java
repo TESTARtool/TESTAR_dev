@@ -119,7 +119,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File currentSeq;
 
 	protected Mouse mouse = AWTMouse.build();
-	protected State lastState = null;
 	protected int nonReactingActionNumber;
 
 	protected ProcessListener processListener = new ProcessListener();
@@ -831,7 +830,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Executing the selected action:
 			executeAction(system, state, action);
-			lastExecutedAction = action;
 			actionCount++;
 
 			//Saving the actions and the executed action into replayable test sequence:

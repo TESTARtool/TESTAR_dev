@@ -45,6 +45,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.ConcreteState;
+import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -221,8 +222,16 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
             output.add(innerMap);
         }
 
+		AbstractState lastAbstractState = stateModelManager.getCurrentAbstractState();
 
-		stateModelManager.associateTextInputs(((ConcreteState)(this.lastState)).getAbstractState(), output);
+		if ( lastAbstractState == null ) {
+			logger.error("CKAN protocol could not get last abstract state from state model manager.");
+			logger.error("Unable to save text data in state model.");
+		}
+		else {
+			logger.info("CKAN protocol saved text data to abstract state.");
+			stateModelManager.associateTextInputs(lastAbstractState, output);
+		}
     }
 
     /**
@@ -246,10 +255,11 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 		AbstractState abstractState = stateModelManager.getCurrentAbstractState();
 		Set<Map<String,String>> textInputs = null;
 		if ( abstractState == null ) {
-				logger.info("Abstract state is null. Passing empty text input set to data manager.");
-				textInputs = new HashSet<Map<String,String>> ();
+			logger.info("Abstract state is null. Passing empty text input set to data manager.");
+			textInputs = new HashSet<Map<String,String>> ();
 		}
 		else {
+			logger.info("Retrieved text inputs for action derivation from state model.");
 		 	textInputs = stateModelManager.getTextInputs(abstractState);
 		}
         ((InterestingStringsDataManager)(dataManager)).loadInput(textInputs);
