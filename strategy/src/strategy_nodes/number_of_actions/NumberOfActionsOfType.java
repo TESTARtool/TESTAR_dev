@@ -25,7 +25,7 @@ public class NumberOfActionsOfType extends BaseIntegerNode
                 numberOfActions++;
         }
         
-        System.out.println("number of actions (" + actionType.toString() + ") : " + numberOfActions);
+//        System.out.println("number of actions (" + actionType.toString() + ") : " + numberOfActions);
         
         return numberOfActions;
     }

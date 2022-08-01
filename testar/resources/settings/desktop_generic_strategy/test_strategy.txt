@@ -13,8 +13,8 @@ ELSE
 */
 
 IF
-    number-of-actions-of-type click-action > 0
+    5 > 3
 THEN
-    random-action-of-type click-action
+    previous-action
 ELSE
-    random-action
+    random-least-executed-action

@@ -20,14 +20,19 @@ public class RandomLeastExecutedAction extends BaseActionNode
     }
     
     @Override
-    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if this works
+    public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
+        System.out.println("Map: " + actionsExecuted.toString());
+        
+        if(actions.size() == 1)
+            return new ArrayList<>(actions).get(0);
+        
         ArrayList filteredActions = new ArrayList();
         if(actions.size() > actionsExecuted.size()) // there are some unexecuted actions
         {
             for(Action action : actions)
             {
-                if(actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
+                if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
                     filteredActions.add(action);
             }
             return selectRandomAction(filteredActions);

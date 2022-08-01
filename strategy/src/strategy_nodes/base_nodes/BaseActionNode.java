@@ -23,15 +23,15 @@ public abstract class BaseActionNode extends BaseStrategyNode<Action>
     
     protected Action selectRandomAction(Set<Action> actions)
     {
-        long   graphTime = System.currentTimeMillis();
-        Random rnd       = new Random(graphTime);
+//        long   graphTime = System.currentTimeMillis();
+        Random rnd       = new Random();//graphTime);
         return new ArrayList<>(actions).get(rnd.nextInt(actions.size())); //return a random action
     }
     
     protected Action selectRandomAction(ArrayList<Action> actions)
     {
-        long   graphTime = System.currentTimeMillis();
-        Random rnd       = new Random(graphTime);
+//        long   graphTime = System.currentTimeMillis();
+        Random rnd       = new Random();//graphTime);
         return actions.get(rnd.nextInt(actions.size())); //return a random action
     }
 }

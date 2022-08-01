@@ -93,12 +93,13 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	@Override
 	protected Action selectAction(State state, Set<Action> actions)
 	{
-		Action selectedAction = parseStrategy.selectAction(state, actions);
+		Action selectedAction = parseStrategy.selectAction(state, actions, actionsExecuted);
 		
-		System.out.println(selectedAction.toString());
-		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
+//		System.out.println(selectedAction.toString());
+//		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
 		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
+		state.set(Tags.PreviousActionUsed, actionID);
 		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
 		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
 		
