@@ -1,5 +1,6 @@
 package org.fruit.monkey.orientdb;
 
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 
 import java.io.IOException;
@@ -13,6 +14,6 @@ public interface OrientDBService {
     void setDelegate(OrientDBServiceDelegate delegate);
 
 
-    void startLocalDatabase(String database, String username, String password) throws IOException;
+    void startLocalDatabase(String database, String username, String password) throws IOException, TestarServiceException;
 
 }

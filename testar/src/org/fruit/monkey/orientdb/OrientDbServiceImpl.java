@@ -4,6 +4,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
@@ -42,9 +43,12 @@ public class OrientDbServiceImpl implements OrientDBService {
     }
 
     @Override
-    public void startLocalDatabase(String database, String username, String password) throws IOException {
-        dockerPoolService.start("reporting");
+    public void startLocalDatabase(String database, String username, String password) throws IOException, TestarServiceException {
+        if (!dockerPoolService.isDockerAvailable()) {
+            throw new TestarServiceException(TestarServiceException.DOCKER_UNAVAILABLE);
+        }
 
+        dockerPoolService.start("reporting");
 
         if (delegate != null)
             delegate.onStateChanged(OrientDBServiceDelegate.State.BUILDING_IMAGE, "Building the orientdb database image");

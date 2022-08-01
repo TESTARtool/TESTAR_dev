@@ -1,5 +1,6 @@
 package org.fruit.monkey.mysql;
 
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ public interface MySqlService {
     MySqlServiceDelegate getDelegate();
     void setDelegate(MySqlServiceDelegate delegate);
 
-    void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException;
+    void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException, TestarServiceException;
 //    void stopLocalDatabase();
     void connectExternalDatabase(String hostname, String databaseName, String userName, String userPassword) throws ClassNotFoundException, SQLException;
 

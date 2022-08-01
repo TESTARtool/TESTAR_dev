@@ -5,6 +5,7 @@ import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
 import com.sun.jmx.snmp.daemon.CommunicationException;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
@@ -40,7 +41,11 @@ public class MySqlServiceImpl implements MySqlService {
         this.delegate = delegate;
     }
 
-    public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException {
+    public synchronized void startLocalDatabase(String databaseName, String userName, String userPassword) throws IOException, ClassNotFoundException, SQLException, TestarServiceException {
+        if (!dockerPoolService.isDockerAvailable()) {
+            throw new TestarServiceException(TestarServiceException.DOCKER_UNAVAILABLE);
+        }
+
         System.out.println("Creating MYSQL docker image");
         dockerPoolService.start("reporting");
 

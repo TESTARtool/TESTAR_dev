@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 import org.eclipse.jgit.lib.ProgressMonitor;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.sonarqube.SonarqubeService;
 import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
 import org.fruit.monkey.sonarqube.SonarqubeServiceImpl;
@@ -160,7 +161,7 @@ public class WhiteboxTestLauncher implements ProgressMonitor, SonarqubeServiceDe
 
             try {
                 sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
-            } catch (IOException e) {
+            } catch (IOException | TestarServiceException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Whitebox testing exception");
                 alert.setHeaderText("Project analysis failure");

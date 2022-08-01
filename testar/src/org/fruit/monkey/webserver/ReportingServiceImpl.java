@@ -6,6 +6,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.Main;
 import sun.net.www.http.HttpClient;
@@ -42,7 +43,11 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() throws IOException, TestarServiceException {
+        if (!dockerPoolService.isDockerAvailable()) {
+            throw new TestarServiceException(TestarServiceException.DOCKER_UNAVAILABLE);
+        }
+
         dockerPoolService.start("reporting");
         if (delegate != null) {
             delegate.onStateChanged(ReportingServiceDelegate.State.BUILDING_IMAGE, "Building report service image");

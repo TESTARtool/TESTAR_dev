@@ -12,6 +12,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.fruit.monkey.docker.DockerPoolServiceDelegate;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
@@ -50,7 +51,11 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     }
 
     @Override
-    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir) {
+    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir) throws TestarServiceException {
+        if (!dockerPoolService.isDockerAvailable()) {
+            throw new TestarServiceException(TestarServiceException.DOCKER_UNAVAILABLE);
+        }
+
         System.out.println("Analysing a project " + projectName);
         dockerPoolService.start(serviceId);
         boolean awaitingReport = false;

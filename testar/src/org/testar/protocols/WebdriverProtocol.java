@@ -59,6 +59,7 @@ import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 import nl.ou.testar.SequenceReport;
 import nl.ou.testar.TestReport;
 import org.apache.commons.lang3.ArrayUtils;
+import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceDelegate;
 import org.fruit.monkey.mysql.MySqlServiceImpl;
@@ -153,6 +154,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		Thread orientdbThread = null;
 
 		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
+			if (!Main.getReportingService().isDockerAvailable()) {
+				delegate.popupMessage(TestarServiceException.DOCKER_UNAVAILABLE);
+				return;
+			}
+
 			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();
@@ -182,6 +188,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						settings.set(ConfigTags.DataStoreServer, "orientdb");
 						orientService.startLocalDatabase(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword));
 					} catch (Exception e) {
+						delegate.popupMessage(e.getMessage());
 						System.err.println("Cannot initialize OrientDB");
 						e.printStackTrace();
 					}
@@ -235,6 +242,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						}
 					} catch (Exception e) {
 						System.err.println("Cannot initialize a database");
+						delegate.popupMessage(e.getMessage());
 						e.printStackTrace();
 					}
 				}
@@ -358,8 +366,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 					public void run() {
 						try {
 							reportingService.start();
-						} catch (IOException e) {
-							System.err.println("Cannot start web service: " + e.getMessage());
+						} catch (IOException | TestarServiceException e) {
+							delegate.popupMessage(e.getMessage());
 							e.printStackTrace();
 						}
 					}
