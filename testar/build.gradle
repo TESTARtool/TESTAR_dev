@@ -109,6 +109,7 @@ dependencies {
     implementation files('./lib/gson-2.8.5.jar')
     implementation jnativehook
     implementation 'com.google.guava:guava:26.0-jre'
+    implementation 'mysql:mysql-connector-java:5.1.+'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'
