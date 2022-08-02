@@ -37,6 +37,7 @@ import nl.ou.testar.ReinforcementLearning.Policies.Policy;
 import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
 import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import org.apache.commons.text.StringEscapeUtils;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
@@ -80,36 +81,29 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		customBuildAbstractIDCustom(state);
 	}
 
-//	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
-//		CodingManager.buildIDs(state, actions);
-//		for(Action a : actions) { a.set(Tags.AbstractIDCustom, ""); }
-//		// Custom the State AbstractIDCustom identifier
-//		customActionBuildAbstractIDCustom(actions);
-//	}
-//
-//	private synchronized void customActionBuildAbstractIDCustom(Set<Action> actions) {
-//		actions.stream().
-//				filter(action -> {
-//					try {
-//						action.get(Tags.OriginWidget).get(Tags.Path);
-//						return true;
-//					}
-//					catch (NoSuchTagException ex) {
-//						System.out.println("No origin widget found for action role: ");
-//						System.out.println(action.get(Tags.Role));
-//						System.out.println(action.get(Tags.Desc));
-//						return false;
-//					}
-//				}).
-//				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
-//				forEach(
-//						action -> {
-//							CodingManager.updateRoleCounter(action, roleCounter);
-//							action.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
-//									CodingManager.codify(getAbstractActionIdentifier(action, roleCounter)));
-//						}
-//				);
-//	}
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		// Custom the State AbstractIDCustom identifier
+		customActionBuildAbstractIDCustom(actions);
+	}
+
+	private synchronized void customActionBuildAbstractIDCustom(Set<Action> actions) {
+		for (Action a : actions) {
+			/* To create the AbstractIDCustom use:
+			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
+			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
+			 */
+			if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.CompoundAction) || a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.HitKey)) {
+				System.out.println(a.get(Tags.Desc));
+				System.out.println(a.get(Tags.Role, ActionRoles.Action));
+				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
+						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
+			} else {
+				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
+						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+			}
+		}
+	}
 
 	private synchronized void customBuildAbstractIDCustom(Widget widget){
 		if (widget.parent() != null) {
@@ -419,8 +413,14 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 			return new HashSet<>(Collections.singletonList(nop));
 		}
 
-		actions.add(ac.hitKey(KBKeys.VK_PAGE_DOWN));
-		actions.add(ac.hitKey(KBKeys.VK_PAGE_UP));
+		Action key_down = ac.hitKey(KBKeys.VK_PAGE_DOWN);
+		key_down.set(Tags.OriginWidget, state);
+		actions.add(key_down);
+
+
+		Action key_up = ac.hitKey(KBKeys.VK_PAGE_UP);
+		key_up.set(Tags.OriginWidget, state);
+		actions.add(key_up);
 		Action protocol = getProtocolAction(state);
 		if(protocol!=null)
 			actions.add(protocol);
