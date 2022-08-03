@@ -79,6 +79,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 dockerPoolService.startWithImage(serviceImageId, "sonarqube", hostConfig);
             }
             catch (Exception e) {
+                System.out.println("Cannot build Sonarqube image");
+                e.printStackTrace();
                 if (delegate != null) {
                     delegate.onError(SonarqubeServiceDelegate.ErrorCode.SERVICE_ERROR, e.getLocalizedMessage());
                 }

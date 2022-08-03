@@ -4,7 +4,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Volume;
-import com.sun.jmx.snmp.daemon.CommunicationException;
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.testar.monkey.ConfigTags;
@@ -98,7 +98,7 @@ public class MySqlServiceImpl implements MySqlService {
             try {
                 connection = DriverManager.getConnection(url);
             }
-            catch (CommunicationException e) {
+            catch (CommunicationsException e) {
                 System.out.println("Still not ready");
                 try {
                     Thread.sleep(2000);

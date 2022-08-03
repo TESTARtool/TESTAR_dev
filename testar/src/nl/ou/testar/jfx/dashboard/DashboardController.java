@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import nl.ou.testar.jfx.JfxProgressMonitor;
 import nl.ou.testar.jfx.WhiteboxTestLauncher;
 import nl.ou.testar.jfx.core.ViewController;
 import nl.ou.testar.jfx.thirdparty.DisplayShelf;
@@ -61,13 +62,14 @@ public class DashboardController extends ViewController {
     private void startWhiteboxTesting(Parent view) {
         final Stage stage = (Stage) view.getScene().getWindow();
 
-        final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher();
+        final JfxProgressMonitor progressMonitor = new JfxProgressMonitor();
+        final WhiteboxTestLauncher whiteboxTestLauncher = new WhiteboxTestLauncher(progressMonitor);
         try {
             whiteboxTestLauncher.setDashboardDelegate(delegate);
             whiteboxTestLauncher.start(stage, settings);
         }
         catch(IOException e) {
-            whiteboxTestLauncher.stop();
+            progressMonitor.stop();
             final Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot analyse code\n" + e.getMessage());
             alert.show();
 

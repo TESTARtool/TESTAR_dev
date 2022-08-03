@@ -37,6 +37,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
+import nl.ou.testar.jfx.JfxProgressMonitor;
 import nl.ou.testar.jfx.MainController;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
@@ -97,6 +98,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 	private static final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 	private static Thread mainThread;
+
+	private JfxProgressMonitor progressMonitor = new JfxProgressMonitor();
+	private boolean initialisationInProgress;
 
 	public static DockerPoolService getReportingService() {
 		return reportingDockerService;
@@ -182,6 +186,8 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.println("(9)");
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
+
+		initialisationInProgress = false;
 	}
 
 	@Override
@@ -907,6 +913,27 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
+	}
+
+	@Override
+	public void startProgress(Settings settings, String status) {
+		if (!initialisationInProgress) {
+			progressMonitor.start(primaryStage, settings);
+			progressMonitor.updateStage("Work in progress");
+			initialisationInProgress = true;
+		}
+		progressMonitor.beginTask(status, 0);
+	}
+
+	@Override
+	public void changeStatus(String status) {
+		progressMonitor.beginTask(status, 0);
+	}
+
+	@Override
+	public void endProgress() {
+		progressMonitor.stop();
+		initialisationInProgress = false;
 	}
 
 	/**

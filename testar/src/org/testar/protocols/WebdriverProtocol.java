@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -153,8 +154,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		Thread mysqlThread = null;
 		Thread orientdbThread = null;
 
+		delegate.startProgress(settings, "Initialising database(s)");
+
 		if(settings.get(ConfigTags.StateModelEnabled) && settings.get(ConfigTags.DataStoreType).equals("docker")) {
 			if (!Main.getReportingService().isDockerAvailable()) {
+				delegate.endProgress();
 				delegate.popupMessage(TestarServiceException.DOCKER_UNAVAILABLE);
 				return;
 			}
@@ -188,8 +192,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						settings.set(ConfigTags.DataStoreServer, "orientdb");
 						orientService.startLocalDatabase(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword));
 					} catch (Exception e) {
-						delegate.popupMessage(e.getMessage());
-						System.err.println("Cannot initialize OrientDB");
+						final String errorMessage = "Cannot initialize OrientDB";
+						delegate.endProgress();
+						delegate.popupMessage(errorMessage);
+						System.err.println(errorMessage);
 						e.printStackTrace();
 					}
 					System.out.println("OrientDB docker image finished.");
@@ -240,9 +246,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 							sqlService.connectExternalDatabase(settings.get(ConfigTags.SQLReportingServer),
 									databaseName, userName, userPassword);
 						}
-					} catch (Exception e) {
-						System.err.println("Cannot initialize a database");
-						delegate.popupMessage(e.getMessage());
+					} catch (ClassNotFoundException | IOException | SQLException | TestarServiceException e) {
+						final String errorMessage = "Cannot initialize a database";
+						delegate.endProgress();
+						delegate.popupMessage(errorMessage);
+						System.err.println(errorMessage);
 						e.printStackTrace();
 					}
 				}
@@ -268,7 +276,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			e.printStackTrace();
 		}
 
+		delegate.changeStatus("Preparing a model");
+
 		super.initialize(settings);
+
+		delegate.changeStatus("Starting a web driver");
 
 		// Initialize HTML Report (Dashboard)
 		if (sqlService != null) {
@@ -304,6 +316,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+
+		delegate.endProgress();
 	}
 
 	@Override
