@@ -31,6 +31,7 @@
 
 package org.testar.monkey;
 
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.EventHandler;
 import org.testar.IEventListener;
 import org.testar.monkey.alayer.devices.MouseButtons;
@@ -50,6 +51,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected boolean markParentWidget = false;
     protected boolean visualizationOn = false;
 
+    protected ProtocolDelegate delegate;
+
     public enum Modes{
         Spy,
         Record,
@@ -61,6 +64,14 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     protected Modes mode;
     private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+
+    public ProtocolDelegate getDelegate() {
+        return delegate;
+    }
+
+    public  void setDelegate(ProtocolDelegate delegate) {
+        this.delegate = delegate;
+    }
 
     public EventHandler initializeEventHandler() {
     	return new EventHandler(this);
@@ -90,7 +101,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        if (settings.get(ConfigTags.FlashFeedback)) {
+        if (settings.get(ConfigTags.FlashFeedback) && delegate != null) {
+            delegate.updateStage(modeNfo);
 //    	    FlashFeedback.flash(modeNfo, 1000);
         }
     }

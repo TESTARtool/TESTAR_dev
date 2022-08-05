@@ -52,7 +52,7 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
     }
 
     public void start(Stage stage, Settings settings) throws IOException {
-        progressMonitor.start(stage, settings);
+        progressMonitor.start(stage);
 
         // Clone GIT repository
 

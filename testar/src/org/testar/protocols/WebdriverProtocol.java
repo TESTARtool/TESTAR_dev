@@ -276,11 +276,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			e.printStackTrace();
 		}
 
-		delegate.changeStatus("Preparing a model");
+		delegate.updateStatus("Building a model", 0);
 
 		super.initialize(settings);
 
-		delegate.changeStatus("Starting a web driver");
+		delegate.updateStatus("Starting a web driver", 0);
 
 		// Initialize HTML Report (Dashboard)
 		if (sqlService != null) {
@@ -317,11 +317,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 
-		delegate.endProgress();
+		delegate.updateStage("Testing");
+		delegate.updateStatus("", 0);
 	}
 
 	@Override
 	protected void onTestEndEvent() {
+		delegate.updateStatus("Preparing a report", 0);
 		this.testReport.saveReport(
 				this.settings().get(ConfigTags.SequenceLength),
 				this.settings().get(ConfigTags.Sequences),
@@ -397,6 +399,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				e.printStackTrace();
 			}
 		}
+		delegate.endProgress();
 	}
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -686,7 +689,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         // adding the action that is going to be executed into HTML report:
         sequenceReport.addSelectedAction(state, action);
         testReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
+        boolean result = super.executeAction(system, state, action);
+        System.out.println("Executed action: " + action.toShortString());
+        return result;
     }
 
     /**
@@ -696,7 +701,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
         // adding the action that is going to be executed into HTML report:
 		sequenceReport.addSelectedAction(state, action);
-        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
+        boolean result = super.replayAction(system, state, action, actionWaitTime, actionDuration);
+        System.out.println("Replayed action: " + action.toShortString());
+        return result;
     }
 
     /**

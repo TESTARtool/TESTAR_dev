@@ -32,6 +32,7 @@ package org.testar.monkey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.SystemProcessHandling;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -51,6 +52,16 @@ public class WindowsCommandLineSutConnector implements SutConnector {
     private boolean tryToKillIfRunning = true; //set to false after 1st re-try
     private boolean flashFeedback;
     private static final Logger logger = LogManager.getLogger();
+
+    private ProtocolDelegate protocolDelegate;
+
+    public ProtocolDelegate getProtocolDelegate() {
+        return protocolDelegate;
+    }
+
+    public void setProtocolDelegate(ProtocolDelegate protocolDelegate) {
+        this.protocolDelegate = protocolDelegate;
+    }
 
     public WindowsCommandLineSutConnector(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
         this.SUTConnectorValue = SUTConnectorValue;
@@ -72,9 +83,8 @@ public class WindowsCommandLineSutConnector implements SutConnector {
         //Refresh the flash information, to avoid that SUT hide the information
         if (flashFeedback) {
             int countTimeFlash = 0;
-            while(countTimeFlash<timeFlash && !sut.isRunning()) {
-//                FlashFeedback.flash(printSutInfo, 2000);
-                countTimeFlash += 2000;
+            while(countTimeFlash<timeFlash && !sut.isRunning() && protocolDelegate != null) {
+                protocolDelegate.updateStatus(printSutInfo, 1000);
             }
         }
 
@@ -86,7 +96,9 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 //Print info to the user to know that TESTAR is READY for its use :-)
                 if (flashFeedback) {
                     printSutInfo = "SUT is READY";
-//                    FlashFeedback.flash(printSutInfo,2000);
+                    if (protocolDelegate != null) {
+                        protocolDelegate.updateStatus(printSutInfo, 1000);
+                    }
                 }
                 logger.trace("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
                 state = builder.apply(sut);
@@ -106,7 +118,9 @@ public class WindowsCommandLineSutConnector implements SutConnector {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
                 if (flashFeedback) {
                     printSutInfo = "Waiting for the SUT to be accessible ...";
-//                    FlashFeedback.flash(printSutInfo, 500);
+                    if (protocolDelegate != null) {
+                        protocolDelegate.updateStatus(printSutInfo, 1000);
+                    }
                 }
             }
             Util.pauseMs(500);

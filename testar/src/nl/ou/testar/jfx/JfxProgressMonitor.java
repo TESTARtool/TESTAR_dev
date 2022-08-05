@@ -1,16 +1,19 @@
 package nl.ou.testar.jfx;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.eclipse.jgit.lib.ProgressMonitor;
-import org.testar.monkey.Settings;
 import org.testar.settingsdialog.codeanalysis.RepositoryLanguage;
 
 import java.io.IOException;
@@ -31,8 +34,23 @@ public class JfxProgressMonitor implements ProgressMonitor {
     private Long currentProgress;
     private Long totalProgress;
 
+    private final static int SMALL_VIEW_WIDTH = 512;
+    private final static int SMALL_VIEW_HEIGHT = 24;
     private final static int HEADER_HEIGHT = 56;
     private final static int ITEM_HEIGHT = 44;
+
+    public enum ViewType { STATIC_ANALYSIS, WEB_TEST };
+
+    private ViewType viewType;
+
+    private PauseTransition timeoutTransition;
+
+    public JfxProgressMonitor() {
+        timeoutTransition = new PauseTransition();
+        timeoutTransition.setOnFinished( e -> {
+            statusLabel.setText("");
+        });
+    }
 
     @Override
     public void start(int totalTasks) {
@@ -81,13 +99,20 @@ public class JfxProgressMonitor implements ProgressMonitor {
         return false;
     }
 
-    public void start(Stage stage, Settings settings) {
+    public void start(Stage stage) {
+        start(stage, ViewType.STATIC_ANALYSIS);
+    }
+
+    public void start(Stage stage, ViewType viewType) {
+
+        this.viewType = viewType;
+
         Platform.runLater(() -> {
             parentStage = stage;
             parentStage.hide();
             whiteboxStage = new Stage(StageStyle.UNDECORATED);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/progress.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(viewType == ViewType.WEB_TEST ? "jfx/progress_small.fxml" : "jfx/progress.fxml"));
             try {
                 view = loader.load();
             }
@@ -98,9 +123,20 @@ public class JfxProgressMonitor implements ProgressMonitor {
             stageLabel = (Label) view.lookup("#procStage");
             statusLabel = (Label) view.lookup("#procStatus");
             progressBar = (ProgressBar) view.lookup("#procProgressBar");
-            contentBox = (VBox) view.lookup("#contentBox");
+            if (this.viewType == ViewType.STATIC_ANALYSIS) {
+                contentBox = (VBox) view.lookup("#contentBox");
+            }
 
             whiteboxStage.setScene(new Scene(view));
+
+            if (this.viewType == ViewType.WEB_TEST) {
+                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                whiteboxStage.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - SMALL_VIEW_WIDTH);
+                whiteboxStage.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - SMALL_VIEW_HEIGHT);
+                whiteboxStage.setWidth(SMALL_VIEW_WIDTH);
+                whiteboxStage.setHeight(SMALL_VIEW_HEIGHT);
+            }
+
             whiteboxStage.show();
         });
     }
@@ -123,7 +159,22 @@ public class JfxProgressMonitor implements ProgressMonitor {
         });
     }
 
+    public void updateStatus(String status, int timeout) {
+        Platform.runLater(() -> {
+            timeoutTransition.stop();
+            statusLabel.setText(status);
+            if (timeout > 0) {
+                timeoutTransition.setDuration(Duration.millis(timeout));
+                timeoutTransition.play();
+            }
+        });
+    }
+
     public void displayLanguages(List<RepositoryLanguage> languages) {
+        if (viewType != ViewType.STATIC_ANALYSIS) {
+            System.err.println("Cannot display languages info: wrong progress monitor mode");
+            return;
+        }
         Platform.runLater(() -> {
             try {
                 FXMLLoader headerLoader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/lang_header.fxml"));

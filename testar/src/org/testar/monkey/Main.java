@@ -918,16 +918,21 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	@Override
 	public void startProgress(Settings settings, String status) {
 		if (!initialisationInProgress) {
-			progressMonitor.start(primaryStage, settings);
-			progressMonitor.updateStage("Work in progress");
+			progressMonitor.start(primaryStage, JfxProgressMonitor.ViewType.WEB_TEST);
+			progressMonitor.updateStage("Preparing to test");
 			initialisationInProgress = true;
 		}
 		progressMonitor.beginTask(status, 0);
 	}
 
 	@Override
-	public void changeStatus(String status) {
-		progressMonitor.beginTask(status, 0);
+	public void updateStage(String stage) {
+		progressMonitor.updateStage(stage);
+	}
+
+	@Override
+	public void updateStatus(String status, int timeout) {
+		progressMonitor.updateStatus(status, timeout);
 	}
 
 	@Override
