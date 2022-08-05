@@ -24,6 +24,6 @@ public class OrOprNode extends BaseBooleanNode
     @Override
     public String toString()
     {
-        return left.toString() + " OR " + right.toString();
+        return "(" + left.toString() + " OR " + right.toString() + ")";
     }
 }

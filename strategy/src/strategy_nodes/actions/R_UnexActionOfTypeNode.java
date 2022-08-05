@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class RandomUnexecutedActionOtherThan extends BaseActionNode
+public class R_UnexActionOfTypeNode extends BaseActionNode
 {
     private ActionType actionType;
     
-    public RandomUnexecutedActionOtherThan(int weight, ActionType actionType)
+    public R_UnexActionOfTypeNode(int weight, String name, ActionType actionType)
     {
-        this.name = "random-unexecuted-action-other-than";
+        this.name = name;
         this.WEIGHT = weight;
         this.actionType = actionType;
     }
@@ -34,7 +34,7 @@ public class RandomUnexecutedActionOtherThan extends BaseActionNode
         {
             for(Action action : actions)
             {
-                if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)) && !ActionType.RoleMatchesType(action, actionType))
+                if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)) && ActionType.RoleMatchesType(action, actionType))
                     filteredActions.add(action);
             }
         }

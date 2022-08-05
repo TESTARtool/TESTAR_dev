@@ -20,7 +20,6 @@ public class SutTypeIsNode extends BaseBooleanNode
     @Override
     public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-//        state.get(Tag.)
         return null; //todo
     }
     

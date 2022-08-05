@@ -7,9 +7,14 @@ import strategy_nodes.base_nodes.BaseIntegerNode;
 import java.util.Map;
 import java.util.Set;
 
-public class TotalNumberOfActions extends BaseIntegerNode
+public class Total_N_ActionsNode extends BaseIntegerNode
 {
-    private String name = "total-number-of-actions";
+    private String name;
+    
+    public Total_N_ActionsNode(String name)
+    {
+        this.name = name;
+    }
     
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)

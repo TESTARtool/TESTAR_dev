@@ -23,6 +23,6 @@ public class AndOprNode extends BaseBooleanNode
     @Override
     public String toString()
     {
-        return left.toString() + " AND " + right.toString();
+        return "(" + left.toString() + " AND " + right.toString() + ")";
     }
 }

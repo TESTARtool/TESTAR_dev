@@ -17,10 +17,12 @@ public class StrategyParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, NUM_ACTIONS=4, COMPOUND_NUM_ACTIONS=5, ACTION=6, 
-		COMPOUND_ACTION=7, ACTION_TYPE=8, SUT_TYPE=9, NOT=10, AND=11, XOR=12, 
-		OR=13, GT=14, GE=15, LT=16, LE=17, EQ=18, NE=19, IF=20, THEN=21, ELSE=22, 
-		NUMBER=23, BOOLEAN=24, LP=25, RP=26, COMMENT=27, WHITESPACE=28, ANY=29;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
+		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, ACTION_TYPE=23, SUT_TYPE=24, 
+		NOT=25, AND=26, XOR=27, OR=28, GT=29, GE=30, LT=31, LE=32, EQ=33, NE=34, 
+		IF=35, THEN=36, ELSE=37, NUMBER=38, BOOLEAN=39, LP=40, RP=41, COMMENT=42, 
+		WHITESPACE=43, ANY=44;
 	public static final int
 		RULE_strategy_file = 0, RULE_strategy = 1, RULE_bool_expr = 2, RULE_state_boolean = 3, 
 		RULE_number_expr = 4, RULE_number_of_actions = 5, RULE_action_expr = 6, 
@@ -36,17 +38,24 @@ public class StrategyParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'available-actions-of-type'", "'sut-type-is'", "'state-changed'", 
-			null, null, null, null, null, null, null, null, null, null, "'>'", "'>='", 
-			"'<'", "'<='", null, "'!='", null, null, null, null, null, "'('", "')'"
+			"'total-n-actions'", "'total-n-unexecuted-actions'", "'total-n-previous-executed-actions'", 
+			"'n-previous-executed-actions-of-type'", "'n-actions-of-type'", "'n-of-unexecuted-actions-of-type'", 
+			"'random-action'", "'previous-action'", "'r-unexecuted-action'", "'r-least-executed-action'", 
+			"'r-most-executed-action'", "'r-action-of-type'", "'r-unexecuted-action-of-type'", 
+			"'r-action-not-of-type'", "'r-unexecuted-action-not-of-type'", "'select-sibling-action'", 
+			"'select-child-action'", "'select-child-or-sibling-action'", "'select-sibling-or-child-action'", 
+			null, null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, 
+			"'!='", null, null, null, null, null, "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, "NUM_ACTIONS", "COMPOUND_NUM_ACTIONS", "ACTION", 
-			"COMPOUND_ACTION", "ACTION_TYPE", "SUT_TYPE", "NOT", "AND", "XOR", "OR", 
-			"GT", "GE", "LT", "LE", "EQ", "NE", "IF", "THEN", "ELSE", "NUMBER", "BOOLEAN", 
-			"LP", "RP", "COMMENT", "WHITESPACE", "ANY"
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, "ACTION_TYPE", 
+			"SUT_TYPE", "NOT", "AND", "XOR", "OR", "GT", "GE", "LT", "LE", "EQ", 
+			"NE", "IF", "THEN", "ELSE", "NUMBER", "BOOLEAN", "LP", "RP", "COMMENT", 
+			"WHITESPACE", "ANY"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -1053,8 +1062,12 @@ public class StrategyParser extends Parser {
 			setState(143);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case NUM_ACTIONS:
-			case COMPOUND_NUM_ACTIONS:
+			case T__3:
+			case T__4:
+			case T__5:
+			case T__6:
+			case T__7:
+			case T__8:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(141);
@@ -1084,24 +1097,112 @@ public class StrategyParser extends Parser {
 	}
 
 	public static class Number_of_actionsContext extends ParserRuleContext {
-		public TerminalNode NUM_ACTIONS() { return getToken(StrategyParser.NUM_ACTIONS, 0); }
-		public TerminalNode COMPOUND_NUM_ACTIONS() { return getToken(StrategyParser.COMPOUND_NUM_ACTIONS, 0); }
-		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public Number_of_actionsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_number_of_actions; }
+	 
+		public Number_of_actionsContext() { }
+		public void copyFrom(Number_of_actionsContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class TnUnexActionsContext extends Number_of_actionsContext {
+		public TnUnexActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNumber_of_actions(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTnUnexActions(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNumber_of_actions(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTnUnexActions(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNumber_of_actions(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnUnexActions(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class NActionsOfTypeContext extends Number_of_actionsContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public NActionsOfTypeContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNActionsOfType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNActionsOfType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNActionsOfType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class NUnexActionsOfTypeContext extends Number_of_actionsContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public NUnexActionsOfTypeContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNUnexActionsOfType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNUnexActionsOfType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNUnexActionsOfType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class TnPrevUnexActionsContext extends Number_of_actionsContext {
+		public TnPrevUnexActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTnPrevUnexActions(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTnPrevUnexActions(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnPrevUnexActions(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class TnActionsContext extends Number_of_actionsContext {
+		public TnActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTnActions(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTnActions(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnActions(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class NPrevExecActionsContext extends Number_of_actionsContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public NPrevExecActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNPrevExecActions(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNPrevExecActions(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNPrevExecActions(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1110,22 +1211,60 @@ public class StrategyParser extends Parser {
 		Number_of_actionsContext _localctx = new Number_of_actionsContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_number_of_actions);
 		try {
-			setState(148);
+			setState(154);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case NUM_ACTIONS:
+			case T__3:
+				_localctx = new TnActionsContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(145);
-				match(NUM_ACTIONS);
+				match(T__3);
 				}
 				break;
-			case COMPOUND_NUM_ACTIONS:
+			case T__4:
+				_localctx = new TnUnexActionsContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(146);
-				match(COMPOUND_NUM_ACTIONS);
+				match(T__4);
+				}
+				break;
+			case T__5:
+				_localctx = new TnPrevUnexActionsContext(_localctx);
+				enterOuterAlt(_localctx, 3);
+				{
 				setState(147);
+				match(T__5);
+				}
+				break;
+			case T__6:
+				_localctx = new NPrevExecActionsContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(148);
+				match(T__6);
+				setState(149);
+				match(ACTION_TYPE);
+				}
+				break;
+			case T__7:
+				_localctx = new NActionsOfTypeContext(_localctx);
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(150);
+				match(T__7);
+				setState(151);
+				match(ACTION_TYPE);
+				}
+				break;
+			case T__8:
+				_localctx = new NUnexActionsOfTypeContext(_localctx);
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(152);
+				match(T__8);
+				setState(153);
 				match(ACTION_TYPE);
 				}
 				break;
@@ -1178,35 +1317,46 @@ public class StrategyParser extends Parser {
 		enterRule(_localctx, 12, RULE_action_expr);
 		int _la;
 		try {
-			setState(156);
+			setState(162);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case IF:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(150);
+				setState(156);
 				strategy();
 				}
 				break;
-			case ACTION:
-			case COMPOUND_ACTION:
+			case T__9:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
+			case T__19:
+			case T__20:
+			case T__21:
 			case NUMBER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(152); 
+				setState(158); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(151);
+					setState(157);
 					action();
 					}
 					}
-					setState(154); 
+					setState(160); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << ACTION) | (1L << COMPOUND_ACTION) | (1L << NUMBER))) != 0) );
+				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << NUMBER))) != 0) );
 				}
 				break;
 			default:
@@ -1225,25 +1375,221 @@ public class StrategyParser extends Parser {
 	}
 
 	public static class ActionContext extends ParserRuleContext {
-		public TerminalNode ACTION() { return getToken(StrategyParser.ACTION, 0); }
-		public TerminalNode COMPOUND_ACTION() { return getToken(StrategyParser.COMPOUND_ACTION, 0); }
-		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
-		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
 		public ActionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_action; }
+	 
+		public ActionContext() { }
+		public void copyFrom(ActionContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class RActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RActionContext(ActionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterAction(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRAction(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitAction(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRAction(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitAction(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RActionNotTypeContext extends ActionContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RActionNotTypeContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRActionNotType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRActionNotType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRActionNotType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RActionOfTypeContext extends ActionContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RActionOfTypeContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRActionOfType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRActionOfType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRActionOfType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RLeastExActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RLeastExActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRLeastExAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRLeastExAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRLeastExAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class SChildOrSiblingActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public SChildOrSiblingActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterSChildOrSiblingAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitSChildOrSiblingAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitSChildOrSiblingAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RUnexActionOfTypeContext extends ActionContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RUnexActionOfTypeContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRUnexActionOfType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRUnexActionOfType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRUnexActionOfType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RUnexActionNotTypeContext extends ActionContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RUnexActionNotTypeContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRUnexActionNotType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRUnexActionNotType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRUnexActionNotType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class PrevActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public PrevActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterPrevAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitPrevAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitPrevAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RUnexActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RUnexActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRUnexAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRUnexAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRUnexAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class RMostExActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public RMostExActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterRMostExAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitRMostExAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitRMostExAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class SChildActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public SChildActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterSChildAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitSChildAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitSChildAction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class SSiblingActionContext extends ActionContext {
+		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
+		public SSiblingActionContext(ActionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterSSiblingAction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitSSiblingAction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitSSiblingAction(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1253,38 +1599,251 @@ public class StrategyParser extends Parser {
 		enterRule(_localctx, 14, RULE_action);
 		int _la;
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(159);
+			setState(220);
 			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==NUMBER) {
+			switch ( getInterpreter().adaptivePredict(_input,21,_ctx) ) {
+			case 1:
+				_localctx = new RActionContext(_localctx);
+				enterOuterAlt(_localctx, 1);
 				{
-				setState(158);
-				match(NUMBER);
+				setState(165);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(164);
+					match(NUMBER);
+					}
 				}
-			}
 
-			setState(164);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case ACTION:
-				{
-				setState(161);
-				match(ACTION);
+				setState(167);
+				match(T__9);
 				}
 				break;
-			case COMPOUND_ACTION:
+			case 2:
+				_localctx = new PrevActionContext(_localctx);
+				enterOuterAlt(_localctx, 2);
 				{
-				setState(162);
-				match(COMPOUND_ACTION);
-				setState(163);
+				setState(169);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(168);
+					match(NUMBER);
+					}
+				}
+
+				setState(171);
+				match(T__10);
+				}
+				break;
+			case 3:
+				_localctx = new RUnexActionContext(_localctx);
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(173);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(172);
+					match(NUMBER);
+					}
+				}
+
+				setState(175);
+				match(T__11);
+				}
+				break;
+			case 4:
+				_localctx = new RLeastExActionContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(177);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(176);
+					match(NUMBER);
+					}
+				}
+
+				setState(179);
+				match(T__12);
+				}
+				break;
+			case 5:
+				_localctx = new RMostExActionContext(_localctx);
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(181);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(180);
+					match(NUMBER);
+					}
+				}
+
+				setState(183);
+				match(T__13);
+				}
+				break;
+			case 6:
+				_localctx = new RActionOfTypeContext(_localctx);
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(185);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(184);
+					match(NUMBER);
+					}
+				}
+
+				setState(187);
+				match(T__14);
+				setState(188);
 				match(ACTION_TYPE);
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
-			}
+			case 7:
+				_localctx = new RUnexActionOfTypeContext(_localctx);
+				enterOuterAlt(_localctx, 7);
+				{
+				setState(190);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(189);
+					match(NUMBER);
+					}
+				}
+
+				setState(192);
+				match(T__15);
+				setState(193);
+				match(ACTION_TYPE);
+				}
+				break;
+			case 8:
+				_localctx = new RActionNotTypeContext(_localctx);
+				enterOuterAlt(_localctx, 8);
+				{
+				setState(195);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(194);
+					match(NUMBER);
+					}
+				}
+
+				setState(197);
+				match(T__16);
+				setState(198);
+				match(ACTION_TYPE);
+				}
+				break;
+			case 9:
+				_localctx = new RUnexActionNotTypeContext(_localctx);
+				enterOuterAlt(_localctx, 9);
+				{
+				setState(200);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(199);
+					match(NUMBER);
+					}
+				}
+
+				setState(202);
+				match(T__17);
+				setState(203);
+				match(ACTION_TYPE);
+				}
+				break;
+			case 10:
+				_localctx = new SSiblingActionContext(_localctx);
+				enterOuterAlt(_localctx, 10);
+				{
+				setState(205);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(204);
+					match(NUMBER);
+					}
+				}
+
+				setState(207);
+				match(T__18);
+				}
+				break;
+			case 11:
+				_localctx = new SChildActionContext(_localctx);
+				enterOuterAlt(_localctx, 11);
+				{
+				setState(209);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(208);
+					match(NUMBER);
+					}
+				}
+
+				setState(211);
+				match(T__19);
+				}
+				break;
+			case 12:
+				_localctx = new SChildOrSiblingActionContext(_localctx);
+				enterOuterAlt(_localctx, 12);
+				{
+				setState(213);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(212);
+					match(NUMBER);
+					}
+				}
+
+				setState(215);
+				match(T__20);
+				}
+				break;
+			case 13:
+				_localctx = new SChildOrSiblingActionContext(_localctx);
+				enterOuterAlt(_localctx, 13);
+				{
+				setState(217);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(216);
+					match(NUMBER);
+					}
+				}
+
+				setState(219);
+				match(T__21);
+				}
+				break;
 			}
 		}
 		catch (RecognitionException re) {
@@ -1318,56 +1877,84 @@ public class StrategyParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\37\u00a9\4\2\t\2"+
-		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3.\u00e1\4\2\t\2\4"+
+		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3"+
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
 		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
 		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
 		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4y\n\4\3\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\7\4\u0084\n\4\f\4\16\4\u0087\13\4\3\5\3\5\3\5\3\5"+
-		"\3\5\5\5\u008e\n\5\3\6\3\6\5\6\u0092\n\6\3\7\3\7\3\7\5\7\u0097\n\7\3\b"+
-		"\3\b\6\b\u009b\n\b\r\b\16\b\u009c\5\b\u009f\n\b\3\t\5\t\u00a2\n\t\3\t"+
-		"\3\t\3\t\5\t\u00a7\n\t\3\t\2\3\6\n\2\4\6\b\n\f\16\20\2\2\2\u00be\2\22"+
-		"\3\2\2\2\4\25\3\2\2\2\6x\3\2\2\2\b\u008d\3\2\2\2\n\u0091\3\2\2\2\f\u0096"+
-		"\3\2\2\2\16\u009e\3\2\2\2\20\u00a1\3\2\2\2\22\23\5\4\3\2\23\24\7\2\2\3"+
-		"\24\3\3\2\2\2\25\26\7\26\2\2\26\27\5\6\4\2\27\30\7\27\2\2\30\31\5\16\b"+
-		"\2\31\32\7\30\2\2\32\33\5\16\b\2\33\5\3\2\2\2\34\35\b\4\1\2\35\36\7\f"+
-		"\2\2\36y\5\6\4\31\37 \7\33\2\2 !\7\f\2\2!\"\5\6\4\2\"#\7\34\2\2#y\3\2"+
-		"\2\2$%\7\33\2\2%&\5\6\4\2&\'\7\r\2\2\'(\5\6\4\2()\7\34\2\2)y\3\2\2\2*"+
-		"+\7\33\2\2+,\5\6\4\2,-\7\16\2\2-.\5\6\4\2./\7\34\2\2/y\3\2\2\2\60\61\7"+
-		"\33\2\2\61\62\5\6\4\2\62\63\7\17\2\2\63\64\5\6\4\2\64\65\7\34\2\2\65y"+
-		"\3\2\2\2\66\67\5\n\6\2\678\7\20\2\289\5\n\6\29y\3\2\2\2:;\7\33\2\2;<\5"+
-		"\n\6\2<=\7\20\2\2=>\5\n\6\2>?\7\34\2\2?y\3\2\2\2@A\5\n\6\2AB\7\21\2\2"+
-		"BC\5\n\6\2Cy\3\2\2\2DE\7\33\2\2EF\5\n\6\2FG\7\21\2\2GH\5\n\6\2HI\7\34"+
-		"\2\2Iy\3\2\2\2JK\5\n\6\2KL\7\22\2\2LM\5\n\6\2My\3\2\2\2NO\7\33\2\2OP\5"+
-		"\n\6\2PQ\7\22\2\2QR\5\n\6\2RS\7\34\2\2Sy\3\2\2\2TU\5\n\6\2UV\7\23\2\2"+
-		"VW\5\n\6\2Wy\3\2\2\2XY\7\33\2\2YZ\5\n\6\2Z[\7\23\2\2[\\\5\n\6\2\\]\7\34"+
-		"\2\2]y\3\2\2\2^_\5\n\6\2_`\7\24\2\2`a\5\n\6\2ay\3\2\2\2bc\7\33\2\2cd\5"+
-		"\n\6\2de\7\24\2\2ef\5\n\6\2fg\7\34\2\2gy\3\2\2\2hi\5\n\6\2ij\7\25\2\2"+
-		"jk\5\n\6\2ky\3\2\2\2lm\7\33\2\2mn\5\n\6\2no\7\25\2\2op\5\n\6\2pq\7\34"+
-		"\2\2qy\3\2\2\2ry\5\b\5\2st\7\33\2\2tu\5\b\5\2uv\7\34\2\2vy\3\2\2\2wy\7"+
-		"\32\2\2x\34\3\2\2\2x\37\3\2\2\2x$\3\2\2\2x*\3\2\2\2x\60\3\2\2\2x\66\3"+
-		"\2\2\2x:\3\2\2\2x@\3\2\2\2xD\3\2\2\2xJ\3\2\2\2xN\3\2\2\2xT\3\2\2\2xX\3"+
-		"\2\2\2x^\3\2\2\2xb\3\2\2\2xh\3\2\2\2xl\3\2\2\2xr\3\2\2\2xs\3\2\2\2xw\3"+
-		"\2\2\2y\u0085\3\2\2\2z{\f\27\2\2{|\7\r\2\2|\u0084\5\6\4\30}~\f\25\2\2"+
-		"~\177\7\16\2\2\177\u0084\5\6\4\26\u0080\u0081\f\23\2\2\u0081\u0082\7\17"+
-		"\2\2\u0082\u0084\5\6\4\24\u0083z\3\2\2\2\u0083}\3\2\2\2\u0083\u0080\3"+
-		"\2\2\2\u0084\u0087\3\2\2\2\u0085\u0083\3\2\2\2\u0085\u0086\3\2\2\2\u0086"+
-		"\7\3\2\2\2\u0087\u0085\3\2\2\2\u0088\u0089\7\3\2\2\u0089\u008e\7\n\2\2"+
-		"\u008a\u008b\7\4\2\2\u008b\u008e\7\13\2\2\u008c\u008e\7\5\2\2\u008d\u0088"+
-		"\3\2\2\2\u008d\u008a\3\2\2\2\u008d\u008c\3\2\2\2\u008e\t\3\2\2\2\u008f"+
-		"\u0092\5\f\7\2\u0090\u0092\7\31\2\2\u0091\u008f\3\2\2\2\u0091\u0090\3"+
-		"\2\2\2\u0092\13\3\2\2\2\u0093\u0097\7\6\2\2\u0094\u0095\7\7\2\2\u0095"+
-		"\u0097\7\n\2\2\u0096\u0093\3\2\2\2\u0096\u0094\3\2\2\2\u0097\r\3\2\2\2"+
-		"\u0098\u009f\5\4\3\2\u0099\u009b\5\20\t\2\u009a\u0099\3\2\2\2\u009b\u009c"+
-		"\3\2\2\2\u009c\u009a\3\2\2\2\u009c\u009d\3\2\2\2\u009d\u009f\3\2\2\2\u009e"+
-		"\u0098\3\2\2\2\u009e\u009a\3\2\2\2\u009f\17\3\2\2\2\u00a0\u00a2\7\31\2"+
-		"\2\u00a1\u00a0\3\2\2\2\u00a1\u00a2\3\2\2\2\u00a2\u00a6\3\2\2\2\u00a3\u00a7"+
-		"\7\b\2\2\u00a4\u00a5\7\t\2\2\u00a5\u00a7\7\n\2\2\u00a6\u00a3\3\2\2\2\u00a6"+
-		"\u00a4\3\2\2\2\u00a7\21\3\2\2\2\fx\u0083\u0085\u008d\u0091\u0096\u009c"+
-		"\u009e\u00a1\u00a6";
+		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
+		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4y\n\4\3\4\3\4\3\4\3\4\3"+
+		"\4\3\4\3\4\3\4\3\4\7\4\u0084\n\4\f\4\16\4\u0087\13\4\3\5\3\5\3\5\3\5\3"+
+		"\5\5\5\u008e\n\5\3\6\3\6\5\6\u0092\n\6\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7"+
+		"\3\7\5\7\u009d\n\7\3\b\3\b\6\b\u00a1\n\b\r\b\16\b\u00a2\5\b\u00a5\n\b"+
+		"\3\t\5\t\u00a8\n\t\3\t\3\t\5\t\u00ac\n\t\3\t\3\t\5\t\u00b0\n\t\3\t\3\t"+
+		"\5\t\u00b4\n\t\3\t\3\t\5\t\u00b8\n\t\3\t\3\t\5\t\u00bc\n\t\3\t\3\t\3\t"+
+		"\5\t\u00c1\n\t\3\t\3\t\3\t\5\t\u00c6\n\t\3\t\3\t\3\t\5\t\u00cb\n\t\3\t"+
+		"\3\t\3\t\5\t\u00d0\n\t\3\t\3\t\5\t\u00d4\n\t\3\t\3\t\5\t\u00d8\n\t\3\t"+
+		"\3\t\5\t\u00dc\n\t\3\t\5\t\u00df\n\t\3\t\2\3\6\n\2\4\6\b\n\f\16\20\2\2"+
+		"\2\u0111\2\22\3\2\2\2\4\25\3\2\2\2\6x\3\2\2\2\b\u008d\3\2\2\2\n\u0091"+
+		"\3\2\2\2\f\u009c\3\2\2\2\16\u00a4\3\2\2\2\20\u00de\3\2\2\2\22\23\5\4\3"+
+		"\2\23\24\7\2\2\3\24\3\3\2\2\2\25\26\7%\2\2\26\27\5\6\4\2\27\30\7&\2\2"+
+		"\30\31\5\16\b\2\31\32\7\'\2\2\32\33\5\16\b\2\33\5\3\2\2\2\34\35\b\4\1"+
+		"\2\35\36\7\33\2\2\36y\5\6\4\31\37 \7*\2\2 !\7\33\2\2!\"\5\6\4\2\"#\7+"+
+		"\2\2#y\3\2\2\2$%\7*\2\2%&\5\6\4\2&\'\7\34\2\2\'(\5\6\4\2()\7+\2\2)y\3"+
+		"\2\2\2*+\7*\2\2+,\5\6\4\2,-\7\35\2\2-.\5\6\4\2./\7+\2\2/y\3\2\2\2\60\61"+
+		"\7*\2\2\61\62\5\6\4\2\62\63\7\36\2\2\63\64\5\6\4\2\64\65\7+\2\2\65y\3"+
+		"\2\2\2\66\67\5\n\6\2\678\7\37\2\289\5\n\6\29y\3\2\2\2:;\7*\2\2;<\5\n\6"+
+		"\2<=\7\37\2\2=>\5\n\6\2>?\7+\2\2?y\3\2\2\2@A\5\n\6\2AB\7 \2\2BC\5\n\6"+
+		"\2Cy\3\2\2\2DE\7*\2\2EF\5\n\6\2FG\7 \2\2GH\5\n\6\2HI\7+\2\2Iy\3\2\2\2"+
+		"JK\5\n\6\2KL\7!\2\2LM\5\n\6\2My\3\2\2\2NO\7*\2\2OP\5\n\6\2PQ\7!\2\2QR"+
+		"\5\n\6\2RS\7+\2\2Sy\3\2\2\2TU\5\n\6\2UV\7\"\2\2VW\5\n\6\2Wy\3\2\2\2XY"+
+		"\7*\2\2YZ\5\n\6\2Z[\7\"\2\2[\\\5\n\6\2\\]\7+\2\2]y\3\2\2\2^_\5\n\6\2_"+
+		"`\7#\2\2`a\5\n\6\2ay\3\2\2\2bc\7*\2\2cd\5\n\6\2de\7#\2\2ef\5\n\6\2fg\7"+
+		"+\2\2gy\3\2\2\2hi\5\n\6\2ij\7$\2\2jk\5\n\6\2ky\3\2\2\2lm\7*\2\2mn\5\n"+
+		"\6\2no\7$\2\2op\5\n\6\2pq\7+\2\2qy\3\2\2\2ry\5\b\5\2st\7*\2\2tu\5\b\5"+
+		"\2uv\7+\2\2vy\3\2\2\2wy\7)\2\2x\34\3\2\2\2x\37\3\2\2\2x$\3\2\2\2x*\3\2"+
+		"\2\2x\60\3\2\2\2x\66\3\2\2\2x:\3\2\2\2x@\3\2\2\2xD\3\2\2\2xJ\3\2\2\2x"+
+		"N\3\2\2\2xT\3\2\2\2xX\3\2\2\2x^\3\2\2\2xb\3\2\2\2xh\3\2\2\2xl\3\2\2\2"+
+		"xr\3\2\2\2xs\3\2\2\2xw\3\2\2\2y\u0085\3\2\2\2z{\f\27\2\2{|\7\34\2\2|\u0084"+
+		"\5\6\4\30}~\f\25\2\2~\177\7\35\2\2\177\u0084\5\6\4\26\u0080\u0081\f\23"+
+		"\2\2\u0081\u0082\7\36\2\2\u0082\u0084\5\6\4\24\u0083z\3\2\2\2\u0083}\3"+
+		"\2\2\2\u0083\u0080\3\2\2\2\u0084\u0087\3\2\2\2\u0085\u0083\3\2\2\2\u0085"+
+		"\u0086\3\2\2\2\u0086\7\3\2\2\2\u0087\u0085\3\2\2\2\u0088\u0089\7\3\2\2"+
+		"\u0089\u008e\7\31\2\2\u008a\u008b\7\4\2\2\u008b\u008e\7\32\2\2\u008c\u008e"+
+		"\7\5\2\2\u008d\u0088\3\2\2\2\u008d\u008a\3\2\2\2\u008d\u008c\3\2\2\2\u008e"+
+		"\t\3\2\2\2\u008f\u0092\5\f\7\2\u0090\u0092\7(\2\2\u0091\u008f\3\2\2\2"+
+		"\u0091\u0090\3\2\2\2\u0092\13\3\2\2\2\u0093\u009d\7\6\2\2\u0094\u009d"+
+		"\7\7\2\2\u0095\u009d\7\b\2\2\u0096\u0097\7\t\2\2\u0097\u009d\7\31\2\2"+
+		"\u0098\u0099\7\n\2\2\u0099\u009d\7\31\2\2\u009a\u009b\7\13\2\2\u009b\u009d"+
+		"\7\31\2\2\u009c\u0093\3\2\2\2\u009c\u0094\3\2\2\2\u009c\u0095\3\2\2\2"+
+		"\u009c\u0096\3\2\2\2\u009c\u0098\3\2\2\2\u009c\u009a\3\2\2\2\u009d\r\3"+
+		"\2\2\2\u009e\u00a5\5\4\3\2\u009f\u00a1\5\20\t\2\u00a0\u009f\3\2\2\2\u00a1"+
+		"\u00a2\3\2\2\2\u00a2\u00a0\3\2\2\2\u00a2\u00a3\3\2\2\2\u00a3\u00a5\3\2"+
+		"\2\2\u00a4\u009e\3\2\2\2\u00a4\u00a0\3\2\2\2\u00a5\17\3\2\2\2\u00a6\u00a8"+
+		"\7(\2\2\u00a7\u00a6\3\2\2\2\u00a7\u00a8\3\2\2\2\u00a8\u00a9\3\2\2\2\u00a9"+
+		"\u00df\7\f\2\2\u00aa\u00ac\7(\2\2\u00ab\u00aa\3\2\2\2\u00ab\u00ac\3\2"+
+		"\2\2\u00ac\u00ad\3\2\2\2\u00ad\u00df\7\r\2\2\u00ae\u00b0\7(\2\2\u00af"+
+		"\u00ae\3\2\2\2\u00af\u00b0\3\2\2\2\u00b0\u00b1\3\2\2\2\u00b1\u00df\7\16"+
+		"\2\2\u00b2\u00b4\7(\2\2\u00b3\u00b2\3\2\2\2\u00b3\u00b4\3\2\2\2\u00b4"+
+		"\u00b5\3\2\2\2\u00b5\u00df\7\17\2\2\u00b6\u00b8\7(\2\2\u00b7\u00b6\3\2"+
+		"\2\2\u00b7\u00b8\3\2\2\2\u00b8\u00b9\3\2\2\2\u00b9\u00df\7\20\2\2\u00ba"+
+		"\u00bc\7(\2\2\u00bb\u00ba\3\2\2\2\u00bb\u00bc\3\2\2\2\u00bc\u00bd\3\2"+
+		"\2\2\u00bd\u00be\7\21\2\2\u00be\u00df\7\31\2\2\u00bf\u00c1\7(\2\2\u00c0"+
+		"\u00bf\3\2\2\2\u00c0\u00c1\3\2\2\2\u00c1\u00c2\3\2\2\2\u00c2\u00c3\7\22"+
+		"\2\2\u00c3\u00df\7\31\2\2\u00c4\u00c6\7(\2\2\u00c5\u00c4\3\2\2\2\u00c5"+
+		"\u00c6\3\2\2\2\u00c6\u00c7\3\2\2\2\u00c7\u00c8\7\23\2\2\u00c8\u00df\7"+
+		"\31\2\2\u00c9\u00cb\7(\2\2\u00ca\u00c9\3\2\2\2\u00ca\u00cb\3\2\2\2\u00cb"+
+		"\u00cc\3\2\2\2\u00cc\u00cd\7\24\2\2\u00cd\u00df\7\31\2\2\u00ce\u00d0\7"+
+		"(\2\2\u00cf\u00ce\3\2\2\2\u00cf\u00d0\3\2\2\2\u00d0\u00d1\3\2\2\2\u00d1"+
+		"\u00df\7\25\2\2\u00d2\u00d4\7(\2\2\u00d3\u00d2\3\2\2\2\u00d3\u00d4\3\2"+
+		"\2\2\u00d4\u00d5\3\2\2\2\u00d5\u00df\7\26\2\2\u00d6\u00d8\7(\2\2\u00d7"+
+		"\u00d6\3\2\2\2\u00d7\u00d8\3\2\2\2\u00d8\u00d9\3\2\2\2\u00d9\u00df\7\27"+
+		"\2\2\u00da\u00dc\7(\2\2\u00db\u00da\3\2\2\2\u00db\u00dc\3\2\2\2\u00dc"+
+		"\u00dd\3\2\2\2\u00dd\u00df\7\30\2\2\u00de\u00a7\3\2\2\2\u00de\u00ab\3"+
+		"\2\2\2\u00de\u00af\3\2\2\2\u00de\u00b3\3\2\2\2\u00de\u00b7\3\2\2\2\u00de"+
+		"\u00bb\3\2\2\2\u00de\u00c0\3\2\2\2\u00de\u00c5\3\2\2\2\u00de\u00ca\3\2"+
+		"\2\2\u00de\u00cf\3\2\2\2\u00de\u00d3\3\2\2\2\u00de\u00d7\3\2\2\2\u00de"+
+		"\u00db\3\2\2\2\u00df\21\3\2\2\2\30x\u0083\u0085\u008d\u0091\u009c\u00a2"+
+		"\u00a4\u00a7\u00ab\u00af\u00b3\u00b7\u00bb\u00c0\u00c5\u00ca\u00cf\u00d3"+
+		"\u00d7\u00db\u00de";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

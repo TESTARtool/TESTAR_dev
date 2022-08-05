@@ -23,6 +23,6 @@ public class XorOprNode extends BaseBooleanNode
     @Override
     public String toString()
     {
-        return left.toString() + " XOR " + right.toString();
+        return "(" + left.toString() + " XOR " + right.toString() + ")";
     }
 }

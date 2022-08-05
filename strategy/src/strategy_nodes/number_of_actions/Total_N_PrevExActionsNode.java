@@ -8,9 +8,14 @@ import strategy_nodes.base_nodes.BaseIntegerNode;
 import java.util.Map;
 import java.util.Set;
 
-public class TotalNumberOfUnexecutedActions extends BaseIntegerNode
+public class Total_N_PrevExActionsNode extends BaseIntegerNode
 {
-    private String name = "total-number-of-unexecuted-actions";
+    private String name;
+    
+    public Total_N_PrevExActionsNode(String name)
+    {
+        this.name = name;
+    }
     
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
@@ -18,7 +23,7 @@ public class TotalNumberOfUnexecutedActions extends BaseIntegerNode
         int count = 0;
         for(Action action : actions)
         {
-            if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
+            if(actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
                 count++;
         }
         return count;

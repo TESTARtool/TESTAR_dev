@@ -38,34 +38,30 @@ state_boolean:
 
 number_expr:        number_of_actions | NUMBER;
 
-number_of_actions:  NUM_ACTIONS | COMPOUND_NUM_ACTIONS ACTION_TYPE;
+number_of_actions:  'total-n-actions'                                       #tnActions
+|                   'total-n-unexecuted-actions'                            #tnUnexActions
+|                   'total-n-previous-executed-actions'                     #tnPrevUnexActions
+|                   'n-previous-executed-actions-of-type'   ACTION_TYPE     #nPrevExecActions
+|                   'n-actions-of-type'                     ACTION_TYPE     #nActionsOfType
+|                   'n-of-unexecuted-actions-of-type'       ACTION_TYPE     #nUnexActionsOfType
+;
 
 action_expr:        strategy | action+;
 
-action: NUMBER? (ACTION | COMPOUND_ACTION ACTION_TYPE);
-
-NUM_ACTIONS:
-    'total-number-of-actions'
-|   'total-number-of-unexecuted-actions'
-|   'total-number-of-previous-executed-actions';
-
-COMPOUND_NUM_ACTIONS: //pair with ACTION_TYPE
-    'number-of-previous-executed-actions-of-type'
-|   'number-of-actions-of-type'
-|   'number-of-unexecuted-actions-of-type';
-
-ACTION:
-    'random-action'
-|   'previous-action'
-|   'random-unexecuted-action'
-|   'random-least-executed-action'
-|   'random-most-executed-action';
-
-COMPOUND_ACTION: //pair with ACTION_TYPE
-    'random-action-of-type'
-|   'random-unexecuted-action-of-type'
-|   'random-action-other-than-of-type'
-|   'random-unexecuted-action-other-than-of-type';
+action: NUMBER?     'random-action'                                            #rAction
+|       NUMBER?     'previous-action'                                          #prevAction
+|       NUMBER?     'r-unexecuted-action'                                      #rUnexAction
+|       NUMBER?     'r-least-executed-action'                                  #rLeastExAction
+|       NUMBER?     'r-most-executed-action'                                   #rMostExAction
+|       NUMBER?     'r-action-of-type'                         ACTION_TYPE     #rActionOfType
+|       NUMBER?     'r-unexecuted-action-of-type'              ACTION_TYPE     #rUnexActionOfType
+|       NUMBER?     'r-action-not-of-type'                     ACTION_TYPE     #rActionNotType
+|       NUMBER?     'r-unexecuted-action-not-of-type'          ACTION_TYPE     #rUnexActionNotType
+|       NUMBER?     'select-sibling-action'                                    #sSiblingAction
+|       NUMBER?     'select-child-action'                                      #sChildAction
+|       NUMBER?     'select-child-or-sibling-action'                           #sChildOrSiblingAction
+|       NUMBER?     'select-sibling-or-child-action'                           #sChildOrSiblingAction
+;
 
 ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
 SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';

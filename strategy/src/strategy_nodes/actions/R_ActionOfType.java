@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class RandomActionOfType extends BaseActionNode
+public class R_ActionOfType extends BaseActionNode
 {
     private ActionType actionType;
     
-    public RandomActionOfType(int weight, ActionType actionType)
+    public R_ActionOfType(int weight, String name, ActionType actionType)
     {
-        this.name = "random-action-of-type";
+        this.name = name;
         this.WEIGHT = weight;
         this.actionType = actionType;
     }

@@ -20,7 +20,19 @@ public class AvailableActionOfTypeNode extends BaseBooleanNode
     @Override
     public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return null; //todo
+        boolean available = false;
+        for(Action action : actions)
+        {
+            if(ActionType.RoleMatchesType(action, actionType))
+            {
+                available = true;
+                break;
+            }
+        }
+
+//        System.out.println("actions of type " + actionType.toString() + "available: " + available);
+        
+        return available;
     }
     
     @Override

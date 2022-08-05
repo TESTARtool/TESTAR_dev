@@ -7,11 +7,11 @@ import strategy_nodes.base_nodes.BaseActionNode;
 import java.util.Map;
 import java.util.Set;
 
-public class RandomAction extends BaseActionNode
+public class RandomActionNode extends BaseActionNode
 {
-    public RandomAction(int weight)
+    public RandomActionNode(int weight, String name)
     {
-        this.name = "random-action";
+        this.name = name;
         this.WEIGHT = weight;
     }
     @Override

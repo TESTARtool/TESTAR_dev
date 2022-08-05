@@ -16,5 +16,5 @@ public class NotOprNode extends BaseBooleanNode
     public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) { return !expr.GetResult(state, actions, actionsExecuted);}
     
     @Override
-    public String toString() {return "NOT " + expr.toString();}
+    public String toString() {return "(NOT " + expr.toString() + ")";}
 }

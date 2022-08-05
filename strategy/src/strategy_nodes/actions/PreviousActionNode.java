@@ -8,18 +8,18 @@ import strategy_nodes.base_nodes.BaseActionNode;
 import java.util.Map;
 import java.util.Set;
 
-public class PreviousAction extends BaseActionNode
+public class PreviousActionNode extends BaseActionNode
 {
-    public PreviousAction(int weight)
+    public PreviousActionNode(int weight, String name)
     {
-        this.name = "previous-action";
+        this.name = name;
         this.WEIGHT = weight;
     }
     
     @Override
     public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works correctly
     {
-        String previousAction = state.get(Tags.PreviousActionUsed, null);
+        Action previousAction = state.get(Tags.PreviousAction, null);
         
         if(previousAction == null)
         {
@@ -29,7 +29,7 @@ public class PreviousAction extends BaseActionNode
         
         for(Action action : actions)
         {
-            if(action.get(Tags.AbstractIDCustom).equals(previousAction))
+            if(action.get(Tags.AbstractIDCustom).equals(previousAction.get(Tags.AbstractIDCustom)))
                 return action;
         }
         return selectRandomAction(actions); // if the previous action isn't available, pick randomly

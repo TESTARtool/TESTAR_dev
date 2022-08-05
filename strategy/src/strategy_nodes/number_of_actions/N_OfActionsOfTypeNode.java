@@ -2,30 +2,32 @@ package strategy_nodes.number_of_actions;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import strategy_nodes.base_nodes.BaseIntegerNode;
 import strategy_nodes.terminals.ActionType;
 
 import java.util.Map;
 import java.util.Set;
 
-public class NumberOfPreviousExecutedActionsOfType extends BaseIntegerNode
+public class N_OfActionsOfTypeNode extends BaseIntegerNode
 {
-    private String name = "number-of-previous-executed-actions-of-type";
+    private String name = "number-of-actions-of-type";
     private ActionType actionType;
     
-    public NumberOfPreviousExecutedActionsOfType(ActionType actionType) {this.actionType = actionType;}
+    public N_OfActionsOfTypeNode(ActionType actionType) {this.actionType = actionType;}
     
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        int count = 0;
+        int numberOfActions = 0;
         for(Action action : actions)
         {
-            if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)) && ActionType.RoleMatchesType(action, actionType))
-                count++;
+            if(ActionType.RoleMatchesType(action, actionType))
+                numberOfActions++;
         }
-        return count;
+        
+//        System.out.println("number of actions (" + actionType.toString() + ") : " + numberOfActions);
+        
+        return numberOfActions;
     }
     
     @Override

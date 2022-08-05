@@ -10,30 +10,39 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class RandomMostExecutedAction extends BaseActionNode
+public class R_LeastExActionNode extends BaseActionNode
 {
-    public RandomMostExecutedAction(int weight)
+    public R_LeastExActionNode(int weight, String name)
     {
-        this.name = "random-most-executed-action";
+        this.name = name;
         this.WEIGHT = weight;
     }
     
     @Override
     public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-//        System.out.println("Map: " + actionsExecuted.toString());
+        System.out.println("Map: " + actionsExecuted.toString());
         
         if(actions.size() == 1)
             return new ArrayList<>(actions).get(0);
         
         ArrayList filteredActions = new ArrayList();
-        if(actionsExecuted.size() > 0) // there is at least one executed action
+        if(actions.size() > actionsExecuted.size()) // there are some unexecuted actions
         {
-            Integer maxCount = Collections.max(actionsExecuted.values());
+            for(Action action : actions)
+            {
+                if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
+                    filteredActions.add(action);
+            }
+            return selectRandomAction(filteredActions);
+        }
+        else // all actions have been used at least once
+        {
+            Integer minCount = Collections.min(actionsExecuted.values());
             ArrayList<String> actionIDs = new ArrayList<>();
             for(Map.Entry<String, Integer> entry : actionsExecuted.entrySet())
             {
-                if(entry.getValue().equals(maxCount))
+                if(entry.getValue().equals(minCount))
                     actionIDs.add(entry.getKey());
             }
             for(Action action : actions)
@@ -43,7 +52,5 @@ public class RandomMostExecutedAction extends BaseActionNode
             }
             return selectRandomAction(filteredActions);
         }
-        else
-            return selectRandomAction(actions);
     }
 }

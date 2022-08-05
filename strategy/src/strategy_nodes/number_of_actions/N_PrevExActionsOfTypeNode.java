@@ -9,12 +9,12 @@ import strategy_nodes.terminals.ActionType;
 import java.util.Map;
 import java.util.Set;
 
-public class NumberOfUnexecutedActionsOfType extends BaseIntegerNode
+public class N_PrevExActionsOfTypeNode extends BaseIntegerNode
 {
-    private String name = "number-of-unexecuted-actions-of-type";
+    private String name = "number-of-previous-executed-actions-of-type";
     private ActionType actionType;
     
-    public NumberOfUnexecutedActionsOfType(ActionType actionType) {this.actionType = actionType;}
+    public N_PrevExActionsOfTypeNode(ActionType actionType) {this.actionType = actionType;}
     
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
@@ -22,7 +22,7 @@ public class NumberOfUnexecutedActionsOfType extends BaseIntegerNode
         int count = 0;
         for(Action action : actions)
         {
-            if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)) && !ActionType.RoleMatchesType(action, actionType))
+            if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)) && ActionType.RoleMatchesType(action, actionType))
                 count++;
         }
         return count;

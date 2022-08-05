@@ -2,20 +2,18 @@ package strategy_nodes.actions;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import strategy_nodes.base_nodes.BaseActionNode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class RandomLeastExecutedAction extends BaseActionNode
+public class R_UnexActionNode extends BaseActionNode
 {
-    public RandomLeastExecutedAction(int weight)
+    public R_UnexActionNode(int weight, String name)
     {
-        this.name = "random-least-executed-action";
+        this.name = name;
         this.WEIGHT = weight;
     }
     
@@ -35,23 +33,7 @@ public class RandomLeastExecutedAction extends BaseActionNode
                 if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
                     filteredActions.add(action);
             }
-            return selectRandomAction(filteredActions);
         }
-        else // all actions have been used at least once
-        {
-            Integer minCount = Collections.min(actionsExecuted.values());
-            ArrayList<String> actionIDs = new ArrayList<>();
-            for(Map.Entry<String, Integer> entry : actionsExecuted.entrySet())
-            {
-                if(entry.getValue().equals(minCount))
-                    actionIDs.add(entry.getKey());
-            }
-            for(Action action : actions)
-            {
-                if(actionIDs.contains(action.get(Tags.AbstractIDCustom)))
-                    filteredActions.add(action);
-            }
-            return selectRandomAction(filteredActions);
-        }
+        return selectRandomAction(filteredActions);
     }
 }

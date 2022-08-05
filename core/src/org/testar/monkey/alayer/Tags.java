@@ -217,5 +217,5 @@ public final class Tags extends TagsBase {
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
 	public static Tag<Boolean> StateChanged = from("StateChanged", Boolean.class);
-	public static Tag<String> PreviousActionUsed = from("PreviousActionUsed", String.class);
+	public static Tag<Action> PreviousAction = from("PreviousAction", Action.class);
 }

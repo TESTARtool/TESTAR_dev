@@ -134,11 +134,47 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNumber_expr(StrategyParser.Number_exprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link StrategyParser#number_of_actions}.
+	 * Visit a parse tree produced by the {@code tnActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx);
+	T visitTnActions(StrategyParser.TnActionsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code tnUnexActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code tnPrevUnexActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nPrevExecActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nActionsOfType}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nUnexActionsOfType}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
@@ -146,9 +182,87 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAction_expr(StrategyParser.Action_exprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code rAction}
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAction(StrategyParser.ActionContext ctx);
+	T visitRAction(StrategyParser.RActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code prevAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrevAction(StrategyParser.PrevActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rUnexAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRUnexAction(StrategyParser.RUnexActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rLeastExAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRLeastExAction(StrategyParser.RLeastExActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rMostExAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRMostExAction(StrategyParser.RMostExActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rActionOfType}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRActionOfType(StrategyParser.RActionOfTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rUnexActionOfType}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rActionNotType}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRActionNotType(StrategyParser.RActionNotTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code rUnexActionNotType}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code sSiblingAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSSiblingAction(StrategyParser.SSiblingActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code sChildAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSChildAction(StrategyParser.SChildActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code sChildOrSiblingAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx);
 }

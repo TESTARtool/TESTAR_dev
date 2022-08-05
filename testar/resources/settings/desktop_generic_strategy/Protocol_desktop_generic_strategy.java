@@ -98,8 +98,9 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 //		System.out.println(selectedAction.toString());
 //		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
 		
+		state.set(Tags.PreviousAction, selectedAction);
+		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		state.set(Tags.PreviousActionUsed, actionID);
 		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
 		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
 		
