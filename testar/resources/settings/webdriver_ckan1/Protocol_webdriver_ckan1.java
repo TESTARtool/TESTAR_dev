@@ -252,17 +252,22 @@ public class Protocol_webdriver_ckan1 extends CodeAnalysisWebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Load text inputs
-		AbstractState abstractState = stateModelManager.getCurrentAbstractState();
-		Set<Map<String,String>> textInputs = null;
-		if ( abstractState == null ) {
-			logger.info("Abstract state is null. Passing empty text input set to data manager.");
-			textInputs = new HashSet<Map<String,String>> ();
+		if (stateModelManager == null ) {
+			logger.info("No state model manager, so not loading text data. This can happen in spy mode.");
 		}
 		else {
-			logger.info("Retrieved text inputs for action derivation from state model.");
-		 	textInputs = stateModelManager.getTextInputs(abstractState);
+			AbstractState abstractState = stateModelManager.getCurrentAbstractState();
+			Set<Map<String,String>> textInputs = null;
+			if ( abstractState == null ) {
+				logger.info("Abstract state is null. Passing empty text input set to data manager.");
+				textInputs = new HashSet<Map<String,String>> ();
+			}
+			else {
+				logger.info("Retrieved text inputs for action derivation from state model.");
+				textInputs = stateModelManager.getTextInputs(abstractState);
+			}
+			((InterestingStringsDataManager)(dataManager)).loadInput(textInputs);
 		}
-        ((InterestingStringsDataManager)(dataManager)).loadInput(textInputs);
 
         // CKAN Customization: start with empty actions HashSet, so that we only rely
         // on this method definition for deriving actions.
