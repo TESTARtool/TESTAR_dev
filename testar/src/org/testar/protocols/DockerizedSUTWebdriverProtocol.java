@@ -142,7 +142,6 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 	protected void resetSUTBetweenSequences() {
 		stopDockerSUT();
 		removeSUTApplicationVolumes();
-		startDockerSUT();
 	}
 
 	protected void removeSUTApplicationVolumes() {
