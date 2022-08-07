@@ -198,6 +198,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
         for ( String element: input) {
             Map<String, String> innerMap = new HashMap<>();
             int sepIndex = element.indexOf(":");
+            if( sepIndex == -1 ) {
+                System.out.println("AbstractAction -> TSMF ignores element /" + element + "/");
+                continue;
+            }
             innerMap.put("type", element.substring(0,sepIndex));
             innerMap.put("value", element.substring(sepIndex+1));
             result.add(innerMap);
