@@ -82,8 +82,8 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         if (textInputs == null) {
             throw new HydrationException("Property `textInputs` was not found in abstract state class");
         }
-        if (!((AbstractState) source).getTextInputs().isEmpty()) {
-            target.addPropertyValue(textInputs.getPropertyName(), new PropertyValue(textInputs.getPropertyType(), ((AbstractState) source).getTextInputs()));
+        if (!((AbstractState) source).getOriginalTextInputs().isEmpty()) {
+            target.addPropertyValue(textInputs.getPropertyName(), new PropertyValue(textInputs.getPropertyType(), ((AbstractState) source).getOriginalTextInputs()));
         }
 
     }

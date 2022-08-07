@@ -184,6 +184,15 @@ public class AbstractState extends AbstractEntity implements Persistable {
        return(textInputToSetMapFormat(textInputs));
     }
 
+   /**
+     * This method returns a set of the current relevant text inputs for the code analysis experiment
+     * stored in this action in the Set<String> format for persistence.
+     * @return text inputs, in set of maps format
+     */
+    public Set<String> getOriginalTextInputs() {
+        return textInputs;
+    }
+
     /**
      * This method sets the current relevant text inputs for the code analysis experiment
      * stored in this action
