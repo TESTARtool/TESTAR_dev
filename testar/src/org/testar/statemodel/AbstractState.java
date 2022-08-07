@@ -171,9 +171,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param newValues the new inputs to merge
      */
     public void mergeTextInputs(Set<Map<String,String>> newInputs) {
-        System.out.println("AS: merge text inputs of size" + newInputs.size());
-        textInputs.addAll(textInputToSetStringFormat(newInputs));
-        System.out.println("AS: text input size is now " + textInputs.size());
+        Set<String> inputAsSetStrings = textInputToSetStringFormat(newInputs);
+        textInputs.addAll(inputAsSetStrings);
     }
 
     /**
