@@ -22,6 +22,7 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Logger>
+		<Logger name="io.netty" level="off"/> <!-- Ignore ugly warning https://github.com/netty/netty/issues/7817 -->
         <Root level="ALL">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>

@@ -43,6 +43,15 @@ public class WdRootElement extends WdElement {
   public boolean hasStandardKeyboard;
   public String documentTitle;
 
+  public WdRootElement() {
+	  super(null, null);
+	  root = this;
+	  parent = this;
+	  isForeground = true;
+	  documentTitle = WdDriver.getCurrentUrl();
+	  blocked = false;
+  }
+
   public WdRootElement(Map<String, Object> packedbody) {
     super(packedbody, null, null);
     root = this;

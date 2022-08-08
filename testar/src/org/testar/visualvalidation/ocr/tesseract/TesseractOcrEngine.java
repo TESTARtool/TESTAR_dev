@@ -48,7 +48,7 @@ import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO_OSD;
 public class TesseractOcrEngine extends Thread implements OcrEngineInterface {
     private static final String TAG = "Tesseract";
     private final TessBaseAPI _engine;
-    private final Boolean _scanSync = true;
+    private final Object _scanSync = new Object();
     private final int _imageResolution;
     private final boolean _loggingEnabled;
     private final boolean _saveImageBufferToDisk;

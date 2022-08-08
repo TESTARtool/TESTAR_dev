@@ -60,6 +60,8 @@ public class MiscPanel extends SettingsPanel {
   private JTextField txtOutputDir;
   private JTextField txtTempDir;
 
+  private JCheckBox onlySaveFaultySequences;
+
   public MiscPanel() {
     // Init the global items
     initMiscGlobal();
@@ -86,6 +88,9 @@ public class MiscPanel extends SettingsPanel {
     btnSetTempDir.addActionListener(this::btnSetTempDirActionPerformed);
     btnSetTempDir.setEnabled(true);
 
+    onlySaveFaultySequences = new JCheckBox("Only Save Faulty Sequences");
+    onlySaveFaultySequences.setToolTipText("Only Save Faulty Sequences");
+
     GroupLayout gl_jPanelMisc = new GroupLayout(this);
     this.setLayout(gl_jPanelMisc);
     gl_jPanelMisc.setHorizontalGroup(
@@ -95,6 +100,7 @@ public class MiscPanel extends SettingsPanel {
                 .addGroup(gl_jPanelMisc.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane5)
                     .addComponent(jScrollPane4)
+                    .addComponent(onlySaveFaultySequences)
                     .addGroup(gl_jPanelMisc.createSequentialGroup()
                         .addGroup(gl_jPanelMisc.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addGroup(gl_jPanelMisc.createSequentialGroup()
@@ -137,7 +143,8 @@ public class MiscPanel extends SettingsPanel {
                 .addComponent(jLabel20)
                 .addPreferredGap(RELATED)
                 .addComponent(jScrollPane4, PREFERRED_SIZE, 103, PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE)
+                .addComponent(onlySaveFaultySequences))
     );
 
   }
@@ -244,6 +251,7 @@ public class MiscPanel extends SettingsPanel {
    */
   @Override
   public void populateFrom(final Settings settings) {
+    onlySaveFaultySequences.setSelected(settings.get(ConfigTags.OnlySaveFaultySequences));
     currentDirectory = new File(settings.get(ConfigTags.OutputDir)).getParentFile();
 
     txtOutputDir.setText(settings.get(ConfigTags.OutputDir));
@@ -279,6 +287,7 @@ public class MiscPanel extends SettingsPanel {
    */
   @Override
   public void extractInformation(final Settings settings) {
+    settings.set(ConfigTags.OnlySaveFaultySequences, onlySaveFaultySequences.isSelected());
     settings.set(ConfigTags.OutputDir, txtOutputDir.getText());
     settings.set(ConfigTags.TempDir, txtTempDir.getText());
 

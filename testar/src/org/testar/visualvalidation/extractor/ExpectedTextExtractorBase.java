@@ -40,7 +40,7 @@ public class ExpectedTextExtractorBase extends Thread implements TextExtractorIn
     private static final Map<String, Tag<String>> _tag = TagsBase.tagSet().stream()
             .filter(tag -> tag.type().equals(String.class))
             .collect(Collectors.toMap(Tag::name, tag -> (Tag<String>) tag));
-    private final Boolean _threadSync = true;
+    private final Object _threadSync = new Object();
     final private Tag<String> defaultTag;
     private final boolean _loggingEnabled;
     /**

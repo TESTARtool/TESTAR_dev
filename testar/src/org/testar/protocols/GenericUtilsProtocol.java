@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,9 +44,12 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,17 +68,52 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitAndLeftClickWidgetWithMatchingTag(String tagName, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitAndLeftClickWidgetWithMatchingTag(tag,value,state,system,maxNumberOfRetries,waitBetween);
             }
         }
         System.out.println("Matching widget was not found, "+tagName+"=" + value);
+        return false;
+    }
+
+    /**
+     * This method waits until a widget with multiple matching tag values is found or the retry limit is reached.
+     * If a widget that matches all specified tag values is found, the left mouse button is clicked on it and the
+     * return value is true. Else returns false
+     *
+     * @param tagValues Map where the keys are tag names, and the values are the values these tags should have.
+     * @param state
+     * @param system needed for updating the state between retries
+     * @param maxNumberOfRetries int number of times
+     * @param waitBetween double in seconds
+     */
+    protected boolean waitAndLeftClickWidgetWithMatchingTags(Map<String,String> tagValues, State state, SUT system, int maxNumberOfRetries, double waitBetween) {
+        int numberOfRetries = 0;
+        while (numberOfRetries<maxNumberOfRetries){
+            Widget widget = getWidgetWithMatchingTags(tagValues, state);
+            if (widget != null) {
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                executeAction(system, state, ac.leftClickAt(widget));
+                return true;
+            }
+            else {
+                Util.pause(waitBetween);
+                state = getState(system);
+                numberOfRetries++;
+            }
+        }
         return false;
     }
 
@@ -129,12 +167,18 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(String tagName, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitLeftClickAndTypeIntoWidgetWithMatchingTag(tag,value,textToType,state,system,maxNumberOfRetries,waitBetween);
             }
@@ -143,6 +187,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return false;
     }
 
+    /**
+     * This method waits until a widget matching multiple tag values is found or the retry limit is reached.
+     * If a matching widget is found, the left mouse button is clicked on it, the given text is typed into it, and the return value is true.
+     * Else it returns false
+     *
+     * @param tagValues Map where the keys are tag names, and the values are the values these tags should have.
+     * @param textToType types the given text by replacing the existing text
+     * @param state
+     * @param system needed for updating the state between retries
+     * @param maxNumberOfRetries int number of times
+     * @param waitBetween double in seconds
+     * @return
+     */
+    protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTags(Map<String,String> tagValues, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween) {
+        int numberOfRetries = 0;
+        while(numberOfRetries<maxNumberOfRetries){
+            Widget widget = getWidgetWithMatchingTags(tagValues,state);
+            if(widget!=null){
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+                return true;
+            }
+            else {
+                Util.pause(waitBetween);
+                state = getState(system);
+                numberOfRetries++;
+            }
+        }
+        return false;
+    }
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -195,12 +269,18 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected boolean waitLeftClickAndPasteIntoWidgetWithMatchingTag(String tagName, String value, String textToPaste, State state, SUT system, int maxNumberOfRetries, double waitBetween){
+    	// If the state has no children return false
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return false;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return waitLeftClickAndPasteIntoWidgetWithMatchingTag(tag,value,textToPaste,state,system,maxNumberOfRetries,waitBetween);
             }
@@ -209,6 +289,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         return false;
     }
 
+   /**
+     * This method waits until a widget matching multiple tag values is found or the retry limit is reached.
+     * If a matching widget is found, the left mouse button is clicked on it, the given text is pasted into it, and the return value is true.
+     * Else it returns false
+     *
+     * @param tagValues Map where the keys are tag names, and the values are the values these tags should have.
+     * @param textToPaste pastes the given text by replacing the existing text
+     * @param state
+     * @param system needed for updating the state between retries
+     * @param maxNumberOfRetries int number of times
+     * @param waitBetween double in seconds
+     * @return
+     */
+    protected boolean waitLeftClickAndPasteIntoWidgetWithMatchingTags(Map<String,String> tagValues, String textToPaste, State state, SUT system, int maxNumberOfRetries, double waitBetween) {
+        int numberOfRetries = 0;
+        while(numberOfRetries<maxNumberOfRetries){
+            Widget widget = getWidgetWithMatchingTags(tagValues,state);
+            if(widget!=null){
+                StdActionCompiler ac = new AnnotatingActionCompiler();
+                executeAction(system,state,ac.pasteTextInto(widget, textToPaste, true));
+                return true;
+            }
+            else {
+                Util.pause(waitBetween);
+                state = getState(system);
+                numberOfRetries++;
+            }
+        }
+        return false;
+    }
 
     /**
      * This method waits until the widget with a matching Tag value (case sensitive) is found or the retry limit is reached.
@@ -256,16 +366,94 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @return
      */
     protected Widget getWidgetWithMatchingTag(String tagName, String value, State state){
+    	// If the state has no children return null
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return null;
+    	}
+
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             if(!tagName.startsWith("Web")){
                 tagName = "Web"+tagName;
             }
         }
-        for(Tag tag:state.tags()){
+        for(Tag tag:state.child(0).tags()){
             if(tag.name().equalsIgnoreCase(tagName)){
                 return getWidgetWithMatchingTag(tag, value, state);
             }
         }
+        return null;
+    }
+
+     /**
+     * Finds a widget that matches all specified tag values
+     *
+     * @param tagValues A map of tags. The keys are the tag names and the values are the values these tags should have
+     * @param state
+     * @return
+     */
+    protected Widget getWidgetWithMatchingTags(Map<String,String> tagValues, State state) {
+    	// If the state has no children return null
+    	// This may happen because the state has no GUI elements, for example a XML page
+    	if(state.childCount() == 0) {
+    		return null;
+    	}
+
+        // First make a lookup table to find Tags for each tag name
+        Map<String,Tag<?>> tagLookup = new HashMap<String,Tag<?>>();
+        for (String tagName : tagValues.keySet()) {
+
+            if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) &&
+            ! tagName.startsWith("Web") ) {
+                tagName = "Web" + tagName;
+            }
+
+            boolean tagFound = false;
+
+            for ( Tag tag : state.child(0).tags() ) {
+                if ( tag.name().equalsIgnoreCase(tagName) ) {
+                    tagLookup.put(tagName,tag);
+                    tagFound = true;
+                    break;
+                }
+            }
+            if ( ! tagFound ) {
+                System.out.println("Error: could not find tag for tag name " + tagName);
+                return null;
+            }
+        }
+
+        // Then check the tags of each widget to see if they match the tag values we are
+        // looking for.
+        for (Widget widget : state) {
+            Vector<String> tagsFound = new Vector<String>();
+
+            HashMap<String, String> webTagValues = new HashMap<>();
+            webTagValues.putAll(tagValues);
+
+            for (String tagName : tagValues.keySet()) {
+
+            	if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) &&
+            			! tagName.startsWith("Web") ) {
+            		String value = tagValues.get(tagName);
+            		webTagValues.remove(tagName);
+            		tagName = "Web" + tagName;
+            		webTagValues.put(tagName, value);
+            	}
+
+                Tag tag = tagLookup.get(tagName);
+                String value = webTagValues.get(tagName);
+                if (    widget.get(tag, null) != null &&
+                        widget.get(tag, null).toString().equals(value) )  {
+                    tagsFound.add(tagName);
+                }
+            }
+
+            if ( tagsFound.size() == webTagValues.keySet().size() ) {
+                return widget;
+            }
+        }
+
         return null;
     }
 
@@ -474,17 +662,17 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
     @Override
     protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-    	if(actions.isEmpty()) { 
+    	if(actions.isEmpty()) {
     		actions = retryDeriveAction(system, 5, 1);
     	}
     	return super.preSelectAction(system, state, actions);
     }
 
     /**
-     * If SUT is slow rendering the GUI elements, this retry method may help to 
-     * to wait and obtain the SUT state and derive SUT actions. 
-     * User can indicate the number of retries and seconds to wait. 
-     * 
+     * If SUT is slow rendering the GUI elements, this retry method may help to
+     * to wait and obtain the SUT state and derive SUT actions.
+     * User can indicate the number of retries and seconds to wait.
+     *
      * @param system
      * @param maxRetries
      * @param waitingSeconds

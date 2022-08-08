@@ -43,9 +43,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
-
 import java.util.*;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
@@ -288,20 +286,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Select one of the possible actions (e.g. at random)

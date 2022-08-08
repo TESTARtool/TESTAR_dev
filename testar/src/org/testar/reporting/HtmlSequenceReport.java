@@ -55,9 +55,19 @@ import java.util.function.Supplier;
 
 public class HtmlSequenceReport implements Reporting {
 
-    private static final String[] HEADER = new String[]{
-            "<!DOCTYPE html>",
-            "<html>",
+    private boolean firstStateAdded = false;
+    private boolean firstActionsAdded = false;
+
+    private static final String[] HEADER = new String[] {
+    		"<!DOCTYPE html>",
+    		"<html>",
+    		// Script function that allows to reverse the order of the states
+    		"<script>",
+    		"function reverse(){",
+    		"let direction = document.getElementById('main').style.flexDirection;",
+    		"if(direction === 'column') document.getElementById('main').style.flexDirection = 'column-reverse';",
+    		"else document.getElementById('main').style.flexDirection = 'column';}",
+    		"</script>",
             "<style>",
             "th, td {",
             "border: 1px solid black;",
@@ -69,32 +79,40 @@ public class HtmlSequenceReport implements Reporting {
             "text-align: center;",
             "}",
             "</style>",
-            "<head>",
-            "<title>TESTAR execution sequence report</title>",
-            "</head>",
-            "<body>"
+    		"<head>",
+    		"<title>TESTAR execution sequence report</title>",
+    		"</head>",
+    		"<body>"
     };
+    private static final String DIV_ID_BLOCK_START = "<div id='block' style='display:flex;flex-direction:column'>";
+    private static final String DIV_CLOSE = "</div>";
+
+    private PrintWriter out;
     private static final String REPORT_FILENAME_MID = "_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
-    private boolean firstStateAdded = false;
-    private boolean firstActionsAdded = false;
-    private PrintWriter out;
+    private static String htmlFilename;
+    private static String FINAL_VERDICT_FILENAME = "OK";
+
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
         try {
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
+            htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
                     + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
                     + REPORT_FILENAME_AFT;
 
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            out = new PrintWriter(htmlFilename, HTMLReporter.CHARSET);
             for (String s : HEADER) {
                 write(s);
             }
 
             write("<h1>TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount + "</h1>");
+            // HTML button to invoke reverse function
+            write("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
+            // Initialize the main div container to apply the reverse order
+            write("<div id='main' style='display:flex;flex-direction:column'>");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -110,11 +128,11 @@ public class HtmlSequenceReport implements Reporting {
      */
     public HtmlSequenceReport(String pathReplayedSequence) {
         try {
-            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
+            htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
                     + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
                     + REPORT_FILENAME_AFT;
 
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            out = new PrintWriter(htmlFilename, HTMLReporter.CHARSET);
             for (String s : HEADER) {
                 write(s);
             }
@@ -159,6 +177,7 @@ public class HtmlSequenceReport implements Reporting {
         write("<h" + h + ">" + text + "</h" + h + ">");
     }
 
+    //TODO: This method is not used, check and delete
     public void addSequenceStep(State state, String actionImagePath) {
         try {
             String imagePath = state.get(Tags.ScreenshotPath);
@@ -191,12 +210,12 @@ public class HtmlSequenceReport implements Reporting {
 
     private void writeStateIntoReport(State state) {
         try {
+            write(DIV_ID_BLOCK_START); // Open state block container
             write("<h2>State " + innerLoopCounter + "</h2>");
             write("<h4>ConcreteIDCustom=" + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + "</h4>");
             write("<h4>AbstractIDCustom=" + state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable") + "</h4>");
             write("<p><img src=\"" + getScreenshotPath(state) + "\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-            // file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-            // statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
+            write(DIV_CLOSE); // Close state block container
         } catch (NullPointerException | NoSuchTagException e) {
             System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
             write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
@@ -206,6 +225,7 @@ public class HtmlSequenceReport implements Reporting {
 
     public void addActions(Set<Action> actions) {
         if (!firstActionsAdded) firstActionsAdded = true;
+        write(DIV_ID_BLOCK_START); // Open derived actions block container
         write("<h4>Set of actions:</h4><ul>");
         for (Action action : actions) {
             write("<li>");
@@ -229,11 +249,13 @@ public class HtmlSequenceReport implements Reporting {
             write("</li>");
         }
         write("</ul>");
+        write(DIV_CLOSE); // Close derived actions block container
     }
 
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions) {
         if (!firstActionsAdded) firstActionsAdded = true;
         if (actions.size() == concreteIdsOfUnvisitedActions.size()) {
+            write(DIV_ID_BLOCK_START); // Open derived actions block container
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
             for (Action action : actions) {
                 write("<li>");
@@ -252,7 +274,9 @@ public class HtmlSequenceReport implements Reporting {
                 write("</li>");
             }
             write("</ul>");
+            write(DIV_CLOSE); // Close derived actions block container
         } else if (concreteIdsOfUnvisitedActions.size() == 0) {
+            write(DIV_ID_BLOCK_START); // Open derived actions block container
             write("<h4>All actions have been visited, set of available actions:</h4><ul>");
             for (Action action : actions) {
                 write("<li>");
@@ -271,7 +295,9 @@ public class HtmlSequenceReport implements Reporting {
                 write("</li>");
             }
             write("</ul>");
+            write(DIV_CLOSE); // Close derived actions block container
         } else {
+            write(DIV_ID_BLOCK_START); // Open derived actions block container
             write("<h4>" + concreteIdsOfUnvisitedActions.size() + " out of " + actions.size() + " actions have not been visited yet:</h4><ul>");
             for (Action action : actions) {
                 if (concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"))) {
@@ -293,10 +319,12 @@ public class HtmlSequenceReport implements Reporting {
                 }
             }
             write("</ul>");
+            write(DIV_CLOSE); // Close derived actions block container
         }
     }
 
     public void addSelectedAction(State state, Action action) {
+        write(DIV_ID_BLOCK_START); // Open executed action block container
         write("<h2>Selected Action " + innerLoopCounter + " leading to State " + innerLoopCounter + "\"</h2>");
         write("<h4>ConcreteIDCustom=" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
 
@@ -307,6 +335,7 @@ public class HtmlSequenceReport implements Reporting {
 
         write("</h4>");
         write("<p><img src=\"" + getActionScreenshotPath(state, action) + "\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+        write(DIV_CLOSE); // Close executed action block container
     }
 
     public void addTestVerdict(Verdict verdict) {
@@ -314,13 +343,18 @@ public class HtmlSequenceReport implements Reporting {
         if (verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
 
+        write(DIV_ID_BLOCK_START); // Open verdict block container
         write("<h2>Test verdict for this sequence: " + verdictInfo + "</h2>");
         write("<h4>Severity: " + verdict.severity() + "</h4>");
+        write(DIV_CLOSE); // Close verdict block container
+        
+        FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();         
     }
 
     @Override
     public void addVisualValidationResult(MatcherResult result, State state, @Nullable Action action) {
         if (result != null) {
+            write(DIV_ID_BLOCK_START);
             if (!result.getNoLocationMatches().isEmpty() || !result.getResult().isEmpty()) {
                 write("<h2>Visual validation result:</h2>");
 
@@ -344,6 +378,7 @@ public class HtmlSequenceReport implements Reporting {
             write("<h2>Visual validation result:</h2>");
             write("<h4>No results available.</h4>");
         }
+        write(DIV_CLOSE);
     }
 
     private void composeMatchedResultTable(MatcherResult result) {
@@ -418,10 +453,16 @@ public class HtmlSequenceReport implements Reporting {
     }
 
     public void close() {
+        write(DIV_CLOSE); // Close the main div container
         for (String s : HTMLReporter.FOOTER) {
             write(s);
         }
         out.close();
+
+        // Finally rename the HTML report by indicating the final Verdict
+        // sequence_1.html to sequence_1_OK.html
+        String htmlFilenameVerdict = htmlFilename.replace(".html", "_" + FINAL_VERDICT_FILENAME + ".html");
+        new File(htmlFilename).renameTo(new File (htmlFilenameVerdict));
     }
 
     private void write(String s) {

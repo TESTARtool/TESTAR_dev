@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
@@ -47,6 +46,7 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 
 /**
  * An action that is composed of several other actions.
@@ -78,6 +78,12 @@ public final class CompoundAction extends TaggableBase implements Action {
 			for(int i = 0; i < relativeDurations.size(); i++)
 				relativeDurations.set(i, relativeDurations.get(i) / durationSum);
 			return new CompoundAction(this);
+		}
+
+		public CompoundAction build(Widget originWidget){
+		    CompoundAction compoundAction = build();
+		    compoundAction.set(Tags.OriginWidget, originWidget);
+		    return compoundAction;
 		}
 	}
 	
