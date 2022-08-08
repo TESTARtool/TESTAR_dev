@@ -1,18 +1,18 @@
-import es.upv.staq.testar.NativeLinker;
-import nl.ou.testar.SutVisualization;
 import nl.ou.testar.resolver.MySQLSerialResolver;
 import nl.ou.testar.resolver.OrientDBSerialResolver;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.WidgetActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WidgetActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
@@ -21,10 +21,10 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_yoho extends WebdriverProtocol {
     protected boolean isTestReportEnabled = true;
