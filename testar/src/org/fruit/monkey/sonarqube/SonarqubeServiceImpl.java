@@ -14,7 +14,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
-import org.fruit.monkey.docker.DockerPoolServiceDelegate;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
 
 import java.io.*;
@@ -215,7 +214,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 status = newTokenResponse.getCode();
             } catch (Exception e) {
                 System.out.println("Not yet ready: " + e);
-//            } finally {
+            } finally {
+                newTokenRequest.reset();
 //                newTokenRequest.releaseConnection();
             }
 
@@ -263,8 +263,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
                 "ENV SONAR_HOST_URL http://sonarqube:9000\n" +
                 "ENV SONAR_TOKEN " + token  + "\n" +
-                "WORKDIR /usr/src\n" +
-                "RUN npm install typescript --save\n";
+                "WORKDIR /usr/src\n";// +
+                //"RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
         final String containerId = dockerPoolService.startWithImage(imageId, "sonar-scanner", hostConfig);
@@ -299,7 +299,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
                 tries++;
             }
-//            issuesRequest.releaseConnection();
+            issuesRequest.reset();
         }
         return report;
     }
