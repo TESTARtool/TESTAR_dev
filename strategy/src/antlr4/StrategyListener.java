@@ -172,6 +172,26 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitEqualExpr(StrategyParser.EqualExprContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link StrategyParser#number_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterNumber_expr(StrategyParser.Number_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link StrategyParser#number_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitNumber_expr(StrategyParser.Number_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link StrategyParser#action_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterAction_expr(StrategyParser.Action_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link StrategyParser#action_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitAction_expr(StrategyParser.Action_exprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code availableActionsOftype}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
@@ -207,16 +227,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStateChanged(StrategyParser.StateChangedContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link StrategyParser#number_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterNumber_expr(StrategyParser.Number_exprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link StrategyParser#number_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitNumber_expr(StrategyParser.Number_exprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code tnActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
@@ -289,16 +299,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link StrategyParser#action_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAction_expr(StrategyParser.Action_exprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link StrategyParser#action_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAction_expr(StrategyParser.Action_exprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code rAction}
 	 * labeled alternative in {@link StrategyParser#action}.
@@ -407,6 +407,18 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code sSubmitAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 */
+	void enterSSubmitAction(StrategyParser.SSubmitActionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code sSubmitAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 */
+	void exitSSubmitAction(StrategyParser.SSubmitActionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code sSiblingAction}
 	 * labeled alternative in {@link StrategyParser#action}.

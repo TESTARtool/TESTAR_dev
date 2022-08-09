@@ -33,7 +33,9 @@
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.*;
  import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+ import org.testar.monkey.alayer.actions.NOP;
  import org.testar.monkey.alayer.actions.StdActionCompiler;
+ import org.testar.monkey.alayer.actions.WdFillFormAction;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -92,19 +94,23 @@
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
         
+        
+        
+        
+        
         // iterate through all widgets
         for (Widget widget : state) {
             // fill forms actions
             if (isAtBrowserCanvas(widget) && isForm(widget)) //todo: add mini strategy functionality
             {
-                useFormStrategy = true;
-//                String protocol = settings.get(ConfigTags.ProtocolClass, "");
-//                Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-//                if(formFillingAction instanceof NOP){
-//                    // do nothing with NOP actions - the form was not actionable
-//                }else{
-//                    actions.add(formFillingAction);
-//                }
+//                useFormStrategy = true;
+                String protocol = settings.get(ConfigTags.ProtocolClass, "");
+                Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+                if(formFillingAction instanceof NOP){
+                    // do nothing with NOP actions - the form was not actionable
+                }else{
+                    actions.add(formFillingAction);
+                }
             }
             
             // only consider enabled and non-tabu widgets

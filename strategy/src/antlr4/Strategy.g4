@@ -57,6 +57,7 @@ action: NUMBER?     'random-action'                                            #
 |       NUMBER?     'r-unexecuted-action-of-type'              ACTION_TYPE     #rUnexActionOfType
 |       NUMBER?     'r-action-not-of-type'                     ACTION_TYPE     #rActionNotType
 |       NUMBER?     'r-unexecuted-action-not-of-type'          ACTION_TYPE     #rUnexActionNotType
+|       NUMBER?     'select-submit-action'                                     #sSubmitAction
 |       NUMBER?     'select-sibling-action'                                    #sSiblingAction
 |       NUMBER?     'select-child-action'                                      #sChildAction
 |       NUMBER?     'select-child-or-sibling-action'                           #sChildOrSiblingAction

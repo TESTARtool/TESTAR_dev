@@ -184,6 +184,30 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNumber_expr(StrategyParser.Number_exprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNumber_expr(StrategyParser.Number_exprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAction_expr(StrategyParser.Action_exprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAction_expr(StrategyParser.Action_exprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -215,18 +239,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStateChanged(StrategyParser.StateChangedContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNumber_expr(StrategyParser.Number_exprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNumber_expr(StrategyParser.Number_exprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -299,18 +311,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAction_expr(StrategyParser.Action_exprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAction_expr(StrategyParser.Action_exprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -419,6 +419,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSSubmitAction(StrategyParser.SSubmitActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSSubmitAction(StrategyParser.SSubmitActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
