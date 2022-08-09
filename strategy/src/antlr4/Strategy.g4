@@ -22,13 +22,17 @@ bool_expr:
 |       left=number_expr    LE              right=number_expr           #lessEqualThanExpr
 |   LP  left=number_expr    LE              right=number_expr   RP      #lessEqualThanExpr
 |       left=number_expr    EQ              right=number_expr           #equalExpr
-|   LP  left=number_expr    EQ              right=number_expr   RP      #notEqualExpr
+|   LP  left=number_expr    EQ              right=number_expr   RP      #equalExpr
 |       left=number_expr    NE              right=number_expr           #notEqualExpr
-|   LP  left=number_expr    NE              right=number_expr   RP      #equalExpr
+|   LP  left=number_expr    NE              right=number_expr   RP      #notEqualExpr
 |                           state_boolean                               #stateBool
 |   LP                      state_boolean                       RP      #stateBool
 |                           BOOLEAN                                     #baseBool
 ;
+
+number_expr:        number_of_actions | NUMBER;
+
+action_expr:        strategy | action+;
 
 state_boolean:
     'available-actions-of-type'     ACTION_TYPE         #availableActionsOftype
@@ -36,17 +40,13 @@ state_boolean:
 |   'state-changed'                                     #stateChanged
 ;
 
-number_expr:        number_of_actions | NUMBER;
-
 number_of_actions:  'total-n-actions'                                       #tnActions
 |                   'total-n-unexecuted-actions'                            #tnUnexActions
-|                   'total-n-previous-executed-actions'                     #tnPrevUnexActions
-|                   'n-previous-executed-actions-of-type'   ACTION_TYPE     #nPrevExecActions
+|                   'total-n-executed-actions'                              #tnExActions
 |                   'n-actions-of-type'                     ACTION_TYPE     #nActionsOfType
-|                   'n-of-unexecuted-actions-of-type'       ACTION_TYPE     #nUnexActionsOfType
+|                   'n-executed-actions-of-type'            ACTION_TYPE     #nExecActions
+|                   'n-unexecuted-actions-of-type'          ACTION_TYPE     #nUnexActionsOfType
 ;
-
-action_expr:        strategy | action+;
 
 action: NUMBER?     'random-action'                                            #rAction
 |       NUMBER?     'previous-action'                                          #prevAction
@@ -63,8 +63,9 @@ action: NUMBER?     'random-action'                                            #
 |       NUMBER?     'select-sibling-or-child-action'                           #sChildOrSiblingAction
 ;
 
-ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
 SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
+
+ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
 
 NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';

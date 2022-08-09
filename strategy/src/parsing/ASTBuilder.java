@@ -13,7 +13,7 @@ import strategy_nodes.hierarchy.S_ChildNode;
 import strategy_nodes.hierarchy.S_ChildOrSiblingNode;
 import strategy_nodes.hierarchy.S_SiblingNode;
 import strategy_nodes.number_of_actions.Total_N_ActionsNode;
-import strategy_nodes.number_of_actions.Total_N_PrevExActionsNode;
+import strategy_nodes.number_of_actions.Total_N_ExActionsNode;
 import strategy_nodes.number_of_actions.Total_N_UnexActionsNode;
 import strategy_nodes.number_operators.*;
 import strategy_nodes.state_bools.*;
@@ -65,8 +65,6 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public GreaterEqualThanOprNode visitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx)
     {return new GreaterEqualThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));}
-    
-    
     @Override
     public EqualOprNode visitEqualExpr(StrategyParser.EqualExprContext ctx)
     {return new EqualOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));}
@@ -84,33 +82,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
             return visit(ctx.number_of_actions());
     }
     
-//    @Override
-//    public BaseStrategyNode visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx)
-//    {
-//        String stringValue = "";
-//        if(ctx.NUM_ACTIONS() != null) //normal action
-//            stringValue = ctx.NUM_ACTIONS().getText();
-//        else if(ctx.COMPOUND_NUM_ACTIONS().getText() != null) //compound action
-//            stringValue = ctx.COMPOUND_NUM_ACTIONS().getText();
-//
-//        switch(stringValue)
-//        {
-//            case "total-number-of-actions":
-//                return new TotalNumberOfActions();
-//            case "total-number-of-unexecuted-actions":
-//                return new TotalNumberOfUnexecutedActions();
-//            case "total-number-of-previous-executed-actions":
-//                return new TotalNumberOfPreviousExecutedActions();
-//            case "number-of-previous-executed-actions-of-type":
-//                return new NumberOfPreviousExecutedActionsOfType(ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
-//            case "number-of-actions-of-type":
-//                return new NumberOfActionsOfType(ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
-//            case "number-of-unexecuted-actions-of-type":
-//                return new NumberOfUnexecutedActionsOfType(ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
-//            default://default is null
-//                return null;
-//        }
-//    }
+    
     //number of actions
     @Override
     public Total_N_ActionsNode visitTnActions(StrategyParser.TnActionsContext ctx)
@@ -119,8 +91,8 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     public Total_N_UnexActionsNode visitTnUnexActions(StrategyParser.TnUnexActionsContext ctx)
     {return new Total_N_UnexActionsNode(ctx.getText());}
     @Override
-    public Total_N_PrevExActionsNode visitTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx)
-    {return new Total_N_PrevExActionsNode(ctx.getText());}
+    public Total_N_ExActionsNode visitTnExActions(StrategyParser.TnExActionsContext ctx)
+    {return new Total_N_ExActionsNode(ctx.getText());}
     
     
     //state booleans
@@ -139,20 +111,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     {
         return new StateChangedNode();
     }
-    //action expressions
-//    @Override
-//    public BaseStrategyNode visitAction_expr(StrategyParser.Action_exprContext ctx)
-//    {
-//        if(ctx.strategy() == null)
-//        {
-//            List<BaseActionNode> actionNodes = new ArrayList<>();
-//            for(int i = 0; i < ctx.getChildCount(); i++)
-//                actionNodes.add(visitAction(ctx.action(i)));
-//            return new ActionListNode(actionNodes);
-//        }
-//        else return visit(ctx.strategy());
-//    }
     
+    
+    //action expressions
     @Override
     public BaseStrategyNode visitAction_expr(StrategyParser.Action_exprContext ctx)
     {

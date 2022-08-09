@@ -242,29 +242,17 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code tnPrevUnexActions}
+	 * Enter a parse tree produced by the {@code tnExActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 */
-	void enterTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx);
+	void enterTnExActions(StrategyParser.TnExActionsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code tnPrevUnexActions}
+	 * Exit a parse tree produced by the {@code tnExActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 */
-	void exitTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code nPrevExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void enterNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code nPrevExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void exitNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx);
+	void exitTnExActions(StrategyParser.TnExActionsContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code nActionsOfType}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
@@ -277,6 +265,18 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code nExecActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 */
+	void enterNExecActions(StrategyParser.NExecActionsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code nExecActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 */
+	void exitNExecActions(StrategyParser.NExecActionsContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code nUnexActionsOfType}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.

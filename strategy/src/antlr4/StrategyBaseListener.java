@@ -256,25 +256,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx) { }
+	@Override public void enterTnExActions(StrategyParser.TnExActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx) { }
+	@Override public void exitTnExActions(StrategyParser.TnExActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -287,6 +275,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNExecActions(StrategyParser.NExecActionsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNExecActions(StrategyParser.NExecActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

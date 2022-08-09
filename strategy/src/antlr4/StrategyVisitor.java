@@ -148,19 +148,12 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code tnPrevUnexActions}
+	 * Visit a parse tree produced by the {@code tnExActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTnPrevUnexActions(StrategyParser.TnPrevUnexActionsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code nPrevExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNPrevExecActions(StrategyParser.NPrevExecActionsContext ctx);
+	T visitTnExActions(StrategyParser.TnExActionsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code nActionsOfType}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
@@ -168,6 +161,13 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nExecActions}
+	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNExecActions(StrategyParser.NExecActionsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code nUnexActionsOfType}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.

@@ -8,11 +8,11 @@ import strategy_nodes.base_nodes.BaseIntegerNode;
 import java.util.Map;
 import java.util.Set;
 
-public class Total_N_PrevExActionsNode extends BaseIntegerNode
+public class Total_N_ExActionsNode extends BaseIntegerNode
 {
     private String name;
     
-    public Total_N_PrevExActionsNode(String name)
+    public Total_N_ExActionsNode(String name)
     {
         this.name = name;
     }

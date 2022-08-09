@@ -38,8 +38,8 @@ public class StrategyParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'available-actions-of-type'", "'sut-type-is'", "'state-changed'", 
-			"'total-n-actions'", "'total-n-unexecuted-actions'", "'total-n-previous-executed-actions'", 
-			"'n-previous-executed-actions-of-type'", "'n-actions-of-type'", "'n-of-unexecuted-actions-of-type'", 
+			"'total-n-actions'", "'total-n-unexecuted-actions'", "'total-n-executed-actions'", 
+			"'n-actions-of-type'", "'n-executed-actions-of-type'", "'n-unexecuted-actions-of-type'", 
 			"'random-action'", "'previous-action'", "'r-unexecuted-action'", "'r-least-executed-action'", 
 			"'r-most-executed-action'", "'r-action-of-type'", "'r-unexecuted-action-of-type'", 
 			"'r-action-not-of-type'", "'r-unexecuted-action-not-of-type'", "'select-sibling-action'", 
@@ -357,16 +357,15 @@ public class StrategyParser extends Parser {
 	public static class NotEqualExprContext extends Bool_exprContext {
 		public Number_exprContext left;
 		public Number_exprContext right;
-		public TerminalNode LP() { return getToken(StrategyParser.LP, 0); }
-		public TerminalNode EQ() { return getToken(StrategyParser.EQ, 0); }
-		public TerminalNode RP() { return getToken(StrategyParser.RP, 0); }
+		public TerminalNode NE() { return getToken(StrategyParser.NE, 0); }
 		public List<Number_exprContext> number_expr() {
 			return getRuleContexts(Number_exprContext.class);
 		}
 		public Number_exprContext number_expr(int i) {
 			return getRuleContext(Number_exprContext.class,i);
 		}
-		public TerminalNode NE() { return getToken(StrategyParser.NE, 0); }
+		public TerminalNode LP() { return getToken(StrategyParser.LP, 0); }
+		public TerminalNode RP() { return getToken(StrategyParser.RP, 0); }
 		public NotEqualExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -522,7 +521,6 @@ public class StrategyParser extends Parser {
 			return getRuleContext(Number_exprContext.class,i);
 		}
 		public TerminalNode LP() { return getToken(StrategyParser.LP, 0); }
-		public TerminalNode NE() { return getToken(StrategyParser.NE, 0); }
 		public TerminalNode RP() { return getToken(StrategyParser.RP, 0); }
 		public EqualExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
@@ -771,17 +769,17 @@ public class StrategyParser extends Parser {
 				break;
 			case 15:
 				{
-				_localctx = new NotEqualExprContext(_localctx);
+				_localctx = new EqualExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(96);
 				match(LP);
 				setState(97);
-				((NotEqualExprContext)_localctx).left = number_expr();
+				((EqualExprContext)_localctx).left = number_expr();
 				setState(98);
 				match(EQ);
 				setState(99);
-				((NotEqualExprContext)_localctx).right = number_expr();
+				((EqualExprContext)_localctx).right = number_expr();
 				setState(100);
 				match(RP);
 				}
@@ -801,17 +799,17 @@ public class StrategyParser extends Parser {
 				break;
 			case 17:
 				{
-				_localctx = new EqualExprContext(_localctx);
+				_localctx = new NotEqualExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(106);
 				match(LP);
 				setState(107);
-				((EqualExprContext)_localctx).left = number_expr();
+				((NotEqualExprContext)_localctx).left = number_expr();
 				setState(108);
 				match(NE);
 				setState(109);
-				((EqualExprContext)_localctx).right = number_expr();
+				((NotEqualExprContext)_localctx).right = number_expr();
 				setState(110);
 				match(RP);
 				}
@@ -1157,19 +1155,36 @@ public class StrategyParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class TnPrevUnexActionsContext extends Number_of_actionsContext {
-		public TnPrevUnexActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+	public static class TnExActionsContext extends Number_of_actionsContext {
+		public TnExActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTnPrevUnexActions(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTnExActions(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTnPrevUnexActions(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTnExActions(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnPrevUnexActions(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnExActions(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class NExecActionsContext extends Number_of_actionsContext {
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
+		public NExecActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNExecActions(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNExecActions(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNExecActions(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1186,23 +1201,6 @@ public class StrategyParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTnActions(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class NPrevExecActionsContext extends Number_of_actionsContext {
-		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
-		public NPrevExecActionsContext(Number_of_actionsContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterNPrevExecActions(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitNPrevExecActions(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitNPrevExecActions(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1231,7 +1229,7 @@ public class StrategyParser extends Parser {
 				}
 				break;
 			case T__5:
-				_localctx = new TnPrevUnexActionsContext(_localctx);
+				_localctx = new TnExActionsContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(147);
@@ -1239,7 +1237,7 @@ public class StrategyParser extends Parser {
 				}
 				break;
 			case T__6:
-				_localctx = new NPrevExecActionsContext(_localctx);
+				_localctx = new NActionsOfTypeContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(148);
@@ -1249,7 +1247,7 @@ public class StrategyParser extends Parser {
 				}
 				break;
 			case T__7:
-				_localctx = new NActionsOfTypeContext(_localctx);
+				_localctx = new NExecActionsContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(150);
