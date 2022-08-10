@@ -38,7 +38,12 @@ public class R_UnexActionOfTypeNode extends BaseActionNode
                     filteredActions.add(action);
             }
         }
-        return selectRandomAction(filteredActions);
+        if(filteredActions.size() == 0)
+            return selectRandomAction(actions);
+        else if (filteredActions.size() == 1)
+            return new ArrayList<>(actions).get(0);
+        else
+            return selectRandomAction(filteredActions);
     }
     
     @Override

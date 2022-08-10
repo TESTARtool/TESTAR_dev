@@ -23,6 +23,9 @@ public class R_ActionOfType extends BaseActionNode
     @Override
     public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
+        if(actions.size() == 1)
+            return new ArrayList<>(actions).get(0);
+        
         ArrayList<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)
         {

@@ -41,7 +41,12 @@ public class R_MostExActionNode extends BaseActionNode
                 if(actionIDs.contains(action.get(Tags.AbstractIDCustom)))
                     filteredActions.add(action);
             }
-            return selectRandomAction(filteredActions);
+            if(filteredActions.size() == 0)
+                return selectRandomAction(actions);
+            else if (filteredActions.size() == 1)
+                return new ArrayList<>(actions).get(0);
+            else
+                return selectRandomAction(filteredActions);
         }
         else
             return selectRandomAction(actions);
