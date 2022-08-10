@@ -13,8 +13,7 @@ public enum ActionType
     TYPING ("type-action"),
     DRAG ("drag-action"),
     SCROLL ("scroll-action"),
-    HIT_KEY ("hit-key-action"),
-    SUBMIT ("submit-action");
+    HIT_KEY ("hit-key-action");
     
     public final String label;
     private static final Map<String, ActionType> BY_LABEL = new HashMap<>();
@@ -52,11 +51,6 @@ public enum ActionType
                 if(action.get(Tags.Role,  null) == ActionRoles.HitKey)
                     return true;
                 break;
-            case SUBMIT:
-                return false;
-//                if(action.get(Tags.Role,  null) == WdActionRoles.)
-//                    return true;
-//                break;
         }
         return false;
     }
