@@ -116,7 +116,8 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
-Strategy settings
+# Strategy settings
+#################################################################
 
 StrategyFile = settings/desktop_generic_strategy/test_strategy.txt
 #################################################################

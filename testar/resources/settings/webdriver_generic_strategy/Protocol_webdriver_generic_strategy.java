@@ -95,29 +95,25 @@
         Set<Action> forcedActions = detectForcedActions(state, ac);
         
         
-        
-        
-        
         // iterate through all widgets
         for (Widget widget : state) {
-            // fill forms actions
-            if (isAtBrowserCanvas(widget) && isForm(widget)) //todo: add mini strategy functionality
-            {
+//            // fill forms actions
+//            if (isAtBrowserCanvas(widget) && isForm(widget)) //todo: add mini strategy functionality
+//            {
 //                useFormStrategy = true;
-                String protocol = settings.get(ConfigTags.ProtocolClass, "");
-                Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-                if(formFillingAction instanceof NOP){
-                    // do nothing with NOP actions - the form was not actionable
-                }else{
-                    actions.add(formFillingAction);
-                }
-            }
+//                String protocol = settings.get(ConfigTags.ProtocolClass, "");
+//                Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+//                if(formFillingAction instanceof NOP){
+//                    // do nothing with NOP actions - the form was not actionable
+//                }else{
+//                    actions.add(formFillingAction);
+//                }
+//            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
                 continue;
             }
-            
             // The blackListed widgets are those that have been filtered during the SPY mode with the
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if(blackListed(widget)){
@@ -162,6 +158,10 @@
                 }
             }
         }
+        
+        //if(actions.isEmpty()) {
+        //	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+        //}
         
         // If we have forced actions, prioritize and filter the other ones
         if (forcedActions != null && forcedActions.size() > 0) {
