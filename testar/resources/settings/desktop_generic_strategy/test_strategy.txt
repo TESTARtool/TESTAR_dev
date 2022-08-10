@@ -17,4 +17,4 @@ IF
 THEN
     previous-action
 ELSE
-    random-least-executed-action
+    r-least-executed-action

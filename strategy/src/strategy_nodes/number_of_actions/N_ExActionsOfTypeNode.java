@@ -11,10 +11,11 @@ import java.util.Set;
 
 public class N_ExActionsOfTypeNode extends BaseIntegerNode
 {
-    private String name = "number-of-previous-executed-actions-of-type";
+    private String name;
     private ActionType actionType;
     
-    public N_ExActionsOfTypeNode(ActionType actionType) {this.actionType = actionType;}
+    public N_ExActionsOfTypeNode(String name, ActionType actionType)
+    {this.name = name; this.actionType = actionType;}
     
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)

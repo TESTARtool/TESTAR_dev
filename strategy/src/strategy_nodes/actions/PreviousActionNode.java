@@ -21,16 +21,14 @@ public class PreviousActionNode extends BaseActionNode
     {
         Action previousAction = state.get(Tags.PreviousAction, null);
         
-        if(previousAction == null)
+        if(previousAction != null)
         {
             System.out.println("Previous action: " + previousAction);
-            return selectRandomAction(actions);
-        }
-        
-        for(Action action : actions)
-        {
-            if(action.get(Tags.AbstractIDCustom).equals(previousAction.get(Tags.AbstractIDCustom)))
-                return action;
+            for(Action action : actions)
+            {
+                if(action.get(Tags.AbstractIDCustom).equals(previousAction.get(Tags.AbstractIDCustom)))
+                    return action;
+            }
         }
         return selectRandomAction(actions); // if the previous action isn't available, pick randomly
     }

@@ -4,17 +4,10 @@ import antlr4.StrategyBaseVisitor;
 import antlr4.StrategyParser;
 import strategy_nodes.*;
 import strategy_nodes.actions.*;
-import strategy_nodes.base_nodes.BaseActionNode;
-import strategy_nodes.base_nodes.BaseBooleanNode;
-import strategy_nodes.base_nodes.BaseIntegerNode;
-import strategy_nodes.base_nodes.BaseStrategyNode;
+import strategy_nodes.base_nodes.*;
 import strategy_nodes.bool_operators.*;
-import strategy_nodes.hierarchy.S_ChildNode;
-import strategy_nodes.hierarchy.S_ChildOrSiblingNode;
-import strategy_nodes.hierarchy.S_SiblingNode;
-import strategy_nodes.number_of_actions.Total_N_ActionsNode;
-import strategy_nodes.number_of_actions.Total_N_ExActionsNode;
-import strategy_nodes.number_of_actions.Total_N_UnexActionsNode;
+import strategy_nodes.hierarchy.*;
+import strategy_nodes.number_of_actions.*;
 import strategy_nodes.number_operators.*;
 import strategy_nodes.state_bools.*;
 import strategy_nodes.terminals.*;
@@ -85,6 +78,15 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     
     //number of actions
     @Override
+    public N_ActionsOfTypeNode visitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx)
+    {return new N_ActionsOfTypeNode(ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
+    @Override
+    public N_ExActionsOfTypeNode visitNExecActions(StrategyParser.NExecActionsContext ctx)
+    {return new N_ExActionsOfTypeNode(ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
+    @Override
+    public N_UnexActionsOfTypeNode visitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx)
+    {return new N_UnexActionsOfTypeNode(ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
+    @Override
     public Total_N_ActionsNode visitTnActions(StrategyParser.TnActionsContext ctx)
     {return new Total_N_ActionsNode(ctx.getText());}
     @Override
@@ -129,40 +131,73 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     
     @Override
     public RandomActionNode visitRAction(StrategyParser.RActionContext ctx)
-    {return new RandomActionNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new RandomActionNode(weight, ctx.getText());
+    }
     @Override
     public PreviousActionNode visitPrevAction(StrategyParser.PrevActionContext ctx)
-    {return new PreviousActionNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new PreviousActionNode(weight, ctx.getText());
+    }
     @Override
     public R_ActionOfType visitRActionOfType(StrategyParser.RActionOfTypeContext ctx)
-    {return new R_ActionOfType(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText(), ActionType.valueOf(ctx.ACTION_TYPE().getText()));}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_ActionOfType(weight, ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
     @Override
     public R_ActionNotTypeNode visitRActionNotType(StrategyParser.RActionNotTypeContext ctx)
-    {return new R_ActionNotTypeNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText(), ActionType.valueOf(ctx.ACTION_TYPE().getText()));}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_ActionNotTypeNode(weight, ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
+    }
     @Override
     public R_LeastExActionNode visitRLeastExAction(StrategyParser.RLeastExActionContext ctx)
-    {return new R_LeastExActionNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_LeastExActionNode(weight, ctx.getText());
+    }
     @Override
     public R_MostExActionNode visitRMostExAction(StrategyParser.RMostExActionContext ctx)
-    {return new R_MostExActionNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_MostExActionNode(weight, ctx.getText());
+    }
     @Override
     public R_UnexActionNode visitRUnexAction(StrategyParser.RUnexActionContext ctx)
-    {return new R_UnexActionNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_UnexActionNode(weight, ctx.getText());}
     @Override
     public R_UnexActionOfTypeNode visitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx)
-    {return new R_UnexActionOfTypeNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText(), ActionType.valueOf(ctx.ACTION_TYPE().getText()));}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_UnexActionOfTypeNode(weight, ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
+    }
     @Override
     public R_UnexActionNotTypeNode visitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx)
-    {return new R_UnexActionNotTypeNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText(), ActionType.valueOf(ctx.ACTION_TYPE().getText()));}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new R_UnexActionNotTypeNode(weight, ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
     
     //hierarchy
     @Override
     public S_ChildNode visitSChildAction(StrategyParser.SChildActionContext ctx)
-    {return new S_ChildNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new S_ChildNode(weight, ctx.getText());
+    }
     @Override
     public S_SiblingNode visitSSiblingAction(StrategyParser.SSiblingActionContext ctx)
-    {return new S_SiblingNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new S_SiblingNode(weight, ctx.getText());
+    }
     @Override
     public S_ChildOrSiblingNode visitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx)
-    {return new S_ChildOrSiblingNode(Integer.valueOf(ctx.NUMBER().getText()), ctx.getText());}
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new S_ChildOrSiblingNode(weight, ctx.getText());
+    }
 }
