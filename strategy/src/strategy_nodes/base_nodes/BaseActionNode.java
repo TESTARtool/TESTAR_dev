@@ -17,7 +17,7 @@ public abstract class BaseActionNode extends BaseStrategyNode<Action>
     public abstract Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
     
     @Override
-    public String toString() {return String.valueOf(WEIGHT) + " " + name;}
+    public String toString() {return WEIGHT + " " + name;}
     
     public int GetWeight() {return WEIGHT;}
     
@@ -29,7 +29,7 @@ public abstract class BaseActionNode extends BaseStrategyNode<Action>
     
     protected Action selectRandomAction(ArrayList<Action> actions)
     {
-        Random rnd       = new Random();
+        Random rnd = new Random();
         return actions.get(rnd.nextInt(actions.size())); //return a random action
     }
 }

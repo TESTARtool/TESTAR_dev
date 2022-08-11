@@ -183,7 +183,10 @@
 //		System.out.println(selectedAction.toString());
 //		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
         
+        Action prevAction = state.get(Tags.PreviousAction);
         state.set(Tags.PreviousAction, selectedAction);
+        
+        System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action

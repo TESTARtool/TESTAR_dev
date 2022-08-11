@@ -23,7 +23,7 @@ public class PreviousActionNode extends BaseActionNode
         
         if(previousAction != null)
         {
-            System.out.println("Previous action: " + previousAction);
+//            System.out.println("Previous action: " + previousAction);
             for(Action action : actions)
             {
                 if(action.get(Tags.AbstractIDCustom).equals(previousAction.get(Tags.AbstractIDCustom)))
