@@ -450,6 +450,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# Strategy settings\n"
 					+"#################################################################\n"
 					+"StrategyFile = " + Util.lineSep()
+					+"SecondaryStrategyFile = " + Util.lineSep()
+					+"FormModeProbability = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

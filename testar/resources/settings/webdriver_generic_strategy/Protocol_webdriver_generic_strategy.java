@@ -28,24 +28,20 @@
  *
  */
 
+ import org.apache.commons.lang.SerializationUtils;
  import org.testar.SutVisualization;
  import org.testar.monkey.ConfigTags;
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.*;
  import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
- import org.testar.monkey.alayer.actions.NOP;
  import org.testar.monkey.alayer.actions.StdActionCompiler;
- import org.testar.monkey.alayer.actions.WdFillFormAction;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
- import parsing.Parse;
+ import parsing.ParseUtil;
 
- import java.util.HashMap;
- import java.util.HashSet;
- import java.util.Map;
- import java.util.Set;
+ import java.util.*;
 
  import static org.testar.monkey.alayer.Tags.Blocked;
  import static org.testar.monkey.alayer.Tags.Enabled;
@@ -54,15 +50,16 @@
 
  public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
-    private     Parse                parseStrategy;
+    private ParseUtil            parseUtil;
     private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
     private boolean useFormStrategy = false;
+    double formModeProbability;
     
     @Override
     protected void initialize(Settings settings)
     {
         super.initialize(settings);
-        parseStrategy = new Parse(settings.get(ConfigTags.StrategyFile));
+        parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile), settings.get(ConfigTags.SecondaryStrategyFile));
     }
     
     @Override
@@ -77,6 +74,9 @@
             boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
             state.set(Tags.StateChanged, stateChanged);
         }
+        
+        //detect form and switch with some probability
+        formModeProbability = settings.get(ConfigTags.FormModeProbability);
         
         return state;
     }
@@ -96,19 +96,17 @@
         
         
         // iterate through all widgets
-        for (Widget widget : state) {
-//            // fill forms actions
-//            if (isAtBrowserCanvas(widget) && isForm(widget)) //todo: add mini strategy functionality
-//            {
-//                useFormStrategy = true;
-//                String protocol = settings.get(ConfigTags.ProtocolClass, "");
-//                Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-//                if(formFillingAction instanceof NOP){
-//                    // do nothing with NOP actions - the form was not actionable
-//                }else{
-//                    actions.add(formFillingAction);
-//                }
-//            }
+        for (Widget widget : state)
+        {
+            if(!useFormStrategy)
+            {
+                if(isAtBrowserCanvas(widget) && isForm(widget))
+                {
+                    Random rnd = new Random();
+                    if(rnd.nextDouble(0,1) <= formModeProbability)
+                        useFormStrategy = true;
+                }
+            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
@@ -178,15 +176,13 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-        Action selectedAction = parseStrategy.selectAction(state, actions, actionsExecuted);
-
-//		System.out.println(selectedAction.toString());
-//		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
+        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
         
-        Action prevAction = state.get(Tags.PreviousAction);
+        Action prevAction = state.get(Tags.PreviousAction, null);
         state.set(Tags.PreviousAction, selectedAction);
         
-        System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
+        if(prevAction != null)
+            System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action

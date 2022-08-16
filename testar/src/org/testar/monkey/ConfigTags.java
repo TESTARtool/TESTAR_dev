@@ -160,4 +160,6 @@ public final class ConfigTags {
   */
   
   public static final Tag<String> StrategyFile = Tag.from("StrategyFile", String.class);
+  public static final Tag<String> SecondaryStrategyFile = Tag.from("SecondaryStrategyFile", String.class);
+  public static final Tag<Double> FormModeProbability = Tag.from("FormModeProbability", Double.class);
 }

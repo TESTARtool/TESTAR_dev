@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://wpforms.com/templates/bakery-order-form-template/"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 30
 
 #################################################################
 # Oracles based on suspicious titles
@@ -157,6 +157,8 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/webdriver_generic_strategy/test_strategy.txt
+SecondaryStrategyFile = settings/webdriver_generic_strategy/test_strategy_secondary.txt
+FormModeProbability = 0.8
 #################################################################
 # Other more advanced settings
 #################################################################

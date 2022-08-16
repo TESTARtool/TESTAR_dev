@@ -66,7 +66,7 @@ action: NUMBER?     'random-action'                                            #
 
 SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
 
-ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action';
+ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action' | 'input-action';
 
 NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';

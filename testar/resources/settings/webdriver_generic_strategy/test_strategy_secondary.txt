@@ -1,0 +1,11 @@
+IF
+    n-unexecuted-actions-of-type type-action > 0
+THEN
+    r-unexecuted-action-of-type type-action
+ELSE
+    IF
+        n-actions-of-type scroll-action > 0
+    THEN
+        r-action-of-type scroll-action
+    ELSE
+        r-action-of-type click-action

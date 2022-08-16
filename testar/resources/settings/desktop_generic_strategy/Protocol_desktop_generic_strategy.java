@@ -1,3 +1,4 @@
+import org.apache.commons.lang.SerializationUtils;
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
@@ -9,7 +10,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
-import parsing.Parse;
+import parsing.ParseUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,14 +48,14 @@ import java.util.Set;
 
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {
-	private Parse parseStrategy;
+	private ParseUtil            parseUtil;
 	private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
 	
 	@Override
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
-		parseStrategy = new Parse(settings.get(ConfigTags.StrategyFile));
+		parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
 	}
 	
 	@Override
@@ -93,12 +94,15 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	@Override
 	protected Action selectAction(State state, Set<Action> actions)
 	{
-		Action selectedAction = parseStrategy.selectAction(state, actions, actionsExecuted);
+		Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted)); //clone the action
 		
-//		System.out.println(selectedAction.toString());
-//		System.out.println("Action role" + selectedAction.get(Tags.Role, null).toString());
-		
+		Action prevAction = state.get(Tags.PreviousAction, null);
 		state.set(Tags.PreviousAction, selectedAction);
+		
+		if(prevAction != null)
+			System.out.println("Previous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
+		else
+			System.out.println("Previous action is null, current action: " + selectedAction.get(Tags.AbstractIDCustom));
 		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action

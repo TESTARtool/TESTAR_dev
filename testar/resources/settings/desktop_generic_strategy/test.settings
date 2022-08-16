@@ -23,7 +23,8 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar suts/4botones.jar
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+#java -jar suts/4botones.jar
 
 #################################################################
 # Sequences
@@ -32,7 +33,7 @@ SUTConnectorValue = java -jar suts/4botones.jar
 #################################################################
 
 Sequences = 1
-SequenceLength = 5
+SequenceLength = 20
 
 #################################################################
 # Oracles based on suspicious titles
@@ -120,6 +121,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/desktop_generic_strategy/test_strategy.txt
+FormModeProbability = 0.8
 #################################################################
 # Other more advanced settings
 #################################################################
