@@ -35,15 +35,7 @@ import java.util.List;
 
 import org.fruit.Assert;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Abstractor;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Position;
-import org.fruit.alayer.StdAbstractor;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.WidgetPosition;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
@@ -373,7 +365,7 @@ public class StdActionCompiler {
 		builder.add(NOP, 1.0);
 		return builder.build();
 	}
-	
+
 	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }
 	public Action killProcessByName(String name){ return killProcessByName(name, 0); }
 	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling){ return KillProcess.byPID(pid, timeToWaitBeforeKilling); }

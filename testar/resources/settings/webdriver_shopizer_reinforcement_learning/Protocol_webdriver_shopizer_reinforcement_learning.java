@@ -421,9 +421,9 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		Action key_up = ac.hitKey(KBKeys.VK_PAGE_UP);
 		key_up.set(Tags.OriginWidget, state);
 		actions.add(key_up);
-		Action protocol = getProtocolAction(state);
-		if(protocol!=null)
-			actions.add(protocol);
+//		Action protocol = getProtocolAction(state);
+//		if(protocol!=null)
+//			actions.add(protocol);
 		return actions;
 	}
 
