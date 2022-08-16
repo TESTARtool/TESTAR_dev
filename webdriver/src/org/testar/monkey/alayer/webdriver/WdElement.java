@@ -69,7 +69,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt, src;
+  public String valuePattern, href, value, style, target, alt, src;
 
   double zindex;
   Rect rect;
