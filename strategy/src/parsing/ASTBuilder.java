@@ -2,15 +2,15 @@ package parsing;
 
 import antlr4.StrategyBaseVisitor;
 import antlr4.StrategyParser;
-import strategy_nodes.*;
-import strategy_nodes.actions.*;
-import strategy_nodes.base_nodes.*;
-import strategy_nodes.bool_operators.*;
-import strategy_nodes.hierarchy.*;
-import strategy_nodes.number_of_actions.*;
-import strategy_nodes.number_operators.*;
-import strategy_nodes.state_bools.*;
-import strategy_nodes.terminals.*;
+import strategynodes.*;
+import strategynodes.actions.*;
+import strategynodes.basenodes.*;
+import strategynodes.booloperators.*;
+import strategynodes.hierarchy.*;
+import strategynodes.numberofactions.*;
+import strategynodes.integeroperators.*;
+import strategynodes.statebools.*;
+import strategynodes.terminals.*;
 
 import java.util.ArrayList;
 import java.util.List;

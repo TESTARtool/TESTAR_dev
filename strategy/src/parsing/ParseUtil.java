@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategy_nodes.StrategyNode;
+import strategynodes.StrategyNode;
 
 import java.io.IOException;
 import java.util.Map;
