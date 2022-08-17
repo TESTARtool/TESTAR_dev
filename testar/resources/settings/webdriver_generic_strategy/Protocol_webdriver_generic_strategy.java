@@ -60,6 +60,9 @@
     {
         super.initialize(settings);
         parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile), settings.get(ConfigTags.SecondaryStrategyFile));
+        
+        //for detecting forms and switching to form filling mode with some probability
+        formModeProbability = settings.get(ConfigTags.FormModeProbability);
     }
     
     @Override
@@ -74,9 +77,6 @@
             boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
             state.set(Tags.StateChanged, stateChanged);
         }
-        
-        //detect form and switch with some probability
-        formModeProbability = settings.get(ConfigTags.FormModeProbability);
         
         return state;
     }
@@ -102,8 +102,7 @@
             {
                 if(isAtBrowserCanvas(widget) && isForm(widget))
                 {
-                    Random rnd = new Random();
-                    if(rnd.nextDouble(0,1) <= formModeProbability)
+                    if(Math.random() <= formModeProbability)
                         useFormStrategy = true;
                 }
             }
