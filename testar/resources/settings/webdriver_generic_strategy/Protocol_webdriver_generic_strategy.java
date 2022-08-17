@@ -53,7 +53,7 @@
     private ParseUtil            parseUtil;
     private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
     private boolean useFormStrategy = false;
-    double formModeProbability;
+    private double formModeProbability;
     
     @Override
     protected void initialize(Settings settings)
@@ -103,7 +103,10 @@
                 if(isAtBrowserCanvas(widget) && isForm(widget))
                 {
                     if(Math.random() <= formModeProbability)
+                    {
                         useFormStrategy = true;
+                        System.out.println("Form filling mode ON");
+                    }
                 }
             }
             
@@ -176,6 +179,8 @@
     protected Action selectAction(State state, Set<Action> actions)
     {
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
+        
+        //todo: if statement to switch back to regular strategy
         
         Action prevAction = state.get(Tags.PreviousAction, null);
         state.set(Tags.PreviousAction, selectedAction);
