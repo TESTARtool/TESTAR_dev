@@ -39,7 +39,8 @@ public class CombinedUtilityRewardFunction extends StateActionUtilityRewardFunct
 
         logger.info("ID={} pixelReward={}", executedAbstractAction.getId(), pixelReward);
 
-        final float reward = utilityActionReward + pixelReward;
+        float stateChangeWeight = 0.3f;
+        final float reward = utilityActionReward + stateChangeWeight * pixelReward;
         logger.info("ID={} CombinedReward={}", executedAbstractAction.getId(), reward);
         return reward;
     }
