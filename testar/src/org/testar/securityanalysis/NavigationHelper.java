@@ -21,9 +21,9 @@ public class NavigationHelper {
         Set<Action> retActions = new HashSet<>();
 
         for (Action action : actions) {
-            if (action.getClass() == WdSecurityUrlInjectionAction.class)
+            /*if (action.getClass() == WdSecurityUrlInjectionAction.class)
                 continue;
-
+*/
             Action previousAction = previousActions.get(getActionId(action));
 
             if (previousAction == null)
@@ -51,7 +51,7 @@ public class NavigationHelper {
                 }
             }
         }
-
+/*
         if (retActions.isEmpty())
         {
             for(Action action2 : actions)
@@ -84,7 +84,7 @@ public class NavigationHelper {
                     }
                 }
             }
-        }
+        }*/
 
         return retActions;
     }
