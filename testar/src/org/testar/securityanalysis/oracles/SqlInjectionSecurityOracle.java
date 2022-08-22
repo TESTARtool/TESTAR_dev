@@ -1,6 +1,5 @@
 package org.testar.securityanalysis.oracles;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.v101.network.Network;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -8,9 +7,6 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
 import org.testar.securityanalysis.SecurityResultWriter;
 
 import java.util.HashSet;

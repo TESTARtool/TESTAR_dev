@@ -24,6 +24,33 @@ public class SecurityOracleOrchestrator {
         addListeners(devTools);
     }
 
+    public boolean hasActiveOracle()
+    {
+        return (activeSecurityOracle != null);
+    }
+
+    public Set<Action> getActions(State state)
+    {
+        if (activeSecurityOracle != null)
+            return activeSecurityOracle.getActions(state);
+
+        return new HashSet<>();
+    }
+
+    public Set<Action> preSelect(Set<Action> actions)
+    {
+        if (activeSecurityOracle != null)
+            return activeSecurityOracle.preSelect(actions);
+
+        return actions;
+    }
+
+    public void actionSelected(Action action)
+    {
+        if (activeSecurityOracle != null)
+            activeSecurityOracle.actionSelected(action);
+    }
+
     //region configuration
     private void setSecurityOracles(List<String> securityOracleNames, RemoteWebDriver webDriver)
     {
@@ -56,28 +83,6 @@ public class SecurityOracleOrchestrator {
 
         for (BaseSecurityOracle securityOracle : securityOracles)
             securityOracle.addListener(devTools);
-    }
-
-    public Set<Action> getActions(State state)
-    {
-        if (activeSecurityOracle != null)
-            return activeSecurityOracle.getActions(state);
-
-        return new HashSet<>();
-    }
-
-    public Set<Action> preSelect(Set<Action> actions)
-    {
-        if (activeSecurityOracle != null)
-            return activeSecurityOracle.preSelect(actions);
-
-        return actions;
-    }
-
-    public void actionSelected(Action action)
-    {
-        if (activeSecurityOracle != null)
-            activeSecurityOracle.actionSelected(action);
     }
 
     public Verdict getVerdict(Verdict verdict)

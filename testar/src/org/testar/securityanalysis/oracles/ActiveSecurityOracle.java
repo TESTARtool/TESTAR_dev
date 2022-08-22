@@ -51,7 +51,6 @@ public abstract class ActiveSecurityOracle extends BaseSecurityOracle {
     protected boolean isTypeable(Widget widget) {
         Role role = widget.get(Tags.Role, Roles.Widget);
         if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-            // Input type are special...
             if (role.equals(WdRoles.WdINPUT)) {
                 String type = ((WdWidget) widget).element.type;
                 return WdRoles.typeableInputTypes().contains(type.toLowerCase());

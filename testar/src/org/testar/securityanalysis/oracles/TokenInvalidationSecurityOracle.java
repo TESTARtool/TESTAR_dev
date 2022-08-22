@@ -1,18 +1,16 @@
 package org.testar.securityanalysis.oracles;
 
-import com.tigervnc.rdr.Exception;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.securityanalysis.SecurityConfiguration;
 import org.testar.securityanalysis.SecurityResultWriter;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
@@ -20,6 +18,7 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
     private int stage = 0;
     private String loggedInUrl = "";
     private Set<Cookie> cookies;
+    private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
 
     public TokenInvalidationSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
     {
@@ -31,9 +30,8 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
     {
         Set<Action> actions = new HashSet<>();
         String url = WdDriver.getCurrentUrl();
-        if (url.compareToIgnoreCase("http://localhost:41948/Account/Login") == 0 && stage == 0)
+        if (url.compareToIgnoreCase(securityConfiguration.loginUrl) == 0 && stage == 0)
         {
-            System.out.println("login");
             actions.add(login(state));
         }
         else if (stage == 1)
@@ -41,24 +39,20 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
             loggedInUrl = WdDriver.getCurrentUrl();
             takeCookieSnapshot(webDriver);
 
-            System.out.println("logout");
             actions.add(logout(state));
         }
         else if (stage == 2)
         {
-            System.out.println("STAGE 2");
             restoreCookieSnapshot(webDriver);
             actions.add(new WdSecurityUrlInjectionAction(loggedInUrl));
         }
         else if (stage == 3)
         {
-            System.out.println("STAGE 3");
             try {
-                Thread.sleep(60000);
+                Thread.sleep(securityConfiguration.tokenInvalidationWaitTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("AWAKE");
             actions.add(new WdSecurityUrlInjectionAction(loggedInUrl));
         }
 
@@ -83,10 +77,9 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
     @Override
     public void actionSelected(Action action)
     {
-        // bump the stage if proposed action is executed
+        /** bump the stage when proposed action will be executed **/
         if (preferredActions.contains(action) || preferredActions.isEmpty()) {
             stage++;
-            System.out.println("Stage to: " + stage);
         }
 
         preferredActions.clear();
@@ -99,10 +92,12 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
         {
             if (webDriver.getCurrentUrl().compareToIgnoreCase(loggedInUrl) != 0)
             {
-                System.out.println("Vulnerability found!");
+                /** Vulnerability found **/
+                securityResultWriter.WriteResult(webDriver.getCurrentUrl(), "0", "Session tokens were not invalidated");
 
                 /** end oracle **/
                 stage = 10;
+                return Verdict.FAIL;
             }
             else if (stage == 4)
             {
@@ -110,10 +105,6 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
             }
         }
 
-
-        /*if (WdDriver.getCurrentUrl().compareToIgnoreCase(loggedInUrl) == 0)
-            return Verdict.FAIL;
-*/
         return Verdict.OK;
     }
 
@@ -123,13 +114,13 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
         Action submitAction = null;
 
         for (Widget widget : state ) {
-            if (widget.get(Tags.Title).toLowerCase().contains("username")) {
-                builder.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, "Admin"), 0.1) ;
+            if (widget.get(Tags.Title).toLowerCase().contains(securityConfiguration.usernameField)) {
+                builder.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, securityConfiguration.username), 0.1) ;
             }
-            else if (widget.get(Tags.Title).toLowerCase().contains ("password") ) {
-                builder.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, "123"), 0.1);
+            else if (widget.get(Tags.Title).toLowerCase().contains (securityConfiguration.passwordField)) {
+                builder.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, securityConfiguration.password), 0.1);
             }
-            else if (widget.get(Tags.Path).contains("1, 0, 2, 0, 0, 3, 0")) {
+            else if (widget.get(Tags.Path).contains(securityConfiguration.submitButton)) {
                 StdActionCompiler ac = new AnnotatingActionCompiler();
                 submitAction = ac.leftClickAt(widget);
             }
@@ -140,7 +131,7 @@ public class TokenInvalidationSecurityOracle extends ActiveSecurityOracle {
     private Action logout(State state)
     {
         for (Widget widget : state) {
-            if (widget.get(Tags.Title).toLowerCase().contains("logout")) {
+            if (widget.get(Tags.Title).toLowerCase().contains(securityConfiguration.logoutButton)) {
                 StdActionCompiler ac = new AnnotatingActionCompiler();
                 return ac.leftClickAt(widget);
             }

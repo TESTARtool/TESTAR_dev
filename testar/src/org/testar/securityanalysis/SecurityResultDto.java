@@ -1,9 +1,7 @@
 package org.testar.securityanalysis;
 
-import java.util.Map;
-
-public class SecurityResult {
-    public SecurityResult(String path, String cwe, String result)
+public class SecurityResultDto {
+    public SecurityResultDto(String path, String cwe, String result)
     {
         this.path = path;
         this.cwe = cwe;

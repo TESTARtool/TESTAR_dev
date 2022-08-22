@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\WebDriver\\bin\\chromedriver.exe" "1920x900+0+0" "http://localhost:41948/Account/Login"
+SUTConnectorValue = "C:\\WebDriver\\bin\\chromedriver.exe" "1920x900+0+0" "https://localhost:8443/benchmark/sqli-Index.html"
 
 #################################################################
 # Sequences
