@@ -188,7 +188,8 @@
         if(DefaultProtocol.lastExecutedAction != null)
             prevAction=DefaultProtocol.lastExecutedAction;
         
-        state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
+        if(DefaultProtocol.lastExecutedAction != null)
+            state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
         
         if(prevAction != null)
             System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
