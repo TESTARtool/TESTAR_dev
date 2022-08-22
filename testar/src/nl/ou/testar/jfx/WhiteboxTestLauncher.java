@@ -20,7 +20,7 @@ import org.testar.settingsdialog.vcs.GitServiceImpl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
+//import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServiceDelegate {
@@ -99,11 +99,13 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
                 projectSourceDir += File.separator;
             }
 
+            String projectSubdir = settings.get(ConfigTags.SonarSubdir, "");
+
             final SonarqubeService sonarqubeService = new SonarqubeServiceImpl("sonarqube");
             sonarqubeService.setDelegate(this);
 
             try {
-                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir);
+                sonarqubeService.analyseProject(projectName, projectKey, sonarqubeConfPath, projectSourceDir, projectSubdir);
             } catch (IOException | TestarServiceException e) {
                 System.out.println("Whitebox test failed: " + e.getClass().getName());
                 e.printStackTrace();
@@ -149,8 +151,13 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
         Platform.runLater(() -> {
             if (dashboardDelegate != null) {
                 try {
+                    String newProjectKey = sonarqubeService.obtainLastProjectKey();
+                    if (newProjectKey != null) {
+                        System.out.println("Changing project key to " + newProjectKey);
+                        projectKey = newProjectKey;
+                    }
                     dashboardDelegate.openURI(new URI("http://localhost:9000/dashboard?id=" + projectKey));
-                } catch (URISyntaxException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

@@ -2,6 +2,8 @@ package org.fruit.monkey.sonarqube;
 
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -15,8 +17,11 @@ import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
+import org.fruit.monkey.sonarqube.model.SQComponent;
+import org.fruit.monkey.sonarqube.model.SQPage;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +32,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     private HttpClient httpClient ;
     private DockerPoolService dockerPoolService;
     private SonarqubeServiceDelegate delegate;
+
+    private Gson gson = new Gson();
 
     private final static String authHeader = "Basic YWRtaW46YWRtaW4=";// admin:admin
 
@@ -50,7 +57,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     }
 
     @Override
-    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir) throws TestarServiceException {
+    public void analyseProject(String projectName, String projectKey, String sonarqubeDirPath, String projectSourceDir, String projectSubdir) throws TestarServiceException {
         if (!dockerPoolService.isDockerAvailable()) {
             throw new TestarServiceException(TestarServiceException.DOCKER_UNAVAILABLE);
         }
@@ -120,7 +127,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
 
             try {
-                scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, token);
+                scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, projectSubdir, token);
             } catch (Exception e) {
                 delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
                 return;
@@ -174,7 +181,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                             e.printStackTrace();
                         }
                         System.out.println("-= Dispose on complete =-");
-                        dockerPoolService.dispose(false);
+//                        dockerPoolService.dispose(false);
                     }
                 }
 
@@ -246,24 +253,34 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         return null;
     }
 
-    private String createAndStartScanner(String sourcePath, String projectKey, String projectName, String token) throws IOException {
-        File projectFile = new File(sourcePath + "sonar-project.properties");
-        FileOutputStream projectStream = new FileOutputStream(projectFile);
-
-        projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
-        projectStream.write(("sonar.projectName=" + projectName + "\n").getBytes(StandardCharsets.UTF_8));
-        projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
-
-        projectStream.flush();
-        projectStream.close();
+    private String createAndStartScanner(String sourcePath, String projectKey, String projectName, String projectSubdir, String token) throws IOException {
+//        File projectFile = new File(sourcePath + "/" + projectSubdir + "/" + "sonar-project.properties");
+//        System.out.println("Project file: " + projectFile.getAbsolutePath());
+//        FileOutputStream projectStream = new FileOutputStream(projectFile);
+//
+//        projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
+//        projectStream.write(("sonar.projectName=" + projectName + "\n").getBytes(StandardCharsets.UTF_8));
+//        projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
+//
+//        projectStream.flush();
+//        projectStream.close();
 
         final HostConfig hostConfig = HostConfig.newHostConfig()
-                .withBinds(new Bind(sourcePath, new Volume("/usr/src")));
+                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")));
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
                 "ENV SONAR_HOST_URL http://sonarqube:9000\n" +
                 "ENV SONAR_TOKEN " + token  + "\n" +
-                "WORKDIR /usr/src\n";// +
+                "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
+                "WORKDIR /usr/src/"  + projectSubdir + "\n" +
+                "RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
+                "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
+                        "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
+                        "sonar-project.properties; fi; " +
+                        "if [ -f \"./pom.xml\" ]; then mvn clean verify sonar:sonar; " +
+                        "elif [ -f \"gradlew\" ]; then ./gradlew -Dsonar.host.url=$SONAR_HOST_URL sonarqube; " +
+                        "else sonar-scanner; " +
+                        "fi";
                 //"RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
@@ -303,4 +320,40 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         }
         return report;
     }
+
+    public String obtainLastProjectKey() throws IOException {
+
+        //TODO: obtain the last page if applicable
+
+        HttpGet projectsRequest = new HttpGet("http://localhost:9000/api/projects/search");
+        projectsRequest.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+
+        int total = 0;
+        int tries = 0;
+        String projectKey = null;
+        while (total == 0 && tries < 10) {
+            ClassicHttpResponse projectsResponse = (ClassicHttpResponse) httpClient.execute(projectsRequest);
+            if (projectsResponse.getCode() == HttpStatus.SC_OK) {
+                try {
+                    Type projectsPageType = new TypeToken<SQPage<SQComponent>>(){}.getType();
+                    SQPage<SQComponent> projectsPage =  gson.fromJson(EntityUtils.toString(projectsResponse.getEntity()), projectsPageType);
+                    SQComponent[] components = projectsPage.getComponents();
+                    if (components != null) {
+                        total = components.length;
+                        if (total > 0) {
+                            projectKey = components[total - 1].getKey();
+                        }
+                    }
+
+                    tries++;
+                }
+                catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                projectsRequest.reset();
+            }
+        }
+        return projectKey;
+    }
+
 }

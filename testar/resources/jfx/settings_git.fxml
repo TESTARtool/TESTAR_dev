@@ -69,10 +69,6 @@
       </Label>
       <TextField id="gitUrl" GridPane.columnIndex="1" />
       <TextField id="gitUsername" GridPane.columnIndex="3" />
-<<<<<<< HEAD
-      <TextField id="gitUsername" prefHeight="26.0" prefWidth="182.0" GridPane.columnIndex="3" />
-=======
->>>>>>> marviq/javafx
       <TextField id="gitBranch" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <JFXCheckBox id="authorizationRequired" text="Authorization required" textFill="WHITE" unCheckedColor="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <font>
@@ -80,5 +76,17 @@
          </font>
       </JFXCheckBox>
       <PasswordField id="gitToken" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <Label text="Subdir" textFill="WHITE" GridPane.rowIndex="2">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets right="8.0" />
+         </padding>
+      </Label>
+      <TextField id="sonarSubdir" GridPane.columnIndex="1" GridPane.rowIndex="2" />
    </children>
 </GridPane>

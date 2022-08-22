@@ -20,6 +20,7 @@ public class WhiteboxSettingsController extends SettingsEditController {
     private TextField sonarUrlField;
     private TextField sonarUsernameField;
     private TextField sonarPasswordField;
+    private TextField sonarSubdirField;
 
     public WhiteboxSettingsController(Settings settings, String settingsPath) {
         super("Whitebox", settings, settingsPath);
@@ -50,6 +51,7 @@ public class WhiteboxSettingsController extends SettingsEditController {
         sonarUrlField = (TextField) view.lookup("#sonarUrl");
         sonarUsernameField = (TextField) view.lookup("#sonarUsername");
         sonarPasswordField = (TextField) view.lookup("#sonarPassword");
+        sonarSubdirField = (TextField) view.lookup("#sonarSubdir");
 
         CheckBox sonarDockerizeBox = (CheckBox) view.lookup("#sonarDockerize");
 
@@ -65,6 +67,7 @@ public class WhiteboxSettingsController extends SettingsEditController {
         addBinding(sonarUrlField, ConfigTags.SonarUrl, ConfigBinding.GenericType.FIELD_STRING);
         addBinding(sonarUsernameField, ConfigTags.SonarUsername, ConfigBinding.GenericType.FIELD_STRING);
         addBinding(sonarPasswordField, ConfigTags.SonarPassword, ConfigBinding.GenericType.FIELD_STRING);
+        addBinding(sonarSubdirField, ConfigTags.SonarSubdir, ConfigBinding.GenericType.FIELD_STRING);
         addBinding(sonarProjectPropertiesArea, ConfigTags.SonarProjectProperties, ConfigBinding.GenericType.TEXT_INPUT);
         addBinding(sonarProjectNameField, ConfigTags.SonarProjectName, ConfigBinding.GenericType.FIELD_STRING);
         addBinding(sonarProjectKeyField, ConfigTags.SonarProjectKey, ConfigBinding.GenericType.FIELD_STRING);

@@ -171,6 +171,7 @@ public final class ConfigTags {
   public static final Tag<String> SonarUrl = Tag.from("SonarUrl", String.class);
   public static final Tag<String> SonarUsername = Tag.from("SonarUsername", String.class);
   public static final Tag<String> SonarPassword = Tag.from("SonarPassword", String.class);
+  public static final Tag<String> SonarSubdir = Tag.from("SonarSubdir", String.class);
   public static final Tag<Boolean> SonarDockerize = Tag.from("SonarDockerize", Boolean.class);
   public static final Tag<Boolean> SonarSaveResult = Tag.from("SonarSaveResult", Boolean.class);
 
