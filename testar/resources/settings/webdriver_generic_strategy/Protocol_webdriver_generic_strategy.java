@@ -31,6 +31,7 @@
  import org.apache.commons.lang.SerializationUtils;
  import org.testar.SutVisualization;
  import org.testar.monkey.ConfigTags;
+ import org.testar.monkey.DefaultProtocol;
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.*;
  import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -181,9 +182,13 @@
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
         
         //todo: if statement to switch back to regular strategy
+    
+        Action prevAction = null;
         
-        Action prevAction = state.get(Tags.PreviousAction, null);
-        state.set(Tags.PreviousAction, selectedAction);
+        if(DefaultProtocol.lastExecutedAction != null)
+            prevAction=DefaultProtocol.lastExecutedAction;
+        
+        state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
         
         if(prevAction != null)
             System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));

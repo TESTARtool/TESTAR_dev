@@ -3,6 +3,7 @@ package strategynodes.terminals;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 
 import java.util.*;
 
@@ -52,11 +53,9 @@ public enum ActionType
                 if(action.get(Tags.Role,  null) == ActionRoles.HitKey)
                     return true;
                 break;
-            case INPUT: //todo
-                return false;
-//                if(action.get(Tags.Role,  null) == ActionRoles.HitKey)
-//                    return true;
-//                break;
+            case INPUT:
+                if(action.get(Tags.OriginWidget,null).get(Tags.Role,  null).equals(WdRoles.WdINPUT))
+                    return true;
         }
         return false;
     }
