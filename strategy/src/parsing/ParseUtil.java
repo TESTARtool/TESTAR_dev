@@ -1,7 +1,7 @@
 package parsing;
 
-import antlr4.StrategyLexer;
-import antlr4.StrategyParser;
+import antlrfour.StrategyLexer;
+import antlrfour.StrategyParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

@@ -1,7 +1,7 @@
 package parsing;
 
-import antlr4.StrategyBaseVisitor;
-import antlr4.StrategyParser;
+import antlrfour.StrategyBaseVisitor;
+import antlrfour.StrategyParser;
 import strategynodes.*;
 import strategynodes.actions.*;
 import strategynodes.basenodes.*;
