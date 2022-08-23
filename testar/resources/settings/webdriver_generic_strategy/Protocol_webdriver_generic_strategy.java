@@ -182,13 +182,11 @@
     {
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
         
-        Action lastAction = DefaultProtocol.lastExecutedAction;
-        Widget lastWidget = lastAction.get(Tags.OriginWidget, null);
-        
-        System.out.println(lastWidget.toString());
+        Widget selectedWidget = selectedAction.get(Tags.OriginWidget);
+        System.out.println(selectedWidget.toString());
         
         //if statement to switch back to regular strategy
-        if(useFormStrategy && lastWidget != null && isSubmitButton(lastWidget))
+        if(useFormStrategy && selectedWidget != null && isSubmitButton(selectedWidget))
         {
             useFormStrategy = false;
             System.out.println("Form filling mode OFF");
