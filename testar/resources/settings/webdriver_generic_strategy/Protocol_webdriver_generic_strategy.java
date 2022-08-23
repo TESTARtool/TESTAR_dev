@@ -192,7 +192,8 @@
             System.out.println("Form filling mode OFF");
         }
         
-        state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
+        if(DefaultProtocol.lastExecutedAction != null)
+            state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
