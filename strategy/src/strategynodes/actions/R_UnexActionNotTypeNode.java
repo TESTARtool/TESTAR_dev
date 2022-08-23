@@ -24,8 +24,6 @@ public class R_UnexActionNotTypeNode extends BaseActionNode
     @Override
     public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        System.out.println("Map: " + actionsExecuted.toString());
-        
         if(actions.size() == 1)
             return new ArrayList<>(actions).get(0);
         

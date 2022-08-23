@@ -38,6 +38,7 @@
  import org.testar.monkey.alayer.actions.StdActionCompiler;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
+ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
@@ -181,18 +182,14 @@
     {
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
         
-        //todo: if statement to switch back to regular strategy
-    
-        Action prevAction = null;
+        //if statement to switch back to regular strategy
+        if(isSubmitButton(DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget)))
+        {
+            useFormStrategy = false;
+            System.out.println("Form filling mode OFF");
+        }
         
-        if(DefaultProtocol.lastExecutedAction != null)
-            prevAction=DefaultProtocol.lastExecutedAction;
-        
-        if(DefaultProtocol.lastExecutedAction != null)
-            state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
-        
-        if(prevAction != null)
-            System.out.println("Prevous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
+        state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
@@ -201,5 +198,9 @@
         return selectedAction;
     }
     
-    
+    private Boolean isSubmitButton(Widget submit_widget)
+    {
+        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
+        return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
+    }
 }
