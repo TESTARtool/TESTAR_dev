@@ -185,7 +185,6 @@
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive)); //clone the action
         
         Widget selectedWidget = selectedAction.get(Tags.OriginWidget);
-        System.out.println(selectedWidget.toString());
         
         //if statement to switch back to regular strategy
         if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
