@@ -52,10 +52,11 @@
 
  public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
-    private ParseUtil            parseUtil;
-    private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
-    private boolean useFormStrategy = false;
-    private double formModeProbability;
+    private ParseUtil               parseUtil;
+    private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
+    private boolean                 useSecondaryStrategy;
+    private boolean                 formStrategyActive = false;
+    private double                  formModeProbability;
     
     @Override
     protected void initialize(Settings settings)
@@ -64,6 +65,7 @@
         parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile), settings.get(ConfigTags.SecondaryStrategyFile));
         
         //for detecting forms and switching to form filling mode with some probability
+        useSecondaryStrategy = settings.get(ConfigTags.UseSecondaryStrategy);
         formModeProbability = settings.get(ConfigTags.FormModeProbability);
     }
     
@@ -100,13 +102,13 @@
         // iterate through all widgets
         for (Widget widget : state)
         {
-            if(!useFormStrategy)
+            if(useSecondaryStrategy && !formStrategyActive)
             {
                 if(isAtBrowserCanvas(widget) && isForm(widget))
                 {
                     if(Math.random() <= formModeProbability)
                     {
-                        useFormStrategy = true;
+                        formStrategyActive = true;
                         System.out.println("Form filling mode ON");
                     }
                 }
@@ -180,15 +182,15 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, useFormStrategy)); //clone the action
+        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive)); //clone the action
         
         Widget selectedWidget = selectedAction.get(Tags.OriginWidget);
         System.out.println(selectedWidget.toString());
         
         //if statement to switch back to regular strategy
-        if(useFormStrategy && selectedWidget != null && isSubmitButton(selectedWidget))
+        if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
         {
-            useFormStrategy = false;
+            formStrategyActive = false;
             System.out.println("Form filling mode OFF");
         }
         
