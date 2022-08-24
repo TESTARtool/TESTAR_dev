@@ -184,7 +184,7 @@
     {
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive)); //clone the action
         
-        Widget selectedWidget = selectedAction.get(Tags.OriginWidget);
+        Widget selectedWidget = selectedAction.get(Tags.OriginWidget, null);
         
         //if statement to switch back to regular strategy
         if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
@@ -205,6 +205,8 @@
     
     private Boolean isSubmitButton(Widget submit_widget)
     {
+        if(submit_widget == null)
+            return false;
         Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
         return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
     }
