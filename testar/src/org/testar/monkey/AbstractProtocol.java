@@ -171,7 +171,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 * @param actions the set of derived actions
 	 * @return  the selected action
 	 */
-	protected abstract Action selectAction(State state, Set<Action> actions);
+	protected abstract Action selectAction(SUT system, State state, Set<Action> actions);
 
 	/**
 	 * Execute the selected action.

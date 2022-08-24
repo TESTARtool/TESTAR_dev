@@ -308,8 +308,8 @@ public class Protocol_webdriver_selenium extends WebdriverProtocol {
      * @return the selected action (non-null!)
      */
     @Override
-    protected Action selectAction(State state, Set<Action> actions) {
-        return super.selectAction(state, actions);
+    protected Action selectAction(SUT system, State state, Set<Action> actions) {
+        return super.selectAction(system, state, actions);
     }
 
     /**

@@ -191,10 +191,10 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = super.selectAction(state, actions);
+		Action retAction = super.selectAction(system, state, actions);
 		if (retAction == null) {
 			//if no preSelected actions are needed, then implement your own strategy
 			//using the action selector of the state model:
@@ -203,7 +203,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 		if(retAction==null) {
 			System.out.println("State model based action selection did not find an action. Using default action selection.");
 			//if your own action selection algorithm fails to find an action, use the default random action selection:
-			retAction = super.selectAction(state, actions);
+			retAction = super.selectAction(system, state, actions);
 		}
 		return retAction;
 	}

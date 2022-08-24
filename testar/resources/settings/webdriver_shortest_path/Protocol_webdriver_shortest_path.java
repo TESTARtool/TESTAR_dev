@@ -178,7 +178,7 @@ public class Protocol_webdriver_shortest_path extends WebdriverProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.

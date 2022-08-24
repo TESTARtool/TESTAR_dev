@@ -812,7 +812,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(visualizationOn) visualizeActions(cv, state, actions);
 
 			//Selecting one of the available actions:
-			Action action = selectAction(state, actions);
+			Action action = selectAction(system, state, actions);
 
 			//Showing the red dot if visualization is on:
 			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
@@ -1749,7 +1749,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actions
 	 * @return
 	 */
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
 		return RandomActionSelector.selectAction(actions);
 	}

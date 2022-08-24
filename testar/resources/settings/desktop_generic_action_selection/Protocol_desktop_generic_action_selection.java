@@ -96,8 +96,8 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
-		Action action = super.selectAction(state, actions);
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
+		Action action = super.selectAction(system, state, actions);
 		return(action);
 	}
 

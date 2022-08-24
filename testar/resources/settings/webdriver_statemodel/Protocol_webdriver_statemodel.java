@@ -157,11 +157,11 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = super.selectAction(state, actions);
+		Action retAction = super.selectAction(system, state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			//using the action selector of the state model:

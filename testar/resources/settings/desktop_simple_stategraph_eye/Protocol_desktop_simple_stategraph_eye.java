@@ -120,7 +120,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(SUT system, State state, Set<Action> actions){
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
@@ -132,7 +132,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 		}
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = super.selectAction(state, actions);
+		Action retAction = super.selectAction(system, state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:

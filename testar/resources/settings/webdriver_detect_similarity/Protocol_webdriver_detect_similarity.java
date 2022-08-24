@@ -168,7 +168,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 * @return the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
+	protected Action selectAction(SUT system, State state, Set<Action> actions) {
 		
 		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
 		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
@@ -183,10 +183,10 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 					" with similarity : " + a.get(ActionTags.SimilarityValue, 0));
 		}
 		
-		return reduceProbabilityBySimilarity(state, actions);
+		return reduceProbabilityBySimilarity(system, state, actions);
 	}
 	
-	private Action reduceProbabilityBySimilarity(State state, Set<Action> actions) {
+	private Action reduceProbabilityBySimilarity(SUT system, State state, Set<Action> actions) {
 		// Check the totalWeight
 		double totalWeight = 0;
 		for(Action a : actions) {
@@ -195,7 +195,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 		
 		// Just in case, if something wrong return purely random
 		if(totalWeight == 0) {
-			return super.selectAction(state, actions);
+			return super.selectAction(system, state, actions);
 		}
 		
 		System.out.println("*************************** DEBUG SIMILARITY PROBABILITY ***************************");
