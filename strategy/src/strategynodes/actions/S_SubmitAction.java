@@ -31,6 +31,9 @@ public class S_SubmitAction extends BaseActionNode
         }
         return selectRandomAction(actions); // if there is no submit action, pick randomly
     }
+    
+    @Override
+    public String toString() {return name;}
 }
 //    private static Boolean isSubmitButton(Widget submit_widget){
 //        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
