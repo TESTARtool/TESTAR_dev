@@ -1,7 +1,6 @@
 package strategynodes.actions;
 
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.WdSubmitAction;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import strategynodes.basenodes.BaseActionNode;
@@ -31,9 +30,6 @@ public class S_SubmitAction extends BaseActionNode
         }
         return selectRandomAction(actions); // if there is no submit action, pick randomly
     }
-    
-    @Override
-    public String toString() {return name;}
 }
 //    private static Boolean isSubmitButton(Widget submit_widget){
 //        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};

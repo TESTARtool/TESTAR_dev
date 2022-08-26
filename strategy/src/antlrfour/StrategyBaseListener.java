@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlr4\Strategy.g4 by ANTLR 4.9.2
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 
 import org.antlr.v4.runtime.ParserRuleContext;

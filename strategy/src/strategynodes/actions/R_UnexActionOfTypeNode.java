@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class R_UnexActionOfTypeNode extends BaseActionNode
 {
-    private ActionType actionType;
+    private final ActionType actionType;
     
     public R_UnexActionOfTypeNode(int weight, String name, ActionType actionType)
     {
@@ -45,5 +45,5 @@ public class R_UnexActionOfTypeNode extends BaseActionNode
     }
     
     @Override
-    public String toString() {return String.valueOf(WEIGHT) + " " + name + " " + actionType.toString();}
+    public String toString() {return WEIGHT + " " + name + " " + actionType.toString();}
 }

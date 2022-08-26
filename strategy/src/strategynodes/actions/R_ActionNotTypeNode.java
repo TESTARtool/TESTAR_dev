@@ -42,5 +42,5 @@ public class R_ActionNotTypeNode extends BaseActionNode
     }
     
     @Override
-    public String toString() {return String.valueOf(WEIGHT) + " " + name + " " + actionType.toString();}
+    public String toString() {return WEIGHT + " " + name + " " + actionType.toString();}
 }

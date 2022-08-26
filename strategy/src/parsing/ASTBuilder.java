@@ -200,4 +200,10 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
         return new S_ChildOrSiblingNode(weight, ctx.getText());
     }
+    @Override
+    public S_SubmitAction visitSSubmitAction(StrategyParser.SSubmitActionContext ctx)
+    {
+        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
+        return new S_SubmitAction(weight, ctx.getText());
+    }
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class R_ActionOfType extends BaseActionNode
 {
-    private ActionType actionType;
+    private final ActionType actionType;
     
     public R_ActionOfType(int weight, String name, ActionType actionType)
     {
@@ -42,5 +42,5 @@ public class R_ActionOfType extends BaseActionNode
     }
     
     @Override
-    public String toString() {return String.valueOf(WEIGHT) + " " + name + " " + actionType.toString();}
+    public String toString() {return WEIGHT + " " + name + " " + actionType.toString();}
 }
