@@ -38,6 +38,9 @@ public class RewardFunctionFactory {
             case "CombinedUtilityRewardFunction":
                 selectedRewardFunction = new CombinedUtilityRewardFunction();
                 break;
+            case "StateActionsRewardFunction":
+                selectedRewardFunction = new StateActionsRewardFunction();
+                break;
             default:
                 selectedRewardFunction = new CounterBasedRewardFunction();
         }

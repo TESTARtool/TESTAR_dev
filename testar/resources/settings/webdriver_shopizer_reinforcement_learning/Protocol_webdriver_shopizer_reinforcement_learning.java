@@ -81,11 +81,11 @@ public class Protocol_webdriver_shopizer_reinforcement_learning extends Webdrive
 		customBuildAbstractIDCustom(state);
 	}
 
-	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
-		CodingManager.buildIDs(state, actions);
-		// Custom the State AbstractIDCustom identifier
-		customActionBuildAbstractIDCustom(actions);
-	}
+//	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+//		CodingManager.buildIDs(state, actions);
+//		// Custom the State AbstractIDCustom identifier
+//		customActionBuildAbstractIDCustom(actions);
+//	}
 
 	private synchronized void customActionBuildAbstractIDCustom(Set<Action> actions) {
 		for (Action a : actions) {
