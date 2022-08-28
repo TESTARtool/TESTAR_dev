@@ -166,6 +166,7 @@ public class WdDriver extends SUTBase {
         .build();
     ChromeOptions options = new ChromeOptions();
 
+    /** Enables TESTAR to read the browser logs **/
     LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.BROWSER, Level.ALL);
     options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
@@ -179,7 +180,6 @@ public class WdDriver extends SUTBase {
     if(disableSecurity) {
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
-        options.addArguments("--disable-popup-blocking");
     }
 
     Map<String, Object> prefs = new HashMap<>();

@@ -52,8 +52,6 @@ public final class Tags extends TagsBase {
 
 	private Tags() {}
 
-	public static final Tag<Integer> TimesExecuted = from("TimesExecuted", Integer.class);
-
 	/** Usually attached to widgets. Returns a <code>HitTester</code> object which allows to
 	 * is visible at a specific location determine whether the widget */
 	public static final Tag<HitTester> HitTester = from("HitTester", HitTester.class);

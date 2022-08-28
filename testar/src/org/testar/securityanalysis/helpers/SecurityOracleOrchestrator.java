@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/** The SecurityOracleOrchestrator connects the oracles to the protocol.
+ * The protocol calls the SecurityOracleOrchestrator for certain actions and these actions are passed on to the oracles.
+ */
 public class SecurityOracleOrchestrator {
     private Set<BaseSecurityOracle> securityOracles = new HashSet<>();
     private ActiveSecurityOracle activeSecurityOracle;

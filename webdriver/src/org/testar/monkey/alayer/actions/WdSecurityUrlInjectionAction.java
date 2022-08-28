@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 
+/** Enables TESTAR to navigate to a new URL **/
 public class WdSecurityUrlInjectionAction extends TaggableBase implements Action {
     private String text;
 

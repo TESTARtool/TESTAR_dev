@@ -7,6 +7,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 
+/** Enables TESTAR to use special characters in input fields **/
 public class WdSecurityInjectionAction extends TaggableBase implements Action {
     private WebElement element;
     private String text;
