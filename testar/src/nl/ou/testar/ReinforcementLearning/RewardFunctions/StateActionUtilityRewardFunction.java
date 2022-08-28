@@ -57,9 +57,10 @@ public class StateActionUtilityRewardFunction extends CounterBasedRewardFunction
 
         logger.info("ID={} stateReward={}", executedAbstractAction.getId(), stateReward);
 
-        float counterWeight = 0.4f;
-        float stateWeight = 0.3f;
-        final float reward = counterWeight * actionReward + stateWeight * stateReward;
+//        float counterWeight = 0.4f;
+//        float stateWeight = 0.3f;
+//        final float reward = counterWeight * actionReward + stateWeight * stateReward;
+        final float reward = actionReward + stateReward;
         logger.info("ID={} Reward={}", executedAbstractAction.getId(), reward);
         return reward;
     }
