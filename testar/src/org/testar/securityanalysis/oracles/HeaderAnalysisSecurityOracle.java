@@ -44,8 +44,6 @@ public class HeaderAnalysisSecurityOracle extends BaseSecurityOracle {
     @Override
     public Verdict getVerdict()
     {
-        System.out.println("HeaderAnalysisSecurityOracle, getVerdict()");
-
         List<NetworkDataDto> datas = networkCollector.getDataBySequence(lastSequenceActionNumber);
         for (NetworkDataDto data : datas) {
             if (lastSequenceActionNumber < data.sequence)
