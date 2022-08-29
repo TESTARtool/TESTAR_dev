@@ -50,21 +50,32 @@ public class HeaderAnalysisSecurityOracle extends BaseSecurityOracle {
                 lastSequenceActionNumber = data.sequence;
 
             if (data.type == "Headers") {
-                for (Map.Entry<String, String> header : data.data.entrySet()) {
-                    if (header.getKey().equals("Set-Cookie")) {
-                        if (!header.getValue().contains("Secure;")) {
-                            securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "614", "cookie not set secure: " + header.getKey() + " " + header.getValue());
-                            System.out.println("Header insecure:");
-                            System.out.println(header.getValue());
-                        } else {
-                            System.out.println("Header secure:");
-                            System.out.println(header.getValue());
-                        }
-                    }
-                }
+                validateHeaderContainsFlag(data.data, "Set-Cookie", "Secure;");
+                validateHeaderContainsFlag(data.data, "X-XSS-Protection", "1; mode=block");
+                validateHeaderContainsFlag(data.data, "X-Content-Type-Options", "nosniff");
+                validateHeaderIsPresent(data.data, "Strict-Transport-Security");
+                validateHeaderIsPresent(data.data, "X-Frame-Options");
+                validateHeaderIsPresent(data.data, "X-Content-Type-Options");
+                validateHeaderIsPresent(data.data, "X-XSS-Protection");
             }
         }
 
         return Verdict.OK;
+    }
+
+    private void validateHeaderContainsFlag(Map<String, String> headers, String name, String flag)
+    {
+        String header = headers.get(name);
+        if (header != null) {
+            if (!header.contains(flag)) {
+                securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "614", name + " header does not contain " + flag + " flag");
+            }
+        }
+    }
+
+    private void validateHeaderIsPresent(Map<String, String> headers, String name)
+    {
+        if (headers.get(name) == null)
+            securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "614", name + " header is not present");
     }
 }
