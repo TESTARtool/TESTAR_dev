@@ -82,7 +82,7 @@ public class WdDriver extends SUTBase {
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
-  public static boolean disableSecurity = true;
+  public static boolean disableSecurity = false;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -172,12 +172,12 @@ public class WdDriver extends SUTBase {
     options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
     options.addArguments("load-extension=" + extensionPath);
-    options.addArguments("ignore-certificate-errors");
-    // options.addArguments("disable-infobars");
+    options.addArguments("disable-infobars");
     if(fullScreen) {
     	options.addArguments("--start-maximized");
     }
     if(disableSecurity) {
+        options.addArguments("ignore-certificate-errors");
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }
