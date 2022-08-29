@@ -236,7 +236,7 @@ task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineOk'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
     doLast {
         String output = standardOutput.toString()
 
@@ -279,7 +279,7 @@ task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'inst
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
     doLast {
         String output = standardOutput.toString()
 
