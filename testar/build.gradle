@@ -69,6 +69,40 @@ task customZipDistribution(type: Zip) {
    	destinationDir(file('target/install'))
 }
 
+/**
+ * Prepare folder structure to run debugging mode from IDE
+ */
+task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
+    group = 'custom_testar'
+    description ='debuggingDistribution'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task debugFiles(type: Copy) {
+    from 'target/scripts/.'
+    into '.'
+}
+
+task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
+    group = 'custom_testar'
+    description ='cleanDebugging'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task deleteDebugging(type: Delete){
+    delete 'settings'
+    delete 'suts'
+    delete 'output'
+    delete 'testar'
+    delete 'testar.bat'
+    delete 'windows.dll'
+    delete 'index.log'
+}
+
 dependencies {
     implementation project(':core')
     implementation project(':webdriver')
@@ -173,6 +207,7 @@ startScripts.dependsOn {
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
+debuggingDistribution.dependsOn(build)
 
 /**
  * Build TESTAR using Visual Studio Tools to create a windows.dll
