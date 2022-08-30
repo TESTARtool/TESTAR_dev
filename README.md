@@ -3,53 +3,43 @@
 This is the github development root folder for TESTAR development. 
 The software can be build with both ant and gradle.
 
-### Required tools to create TESTAR executable distribution
-
-In order to build the native code, a view manual steps need to be executed;
-
-1. In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
-These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
-2. Install the Visual Studio tools on your machine (remember the path where the tools are installed)
-3. Download [compile_w10.bat](https://github.com/florendg/testar_floren/releases/download/PERFORMANCE/compile_w10.bat) 
-and [clean_w10.bat](https://github.com/florendg/testar_floren/releases/download/PERFORMANCE/clean_w10.bat)
-4. Copy clean.bat and compile.bat to the folder windows/native_src within the TESTAR project
-5. Adapt compile.bat and clean.bat. Set *PATH* to the installation folder used in step 2.
-CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
-
 ### Import Gradle project into Eclipse (similar for other IDEs with Gradle)
 
-1. Create a new empty workspace for Eclipse in a folder which is not the folder that contains the source
-code.
+1. Create a new workspace
 2. Select File -> Import to open the import dialog
-3. Select Gradle -> Existing Gradle project to open te import dialog 
+3. Select Gradle -> Existing Gradle project to open the import dialog 
 4. Select the folder that contains the root of the source code and start the import
 
 It should be possible to build the project using the instructions provided in the next section
 
 ### Gradle tasks
 
-#### gradle build (Files Compilation)
-`gradle build` task : is configured to compile TESTAR project at Java level for error and warning checking. 
+`gradlew` is the instruction to use the gradle wrapper. 
+
+This basically means that TESTAR will download in the system, and will use to compile, 
+the gradle version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wrapper.properties`
+
+#### gradlew build (Files Compilation)
+`gradlew build` task : is configured to compile TESTAR project at Java level for error and warning checking. 
 NOTE that this task doesn't generate an executable distribution by default.
 
 #### windows.dll (Allows TESTAR execution on Windows)
 TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems.
 
-#### gradle windowsDistribution (Allows TESTAR execution on Windows)
-`gradle windowsDistribution` task : uses the `Required tools to build the software` (see above) to create a new file `windows.dll`, which has preference over the default one.
+#### gradlew windowsDistribution (Allows TESTAR execution on Windows)
+`gradlew windowsDistribution` task : Create a new file `windows.dll`, which has preference over the default one.
+This tasks requires the installation of Visual Studio tools:
+https://github.com/TESTARtool/TESTAR_dev/wiki/Update-Windows-UIAutomation-(windows.dll)
 
-NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
- [link]( https://go.microsoft.com/fwlink/?LinkId=746572 ). Also a JAVA 1.8 JDK is required.
-
-#### gradle installDist (Create TESTAR Distribution)
-`gradle installDist` task : creates a runnable TESTAR distribution in the `\testar\target\install\testar\bin\` directory.
-By default, `windows.dll` should be copied from `\testar\resources\windows10\` directory and overwritten by the new dll file if the `gradle windowsDistribution` task was executed.
+#### gradlew installDist (Create TESTAR Distribution)
+`gradlew installDist` task : creates a runnable TESTAR distribution in the `\testar\target\install\testar\bin\` directory.
+By default, `windows.dll` should be copied from `\testar\resources\windows10\` directory and overwritten by the new dll file if the `gradlew windowsDistribution` task was executed.
 
 1. Run `.\gradlew installDist` in the root of the project, or `TESTAR_dev -> distribution -> installDist` with the IDE
 2. Change directory to `\testar\target\install\testar\bin\`
 3. Run testar.bat
 
-#### gradle distZip (Creates a TESTAR Distribution)
+#### gradlew distZip (Creates a TESTAR Distribution)
 It is also possible to generate a zip file containing TESTAR. This zip can be extracted on any other machine
 that has a 64-bit Windows operating system and Visual Studio redistributable installed. A proper way of using
 TESTAR is to run the tool in a virtual-machine.
@@ -57,9 +47,6 @@ To build the zip execute the following command.
 
 1. Run `.\gradlew distZip` in the root of the project. 
 2. Extract the zip on the machine where TESTAR is used.
-
-NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
- [link](https://go.microsoft.com/fwlink/?LinkId=746572) .Also a JAVA 1.8 JDK is required.
 
 #### Running Gradle in Eclipse
 The following procedure has been performed
@@ -70,11 +57,10 @@ code.
 3. Select Gradle -> Existing Gradle project to open te import dialog 
 4. Select the folder that contains the root of the source code and start the import
 
-
 #### Running TESTAR from Gradle
-`gradle runTestar` task : creates a TESTAR distribution with `gradle installDist` task, and executes TESTAR from the runnable file `\testar\target\install\testar\bin\testar.bat`
+`gradlew runTestar` task : creates a TESTAR distribution with `gradlew installDist` task, and executes TESTAR from the runnable file `\testar\target\install\testar\bin\testar.bat`
 
-TESTAR can be started using a gradle command from the root of the project.
+TESTAR can be started using a gradlew command from the root of the project.
 1. .\gradlew runTestar
 
 ##### In Eclipse
@@ -174,8 +160,16 @@ Also is possible to connect at file level without deploy the OrientDB locally:
 		DataStoreUser = testar
 		DataStorePassword = testar
 		
+## Docker chromedriver image
+https://hub.docker.com/u/testartool
+
+https://hub.docker.com/r/testartool/testar-chromedriver
+
 ## Known issues
 https://github.com/TESTARtool/TESTAR_dev/issues
 
 ## Release notes
 https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
+
+## Required tools to create a windows.dll to update UIAutomation API
+https://github.com/TESTARtool/TESTAR_dev/wiki/Update-Windows-UIAutomation-(windows.dll)

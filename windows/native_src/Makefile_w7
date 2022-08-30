@@ -6,10 +6,11 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
 		  /I AccessBridge
 # /I "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
-          
+
 DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\target\classes\java\main\org\fruit\alayer\windows\Windows.class"
+JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\monkey\alayer\windows\Windows.class"
+
 JAVA_CLASS = org.fruit.alayer.windows.Windows
 
 OBJFILES= main_w7.obj\

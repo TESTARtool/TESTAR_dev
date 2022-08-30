@@ -1,0 +1,8 @@
+#!/bin/sh
+cat /README.Docker
+echo "Start Xvfb"
+/opt/bin/start-xvfb.sh &
+sleep 2
+cd /testar/bin
+./testar
+#sh -c "while true; do sleep 1; done"

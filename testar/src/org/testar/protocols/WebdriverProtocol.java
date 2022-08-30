@@ -31,10 +31,12 @@
 
 package org.testar.protocols;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -47,40 +49,41 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.ArrayUtils;
-import org.fruit.Environment;
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.WdDriver;
-import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.alayer.windows.WinProcess;
-import org.fruit.alayer.windows.Windows;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testar.monkey.Environment;
+import org.testar.monkey.Main;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.WdElement;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinProcess;
+import org.testar.monkey.alayer.windows.Windows;
+import org.testar.plugin.NativeLinker;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
-
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import org.testar.serialisation.LogSerialiser;
+import org.testar.reporting.Reporting;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected Reporting htmlReport;
     protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
@@ -104,6 +107,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 		}
 	};
+
+	// Verdict obtained from messages coming from the web browser console
+	protected Verdict webConsoleVerdict = Verdict.OK;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -142,14 +148,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 	}
 	
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
-    }
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = getReporter();
+		// reset web browser console verdict
+		webConsoleVerdict = Verdict.OK;
+	}
     
     /**
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -165,35 +173,45 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected SUT startSystem() throws SystemStartException {
-    	// Add the domain from the SUTConnectorValue to domainsAllowed List
-    	ensureDomainsAllowed();
-    	
     	SUT sut = super.startSystem();
 
-    	// A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
-    	// webdriver in the constructor of WdDriver.
-    	// A possible solution could be creating a snapshot of the running browser processes before and after
-    	if(System.getProperty("os.name").contains("Windows 10")
-    			&& sut.get(Tags.HWND, null) == null) {
-    		// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
-    		// window handle. The running browser needs to be in the foreground when we reach this part.
-    		long hwnd = Windows.GetForegroundWindow();
-    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
-    		// Safe to set breakpoints again.
-    		if (WinProcess.procName(pid).contains("chrome")) {
-    			sut.set(Tags.HWND, hwnd);
-    			sut.set(Tags.PID, pid);
-    			System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
-    		}
-    	}
+    	// Add the domain from the SUTConnectorValue to domainsAllowed List
+    	ensureDomainsAllowed();
 
-		double displayScale = getDisplayScale(sut);
+    	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
+    	setWindowHandleForWebdriverBrowser(sut);
 
-		// See remarks in WdMouse
-        mouse = sut.get(Tags.StandardMouse);
-        mouse.setCursorDisplayScale(displayScale);
+    	double displayScale = getDisplayScale(sut);
+
+    	// See remarks in WdMouse
+    	mouse = sut.get(Tags.StandardMouse);
+    	mouse.setCursorDisplayScale(displayScale);
 
     	return sut;
+    }
+
+    /**
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
+     * webdriver in the constructor of WdDriver. 
+     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     */
+    private void setWindowHandleForWebdriverBrowser(SUT sut) {
+    	try {
+    		if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
+    			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
+    			// window handle. The running browser needs to be in the foreground when we reach this part.
+    			long hwnd = Windows.GetForegroundWindow();
+    			long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    			// Safe to set breakpoints again.
+    			if (WinProcess.procName(pid).contains("chrome")) {
+    				sut.set(Tags.HWND, hwnd);
+    				sut.set(Tags.PID, pid);
+    				System.out.printf("INFO System PID %d and window handle %d have been set\n", pid, hwnd);
+    			}
+    		}
+    	} catch (ExceptionInInitializerError | NoClassDefFoundError e) {
+    		System.out.println("INFO: We can not obtain the Windows 10 windows handle of WebDriver browser instance");
+    	}
     }
 
 	/**
@@ -203,6 +221,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * @return The display scale.
 	 */
 	private double getDisplayScale(SUT sut) {
+		// Call specific OS API to obtain the display scale value of the system
+		// Ex: windows - org.testar.monkey.alayer.windows.Windows10 calls MonitorFromWindow native function
+		// If something fails these specific getDisplayScale OS implementations must return a default value
 		double displayScale = Environment.getInstance().getDisplayScale(sut.get(Tags.HWND, (long)0));
 
 		// If the user has specified a scale override the display scale obtained from the system.
@@ -253,6 +274,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		system.set(Tags.IsRunning, false);
     	}
 
+    	updateCssClassesFromTestSettingsFile();
+
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
@@ -287,26 +310,61 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         htmlReport.addState(latestState);
         return latestState;
     }
-    
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
-		// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
-		if(actions == null || actions.isEmpty()) {
-			System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
-			System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
-			System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
-			actions = new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		}
-		
-		return super.selectAction(state, actions);
-	}
+
+    /**
+     * The getVerdict methods implements the online state oracles that
+     * examine the SUT's current state and returns an oracle verdict.
+     *
+     * @return oracle verdict, which determines whether the state is erroneous and why.
+     */
+    @Override
+    protected Verdict getVerdict(State state) {
+    	Verdict stateVerdict = super.getVerdict(state);
+
+    	// If Web Console Error Oracle is enabled and we have some pattern to match
+    	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
+    		// Load the web console error pattern
+    		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
+    		// Check Severe messages in the WebDriver logs
+    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    		for(LogEntry logEntry : logEntries) {
+    			if(logEntry.getLevel().equals(Level.SEVERE)) {
+    				// Check if the severe error message matches with the web console error pattern
+    				String consoleErrorMsg = logEntry.getMessage();
+    				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
+    				if(matcherError.matches()) {
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + consoleErrorMsg);
+    				}
+    			}
+    		}
+    		// Join GUI verdict with WebDriver console verdict
+    		stateVerdict = stateVerdict.join(webConsoleVerdict);
+    	}
+
+    	// If Web Console Warning Oracle is enabled and we have some pattern to match
+    	if(settings.get(ConfigTags.WebConsoleWarningOracle, false) && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
+    		// Load the web console warning pattern
+    		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
+    		// Check Warning messages in the WebDriver logs
+    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    		for(LogEntry logEntry : logEntries) {
+    			if(logEntry.getLevel().equals(Level.WARNING)) {
+    				// Check if the warning message matches with the web console error pattern
+    				String consoleWarningMsg = logEntry.getMessage();
+    				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
+    				if(matcherWarning.matches()) {
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Warning: " + consoleWarningMsg);
+    				}
+    			}
+    		}
+    		// Join GUI verdict with WebDriver console verdict
+    		stateVerdict = stateVerdict.join(webConsoleVerdict);
+    	}
+
+    	return stateVerdict;
+    }
 
     /**
      * Overwriting to add HTML report writing into it
@@ -316,10 +374,34 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * @return
      */
     @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	// Derive actions didn't find any action, inform the user and force WdHistoryBackAction
+    	if(actions == null || actions.isEmpty()) {
+    		System.out.println(String.format("** WEBDRIVER WARNING: In Action number %s the State seems to have no interactive widgets", actionCount()));
+    		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
+    		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
+    		// Create and build the id of the HistoryBackAction
+    		Action histBackAction = new WdHistoryBackAction();
+    		buildEnvironmentActionIdentifiers(state, histBackAction);
+    		actions = new HashSet<>(Collections.singletonList(histBackAction));
+    	}
+    	// super preSelectAction will not derive ESC action
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
+    }
+
+    /**
+     * Select one of the possible actions (e.g. at random)
+     *
+     * @param state   the SUT's current state
+     * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+     * @return the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions) {
+    	return super.selectAction(state, actions);
     }
 
     /**
@@ -337,29 +419,50 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     }
 
     /**
+     * Replay the saved action
+     */
+    @Override
+    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state, action);
+        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
+    }
+
+    /**
      * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
      */
     @Override
     protected void postSequenceProcessing() {
-    	htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+        String status = "";
+        String statusInfo = "";
 
-    	String sequencesPath = getGeneratedSequenceName();
-    	try {
-    		sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-    	}catch (Exception e) {}
+        if(mode() == Modes.Replay) {
+            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+        }
+        else {
+            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+        }
 
-    	String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-    	String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+        String sequencesPath = getGeneratedSequenceName();
+        try {
+            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
 
-    	statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
+		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
 
-    	//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-    	INDEXLOG.info(OutputStructure.executedSUTname
-    			+ " " + settings.get(ConfigTags.Mode, mode())
-    			+ " " + sequencesPath
-    			+ " " + status + " \"" + statusInfo + "\"" );
-    	
-    	htmlReport.close();
+        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
+        INDEXLOG.info(OutputStructure.executedSUTname
+                + " " + settings.get(ConfigTags.Mode, mode())
+                + " " + sequencesPath
+                + " " + status + " \"" + statusInfo + "\"" );
+
+        htmlReport.close();
     }
     
     @Override
@@ -388,8 +491,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
                     write.close();
                 }
 
-            } catch (Exception e) {System.out.println(e.getMessage());}
-        }
+            } catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
         super.stopSystem(system);
     }
@@ -611,22 +716,34 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
 	 */
 	protected void ensureDomainsAllowed() {
-		String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-		String url = parts[parts.length - 1].replace("\"", "");
-
 		try{
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(url))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s domain to domainsAllowed List", getDomain(url)));
+			// Adding default domain from SUTConnectorValue if is not included in the domainsAllowed list
+			//TODO try-catch for nullpointer if sut connector missing
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(sutConnectorUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to domainsAllowed List", getDomain(sutConnectorUrl)));
 				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(url)));
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(sutConnectorUrl)));
 				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
 			}
-		} catch(Exception e) {
+
+			// Also add the default starting domain of the SUT if is not included in the domainsAllowed list
+			String initialUrl = WdDriver.getCurrentUrl();
+
+			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(initialUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to domainsAllowed List", getDomain(initialUrl)));
+				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
+				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(initialUrl)));
+				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			}
+		} catch(Exception e) { //TODO check what kind of exception can happen
 			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
 			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
-	
+
 	/*
 	 * We need to check if click position is within the canvas
 	 */
@@ -638,5 +755,62 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Widget must be completely visible on viewport for screenshots
 		return widget.get(WdTags.WebIsFullOnScreen, false);
+	}
+
+	protected boolean isForm(Widget widget) {
+	    Role role = widget.get(Tags.Role, Roles.Widget);
+	    return role.equals(WdRoles.WdFORM);
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Read the ClickableClasses property from test.settings file 
+	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 */
+	private void updateCssClassesFromTestSettingsFile() {
+		// Feature only for Spy mode
+		if(settings.get(ConfigTags.Mode) != Modes.Spy) {
+			return;
+		}
+
+		try {
+			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
+				for(String line; (line = br.readLine()) != null;) {
+					if(line.contains(ConfigTags.ClickableClasses.name())){
+						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
+						// Check if user added new CSS Classes from test settings file to update the clickableClasses
+						for(String webClass : fileClickableClasses) {
+							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
+								System.out.println("Adding new clickable class from settings file: " + webClass);
+								clickableClasses.add(webClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+						// Check if user removed CSS Classes from test settings file to update the clickableClasses
+						for(String clickClass : clickableClasses) {
+							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
+								System.out.println("Removing the clickable class: " + clickClass);
+								clickableClasses.remove(clickClass);
+								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {}
 	}
 }
