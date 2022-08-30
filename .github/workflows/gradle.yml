@@ -202,7 +202,7 @@ jobs:
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     
-    - name: Run webdriver to login in parabank using form filling and detect the browser console error message
+    - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
@@ -267,7 +267,7 @@ jobs:
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     
-    - name: Run webdriver to login in parabank using form filling and detect the browser console error message
+    - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
