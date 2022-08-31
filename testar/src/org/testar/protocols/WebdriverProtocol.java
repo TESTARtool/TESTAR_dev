@@ -941,6 +941,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 //				else if (customLoginAction != null) {
 //					builder.add(customLoginAction, 1);
 //				}
+					if (loginFormID != null) {
+						submitAction = new WdSubmitAction(loginFormID);
+					}
 					else/* if (loginFormID == null)*/ {
 						submitAction = actionCompiler.hitKey(KBKeys.VK_ENTER);
 						submitAction.set(Tags.OriginWidget, passwordWidget);
