@@ -11,7 +11,7 @@ DLLFILE="..\target\resources\main\windows.dll"
 
 JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\monkey\alayer\windows\Windows.class"
 
-JAVA_CLASS = org.fruit.alayer.windows.Windows
+JAVA_CLASS = org.testar.monkey.alayer.windows.Windows
 
 OBJFILES= main_w7.obj\
 		  AccessBridgeCalls.obj
