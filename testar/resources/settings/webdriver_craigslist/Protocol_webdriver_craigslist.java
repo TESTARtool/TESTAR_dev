@@ -391,4 +391,17 @@ public class Protocol_webdriver_craigslist extends WebdriverProtocol {
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
+
+	/**
+	 * This method is called after the last sequence, to allow for example handling the reporting of the session
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		// Extract and create JaCoCo run coverage report for Generate Mode
+		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+			compressOutputRunFolder();
+			copyOutputToNewFolderUsingIpAddress("N:");
+		}
+	}
 }
