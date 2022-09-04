@@ -152,7 +152,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
     private void setCoverageContext() {
 		String setContextURL = this.applicationBaseURL + "/testar-covcontext/" + this.coverageContext;
 
-		if (! waitForURL(setContextURL, 60, 5, 200) )  {
+		if (! waitForURL(setContextURL, 60, 5, 1, 200) )  {
 			logger.info("Error: did not succeed in setting coverage context.");
 		}
 	}
@@ -173,7 +173,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 		String context = this.logContextPrefix + "-" + Integer.toString(sequenceNumber) + "-" +
 			Integer.toString(actionNumber);
 		String setContextURL = applicationBaseURL + "/testar-logcontext/" + context;
-		if ( ! waitForURL(setContextURL, 60, 5, 200) )  {
+		if ( ! waitForURL(setContextURL, 60, 5, 1, 200) )  {
 			logger.error("Error: did not succeed in setting log context for context "
 				+ context + ".");
 		}
@@ -193,7 +193,11 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                 logger.info("No coverage data available. Not loading it into SUT.");
             }
             else {
-                if ( ! postRequest( applicationBaseURL + "/testar-importdata", 60, 5, 200, coverageData) ) {
+                logger.info("Coverage data length to be imported is "+ coverageData.length());
+                if ( postRequest( applicationBaseURL + "/testar-importdata", 600, 60, 5, 200, coverageData) ) {
+                    logger.info("Error: transmitted coverage data to SUT.");
+                }
+                else {
                     logger.error("Error: did not succeed in loading coverage data.");
                 }
             }
@@ -206,9 +210,9 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         logger.info("Sequence " + String.valueOf(sequenceNumber ) + " finishing.");
 
         if ( settings.get(ConfigTags.CarryOverCoverage) || settings.get(ConfigTags.ExportCoverage ) ) {
-            coverageData = getRequest ( applicationBaseURL + "/testar-clearlog-exportdata", 60, 5, 200);
+            coverageData = getRequest ( applicationBaseURL + "/testar-clearlog-exportdata", 300, 60, 5, 200);
             if (coverageData == null ) {
-                logger.error("Failed to import coverage data at end of sequence.");
+                logger.error("Failed to export coverage data at end of sequence.");
             }
         }
 
@@ -273,6 +277,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
      *
      * @param url_string URL to send requests to
      * @param maxWaitTime Approximate maximum time to wait, in seconds
+     * @param timeout Timeout for requests, in seconds
      * @param retryTime Approximate time between retries, in seconds
      * @param expectedStatusCode return
      * @return boolean value that shows whether the request returned the expected status code
@@ -280,7 +285,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
      * @throws IOException
      * @throws ProtocolException
      */
-    public static boolean waitForURL(String url_string, int maxWaitTime, int retryTime, int expectedStatusCode) {
+    public static boolean waitForURL(String url_string, int maxWaitTime, int timeout, int retryTime, int expectedStatusCode) {
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
         Logger logger = LogManager.getLogger();
@@ -289,8 +294,8 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                 URL url = new URL(url_string);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
-                con.setConnectTimeout(retryTime*1000);
-                con.setReadTimeout(retryTime*1000);
+                con.setConnectTimeout(timeout*1000);
+                con.setReadTimeout(timeout*1000);
                 int status = con.getResponseCode();
                 logger.info("Status is " + status);
             if ( status == expectedStatusCode ) {
@@ -313,7 +318,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         }
         logger.info("info: sleeping between retries for " + url_string + " ...");
         try {
-         Thread.sleep(retryTime*1000);
+         Thread.sleep((long)retryTime*1000);
         }
         catch (InterruptedException ie) {
             logger.info("Sleep between retries for " + url_string + " was interrupted.");
@@ -323,7 +328,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         return false;
     }
 
-    public static StringBuffer getRequest(String url_string, int maxWaitTime, int retryTime, int expectedStatusCode) {
+    public static StringBuffer getRequest(String url_string, int maxWaitTime, int timeout,  int retryTime, int expectedStatusCode) {
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
         Logger logger = LogManager.getLogger();
@@ -332,8 +337,8 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                 URL url = new URL(url_string);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
-                con.setConnectTimeout(retryTime*1000);
-                con.setReadTimeout(retryTime*1000);
+                con.setConnectTimeout(timeout*1000);
+                con.setReadTimeout(timeout*1000);
                 int status = con.getResponseCode();
                 logger.info("Status is " + status);
                 if ( status == expectedStatusCode ) {
@@ -364,7 +369,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         }
         logger.info("info: sleeping between retries for " + url_string + " ...");
         try {
-         Thread.sleep(retryTime*1000);
+         Thread.sleep((long)retryTime * 1000);
         }
         catch (InterruptedException ie) {
             logger.info("Sleep between retries for " + url_string + " was interrupted.");
@@ -375,7 +380,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
 
     }
 
-    public static boolean postRequest(String url_string, int maxWaitTime,  int retryTime, int expectedStatusCode, StringBuffer content) {
+    public static boolean postRequest(String url_string, int maxWaitTime, int timeout, int retryTime, int expectedStatusCode, StringBuffer content) {
 
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
@@ -385,8 +390,8 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
                 URL url = new URL(url_string);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
-                con.setConnectTimeout(retryTime*1000);
-                con.setReadTimeout(retryTime*1000);
+                con.setConnectTimeout(timeout*1000);
+                con.setReadTimeout(timeout*1000);
                 con.setDoOutput(true);
                 con.setRequestProperty( "Content-Type", "text/plain" );
                 con.setRequestProperty( "Content-Length", String.valueOf(content.length()));
@@ -413,7 +418,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         }
         logger.info("info: sleeping between retries for " + url_string + " ...");
         try {
-         Thread.sleep(retryTime*1000);
+         Thread.sleep((long)retryTime*1000);
         }
         catch (InterruptedException ie) {
             logger.info("Sleep between retries for " + url_string + " was interrupted.");

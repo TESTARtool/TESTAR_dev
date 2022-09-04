@@ -123,7 +123,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
 	protected void startDockerSUT() {
 		String[] command = {"docker-compose", "up", "--force-recreate", "--build", "-d"};
 		runDockerCommand(command);
-		if (! waitForURL(this.applicationBaseURL, 300, 5, 200) ) {
+		if (! waitForURL(this.applicationBaseURL, 300, 5, 5, 200) ) {
 			logger.error("Error: did not succeed in bringing up SUT.");
 		}
 	}
@@ -193,7 +193,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
      * @throws IOException
      * @throws ProtocolException
      */
-    public static boolean waitForURL(String urlString, int maxWaitTime, int retryTime, int expectedStatusCode) {
+    public static boolean waitForURL(String urlString, int maxWaitTime, int timeout, int retryTime, int expectedStatusCode) {
         long beginTime = System.currentTimeMillis() / 1000L;
         long currentTime = beginTime;
 		Logger logger = LogManager.getLogger();
@@ -202,8 +202,8 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
                 URL url = new URL(urlString);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
-                con.setConnectTimeout(retryTime*1000);
-                con.setReadTimeout(retryTime*1000);
+                con.setConnectTimeout(timeout*1000);
+                con.setReadTimeout(timeout*1000);
                 int status = con.getResponseCode();
                 logger.info("Status is " + status);
             if ( status == expectedStatusCode ) {
@@ -225,7 +225,7 @@ public class DockerizedSUTWebdriverProtocol extends GenericWebdriverProtocol {
         }
         logger.info("info: sleeping between retries for " + urlString + " ...");
         try {
-         Thread.sleep(retryTime*1000);
+         Thread.sleep((long)retryTime*1000);
         }
         catch (InterruptedException ie) {
          logger.error("Sleep between retries for " + urlString + " was interrupted.");
