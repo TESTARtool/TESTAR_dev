@@ -184,7 +184,7 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         this.sequenceNumber++;
         this.actionNumber = 0;
 
-        logger.info("Sequence " + String.valueOf(sequenceNumber + " starting."));
+        logger.info("Sequence " + String.valueOf(sequenceNumber) + " starting.");
 
         super.beginSequence(system, state);
 
