@@ -603,7 +603,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	/**
 	 * Execute a State Model query to extract information about number of states and actions.
 	 */
-	private void extractStateModelMetrics() {
+	protected void extractStateModelMetrics() {
 	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
 	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
 	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");

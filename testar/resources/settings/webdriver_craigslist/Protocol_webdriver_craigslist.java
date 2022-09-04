@@ -29,6 +29,7 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.SutVisualization;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -400,6 +401,12 @@ public class Protocol_webdriver_craigslist extends WebdriverProtocol {
 		super.closeTestSession();
 		// Extract and create JaCoCo run coverage report for Generate Mode
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+			try {
+				extractStateModelMetrics();
+			} catch(Exception e) {
+				LogSerialiser.log("ERROR Extracting state model metrics: " + actionCount, LogSerialiser.LogLevel.Info);
+				System.err.println("ERROR Extracting state model metrics: " + actionCount);
+			}
 			compressOutputRunFolder();
 			copyOutputToNewFolderUsingIpAddress("N:");
 		}
