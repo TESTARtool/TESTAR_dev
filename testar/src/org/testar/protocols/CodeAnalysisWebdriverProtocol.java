@@ -137,7 +137,16 @@ public class CodeAnalysisWebdriverProtocol extends DockerizedSUTWebdriverProtoco
         if ( this.instrumentationEnabled && this.setCoverageContext ) {
             setCoverageContext();
         }
+        else {
+            waitForSUT();
+        }
         return sut;
+	}
+
+    private void waitForSUT() {
+		if (! waitForURL(applicationBaseURL, 60, 5,  1, 200) )  {
+			logger.info("Error: did not succeed in waiting .");
+		}
 	}
 
     private void setCoverageContext() {
