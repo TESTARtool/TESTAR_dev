@@ -357,6 +357,12 @@ public class Protocol_webdriver_craigslist extends WebdriverProtocol {
 				.setFilename("urlData")
 				.setInformation(information)
 				.build());
+		try {
+			extractStateModelMetrics();
+		} catch(Exception e) {
+			LogSerialiser.log("ERROR Extracting state model metrics: " + actionCount, LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Extracting state model metrics: " + actionCount);
+		}
 
 		return actionExecuted;
 	}
