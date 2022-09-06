@@ -35,6 +35,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -82,6 +84,8 @@ public class WdDriver extends SUTBase {
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
+
+  private static final Logger logger = LogManager.getLogger();
 
   private WdDriver(String sutConnector) {
 	
@@ -455,24 +459,34 @@ public class WdDriver extends SUTBase {
       waitDocumentReady();
 
       return remoteWebDriver.executeScript(script, args);
-    }
-    catch (NullPointerException | WebDriverException ignored) {
+
+    } catch (NullPointerException | WebDriverException ignored) {
       // We need this for WdSubmitAction
       if (ignored instanceof WebDriverException &&
           script.contains("getElementById")) {
         throw ignored;
       }
       return null;
+    } catch (IllegalArgumentException iae) {
+      if (remoteWebDriver == null) {
+        logger.trace("remoteWebDriver is null, executeScript is not executed");
+        return null;
+      } else {
+        logger.error(iae);
+        return null;
+      }
     }
   }
 
   public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
-    ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
-      Object result = remoteWebDriver.executeScript("return document.readyState");
-      return result != null && result.equals("complete");
-    };
-    wait.until(documentReady);
+    if(remoteWebDriver != null) {
+      WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
+      ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
+        Object result = remoteWebDriver.executeScript("return document.readyState");
+        return result != null && result.equals("complete");
+      };
+      wait.until(documentReady);
+    }
   }
 
   public static void executeCanvasScript(String script, Object... args) {
@@ -484,9 +498,15 @@ public class WdDriver extends SUTBase {
       remoteWebDriver.executeScript("addCanvasTestar()");
 
       remoteWebDriver.executeScript(script, args);
-    }
-    catch (NullPointerException | WebDriverException ignored) {
 
+    } catch (NullPointerException | WebDriverException ignored) {
+
+    } catch (IllegalArgumentException iae) {
+      if(remoteWebDriver == null) {
+        logger.trace("remoteWebDriver is null, executeCanvasScript is not executed");
+      } else {
+        logger.error(iae);
+      }
     }
   }
 }
