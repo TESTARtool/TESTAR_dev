@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\WebDriver\\bin\\chromedriver.exe" "1920x900+0+0" "https://localhost:8443/benchmark/sqli-Index.html"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://localhost:8443/benchmark/sqli-Index.html"
 
 #################################################################
 # Sequences
@@ -115,10 +115,18 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = null
+DomainsAllowed = 
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Override display scale
@@ -134,6 +142,15 @@ SwitchNewTabs = true
 #################################################################
 
 OverrideWebDriverDisplayScale =
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
 
 #################################################################
 # Other more advanced settings
