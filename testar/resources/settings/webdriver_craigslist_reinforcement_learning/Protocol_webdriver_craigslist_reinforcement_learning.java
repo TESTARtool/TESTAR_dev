@@ -28,16 +28,15 @@
  *
  */
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.SutVisualization;
+import org.apache.commons.text.StringEscapeUtils;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.WdFillFormAction;
+import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -125,6 +124,27 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		}};
 	}
 
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		// Custom the State AbstractIDCustom identifier
+		customActionBuildAbstractIDCustom(actions);
+	}
+
+	private synchronized void customActionBuildAbstractIDCustom(Set<Action> actions) {
+		for (Action a : actions) {
+			/* To create the AbstractIDCustom use:
+			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
+			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
+			 */
+			if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.CompoundAction) || a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.HitKey)) {
+				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
+						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
+			} else {
+				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
+						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+			}
+		}
+	}
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of
