@@ -136,14 +136,25 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
 			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
 			 */
+			if(a instanceof WdHistoryBackAction) continue;
 			if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.CompoundAction) || a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.HitKey)) {
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
 			} else {
+				System.out.println(a.get(Tags.Desc, "No desc"));
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
 			}
 		}
+	}
+
+	protected boolean isUrlDenied(String currentUrl) {
+		if (super.isUrlDenied(currentUrl)){
+			if (getDomain(currentUrl).contains("craigslist.org")) return false;
+			return true;
+		}
+		return false;
+
 	}
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
