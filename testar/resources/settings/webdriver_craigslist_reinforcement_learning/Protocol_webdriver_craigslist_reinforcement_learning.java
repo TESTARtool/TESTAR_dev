@@ -216,6 +216,11 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+
+			if (widget.get(WdTags.WebTitle, "").contains("my location")){
+				continue;
+			}
+
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
 				String protocol = settings.get(ConfigTags.ProtocolClass, "");

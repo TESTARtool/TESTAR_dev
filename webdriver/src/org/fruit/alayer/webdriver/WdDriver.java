@@ -172,6 +172,11 @@ public class WdDriver extends SUTBase {
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);
+    prefs.put("profile.default_content_setting_values.geolocation", 1);
+
+    System.out.println("Profile !!!!!!!!!!!!!!");
+
+
     options.setExperimentalOption("prefs", prefs);
 
     return new ChromeDriver(service, options);

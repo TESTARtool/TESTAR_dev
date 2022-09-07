@@ -214,6 +214,11 @@ public class Protocol_webdriver_craigslist extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+
+			if (widget.get(WdTags.WebTitle, "").contains("my location")){
+				continue;
+			}
+
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
 				String protocol = settings.get(ConfigTags.ProtocolClass, "");
