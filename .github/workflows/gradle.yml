@@ -114,13 +114,21 @@ jobs:
         name: runTestWebdriverSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
     
-    - name: Run webdriver to login in parabank app
-      run: ./gradlew runTestWebdriverParabankLogin
-    - name: Save runTestWebdriverParabankLogin HTML report artifact
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestWebdriverParabankLogin-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login
+        name: runTestWebdriverParabankLoginAndConsoleError-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login_console_error
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
+    - name: Save runTestWebdriverParabankFormFilling HTML report artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: runTestWebdriverParabankFormFilling-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
@@ -191,8 +199,11 @@ jobs:
     - name: Run webdriver protocol and detect SuspiciousTitle
       run: ./gradlew runTestWebdriverSuspiciousTitle
     
-    - name: Run webdriver to login in parabank app
-      run: ./gradlew runTestWebdriverParabankLogin
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
@@ -253,8 +264,11 @@ jobs:
     - name: Run webdriver protocol and detect SuspiciousTitle
       run: ./gradlew runTestWebdriverSuspiciousTitle
     
-    - name: Run webdriver to login in parabank app
-      run: ./gradlew runTestWebdriverParabankLogin
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay

@@ -1398,10 +1398,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
+					builder,
+					settings().get(ConfigTags.ForceForeground));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
