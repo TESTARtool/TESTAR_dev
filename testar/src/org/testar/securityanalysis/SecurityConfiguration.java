@@ -33,11 +33,14 @@ package org.testar.securityanalysis;
 import java.util.Arrays;
 import java.util.List;
 
+import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
+
 public class SecurityConfiguration {
     public static int maxBenchmarkExecutionTimes = 2;
     public static String resultWriterOutput = "JSON";
 
-    public List<String> oracles = Arrays.asList("HeaderAnalysisSecurityOracle", "SqlInjectionSecurityOracle");
+    // Enable always the passive HeaderAnalysisSecurityOracle oracle by default
+    public List<String> oracles = Arrays.asList("HeaderAnalysisSecurityOracle");
 
     public String loginUrl = "http://localhost:41948/Account/Login";
     public String usernameField = "username";
@@ -49,4 +52,19 @@ public class SecurityConfiguration {
     public String password = "123";
 
     public long tokenInvalidationWaitTime = 60000; /** One minute **/
+
+    /**
+     * Create the security configuration only with the passive HeaderAnalysisSecurityOracle. 
+     */
+    public SecurityConfiguration() {}
+
+    /**
+     * Create the security configuration with the passive HeaderAnalysisSecurityOracle 
+     * and the chosen active security oracle. 
+     * 
+     * @param activeOracle
+     */
+    public SecurityConfiguration(ActiveSecurityOracle.ActiveOracle activeOracle) {
+    	oracles = Arrays.asList("HeaderAnalysisSecurityOracle", activeOracle.getOracle());
+    }
 }

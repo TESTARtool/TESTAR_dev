@@ -41,7 +41,6 @@ import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
@@ -51,6 +50,9 @@ import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.securityanalysis.*;
 import org.testar.securityanalysis.helpers.SecurityOracleOrchestrator;
+import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
+import org.testar.securityanalysis.oracles.SqlInjectionSecurityOracle;
+import org.testar.securityanalysis.oracles.XssSecurityOracle;
 
 import java.util.*;
 
@@ -72,18 +74,18 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
     private NavigationHelper navigationHelper;
     private RemoteWebDriver webDriver;
     private SecurityOracleOrchestrator oracleOrchestrator;
-    private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+
+    // Passive oracle HeaderAnalysisSecurityOracle is always enabled by default. 
+    // But for active oracles SQL injection, XSS, and Token Invalidation,
+    // we can only select one at a time.
+    private SecurityConfiguration securityConfiguration = 
+            new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.SQL_INJECTION);
 
     @Override
     protected void initialize(Settings settings) {
-    	super.initialize(settings);
-    	// Disable web security such as "ignore-certificate-errors" for local testing purposes
-    	//WdDriver.disableSecurity = true;
-    }
-
-    @Override
-    protected void preSequencePreparations() {
-        super.preSequencePreparations();
+        super.initialize(settings);
+        // Disable web security such as "ignore-certificate-errors" for local testing purposes
+        WdDriver.disableSecurity = true;
     }
 
     @Override
@@ -91,6 +93,31 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         SUT sut = super.startSystem();
         coordinate();
         return sut;
+    }
+
+    private void coordinate() {
+        startSecurityResultWriter();
+        webDriver = WdDriver.getRemoteWebDriver();
+        DevTools devTools = ((HasDevTools) webDriver).getDevTools();
+        devTools.createSession();
+        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()));
+        lastSequenceActionNumber = 0;
+        oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.oracles, webDriver, devTools);
+
+        /**
+         *  This methods allow to customize the XSS and SQL injection input
+         */
+        // TESTAR XSS verdict searches for a console message in the browser that contains the XSS value
+        XssSecurityOracle.setXssInjectionText("<script>console.log('XSS_detected!');</script>");
+        // TESTAR SQL verdict searches for a 500 status code in the browser
+        SqlInjectionSecurityOracle.setSqlInjectionText("'");
+    }
+
+    private void startSecurityResultWriter(){
+        if (securityConfiguration.resultWriterOutput.compareToIgnoreCase("json") == 0)
+            securityResultWriter = new JsonSecurityResultWriter();
+        else
+            throw new NotImplementedException("Unknown output type '" + securityConfiguration.resultWriterOutput + "'");
     }
 
     /**
@@ -106,16 +133,16 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         navigationHelper = new NavigationHelper();
     }
 
-    //region InnerLoop
     @Override
-    protected State getState(SUT system) throws StateBuildException {
-        State state = super.getState(system);
-        return state;
+    protected Verdict getVerdict(State state) {
+        securityResultWriter.WriteVisit(WdDriver.getCurrentUrl());
+        Verdict verdict = Verdict.OK;
+        oracleOrchestrator.getVerdict(verdict);
+        return verdict;
     }
 
     @Override
     protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-        //printState(state);
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
         Set<Action> filteredActions = new HashSet<>();
@@ -215,35 +242,6 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
             return super.executeAction(system, state, new NOP());
     }
 
-    @Override
-    protected Verdict getVerdict(State state) {
-        securityResultWriter.WriteVisit(WdDriver.getCurrentUrl());
-        Verdict verdict = Verdict.OK;
-        oracleOrchestrator.getVerdict(verdict);
-        return verdict;
-    }
-    //endregion
-
-    //region PrivateFunctions
-    private void startSecurityResultWriter(){
-        if (securityConfiguration.resultWriterOutput.compareToIgnoreCase("json") == 0)
-            securityResultWriter = new JsonSecurityResultWriter();
-        else
-            throw new NotImplementedException("Unknown output type '" + securityConfiguration.resultWriterOutput + "'");
-    }
-
-    private void coordinate() {
-        startSecurityResultWriter();
-        webDriver = WdDriver.getRemoteWebDriver();
-        DevTools devTools = ((HasDevTools) webDriver).getDevTools();
-        devTools.createSession();
-        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()));
-        lastSequenceActionNumber = 0;
-        oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.oracles, webDriver, devTools);
-    }
-    //endregion
-
-    //region Overrides
     /** Enables TESTAR to click components that are outside the window **/
     @Override
     protected boolean isClickable(Widget widget) {
@@ -266,5 +264,4 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         clickSet.retainAll(element.cssClasses);
         return clickSet.size() > 0;
     }
-    //endregion
 }

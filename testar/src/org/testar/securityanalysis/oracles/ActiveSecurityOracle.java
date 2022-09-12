@@ -42,6 +42,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class ActiveSecurityOracle extends BaseSecurityOracle {
+
+	public enum ActiveOracle {
+		SQL_INJECTION("SqlInjectionSecurityOracle"), 
+		XSS_INJECTION("XssSecurityOracle"), 
+		TOKEN_INVALIDATION("TokenInvalidationSecurityOracle"); 
+
+		private final String oracle;
+
+		ActiveOracle(String oracle) {
+			this.oracle = oracle;
+		}
+
+		public String getOracle() {
+			return oracle;
+		}
+	}
+
     protected RemoteWebDriver webDriver;
 
     public ActiveSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver){

@@ -49,6 +49,7 @@ import java.util.Set;
 
 public class XssSecurityOracle extends ActiveSecurityOracle {
     private Set<Action> preferredActions = new HashSet<>();
+    private static String xssInjectionText = "<script> console.log('XSS detected!'); </script>";
 
     public XssSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
     {
@@ -62,7 +63,7 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
         for (Widget widget : state)
         {
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, getInjectionText()));
+                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, xssInjectionText));
             }
         }
         preferredActions.addAll(actions);
@@ -100,9 +101,8 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
         return Verdict.OK;
     }
 
-    private String getInjectionText()
-    {
-        return "<script> console.log('XSS detected!'); </script>";
+    public static void setXssInjectionText(String xssInjectionText) {
+    	XssSecurityOracle.xssInjectionText = xssInjectionText;
     }
 
     private Action getUrlInjectionOrDefault()

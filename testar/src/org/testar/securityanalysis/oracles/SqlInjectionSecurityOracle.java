@@ -45,6 +45,7 @@ import java.util.Set;
 public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     private boolean errorReceived = false;
     protected Set<Action> proposedActions = new HashSet<>();
+    private static String sqlInjectionText = "'";
 
     public SqlInjectionSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
     {
@@ -68,7 +69,7 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         for (Widget widget : state)
         {
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, getInjectionText()));
+                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, sqlInjectionText));
             }
         }
 
@@ -85,8 +86,7 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         return Verdict.OK;
     }
 
-    private String getInjectionText()
-    {
-        return "'";
+    public static void setSqlInjectionText(String sqlInjectionText) {
+    	SqlInjectionSecurityOracle.sqlInjectionText = sqlInjectionText;
     }
 }
