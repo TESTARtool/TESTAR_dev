@@ -41,7 +41,7 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
     public WdSecurityUrlInjectionAction(String text)
     {
         super();
-        this.set(Tags.Role, WdActionRoles.FormFillingAction);
+        this.set(Tags.Role, WdActionRoles.ExecuteScript);
         this.set(Tags.Desc, "Execute Webdriver script to redirect to different url");
         this.text = text;
     }
@@ -49,7 +49,7 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
     @Override
     public void run(SUT system, State state, double duration) throws ActionFailedException
     {
-        System.out.println("New location");
+        System.out.println("Executing UrlInjectionAction to new location:");
         System.out.println(this.text);
         WdDriver.executeScript("window.location = \'"+this.text+"\'");
     }

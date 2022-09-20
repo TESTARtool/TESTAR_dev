@@ -50,6 +50,7 @@ import java.util.Set;
 public class XssSecurityOracle extends ActiveSecurityOracle {
     private Set<Action> preferredActions = new HashSet<>();
     private static String xssInjectionText = "<script> console.log('XSS detected!'); </script>";
+    private static String xssInjectionURL = "<script>console.log(%27XSS%20detected!%27);</script>";
 
     public XssSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
     {
@@ -89,6 +90,9 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
         return actions;
     }
 
+    // An XSS injection with a character that is not processed properly 
+    // may provoke a 500 server error or Uncaught SyntaxError. 
+    // TODO: Enrich this verdict or allow customization
     @Override
     public Verdict getVerdict()
     {
@@ -105,20 +109,20 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
     	XssSecurityOracle.xssInjectionText = xssInjectionText;
     }
 
+    public static void setXssInjectionURL(String xssInjectionURL) {
+    	XssSecurityOracle.xssInjectionURL = xssInjectionURL;
+    }
+
     private Action getUrlInjectionOrDefault()
     {
         String url = WdDriver.getCurrentUrl();
 
-        String injection = "<script>console.log(%27XSS%20detected!%27);</script>";
         if (url.contains("?"))
         {
-            String newUrl = url.replaceAll("=.*" + "&", injection + "&");
-            newUrl = newUrl.replaceFirst("[^=]*$", injection);
-
-            System.out.println("newUrl: " + newUrl);
+            String newUrl = url.replaceAll("=.*" + "&", xssInjectionURL + "&");
+            newUrl = newUrl.replaceFirst("[^=]*$", xssInjectionURL);
 
             if (!newUrl.equals(url)) {
-                System.out.println("UrlInjection added");
                 return new WdSecurityUrlInjectionAction(newUrl);
             }
         }

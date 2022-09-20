@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.securityanalysis.SecurityResultWriter;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +47,9 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     private boolean errorReceived = false;
     protected Set<Action> proposedActions = new HashSet<>();
     private static String sqlInjectionText = "'";
+
+    // Use always the 500 Internal Server Error by default
+    private static Set<Integer> serverErrorCodes = new HashSet<>(Arrays.asList(500));
 
     public SqlInjectionSecurityOracle(SecurityResultWriter securityResultWriter, RemoteWebDriver webDriver)
     {
@@ -57,8 +61,9 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     {
         devTools.addListener(Network.responseReceivedExtraInfo(),
                 responseReceived -> {
-                    if (responseReceived.getStatusCode() == 500)
+                    if (serverErrorCodes.contains(responseReceived.getStatusCode())) {
                         errorReceived = true;
+                    }
                 });
     }
 
@@ -86,7 +91,13 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         return Verdict.OK;
     }
 
+    public static void addServerErrorCodes(Set<Integer> serverErrorCode) {
+        SqlInjectionSecurityOracle.serverErrorCodes.addAll(serverErrorCode);
+    }
+
     public static void setSqlInjectionText(String sqlInjectionText) {
     	SqlInjectionSecurityOracle.sqlInjectionText = sqlInjectionText;
     }
+    
+    //TODO: SQL injection in the url parameters
 }

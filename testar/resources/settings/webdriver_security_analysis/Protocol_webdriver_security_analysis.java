@@ -54,6 +54,8 @@ import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
 import org.testar.securityanalysis.oracles.SqlInjectionSecurityOracle;
 import org.testar.securityanalysis.oracles.XssSecurityOracle;
 
+import com.google.common.collect.Sets;
+
 import java.util.*;
 
 /**
@@ -109,8 +111,14 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
          */
         // TESTAR XSS verdict searches for a console message in the browser that contains the XSS value
         XssSecurityOracle.setXssInjectionText("<script>console.log('XSS_detected!');</script>");
+        XssSecurityOracle.setXssInjectionURL("<script>console.log(%27XSS%20detected!%27);</script>");
+
         // TESTAR SQL verdict searches for a 500 status code in the browser
         SqlInjectionSecurityOracle.setSqlInjectionText("'");
+
+        // 500 Internal Server Error is used by default in the SQL injection verdict
+        // It is possible to add a new error status codes to be used in the SQL verdict
+        //SqlInjectionSecurityOracle.addServerErrorCodes(Sets.newHashSet(400, 408));
     }
 
     private void startSecurityResultWriter(){
