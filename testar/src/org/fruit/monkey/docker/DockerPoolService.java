@@ -12,9 +12,11 @@ public interface DockerPoolService {
     DockerClient getClient();
     String buildImage(File destination, String dockerFileContent) throws IOException;
     String startWithImage(String imageId, String name, HostConfig hostConfig);
-    public String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env);
+    String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env);
     void dispose(boolean alsoRemoveImages);
 
+    String getServiceId();
+    String getNetworkId();
     void setDelegate(DockerPoolServiceDelegate delegate);
     DockerPoolServiceDelegate getDelegate();
 }

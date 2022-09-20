@@ -1,0 +1,33 @@
+<app-content-container label="All iterations">
+  <div class="flex flex-col">
+    <div class="grid grid-cols-4 gap-2 px-4 pb-2 font-semibold">
+      <p>
+        Id
+      </p>
+      <p>
+        Info
+      </p>
+      <p>
+        Severity
+      </p>
+    </div>
+    <a
+      *ngFor="let iteration of iterations"
+      [routerLink]="['/iterations', iteration.id]"
+      class="grid grid-cols-4 gap-2 px-4 py-2 even:bg-secondary hover:bg-primary hover:bg-opacity-20 duration-100 cursor-pointer"
+    >
+      <p>
+        {{ iteration.id }}
+      </p>
+      <p>
+        {{ iteration.info }}
+      </p>
+      <p>
+        {{ iteration.severity }}
+      </p>
+      <div class="flex justify-end">
+        >
+      </div>
+    </a>
+  </div>
+</app-content-container>

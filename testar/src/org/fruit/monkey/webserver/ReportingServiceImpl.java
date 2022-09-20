@@ -24,7 +24,7 @@ public class ReportingServiceImpl implements ReportingService {
     private boolean orientdb = false;
     private ReportingServiceDelegate delegate;
 
-    public ReportingServiceImpl(int port, String[] env, DockerPoolService dockerPoolService) throws IOException {
+    public  ReportingServiceImpl(int port, String[] env, DockerPoolService dockerPoolService) throws IOException {
         this.dockerPoolService = dockerPoolService;
         this.port = port;
         this.environmentVariables = env;
@@ -98,4 +98,9 @@ public class ReportingServiceImpl implements ReportingService {
         }
         delegate.onServiceReady(url);
     }
+
+  @Override
+  public void stop() {
+      //STUB
+  }
 }

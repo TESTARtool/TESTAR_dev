@@ -1,6 +1,8 @@
 package org.fruit.monkey.webserver;
 
 import org.fruit.monkey.docker.DockerPoolService;
+import org.fruit.monkey.reporting.ReportingWebService;
+import org.fruit.monkey.reporting.ReportingWebServiceImpl;
 
 import java.io.IOException;
 
@@ -51,12 +53,15 @@ public class ReportingBuilder {
         String mysqlAdapter = (mysqlEnabled) ? "MYSQL" : "None";
 
 
-        final String[] env = {"ADAPTER=" + mysqlAdapter, "MYSQL_HOST=" + dbHostname, "MYSQL_PORT=" + dbPort,
-                "MYSQL_DATABASE=" + dbDatabase, "MYSQL_USER=" + dbUsername, "MYSQL_PASSWORD=" + dbPassword,
-                "MYSQL_WAIT=5", "ORIENTDB_ENABLED=" + orientEnabled, "ORIENTDB_PORT=" + oPort,
-                "ORIENTDB_DATABASE=" + oDatabase, "ORIENTDB_PASSWORD=" + oPassword, "ORIENTDB_USER=" + oUsername, "ORIENTDB_HOST=" + oHostname};
-
-        return new ReportingServiceImpl(this.port, env, this.dockerPoolService);
+//        final String[] env = {"ADAPTER=" + mysqlAdapter, "MYSQL_HOST=" + dbHostname, "MYSQL_PORT=" + dbPort,
+//                "MYSQL_DATABASE=" + dbDatabase, "MYSQL_USER=" + dbUsername, "MYSQL_PASSWORD=" + dbPassword,
+//                "MYSQL_WAIT=5", "ORIENTDB_ENABLED=" + orientEnabled, "ORIENTDB_PORT=" + oPort,
+//                "ORIENTDB_DATABASE=" + oDatabase, "ORIENTDB_PASSWORD=" + oPassword, "ORIENTDB_USER=" + oUsername, "ORIENTDB_HOST=" + oHostname};
+//
+//        return new ReportingServiceImpl(this.port, env, this.dockerPoolService);
+      return new ReportingWebServiceImpl(dockerPoolService, 8888, port, dbHostname, dbPort, dbDatabase, dbUsername, dbPassword);
+//  public ReportingWebServiceImpl(DockerPoolService dockerPoolService, int apiPort, int appPort, String dbHost, int dbPort,
+//      String dbName, String dbUser, String dbPassword) {
     }
 
 }

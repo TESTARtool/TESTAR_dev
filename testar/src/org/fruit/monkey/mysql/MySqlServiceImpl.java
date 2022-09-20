@@ -56,8 +56,9 @@ public class MySqlServiceImpl implements MySqlService {
             delegate.onStateChanged(MySqlServiceDelegate.State.BUILDING_IMAGE, "Building database image");
         }
         final String imageId = dockerPoolService.buildImage(new File(Main.databaseDir),
-                "FROM mysql:latest\n" +
-                "ENV MYSQL_ROOT_PASSWORD=" + userPassword + "\n" +
+                "FROM bitnami/mysql:latest\n" +
+                "ENV ALLOW_EMPTY_PASSWORD='yes'\n" +
+//                "ENV MYSQL_ROOT_PASSWORD=" + userPassword + "\n" +
                 "ENV MYSQL_DATABASE=" + databaseName + "\n" +
                 "ENV MYSQL_USER=" + userName + "\n" +
                 "ENV MYSQL_PASSWORD=" + userPassword);

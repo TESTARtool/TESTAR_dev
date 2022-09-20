@@ -91,8 +91,16 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	public static String extrasDir = testarDir + "extras" + File.separator;
 	public static String databaseDir = extrasDir + "database" + File.separator;
 	public static String orientDBDir = extrasDir + "orientdb" + File.separator;
+
+	//Old value
 	public static String webserverDir = extrasDir + "reporting" + File.separator + "webserver" + File.separator;
-	public static String sonarqubeDir = extrasDir + "sonarqube";
+
+	//New values
+  public static String reportingApiDir = extrasDir + "reporting" + File.separator + "api" + File.separator;
+  public static String reportingAppDir = extrasDir + "reporting" + File.separator + "app" + File.separator;
+  public static String reportingTmpDir = extrasDir + "reporting" + File.separator + "tmp" + File.separator;
+
+  public static String sonarqubeDir = extrasDir + "sonarqube";
 	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
 	private static DockerPoolService reportingDockerService = new DockerPoolServiceImpl();
@@ -441,7 +449,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		if (settings.get(ConfigTags.AlwaysCompile)) {
 			Util.compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));
 		}
-		
+
 
 		URLClassLoader loader = null;
 
@@ -805,9 +813,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	/**
-	 * This method allow us to define and use settings as JVM arguments. 
+	 * This method allow us to define and use settings as JVM arguments.
 	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {

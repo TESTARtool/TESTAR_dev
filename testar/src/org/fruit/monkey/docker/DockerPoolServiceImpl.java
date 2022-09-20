@@ -43,7 +43,15 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         registry.add(this);
     }
 
-    public void setDelegate(DockerPoolServiceDelegate delegate) {
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public String getNetworkId() {
+        return networkId;
+    }
+
+  public void setDelegate(DockerPoolServiceDelegate delegate) {
         this.delegate = delegate;
     }
 
@@ -134,7 +142,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         if (containerId != null) {
             return containerId;
         }
-        
+
         final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
                 .withName(name)
                 .withHostName(name)

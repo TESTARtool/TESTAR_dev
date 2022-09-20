@@ -8,4 +8,5 @@ public interface  ReportingService {
     ReportingServiceDelegate getDelegate();
     void setDelegate(ReportingServiceDelegate delegate);
     void start() throws IOException, TestarServiceException;
+    void stop();
 }

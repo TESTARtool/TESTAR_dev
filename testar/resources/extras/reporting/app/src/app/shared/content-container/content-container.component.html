@@ -1,0 +1,14 @@
+<div class="flex flex-col gap-4 bg-white text-black border border-primary rounded shadow">
+  <div class="flex items-center gap-2 p-4 bg-primary text-white text-lg font-semibold rounded-t">
+    <div
+      *ngIf="critical"
+      class="h-4 w-4 bg-yellow-400 rounded-full"
+    >
+    </div>
+    <p>
+      {{ label }}
+    </p>
+  </div>
+  <ng-content></ng-content>
+</div>
+

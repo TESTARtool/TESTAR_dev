@@ -1,0 +1,21 @@
+#server:
+#  port: 8888
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/testar?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=yes&characterEncoding=UTF-8
+    username: ${DB_USERNAME:testar}
+    password: ${DB_PASSWORD:testar}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+  jackson:
+    default-property-inclusion: non_null
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+#  ldap:
+#    urls: ldap://ldap:1389
+#    embedded:
+#      port: 8389
+#      ldif: classpath:ldap-data.ldif
+#      base-dn: dc=springframework,dc=org

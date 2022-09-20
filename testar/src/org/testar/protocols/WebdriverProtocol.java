@@ -40,6 +40,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -67,9 +68,12 @@ import org.fruit.monkey.mysql.MySqlServiceImpl;
 import org.fruit.monkey.orientdb.OrientDBService;
 import org.fruit.monkey.orientdb.OrientDBServiceDelegate;
 import org.fruit.monkey.orientdb.OrientDbServiceImpl;
+//import org.fruit.monkey.reporting.ReportingWebService;
+//import org.fruit.monkey.reporting.ReportingWebServiceImpl;
 import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
+import org.fruit.monkey.webserver.ReportingServiceImpl;
 import org.testar.OutputStructure;
 
 import org.openqa.selenium.logging.LogEntries;
@@ -234,7 +238,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();
 //			progressDialog.setStatusString("Starting database connection");
-			
+
 			sqlService.setDelegate(new MySqlServiceDelegate() {
 				@Override
 				public void onStateChanged(State state, String description) {
@@ -262,6 +266,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 							sqlService.connectExternalDatabase(settings.get(ConfigTags.SQLReportingServer),
 									databaseName, userName, userPassword);
 						}
+//						ReportingWebService reportingService = new ReportingWebServiceImpl(sqlService.getDockerPoolService());
+//						reportingService.start(8888, 1080, "mysql", 3306, "testar", "testar", "testar");
 					} catch (ClassNotFoundException | IOException | SQLException | TestarServiceException e) {
 						final String errorMessage = "Cannot initialize a database";
 						delegate.endProgress();
@@ -385,13 +391,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 //						progressDialog.endProgress(null, true);
 
 						// TODO: open web link
-//						try {
+						try {
+						  delegate.openURI(new URI(url));
 //							Desktop.getDesktop().browse(new URI("http://localhost:" + port));
-//						}
-//						catch (Exception e) {
-//							System.err.println("Cannot browse report: " + e.getMessage());
-//							e.printStackTrace();
-//						}
+						}
+						catch (Exception e) {
+							System.err.println("Cannot browse report: " + e.getMessage());
+							e.printStackTrace();
+						}
 					}
 				});
 				new Thread() {
@@ -470,9 +477,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
-     * webdriver in the constructor of WdDriver. 
-     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+     * webdriver in the constructor of WdDriver.
+     * A possible solution could be creating a snapshot of the running browser processes before and after.
      */
     private void setWindowHandleForWebdriverBrowser(SUT sut) {
     	try {
@@ -530,7 +537,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
     }
-    
+
     /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
@@ -541,7 +548,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	
+
     	try {
     		WdDriver.waitDocumentReady();
     	} catch(org.openqa.selenium.WebDriverException wde) {
@@ -561,18 +568,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	if(settings.get(ConfigTags.ForceForeground)
     			&& System.getProperty("os.name").contains("Windows 10")
     			&& system.get(Tags.IsRunning, false) && !system.get(Tags.NotResponding, false)
-    			&& system.get(Tags.PID, (long)-1) != (long)-1 
-    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
+    			&& system.get(Tags.PID, (long)-1) != (long)-1
+    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome")
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
 
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
-    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
+    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... "
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
 
     	}
 
     	latestState = state;
-    	
+
     	//Spy mode didn't use the html report
     	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
@@ -582,10 +589,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				existingCssClasses.add(s);
     			}
     		}
-    		
+
         	return state;
     	}
-    	
+
         //adding state to the HTML sequence report:
         sequenceReport.addState(latestState);
         testReport.addState(latestState);
@@ -796,7 +803,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     	sequenceReport.close();
     }
-    
+
     @Override
 	protected void finishSequence(){
 		//With webdriver version we don't use the call SystemProcessHandling.killTestLaunchedProcesses
@@ -832,7 +839,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		super.stopSystem(system);
     }
-    
+
     @Override
 	protected void closeTestSession() {
 		super.closeTestSession();
@@ -968,9 +975,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	@Override
 	public boolean moreActions(State state) {
-		if (!isForcedLoginInProgress && WdDriver.getCurrentUrl().startsWith(loginURL)) {
-			// Forced login expected
-			return true;
+		if (!isForcedLoginInProgress) {
+		  String currentURL = WdDriver.getCurrentUrl();
+		  if (currentURL != null && loginURL != null && currentURL.startsWith(loginURL)) {
+        // Forced login expected
+        return true;
+      }
 		}
 		return super.moreActions(state);
 	}
@@ -1198,8 +1208,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/**
-	 * Read the ClickableClasses property from test.settings file 
-	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 * Read the ClickableClasses property from test.settings file
+	 * to update the clickableClasses while TESTAR is running in Spy mode.
 	 */
 	private void updateCssClassesFromTestSettingsFile() {
 		// Feature only for Spy mode

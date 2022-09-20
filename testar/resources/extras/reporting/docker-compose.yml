@@ -2,12 +2,12 @@ version: "3.8"
 services:
   app:
     build:
-      context: ./webserver
-    ports:
-      - "80:8000"
-    volumes:
-      - ./webserver:/usr/app
-      - /home/anon/Projects/TESTAR_dev/testar/target/install/testar/bin/output:/usr/app/static/output/
+      context: ./app
+        #    ports:
+        #      - "80:8000"
+        #    volumes:
+        #      - ./webserver:/usr/app
+        #      - /home/anon/Projects/TESTAR_dev/testar/target/install/testar/bin/output:/usr/app/static/output/
     environment:
       FLASK_DEBUG: 1
       FLASK_ENV: development
