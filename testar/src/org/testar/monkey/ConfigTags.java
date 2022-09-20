@@ -49,6 +49,7 @@ public final class ConfigTags {
   public static final Tag<Double> FaultThreshold = Tag.from("FaultThreshold", Double.class);
   public static final Tag<Double> TimeToWaitAfterAction = Tag.from("TimeToWaitAfterAction", Double.class);
   public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class);
+  public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class);
   public static final Tag<Boolean> VisualizeSelectedAction = Tag.from("VisualizeSelectedAction", Boolean.class);
   public static final Tag<Boolean> DrawWidgetUnderCursor = Tag.from("DrawWidgetUnderCursor", Boolean.class);
   public static final Tag<Boolean> DrawWidgetInfo = Tag.from("DrawWidgetInfo", Boolean.class);

@@ -41,6 +41,14 @@ import org.testar.monkey.alayer.webdriver.WdStateBuilder;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.*;
+import org.testar.monkey.alayer.android.AndroidAppiumFramework;
+import org.testar.monkey.alayer.android.AndroidCanvas;
+import org.testar.monkey.alayer.android.AndroidStateBuilder;
+import org.testar.monkey.alayer.android.enums.AndroidRoles;
+import org.testar.monkey.alayer.ios.IOSAppiumFramework;
+import org.testar.monkey.alayer.ios.IOSCanvas;
+import org.testar.monkey.alayer.ios.IOSStateBuilder;
+import org.testar.monkey.alayer.ios.enums.IOSRoles;
 
 import java.util.*;
 
@@ -88,7 +96,23 @@ public class NativeLinker {
 	public static void cleanWdDriverOS() {
 		PLATFORM_OS.remove(OperatingSystems.WEBDRIVER);
 	}
-	
+
+	public static void addAndroidOS() {
+		PLATFORM_OS.add(OperatingSystems.ANDROID);
+	}
+
+	public static void cleanAndroidOS() {
+		PLATFORM_OS.remove(OperatingSystems.ANDROID);
+	}
+
+	public static void addIOS() {
+		PLATFORM_OS.add(OperatingSystems.IOS);
+	}
+
+	public static void cleanIOS() {
+		PLATFORM_OS.remove(OperatingSystems.IOS);
+	}
+
 	public static Set<OperatingSystems> getPLATFORM_OS() {
 		return PLATFORM_OS;
 	}
@@ -103,6 +127,12 @@ public class NativeLinker {
 	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return new AndroidStateBuilder(timeToFreeze);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			return new IOSStateBuilder(timeToFreeze);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -133,6 +163,12 @@ public class NativeLinker {
 	public static Canvas getNativeCanvas(Pen pen){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return new WdCanvas(pen);
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return new AndroidCanvas(pen);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			return new IOSCanvas(pen);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
@@ -153,6 +189,12 @@ public class NativeLinker {
 	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AndroidAppiumFramework.fromCapabilities(executableCommand);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			return IOSAppiumFramework.fromCapabilities(executableCommand);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -185,6 +227,12 @@ public class NativeLinker {
 	public static List<SUT> getNativeProcesses(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdDriver.fromAll();
+		else if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AndroidAppiumFramework.fromAll();
+		}
+		else if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			return IOSAppiumFramework.fromAll();
+		}
 		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -215,6 +263,14 @@ public class NativeLinker {
 	public static int getMemUsage(SUT nativeSUT){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return 0;
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			//TODO: Implement Emulator + internal android usage
+			return 0;
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			//TODO: Implement Emulator + internal android usage
+			return 0;
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -230,6 +286,14 @@ public class NativeLinker {
 	public static long[] getCPUsage(SUT nativeSUT){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			// TODO Make sure 'runTest' doesn't need this anymore
+			return new long[]{0, 0, 0};
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			//TODO: Implement Emulator + internal android usage
+			return new long[]{0, 0, 0};
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			//TODO: Implement Emulator + internal android usage
 			return new long[]{0, 0, 0};
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
@@ -250,6 +314,12 @@ public class NativeLinker {
 	public static Collection<Role> getNativeRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdRoles.rolesSet();
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
+			return AndroidRoles.rolesSet();
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
+			return IOSRoles.rolesSet();
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();

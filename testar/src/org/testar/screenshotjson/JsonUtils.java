@@ -32,9 +32,11 @@ package org.testar.screenshotjson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.windows.UIATags;
 
@@ -44,6 +46,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JsonUtils {
+
+    public static void createFullWidgetTreeJsonFile(State state, String fileNamePath){
+        Set<FullWidgetInfoJsonObject> widgetTreeObjects = new HashSet<FullWidgetInfoJsonObject>();
+        for(Widget widget:state){
+            Set<Pair<String, String>> widgetTags = new HashSet<Pair<String, String>>();
+            for(Tag tag:widget.tags()){
+                Pair<String, String> widgetTag = new Pair<String, String>(tag.name(), widget.get(tag).toString());
+                widgetTags.add(widgetTag);
+            }
+            widgetTreeObjects.add(new FullWidgetInfoJsonObject(widgetTags));
+        }
+        writeJsonToFile(widgetTreeObjects,fileNamePath);
+    }
 
     public static void createWidgetInfoJsonFile(State state){
     	
@@ -88,14 +103,20 @@ public class JsonUtils {
 //        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
 //        System.out.println("FilePath="+filePath);
+        writeJsonToFile(screenshotWidgetJsonObject, filePath);
+    }
+
+    private static void writeJsonToFile(Object objectToWrite, String fileNamePath){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try{
-            FileWriter fileWriter = new FileWriter(filePath);
-            gson.toJson(screenshotWidgetJsonObject, fileWriter);
+            FileWriter fileWriter = new FileWriter(fileNamePath);
+            gson.toJson(objectToWrite, fileWriter);
             fileWriter.flush(); //flush data to file   <---
             fileWriter.close(); //close write          <---
-        }catch(IOException e){
-            e.printStackTrace();
+        }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
+            // Object="+objectToWrite+", filename="+fileNamePath);
+            e.printStackTrace();
         }
     }
 }

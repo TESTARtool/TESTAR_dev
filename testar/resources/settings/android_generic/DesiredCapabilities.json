@@ -1,0 +1,9 @@
+{
+  "deviceName": "Android Emulator",
+  "platformName": "Android",
+  "app": "ApiDemos-debug.apk",
+  "automationName" : "UiAutomator2",
+  "allowTestPackages": true,
+  "newCommandTimeout": 500000,
+  "appWaitActivity": "io.appium.android.apis.ApiDemos"
+}

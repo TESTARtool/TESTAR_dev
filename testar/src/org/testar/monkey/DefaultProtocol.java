@@ -91,6 +91,10 @@ import org.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.monkey.alayer.ios.spy_visualization.MobileVisualizationIOS;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.android.spy_visualization.MobileVisualizationAndroid;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -901,6 +905,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = startSystem();
 		this.cv = buildCanvas();
 
+		// Initialized the screenshotfolder
+		ScreenshotSerialiser.start("screenshot_folder", "androidScreenshots");
+
+		//TODO: this must stay here as there is no canvas function called in the original default protocol
+		MobileVisualizationAndroid mobileVisualizationAndroid = null;
+		MobileVisualizationIOS mobileVisualizationIOS = null;
+
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
+			State state = getState(system);
+			mobileVisualizationAndroid = new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
+			//mobileVisualizationAndroid.createVisualization(AndroidProtocolUtil.getStateshot(state));
+		} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
+			State state = getState(system);
+			mobileVisualizationIOS = new MobileVisualizationIOS(IOSProtocolUtil.getStateshotSpyMode(state), state);
+		}
+
 		while(mode() == Modes.Spy && system.isRunning()) {
 
 			State state = getState(system);
@@ -909,12 +931,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
-			
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
+			//TODO: can we work this into sutvisualization/ canvas?
+			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				assert mobileVisualizationAndroid != null;
+				mobileVisualizationAndroid.updateStateVisualization(state);
+			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				assert mobileVisualizationIOS != null;
+				mobileVisualizationIOS.updateStateVisualization(state);
+			}
+			else {
 
-			//in Spy-mode, always visualize the green dots:
-			visualizeActions(cv, state, actions);
+				//in Spy-mode, always visualize the widget info under the mouse cursor:
+				SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
+
+				//in Spy-mode, always visualize the green dots:
+				visualizeActions(cv, state, actions);
+			}
 			
 			cv.end();
 
@@ -925,6 +957,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					this.wait(msRefresh);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+				}
+			}
+
+			// TODO: can we work this into canvas thing?
+			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				assert mobileVisualizationAndroid != null;
+				if (mobileVisualizationAndroid.closedSpyVisualization) {
+					break;
+				}
+			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				assert mobileVisualizationIOS != null;
+				if (mobileVisualizationIOS.closedSpyVisualization) {
+					break;
 				}
 			}
 
@@ -1466,7 +1511,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
 				//System.out.println("DEBUG: Using WebDriver specific state shot.");
 				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
-			}else{
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				state.set(Tags.ScreenshotPath, AndroidProtocolUtil.getStateshot(state));
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			}
+			else{
 				//System.out.println("DEBUG: normal state shot");
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
 			}
