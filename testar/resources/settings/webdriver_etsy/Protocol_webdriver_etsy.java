@@ -153,8 +153,16 @@ public class Protocol_webdriver_etsy extends WebdriverProtocol {
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
 			} else {
+				if (a instanceof WdNavigateTo){
+					System.out.println("--------------------");
+					System.out.println(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom));
+				}
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+				if (a instanceof WdNavigateTo){
+					System.out.println(a.get(Tags.AbstractIDCustom));
+					System.out.println("--------------------");
+				}
 			}
 		}
 	}
@@ -271,10 +279,10 @@ public class Protocol_webdriver_etsy extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+//			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+			if (widget.get(Blocked, false)) {
 				continue;
 			}
 
@@ -293,7 +301,7 @@ public class Protocol_webdriver_etsy extends WebdriverProtocol {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
 						if (widget.get(WdTags.WebCssClasses, "").contains("listing-link") ||
-							widget.get(WdTags.WebCssClasses, "").contains("wt-arrow-link--forward"))
+								widget.get(WdTags.WebCssClasses, "").contains("wt-arrow-link--forward"))
 						{
 //							filteredActions.add(ac.leftClickAt(widget));
 							String URL = widget.get(WdTags.WebHref, null);
@@ -318,14 +326,14 @@ public class Protocol_webdriver_etsy extends WebdriverProtocol {
 			}
 		}
 
-		if(actions.isEmpty()) {
-			System.out.println("Derive Actions Empty! Wait 2 second because maybe a menu is loading");
-			Util.pause(2);
-			Action nop = new NOP();
-			nop.set(Tags.OriginWidget, state);
-			nop.set(Tags.Desc, "NOP action to wait");
-			return new HashSet<>(Collections.singletonList(nop));
-		}
+//		if(actions.isEmpty()) {
+//			System.out.println("Derive Actions Empty! Wait 2 second because maybe a menu is loading");
+//			Util.pause(2);
+//			Action nop = new NOP();
+//			nop.set(Tags.OriginWidget, state);
+//			nop.set(Tags.Desc, "NOP action to wait");
+//			return new HashSet<>(Collections.singletonList(nop));
+//		}
 		
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {

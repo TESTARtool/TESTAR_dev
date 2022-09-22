@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2022 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,16 +32,20 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.RandomActionSelector;
-import nl.ou.testar.SutVisualization;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ProtocolAction;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.Policy;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.RLTags;
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import org.apache.commons.text.StringEscapeUtils;
-import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
@@ -53,77 +57,23 @@ import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
+import org.testar.settings.ExtendedSettingsFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
+
+public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverProtocol {
+
+	// Custom email for registration and login
+	private String email = "testar@testar.com";
+
+	private ActionSelector actionSelector = null;
+	private Policy policy = null;
 
 
-public class Protocol_webdriver_craigslist_reinforcement_learning extends WebdriverProtocol {
-
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings) {
-		super.initialize(settings);
-
-		/*
-		These settings are initialized in WebdriverProtocol:
-
-		// Classes that are deemed clickable by the web framework
-		// getting from the settings file:
-		clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		// getting from the settings file:
-		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
-		*/
-
-		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "QLearningModelManager");
-
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		// TODO: getting from the settings file, not sure if this works:
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
-		// List of attributes to identify and close policy popups
-		// Set to null to disable this feature
-		//TODO put into settings file
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "lfr-btn-label");
-		}};
-	}
 
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 		CodingManager.buildIDs(state, actions);
@@ -137,41 +87,74 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 			 * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
 			 * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
 			 */
+
 			if(a instanceof WdHistoryBackAction) continue;
 			if(a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.CompoundAction) || a.get(Tags.Role, ActionRoles.Action).equals(ActionRoles.HitKey)) {
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + StringEscapeUtils.escapeHtml4(a.get(Tags.Desc, ""))));
 			} else {
-				System.out.println(a.get(Tags.Desc, "No desc"));
+				if (a instanceof WdNavigateTo){
+					System.out.println("--------------------");
+					System.out.println(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom));
+				}
 				a.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM +
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+				if (a instanceof WdNavigateTo){
+					System.out.println(a.get(Tags.AbstractIDCustom));
+					System.out.println("Q-Value: " + a.get(RLTags.QLearningValue, -1f));
+					System.out.println("--------------------");
+				}
 			}
 		}
 	}
 
-	protected boolean isUrlDenied(String currentUrl) {
-		if (super.isUrlDenied(currentUrl)){
-			if (getDomain(currentUrl).contains("craigslist.org")) return false;
-			return true;
-		}
-		return false;
-
+	private boolean isSonOfBillAddressBox(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("editBillingAddress_100")) return true;
+		else return isSonOfBillAddressBox(widget.parent());
 	}
+
+	private boolean isSonOfShopAddressBox(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("editShippingAddress_100")) return true;
+		else return isSonOfShopAddressBox(widget.parent());
+	}
+
+	private boolean isSonOfCartItems(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(WdTags.WebId, "").equals("miniCartDetails")) return true;
+		else return isSonOfCartItems(widget.parent());
+	}
+
 	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
+	protected void initialize(Settings settings){
+
+		// Disconnect from Windows Remote Desktop, without close the GUI session
+		// User will need to disable or accept UAC permission prompt message
+		//disconnectRDP();
+
+		//Create Abstract Model with Reinforcement Learning Implementation
+		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
+
+		// Extended settings framework, set ConfigTags settings with XML framework values
+		// test.setting -> ExtendedSettingsFile
+		ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+		settings = rlXmlSetting.updateXMLSettings(settings);
+
+		policy = PolicyFactory.getPolicy(settings);
+		actionSelector = new ReinforcementLearningActionSelector(policy);
+
+		super.initialize(settings);
+
+		// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+		copyJacocoBuildFile();
+
+		startRunTime = System.currentTimeMillis();
 	}
 
 	/**
@@ -183,6 +166,11 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		// Cookies button
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.WebTextContent, "Accept", state, system, 5, 1);
+
+		// TODO: force Shopizer login?
+		// http://aws-demo.shopizer.com/shop/customer/customLogon.html
 	}
 
 	/**
@@ -198,28 +186,17 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
+		System.out.println("State AbstractIDCustom: " + state.get(Tags.AbstractIDCustom));
+
+		for (Widget widget: state){
+			if(widget.get(WdTags.WebTextContent, "").contains("HTTP Status 404") || widget.get(WdTags.WebTextContent, "").contains("An error occurred in the request")){
+				WdDriver.executeScript("window.history.back();");
+				Util.pause(1);
+				state = super.getState(system);
+			}
+		}
+
 		return state;
-	}
-
-	/**
-	 * This is a helper method used by the default implementation of <code>buildState()</code>
-	 * It examines the SUT's current state and returns an oracle verdict.
-	 *
-	 * @return oracle verdict, which determines whether the state is erroneous and why.
-	 */
-	@Override
-	protected Verdict getVerdict(State state) {
-
-		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
-
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-		return verdict;
 	}
 
 	/**
@@ -243,29 +220,29 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		// such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// Check if forced actions are needed to stay within allowed domains
 		Set<Action> forcedActions = detectForcedActions(state, ac);
+		if (forcedActions != null && forcedActions.size() > 0) {
+			return forcedActions;
+		}
 
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			if (widget.get(WdTags.WebTitle, "").contains("my location")){
-				continue;
-			}
-
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
-				String protocol = settings.get(ConfigTags.ProtocolClass, "");
+		    	String protocol = settings.get(ConfigTags.ProtocolClass, "");
 		        Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-		        if(formFillingAction instanceof NOP){
-		        	// do nothing with NOP actions - the form was not actionable
-				}else{
-		        	actions.add(formFillingAction);
-				}
+		        if(((WdFillFormAction)formFillingAction).isHiddenForm()) {
+		            System.out.println("DEBUG: we derive a NOP action, but lets ignore");
+		            // do nothing with NOP actions - the form was not actionable
+		        } else {
+		            System.out.println("DEBUG: form action found: ");
+		            actions.add(formFillingAction);
+		        }
 		    }
 
 			// only consider enabled and non-tabu widgets
-			if (!widget.get(Enabled, true)) {
+			if (!widget.get(Enabled, true) || blackListed(widget)) {
 				continue;
 			}
 			// The blackListed widgets are those that have been filtered during the SPY mode with the
@@ -279,11 +256,11 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 				continue;
 			}
 
-			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+//			 slides can happen, even though the widget might be blocked
+//			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
-			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+			// If the element is blocked, TESTAR can't click on or type in the widget
+			if (widget.get(Blocked, false)) {
 				continue;
 			}
 
@@ -301,7 +278,21 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						if (widget.get(WdTags.WebCssClasses, "").contains("listing-link") ||
+								widget.get(WdTags.WebCssClasses, "").contains("wt-arrow-link--forward"))
+						{
+//							filteredActions.add(ac.leftClickAt(widget));
+							String URL = widget.get(WdTags.WebHref, null);
+							if (URL != null) {
+								Action goToLink = new WdNavigateTo(URL);
+								goToLink.set(Tags.OriginWidget, widget);
+								actions.add(goToLink);
+							}
+						}
+						else {
+
+							actions.add(ac.leftClickAt(widget));
+						}
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -311,36 +302,46 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
+//		}
+			// left clicks, but ignore links outside domain
+//			if (isAtBrowserCanvas(widget) && isClickable(widget) && !isLinkDenied(widget) && (whiteListed(widget) || isUnfiltered(widget)) ) {
+//				System.out.println("-------------------- 2");
+//				System.out.println(widget.get(WdTags.Desc, ""));
+//				// Click on select web items opens the menu but does not allow TESTAR to select an item,
+//				// thats why we need a custom action selection
+//				if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) || widget.get(WdTags.WebCssClasses, "").contains("hidden-xs")) {
+//					System.out.println(widget.get(WdTags.Desc, ""));
+//					//actions.add(randomFromSelectList(widget));
+//				} else {
+//						actions.add(ac.leftClickAt(widget));
+//				}
+//			}
 		}
 
-		if(actions.isEmpty()) {
-			System.out.println("Derive Actions Empty! Wait 2 second because maybe a menu is loading");
-			Util.pause(2);
-			Action nop = new NOP();
-			nop.set(Tags.OriginWidget, state);
-			nop.set(Tags.Desc, "NOP action to wait");
-			return new HashSet<>(Collections.singletonList(nop));
-		}
-		
-		// If we have forced actions, prioritize and filter the other ones
-		if (forcedActions != null && forcedActions.size() > 0) {
-			filteredActions = actions;
-			actions = forcedActions;
-		}
-
-		//Showing the grey dots for filtered actions if visualization is on:
-		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+		// TODO: Check how this affects the Shared Algorithm, move to default derived actions
+//		if(actions.isEmpty()) {
+//			System.out.println("Derive Actions Empty! Wait 2 second because maybe a menu is loading");
+//			Util.pause(2);
+//			Action nop = new NOP();
+//			nop.set(Tags.OriginWidget, state);
+//			nop.set(Tags.Desc, "NOP action to wait");
+//			return new HashSet<>(Collections.singletonList(nop));
+//		}
 
 		Action key_down = ac.hitKey(KBKeys.VK_PAGE_DOWN);
 		key_down.set(Tags.OriginWidget, state);
 		actions.add(key_down);
 
+
 		Action key_up = ac.hitKey(KBKeys.VK_PAGE_UP);
 		key_up.set(Tags.OriginWidget, state);
 		actions.add(key_up);
-
+//		Action protocol = getProtocolAction(state);
+//		if(protocol!=null)
+//			actions.add(protocol);
 		return actions;
 	}
+
 
 	@Override
 	protected boolean isClickable(Widget widget) {
@@ -364,12 +365,34 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		return clickSet.size() > 0;
 	}
 
+//	@Override
+//	protected boolean isTypeable(Widget widget) {
+//		Role role = widget.get(Tags.Role, Roles.Widget);
+//		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+//			// Specific class="input" for parasoft SUT
+//			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+//				return true;
+//			}
+//
+//			// Input type are special...
+//			if (role.equals(WdRoles.WdINPUT)) {
+//				String type = ((WdWidget) widget).element.type;
+//				return WdRoles.typeableInputTypes().contains(type);
+//			}
+//			return true;
+//		}
+//
+//		return false;
+//	}
 
 	/**
-	 * Select one of the possible actions (e.g. at random)
+	 * Select one of the available actions using a reinforcement learning action selection algorithm
 	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	 * overwrite it, not always running it, we have take care of the HTML report here
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
 	 * @return the selected action (non-null!)
 	 */
 	@Override
@@ -391,14 +414,10 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 
 	/**
 	 * Execute the selected action.
-	 *
-	 * @param system the SUT
-	 * @param state  the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
+	 * Extract and create JaCoCo coverage report (After each action JaCoCo report will be created).
 	 */
 	@Override
-	protected boolean executeAction(SUT system, State state, Action action) {
+	protected boolean executeAction(SUT system, State state, Action action){
 		boolean actionExecuted = super.executeAction(system, state, action);
 
 		String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
@@ -408,6 +427,7 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 				.setFilename("urlData")
 				.setInformation(information)
 				.build());
+
 		try {
 			extractStateModelMetrics();
 		} catch(Exception e) {
@@ -419,35 +439,34 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 	}
 
 	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 *
-	 * @return if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-		return super.moreActions(state);
-	}
-
-	/**
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
+	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
 	 */
 	@Override
 	protected void finishSequence() {
+//
+//		// Extract and create JaCoCo sequence coverage report for Generate Mode
+//		if(settings.get(ConfigTags.Mode).equals(Modes.Generate)) {
+//			extractJacocoSequenceReport();
+//		}
+
 		super.finishSequence();
 	}
 
 	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
+	 * This methods stops the SUT
 	 *
-	 * @return if <code>true</code> continue test, else stop
+	 * @param system
 	 */
 	@Override
-	protected boolean moreSequences() {
-		return super.moreSequences();
+	protected void stopSystem(SUT system) {
+		super.stopSystem(system);
+
+		// This is the default JaCoCo generated file, we dumped our desired file with MBeanClient (finishSequence)
+		// In this protocol this one is residual, so just delete
+//		if(new File("jacoco.exec").exists()) {
+//			System.out.println("Deleted residual jacoco.exec file ? " + new File("jacoco.exec").delete());
+//		}
 	}
 
 	/**

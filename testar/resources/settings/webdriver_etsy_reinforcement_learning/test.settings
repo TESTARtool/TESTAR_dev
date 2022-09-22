@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_etsy/Protocol_webdriver_etsy
+ProtocolClass = webdriver_etsy_reinforcement_learning/Protocol_webdriver_etsy_reinforcement_learning
 
 #################################################################
 # State model inference settings
@@ -108,7 +108,7 @@ ProtocolClass = webdriver_etsy/Protocol_webdriver_etsy
 StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
-DataStoreDirectory = C:\\Users\\worker\\Desktop\\orientdb-3.0.4\\databases
+DataStoreDirectory = D:\\Work\\Testar\\Experiments\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -117,7 +117,6 @@ ApplicationName = etsy
 ApplicationVersion = 1
 StateModelStoreWidgets = false
 
-
 #################################################################
 # State identifier attributes
 #
@@ -125,6 +124,28 @@ StateModelStoreWidgets = false
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WebWidgetId,WebWidgetTextContent,WidgetPath
+
+#################################################################
+# Reinforcement learning settings
+#################################################################
+Alpha = 1.0
+Gamma = 0.99
+DefaultValue = 0.0
+DefaultReward = 0.0
+Epsilon = 0.7
+MaxQValue = 1.0
+DecayRate = 0.0001
+Temperature = 1.0
+RewardFunction = WidgetTreeBasedRewardFunction
+Policy = EpsilonGreedyPolicy
+
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\webdriver_etsy_reinforcement_learning\\ExtendedRLStateUtility.xml
 
 #################################################################
 # WebDriver features
