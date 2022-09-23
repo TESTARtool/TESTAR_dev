@@ -115,11 +115,13 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
 
     private Action getUrlInjectionOrDefault()
     {
-        String url = WdDriver.getCurrentUrl();
+        String url = webDriver.getCurrentUrl();
 
         if (url.contains("?"))
         {
-            String newUrl = url.replaceAll("=.*" + "&", xssInjectionURL + "&");
+            // Replace the parameter with the XSS injection
+            // regex (?<=X)(.*?)(?=Y) with X,Y delimiters
+            String newUrl = url.replaceAll("(?<==)(.*?)(?=&)", xssInjectionURL);
             newUrl = newUrl.replaceFirst("[^=]*$", xssInjectionURL);
 
             if (!newUrl.equals(url)) {

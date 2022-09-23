@@ -30,45 +30,33 @@
 
 package org.testar.securityanalysis;
 
-import java.util.Arrays;
-import java.util.List;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
 
-public class SecurityConfiguration {
-    public static int maxBenchmarkExecutionTimes = 2;
-    public static String resultWriterOutput = "JSON";
+public class SecurityConfigurationTest {
 
-    // Enable always the passive HeaderAnalysisSecurityOracle oracle by default
-    private List<String> oracles = Arrays.asList("HeaderAnalysisSecurityOracle");
+	@Test
+	public void select_security_configuration() {
+		SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+		assertTrue(securityConfiguration.getOracles().size() == 1);
+		assertTrue(securityConfiguration.getOracles().contains("HeaderAnalysisSecurityOracle"));
 
-    public String loginUrl = "http://localhost:41948/Account/Login";
-    public String usernameField = "username";
-    public String passwordField = "password";
-    public String submitButton = "1, 0, 2, 0, 0, 3, 0";
-    public String logoutButton = "logout";
+		securityConfiguration = new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.SQL_INJECTION);
+		assertTrue(securityConfiguration.getOracles().size() == 2);
+		assertTrue(securityConfiguration.getOracles().contains("HeaderAnalysisSecurityOracle"));
+		assertTrue(securityConfiguration.getOracles().contains("SqlInjectionSecurityOracle"));
 
-    public String username = "Admin";
-    public String password = "123";
+		securityConfiguration = new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.XSS_INJECTION);
+		assertTrue(securityConfiguration.getOracles().size() == 2);
+		assertTrue(securityConfiguration.getOracles().contains("HeaderAnalysisSecurityOracle"));
+		assertTrue(securityConfiguration.getOracles().contains("XssSecurityOracle"));
 
-    public long tokenInvalidationWaitTime = 60000; /** One minute **/
+		securityConfiguration = new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.TOKEN_INVALIDATION);
+		assertTrue(securityConfiguration.getOracles().size() == 2);
+		assertTrue(securityConfiguration.getOracles().contains("HeaderAnalysisSecurityOracle"));
+		assertTrue(securityConfiguration.getOracles().contains("TokenInvalidationSecurityOracle"));
+	}
 
-    /**
-     * Create the security configuration only with the passive HeaderAnalysisSecurityOracle. 
-     */
-    public SecurityConfiguration() {}
-
-    /**
-     * Create the security configuration with the passive HeaderAnalysisSecurityOracle 
-     * and the chosen active security oracle. 
-     * 
-     * @param activeOracle
-     */
-    public SecurityConfiguration(ActiveSecurityOracle.ActiveOracle activeOracle) {
-    	oracles = Arrays.asList("HeaderAnalysisSecurityOracle", activeOracle.getOracle());
-    }
-
-    public List<String> getOracles() {
-    	return oracles;
-    }
 }

@@ -35,6 +35,7 @@ import org.openqa.selenium.devtools.v104.network.Network;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
+import org.testar.monkey.alayer.actions.WdSecurityUrlInjectionAction;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.securityanalysis.SecurityResultWriter;
@@ -47,6 +48,7 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     private boolean errorReceived = false;
     protected Set<Action> proposedActions = new HashSet<>();
     private static String sqlInjectionText = "'";
+    private static String sqlInjectionURL = "%27";
 
     // Use always the 500 Internal Server Error by default
     private static Set<Integer> serverErrorCodes = new HashSet<>(Arrays.asList(500));
@@ -79,6 +81,11 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         }
 
         proposedActions = actions;
+
+        Action urlInjection = getUrlInjectionOrDefault();
+        if (urlInjection != null)
+        	actions.add(urlInjection);
+
         return actions;
     }
 
@@ -98,6 +105,27 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
     public static void setSqlInjectionText(String sqlInjectionText) {
     	SqlInjectionSecurityOracle.sqlInjectionText = sqlInjectionText;
     }
-    
-    //TODO: SQL injection in the url parameters
+
+    public static void setSqlInjectionURL(String sqlInjectionURL) {
+    	SqlInjectionSecurityOracle.sqlInjectionURL = sqlInjectionURL;
+    }
+
+    private Action getUrlInjectionOrDefault()
+    {
+    	String url = webDriver.getCurrentUrl();
+
+    	if (url.contains("?"))
+    	{
+    		// TODO: Maybe add the injection character instead of replace
+    		// Replace the parameter with the SQL injection character
+    		// regex (?<=X)(.*?)(?=Y) with X,Y delimiters
+    		String newUrl = url.replaceAll("(?<==)(.*?)(?=&)", sqlInjectionURL);
+    		// regex = to end of line
+    		newUrl = newUrl.replaceFirst("[^=]*$", sqlInjectionURL);
+    		if (!newUrl.equals(url)) {
+    			return new WdSecurityUrlInjectionAction(newUrl);
+    		}
+    	}
+    	return null;
+    }
 }

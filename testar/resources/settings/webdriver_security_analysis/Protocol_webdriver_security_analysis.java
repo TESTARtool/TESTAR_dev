@@ -104,7 +104,7 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         devTools.createSession();
         devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()));
         lastSequenceActionNumber = 0;
-        oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.oracles, webDriver, devTools);
+        oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.getOracles(), webDriver, devTools);
 
         /**
          *  This methods allow to customize the XSS and SQL injection input
@@ -115,6 +115,7 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
 
         // TESTAR SQL verdict searches for a 500 status code in the browser
         SqlInjectionSecurityOracle.setSqlInjectionText("'");
+        SqlInjectionSecurityOracle.setSqlInjectionURL("%27");
 
         // 500 Internal Server Error is used by default in the SQL injection verdict
         // It is possible to add a new error status codes to be used in the SQL verdict

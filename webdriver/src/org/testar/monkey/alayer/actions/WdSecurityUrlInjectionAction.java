@@ -46,6 +46,10 @@ public class WdSecurityUrlInjectionAction extends TaggableBase implements Action
         this.text = text;
     }
 
+    public String getText() {
+    	return text;
+    }
+
     @Override
     public void run(SUT system, State state, double duration) throws ActionFailedException
     {
