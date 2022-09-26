@@ -32,6 +32,9 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.ReinforcementLearning.ActionSelectors.ReinforcementLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.Policies.PolicyFactory;
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
 import nl.ou.testar.SutVisualization;
 import org.apache.commons.text.StringEscapeUtils;
 import org.fruit.Pair;
@@ -53,6 +56,7 @@ import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.protocols.experiments.WriterExperiments;
 import org.testar.protocols.experiments.WriterExperimentsParams;
+import org.testar.settings.ExtendedSettingsFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,6 +79,13 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 	 */
 	@Override
 	protected void initialize(Settings settings) {
+
+		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "QLearningModelManager");
+		// Extended settings framework, set ConfigTags settings with XML framework values
+		// test.setting -> ExtendedSettingsFile
+		ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+		settings = rlXmlSetting.updateXMLSettings(settings);
+
 		super.initialize(settings);
 
 		/*
@@ -107,8 +118,6 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		//This feature can block the correct display of select dropdown elements 
 		WdDriver.forceActivateTab = true;
 		*/
-
-		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "QLearningModelManager");
 
 		// URL + form name, username input id + value, password input id + value
 		// Set login to null to disable this feature

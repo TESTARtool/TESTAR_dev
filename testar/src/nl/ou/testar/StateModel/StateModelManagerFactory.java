@@ -82,6 +82,7 @@ public class StateModelManagerFactory {
 
             final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
             final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+            System.out.println(rewardFunction);
 
             logger.info("State model with Reinforcement Learning Model Manager selected");
             switch (stateModelRL){
@@ -98,6 +99,7 @@ public class StateModelManagerFactory {
 //                            tag);
                 case "QLearningModelManager":
                     logger.info("State model with QLearningModelManager selected");
+                    System.out.println("State model with QLearningModelManager selected");
                     return new QLearningModelManager(abstractStateModel,
                             actionSelector,
                             persistenceManager,
@@ -124,6 +126,7 @@ public class StateModelManagerFactory {
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
 
         logger.info("State model with modelManager selected");
+        System.out.println("State model with modelManager selected");
         return new ModelManager(abstractStateModel,
                 actionSelector,
                 persistenceManager,
