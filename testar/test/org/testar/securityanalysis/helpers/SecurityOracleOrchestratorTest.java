@@ -30,13 +30,12 @@
 
 package org.testar.securityanalysis.helpers;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
+
 import static org.junit.Assert.*;
 
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -45,20 +44,15 @@ import org.testar.securityanalysis.SecurityConfiguration;
 import org.testar.securityanalysis.SecurityResultWriter;
 import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
 
-/**
- * Ignore by default because it has a dependency on a directory with chromedriver. 
- */
-
-@Ignore
 public class SecurityOracleOrchestratorTest {
 
-	private static ChromeDriver driver;
+	private static DevTools mockDevTools;
 
 	@BeforeClass
 	public static void setup() {
-		// Set the path to the desired chromedriver in the system
-		System.setProperty("webdriver.chrome.driver", "/Windows/chromedriver.exe");
-		driver = new ChromeDriver();
+		// Mock DevTools listener to do nothing
+		mockDevTools = Mockito.mock(DevTools.class);
+		Mockito.doNothing().when(mockDevTools).addListener(null, null);
 	}
 
 	@Test
@@ -66,13 +60,12 @@ public class SecurityOracleOrchestratorTest {
 		SecurityConfiguration securityConfiguration = new SecurityConfiguration();
 		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
 		RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
-		DevTools devTools = driver.getDevTools();
 
 		SecurityOracleOrchestrator oracleOrchestrator = 
 				new SecurityOracleOrchestrator(securityResultWriter, 
 						securityConfiguration.getOracles(), 
 						webDriver, 
-						devTools);
+						mockDevTools);
 
 		assertFalse(oracleOrchestrator.hasActiveOracle());
 	}
@@ -83,23 +76,14 @@ public class SecurityOracleOrchestratorTest {
 				new SecurityConfiguration(ActiveSecurityOracle.ActiveOracle.SQL_INJECTION);
 		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
 		RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
-		DevTools devTools = driver.getDevTools();
 
 		SecurityOracleOrchestrator oracleOrchestrator = 
 				new SecurityOracleOrchestrator(securityResultWriter, 
 						securityConfiguration.getOracles(), 
 						webDriver, 
-						devTools);
+						mockDevTools);
 
 		assertTrue(oracleOrchestrator.hasActiveOracle());
-	}
-
-	@AfterClass
-	public static void cleanUp(){
-		if (driver != null) {
-			driver.close();
-			driver.quit();
-		}
 	}
 
 }

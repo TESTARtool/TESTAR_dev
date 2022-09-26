@@ -37,7 +37,6 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
 import org.testar.monkey.alayer.actions.WdSecurityUrlInjectionAction;
 import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.securityanalysis.SecurityResultWriter;
 
 import java.util.Arrays;
@@ -76,7 +75,7 @@ public class SqlInjectionSecurityOracle extends ActiveSecurityOracle {
         for (Widget widget : state)
         {
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, sqlInjectionText));
+                actions.add(new WdSecurityInjectionAction(webDriver, widget, sqlInjectionText));
             }
         }
 

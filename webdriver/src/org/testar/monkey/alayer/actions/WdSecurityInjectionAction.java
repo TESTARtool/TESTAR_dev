@@ -35,20 +35,25 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
-import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 /** Enables TESTAR to use special characters in input fields **/
 public class WdSecurityInjectionAction extends TaggableBase implements Action {
     private WebElement element;
     private String text;
 
-    public WdSecurityInjectionAction(RemoteWebDriver webDriver, WdWidget widget, String text)
+    public WdSecurityInjectionAction(RemoteWebDriver webDriver, Widget widget, String text)
     {
-        element = webDriver.findElement(new By.ById(widget.element.id));
+    	//TODO: This only works if the web element contains the id property
+        element = webDriver.findElement(new By.ById(widget.get(WdTags.WebId, "")));
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
         this.set(Tags.Desc, "Inject text that contains special characters");
         this.text = text;
         this.set(Tags.OriginWidget, widget);
+    }
+
+    public String getText() {
+    	return text;
     }
 
     @Override

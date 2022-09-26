@@ -38,36 +38,43 @@ import static org.junit.Assert.*;
 
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
 import org.testar.monkey.alayer.actions.WdSecurityUrlInjectionAction;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
 import org.testar.securityanalysis.JsonSecurityResultWriter;
 import org.testar.securityanalysis.SecurityResultWriter;
 import org.testar.stub.StateStub;
+import org.testar.stub.WidgetStub;
 
 import java.util.Set;
 
 public class SqlInjectionSecurityOracleTest {
 
 	private static RemoteWebDriver mockDriver;
-	private static StateStub state;
 
 	@BeforeClass
 	public static void setup() {
-		// Mock the driver URL to test SQL action injections
 		mockDriver = Mockito.mock(RemoteWebDriver.class);
-		Mockito.when(mockDriver.getCurrentUrl()).thenReturn("http://example.com/page?parameter=value&also=another");
+		NativeLinker.addWdDriverOS();
 	}
 
 	@Test
 	public void sql_url_injection_action() {
+		// Mock the driver URL to test SQL action injections
+		Mockito.when(mockDriver.getCurrentUrl()).thenReturn("http://example.com/page?parameter=value&also=another");
+		// And create an empty state to force to obtain only one URL SQL injection action
+		StateStub state = new StateStub();
+
 		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
 		SqlInjectionSecurityOracle sqlInjectionSecurityOracle = 
 				new SqlInjectionSecurityOracle(securityResultWriter, mockDriver);
 
 		SqlInjectionSecurityOracle.setSqlInjectionURL("%27");
 
-		// Create an empty state to force to obtain only one URL SQL injection action
-		state = new StateStub();
 		Set<Action> sqlActions = sqlInjectionSecurityOracle.getActions(state);
 		assertTrue(sqlActions.size() == 1);
 
@@ -80,6 +87,40 @@ public class SqlInjectionSecurityOracleTest {
 
 		String sqlURL = sqlInjectionURLaction.getText();
 		assertTrue(sqlURL.equals("http://example.com/page?parameter=%27&also=%27"));
+	}
+
+	@Test
+	public void sql_widget_injection_action() {
+		// Mock the driver URL without parameters
+		Mockito.when(mockDriver.getCurrentUrl()).thenReturn("http://example.com/page");
+		// And create a state with a text widget to obtain only one text area SQL injection action
+		StateStub state = new StateStub();
+		WidgetStub widget = new WidgetStub();
+		state.addChild(widget);
+		widget.setParent(state);
+
+		// Widget must be visible at browser canvas and typeable
+		widget.set(WdTags.WebIsFullOnScreen, true);
+		widget.set(Tags.Shape, Rect.from(1, 1, 1, 1));
+		widget.set(Tags.Role, WdRoles.WdTEXTAREA);
+
+		SecurityResultWriter securityResultWriter = new JsonSecurityResultWriter();
+		SqlInjectionSecurityOracle sqlInjectionSecurityOracle = 
+				new SqlInjectionSecurityOracle(securityResultWriter, mockDriver);
+
+		SqlInjectionSecurityOracle.setSqlInjectionText("' and sleep(10)");
+
+		Set<Action> sqlActions = sqlInjectionSecurityOracle.getActions(state);
+		assertTrue(sqlActions.size() == 1);
+
+		// Check that text area SQL injection action was created correctly
+		WdSecurityInjectionAction sqlInjectionWidgetAction = (WdSecurityInjectionAction) sqlActions.stream()
+				.filter(action -> action instanceof WdSecurityInjectionAction)
+				.findFirst().get();
+
+		assertTrue(sqlInjectionWidgetAction.get(Tags.Desc, "").equals("Inject text that contains special characters"));
+
+		assertTrue(sqlInjectionWidgetAction.getText().equals("' and sleep(10)"));
 	}
 
 }

@@ -41,7 +41,6 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
 import org.testar.monkey.alayer.actions.WdSecurityUrlInjectionAction;
 import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.securityanalysis.SecurityResultWriter;
 
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
         for (Widget widget : state)
         {
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                actions.add(new WdSecurityInjectionAction(webDriver, (WdWidget)widget, xssInjectionText));
+                actions.add(new WdSecurityInjectionAction(webDriver, widget, xssInjectionText));
             }
         }
         preferredActions.addAll(actions);
