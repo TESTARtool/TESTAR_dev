@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.testar.serialisation.ScreenshotSerialiser;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.GsmCallActions;
@@ -43,9 +42,10 @@ import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.appmanagement.ApplicationState;
 import io.appium.java_client.touch.LongPressOptions;
 import io.appium.java_client.touch.offset.ElementOption;
-import org.apache.commons.io.FileUtils;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
@@ -70,19 +70,15 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
 public class AndroidAppiumFramework extends SUTBase {
 
 	public static AndroidAppiumFramework androidSUT = null;
 
-	private static AndroidDriver<MobileElement> driver = null;
+	private static AndroidDriver driver = null;
 
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
-
-
-		// Original address 2 lines below was: http://127.0.0.1:4723/wd/hub. Changed it into: http://0.0.0.0:4723/wd/hub
 		try {
-			driver = new AndroidDriver<>(new URL("http://0.0.0.0:4723/wd/hub "), cap);
+			driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
 			// Next few lines of code enable the show touches in Android.
 			// command to be executed: adb shell content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:1
 			List<String> showTouchesArgs = Arrays.asList(
@@ -93,27 +89,29 @@ public class AndroidAppiumFramework extends SUTBase {
 					"name:s:show_touches",
 					"--bind",
 					"value:i:1"
-			);
+					);
 			Map<String, Object> showTouchesCmd = ImmutableMap.of(
 					"command", "content",
 					"args", showTouchesArgs
-			);
+					);
 			driver.executeScript("mobile: shell", showTouchesCmd);
 
-//			// command2 to be executed: adb shell settings put system pointer_location 1
-//			List<String> showPointerArgs = Arrays.asList(
-//					"put",
-//					"system",
-//					"pointer_location",
-//					"1"
-//			);
-//			Map<String, Object> showPointerCmd = ImmutableMap.of(
-//					"command", "settings",
-//					"args", showPointerArgs
-//			);
-//			driver.executeScript("mobile: shell", showPointerCmd);
+			// command2 to be executed: adb shell settings put system pointer_location 1
+			/*
+			List<String> showPointerArgs = Arrays.asList(
+					"put",
+					"system",
+					"pointer_location",
+					"1"
+			);
+			Map<String, Object> showPointerCmd = ImmutableMap.of(
+					"command", "settings",
+					"args", showPointerArgs
+			);
+			driver.executeScript("mobile: shell", showPointerCmd);
+			 */
 		} catch (MalformedURLException e) {
-			System.out.println("ERROR: Exception with Android Driver URL: http://127.0.0.0:4723/wd/hub");
+			System.err.println("ERROR: Exception with Android Driver URL: http://0.0.0.0:4723/wd/hub");
 			e.printStackTrace();
 		}
 	}
@@ -128,44 +126,52 @@ public class AndroidAppiumFramework extends SUTBase {
 		return new AndroidAppiumFramework(cap);
 	}
 
-	public static AndroidDriver<MobileElement> getDriver() {
+	public static AndroidDriver getDriver() {
 		return driver;
 	}
 
-	public static List<MobileElement> findElements(By by){
+	public static List<WebElement> findElements(By by){
 		return driver.findElements(by);
 	}
-	
-	// Send Click Action
-	// Uses unique accessibility ID if present, otherwise uses xpath.
-	
+
+	/**
+	 * Send Click Action. 
+	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * 
+	 * @param id
+	 * @param w
+	 */
 	public static void clickElementById(String id, Widget w){
 		if (!id.equals("")) {
-			//System.out.println("GOT IN ID SECTION CLICK: " + id);
-			driver.findElementByAccessibilityId(id).click();
+			driver.findElement(new By.ById(id)).click();
 		}
 		else {
 			String xpathString = w.get(AndroidTags.AndroidXpath);
-			//System.out.println("XPATH click: " + xpathString);
-			driver.findElementByXPath(xpathString).click();
+			driver.findElement(new By.ByXPath(xpathString)).click();
 		}
 	}
-	
-	// Send Type Action
-	
-	public static void setValueElementById(String id, String value, Widget w){
+
+	/**
+	 * Send Type Action. 
+	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * 
+	 * @param id
+	 * @param value
+	 * @param w
+	 */
+	public static void sendKeysTextTextElementById(String id, String text, Widget w){
 		if (!id.equals("")) {
-			//System.out.println("GOT IN ID SECTION WRITE: " + id);
-			driver.findElementByAccessibilityId(id).setValue(value);
+			WebElement element = driver.findElement(new By.ById(id));
+			element.clear();
+			element.sendKeys(text);
 		}
 		else {
 			String xpathString = w.get(AndroidTags.AndroidXpath);
-			//System.out.println("XPATH write: " + xpathString);
-			driver.findElementByXPath(xpathString).setValue(value);
+			WebElement element = driver.findElement(new By.ByXPath(xpathString));
+			element.clear();
+			element.sendKeys(text);
 		}
-
 	}
-
 
 	public static void scrollElementById(String id, Widget w, int scrollDistance) {
 		Duration NO_TIME = Duration.ofMillis(0);
@@ -177,12 +183,9 @@ public class AndroidAppiumFramework extends SUTBase {
 		int startCoorsX = (int) (bounds.x() + 0.5*bounds.width());
 		int startCoorsY = (int) (bounds.y() + 0.5*bounds.height());
 
-		System.out.println("GOT IN SCROLL ACTION: " + w.get(AndroidTags.AndroidClassName));
-
 		//TODO: THIS SECTION NOW DISPLAYS DRAG AND DROP BEHAVIOR!
-//		TouchAction touchAction = new TouchAction(driver);
-//		touchAction.press(PointOption.point(594, 723)).moveTo(PointOption.point(580, 1236)).perform();
-		//TODO: THIS SECTION NOW DISPLAYS DRAG AND DROP BEHAVIOR!
+		//TouchAction touchAction = new TouchAction(driver);
+		//touchAction.press(PointOption.point(594, 723)).moveTo(PointOption.point(580, 1236)).perform();
 
 		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 		Sequence scroll = new Sequence(finger, 0);
@@ -197,8 +200,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		scroll.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 		driver.perform(Arrays.asList(scroll));
 
-		System.out.println("DONE SCROLL ACTION");
-
 		try {
 			TimeUnit.MILLISECONDS.sleep(1000);
 		} catch (InterruptedException e) {
@@ -206,15 +207,14 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 	}
 
-
 	public static void longClickElementById(String id, Widget w) {
-		MobileElement el;
+		WebElement el;
 		if (!id.equals("")) {
-			el = driver.findElementByAccessibilityId(id);
+			el = driver.findElement(new By.ById(id));
 		}
 		else {
 			String xpathString = w.get(AndroidTags.AndroidXpath);
-			el = driver.findElementByXPath(xpathString);
+			el = driver.findElement(new By.ByXPath(xpathString));
 		}
 
 		LongPressOptions longPressOptions = new LongPressOptions();
@@ -225,7 +225,6 @@ public class AndroidAppiumFramework extends SUTBase {
 	public static void clickBackButton() {
 		driver.navigate().back();
 	}
-
 
 	/** Zooming functions.
 	public static void zoomIn(Point center, int distance) {
@@ -255,7 +254,6 @@ public class AndroidAppiumFramework extends SUTBase {
 
 		return (new Pair<>(fingerAPath,fingerBPath));
 	}
-
 
 	private static Sequence zoomSinglefinger(String fingerName, Point locus, int startRadius, int endRadius, double angle, Duration duration) {
 		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, fingerName);
@@ -290,7 +288,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 		return fingerPath;
 	}
-	*/
+	 */
 
 	//System actions:
 	public static void changeOrientation() {
@@ -335,52 +333,49 @@ public class AndroidAppiumFramework extends SUTBase {
 		return currentPackage;
 	}
 
-	public static void sendKeysElementById(String id, CharSequence keysToSend){
-		driver.findElementByAccessibilityId(id).sendKeys(keysToSend);
-	}
-	
 	public static void pressKeyEvent(KeyEvent keyEvent){
 		driver.pressKey(keyEvent);
 	}
-	
+
 	// Utility Interactions
 	public static void hideKeyboard(){
 		driver.hideKeyboard();
 	}
-	
+
 	public static void wakeUpKeyCode(){
 		driver.pressKey(new KeyEvent(AndroidKey.WAKEUP));
 	}
-	
+
 	public static void activateAppByBundleId(String bundleId){
 		driver.activateApp(bundleId);
 	}
-	
-	public static List<Map<String, Object>> getAllSessionDetails(){
+
+	//TODO: Update from Appium 7.3.0 to 8.2.0
+	/*public static List<Map<String, Object>> getAllSessionDetails(){
 		return driver.getAllSessionDetails();
-	}
-	
+	}*/
+
 	public static Set<String> getWindowHandles(){
 		return driver.getWindowHandles();
 	}
-	
+
 	public static String getTitleOfCurrentPage(){
 		return driver.getTitle();
 	}
-	
+
 	public static void resetApp(){
 		driver.resetApp();
 	}
-	
+
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
-	
+
 	public static void pushFile(String remotePath, File file){
 		try {
 			driver.pushFile(remotePath, file);
 		} catch (IOException e) {
-			System.out.println("Exception: AndroidDriver pushFile request was not properly executed");
+			System.err.println("Exception: AndroidDriver pushFile request was not properly executed");
 		}
 	}
 
@@ -392,24 +387,24 @@ public class AndroidAppiumFramework extends SUTBase {
 		String scrshotOutputFolder = "screenshot_folder";
 		String testSequenceFolder = "androidScreenshots";
 		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
-		File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		File srcFile = driver.getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(srcFile, new File(statePath));
 
 		return statePath;
 	}
 
 	public static String getScreenshotState(State state) throws IOException {
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
 		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 
-		// Highligh the action on the screenshot:
+		// Highlight the action on the screenshot:
 		BufferedImage newBi = ImageIO.read(is);
 		// get the Graphics context for this single BufferedImage object
 		Graphics2D g = (Graphics2D) newBi.getGraphics();
@@ -433,7 +428,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		ImageIO.write(newBi, "png", os);
 		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
 
-
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
 		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
 	}
@@ -441,30 +435,31 @@ public class AndroidAppiumFramework extends SUTBase {
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
 	public static AWTCanvas getScreenshotBinary(State state, Widget widget) throws IOException {
 
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
-//		BufferedImage newBi = ImageIO.read(is);
-//		// get the Graphics context for this single BufferedImage object
-//		Graphics g = newBi.getGraphics();
-//
-//		Rect bounds = widget.get(AndroidTags.AndroidBounds);
-//		int xLocation = (int)(bounds.x() + (bounds.width()/2.0));
-//		int yLocation = (int)(bounds.y() + (bounds.height()/2.0));
-//
-//		g.setColor(new Color(255, 0, 0, 130));
-//		g.drawOval(xLocation, yLocation, 20, 20);
-//		g.setColor(new Color(255, 0, 0, 130));
-//		g.fillOval(xLocation, yLocation, 20, 20);
-//		g.dispose();  // get rid of the Graphics context to save resources
-//
-//		ByteArrayOutputStream os = new ByteArrayOutputStream();
-//		ImageIO.write(newBi, "jpeg", os);
-//		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
+		/*
+		BufferedImage newBi = ImageIO.read(is);
+		// get the Graphics context for this single BufferedImage object
+		Graphics g = newBi.getGraphics();
 
+		Rect bounds = widget.get(AndroidTags.AndroidBounds);
+		int xLocation = (int)(bounds.x() + (bounds.width()/2.0));
+		int yLocation = (int)(bounds.y() + (bounds.height()/2.0));
+
+		g.setColor(new Color(255, 0, 0, 130));
+		g.drawOval(xLocation, yLocation, 20, 20);
+		g.setColor(new Color(255, 0, 0, 130));
+		g.fillOval(xLocation, yLocation, 20, 20);
+		g.dispose();  // get rid of the Graphics context to save resources
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ImageIO.write(newBi, "jpeg", os);
+		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
+		 */
 
 		return AWTCanvas.fromInputStream(is);
 	}
-	
+
 	public static void terminateApp(String bundleId){
 		driver.terminateApp(bundleId);
 	}
@@ -480,14 +475,13 @@ public class AndroidAppiumFramework extends SUTBase {
 	public static Document getAndroidPageSource() {
 		try {
 			String appiumState = driver.getPageSource();
-//			System.out.println("INFORMATION ON STATE SUT FROM APPIUM: " + appiumState);
 			return loadXML(appiumState);
 		} catch (WebDriverException wde) {
-			System.out.println("ERROR: Exception trying to obtain driver.getPageSource()");
+			System.err.println("ERROR: Exception trying to obtain driver.getPageSource()");
 		} catch (ParserConfigurationException | SAXException | IOException doce) {
-			System.out.println("ERROR: Exception parsing Android Driver Page Source to XML Document");
+			System.err.println("ERROR: Exception parsing Android Driver Page Source to XML Document");
 		} catch (Exception e) {
-			System.out.println("ERROR: Unknown Exception AppiumFramework getAndroidPageSource()");
+			System.err.println("ERROR: Unknown Exception AppiumFramework getAndroidPageSource()");
 			e.printStackTrace();
 		}
 		return null;
@@ -512,8 +506,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static LogEntries getAppiumLogs() {
-		LogEntries logEntries = driver.manage().logs().get("driver");
-		return logEntries;
+		return driver.manage().logs().get("driver");
 	}
 
 	@Override
@@ -576,7 +569,7 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
 			cap.setCapability("allowTestPackages", true);
 			cap.setCapability("newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-//			cap.setCapability("appActivity", jsonObject.get("appActivity").getAsString());
+			//cap.setCapability("appActivity", jsonObject.get("appActivity").getAsString());
 			cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
 
 			String appPath = jsonObject.get("app").getAsString();
@@ -586,7 +579,7 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("app", appLocation);
 
 		} catch (IOException | NullPointerException e) {
-			System.out.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
+			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
 			e.printStackTrace();
 		}
 

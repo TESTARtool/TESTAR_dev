@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,11 +41,10 @@ import java.util.ArrayList;
 public class IOSProtocolUtil extends ProtocolUtil {
 
 	public static String getActionshot(State state, Action action) {
-
 		try {
 			return IOSAppiumFramework.getScreenshotAction(state, action);
 		} catch(Exception e) {
-			System.out.println("Exception when taking action screenshot: " + e);
+			System.err.println("Exception when taking action screenshot: " + e);
 		}
 
 		return ProtocolUtil.getActionshot(state, action);
@@ -55,7 +54,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 		try {
 			return IOSAppiumFramework.getScreenshotState(state);
 		} catch(Exception e) {
-			System.out.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a screenshot of the iOS emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshot(state);
@@ -65,7 +64,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 		try {
 			return IOSAppiumFramework.getScreenshotSpyMode(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 		} catch(Exception e) {
-			System.out.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a screenshot of the iOS emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshot(state);
@@ -81,7 +80,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 		try {
 			return IOSAppiumFramework.getScreenshotBinary(state, widget);
 		} catch (IOException e) {
-			System.out.println("Exception occured when trying to take a binary screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a binary screenshot of the iOS emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshotBinary(state);
@@ -94,8 +93,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 		StringBuilder sb =  new StringBuilder();
 		Widget parentWidget = w;
 
-
-		while (!parentWidget.equals("Root")) {
+		while (parentWidget != w.root()) {
 			String classTag = parentWidget.get(Tags.Desc);
 			int indexNumber = parentWidget.get(IOSTags.iosNodeIndex);
 
@@ -105,7 +103,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 
 			parentWidget = parentWidget.parent();
 
-			ArrayList<Pair<String, Integer>> childClasses = new ArrayList<Pair<String, Integer>>();
+			ArrayList<Pair<String, Integer>> childClasses = new ArrayList<>();
 
 			for (int i = 0; i < parentWidget.childCount(); i++) {
 				childClasses.add(new Pair<String, Integer>(parentWidget.child(i).get(Tags.Desc), parentWidget.child(i).get(IOSTags.iosNodeIndex)));
@@ -139,7 +137,6 @@ public class IOSProtocolUtil extends ProtocolUtil {
 
 		}
 
-
 		int indexBackSlash = sb.indexOf("/", sb.indexOf("/") + 1);
 		if (indexBackSlash > 0) {
 			String appName = IOSAppiumFramework.getAppName();
@@ -148,9 +145,6 @@ public class IOSProtocolUtil extends ProtocolUtil {
 		}
 
 		sb.insert(0, "/");
-
-
-		// System.out.println("XPATH THE END!!!!: " + sb.toString());
 
 		return sb.toString();
 	}

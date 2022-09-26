@@ -467,7 +467,7 @@ public class WdDriver extends SUTBase {
   }
 
   public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, 60);
+    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
     ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
       Object result = remoteWebDriver.executeScript("return document.readyState");
       return result != null && result.equals("complete");

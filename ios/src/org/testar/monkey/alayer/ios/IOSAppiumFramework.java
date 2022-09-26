@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,6 @@ package org.testar.monkey.alayer.ios;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.testar.serialisation.ScreenshotSerialiser;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.ios.IOSDriver;
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Pair;
@@ -58,8 +57,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
@@ -68,14 +65,14 @@ public class IOSAppiumFramework extends SUTBase {
 
 	public static IOSAppiumFramework iosSUT = null;
 
-	private static IOSDriver<MobileElement> driver = null;
+	private static IOSDriver driver = null;
 
 	public IOSAppiumFramework(DesiredCapabilities cap) {
 
 		try {
-			driver = new IOSDriver<>(new URL("http://0.0.0.0:4723/wd/hub"), cap);
+			driver = new IOSDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
 		} catch (MalformedURLException e) {
-			System.out.println("ERROR: Exception with IOS Driver URL: http://0.0.0.0:4723/wd/hub");
+			System.err.println("ERROR: Exception with IOS Driver URL: http://0.0.0.0:4723/wd/hub");
 			e.printStackTrace();
 		}
 	}
@@ -90,31 +87,50 @@ public class IOSAppiumFramework extends SUTBase {
 		return new IOSAppiumFramework(cap);
 	}
 
-	public static List<MobileElement> findElements(By by){
+	public static IOSDriver getDriver() {
+		return driver;
+	}
+
+	public static List<WebElement> findElements(By by){
 		return driver.findElements(by);
 	}
-	
-	// Send Click Action
-	
+
+	/**
+	 * Send Click Action. 
+	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * 
+	 * @param id
+	 * @param w
+	 */
 	public static void clickElementById(String id, Widget w){
 		if (!id.equals("")) {
-			driver.findElementByAccessibilityId(id).click();
+			driver.findElement(new By.ById(id)).click();
 		}
 		else {
 			String xpathString = w.get(IOSTags.iosXpath);
-			driver.findElementByXPath(xpathString).click();
+			driver.findElement(new By.ByXPath(xpathString)).click();
 		}
 	}
-	
-	// Send Type Action
-	
-	public static void setValueElementById(String id, String value, Widget w){
+
+	/**
+	 * Send Type Action. 
+	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * 
+	 * @param id
+	 * @param value
+	 * @param w
+	 */
+	public static void sendKeysTextTextElementById(String id, String text, Widget w){
 		if (!id.equals("")) {
-			driver.findElementByAccessibilityId(id).setValue(value);
+			WebElement element = driver.findElement(new By.ById(id));
+			element.clear();
+			element.sendKeys(text);
 		}
 		else {
 			String xpathString = w.get(IOSTags.iosXpath);
-			driver.findElementByXPath(xpathString).setValue(value);
+			WebElement element = driver.findElement(new By.ByXPath(xpathString));
+			element.clear();
+			element.sendKeys(text);
 		}
 	}
 
@@ -128,8 +144,6 @@ public class IOSAppiumFramework extends SUTBase {
 		int startCoorsX = (int) (bounds.x() + 0.5*bounds.width());
 		int startCoorsY = (int) (bounds.y() + 0.5*bounds.height());
 
-		//System.out.println("GOT IN SCROLL ACTION: " + w.get(IOSTags.iosClassName));
-
 		PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 		Sequence scroll = new Sequence(finger, 0);
 		scroll.addAction(finger.createPointerMove(Duration.ofMillis(10), VIEW, startCoorsX, startCoorsY));
@@ -142,15 +156,11 @@ public class IOSAppiumFramework extends SUTBase {
 
 		scroll.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 		driver.perform(Arrays.asList(scroll));
-
-		//System.out.println("DONE SCROLL ACTION");
 	}
 
 	public static void shakeDevice() {
 		driver.shake();
 	}
-
-
 
 	public static void clickBackButton() {
 		driver.navigate().back();
@@ -168,78 +178,67 @@ public class IOSAppiumFramework extends SUTBase {
 			driver.rotate(ScreenOrientation.PORTRAIT);
 		}
 	}
-	
-	public static void sendKeysElementById(String id, CharSequence keysToSend){
-		driver.findElementById(id).sendKeys(keysToSend);
-	}
-	
-    // TODO: Complete for IOSDriver, KeyEvent seems android specific?
+
+	// TODO: Complete for IOSDriver, KeyEvent seems android specific?
 	/*public static void pressKeyEvent(KeyEvent keyEvent){
 		driver.pressKey(keyEvent);
 	}*/
-	
+
 	// Utility Interactions
-	
 	public static void hideKeyboard(){
 		driver.hideKeyboard();
 	}
-	
+
 	// TODO: Complete for IOSDriver, KeyEvent seems android specific?
 	/*public static void wakeUpKeyCode(){
 		driver.pressKey(new KeyEvent(AndroidKey.WAKEUP));
 	}*/
-	
+
 	public static void activateAppByBundleId(String bundleId){
 		driver.activateApp(bundleId);
 	}
-	
-	public static List<Map<String, Object>> getAllSessionDetails(){
+
+	//TODO: Update from Appium 7.3.0 to 8.2.0
+	/*public static List<Map<String, Object>> getAllSessionDetails(){
 		return driver.getAllSessionDetails();
-	}
-	
+	}*/
+
 	public static Set<String> getWindowHandles(){
 		return driver.getWindowHandles();
 	}
-	
+
 	public static String getTitleOfCurrentPage(){
 		return driver.getTitle();
 	}
-	
+
 	public static void resetApp(){
 		driver.resetApp();
 	}
-	
+
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
-	
+
 	public static void pushFile(String remotePath, File file){
 		try {
 			driver.pushFile(remotePath, file);
 		} catch (IOException e) {
-			System.out.println("Exception: IOSDriver pushFile request was not properly executed");
+			System.err.println("Exception: IOSDriver pushFile request was not properly executed");
 		}
-	}
-
-	public static IOSDriver<MobileElement> getDriver() {
-		return driver;
 	}
 
 	public static Pair<Integer, Integer> getScreenSize() {
 		Dimension screenSize = driver.manage().window().getSize();
 		Pair<Integer, Integer> widthHeight = new Pair(screenSize.width, screenSize.height);
 		return widthHeight;
-
 	}
 
 	public static String getScreenshot(String stateID) throws IOException {
 		String scrshotOutputFolder = "screenshot_folder";
 		String testSequenceFolder = "IOSScreenshots";
 		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
-		File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		File srcFile = driver.getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(srcFile, new File(statePath));
-
-
 
 		return statePath;
 	}
@@ -248,27 +247,21 @@ public class IOSAppiumFramework extends SUTBase {
 		String scrshotOutputFolder = "screenshot_folder";
 		String testSequenceFolder = "IOSScreenshots";
 		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
-		File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		File srcFile = driver.getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(srcFile, new File(statePath));
-
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		System.out.println("WORKING DIR: " + s);
-		System.out.println("PATH SCREENSHOT: " + statePath);
 
 		return statePath;
 	}
 
 	public static String getScreenshotState(State state) throws IOException {
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
 		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
-		System.out.println("Screenshot Action: " + action);
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 
 		// Highligh the action on the screenshot:
@@ -286,22 +279,14 @@ public class IOSAppiumFramework extends SUTBase {
 
 		Widget widget = action.get(Tags.OriginWidget);
 
-//		System.out.println("widget of action being taken class: " + widget.get(IOSTags.iosClassName));
-//		System.out.println("widget of action being taken accessID: " + widget.get(IOSTags.iosAccessibilityId));
-//		System.out.println("widget of action being taken text: " + widget.get(IOSTags.iosText));
-
 		Rect bounds = widget.get(IOSTags.iosBounds);
 		int dotWidth = (int)(((((double)width)/screenWidth) * widget.get(IOSTags.iosWidth))/2.0);
 		int dotHeight = (int)(((((double)height)/screenHeight) * widget.get(IOSTags.iosHeight))/2.0);
 		int xLocationDot = (int)((((double)width)/screenWidth)*widget.get(IOSTags.iosX) + dotWidth);
 		int yLocationDot = (int)((((double)height)/screenHeight)*widget.get(IOSTags.iosY) + dotHeight);
 
-		System.out.println("SCREENWIDTH: " + screenWidth);
-		System.out.println("WIDTH IMAGE: " + width);
-		System.out.println("WIDTH WIDGET: " + widget.get(IOSTags.iosWidth));
-
-//		int xLocation = ((int)(widget.get(IOSTags.iosX) + (widget.get(IOSTags.iosWidth)/2.0))-1);
-//		int yLocation = ((int)(widget.get(IOSTags.iosY) + (widget.get(IOSTags.iosHeight)/2.0))-1);
+		//int xLocation = ((int)(widget.get(IOSTags.iosX) + (widget.get(IOSTags.iosWidth)/2.0))-1);
+		//int yLocation = ((int)(widget.get(IOSTags.iosY) + (widget.get(IOSTags.iosHeight)/2.0))-1);
 
 		int xLocationBox = (int)((((double)width)/screenWidth)*widget.get(IOSTags.iosX));
 		int yLocationBox = (int)((((double)height)/screenHeight)*widget.get(IOSTags.iosY));
@@ -321,30 +306,35 @@ public class IOSAppiumFramework extends SUTBase {
 		ImageIO.write(newBi, "png", os);
 		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
 
-
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
 		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
 	}
 
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
 	public static AWTCanvas getScreenshotBinary(State state, Widget widget) throws IOException {
-
-		byte[] byteImage = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		return AWTCanvas.fromInputStream(is);
 	}
 
 	public static String getAppName() {
-		Map<String, Object> sessionDetails = driver.getSessionDetails();
-		String tempApp = (String) sessionDetails.get("app");
-		int indexSlash = tempApp.lastIndexOf("/");
-		tempApp = tempApp.substring(indexSlash + 1);
+		// getSessionDetails() does not exist anymore for Appium 8.X
+		//TODO: Debug and validate the capability to replace session details
+
+		//Map<String, Object> sessionDetails = driver.getSessionDetails();
+		//String tempApp = (String) sessionDetails.get("app");
+		//int indexSlash = tempApp.lastIndexOf("/");
+		//tempApp = tempApp.substring(indexSlash + 1);
+		//int indexDot = tempApp.indexOf(".");
+		//tempApp = tempApp.substring(0 , indexDot);
+
+		String tempApp = (String) driver.getCapabilities().getCapability("appPackage");
 		int indexDot = tempApp.indexOf(".");
 		tempApp = tempApp.substring(0 , indexDot);
 
 		return tempApp;
 	}
-	
+
 	public static void terminateApp(String bundleId){
 		driver.terminateApp(bundleId);
 	}
@@ -359,49 +349,18 @@ public class IOSAppiumFramework extends SUTBase {
 	 */
 	public static Document getIOSPageSource() {
 		try {
-			// get start time
-//			LocalTime startTime = java.time.LocalTime.now();
-//			System.out.println("start get page source: " + startTime);
-
 			String pageSource = driver.getPageSource();
-
-//			System.out.println("GET SIZE PAGESOURE: " + pageSource.getBytes().length);
-
-//			// get end time
-//			LocalTime endTime = java.time.LocalTime.now();
-//			System.out.println("end get page source: " + endTime);
-//			// Compute difference start and end time
-//			long timeBetween = ChronoUnit.MILLIS.between(startTime, endTime);
-//			System.out.println("Time between get page source: " + timeBetween);
-
-//			// get start time
-//			LocalTime startTime2 = java.time.LocalTime.now();
-//			System.out.println("start loadXML: " + startTime2);
-
-			Document loadedPageSource = loadXML(pageSource);
-
-//			// get end time
-//			LocalTime endTime2 = java.time.LocalTime.now();
-//			System.out.println("end loadXML: " + endTime2);
-//
-//			// Compute difference start and end time
-//			long timeBetween2 = ChronoUnit.MILLIS.between(startTime2, endTime2);
-//			System.out.println("Time between loadXML: " + timeBetween2);
-
-			return loadedPageSource;
+			return loadXML(pageSource);
 		} catch (WebDriverException wde) {
-			System.out.println("ERROR: Exception trying to obtain driver.getPageSource()");
+			System.err.println("ERROR: Exception trying to obtain driver.getPageSource()");
 		} catch (ParserConfigurationException | SAXException | IOException doce) {
-			System.out.println("ERROR: Exception parsing IOS Driver Page Source to XML Document");
+			System.err.println("ERROR: Exception parsing IOS Driver Page Source to XML Document");
 		} catch (Exception e) {
-			System.out.println("ERROR: Unknown Exception AppiumFramework getIOSPageSource()");
+			System.err.println("ERROR: Unknown Exception AppiumFramework getIOSPageSource()");
 			e.printStackTrace();
 		}
 		return null;
 	}
-
-
-
 
 	public static boolean widgetVisible(Widget w) {
 		Pair<Integer, Integer> widthHeight = getScreenSize();
@@ -410,11 +369,9 @@ public class IOSAppiumFramework extends SUTBase {
 		int y = w.get(IOSTags.iosY);
 
 		return y >= 0 && y <= height;
-
 	}
 
 	private static Document loadXML(String xml) throws ParserConfigurationException, SAXException, IOException {
-//		System.out.println("XML FILE IOS: " + xml);
 		DocumentBuilderFactory fctr = DocumentBuilderFactory.newInstance();
 		DocumentBuilder bldr = fctr.newDocumentBuilder();
 		InputSource insrc = new InputSource(new StringReader(xml));
@@ -431,7 +388,7 @@ public class IOSAppiumFramework extends SUTBase {
 	public boolean isRunning() {
 		//TODO: Check and select proper method to verify if running
 		try {
-		    driver.getPageSource();
+			driver.getPageSource();
 		}
 		catch (Exception e) {
 			return false;
@@ -481,7 +438,7 @@ public class IOSAppiumFramework extends SUTBase {
 			cap.setCapability("app", appLocation);
 
 		} catch (IOException | NullPointerException e) {
-			System.out.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
+			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
 			e.printStackTrace();
 		}
 

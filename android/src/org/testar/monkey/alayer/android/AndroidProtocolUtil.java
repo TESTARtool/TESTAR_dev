@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,29 +41,20 @@ import java.util.ArrayList;
 public class AndroidProtocolUtil extends ProtocolUtil {
 
 	public static String getActionshot(State state, Action action) {
-
-//		if(action instanceof AndroidActionClick) {
-//			try {
-//				return AndroidAppiumFramework.getScreenshotAction(state, action);
-//			} catch(Exception e) {
-//				System.out.println("Exception when taking action screenshot: " + e);
-//			}
-//		}
 		try {
 			return org.testar.monkey.alayer.android.AndroidAppiumFramework.getScreenshotAction(state, action);
 		} catch(Exception e) {
-			System.out.println("Exception when taking action screenshot: " + e);
+			System.err.println("Exception when taking action screenshot: " + e);
 		}
 
 		return ProtocolUtil.getActionshot(state, action);
 	}
 
-
 	public static String getStateshot(State state) {
 		try {
 			return AndroidAppiumFramework.getScreenshotState(state);
 		} catch(Exception e) {
-			System.out.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshot(state);
@@ -73,7 +64,7 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 		try {
 			return org.testar.monkey.alayer.android.AndroidAppiumFramework.getScreenshotSpyMode(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
 		} catch(Exception e) {
-			System.out.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a screenshot of the Android emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshot(state);
@@ -89,13 +80,13 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 		try {
 			return AndroidAppiumFramework.getScreenshotBinary(state, widget);
 		} catch (IOException e) {
-			System.out.println("Exception occured when trying to take a binary screenshot of the Android emulator: " + e);
+			System.err.println("Exception occured when trying to take a binary screenshot of the Android emulator: " + e);
 		}
 
 		return ProtocolUtil.getStateshotBinary(state);
 	}
 
-	public static String GetCurrentPackage() {
+	public static String getCurrentPackage() {
 		return AndroidAppiumFramework.getCurrentPackage();
 	}
 
@@ -105,8 +96,7 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 		StringBuilder sb =  new StringBuilder();
 		Widget parentWidget = w;
 
-
-		while (!parentWidget.equals("Root")) {
+		while (parentWidget != w.root()) {
 			String classTag = parentWidget.get(Tags.Desc);
 			int indexNumber = parentWidget.get(AndroidTags.AndroidNodeIndex);
 
@@ -151,8 +141,6 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 		}
 
 		sb.insert(0, "/hierarchy");
-
-		// System.out.println("XPATH THE END!!!!: " + sb.toString());
 
 		return sb.toString();
 	}

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,44 +43,44 @@ public class AndroidActionType extends TaggableBase implements Action {
 	private static final long serialVersionUID = 6685918140970666660L;
 
 	private final String type;
-	private final String AccessibilityId;
+	private final String accessibilityId;
 	private final Widget widget;
 	private final String widgetClass;
 	private final String xpath;
-	
+
 	private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
-	        .setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
+			.setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
 	private final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
 	public AndroidActionType(State state, Widget w, String type, String accessibilityId, String text, String className) {
-	    this.set(Tags.Role, AndroidRoles.AndroidWidget);
-	    this.set(Tags.OriginWidget, w);
-	    this.type = type;
-	    this.AccessibilityId = accessibilityId;
-	    this.widget = w;
+		this.set(Tags.Role, AndroidRoles.AndroidWidget);
+		this.set(Tags.OriginWidget, w);
+		this.type = type;
+		this.accessibilityId = accessibilityId;
+		this.widget = w;
 		this.widgetClass = className;
 		this.xpath = w.get(AndroidTags.AndroidXpath);
-	    double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
-	    double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
-	    Position position = new AbsolutePosition(relX, relY);
-	    this.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(type, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
+		double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
+		Position position = new AbsolutePosition(relX, relY);
+		this.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(type, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		this.set(Tags.Desc, toShortString());
 	}
 
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		try {
-		    AndroidAppiumFramework.setValueElementById(this.AccessibilityId, this.type, this.widget);
+			AndroidAppiumFramework.sendKeysTextTextElementById(this.accessibilityId, this.type, this.widget);
 		} catch(Exception e) {
-			System.out.println("Exception trying to Type " + this.type + " in the Element with Id : " + this.AccessibilityId);
-			System.out.println(e.getMessage());
+			System.err.println("Exception trying to Type " + this.type + " in the Element with Id : " + this.accessibilityId);
+			System.err.println(e.getMessage());
 			throw new ActionFailedException(toShortString());
 		}
 	}
 
 	@Override
 	public String toShortString() {
-		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.AccessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + this.type;
+		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.accessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + this.type;
 	}
 
 	@Override
