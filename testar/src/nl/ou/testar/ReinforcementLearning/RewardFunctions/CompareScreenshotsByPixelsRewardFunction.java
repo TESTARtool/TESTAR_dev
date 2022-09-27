@@ -10,6 +10,7 @@ import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
+import java.awt.*;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -32,7 +33,14 @@ public class CompareScreenshotsByPixelsRewardFunction implements RewardFunction 
     @Override
     public float getReward(State state, final ConcreteState notUsedCurrentConcreteState, final AbstractState notUsedcurrentAbstractState, final Action notUsedExecutedAction, final AbstractAction notUsedExecutedAbstractAction, final AbstractAction notUsedSelectedAbstractAction, Set<Action> notUsedActions) {
         logger.info(". . . . . CompareScreenshotsByPixelsRewardFunction . . . . .");
-        AWTCanvas currentStateCanvas = getStateshotBinary.apply(state);
+        AWTCanvas currentStateCanvas;
+        try{
+            currentStateCanvas = getStateshotBinary.apply(state);
+        }
+        catch (RuntimeException awte) {
+            System.out.println(awte.getMessage());
+            return defaultReward;
+        }
 
         if (currentStateCanvas == null){
             return defaultReward;
