@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.testar.visualvalidation.Location;
 import org.testar.visualvalidation.extractor.ExpectedElement;
 import org.testar.visualvalidation.ocr.RecognizedElement;
