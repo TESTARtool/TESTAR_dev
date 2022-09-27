@@ -39,7 +39,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 
 /**
  * Extend AWTCanvas to get the screenshot from WebDriver
@@ -52,21 +52,22 @@ public class WdScreenshot extends AWTCanvas {
   }
 
   public static WdScreenshot fromScreenshot(Rect r, long windowHandle)
-      throws StateBuildException {
+          throws StateBuildException {
     WdScreenshot wdScreenshot = new WdScreenshot();
     RemoteWebDriver webDriver = WdDriver.getRemoteWebDriver();
 
     try {
-      File screenshot = webDriver.getScreenshotAs(OutputType.FILE);
-      BufferedImage fullImg = ImageIO.read(screenshot);
-      double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
-      int x = (int) Math.max(0, r.x() * displayScale);
-      int y = (int) Math.max(0, r.y() * displayScale);
-      int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
-      int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
-      wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
-    }
-    catch (Exception ignored) {
+      byte[] image = webDriver.getScreenshotAs(OutputType.BYTES);
+      try (ByteArrayInputStream inputStream = new ByteArrayInputStream(image)) {
+        BufferedImage fullImg = ImageIO.read(inputStream);
+        double displayScale = Environment.getInstance().getDisplayScale(windowHandle);
+        int x = (int) Math.max(0, r.x() * displayScale);
+        int y = (int) Math.max(0, r.y() * displayScale);
+        int width = (int) Math.min(fullImg.getWidth(), r.width() * displayScale);
+        int height = (int) Math.min(fullImg.getHeight(), r.height() * displayScale);
+        wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
+      }
+    } catch (Exception ignored) {
 
     }
     return wdScreenshot;

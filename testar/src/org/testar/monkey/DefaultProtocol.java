@@ -31,41 +31,45 @@
 
 package org.testar.monkey;
 
-import static org.testar.monkey.alayer.Tags.ActionDelay;
-import static org.testar.monkey.alayer.Tags.ActionDuration;
-import static org.testar.monkey.alayer.Tags.ActionSet;
-import static org.testar.monkey.alayer.Tags.Desc;
-import static org.testar.monkey.alayer.Tags.ExecutedAction;
-import static org.testar.monkey.alayer.Tags.IsRunning;
-import static org.testar.monkey.alayer.Tags.OracleVerdict;
-import static org.testar.monkey.alayer.Tags.SystemState;
-
-import java.awt.Desktop;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import org.testar.*;
-import org.testar.reporting.Reporting;
-import org.testar.statemodel.StateModelManager;
-import org.testar.statemodel.StateModelManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.testar.monkey.alayer.*;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.ActionStatus;
+import org.testar.CodingManager;
+import org.testar.EventHandler;
+import org.testar.FileHandling;
+import org.testar.OutputStructure;
+import org.testar.ProcessInfo;
+import org.testar.ProcessListener;
+import org.testar.ProtocolUtil;
+import org.testar.RandomActionSelector;
+import org.testar.SutVisualization;
+import org.testar.SystemProcessHandling;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.managers.DataManager;
+import org.testar.monkey.alayer.AWTCanvas;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.AutomationCache;
+import org.testar.monkey.alayer.Canvas;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.FillPattern;
+import org.testar.monkey.alayer.Finder;
+import org.testar.monkey.alayer.Pen;
+import org.testar.monkey.alayer.Roles;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.StateBuilder;
+import org.testar.monkey.alayer.StrokePattern;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.Taggable;
+import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Visualizer;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.KillProcess;
@@ -84,13 +88,56 @@ import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.managers.DataManager;
+import org.testar.reporting.Reporting;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.visualvalidation.VisualValidationFactory;
+import org.testar.visualvalidation.VisualValidationManager;
+import org.testar.visualvalidation.VisualValidationTag;
+
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.Desktop;
+import java.awt.Font;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+import static org.testar.monkey.alayer.Tags.ActionDelay;
+import static org.testar.monkey.alayer.Tags.ActionDuration;
+import static org.testar.monkey.alayer.Tags.ActionSet;
+import static org.testar.monkey.alayer.Tags.Desc;
+import static org.testar.monkey.alayer.Tags.ExecutedAction;
+import static org.testar.monkey.alayer.Tags.IsRunning;
+import static org.testar.monkey.alayer.Tags.OracleVerdict;
+import static org.testar.monkey.alayer.Tags.OriginWidget;
+import static org.testar.monkey.alayer.Tags.SystemState;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -152,7 +199,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
@@ -173,9 +219,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
+	protected VisualValidationManager visualValidationManager;
+	
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
-
 
 	/**
 	 * This is the abstract flow of TESTAR (generate mode):
@@ -265,15 +312,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		if(e.getMessage()!=null && e.getMessage().contains("Chrome version")) {
 
     			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
-    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
-    					+ "\n"
-						//TODO check when implementing other webdriver than chromedriver
+    					+ "<br>Please verify your Chrome browser version: chrome://settings/help"
+    					+ "<br>And <a href=\"https://chromedriver.chromium.org/downloads\">download</a> the appropriate ChromeDriver version."
+    					+ "<br>"
+    					//TODO check when implementing other webdriver than chromedriver
 						//TODO remove when automatically killing webdriver process when creating the session fails
-    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-    					+ "Please use Windows Task Manager to stop that process.";
+    					+ "<br>As a result of this error, there is probably a \"chromedriver.exe\" process running."
+    					+ "<br>Please use Windows Task Manager to stop that process.";
 
-    			popupMessage(msg);
+				chromeDriverMissing(msg);
     			System.out.println(msg);
     			System.out.println(e.getMessage());
     		}else {
@@ -335,6 +382,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+
+			visualValidationManager = VisualValidationFactory.createVisualValidator(settings.get(ConfigTags.ProtocolClass));
 		}
 
 		try {
@@ -440,6 +489,47 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
 			JOptionPane.showMessageDialog(frame, message);
+
+		}
+	}
+
+	/**
+	 * Show a popup containing a html message with click interaction.
+	 * Only if GUI option is enabled (disabled for CI)
+	 */
+	private void chromeDriverMissing(String htmlMessage) {
+		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			JFrame frame = new JFrame();
+			// for copying style
+			JLabel label = new JLabel();
+			Font font = label.getFont();
+
+			// create some css from the label's font
+			String style = "font-family:" + font.getFamily() + ";"
+					+ "font-weight:" + (font.isBold() ? "bold" : "normal") + ";"
+					+ "font-size:" + font.getSize() + "pt;";
+			// html content
+			JEditorPane ep = new JEditorPane("text/html", "<html><body style=\"" + style + "\">"
+					+ htmlMessage
+					+ "</body></html>");
+
+			// handle link events
+			ep.addHyperlinkListener(e -> {
+				if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+					Desktop desktop = Desktop.getDesktop();
+					try {
+						desktop.browse(e.getURL().toURI());
+					} catch (URISyntaxException | IOException exception) {
+						exception.printStackTrace();
+					}
+				}
+			});
+			ep.setEditable(false);
+			ep.setBackground(label.getBackground());
+
+			// show
+			JOptionPane.showMessageDialog(frame, ep);
+
 		}
 	}
 
@@ -909,17 +999,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Set<Action> actions = deriveActions(system,state);
 			buildStateActionsIdentifiers(state, actions);
 
-			
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
 			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
 
 			//in Spy-mode, always visualize the green dots:
 			visualizeActions(cv, state, actions);
-			
+
 			cv.end();
 
 			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
-			
+
 			synchronized (this) {
 				try {
 					this.wait(msRefresh);
@@ -937,7 +1026,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
-		
+
 		//finishSequence() content, but SPY mode is not a sequence
 		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
 			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
@@ -1142,7 +1231,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	        double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
-	        while(success && !faultySequence && mode() == Modes.Replay){
+			boolean suppressFaultySequence = ExtendedSettingsFactory.createVisualValidationSettings().enabled;
+
+	        while(success && (suppressFaultySequence || !faultySequence) && mode() == Modes.Replay){
 
 	            //Initialize local fragment and read saved action of PathToReplaySequence File
 	            Taggable replayableFragment;
@@ -1436,13 +1527,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		setStateForClickFilterLayerProtocol(state);
 
-		if(settings.get(ConfigTags.Mode) == Modes.Spy)
+		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 			return state;
-		
-		Verdict verdict = getVerdict(state);
-		state.set(Tags.OracleVerdict, verdict);
+		}
 
 		setStateScreenshot(state);
+
+		Verdict verdict = getVerdict(state);
+		state.set(Tags.OracleVerdict, verdict);
 
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
@@ -1457,29 +1549,37 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		return state;
 	}
 
 	/**
-	 * Take a Screenshot of the State and associate the path into state tag
+	 * Take a Screenshot of the State and associate the path into state tag.
+	 * If enabled run the visual validation on the capture screenshot.
 	 */
 	private void setStateScreenshot(State state) {
 		Shape viewPort = state.get(Tags.Shape, null);
+		AWTCanvas screenshot = null;
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				//System.out.println("DEBUG: Using WebDriver specific state shot.");
-				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+				screenshot = WdProtocolUtil.getStateshotBinary(state);
 			}else{
-				//System.out.println("DEBUG: normal state shot");
-				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+				screenshot = ProtocolUtil.getStateshotBinary(state);
 			}
-		}
-	}
+			String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom,
+                    "NoConcreteIdAvailable"), screenshot);
+            state.set(Tags.ScreenshotPath, screenshotPath);
+        }
 
-	@Override
+        htmlReport.addVisualValidationResult(
+                visualValidationManager.AnalyzeImage(state, screenshot), state, null
+        );
+    }
+
+    @Override
 	protected Verdict getVerdict(State state){
 		Assert.notNull(state);
+		Verdict visualValidationVerdict = state.get(VisualValidationTag.VisualValidationVerdict, Verdict.OK);
 		//-------------------
 		// ORACLES FOR FREE
 		//-------------------
@@ -1500,18 +1600,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
-		Verdict suspiciousValueVerdict = Verdict.OK;
+		Verdict suspiciousValueVerdict;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
 			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
-				return suspiciousValueVerdict;
+				return suspiciousValueVerdict.join(visualValidationVerdict);
 			}
 		}
 
 		// if everything was OK ...
-		return Verdict.OK;
+		return Verdict.OK.join(visualValidationVerdict);
 	}
-	
+
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
 
@@ -1635,15 +1735,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
+		takeActionScreenshot(state, action);
 
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
-			WdProtocolUtil.getActionshot(state,action);
-		}else{
-			//System.out.println("DEBUG: normal action shot");
-			ProtocolUtil.getActionshot(state,action);
-		}
-		
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
 		try{
@@ -1668,16 +1761,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return false;
 		}
 	}
-	
-	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-	    // Get an action screenshot based on the NativeLinker platform
-	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-	        WdProtocolUtil.getActionshot(state,action);
-	    } else {
-	        ProtocolUtil.getActionshot(state,action);
-	    }
 
-	    try{
+	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+		takeActionScreenshot(state, action);
+
+		try{
 	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
 	        Util.pause(halfWait); // help for a better match of the state' actions visualization
 	        action.run(system, state, actionDuration);
@@ -1698,6 +1786,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    }catch(ActionFailedException afe){
 	        return false;
 	    }
+	}
+
+	private void takeActionScreenshot(State state, Action action) {
+		AWTCanvas screenshot;
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
+			screenshot = WdProtocolUtil.getActionshot(state, action);
+		} else {
+			screenshot = ProtocolUtil.getActionshot(state, action);
+		}
+		state.set(ExecutedAction, action);
+		ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+				action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+				screenshot);
+
+		htmlReport.addVisualValidationResult(
+				visualValidationManager.AnalyzeImage(state, screenshot, action.get(OriginWidget, null)),
+				state, action
+		);
 	}
 
 	/**
@@ -1734,7 +1840,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
+		// When visual validation module is enabled continue even when faults are detected.
+		boolean suppressFaultySequence = ExtendedSettingsFactory.createVisualValidationSettings().enabled ||
+				(!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence);
+		return suppressFaultySequence &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&
@@ -1785,6 +1894,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					GlobalScreen.removeNativeKeyListener(eventHandler);
 					GlobalScreen.unregisterNativeHook();
 				}
+			}
+			if (visualValidationManager != null) {
+				visualValidationManager.Destroy();
 			}
 		} catch (NativeHookException e) {
 			e.printStackTrace();

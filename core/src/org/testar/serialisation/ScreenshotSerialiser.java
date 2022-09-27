@@ -109,6 +109,8 @@ public class ScreenshotSerialiser extends Thread {
 					r.scrshot.saveAsPng(r.scrshotPath);
 				} catch (IOException e) {
 					LogSerialiser.log("I/O exception saving screenshot <" + r.scrshotPath + ">\n", LogSerialiser.LogLevel.Critical);
+				} catch (NullPointerException e){
+					LogSerialiser.log("Screenshot was empty" + r.scrshotPath + ">\n", LogSerialiser.LogLevel.Critical);
 				}
 			}
 		}

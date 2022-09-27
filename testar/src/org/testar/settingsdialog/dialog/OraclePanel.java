@@ -115,11 +115,10 @@ public class OraclePanel extends SettingsPanel {
         enableWebConsoleWarningOracle.setToolTipText("Enable Web Console Warning Oracle");
         add(enableWebConsoleWarningOracle);
 
-        // Disable the visualization until the implementation is ready
-        //enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
-        //enableVisualValidationCheckBox.setBounds(10, 330, 180, 27);
-        //enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
-        //add(enableVisualValidationCheckBox);
+        enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
+        enableVisualValidationCheckBox.setBounds(300, 300, 180, 27);
+        enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
+        add(enableVisualValidationCheckBox);
 
         freezeTimeLabel.setBounds(300, 330, 80, 27);
         add(freezeTimeLabel);
@@ -149,8 +148,7 @@ public class OraclePanel extends SettingsPanel {
         txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        // Disable the visualization until the implementation is ready
-        //enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
+        enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
     }
 
     /**
@@ -171,7 +169,6 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        // Disable the visualization until the implementation is ready
-        //visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
+        visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
     }
 }

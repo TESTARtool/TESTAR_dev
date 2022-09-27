@@ -33,6 +33,7 @@ package org.testar.monkey;
 
 import org.testar.monkey.alayer.Tag;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public final class ConfigTags {

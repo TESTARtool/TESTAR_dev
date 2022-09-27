@@ -245,10 +245,20 @@ public class ProtocolUtil {
 	 */
 	public static AWTCanvas getStateshotBinary(State state) {
 		Shape viewPort = null;
-		if (state.childCount() > 0){
-			viewPort = state.child(0).get(Tags.Shape, null);
-			if (viewPort != null && (viewPort.width() * viewPort.height() < 1))
-				viewPort = null;
+		for (int index = 0; index < state.childCount(); index++){
+			// While testing Word (2109 build 14430.20270) we noticed that the height of the screenshots was only 5px.
+			// After investigation, we noticed that root contained 5 children. Four had "MSO_BORDEREFFECT_WINDOW_CLASS"
+			// and had none children. And only one was called "OpusApp" and contained child elements.
+			// Ideally this check is more strict; (frameworkId == Win32 and classname != MSO_BORDEREFFECT_WINDOW_CLASS)
+			// but unfortunately these tags are not available at this generic level. Previous implementation directly
+			// used the first child. However, it makes more sense to select the widget which contains children.
+			if (state.child(index).childCount() != 0) {
+				viewPort = state.child(index).get(Tags.Shape, null);
+				if (viewPort != null && (viewPort.width() * viewPort.height() < 1)) {
+					viewPort = null;
+				}
+				break;
+			}
 		}
 		
 		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
@@ -260,8 +270,8 @@ public class ProtocolUtil {
 		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
 		return scrshot;
 	}
-	
-	public static String getActionshot(State state, Action action){
+
+	public static AWTCanvas getActionshot(State state, Action action){
 		List<Finder> targets = action.get(Tags.Targets, null);
 		if (targets != null){
 			Widget w;
@@ -274,14 +284,14 @@ public class ProtocolUtil {
 				r = new Rectangle((int)s.x(), (int)s.y(), (int)s.width(), (int)s.height());
 				actionArea = actionArea.union(r);
 			}
-			if (actionArea.isEmpty())
+			if (actionArea.isEmpty()) {
 				return null;
-			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
+			}
+			return AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
 														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
 		}
 		return null;
-	}	
+	}
 
 	private static long getRootWindowHandle(State state) {
 		long windowHandle = 0;

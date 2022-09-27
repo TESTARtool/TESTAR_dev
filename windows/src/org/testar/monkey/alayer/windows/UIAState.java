@@ -254,8 +254,8 @@ final class UIAState extends UIAWidget implements State {
 		// compile a query set
 		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
 		queryTags.addAll(tags.keySet());  // the tags that have been set on this widget (state is also a widget)
-		queryTags.addAll(Tags.tagSet()); // the tags defined in org.fruit.alayer.Tags
-		queryTags.addAll(UIATags.tagSet()); // the tags defined in org.fruit.alayer.windows.UIATags
+		queryTags.addAll(Tags.tagSet()); // the tags defined in org.testar.monkey.alayer.Tags
+		queryTags.addAll(UIATags.tagSet()); // the tags defined in org.testar.monkey.alayer.windows.UIATags
 
 		Iterable<Tag<?>> returnTags = new Iterable<Tag<?>>(){
 			public Iterator<Tag<?>> iterator() {

@@ -104,7 +104,7 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
-
+		root.set(Tags.HWND, uiaRoot.children.get(0).get(Tags.HWND, 0L));
 		for (Widget w : root)
 			w.set(Tags.Path,Util.indexString(w));
 		if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)
@@ -327,7 +327,7 @@ public class StateFetcher implements Callable<UIAState>{
 			long uiaWindowPointer = Windows.IUIAutomationElement_GetPattern(uiaCachePointer, Windows.UIA_WindowPatternId, true);
 			if(uiaWindowPointer != 0){
 				uiaElement.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWindowPointer, true);
-				uiaElement.blocked = (uiaElement.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
+				uiaElement.blocked = isElementBlocked(uiaElement);
 				uiaElement.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWindowPointer, true);
 				uiaElement.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWindowPointer, true);
 
@@ -508,7 +508,18 @@ public class StateFetcher implements Callable<UIAState>{
 		
 		return modalElement;
 	}
-	
+
+	private boolean isElementBlocked(UIAElement uiaElement) {
+		// Qt applications are always started in the running state.
+		// Without this dedicated check TESTAR can't find any actions for the Qt application.
+		if (Objects.equals(uiaElement.frameworkId, "Qt")) {
+			return !(uiaElement.wndInteractionState == Windows.WindowInteractionState_ReadyForUserInteraction ||
+					uiaElement.wndInteractionState == Windows.WindowInteractionState_Running);
+		} else {
+			return (uiaElement.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
+		}
+	}
+
 	// (through AccessBridge)
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;

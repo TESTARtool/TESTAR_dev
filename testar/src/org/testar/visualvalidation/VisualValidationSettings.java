@@ -31,6 +31,8 @@
 package org.testar.visualvalidation;
 
 import org.testar.extendedsettings.ExtendedSettingBase;
+import org.testar.visualvalidation.matcher.MatcherConfiguration;
+import org.testar.visualvalidation.ocr.OcrConfiguration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -40,11 +42,26 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class VisualValidationSettings extends ExtendedSettingBase<VisualValidationSettings> {
     public Boolean enabled;
+    public OcrConfiguration ocrConfiguration;
+    public MatcherConfiguration matcherConfiguration;
+    // The selected protocol will be set automatically when we initialize TESTAR.
+    public String protocol;
+
+    public static VisualValidationSettings CreateDefault() {
+        VisualValidationSettings defaultInstance = new VisualValidationSettings();
+        defaultInstance.enabled = false;
+        defaultInstance.ocrConfiguration = OcrConfiguration.CreateDefault();
+        defaultInstance.matcherConfiguration = MatcherConfiguration.CreateDefault();
+        return defaultInstance;
+    }
 
     @Override
     public int compareTo(VisualValidationSettings other) {
         int res = -1;
-        if (this.enabled.equals(other.enabled)) {
+        if ((enabled.equals(other.enabled)) &&
+                (ocrConfiguration.compareTo(other.ocrConfiguration) == 0) &&
+                (matcherConfiguration.compareTo(other.matcherConfiguration) == 0)
+        ) {
             res = 0;
         }
         return res;
@@ -54,12 +71,8 @@ public class VisualValidationSettings extends ExtendedSettingBase<VisualValidati
     public String toString() {
         return "VisualValidationSettings{" +
                 "enabled=" + enabled +
+                ", ocr=" + ocrConfiguration +
+                ", matcher=" + matcherConfiguration +
                 '}';
-    }
-
-    public static VisualValidationSettings CreateDefault() {
-        VisualValidationSettings DefaultInstance = new VisualValidationSettings();
-        DefaultInstance.enabled = false;
-        return DefaultInstance;
     }
 }

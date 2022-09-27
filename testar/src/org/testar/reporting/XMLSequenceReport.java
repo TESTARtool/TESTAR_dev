@@ -36,11 +36,12 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
+import org.testar.OutputStructure;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.OutputStructure;
-
+import org.testar.visualvalidation.matcher.MatcherResult;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 
@@ -154,6 +155,11 @@ public class XMLSequenceReport implements Reporting {
         System.out.println("addTestVerdict "+verdict);
         out.write(testRun.toString());
         out.flush();
+    }
+
+    @Override
+    public void addVisualValidationResult(MatcherResult result, State state, @Nullable Action action) {
+
     }
 
     private TestRun testRun = new TestRun();

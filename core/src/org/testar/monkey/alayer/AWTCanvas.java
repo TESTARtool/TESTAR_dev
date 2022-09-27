@@ -45,11 +45,12 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
+import java.awt.image.WritableRaster;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -74,7 +75,7 @@ import org.testar.monkey.Pair;
 
 public class AWTCanvas implements Image, Canvas {
 
-	public static enum StorageFormat{ JPEG, PNG, BMP; }
+	public enum StorageFormat{ JPEG, PNG, BMP }
 
 	public static void saveAsJpeg(BufferedImage image, OutputStream os, double quality) throws IOException{
 		if(quality == 1){
@@ -131,12 +132,8 @@ public class AWTCanvas implements Image, Canvas {
 	}
 
 	public static AWTCanvas fromFile(String file) throws IOException{
-		BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File(file)));
-
-		try{
+		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
 			return fromInputStream(bis);
-		}finally{
-			bis.close();
 		}
 	}
 	
@@ -154,9 +151,9 @@ public class AWTCanvas implements Image, Canvas {
 
 	private static final long serialVersionUID = -5041497503329308870L;
 	protected transient BufferedImage img;
-	private StorageFormat format;
-	private double quality;
-	private double x, y;
+	private final StorageFormat format;
+	private final double quality;
+	private final double x, y;
 	transient Graphics2D gr;
 	static final Pen defaultPen = Pen.PEN_DEFAULT;
 	double fontSize, strokeWidth;
@@ -188,11 +185,8 @@ public class AWTCanvas implements Image, Canvas {
 		this.format = format;
 		this.quality = quality;
 		gr = img.createGraphics();
-		//		gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-		//				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		
-		adjustPen(defaultPen);		
-		//gr.setComposite(AlphaComposite.Clear);
+
+		adjustPen(defaultPen);
 	}
 
 	public void begin() {}
@@ -203,7 +197,16 @@ public class AWTCanvas implements Image, Canvas {
 	public double x(){ return x; }
 	public double y(){ return y; }
 	public BufferedImage image(){ return img; }
-	
+
+	/**
+	 * @return A deep copy of the image.
+	 */
+	public BufferedImage deepCopyImage() {
+		ColorModel cm = img.getColorModel();
+		WritableRaster raster = img.copyData(img.getRaster().createCompatibleWritableRaster());
+		return new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
+	}
+
 	private void adjustPen(Pen pen){
 		Double tstrokeWidth = pen.strokeWidth();
 		if(tstrokeWidth == null)
@@ -221,7 +224,7 @@ public class AWTCanvas implements Image, Canvas {
 			strokePattern = tstrokePattern;
 			strokeWidth = tstrokeWidth;
 			strokeCaps = tstrokeCaps;
-			gr.setStroke(new BasicStroke((float)(double)strokeWidth));
+			gr.setStroke(new BasicStroke((float)strokeWidth));
 		}
 		
 		Color tcolor = pen.color();
@@ -244,7 +247,7 @@ public class AWTCanvas implements Image, Canvas {
 		if(!tfont.equals(font) || !tfontSize.equals(fontSize)){
 			font = tfont;
 			fontSize = tfontSize;
-			gr.setFont(new Font(font, Font.PLAIN, (int)(double)fontSize));
+			gr.setFont(new Font(font, Font.PLAIN, (int)fontSize));
 		}
 		
 		FillPattern tfillPattern = pen.fillPattern();
@@ -328,12 +331,8 @@ public class AWTCanvas implements Image, Canvas {
 	}
 
 	public void saveAsJpeg(String file, double quality) throws IOException{
-		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(file)));
-
-		try{
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
 			saveAsJpeg(bos, quality);
-		}finally{
-			bos.close();
 		}
 	}
 
@@ -341,13 +340,9 @@ public class AWTCanvas implements Image, Canvas {
 		saveAsPng(img, os);
 	}
 
-	public void saveAsPng(String file) throws IOException{		
-		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(file)));
-
-		try{
+	public void saveAsPng(String file) throws IOException{
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
 			saveAsPng(bos);
-		}finally{
-			bos.close();
 		}
 	}
 
@@ -375,7 +370,7 @@ public class AWTCanvas implements Image, Canvas {
 			double height) {
 		Assert.notNull(canvas);
 
-		int data[] = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
+		int[] data = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
 		canvas.image(canvas.defaultPen(), x, y, width, height,
 				data, img.getWidth(), img.getHeight());
 	}
@@ -392,7 +387,7 @@ public class AWTCanvas implements Image, Canvas {
 		BufferedImage subImage = new BufferedImage(srcWidth, srcHeight, BufferedImage.TYPE_INT_ARGB);
 		subImage.getGraphics().drawImage(img.getSubimage(srcX, srcY, srcWidth, srcHeight), 0, 0, srcWidth, srcHeight, null);
 		
-		int area[] = ((DataBufferInt)subImage.getRaster().getDataBuffer()).getData();
+		int[] area = ((DataBufferInt)subImage.getRaster().getDataBuffer()).getData();
 		canvas.image(canvas.defaultPen(), destRect.x(), destRect.y(), destRect.width(), destRect.height(), area, srcWidth, srcHeight);
 	}
 
@@ -412,7 +407,7 @@ public class AWTCanvas implements Image, Canvas {
 	 * @author urueda
 	 */
 	public float compareImage(AWTCanvas img) {
-		//long now = System.currentTimeMillis();		
+		//long now = System.currentTimeMillis();
 		DataBuffer dbThis = this.img.getData().getDataBuffer(),
 				   dbImg = img.img.getData().getDataBuffer();
 		int sizeThis = dbThis.getSize(),
@@ -435,10 +430,10 @@ public class AWTCanvas implements Image, Canvas {
 		float meanSize = (sizeThis + sizeImg) / 2;
 		float percent = sizeSimilarity - (1.0f - (equalPixels / meanSize));
 		//System.out.println("Image comparison took : " + (System.currentTimeMillis() - now) + " ms");
-		return (percent < 0f ? 0f : (percent > 1f ? 1f : percent));
+		return (percent < 0f ? 0f : Math.min(percent, 1f));
 	}	
 
 	public void release() {}
-	
+
 	public String toString(){ return "AWTCanvas (width: " + width() + " height: " + height() + ")";	}
 }

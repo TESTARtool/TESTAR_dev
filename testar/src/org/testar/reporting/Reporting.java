@@ -30,10 +30,12 @@
 
 package org.testar.reporting;
 
-import org.testar.monkey.alayer.State;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.visualvalidation.matcher.MatcherResult;
 
 public interface Reporting {
     public void addSequenceStep(State state, String actionImagePath);
@@ -42,5 +44,6 @@ public interface Reporting {
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
     public void addTestVerdict(Verdict verdict);
+    void addVisualValidationResult(MatcherResult result, State state, @Nullable Action action);
     public void close();
 }

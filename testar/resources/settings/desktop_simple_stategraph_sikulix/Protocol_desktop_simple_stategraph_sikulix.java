@@ -33,6 +33,8 @@ import java.io.File;
 import java.util.Set;
 
 import org.testar.ProtocolUtil;
+import org.testar.monkey.alayer.Tags;
+import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
@@ -157,7 +159,10 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			//System.out.println("DEBUG: action: "+action.toString());
 			//System.out.println("DEBUG: action short: "+action.toShortString());
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
-				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ScreenshotSerialiser.saveActionshot(
+						state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+						action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+						ProtocolUtil.getActionshot(state,action));
 				Screen sikuliScreen = new Screen();
 				try {
 					//System.out.println("DEBUG: sikuli clicking ");
@@ -174,7 +179,10 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			}else if(action.toShortString().contains("ClickTypeInto(")){
 				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
 				//System.out.println("parsed text:"+textToType);
-				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ScreenshotSerialiser.saveActionshot(
+						state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+						action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"),
+						ProtocolUtil.getActionshot(state,action));
 				Util.pause(halfWait);
 				Screen sikuliScreen = new Screen();
 				try {

@@ -47,7 +47,7 @@ public class ExampleSetting extends ExtendedSettingBase<ExampleSetting> {
 
     @Override
     public int compareTo(ExampleSetting other) {
-        if (test.contentEquals(other.test)){
+        if (test.contentEquals(other.test)) {
             return 0;
         }
         return -1;

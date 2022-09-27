@@ -48,6 +48,7 @@ public class ExtendedSettingContainer<S extends ExtendedSettingBase<S>> implemen
 
     /**
      * Get the settings.
+     *
      * @return The actual settings.
      */
     ExtendedSettingBase<S> GetSettings() {

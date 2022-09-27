@@ -545,7 +545,7 @@ public final class Util {
 	}
 
 	public static File createTempDir() {
-		return createTempDir("org.fruit.", Long.toString(System.nanoTime()));
+		return createTempDir("org.testar.monkey.", Long.toString(System.nanoTime()));
 	}
 
 	public static File createTempDir(String pref, String suff) {
@@ -562,11 +562,11 @@ public final class Util {
 	}
 
 	public static File createTempFile() {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), null);
+		return createTempFile("org.testar.monkey.", Long.toString(System.nanoTime()), null);
 	}
 
 	public static File createTempFile(String content) {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), content);
+		return createTempFile("org.testar.monkey.", Long.toString(System.nanoTime()), content);
 	}
 
 	public static File createTempFile(String pref, String suff, String content) {
