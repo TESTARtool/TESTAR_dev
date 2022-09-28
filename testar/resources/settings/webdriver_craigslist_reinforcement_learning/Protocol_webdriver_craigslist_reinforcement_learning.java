@@ -259,7 +259,12 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		for (Widget widget : state) {
 
 			if (widget.get(WdTags.WebTitle, "").contains("my location") ||
-					widget.get(WdTags.WebTextContent, "").contains("use map")){
+					widget.get(WdTags.WebTextContent, "").contains("use map") ||
+					widget.get(WdTags.WebTextContent, "").contains("Toggle Full Screen") ||
+					widget.get(WdTags.WebTextContent, "").contains("Zoom in") ||
+					widget.get(WdTags.WebTextContent, "").contains("Zoom out") ||
+					widget.get(Tags.Desc, "").contains("Map data")
+			){
 				continue;
 			}
 
