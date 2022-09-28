@@ -265,6 +265,8 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 					widget.get(WdTags.WebTextContent, "").contains("Zoom out") ||
 					widget.get(Tags.Desc, "").contains("Map data") ||
 					widget.get(WdTags.WebTextContent, "").contains("change search area")
+			widget.get(WdTags.WebCssClasses, "").contains("location-picker-link") ||
+					widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)
 			){
 				continue;
 			}
