@@ -258,7 +258,8 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			if (widget.get(WdTags.WebTitle, "").contains("my location")){
+			if (widget.get(WdTags.WebTitle, "").contains("my location") ||
+					widget.get(WdTags.WebTextContent, "").contains("use map")){
 				continue;
 			}
 
