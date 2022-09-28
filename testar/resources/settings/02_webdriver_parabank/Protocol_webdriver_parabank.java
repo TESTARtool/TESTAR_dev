@@ -28,6 +28,11 @@
  *
  */
 
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v104.performance.Performance;
+import org.openqa.selenium.devtools.v104.performance.model.Metric;
 import org.testar.SutVisualization;
 
 import org.testar.monkey.Util;
@@ -45,7 +50,10 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.math.BigInteger;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -55,6 +63,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_parabank extends WebdriverProtocol {
 	
+	private DevTools devTools;
 	private List<String> listErrorVerdictInfo = new ArrayList<>();
 
   /**
@@ -95,7 +104,12 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected SUT startSystem() throws SystemStartException {
-	  return super.startSystem();
+	  SUT sut = super.startSystem();
+	  // Initialize a session of the web developers tool
+	  Logger.getLogger(org.openqa.selenium.devtools.Connection.class.getName()).setLevel(Level.WARNING);
+	  devTools = ((HasDevTools) WdDriver.getRemoteWebDriver()).getDevTools();
+	  devTools.createSessionIfThereIsNotOne();
+	  return sut;
   }
 
   /**
@@ -151,9 +165,38 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected State getState(SUT system) throws StateBuildException {
-      State state = super.getState(system);
+	  devTools.send(Performance.enable(Optional.empty()));
+	  List<Metric> metricList = devTools.send(Performance.getMetrics());
 
-      return state;
+	  State state = super.getState(system);
+
+	  System.out.println(String.format("---------------- State %s ----------------", actionCount));
+
+	  // Info https://pptr.dev/next/api/puppeteer.page.metrics
+
+	  // Print all devTools performance metrics
+	  /*
+	  for(Metric m : metricList) {
+		  System.out.println(m.getName() + " = " + m.getValue());
+	  }
+	   */
+
+	  // LayoutDuration : Combined durations of all page layouts
+	  // ScriptDuration : Combined duration of JavaScript execution
+	  // TaskDuration : Combined duration of all tasks performed by the browser
+	  // JSHeapUsedSize : Used JavaScript heap size
+	  // JSHeapTotalSize : Total JavaScript heap size
+	  System.out.println("LayoutDuration: " + metricList.stream().filter(m -> "LayoutDuration".equals(m.getName())).findFirst().get().getValue() + " seconds");
+	  System.out.println("ScriptDuration: " + metricList.stream().filter(m -> "ScriptDuration".equals(m.getName())).findFirst().get().getValue() + " seconds");
+	  System.out.println("TaskDuration: " + metricList.stream().filter(m -> "TaskDuration".equals(m.getName())).findFirst().get().getValue() + " seconds");
+	  System.out.println("JSHeapUsedSize: " + FileUtils.byteCountToDisplaySize(BigInteger.valueOf(metricList.stream()
+			  .filter(m -> "JSHeapUsedSize".equals(m.getName()))
+			  .findFirst().get().getValue().intValue())));
+	  System.out.println("JSHeapTotalSize: " + FileUtils.byteCountToDisplaySize(BigInteger.valueOf(metricList.stream()
+			  .filter(m -> "JSHeapTotalSize".equals(m.getName()))
+			  .findFirst().get().getValue().intValue())));
+
+	  return state;
   }
 
   /**
