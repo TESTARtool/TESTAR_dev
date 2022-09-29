@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="24.0" prefWidth="512.0" style="-fx-background-color: #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label id="procStage" contentDisplay="CENTER" prefHeight="29.0" prefWidth="224.0" text="Stage" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+         <HBox.margin>
+            <Insets left="8.0" />
+         </HBox.margin>
+      </Label>
+      <Label id="procStatus" alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="224.0" text="Process Status" textAlignment="RIGHT" textFill="WHITE">
+         <HBox.margin>
+            <Insets right="16.0" />
+         </HBox.margin>
+      </Label>
+      <ProgressBar id="procProgressBar" prefWidth="64.0" progress="0.0">
+         <HBox.margin>
+            <Insets right="4.0" />
+         </HBox.margin></ProgressBar>
+   </children>
+</HBox>
