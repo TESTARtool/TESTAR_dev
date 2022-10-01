@@ -16,7 +16,6 @@ import java.util.LinkedList;
 
 public class OverlayVisualization extends JLayeredPane {
     private final MobileVisualizationAndroid mobileVisualizationAndroid;
-    private ImageIcon imageIcon;
     private final JLabel imageLabel = new JLabel();
     private Integer depth = 5;
     public ArrayList<OverlayBox> boxTrackSetNotDisplayed = new ArrayList<>();
@@ -37,12 +36,13 @@ public class OverlayVisualization extends JLayeredPane {
     }
 
     public void updateSc(String screenshotPath, JTree tree) {
-        ImageIcon tempImageIcon = new ImageIcon(new ImageIcon(screenshotPath).getImage());
-        originalHeight = tempImageIcon.getIconHeight();
-        originalWidth = tempImageIcon.getIconWidth();
-        imageIcon = new ImageIcon(tempImageIcon.getImage().getScaledInstance(width, height, Image.SCALE_DEFAULT));
+    	ImageIcon tempImageIcon = new ImageIcon(screenshotPath);
+    	originalHeight = tempImageIcon.getIconHeight();
+    	originalWidth = tempImageIcon.getIconWidth();
 
-        imageLabel.setIcon(imageIcon);
+    	Image stateImage = tempImageIcon.getImage().getScaledInstance(width, height, Image.SCALE_DEFAULT);
+    	ImageIcon stateIcon = new ImageIcon(stateImage);
+    	imageLabel.setIcon(stateIcon);
 
         for (OverlayBox i: boxTrackSetNotDisplayed) {
             this.remove(i);
@@ -165,6 +165,7 @@ public class OverlayVisualization extends JLayeredPane {
         }
 
         public void executeTreeClick () {
+            // Highlight (blue) on the left screen the selected component of the widget-tree
             this.setOpaque(true);
             this.setBackground(new Color(0, 0, 255, 100));
             displayed = true;
@@ -189,7 +190,7 @@ public class OverlayVisualization extends JLayeredPane {
                     (int)((((double)overlay.width)/overlay.originalWidth)*bounds.width()),
                     (int)((((double)overlay.height)/overlay.originalHeight)*bounds.height()));
 
-            this.setOpaque(true);
+            //this.setOpaque(true);
             this.setBackground(new Color(0, 0, 255, 0));
 
             this.addMouseListener(new MouseListener() {
@@ -197,13 +198,12 @@ public class OverlayVisualization extends JLayeredPane {
                 public void mouseClicked(MouseEvent e)
                 {
                     if (!displayed) {
-                        instanceOverlayBox.setOpaque(true);
+                        //instanceOverlayBox.setOpaque(true);
                         instanceOverlayBox.setBackground(new Color(0, 0, 255, 100));
                         displayed = true;
                         overlay.boxTrackSetDisplayed.add(instanceOverlayBox);
                         overlay.boxTrackSetNotDisplayed.remove(instanceOverlayBox);
                         if (overlay.boxTrackSetDisplayed.size() > 1) {
-//                            System.out.println("GOT INTO THE DISABLE OVERLAY SECTION");
                             OverlayBox tempOverlayBox = overlay.boxTrackSetDisplayed.get(0);
                             tempOverlayBox.fakeMouseClick();
                         }
@@ -229,24 +229,24 @@ public class OverlayVisualization extends JLayeredPane {
 
                 @Override
                 public void mouseEntered(MouseEvent mouseEvent) {
+                    // Highlight (yellow) on the left screen the focused component with the mouse
                     if (!displayed) {
                         instanceOverlayBox.setOpaque(true);
                         instanceOverlayBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
                         instanceOverlayBox.setBackground(new Color(255, 255, 0, 100));
                         overlay.repaint();
                     }
-
                 }
 
                 @Override
                 public void mouseExited(MouseEvent mouseEvent) {
+                    // Remove the highlight (yellow) of the component that has lost the mouse focus
                     if (!displayed) {
                         instanceOverlayBox.setOpaque(true);
                         instanceOverlayBox.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         instanceOverlayBox.setBackground(new Color(255, 255, 0, 0));
                         overlay.repaint();
                     }
-
                 }
             });
 

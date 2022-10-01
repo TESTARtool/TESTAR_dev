@@ -112,7 +112,7 @@ public class MobileVisualizationAndroid {
 
         // Sets the initial screenshot of the SUT
         imagePanel = new OverlayVisualization(this);
-        imagePanel.updateSc(screenshotPath, treeVizInstance.tree);
+        updateScreen();
         leftside.add(imagePanel);
 
         frame.add(splitPane);

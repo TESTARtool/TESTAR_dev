@@ -34,6 +34,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.testar.serialisation.ScreenshotSerialiser;
+
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.GsmCallActions;
@@ -78,6 +80,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
 		try {
+			//TODO: Appium v2 will not use /wd/hub suffix anymore
 			driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
 			// Next few lines of code enable the show touches in Android.
 			// command to be executed: adb shell content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:1
@@ -143,7 +146,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 */
 	public static void clickElementById(String id, Widget w){
 		if (!id.equals("")) {
-			driver.findElement(new By.ById(id)).click();
+			driver.findElement(new AppiumBy.ByAccessibilityId(id)).click();
 		}
 		else {
 			String xpathString = w.get(AndroidTags.AndroidXpath);
@@ -161,7 +164,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
 		if (!id.equals("")) {
-			WebElement element = driver.findElement(new By.ById(id));
+			WebElement element = driver.findElement(new AppiumBy.ByAccessibilityId(id));
 			element.clear();
 			element.sendKeys(text);
 		}
@@ -210,7 +213,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	public static void longClickElementById(String id, Widget w) {
 		WebElement el;
 		if (!id.equals("")) {
-			el = driver.findElement(new By.ById(id));
+			el = driver.findElement(new AppiumBy.ByAccessibilityId(id));
 		}
 		else {
 			String xpathString = w.get(AndroidTags.AndroidXpath);
@@ -384,9 +387,8 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static String getScreenshotSpyMode(String stateID) throws IOException {
-		String scrshotOutputFolder = "screenshot_folder";
-		String testSequenceFolder = "androidScreenshots";
-		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
+		String scrshotOutputFolder = "output" + File.separator + "android_spy_screenshots";
+		String statePath = scrshotOutputFolder + File.separator + stateID + ".png";
 		File srcFile = driver.getScreenshotAs(OutputType.FILE);
 		FileUtils.copyFile(srcFile, new File(statePath));
 
@@ -569,14 +571,11 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
 			cap.setCapability("allowTestPackages", true);
 			cap.setCapability("newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-			//cap.setCapability("appActivity", jsonObject.get("appActivity").getAsString());
 			cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
+			cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
-
-			//TODO modify this to a more generic app path!!!
-			String appLocation = "suts//" + appPath;
-			cap.setCapability("app", appLocation);
+			cap.setCapability("app", new File(appPath).getCanonicalPath());
 
 		} catch (IOException | NullPointerException e) {
 			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);

@@ -33,6 +33,8 @@ package org.testar.monkey.alayer.ios;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.testar.serialisation.ScreenshotSerialiser;
+
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Pair;
@@ -104,7 +106,7 @@ public class IOSAppiumFramework extends SUTBase {
 	 */
 	public static void clickElementById(String id, Widget w){
 		if (!id.equals("")) {
-			driver.findElement(new By.ById(id)).click();
+			driver.findElement(new AppiumBy.ByAccessibilityId(id)).click();
 		}
 		else {
 			String xpathString = w.get(IOSTags.iosXpath);
@@ -122,7 +124,7 @@ public class IOSAppiumFramework extends SUTBase {
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
 		if (!id.equals("")) {
-			WebElement element = driver.findElement(new By.ById(id));
+			WebElement element = driver.findElement(new AppiumBy.ByAccessibilityId(id));
 			element.clear();
 			element.sendKeys(text);
 		}

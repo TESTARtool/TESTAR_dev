@@ -905,9 +905,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		SUT system = startSystem();
 		this.cv = buildCanvas();
 
-		// Initialized the screenshotfolder
-		ScreenshotSerialiser.start("screenshot_folder", "androidScreenshots");
-
 		//TODO: this must stay here as there is no canvas function called in the original default protocol
 		MobileVisualizationAndroid mobileVisualizationAndroid = null;
 		MobileVisualizationIOS mobileVisualizationIOS = null;

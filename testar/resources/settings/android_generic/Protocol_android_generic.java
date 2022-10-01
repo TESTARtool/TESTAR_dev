@@ -42,6 +42,10 @@ import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -124,7 +128,6 @@ public class Protocol_android_generic extends AndroidProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-	 	System.out.println("Android Generic: beginSequence()");
 	 	super.beginSequence(system, state);
 	}
 
@@ -139,10 +142,20 @@ public class Protocol_android_generic extends AndroidProtocol {
 	 @Override
 	 protected State getState(SUT system) throws StateBuildException {
 	 	State state = super.getState(system);
-	 	counter += 1;
-	 	String screenshotPath = "suts//results//";
-	 	String filePath = screenshotPath + "tempJsonFile" + counter +".json";
-	 	JsonUtils.createFullWidgetTreeJsonFile(state, filePath);
+
+	 	//TODO: Change to StateId JSON instead of the incremental counter
+	 	// Creates a JSON file that allows debugging the information of the android widgets
+	 	/*
+	 	try {
+	 		counter += 1;
+	 		String debugWidgetTreePath = "output" + File.separator + "android_state_debug";
+	 		Files.createDirectories(Paths.get(debugWidgetTreePath));
+	 		String filePath = debugWidgetTreePath + File.separator + "tempJsonFile" + counter +".json";
+	 		JsonUtils.createFullWidgetTreeJsonFile(state, filePath);
+	 	} catch (IOException e) {
+	 		e.printStackTrace();
+	 	}
+	 	 */
 
 	 	return state;
 	 }
@@ -258,11 +271,6 @@ public class Protocol_android_generic extends AndroidProtocol {
 					new AndroidSystemActionText(state, topWidget)
 			);
 		}
-
-
-//		for (Action actionToPrint : actions) {
-//			System.out.println("ACTION: " + actionToPrint.toShortString());
-//		}
 
 		return actions;
 	}

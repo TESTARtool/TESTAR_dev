@@ -90,7 +90,7 @@ public class AndroidProtocol extends GenericUtilsProtocol {
         }
 
         latestState = super.getState(system);
-        System.out.println("GET STATE NON SPY!!!!");
+
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
