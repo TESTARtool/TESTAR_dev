@@ -78,10 +78,12 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	private static AndroidDriver driver = null;
 
+	//TODO: Appium v2 will not use /wd/hub suffix anymore
+	public static String androidAppiumURL = "http://0.0.0.0:4723/wd/hub";
+
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
 		try {
-			//TODO: Appium v2 will not use /wd/hub suffix anymore
-			driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
+			driver = new AndroidDriver(new URL(androidAppiumURL), cap);
 			// Next few lines of code enable the show touches in Android.
 			// command to be executed: adb shell content insert --uri content://settings/system --bind name:s:show_touches --bind value:i:1
 			List<String> showTouchesArgs = Arrays.asList(
@@ -575,7 +577,16 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
-			cap.setCapability("app", new File(appPath).getCanonicalPath());
+
+			// If emulator is running inside a docker use the APK raw URL
+			if(jsonObject.get("isEmulatorDocker").getAsBoolean()) {
+				cap.setCapability("app", appPath);
+				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
+			} 
+			// Else, obtain the local directory that contains the APK file
+			else {
+				cap.setCapability("app", new File(appPath).getCanonicalPath());
+			}
 
 		} catch (IOException | NullPointerException e) {
 			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
