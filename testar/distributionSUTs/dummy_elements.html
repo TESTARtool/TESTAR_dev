@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Web elements</h2>
+
+<p>Hello User</p>
+
+<h3>Buttons</h3>
+<div id="buttons" class="tabcontent">
+  <button id="functional_button" onclick="changeText()">FunctionalButton</button>
+  <button id="dummy_button">DummyButton</button>
+</div>
+
+<h3>Dropdown</h3>
+<select id="functional_select">
+  <option id="One">One</option>
+  <option id="Two">Two</option>
+</select>
+
+<select id="dummy_select">
+</select>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+function changeText() {
+    if ($("p").is(':contains(Hello)')) {
+        $("p:contains(Hello)").text("This is a TESTAR web example");
+    } else {
+        $("p:contains(TESTAR)").text("Hello user");
+    }
+}
+</script>
+   
+</body>
+</html> 
