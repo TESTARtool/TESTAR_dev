@@ -1,5 +1,16 @@
 version: "3.8"
 services:
+  mysql:
+    image: bitnami/mysql:latest
+    ports:
+      - "3306:13306"
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+  api:
+    build:
+      context: ./api
+    depends_on:
+      - mysql
   app:
     build:
       context: ./app

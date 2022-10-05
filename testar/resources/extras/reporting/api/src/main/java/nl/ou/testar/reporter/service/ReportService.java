@@ -20,17 +20,21 @@ import java.util.Collection;
 
 @Service
 public class ReportService {
-    private ReportRepo reportRepo;
+
+	@Autowired
+	private ReportRepo reportRepo;
+	
+	@Autowired
     private ReportAssembler resourceAssembler;
 
     @Autowired
     private AssemblingFlags assemblingFlags;
 
-    @Autowired
-    public ReportService(ReportRepo reportRepo, ReportAssembler resourceAssembler) {
-        this.reportRepo = reportRepo;
-        this.resourceAssembler = resourceAssembler;
-    }
+//    @Autowired
+//    public ReportService(ReportRepo reportRepo, ReportAssembler resourceAssembler) {
+//        this.reportRepo = reportRepo;
+//        this.resourceAssembler = resourceAssembler;
+//    }
 
     public PagedModel<Report> getAllReports(
             Collection<Long> ids,

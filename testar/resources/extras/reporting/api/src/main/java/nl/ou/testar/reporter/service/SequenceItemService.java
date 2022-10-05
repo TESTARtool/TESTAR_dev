@@ -20,17 +20,20 @@ import java.util.Collection;
 @Service
 public class SequenceItemService {
 
-    private SequenceItemRepo sequenceItemRepo;
+	@Autowired
+	private SequenceItemRepo sequenceItemRepo;
+	
+	@Autowired
     private SequenceItemAssembler resourceAssembler;
 
     @Autowired
     private AssemblingFlags assemblingFlags;
 
-    @Autowired
-    public SequenceItemService(SequenceItemRepo sequenceItemRepo, SequenceItemAssembler resourceAssembler) {
-        this.sequenceItemRepo = sequenceItemRepo;
-        this.resourceAssembler = resourceAssembler;
-    }
+//    @Autowired
+//    public SequenceItemService(SequenceItemRepo sequenceItemRepo, SequenceItemAssembler resourceAssembler) {
+//        this.sequenceItemRepo = sequenceItemRepo;
+//        this.resourceAssembler = resourceAssembler;
+//    }
 
     public PagedModel<SequenceItem> getAllSequenceItems(
             Collection<Long> ids,

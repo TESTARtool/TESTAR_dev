@@ -11,7 +11,7 @@
 	<groupId>nl.ou.testar</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>reporter</name>
 	<description>Testar Reporting Service</description>
 	<properties>
@@ -120,6 +120,11 @@
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>3.18.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.2.3.Final</version>
 		</dependency>
 
 		<!--		<dependency>-->

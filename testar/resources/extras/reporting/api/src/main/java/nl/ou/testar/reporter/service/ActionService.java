@@ -22,14 +22,17 @@ import java.util.List;
 @Service
 public class ActionService {
 
-    private ActionRepo actionRepo;
+	@Autowired
+	private ActionRepo actionRepo;
+	
+	@Autowired
     private ActionAssembler resourceAssembler;
 
-    @Autowired
-    public ActionService(ActionRepo actionRepo, ActionAssembler resourceAssembler) {
-        this.actionRepo = actionRepo;
-        this.resourceAssembler = resourceAssembler;
-    }
+//    @Autowired
+//    public ActionService(ActionRepo actionRepo, ActionAssembler resourceAssembler) {
+//        this.actionRepo = actionRepo;
+//        this.resourceAssembler = resourceAssembler;
+//    }
 
     public PagedModel<Action> getAllActions(
             Collection<Long> ids,

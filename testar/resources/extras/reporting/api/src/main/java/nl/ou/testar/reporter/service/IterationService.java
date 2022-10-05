@@ -20,17 +20,20 @@ import java.util.Collection;
 @Service
 public class IterationService {
 
-    private IterationRepo iterationRepo;
+	@Autowired
+	private IterationRepo iterationRepo;
+	
+	@Autowired
     private IterationAssembler resourceAssembler;
 
     @Autowired
     private AssemblingFlags assemblingFlags;
 
-    @Autowired
-    public IterationService(IterationRepo iterationRepo, IterationAssembler resourceAssembler) {
-        this.iterationRepo = iterationRepo;
-        this.resourceAssembler = resourceAssembler;
-    }
+//    @Autowired
+//    public IterationService(IterationRepo iterationRepo, IterationAssembler resourceAssembler) {
+//        this.iterationRepo = iterationRepo;
+//        this.resourceAssembler = resourceAssembler;
+//    }
 
     public PagedModel<Iteration> getAllIterations(
             Collection<Long> ids,
