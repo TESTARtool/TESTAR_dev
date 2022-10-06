@@ -1,8 +1,9 @@
-FROM maven:3.8.5-openjdk-11 AS builder
-COPY . /user/src/app
-WORKDIR /user/src/app
-RUN mvn clean install
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
 
-FROM tomcat:9.0
-COPY --from=builder /user/src/app/target/api.war /usr/local/tomcat/webapps
-CMD catalina.sh run
+FROM openjdk:11-jre-slim
+COPY --from=build /home/app/target/api.jar /usr/local/lib/api.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/usr/local/lib/api.jar"]

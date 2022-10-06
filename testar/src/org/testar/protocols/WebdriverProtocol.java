@@ -56,10 +56,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
-import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
-import nl.ou.testar.SequenceReport;
-import nl.ou.testar.TestReport;
 import org.apache.commons.lang3.ArrayUtils;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.mysql.MySqlService;
@@ -73,17 +69,31 @@ import org.fruit.monkey.orientdb.OrientDbServiceImpl;
 import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
-import org.fruit.monkey.webserver.ReportingServiceImpl;
-import org.testar.OutputStructure;
-
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testar.OutputStructure;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.Roles;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.CompoundAction;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.Wait;
+import org.testar.monkey.alayer.actions.WdCloseTabAction;
+import org.testar.monkey.alayer.actions.WdHistoryBackAction;
+import org.testar.monkey.alayer.actions.WdSubmitAction;
+import org.testar.monkey.alayer.actions.WidgetActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -95,12 +105,14 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
-
 import org.testar.reporting.HtmlSequenceReport;
 import org.testar.reporting.HtmlTestReport;
 import org.testar.serialisation.LogSerialiser;
+
+import nl.ou.testar.SequenceReport;
+import nl.ou.testar.TestReport;
+import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
+import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
@@ -178,9 +190,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				return;
 			}
 
-			if (progressMonitor != null) {
-				progressMonitor.beginTask("Prepare database instance(s)", 0);
-			}
+//			if (progressMonitor != null) {
+//				progressMonitor.beginTask("Prepare database instance(s)", 0);
+//			}
 			OrientDbServiceImpl			orientService = new OrientDbServiceImpl(Main.getReportingService(), settings);
 			// TODO: Re-enable progress dialog
 //			ProgressDialog progressDialog = new ProgressDialog();

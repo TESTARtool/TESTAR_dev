@@ -39,7 +39,6 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 import nl.ou.testar.jfx.JfxProgressMonitor;
 import nl.ou.testar.jfx.MainController;
-import nl.ou.testar.jfx.StartupProgressMonitor;
 import nl.ou.testar.jfx.core.NavigationController;
 import nl.ou.testar.jfx.core.NavigationDelegate;
 import nl.ou.testar.jfx.core.ViewController;
@@ -74,12 +73,13 @@ import static org.testar.monkey.ConfigTags.*;
 
 public class Main extends Application implements DashboardDelegate, ProtocolDelegate {
 
-	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
+	// public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS
+	// environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
 
-	//Default paths
+	// Default paths
 	public static String testarDir = "." + File.separator;
 	public static String settingsDir = testarDir + "settings" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
@@ -87,20 +87,20 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 	private Stage primaryStage;
 
-	//Extras
+	// Extras
 	public static String extrasDir = testarDir + "extras" + File.separator;
 	public static String databaseDir = extrasDir + "database" + File.separator;
 	public static String orientDBDir = extrasDir + "orientdb" + File.separator;
 
-	//Old value
+	// Old value
 	public static String webserverDir = extrasDir + "reporting" + File.separator + "webserver" + File.separator;
 
-	//New values
-  public static String reportingApiDir = extrasDir + "reporting" + File.separator + "api" + File.separator;
-  public static String reportingAppDir = extrasDir + "reporting" + File.separator + "app" + File.separator;
-  public static String reportingTmpDir = extrasDir + "reporting" + File.separator + "tmp" + File.separator;
+	// New values
+	public static String reportingApiDir = extrasDir + "reporting" + File.separator + "api" + File.separator;
+	public static String reportingAppDir = extrasDir + "reporting" + File.separator + "app" + File.separator;
+	public static String reportingTmpDir = extrasDir + "reporting" + File.separator + "tmp" + File.separator;
 
-  public static String sonarqubeDir = extrasDir + "sonarqube";
+	public static String sonarqubeDir = extrasDir + "sonarqube";
 	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
 
 	private static DockerPoolService reportingDockerService = new DockerPoolServiceImpl();
@@ -119,7 +119,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	private String protocolClass;
 
 	/**
-	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
+	 * This method scans the settings directory of TESTAR for a file that end with
+	 * extension SUT_SETTINGS_EXT
+	 * 
 	 * @return A list of file names that have extension SUT_SETTINGS_EXT
 	 */
 	public static String[] getSSE() {
@@ -178,22 +180,18 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 		Settings settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
 
-		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
+		// Continuous Integration: If GUI is disabled TESTAR was executed from command
+		// line.
 		// We only want to execute TESTAR one time with the selected settings.
-		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
-			System.out.println("<<< 0 >>>");
+		if (!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			setTestarDirectory(settings);
-			System.out.println("<<< 1 >>>");
 			initCodingManager(settings);
-			System.out.println("<<< 2 >>>");
 			initOperatingSystem();
-			System.out.println("<<< 3 >>>");
-			startTestar(settings, new StartupProgressMonitor());
-			System.out.println("<<< 4 >>>");
-			System.out.println("<<< 5 >>>");
+			startTestar(settings);
 		}
 
-		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
+		// TESTAR GUI is enabled, we're going to show again the GUI when the selected
+		// protocol execution finishes
 		else {
 			System.out.println("(9)");
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
@@ -209,11 +207,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	@Override
-	public void startTesting(Settings settings, StartupProgressMonitor progressMonitor) {
+	public void startTesting(Settings settings) {
 		setTestarDirectory(settings);
 		initCodingManager(settings);
 		initOperatingSystem();
-		startTestar(settings, progressMonitor);
+		startTestar(settings);
 	}
 
 	private static void shutdown() {
@@ -225,15 +223,15 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	private boolean isValidJavaEnvironment() {
 
 		try {
-			if(!System.getenv("JAVA_HOME").contains("jdk"))
+			if (!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
+			if (!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {
+		} catch (Exception e) {
 			final String errorMessage = "Exception: Something is wrong with your JAVA_HOME \n"
-					+"Check if JAVA_HOME system variable is correctly defined \n \n"
-					+"GO TO: https://testar.org/faq/ to obtain more details \n \n";
+					+ "Check if JAVA_HOME system variable is correctly defined \n \n"
+					+ "GO TO: https://testar.org/faq/ to obtain more details \n \n";
 			System.out.println(errorMessage);
 			popupMessage(errorMessage);
 		}
@@ -242,22 +240,25 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	/**
-	 * Verify the initial directory of TESTAR
-	 * If this directory didn't contain testar.bat file inform the user
+	 * Verify the initial directory of TESTAR If this directory didn't contain
+	 * testar.bat file inform the user
 	 */
 	private static void verifyTestarInitialDirectory() {
 		// Obtain Files name of current testarDir
 		Set<String> filesName = new HashSet<>();
 		File[] filesList = new File(testarDir).listFiles();
-        for(File file : filesList){
-        	filesName.add(file.getName());
-        }
+		for (File file : filesList) {
+			filesName.add(file.getName());
+		}
 
-        // Verify if we are in the correct executable testar directory (contains testar.bat)
-		if(!filesName.contains("testar.bat")) {
+		// Verify if we are in the correct executable testar directory (contains
+		// testar.bat)
+		if (!filesName.contains("testar.bat")) {
 			System.out.println("WARNING: We cannot find testar.bat executable file.");
-			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
-			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			System.out.println(
+					"WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println(String.format("WARNING: Current directory %s with existing files:",
+					new File(testarDir).getAbsolutePath()));
 			filesName.forEach(System.out::println);
 		}
 	}
@@ -266,42 +267,42 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * Set the current directory of TESTAR, settings and output folders
 	 */
 	private static void setTestarDirectory(Settings settings) {
-		//Use the OS environment to obtain TESTAR directory
-		/*try {
-			testarDir = System.getenv(TESTAR_DIR_PROPERTY);
-		}catch (IOException e) {
-			testarDir = "." + File.separator;
-			System.out.println(e);
-			System.out.println("Please execute TESTAR from their existing directory");
-		}*/
+		// Use the OS environment to obtain TESTAR directory
+		/*
+		 * try { testarDir = System.getenv(TESTAR_DIR_PROPERTY); }catch (IOException e)
+		 * { testarDir = "." + File.separator; System.out.println(e);
+		 * System.out.println("Please execute TESTAR from their existing directory"); }
+		 */
 
 		outputDir = settings.get(ConfigTags.OutputDir);
 		tempDir = settings.get(ConfigTags.TempDir);
 	}
 
 	/**
-	 * Find or create the .sse file, to known with what settings and protocol start TESTAR
+	 * Find or create the .sse file, to known with what settings and protocol start
+	 * TESTAR
 	 *
 	 * @param parameters
 	 */
-	private void initTestarSSE(Parameters parameters, List<String> rawParameters){
+	private void initTestarSSE(Parameters parameters, List<String> rawParameters) {
 
 		Locale.setDefault(Locale.ENGLISH);
 
 		// TODO: put the code below into separate method/class
-		// Get the files with SUT_SETTINGS_EXT extension and check whether it is not empty
+		// Get the files with SUT_SETTINGS_EXT extension and check whether it is not
+		// empty
 		// and that there is exactly one.
 
-		//Allow users to use command line to choose a protocol modifying sse file
+		// Allow users to use command line to choose a protocol modifying sse file
 		System.out.println("[0]");
 		if (rawParameters == null) {
 			rawParameters = parameters.getRaw();
 		}
-		for(String sett : rawParameters) {
-			if(sett.toString().contains("sse="))
+		for (String sett : rawParameters) {
+			if (sett.toString().contains("sse="))
 				try {
 					protocolFromCmd(sett);
-				}catch(Exception e) {
+				} catch (Exception e) {
 					final String errorMessage = "Error trying to modify sse from command line";
 					System.out.println(errorMessage);
 					popupMessage(errorMessage);
@@ -319,21 +320,21 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			files = null;
 		}
 
-		//If there is none, then start up a selection menu
+		// If there is none, then start up a selection menu
 		if (files == null || files.length == 0) {
 			settingsSelection();
 			if (SSE_ACTIVATED == null) {
 				System.exit(-1);
 			}
-		}
-		else {
-			//Use the only file that was found
+		} else {
+			// Use the only file that was found
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
 	}
 
 	/**
-	 *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
+	 * This method creates the dropdown menu to select a protocol when TESTAR starts
+	 * WITHOUT a .sse file
 	 */
 	private void settingsSelection() {
 
@@ -381,7 +382,8 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		SSE_ACTIVATED = null;
 	}
 
-	//TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
+	// TODO: After know what overrideWithUserProperties does, unify this method with
+	// loadSettings
 	/**
 	 * Load the settings of the selected test.settings file
 	 *
@@ -389,18 +391,19 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * @param testSettingsFileName
 	 * @return settings
 	 */
-	private Settings loadTestarSettings(List<String> args, String testSettingsFileName){
+	private Settings loadTestarSettings(List<String> args, String testSettingsFileName) {
 
 		Settings settings = null;
 		try {
 			settings = loadSettings(args, testSettingsFileName);
 		} catch (ConfigException ce) {
-			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
+			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n",
+					LogSerialiser.LogLevel.Critical);
 		}
 
-		//TODO: Understand what this exactly does?
+		// TODO: Understand what this exactly does?
 		overrideWithUserProperties(settings);
-		Float SST = null;//settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+		Float SST = null;// settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 		if (SST != null) {
 			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
 		}
@@ -409,7 +412,8 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	/**
-	 * Open TESTAR GUI to allow the users modify the settings and the protocol with which the want run TESTAR
+	 * Open TESTAR GUI to allow the users modify the settings and the protocol with
+	 * which the want run TESTAR
 	 *
 	 * @param settings
 	 * @param testSettingsFileName
@@ -437,24 +441,25 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * Start TESTAR protocol with the selected settings
 	 *
 	 *
-	 * This method get the specific protocol class of the selected settings to run TESTAR
+	 * This method get the specific protocol class of the selected settings to run
+	 * TESTAR
 	 *
 	 * @param settings
 	 */
-	private void startTestar(Settings settings, StartupProgressMonitor progressMonitor) {
+	private void startTestar(Settings settings) {
 
 //		launch();
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
-			Util.compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));
+			Util.compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass),
+					settings.get(ConfigTags.ProtocolCompileDirectory));
 		}
-
 
 		URLClassLoader loader = null;
 
 		try {
-		    List<String> cp = new ArrayList<>(settings.get(ConfigTags.MyClassPath));
+			List<String> cp = new ArrayList<>(settings.get(ConfigTags.MyClassPath));
 			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
@@ -465,14 +470,14 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			loader = new URLClassLoader(classPath);
 
 			String pc = settings.get(ConfigTags.ProtocolClass);
-			String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
+			String protocolClass = pc.substring(pc.lastIndexOf('/') + 1, pc.length());
 
 			if (!protocolClass.equals(this.protocolClass)) {
 
 				this.protocolClass = protocolClass;
 
-				LogSerialiser.log("Trying to load TESTAR protocol in class '" + protocolClass +
-						"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
+				LogSerialiser.log("Trying to load TESTAR protocol in class '" + protocolClass + "' with class path '"
+						+ Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
 
 				protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
 				LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
@@ -484,13 +489,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				}
 			}
 
-			//Set progress monitor if applicable
-			if (DefaultProtocol.class.isInstance(protocol)) {
-				((DefaultProtocol)protocol).setProgressMonitor(progressMonitor);
-				progressMonitor.start(primaryStage, settings);
-			}
+			// Set progress monitor if applicable
+//			if (DefaultProtocol.class.isInstance(protocol)) {
+//				((DefaultProtocol) protocol).setProgressMonitor(progressMonitor);
+//				progressMonitor.start(primaryStage, settings);
+//			}
 
-			//Run TESTAR protocol with the selected settings
+			// Run TESTAR protocol with the selected settings
 			protocol.run(settings);
 
 		} catch (InstantiationException e) {
@@ -553,8 +558,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			if (logStream != null) {
 				e.printStackTrace(LogSerialiser.getLogStream());
 			}
-		}
-		finally {
+		} finally {
 			if (loader != null) {
 				try {
 					loader.close();
@@ -571,10 +575,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		System.out.println("+++ 7 +++");
 	}
 
-	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
+	// TODO: This methods should be part of the Settings class. It contains all the
+	// default values of the settings.
 	/**
-	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
-	 * This is needed because the user might not have set all the possible settings in the test.settings file.
+	 * Load the default settings for all the configurable settings and add/overwrite
+	 * with those from the file This is needed because the user might not have set
+	 * all the possible settings in the test.settings file.
+	 * 
 	 * @param args
 	 * @param file
 	 * @return An instance of Settings
@@ -672,7 +679,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
 			defaults.add(Pair.from(FlashFeedback, true));
 			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
-			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
+			defaults.add(Pair.from(ReportingClass, "HTML Reporting"));
 
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
@@ -703,14 +710,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 				}
 			}));
 
-            defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
-                {
-                    add("Title");
-                    add("WebName");
-                    add("WebTagName");
-                }
-            }));
-
+			defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
+				{
+					add("Title");
+					add("WebName");
+					add("WebTagName");
+				}
+			}));
 
 			defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
 				{
@@ -725,44 +731,48 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(SwitchNewTabs, true));
 
 			/*
-			//TODO web driver settings for login feature
-			defaults.add(Pair.from(Login, null)); // null = feature not enabled
-			// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-			defaults.add(Pair.from(Username, ""));
-			defaults.add(Pair.from(Password, ""));
-			*/
+			 * //TODO web driver settings for login feature defaults.add(Pair.from(Login,
+			 * null)); // null = feature not enabled // login =
+			 * Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+			 * defaults.add(Pair.from(Username, "")); defaults.add(Pair.from(Password, ""));
+			 */
 
-			//Overwrite the default settings with those from the file
+			// Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
 
-			//If user use command line to input properties, mix file settings with cmd properties
+			// If user use command line to input properties, mix file settings with cmd
+			// properties
 
 			int size = args.size();
-			if(size>0) {
+			if (size > 0) {
 				String argArray[] = new String[size];
 				try {
 					settings = Settings.fromFileCmd(defaults, file, args.toArray(argArray));
-				}catch(Exception e) {
-					final String errorMessage = "Error with command line properties. Examples:\n" +
-							"testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*\n" +
-							"SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"";
+				} catch (Exception e) {
+					final String errorMessage = "Error with command line properties. Examples:\n"
+							+ "testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*\n"
+							+ "SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"";
 
 					System.out.println(errorMessage);
 					popupMessage(errorMessage);
 				}
-				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
-				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
+				// SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe""
+				// ""https://www.google.es"" "
+				// SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
 			}
 
-			// check that the abstract state properties and the abstract action properties have at least 1 value
+			// check that the abstract state properties and the abstract action properties
+			// have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+				throw new ConfigException(
+						"Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
 			}
 
-			try{
+			try {
 				settings.get(ConfigTags.ExtendedSettingsFile);
-			} catch (NoSuchTagException e){
-				settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
+			} catch (NoSuchTagException e) {
+				settings.set(ConfigTags.ExtendedSettingsFile,
+						file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
 			}
 			ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
@@ -773,15 +783,17 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	/**
-	 * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
+	 * This method creates a sse file to change TESTAR protocol if sett param
+	 * matches an existing protocol
+	 * 
 	 * @param sett
 	 * @throws IOException
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
-		String sseName = sett.substring(sett.indexOf("=")+1);
+		String sseName = sett.substring(sett.indexOf("=") + 1);
 		boolean existSSE = false;
 
-		//Check if choose protocol exist
+		// Check if choose protocol exist
 		for (File f : new File(settingsDir).listFiles()) {
 			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
 				existSSE = true;
@@ -789,32 +801,34 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			}
 		}
 
-		//Command line protocol doesn't exist
-		if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+		// Command line protocol doesn't exist
+		if (!existSSE) {
+			System.out.println("Protocol: " + sseName + " doesn't exist");
+		}
 
-		else{
-			//Obtain previous sse file and delete it (if exist)
+		else {
+			// Obtain previous sse file and delete it (if exist)
 			String[] files = getSSE();
 			if (files != null) {
 				for (String f : files)
-					new File(settingsDir+f).delete();
+					new File(settingsDir + f).delete();
 
 			}
 
-			//Create the new sse file
+			// Create the new sse file
 			String sseDir = settingsDir + sseName + SUT_SETTINGS_EXT;
 			File f = new File(sseDir);
-			if(!f.exists())
+			if (!f.exists())
 				f.createNewFile();
 
-			System.out.println("Protocol changed from command line to: "+sseName);
+			System.out.println("Protocol changed from command line to: " + sseName);
 
 		}
 	}
 
 	/**
-	 * This method allow us to define and use settings as JVM arguments.
-	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
+	 * This method allow us to define and use settings as JVM arguments. Example:
+	 * -DShowVisualSettingsDialogOnStartup=false testar
 	 *
 	 * @param settings
 	 */
@@ -850,9 +864,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			try {
 				Integer sl = new Integer(p);
 				settings.set(ConfigTags.SequenceLength, sl);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sl.toString() + ">", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + sl.toString() + ">",
+						LogSerialiser.LogLevel.Critical);
 			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",
+						LogSerialiser.LogLevel.Critical);
 			}
 		}
 		// ForceToSequenceLength
@@ -875,9 +891,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			try {
 				Integer tt = new Integer(p);
 				settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">",
+						LogSerialiser.LogLevel.Critical);
 			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",
+						LogSerialiser.LogLevel.Critical);
 			}
 		}
 		// StateScreenshotSimilarityThreshold
@@ -890,9 +908,11 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			try {
 				Float sst = new Float(p);
 				settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">",
+						LogSerialiser.LogLevel.Critical);
 			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",
+						LogSerialiser.LogLevel.Critical);
 			}
 		}
 		// UnattendedTests
@@ -908,35 +928,41 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	}
 
 	/**
-	 * This method initializes the coding manager with custom tags to use for constructing
-	 * concrete and abstract state ids, if provided of course.
+	 * This method initializes the coding manager with custom tags to use for
+	 * constructing concrete and abstract state ids, if provided of course.
+	 * 
 	 * @param settings
 	 */
 	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 
-        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-        // for the concrete state tags we use all the state management tags that are available
+		Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+		// for the concrete state tags we use all the state management tags that are
+		// available
 		if (!stateManagementTags.isEmpty()) {
 			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 		}
 
-        // then the attributes for the abstract state id
-        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
-            CodingManager.setCustomTagsForAbstractId(abstractTags);
-        }
-    }
+		// then the attributes for the abstract state id
+		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+			Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream()
+					.map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
+		}
+	}
 
 	/**
-	 * Set the concrete implementation of IEnvironment based on the Operating system on which the application is running.
+	 * Set the concrete implementation of IEnvironment based on the Operating system
+	 * on which the application is running.
 	 */
 	private static void initOperatingSystem() {
 		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
 			Environment.setInstance(new Windows10());
 		} else {
-			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			System.out.printf(
+					"WARNING: Current OS %s has no concrete environment implementation, using default environment\n",
+					NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}

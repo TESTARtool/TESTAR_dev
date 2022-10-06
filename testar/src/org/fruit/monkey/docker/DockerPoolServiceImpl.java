@@ -82,6 +82,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             return (response.getStatusCode() == 200);
         }
         catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

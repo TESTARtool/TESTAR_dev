@@ -85,10 +85,11 @@ public class ReportingWebServiceImpl implements ReportingService {
         "DB_USERNAME=" + dbUser, "DB_PASSWORD=" + dbPassword};
       dockerPoolService.startWithImage(apiImageId, "reporting-api", apiHostConfig, apiEnvironment);
 
-      ServiceUtil.waitForConnection(String.format("http://localhost:%d/api/swagger-ui/index.html", apiPort));
+      ServiceUtil.waitForConnection(String.format("http://localhost:%d/swagger-ui/index.html", apiPort));
 
       appImageId = dockerPoolService.buildImage(reportingAppDir, null);
       final String[] appEnvironment = {"API_SERVER=http://reporting_api"};
+      System.out.println("Starting reporting app");
       dockerPoolService.startWithImage(appImageId, "reporting-app", appHostConfig, appEnvironment);
 
       String reportUrl = String.format("http://localhost:%d", appPort);
