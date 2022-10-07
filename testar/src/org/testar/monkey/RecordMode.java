@@ -31,20 +31,29 @@
 package org.testar.monkey;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.testar.ActionStatus;
 import org.testar.OutputStructure;
+import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Finder;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
+import org.testar.monkey.alayer.devices.MouseButtons;
+import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.serialisation.LogSerialiser;
 
 public class RecordMode {
+
+	private static final int MAX_ESC_ATTEMPTS = 99;
 
 	/**
 	 * Method to run TESTAR on Record User Actions Mode.
@@ -103,9 +112,11 @@ public class RecordMode {
 			//notify the state model manager of the new state
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
 
+			// If no actions are derived, create an ESC action
+			// In Generate mode, this is done in the preSelectAction method
 			if(actions.isEmpty()){
-				if (protocol.escAttempts >= DefaultProtocol.MAX_ESC_ATTEMPTS){
-					LogSerialiser.log("No available actions to execute! Tried ESC <" + DefaultProtocol.MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+				if (protocol.escAttempts >= MAX_ESC_ATTEMPTS){
+					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
 				}
 				//----------------------------------
 				// THERE MUST ALMOST BE ONE ACTION!
@@ -121,7 +132,7 @@ public class RecordMode {
 			ActionStatus actionStatus = new ActionStatus();
 
 			//Start Wait User Action Loop to obtain the Action did by the User
-			protocol.waitUserActionLoop(protocol.cv, system, state, actionStatus);
+			waitUserActionLoop(protocol, system, state, actionStatus);
 
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
@@ -140,10 +151,9 @@ public class RecordMode {
 			 * When we close TESTAR with Shift+down arrow, last actions is detected like null
 			 */
 			if(actionStatus.getAction()!=null) {
-				//System.out.println("DEBUG: User action is not null");
 				protocol.saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
-			}else {
-				//System.out.println("DEBUG: User action ----- null");
+			} else {
+				//If null just ignore
 			}
 
 			Util.clear(protocol.cv);
@@ -182,4 +192,88 @@ public class RecordMode {
 			protocol.stopSystem(system);
 		}
 	}
+
+	/**
+	 * Waits for an user UI action.
+	 * Requirement: Mode must be GenerateManual.
+	 */
+	private void waitUserActionLoop(DefaultProtocol protocol, SUT system, State state, ActionStatus actionStatus){
+		while (protocol.mode() == Modes.Record && !actionStatus.isUserEventAction()){
+			if (protocol.userEvent != null){
+				actionStatus.setAction(mapUserEvent(protocol, state));
+				actionStatus.setUserEventAction((actionStatus.getAction() != null));
+				protocol.userEvent = null;
+			}
+			synchronized(this){
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {}
+			}
+			state = protocol.getState(system);
+			protocol.cv.begin();
+			Util.clear(protocol.cv);
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(protocol.visualizationOn) {
+				SutVisualization.visualizeState(false, 
+						protocol.markParentWidget, 
+						protocol.mouse, 
+						protocol.lastPrintParentsOf, 
+						protocol.cv, 
+						state);
+			}
+
+			Set<Action> actions = protocol.deriveActions(system, state);
+			protocol.buildStateActionsIdentifiers(state, actions);
+
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(protocol.visualizationOn) {
+				protocol.visualizeActions(protocol.cv, state, actions);
+			}
+
+			protocol.cv.end();
+		}
+	}
+
+	/**
+	 * Records user action (for example for Generate-Manual)
+	 *
+	 * @param state
+	 * @return
+	 */
+	private Action mapUserEvent(DefaultProtocol protocol, State state){
+		Assert.notNull(protocol.userEvent);
+		if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
+			double x = ((Double) protocol.userEvent[1]).doubleValue();
+			double y = ((Double) protocol.userEvent[2]).doubleValue();
+			Widget w = null;
+			try {
+				w = Util.widgetFromPoint(state, x, y);
+				x = 0.5; y = 0.5;
+				if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
+					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
+				else if (protocol.userEvent[0] == MouseButtons.BUTTON3) // right click
+					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+			} catch (WidgetNotFoundException we){
+				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+				return null;
+			}
+		} else if (protocol.userEvent[0] instanceof KBKeys) // key events
+			return (new AnnotatingActionCompiler()).hitKey((KBKeys) protocol.userEvent[0]);
+		else if (protocol.userEvent[0] instanceof String){ // type events
+			if (DefaultProtocol.lastExecutedAction == null)
+				return null;
+			List<Finder> targets = DefaultProtocol.lastExecutedAction.get(Tags.Targets,null);
+			if (targets == null || targets.size() != 1)
+				return null;
+			try {
+				Widget w = targets.get(0).apply(state);
+				return (new AnnotatingActionCompiler()).clickTypeInto(w, (String) protocol.userEvent[0], true);
+			} catch (WidgetNotFoundException we){
+				return null;
+			}
+		}
+		return null;
+	}
+
 }

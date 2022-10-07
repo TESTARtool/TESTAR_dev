@@ -71,13 +71,11 @@ import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
@@ -164,9 +162,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private StateBuilder builder;
 	
 	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -1096,9 +1091,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	@Override
-	public void mouseMoved(double x, double y) {} //for iEventListener
-
-	@Override
 	protected void stopSystem(SUT system) {
 
 		if (system != null){
@@ -1142,81 +1134,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void closeTestSession() {
-	}
-
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Records user action (for example for Generate-Manual)
-	//	 *
-	//	 * @param state
-	//	 * @return
-	//	 */
-	protected Action mapUserEvent(State state){
-		Assert.notNull(userEvent);
-		if (userEvent[0] instanceof MouseButtons){ // mouse events
-			double x = ((Double)userEvent[1]).doubleValue();
-			double y = ((Double)userEvent[2]).doubleValue();
-			Widget w = null;
-			try {
-				w = Util.widgetFromPoint(state, x, y);
-				x = 0.5; y = 0.5;
-				if (userEvent[0] == MouseButtons.BUTTON1) // left click
-					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
-					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
-			} catch (WidgetNotFoundException we){
-				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-				return null;
-			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
-			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
-		else if (userEvent[0] instanceof String){ // type events
-			if (lastExecutedAction == null)
-				return null;
-			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
-				return null;
-			try {
-				Widget w = targets.get(0).apply(state);
-				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0], true);
-			} catch (WidgetNotFoundException we){
-				return null;
-			}
-		}
-		return null;
-	}
-
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Waits for an user UI action.
-	//	 * Requirement: Mode must be GenerateManual.
-	//	 */
-	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
-				actionStatus.setAction(mapUserEvent(state));
-				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				userEvent = null;
-			}
-			synchronized(this){
-				try {
-					this.wait(100);
-				} catch (InterruptedException e) {}
-			}
-			state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
-
-			Set<Action> actions = deriveActions(system,state);
-			buildStateActionsIdentifiers(state, actions);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) visualizeActions(cv, state, actions);
-
-			cv.end();
-		}
 	}
 
 	/**

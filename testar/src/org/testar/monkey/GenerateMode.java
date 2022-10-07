@@ -46,6 +46,8 @@ import org.testar.serialisation.LogSerialiser;
 
 public class GenerateMode {
 
+	private boolean exceptionThrown = false;
+
 	/**
 	 * Method to run TESTAR on Generate mode
 	 *
@@ -67,7 +69,7 @@ public class GenerateMode {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (protocol.mode() != Modes.Quit && protocol.moreSequences()) {
-			protocol.exceptionThrown = false;
+			exceptionThrown = false;
 
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
@@ -150,13 +152,13 @@ public class GenerateMode {
 				stackTrace.add(message);
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
-				protocol.exceptionThrown = true;
+				exceptionThrown = true;
 				e.printStackTrace();
 				protocol.emergencyTerminateTestSequence(system, e);
 			}
 		}
 
-		if (protocol.mode() == Modes.Quit && !protocol.exceptionThrown) {
+		if (protocol.mode() == Modes.Quit && !exceptionThrown) {
 			// the user initiated the shutdown
 			protocol.stateModelManager.notifyTestSequenceInterruptedByUser();
 		}
