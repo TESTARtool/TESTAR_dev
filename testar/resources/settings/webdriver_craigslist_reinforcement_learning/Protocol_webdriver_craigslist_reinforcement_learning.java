@@ -260,6 +260,7 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 
 			if (widget.get(WdTags.WebTitle, "").contains("my location") ||
 					widget.get(Tags.Title, "").contains("mapview") ||
+					widget.get(WdTags.WebId, "").contains("mapview") ||
 					widget.get(WdTags.WebTextContent, "").contains("use map") ||
 					widget.get(WdTags.WebTextContent, "").contains("Toggle Full Screen") ||
 					widget.get(WdTags.WebTextContent, "").contains("Zoom in") ||
@@ -320,7 +321,14 @@ public class Protocol_webdriver_craigslist_reinforcement_learning extends Webdri
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						if(widget.get(Tags.Title, "").contains("logoLink") || widget.get(WdTags.WebTitle, "").contains("logoLink")){
+							Action goToLink = new WdNavigateTo("https://ottawa.craigslist.org/");
+							goToLink.set(Tags.OriginWidget, widget);
+							actions.add(goToLink);
+						}
+						else {
+							actions.add(ac.leftClickAt(widget));
+						}
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
