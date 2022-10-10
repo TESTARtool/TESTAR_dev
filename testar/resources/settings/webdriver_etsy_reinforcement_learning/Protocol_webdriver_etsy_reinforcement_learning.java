@@ -101,6 +101,7 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 						CodingManager.lowCollisionID(a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
 				if (a instanceof WdNavigateTo){
 					System.out.println(a.get(Tags.AbstractIDCustom));
+					System.out.println(a.get(RLTags.ExCounter, -1));
 					System.out.println("Q-Value: " + a.get(RLTags.QLearningValue, -1f));
 					System.out.println("--------------------");
 				}
@@ -228,6 +229,10 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 		// iterate through all widgets
 		for (Widget widget : state) {
 
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)){
+				continue;
+			}
+
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
 		    	String protocol = settings.get(ConfigTags.ProtocolClass, "");
@@ -237,7 +242,7 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 		            // do nothing with NOP actions - the form was not actionable
 		        } else {
 		            System.out.println("DEBUG: form action found: ");
-		            actions.add(formFillingAction);
+//		            actions.add(formFillingAction);
 		        }
 		    }
 
@@ -402,6 +407,9 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 		final Action preSelectedAction = preSelectAction(state, actions);
 		if (preSelectedAction != null) {
 			return preSelectedAction;
+		}
+		if(actions.isEmpty()){
+			return super.selectAction(state, actions);
 		}
 		Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
 		if(modelAction==null) {
