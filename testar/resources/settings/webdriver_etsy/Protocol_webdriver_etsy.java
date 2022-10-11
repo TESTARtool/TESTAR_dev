@@ -252,6 +252,11 @@ public class Protocol_webdriver_etsy extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) ||
+					widget.get(WdTags.WebTextContent, "").contains("Sign in")){
+				continue;
+			}
+
 		    // fill forms actions
 		    if (isAtBrowserCanvas(widget) && isForm(widget)) {
 				String protocol = settings.get(ConfigTags.ProtocolClass, "");

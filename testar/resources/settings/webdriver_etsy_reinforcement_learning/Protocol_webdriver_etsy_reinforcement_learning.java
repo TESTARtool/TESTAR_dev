@@ -229,7 +229,8 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)){
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) ||
+					widget.get(WdTags.WebTextContent, "").contains("Sign in")){
 				continue;
 			}
 
