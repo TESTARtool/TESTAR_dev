@@ -254,6 +254,12 @@ public class Protocol_webdriver_craigslist extends WebdriverProtocol {
 					widget.get(WdTags.WebTextContent, "").contains("Toggle Full Screen") ||
 					widget.get(WdTags.WebTextContent, "").contains("Zoom in") ||
 					widget.get(WdTags.WebTextContent, "").contains("Zoom out") ||
+					widget.get(WdTags.WebTitle, "").contains("Toggle Full Screen") ||
+					widget.get(WdTags.WebTitle, "").contains("Zoom in") ||
+					widget.get(WdTags.WebTitle, "").contains("Zoom out") ||
+					widget.get(Tags.Title, "").contains("Toggle Full Screen") ||
+					widget.get(Tags.Title, "").contains("Zoom in") ||
+					widget.get(Tags.Title, "").contains("Zoom out") ||
 					widget.get(Tags.Desc, "").contains("Map data") ||
 					widget.get(WdTags.WebTextContent, "").contains("change search area") ||
 					widget.get(WdTags.WebCssClasses, "").contains("location-picker-link") ||
