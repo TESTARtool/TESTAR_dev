@@ -4,7 +4,7 @@ REM SCRIPT by urueda@UPVLC 2016
 REM ---------------------------
 
 REM How much Java Heap GB to use?
-set MEM=1
+set MEM=3
 
 REM Search for Java JDK8 at JAVA_HOME
 set javajdkbin=%JAVA_HOME%\bin\java.exe
