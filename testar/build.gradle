@@ -1,9 +1,15 @@
 plugins {
     id "de.undercouch.download" version "4.1.1"
     id "io.freefair.lombok" version "6.5.0.3"
+    id "org.openjfx.javafxplugin" version "0.0.13"
 }
 
 apply plugin: 'application'
+
+javafx {
+    version = "11.0.2"
+    modules = ["javafx.controls", "javafx.fxml"]
+}
 
 sourceSets {
     main {
@@ -34,6 +40,11 @@ sourceSets {
  * This task set the working directory to the install folder and runs testar.bat
  */
 task runTestar(type: Exec) {
+    def jfxHome = System.getenv('PATH_TO_FX')
+    if (jfxHome == null) {
+        throw new GradleException("Cannot locate JavaFX runtime: PATH_TO_JAVAFX not defined")
+    }
+
     // Make sure temp dir exists on case-sensitive OSs
     doFirst{
         new File("${project.buildDir}/install/testar/bin/output/temp").mkdirs()
@@ -41,17 +52,15 @@ task runTestar(type: Exec) {
 
     group = 'custom_testar'
     description ='runTESTAR'
+    environment "JAVA_OPTS", "--module-path $jfxHome --add-modules javafx.controls,javafx.fxml"
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar.bat'
 
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-		environment "JAVA_TOOL_OPTIONS", "-Djava.awt.headless=false"
-		commandLine "./testar"
-	} else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-		commandLine "./testar"
-	} else {
-		commandLine 'cmd', '/c', 'testar.bat'
-	}
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+	commandLine 'cmd', '/c', 'testar.bat'
+    }
+    else {
+        commandLine "./testar"
+    }
 }
 
 /*  There's error on Linux, crashing the JVM on unregistering the NativeHook
@@ -128,7 +137,7 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
-    implementation 'com.jfoenix:jfoenix:8.0.10'
+    implementation 'com.jfoenix:jfoenix:9.0.10'
 //>>>>>>> marviq/javafx
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
