@@ -164,7 +164,8 @@ prepareOracles.dependsOn(oracleClasses)
 startScripts {
     if(System.getProperty('DEBUG', 'false') ) {
         applicationDefaultJvmArgs = ['-Dlog4j.configurationFile=log4j2.xml',
-                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005',
+                                     '-Xmx4g']
     } else {
         applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.xml"]
     }
