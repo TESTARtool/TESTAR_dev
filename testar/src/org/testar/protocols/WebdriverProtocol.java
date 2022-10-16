@@ -666,7 +666,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	Verdict stateVerdict = super.getVerdict(state);
 
     	// If Web Console Error Oracle is enabled and we have some pattern to match
-    	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
+        if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
     		// Load the web console error pattern
     		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Severe messages in the WebDriver logs
@@ -687,7 +687,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	}
 
     	// If Web Console Warning Oracle is enabled and we have some pattern to match
-    	if(settings.get(ConfigTags.WebConsoleWarningOracle, false) && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
+      if(settings.get(ConfigTags.WebConsoleWarningOracle, false) && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
     		// Load the web console warning pattern
     		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Warning messages in the WebDriver logs

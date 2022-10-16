@@ -85,9 +85,11 @@ public class SequenceManager {
         if (currentSequence == null) {
             System.out.println("Current sequence is null");
         }
-        currentSequence.setSequenceVerdict(SequenceVerdict.INTERRUPTED_BY_ERROR);
-        currentSequence.setTerminationMessage(message);
-        currentSequence.stop();
+        else {
+            currentSequence.setSequenceVerdict(SequenceVerdict.INTERRUPTED_BY_ERROR);
+            currentSequence.setTerminationMessage(message);
+            currentSequence.stop();
+        }
     }
 
     /**
