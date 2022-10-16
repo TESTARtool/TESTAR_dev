@@ -230,7 +230,20 @@ public class Protocol_webdriver_etsy_reinforcement_learning extends WebdriverPro
 		for (Widget widget : state) {
 
 			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) ||
-					widget.get(WdTags.WebTextContent, "").contains("Sign in")){
+					widget.get(WdTags.WebTextContent, "").contains("Sign in") ||
+					widget.get(WdTags.Desc, "").contains("Continue with Google") ||
+					widget.get(Tags.Desc, "").contains("Continue with Google") ||
+					widget.get(WdTags.Desc, "").contains("Continue with Facebook") ||
+					widget.get(Tags.Desc, "").contains("Continue with Facebook") ||
+					widget.get(WdTags.Desc, "").contains("Continue with Apple") ||
+					widget.get(Tags.Desc, "").contains("Continue with Apple") ||
+					widget.get(WdTags.Desc, "").contains("email") ||
+					widget.get(Tags.Desc, "").contains("email") ||
+					widget.get(WdTags.WebTextContent, "").contains("signing in") ||
+					widget.get(WdTags.WebName, "").contains("submit_attempt") ||
+					widget.get(WdTags.Desc, "").contains("checkout") ||
+					widget.get(Tags.Desc, "").contains("checkout") ||
+					widget.get(WdTags.WebHref, "").contains("guest/favorites")){
 				continue;
 			}
 
