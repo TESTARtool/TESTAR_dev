@@ -38,8 +38,15 @@ public class CompareScreenshotsByPixelsRewardFunction implements RewardFunction 
             currentStateCanvas = getStateshotBinary.apply(state);
         }
         catch (RuntimeException awte) {
+            System.out.println("Error at currentStateCanvas");
             System.out.println(awte.getMessage());
             return defaultReward;
+        }
+        catch (OutOfMemoryError oome) {
+            //Log the info
+            System.err.println("Array size too large");
+            System.err.println("Max JVM memory: " + Runtime.getRuntime().maxMemory());
+            currentStateCanvas = null;
         }
 
         if (currentStateCanvas == null){
