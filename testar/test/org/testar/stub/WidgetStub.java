@@ -131,6 +131,7 @@ public class WidgetStub implements Widget {
 	@Override
 	public final <T> T get(Tag<T> tag, T defaultValue) {
 		Object returnObject = tags.get(tag);
+		if(returnObject == null) return defaultValue;
 		return (T) returnObject;
 	}
 
