@@ -156,8 +156,8 @@ ProtocolSpecificSetting_5 =
 # Strategy settings
 #################################################################
 
-StrategyFile = settings/webdriver_generic_strategy/test_strategy.txt
-SecondaryStrategyFile = settings/webdriver_generic_strategy/test_strategy_secondary.txt
+StrategyFile = settings/webdriver_generic_strategy/main_strategy.txt
+SecondaryStrategyFile = settings/webdriver_generic_strategy/mini_strategy.txt
 UseSecondaryStrategy = true
 FormModeProbability = 0.8
 #################################################################
