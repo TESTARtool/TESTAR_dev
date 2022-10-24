@@ -38,6 +38,10 @@ state_boolean:
     'available-actions-of-type'     ACTION_TYPE         #availableActionsOftype
 |   'sut-type-is'                   SUT_TYPE            #sutType
 |   'state-changed'                                     #stateChanged
+|   'sibling-action-exists'                             #siblingActionExists
+|   'child-action-exists'                               #childActionExists
+|   'child-or-sibling-action-exists'                    #childOrSiblingActionExists
+|   'sibling-or-child-action-exists'                    #childOrSiblingActionExists
 ;
 
 number_of_actions:  'total-n-actions'                                       #tnActions

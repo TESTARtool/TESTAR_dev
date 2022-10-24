@@ -10,6 +10,10 @@ import java.util.Set;
 
 public class StateChangedNode extends BaseBooleanNode
 {
+    private String name;
+    
+    public StateChangedNode(String name) {this.name = name;}
+    
     @Override
     public Boolean GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
@@ -17,5 +21,5 @@ public class StateChangedNode extends BaseBooleanNode
     }
     
     @Override
-    public String toString() {return "state-changed";}
+    public String toString() {return name;}
 }

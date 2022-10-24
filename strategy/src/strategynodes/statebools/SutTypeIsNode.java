@@ -10,10 +10,12 @@ import java.util.Set;
 
 public class SutTypeIsNode extends BaseBooleanNode
 {
+    private String name;
     private SutType sutType;
     
-    public SutTypeIsNode(SutType operatingSystem)
+    public SutTypeIsNode(String name, SutType operatingSystem)
     {
+        this.name = name;
         this.sutType = operatingSystem;
     }
     
@@ -24,5 +26,5 @@ public class SutTypeIsNode extends BaseBooleanNode
     }
     
     @Override
-    public String toString() {return "sut-type-is " + sutType.toString();}
+    public String toString() {return name + " " + sutType.toString();}
 }

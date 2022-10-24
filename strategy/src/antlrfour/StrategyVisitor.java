@@ -140,6 +140,27 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code siblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code childActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code childOrSiblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code tnActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree

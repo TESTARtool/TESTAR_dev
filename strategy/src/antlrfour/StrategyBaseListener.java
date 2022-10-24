@@ -244,6 +244,42 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterChildActionExists(StrategyParser.ChildActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitChildActionExists(StrategyParser.ChildActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTnActions(StrategyParser.TnActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}

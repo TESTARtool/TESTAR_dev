@@ -1,0 +1,6 @@
+IF
+    child-or-sibling-action-exists
+THEN
+    select-child-or-sibling-action
+ELSE
+    random-action

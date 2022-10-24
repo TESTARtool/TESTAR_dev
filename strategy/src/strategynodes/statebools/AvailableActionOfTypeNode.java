@@ -10,10 +10,12 @@ import java.util.Set;
 
 public class AvailableActionOfTypeNode extends BaseBooleanNode
 {
+    private String name;
     private ActionType actionType;
     
-    public AvailableActionOfTypeNode(ActionType actionType)
+    public AvailableActionOfTypeNode(String name, ActionType actionType)
     {
+        this.name = name;
         this.actionType = actionType;
     }
     
@@ -29,12 +31,10 @@ public class AvailableActionOfTypeNode extends BaseBooleanNode
                 break;
             }
         }
-
-//        System.out.println("actions of type " + actionType.toString() + "available: " + available);
         
         return available;
     }
     
     @Override
-    public String toString() {return "available-actions-of-type" + actionType.toString();}
+    public String toString() {return name + " " + actionType.toString();}
 }

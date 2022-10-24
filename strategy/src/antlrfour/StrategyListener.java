@@ -228,6 +228,42 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code siblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code siblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code childActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code childActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code childOrSiblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code childOrSiblingActionExists}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code tnActions}
 	 * labeled alternative in {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree

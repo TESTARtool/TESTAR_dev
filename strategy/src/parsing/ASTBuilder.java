@@ -100,19 +100,25 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     //state booleans
     @Override
     public AvailableActionOfTypeNode visitAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx)
-    {
-        return new AvailableActionOfTypeNode(ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));
-    }
+    {return new AvailableActionOfTypeNode(ctx.getText(), ActionType.valueOfLabel(ctx.ACTION_TYPE().getText()));}
     @Override
     public SutTypeIsNode visitSutType(StrategyParser.SutTypeContext ctx)
-    {
-        return new SutTypeIsNode(SutType.valueOfLabel(ctx.SUT_TYPE().getText()));
-    }
+    {return new SutTypeIsNode(ctx.getText(), SutType.valueOfLabel(ctx.SUT_TYPE().getText()));}
     @Override
     public StateChangedNode visitStateChanged(StrategyParser.StateChangedContext ctx)
-    {
-        return new StateChangedNode();
-    }
+    {return new StateChangedNode(ctx.getText());}
+    @Override
+    public SiblingActionExistsNode visitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx)
+    {return new SiblingActionExistsNode(ctx.getText());}
+    @Override
+    public ChildActionExistsNode visitChildActionExists(StrategyParser.ChildActionExistsContext ctx)
+    {return new ChildActionExistsNode(ctx.getText());}
+    @Override
+    public ChildOrSiblingActionExistsNode visitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx)
+    {return new ChildOrSiblingActionExistsNode(ctx.getText());}
+    
+    
+    
     
     
     //action expressions
