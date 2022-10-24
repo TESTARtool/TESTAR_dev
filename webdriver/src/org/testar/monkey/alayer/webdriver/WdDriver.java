@@ -35,6 +35,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -179,12 +182,17 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
+
+    /** Enables TESTAR to read the browser logs **/
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.BROWSER, Level.ALL);
+    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
     options.addArguments("--verbose");
 
     // Run the chrome driver extra verbose
-    LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
 
     // Ducttape solution https://stackoverflow.com/a/62456219
@@ -194,6 +202,7 @@ public class WdDriver extends SUTBase {
     	options.addArguments("--start-maximized");
     }
     if(disableSecurity) {
+        options.addArguments("ignore-certificate-errors");
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }

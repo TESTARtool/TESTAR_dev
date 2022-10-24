@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Set;
 
 public final class Tags extends TagsBase {
-	
+
 	private Tags() {}
 
 	/** Usually attached to widgets. Returns a <code>HitTester</code> object which allows to

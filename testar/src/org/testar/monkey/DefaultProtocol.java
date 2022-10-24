@@ -34,7 +34,6 @@ package org.testar.monkey;
 import static org.testar.monkey.alayer.Tags.ActionDelay;
 import static org.testar.monkey.alayer.Tags.ActionDuration;
 import static org.testar.monkey.alayer.Tags.ActionSet;
-import static org.testar.monkey.alayer.Tags.Desc;
 import static org.testar.monkey.alayer.Tags.ExecutedAction;
 import static org.testar.monkey.alayer.Tags.IsRunning;
 import static org.testar.monkey.alayer.Tags.OracleVerdict;
@@ -78,13 +77,11 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
@@ -114,18 +111,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
 	}
 
-	private String generatedSequence;
-
+	String generatedSequence;
 	public String getGeneratedSequenceName() {
 		return generatedSequence;
 	}
 
-	private File currentSeq;
+	File currentSeq;
 
 	protected Mouse mouse = AWTMouse.build();
 
 	protected ProcessListener processListener = new ProcessListener();
-	private boolean enabledProcessListener = false;
+	boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
 	private Verdict replayVerdict = Verdict.OK;
 
@@ -188,9 +184,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	private StateBuilder builder;
 	
 	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-
-	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -303,28 +296,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
-			} else if (mode() == Modes.Replay) {
-//				if (progressMonitor != null) {
-//					progressMonitor.beginTask("Replay in progress", 0);
-//				}
-				runReplayLoop();
-			} else if (mode() == Modes.ReplayModel) {
-				runReplayStateModelOuterLoop(settings);
-			} else if (mode() == Modes.Spy) {
-//				if (progressMonitor != null) {
-//					progressMonitor.beginTask("Spy in progress", 0);
-//				}
-				runSpyLoop();
-			} else if(mode() == Modes.Record) {
-//				if (progressMonitor != null) {
-//					progressMonitor.beginTask("Record in progress", 0);
-//				}
-				runRecordLoop(system);
-			} else if (mode() == Modes.Generate) {
-//				if (progressMonitor != null) {
-//					progressMonitor.beginTask("Generate in progress", 0);
-//				}
-				runGenerateOuterLoop(system);
+			} else {
+          runTestLoop(mode(), system);
 			}
 
 		} catch(WinApiException we) {
@@ -458,6 +431,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		}
 	}
 
+    protected void runTestLoop(Modes mode, SUT system) throws StateModelException {
+  	if (mode == Modes.Replay && isValidFile()) {
+			new ReplayMode().runReplayLoop(this);
+		} else if (mode == Modes.ReplayModel) {
+			new ReplayStateModelMode().runReplayStateModelOuterLoop(this);
+		} else if (mode == Modes.Spy) {
+			new SpyMode().runSpyLoop(this);
+		} else if(mode == Modes.Record) {
+			new RecordMode().runRecordLoop(this, system);
+		} else if (mode == Modes.Generate) {
+			new GenerateMode().runGenerateOuterLoop(this, system);
+		}
+   }
+
 	/**
 	 * Check if the selected file to Replay or View contains a valid fragment object
 	 */
@@ -546,7 +533,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	/**
 	 * This method is called from runGenerate() to initialize TESTAR for Generate-mode
 	 */
-	private void initGenerateMode() {
+	void initGenerateMode() {
 		//TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
 		sequenceCount = 1;
 		escAttempts = 0;
@@ -622,7 +609,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * @param system
 	 * @return SUT system
 	 */
-	private SUT startSutIfNotRunning(SUT system) {
+	SUT startSutIfNotRunning(SUT system) {
 		//If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode or Record-mode, the system is running already)
 		if (system == null || !system.isRunning()) {
 			system = startSystem();
@@ -647,7 +634,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 *
 	 * @param system
 	 */
-	private void startTestSequence(SUT system) {
+	void startTestSequence(SUT system) {
 		actionCount = 1;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 		passSeverity = Verdict.SEVERITY_OK;
@@ -658,7 +645,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	/**
 	 * Closing test sequence of TESTAR in normal operation
 	 */
-	private void endTestSequence(){
+	void endTestSequence(){
 		LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
 		cv.release();
 		ScreenshotSerialiser.exit();
@@ -687,7 +674,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * @param system
 	 * @param e
 	 */
-	private void emergencyTerminateTestSequence(SUT system, Exception e){
+	void emergencyTerminateTestSequence(SUT system, Exception e){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 		ScreenshotSerialiser.finish();
 		TestSerialiser.finish();
@@ -714,232 +701,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		}
 	}
 
-	/**
-	 * Method to run TESTAR on Generate mode
-	 *
-	 * @param system
-	 */
-	protected void runGenerateOuterLoop(SUT system) {
+  // TODO: this method might be applicable on every test iteration start
+  public void onGenerateStarted() {
+  }
 
-		boolean startFromGenerate = false;
-		if(system==null)
-			startFromGenerate = true;
-
-		//method for defining other init actions, like setup of external environment
-		initTestSession();
-
-		//initializing TESTAR for generate mode:
-		initGenerateMode();
-
-		/*
-		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
-		 */
-		while (mode() != Modes.Quit && actionResolver.moreSequences()) {
-			exceptionThrown = false;
-
-			synchronized(this){
-				OutputStructure.calculateInnerLoopDateString();
-				OutputStructure.sequenceInnerLoopCount++;
-			}
-
-			//empty method in defaultProtocol - allowing implementation in application specific protocols:
-			preSequencePreparations();
-
-			//reset the faulty variable because we started a new sequence
-			faultySequence = false;
-
-			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
-			system = startSutIfNotRunning(system);
-
-			if(startFromGenerate) {
-				//Generating the sequence file that can be replayed:
-				generatedSequence = getAndStoreGeneratedSequence();
-				currentSeq = getAndStoreSequenceFile();
-			}
-
-			//initializing TESTAR for a new sequence:
-			startTestSequence(system);
-
-			try {
-				// getState() called before beginSequence:
-				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-				State state = getState(system);
-
-				// beginSequence() - a script to interact with GUI, for example login screen
-				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
-				beginSequence(system, state);
-
-				//update state after begin sequence SUT modification
-				state = getState(system);
-
-				//initializing fragment for recording replayable test sequence:
-				initFragmentForReplayableSequence(state);
-
-				// notify the statemodelmanager
-				stateModelManager.notifyTestSequencedStarted();
-
-				/*
-				 ***** starting the INNER LOOP:
-				 */
-				Verdict stateVerdict = runGenerateInnerLoop(system, state);
-
-				//Saving the last state into replayable test sequence:
-				saveStateIntoFragmentForReplayableSequence(state);
-
-				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
-				finishSequence();
-
-				// notify the state model manager of the sequence end
-				stateModelManager.notifyTestSequenceStopped();
-
-				writeAndCloseFragmentForReplayableSequence();
-
-				if (faultySequence)
-					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-
-				Verdict finalVerdict = stateVerdict.join(processVerdict);
-
-				//Copy sequence file into proper directory:
-				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
-
-				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
-				postSequenceProcessing();
-
-				//Ending test sequence of TESTAR:
-				endTestSequence();
-
-				LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
-				stopSystem(system);
-				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
-
-				sequenceCount++;
-
-			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
-				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
-//				System.out.println(message);
-				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
-				stackTrace.add(message);
-				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
-				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
-				exceptionThrown = true;
-				e.printStackTrace();
-				emergencyTerminateTestSequence(system, e);
-			}
-		}
-
-
-		if (mode() == Modes.Quit && !exceptionThrown) {
-			// the user initiated the shutdown
-			stateModelManager.notifyTestSequenceInterruptedByUser();
-		}
-
-		this.onTestEndEvent();
-		// notify the statemodelmanager that the testing has finished
-		stateModelManager.notifyTestingEnded();
-
-		mode = Modes.Quit;
-	}
-
-	protected void onTestEndEvent() {
+	public void onTestEndEvent() {
 		LogSerialiser.log("The test has ended...", LogSerialiser.LogLevel.Debug);
 	}
 
 	protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
 		if (!settings.get(ConfigTags.OnlySaveFaultySequences, false) ||
 				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-
 			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
 			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 		}
 		else {
 			LogSerialiser.log("Skipped generated sequence OK (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
 		}
-	}
-
-	/**
-	 * This is the inner loop of TESTAR Generate-mode:
-	 * * 			GetState
-	 * * 			GetVerdict
-	 * * 			StopCriteria (moreActions/moreSequences/time?)
-	 * * 			DeriveActions
-	 * * 			SelectAction
-	 * * 			ExecuteAction
-	 *
-	 * @param system
-	 */
-	private Verdict runGenerateInnerLoop(SUT system, State state) {
-		/*
-		 ***** INNER LOOP:
-		 */
-		while (mode() != Modes.Quit && actionResolver.moreActions(state)) {
-
-			if (mode() == Modes.Record) {
-				runRecordLoop(system);
-			}
-
-			// getState() including getVerdict() that is saved into the state:
-			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
-			cv.begin(); Util.clear(cv);
-
-			//Deriving actions from the state:
-			System.out.println("--- Deriving actions (1) ---");
-			Set<Action> actions = actionResolver.deriveActions(system, state);
-			CodingManager.buildIDs(state, actions);
-			for(Action a : actions)
-				if(a.get(Tags.AbstractIDCustom, null) == null)
-				    buildEnvironmentActionIdentifiers(state, a);
-
-			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
-			actions = preSelectAction(system, state, actions);
-
-			// notify to state model the current state
-			stateModelManager.notifyNewStateReached(state, actions);
-
-			//Showing the green dots if visualization is on:
-			if(visualizationOn) visualizeActions(cv, state, actions);
-
-			//Selecting one of the available actions:
-			Action action = actionResolver.selectAction(system, state, actions);
-			System.out.println("--- Action selected ---");
-			System.out.println(action.toString());
-			System.out.println("-------");
-			//Showing the red dot if visualization is on:
-			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
-
-			//before action execution, pass it to the state model manager
-			stateModelManager.notifyActionExecution(action);
-
-			//Executing the selected action:
-			executeAction(system, state, action);
-			lastExecutedAction = action;
-			actionCount++;
-
-			//Saving the actions and the executed action into replayable test sequence:
-			saveActionIntoFragmentForReplayableSequence(action, state, actions);
-
-			setReplayVerdict(getVerdict(state));
-
-			// Resetting the visualization:
-			Util.clear(cv);
-			cv.end();
-
-			// fetch the new state
-            state = getState(system);
-		}
-
-		// notify to state model the last state
-		System.out.println("--- Deriving actions (2) ---");
-		Set<Action> actions = actionResolver.deriveActions(system, state);
-		if (actions != null) {
-			buildStateActionsIdentifiers(state, actions);
-			for (Action a : actions)
-				if (a.get(Tags.AbstractIDCustom, null) == null)
-					CodingManager.buildEnvironmentActionIDs(state, a);
-
-			stateModelManager.notifyNewStateReached(state, actions);
-		}
-
-		return getVerdict(state);
 	}
 
 	/**
@@ -1054,413 +832,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	}
 
 	/**
-	 * Method to run TESTAR on Spy Mode.
-	 */
-	protected void runSpyLoop() {
-
-		//Create or detect the SUT & build canvas representation
-		SUT system = startSystem();
-		this.cv = buildCanvas();
-
-		while(mode() == Modes.Spy && system.isRunning()) {
-
-			State state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			Set<Action> actions = actionResolver.deriveActions(system,state);
-			buildStateActionsIdentifiers(state, actions);
-			
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, lastPrintParentsOf, cv, state);
-
-			//in Spy-mode, always visualize the green dots:
-			visualizeActions(cv, state, actions);
-			
-			cv.end();
-
-			int msRefresh = (int)(settings.get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
-			
-			synchronized (this) {
-				try {
-					this.wait(msRefresh);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-
-		//If user closes the SUT while in Spy-mode, TESTAR will close (or go back to SettingsDialog):
-		if(!system.isRunning()){
-			this.mode = Modes.Quit;
-		}
-
-		Util.clear(cv);
-		cv.end();
-		
-		//finishSequence() content, but SPY mode is not a sequence
-		if(!NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-			SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-		}
-
-		//Stop and close the SUT before return to the detectModeLoop
-		stopSystem(system);
-
-	}
-
-	/**
-	 * Method to run TESTAR on Record User Actions Mode.
-	 * @param system
-	 */
-	protected void runRecordLoop(SUT system) {
-		boolean startedRecordMode = false;
-
-		//If system it's null means that we have started TESTAR from the Record User Actions Mode
-		//We need to invoke the SUT & the canvas representation
-		if(system == null) {
-
-			synchronized(this){
-				OutputStructure.calculateInnerLoopDateString();
-				OutputStructure.sequenceInnerLoopCount++;
-			}
-
-			preSequencePreparations();
-			
-			//reset the faulty variable because we started a new execution
-			faultySequence = false;
-
-			system = startSystem();
-			startedRecordMode = true;
-			this.cv = buildCanvas();
-			actionCount = 1;
-
-			//Reset LogSerialiser
-			LogSerialiser.finish();
-			LogSerialiser.exit();
-
-			//Generating the sequence file that can be replayed:
-			generatedSequence = getAndStoreGeneratedSequence();
-			currentSeq = getAndStoreSequenceFile();
-
-			//Activate process Listeners if enabled in the test.settings
-			if(enabledProcessListener)
-				processListener.startListeners(system, settings);
-
-			// notify the statemodelmanager
-			stateModelManager.notifyTestSequencedStarted();
-		}
-		//else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
-
-
-		/**
-		 * Start Record User Action Loop
-		 */
-		while(mode() == Modes.Record && system.isRunning()) {
-			State state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			Set<Action> actions = actionResolver.deriveActions(system,state);
-			buildStateActionsIdentifiers(state, actions);
-
-			//notify the state model manager of the new state
-			stateModelManager.notifyNewStateReached(state, actions);
-
-			if(actions.isEmpty()){
-				if (escAttempts >= MAX_ESC_ATTEMPTS){
-					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				}
-				//----------------------------------
-				// THERE MUST ALMOST BE ONE ACTION!
-				//----------------------------------
-				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				buildEnvironmentActionIdentifiers(state, escAction);
-				actions.add(escAction);
-				escAttempts++;
-			} else
-				escAttempts = 0;
-
-			ActionStatus actionStatus = new ActionStatus();
-
-			//Start Wait User Action Loop to obtain the Action did by the User
-			waitUserActionLoop(cv, system, state, actionStatus);
-
-			//Save the user action information into the logs
-			if (actionStatus.isUserEventAction()) {
-
-			    buildStateActionsIdentifiers(state, Collections.singleton(actionStatus.getAction()));
-
-				//notify the state model manager of the executed action
-				stateModelManager.notifyActionExecution(actionStatus.getAction());
-
-				saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
-				lastExecutedAction = actionStatus.getAction();
-				actionCount++;
-			}
-
-			/**
-			 * When we close TESTAR with Shift+down arrow, last actions is detected like null
-			 */
-			if(actionStatus.getAction()!=null) {
-				//System.out.println("DEBUG: User action is not null");
-				saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
-			}else {
-				//System.out.println("DEBUG: User action ----- null");
-			}
-
-
-			Util.clear(cv);
-			cv.end();
-		}
-
-		//If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
-		if(mode() == Modes.Generate && startedRecordMode){
-			Util.clear(cv);
-			cv.end();
-
-			runGenerateOuterLoop(system);
-		}
-
-		//If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
-		if(!system.isRunning()){
-			this.mode = Modes.Quit;
-		}
-
-		if(startedRecordMode && mode() == Modes.Quit){
-			// notify the statemodelmanager
-			stateModelManager.notifyTestSequenceStopped();
-
-			// notify the state model manager of the sequence end
-			stateModelManager.notifyTestingEnded();
-
-			//Closing fragment for recording replayable test sequence:
-			writeAndCloseFragmentForReplayableSequence();
-
-			//Copy sequence file into proper directory:
-			classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-
-			postSequenceProcessing();
-
-			//If we want to Quit the current execution we stop the system
-			stopSystem(system);
-		}
-	}
-
-	/**
-	* Method to run TESTAR in replay mode.
-	* The sequence to replay is the one indicated in the settings parameter: PathToReplaySequence
-	* Read the replayable file, repeat saved actions and generate new sequences, oracles and logs
-	*/
-	protected void runReplayLoop(){
-		if (!isValidFile()) {
-			return;
-		}
-
-		actionCount = 1;
-		boolean success = true;
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
-		ObjectInputStream ois = null;
-
-		actionCount = 1;
-		faultySequence = false;
-
-    	setReplayVerdict(Verdict.OK);
-		
-		//Reset LogSerialiser
-		LogSerialiser.finish();
-		LogSerialiser.exit();
-
-		synchronized(this){
-			OutputStructure.calculateInnerLoopDateString();
-			OutputStructure.sequenceInnerLoopCount++;
-		}
-
-		preSequencePreparations();
-
-		SUT system = startSystem();
-		try{
-			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			fis = new FileInputStream(seqFile);
-			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
-
-			Canvas cv = buildCanvas();
-			State state = getState(system);
-
-			setReplayVerdict(getVerdict(state));
-
-			String replayMessage;
-
-			double rrt = settings.get(ConfigTags.ReplayRetryTime);
-
-			while(success && mode() != Modes.Quit){
-				TaggableBase fragment;
-				try{
-					fragment = (TaggableBase) ois.readObject();
-				} catch(IOException ioe){
-					success = true;
-					System.out.println("<< Success reached >");
-					break;
-				}
-
-				success = false;
-				int tries = 0;
-				double start = Util.time();
-
-				while(!success && (Util.time() - start < rrt)){
-					tries++;
-					cv.begin(); Util.clear(cv);
-					cv.end();
-
-					if(mode() == Modes.Quit) break;
-
-					Action action = fragment.get(ExecutedAction, new NOP());
-
-    				/**
-    				 * Check if we are replaying the sequence correctly,
-    				 * comparing saved widgets with existing widgets in the current state
-    				 */
-    				
-    				//Obtain the widget Title of the repayable fragment
-    				String widgetStringToFind = fragment.get(Tags.Title, "");
-    				//Could exist actions not associated with widgets
-    				boolean actionHasWidgetAssociated = false;
-    				//Check if we found the widget
-    				boolean widgetTitleFound = false;
-
-    				if (state != null){
-    					List<Finder> targets = action.get(Tags.Targets, null);
-    					if (targets != null){
-    						actionHasWidgetAssociated = true;
-    						Widget w;
-    						for (Finder f : targets){
-    							w = f.apply(state);
-    							if (w != null){			
-    								//Can be this the widget the one that we want to find?
-    								if(widgetStringToFind.equals(w.get(Tags.Title, "")))
-    									widgetTitleFound=true;
-    							}
-    						}
-    					}
-    				}
-
-    				//If action has an associated widget and we don't find it, we are not in the correct state
-    				if(actionHasWidgetAssociated && !widgetTitleFound){
-    					success = false;
-    					String msg = "The Action " + action.get(Tags.Desc, action.toString())
-    					+ " of the replayed sequence can not been replayed into "
-    					+ " the State " + state.get(Tags.ConcreteID, state.toString());
-
-						setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
-    					break;
-    				}
-    				
-					// In Replay-mode, we only show the red dot if visualizationOn is true:
-					if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
-					if(mode() == Modes.Quit) break;
-
-					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-					double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
-
-					try{
-						if(tries < 2){
-							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-						}else{
-							if(tries % 50 == 0)
-								LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-							else
-								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
-						}
-
-						action.run(system, state, actionDuration);
-						success = true;
-						actionCount++;
-						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
-					} catch(ActionFailedException afe){}
-
-					Util.pause(actionDelay);
-
-					if(mode() == Modes.Quit) {
-						break;
-					}
-					state = getState(system);
-				}
-
-			}
-
-			cv.release();
-			//ois.close();
-			stopSystem(system);
-			if (system != null && system.isRunning())
-				system.stop();
-
-
-		} catch(IOException ioe){
-			throw new RuntimeException("Cannot read file.", ioe);
-		} catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException("Cannot read file.", cnfe);
-		} finally {
-			if (ois != null){
-				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (bis != null){
-				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (fis != null){
-				try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (cv != null)
-				cv.release();
-			if (system != null)
-				system.stop();
-		}
-
-		if(faultySequence) {
-			//Update state to obtain correctly the last verdict (this call update the verdict)
-			State state = getState(system);
-			String msg = "Replayed Sequence contains Errors: "+ state.get(Tags.OracleVerdict).info();
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
-
-		}else if(success){
-			String msg = "Sequence successfully replayed!\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
-
-		}else if(replayVerdict.severity() == Verdict.SEVERITY_UNREPLAYABLE){
-			System.out.println(replayVerdict.info());
-			LogSerialiser.log(replayVerdict.info(), LogSerialiser.LogLevel.Critical);
-
-		}else{
-			String msg = "Fail replaying sequence.\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
-		}
-
-		//calling finishSequence() to allow scripting GUI interactions to close the SUT:
-		finishSequence();
-
-		//Close and save the replayable fragment of the current sequence
-		writeAndCloseFragmentForReplayableSequence();
-
-		//Copy sequence file into proper directory:
-		classifyAndCopySequenceIntoAppropriateDirectory(replayVerdict, generatedSequence, currentSeq);
-
-		LogSerialiser.finish();
-		postSequenceProcessing();
-
-		// Going back to TESTAR settings dialog if it was used to start replay:
-		mode = Modes.Quit;
-	}
-
-	/**
 	 * This method is called before the first test sequence, allowing for example setting up the test environment
 	 */
 	@Override
@@ -1502,10 +873,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder);
+			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
+					builder,
+					settings().get(ConfigTags.ForceForeground));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), Math.round(settings().get(ConfigTags.StartupTime) * 1000.0));
+			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
 			// COMMANDLINE and WebDriver SUT CONNECTOR:
@@ -1890,9 +1265,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	}
 
 	@Override
-	public void mouseMoved(double x, double y) {} //for iEventListener
-
-	@Override
 	protected void stopSystem(SUT system) {
 
 		if (system != null){
@@ -1955,81 +1327,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	protected void closeTestSession() {
 	}
 
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Records user action (for example for Generate-Manual)
-	//	 *
-	//	 * @param state
-	//	 * @return
-	//	 */
-	protected Action mapUserEvent(State state){
-		Assert.notNull(userEvent);
-		if (userEvent[0] instanceof MouseButtons){ // mouse events
-			double x = ((Double)userEvent[1]).doubleValue();
-			double y = ((Double)userEvent[2]).doubleValue();
-			Widget w = null;
-			try {
-				w = Util.widgetFromPoint(state, x, y);
-				x = 0.5; y = 0.5;
-				if (userEvent[0] == MouseButtons.BUTTON1) // left click
-					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
-					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
-			} catch (WidgetNotFoundException we){
-				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-				return null;
-			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
-			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
-		else if (userEvent[0] instanceof String){ // type events
-			if (lastExecutedAction == null)
-				return null;
-			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
-				return null;
-			try {
-				Widget w = targets.get(0).apply(state);
-				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0], true);
-			} catch (WidgetNotFoundException we){
-				return null;
-			}
-		}
-		return null;
-	}
-
-	//TODO move to ManualRecording helper class??
-	//	/**
-	//	 * Waits for an user UI action.
-	//	 * Requirement: Mode must be GenerateManual.
-	//	 */
-	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
-				actionStatus.setAction(mapUserEvent(state));
-				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				userEvent = null;
-			}
-			synchronized(this){
-				try {
-					this.wait(100);
-				} catch (InterruptedException e) {}
-			}
-			state = getState(system);
-			cv.begin(); Util.clear(cv);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, lastPrintParentsOf, cv,state);
-
-			Set<Action> actions = actionResolver.deriveActions(system,state);
-			buildStateActionsIdentifiers(state, actions);
-
-			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) visualizeActions(cv, state, actions);
-
-			cv.end();
-		}
-	}
-
 	/**
 	 * Use CodingManager to create the Widget and State identifiers: 
 	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
@@ -2068,6 +1365,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	 * 
 	 * @param settings
 	 * @throws StateModelException
+import org.testar.monkey.alayer.windows.WinApiException;
 	 */
 	protected void runReplayStateModelOuterLoop(final Settings settings) throws StateModelException {
 		// We need at least the name of the model we want to replay (maybe created without version)
@@ -2256,7 +1554,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 				if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, actionToReplay);
 
 				try{
-					String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]", actionCount, actionToReplay.get(Desc, ""));
+					String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]", actionCount, actionToReplay.get(Tags.Desc, ""));
 					LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 
 					preSelectAction(system, state, actions);
@@ -2354,4 +1652,5 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	    }
 	    return actionToReplay;
 	}
+
 }

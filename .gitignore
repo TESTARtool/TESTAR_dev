@@ -13,8 +13,13 @@ build.bat
 *.sse
 *.class
 *.log
-<<<<<<< HEAD
 workspace.code-workspace
-=======
 /logs
+/testar/settings
+/testar/output
+/testar/suts
+/testar/testar
+/testar/testar.bat
+/testar/windows.dll
+/testar/index.log
 >>>>>>> master

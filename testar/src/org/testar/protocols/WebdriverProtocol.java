@@ -77,6 +77,7 @@ import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Environment;
 import org.testar.monkey.Main;
+import org.testar.monkey.ResolverFeaturedReplayMode;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Role;
@@ -102,6 +103,7 @@ import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
@@ -113,6 +115,7 @@ import nl.ou.testar.SequenceReport;
 import nl.ou.testar.TestReport;
 import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
 import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
+import nl.ou.testar.StateModel.Exception.StateModelException;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
@@ -357,7 +360,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	@Override
-	protected void onTestEndEvent() {
+	public void onTestEndEvent() {
 		delegate.updateStatus("Preparing a report", 0);
 		this.testReport.saveReport(
 				this.settings().get(ConfigTags.SequenceLength),
@@ -616,10 +619,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		return latestState;
     }
 
-    @Override
-	protected void runGenerateOuterLoop(SUT system) {
+  @Override
+	public void onGenerateStarted() {
     	isForcedLoginInProgress = false;
-    	super.runGenerateOuterLoop(system);
 	}
 
 	/**
@@ -1255,4 +1257,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 		} catch (Exception e) {}
 	}
+
+  @Override
+  protected void runTestLoop(Modes mode, SUT system) throws StateModelException {
+      if (resolversSupported() && mode == Modes.Replay && orientService != null) {
+          new ResolverFeaturedReplayMode().runReplayLoop(this, orientService);
+      }
+      else {
+          super.runTestLoop(mode, system);
+      }
+  }
+
+  //TODO: put to settings if needed
+  protected boolean resolversSupported() {
+      return false;
+   }
 }

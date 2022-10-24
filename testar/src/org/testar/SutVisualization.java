@@ -112,7 +112,8 @@ public class SutVisualization {
                     canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
                 }
 
-                // Is this really useful?:
+                // TODO: Check if this is useful. If not, just remove it.
+                // SHIFT + ALT --> Toggle widget-tree hierarchy display
                 if (markParentWidget){
                     String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
                     boolean print = !cursorWidgetID.equals(lastPrintParentsOf);
@@ -242,7 +243,6 @@ public class SutVisualization {
         } catch(NoSuchTagException ex){}
         return 1; // default
     }
-
 
     private static Widget getWidget(State state, String concreteID){
         for (Widget w : state){

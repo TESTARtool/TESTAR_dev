@@ -195,25 +195,31 @@ public class CodingManager {
 	                CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
 	    }
 
-	    // Create the Custom Abstract Id and Custom Concrete Id for the derived actions
-	    for (Action a : actions) {
-	        /* To create the AbstractIDCustom use: 
-	         * - AbstractIDCustom of the state calculated with the selected abstract properties (core-StateManagementTags) of all widgets
-	         * - AbstractIDCustom of the OriginWidget calculated with the selected abstract properties (core-StateManagementTags)
-	         * - The ActionRole type of this action (LeftClick, DoubleClick, ClickTypeInto, Drag, etc)
-	         */
-			Widget originWidget = a.get(Tags.OriginWidget, null);
-			String originWidgetId = (originWidget == null ? "" : originWidget.get(Tags.AbstractIDCustom));
-	        a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-	                lowCollisionID(state.get(Tags.AbstractIDCustom) + originWidgetId + a.get(Tags.Role, ActionRoles.Action)));
-
-	        // For the ConcreteIDCustom use all core-StateManagementTags properties of the origin widget
-	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
-	                CodingManager.codify(state.get(Tags.ConcreteIDCustom), a));
-	    }
-
-	    // Check duplicated actions caused by bad abstraction
-	    checkDuplicatedAbstractActions(actions);
+		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
+		// and then set their ids using incremental counters
+		Map<Role, Integer> roleCounter = new HashMap<>();
+		actions.stream().
+				filter(action -> {
+					try {
+						action.get(Tags.OriginWidget).get(Tags.Path);
+						return true;
+					}
+					catch (NoSuchTagException ex) {
+						System.out.println("Coding Action AbstractIDCustom: No origin widget found for action role: " + action.get(Tags.Role));
+						System.out.println("Coding Action AbstractIDCustom: " + action.get(Tags.Desc));
+						return false;
+					}
+				}).
+				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
+				forEach(
+					action -> {
+						updateRoleCounter(action, roleCounter);
+						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
+            action.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
+              CodingManager.codify(state.get(Tags.ConcreteIDCustom), action));
+				}
+		);
 	}
 
 	/**

@@ -27,20 +27,20 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_para extends WebdriverProtocol {
-    protected boolean isTestReportEnabled = true;
-    protected boolean isSequenceReportEnabled = true;
-    protected boolean isPlayableRecordEnabled = true;
-    protected boolean isLogSerializerEnabled = true;
+    // protected boolean isTestReportEnabled = true;
+    // protected boolean isSequenceReportEnabled = true;
+    // protected boolean isPlayableRecordEnabled = true;
+    // protected boolean isLogSerializerEnabled = true;
 
-    protected MySQLSerialResolver databaseReplayResolver;
-    protected OrientDBSerialResolver orientDbSerialResolver;
+    // protected MySQLSerialResolver databaseReplayResolver;
+    // protected OrientDBSerialResolver orientDbSerialResolver;
 
     @Override
     protected void initialize(Settings settings) {
-        isTestReportEnabled = true;
-        isSequenceReportEnabled = true;
-        isLogSerializerEnabled = true;
-        isPlayableRecordEnabled = true;
+        // isTestReportEnabled = true;
+        // isSequenceReportEnabled = true;
+        // isLogSerializerEnabled = true;
+        // isPlayableRecordEnabled = true;
 
         super.initialize(settings);
 
@@ -53,104 +53,104 @@ public class Protocol_para extends WebdriverProtocol {
 
     // Jam logging if disabled
 
-    @Override
-    protected String getAndStoreGeneratedSequence() {
-        if (!isLogSerializerEnabled) {
-            return null;
-        }
-        return super.getAndStoreGeneratedSequence();
-    }
+//     @Override
+//     protected String getAndStoreGeneratedSequence() {
+//         if (!isLogSerializerEnabled) {
+//             return null;
+//         }
+//         return super.getAndStoreGeneratedSequence();
+//     }
 
-    @Override
-    protected File getAndStoreSequenceFile() {
-        if (!isLogSerializerEnabled) {
-            return null;
-        }
-        return super.getAndStoreSequenceFile();
-    }
+//     @Override
+//     protected File getAndStoreSequenceFile() {
+//         if (!isLogSerializerEnabled) {
+//             return null;
+//         }
+//         return super.getAndStoreSequenceFile();
+//     }
 
-    @Override
-    protected void saveActionInfoInLogs(State state, Action action, String actionMode) {
-        if (!isLogSerializerEnabled) {
-            return;
-        }
-        super.saveActionInfoInLogs(state, action, actionMode);
-    }
+//     @Override
+//     protected void saveActionInfoInLogs(State state, Action action, String actionMode) {
+//         if (!isLogSerializerEnabled) {
+//             return;
+//         }
+//         super.saveActionInfoInLogs(state, action, actionMode);
+//     }
 
-    @Override
-    protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq) {
-        if (!isLogSerializerEnabled) {
-            return;
-        }
-        super.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
-    }
+//     @Override
+//     protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq) {
+//         if (!isLogSerializerEnabled) {
+//             return;
+//         }
+//         super.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
+//     }
 
-    // Jam recording if disabled
+//     // Jam recording if disabled
 
-    @Override
-    protected void initFragmentForReplayableSequence(State state) {
-        if (!isPlayableRecordEnabled) {
-            return;
-        }
-        super.initFragmentForReplayableSequence(state);
-    }
+//     @Override
+//     protected void initFragmentForReplayableSequence(State state) {
+//         if (!isPlayableRecordEnabled) {
+//             return;
+//         }
+//         super.initFragmentForReplayableSequence(state);
+//     }
 
-    @Override
-    protected void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
-        if (!isPlayableRecordEnabled) {
-            return;
-        }
-        super.saveActionIntoFragmentForReplayableSequence(action, state, actions);
-    }
+//     @Override
+//     protected void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+//         if (!isPlayableRecordEnabled) {
+//             return;
+//         }
+//         super.saveActionIntoFragmentForReplayableSequence(action, state, actions);
+//     }
 
-    @Override
-    protected void saveStateIntoFragmentForReplayableSequence(State state) {
-        if (isPlayableRecordEnabled) {
-            return;
-        }
-        super.saveStateIntoFragmentForReplayableSequence(state);
-    }
+//     @Override
+//     protected void saveStateIntoFragmentForReplayableSequence(State state) {
+//         if (isPlayableRecordEnabled) {
+//             return;
+//         }
+//         super.saveStateIntoFragmentForReplayableSequence(state);
+//     }
 
-    @Override
-    protected void writeAndCloseFragmentForReplayableSequence() {
-        if (isPlayableRecordEnabled) {
-            return;
-        }
-        super.writeAndCloseFragmentForReplayableSequence();
-    }
+//     @Override
+//     protected void writeAndCloseFragmentForReplayableSequence() {
+//         if (isPlayableRecordEnabled) {
+//             return;
+//         }
+//         super.writeAndCloseFragmentForReplayableSequence();
+//     }
 
-    @Override
-    protected void runReplayLoop() {
-        if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
-            System.out.println(String.format("-= Trying to replay from a database %s =-", sqlService));
-            isTestReportEnabled = true;
-            isSequenceReportEnabled = true;
-            isLogSerializerEnabled = true;
-            isPlayableRecordEnabled = true;
+//     @Override
+//     protected void runReplayLoop() {
+//         if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
+//             System.out.println(String.format("-= Trying to replay from a database %s =-", sqlService));
+//             isTestReportEnabled = true;
+//             isSequenceReportEnabled = true;
+//             isLogSerializerEnabled = true;
+//             isPlayableRecordEnabled = true;
 
-            System.out.println(String.format("-= Service is now %s =-", sqlService));
-            databaseReplayResolver = new MySQLSerialResolver(sqlService, settings);
-            orientDbSerialResolver = new OrientDBSerialResolver(orientService, settings, stateModelManager);
+//             System.out.println(String.format("-= Service is now %s =-", sqlService));
+//             databaseReplayResolver = new MySQLSerialResolver(sqlService, settings);
+//             orientDbSerialResolver = new OrientDBSerialResolver(orientService, settings, stateModelManager);
 
-            try {
-                orientDbSerialResolver.startReplay(settings.get(ConfigTags.SQLReporting));
-                assignActionResolver(orientDbSerialResolver);
-//                databaseReplayResolver.startReplay(settings.get(ConfigTags.SQLReporting));
-//                assignActionResolver(databaseReplayResolver);
-                runGenerateOuterLoop(null);
-                resignActionResolver();
-            }
-            catch (Exception e) {
-                System.err.println("Failed to replay from a database");
-                e.printStackTrace();
-            }
-        }
-        else {
-            System.out.println("-= No database available - falling back =-");
-            System.out.println(settings.get(ConfigTags.ReportType));
-            super.runReplayLoop();
-        }
-    }
+//             try {
+//                 orientDbSerialResolver.startReplay(settings.get(ConfigTags.SQLReporting));
+//                 assignActionResolver(orientDbSerialResolver);
+// //                databaseReplayResolver.startReplay(settings.get(ConfigTags.SQLReporting));
+// //                assignActionResolver(databaseReplayResolver);
+//                 runGenerateOuterLoop(null);
+//                 resignActionResolver();
+//             }
+//             catch (Exception e) {
+//                 System.err.println("Failed to replay from a database");
+//                 e.printStackTrace();
+//             }
+//         }
+//         else {
+//             System.out.println("-= No database available - falling back =-");
+//             System.out.println(settings.get(ConfigTags.ReportType));
+//             super.runReplayLoop();
+//         }
+//     }
 
 
     /**
@@ -301,4 +301,8 @@ public class Protocol_para extends WebdriverProtocol {
         }
         return null;
     }
+
+    protected boolean resolversSupported() {
+        return true;
+   }
 }
