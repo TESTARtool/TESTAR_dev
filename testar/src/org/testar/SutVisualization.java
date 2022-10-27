@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -112,7 +112,8 @@ public class SutVisualization {
                     canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
                 }
 
-                // Is this really useful?:
+                // TODO: Check if this is useful. If not, just remove it.
+                // SHIFT + ALT --> Toggle widget-tree hierarchy display
                 if (markParentWidget){
                     String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
                     boolean print = !cursorWidgetID.equals(lastPrintParentsOf);
@@ -208,7 +209,7 @@ public class SutVisualization {
             if (zindex > maxz)
                 maxz = zindex;
         }
-        int alfa;
+
         try {
             for(Action a : actions){
                 zindex = 1; // default
@@ -243,7 +244,6 @@ public class SutVisualization {
         return 1; // default
     }
 
-
     private static Widget getWidget(State state, String concreteID){
         for (Widget w : state){
             if (w.get(Tags.ConcreteID).equals(concreteID)){
@@ -265,8 +265,6 @@ public class SutVisualization {
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
         try {
             org.testar.monkey.alayer.Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
-            //final int BLINK_COUNT = 3;
-            //final double BLINK_DELAY = 0.5;
             double actionDuration = settings.get(ConfigTags.ActionDuration);
             final int BLINK_COUNT = 3;
             final double BLINK_DELAY = actionDuration / BLINK_COUNT;

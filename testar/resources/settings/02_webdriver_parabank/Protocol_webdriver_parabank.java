@@ -32,9 +32,7 @@ import org.testar.SutVisualization;
 
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.actions.WdHistoryBackAction;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -142,12 +140,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
    */
   @Override
   protected State getState(SUT system) throws StateBuildException {
-      // parabank wsdl pages have no widgets, we need to force a webdriver history back action
-      if(WdDriver.getCurrentUrl().contains("wsdl")) {
-          WdDriver.executeScript("window.history.back();");
-          Util.pause(1);
-      }
-
       State state = super.getState(system);
 
       return state;
@@ -306,10 +298,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
           }
       }
     }
-
-	if(actions.isEmpty()) {
-		return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-	}
 	
 	// If we have forced actions, prioritize and filter the other ones
 	if (forcedActions != null && forcedActions.size() > 0) {
@@ -358,7 +346,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		  // Input type are special...
 		  if (role.equals(WdRoles.WdINPUT)) {
 			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type);
+			  return WdRoles.typeableInputTypes().contains(type.toLowerCase());
 		  }
 		  return true;
 	  }

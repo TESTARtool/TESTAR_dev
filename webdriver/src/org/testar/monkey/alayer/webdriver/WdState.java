@@ -306,9 +306,6 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebBoundingRectangle)) {
 			ret = w.element.rect;
 		}
-		else if (t.equals(WdTags.WebBoundary)) {
-			ret = w.element.rect.toString();
-		}
 
 		cacheTag(w, t, ret);
 

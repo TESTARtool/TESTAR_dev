@@ -5,14 +5,14 @@ name: TESTAR CI - build with Gradle
 
 on:
   push:
-    branches: [ master, master_gradle_workflow ]
+    branches: [ master, master_gradle_workflow, master_workflow ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  windows:
+  windows_java_8:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
     - uses: actions/checkout@v2
@@ -29,10 +29,19 @@ jobs:
     
     - name: Build TESTAR with Gradle
       run: ./gradlew build
-    
+
+    - name: Save JUnit test results
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: saveJunitTests-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/reports/tests
+
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
-    
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
+
     - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
@@ -105,13 +114,21 @@ jobs:
         name: runTestWebdriverSuspiciousTitle-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
     
-    - name: Run webdriver to login in parabank app
-      run: ./gradlew runTestWebdriverParabankLogin
-    - name: Save runTestWebdriverParabankLogin HTML report artifact
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestWebdriverParabankLogin-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login
+        name: runTestWebdriverParabankLoginAndConsoleError-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login_console_error
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
+    - name: Save runTestWebdriverParabankFormFilling HTML report artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: runTestWebdriverParabankFormFilling-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
@@ -128,6 +145,136 @@ jobs:
       with:
         name: runTestWebdriverUnreplayable-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
+
+  windows_java_11:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+    
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+    
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
+
+    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
+      run: ./gradlew runTestDesktopGenericCommandLineOk
+
+    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
+      run: ./gradlew runTestDesktopGenericMultiTags
+
+    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
+    
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+    
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
+    
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
+    
+    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
+      run: ./gradlew runTestDesktopGenericStateModel
+    
+    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
+    
+    - name: Run webdriver protocol and detect SuspiciousTitle
+      run: ./gradlew runTestWebdriverSuspiciousTitle
+    
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
+    
+    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
+      run: ./gradlew runTestWebdriverCorrectReplay
+    
+    - name: Run TESTAR Replay mode to detect a not replayable button
+      run: ./gradlew runTestWebdriverUnreplayable
+
+  windows_java_17:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+    
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+    
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Run TESTAR dialog
+      run: ./gradlew runTestRunGUI
+
+    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
+      run: ./gradlew runTestDesktopGenericCommandLineOk
+
+    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
+      run: ./gradlew runTestDesktopGenericMultiTags
+
+    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
+    
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+    
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
+    
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
+    
+    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
+      run: ./gradlew runTestDesktopGenericStateModel
+    
+    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
+    
+    - name: Run webdriver protocol and detect SuspiciousTitle
+      run: ./gradlew runTestWebdriverSuspiciousTitle
+    
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
+    
+    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
+      run: ./gradlew runTestWebdriverCorrectReplay
+    
+    - name: Run TESTAR Replay mode to detect a not replayable button
+      run: ./gradlew runTestWebdriverUnreplayable
 
   linux:
     runs-on: ubuntu-latest

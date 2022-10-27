@@ -407,6 +407,14 @@ public class Settings extends TaggableBase implements Serializable {
 					+"SwitchNewTabs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# WebDriver Browser Console Oracles\n"
+					+"#################################################################\n"
+					+"WebConsoleErrorOracle = " + Util.lineSep()
+					+"WebConsoleErrorPattern = " + Util.lineSep()
+					+"WebConsoleWarningOracle = " + Util.lineSep()
+					+"WebConsoleWarningPattern = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Override display scale\n"
 					+"#\n"
 					+"# Overrides the displayscale obtained from the system.\n"
@@ -444,22 +452,14 @@ public class Settings extends TaggableBase implements Serializable {
 
 
 			for(Tag<?> t : tags()){
-				
 				int ini = sb.indexOf(t.name()+" =");
 				int end = sb.indexOf(System.lineSeparator(), ini);
 
-				//Forced the hiding of prolog config option
-				//TODO: Take out entirely after prolog has been eradicated from TESTAR
-				if (!t.name().equals("PrologActivated")) {
-					if (ini != -1) { // Overwrite default tags with the new value
-
-						sb = sb.delete(ini, end);
-						sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>) t, get(t))));
-
-					} else { // This tag is new a variable
-
-						sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
-					}
+				if (ini != -1) { // Overwrite default tags with the new value
+					sb = sb.delete(ini, end);
+					sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>) t, get(t))));
+				} else { // This tag is new a variable
+					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
 				}
 			}
 			

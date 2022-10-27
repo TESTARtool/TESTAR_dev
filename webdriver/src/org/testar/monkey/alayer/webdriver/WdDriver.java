@@ -35,6 +35,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -66,14 +69,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.List;
 import java.util.*;
+import java.util.logging.Level;
 
 
 public class WdDriver extends SUTBase {
   private static WdDriver wdDriver = null;
-  private static RemoteWebDriver webDriver = null;
-  private static List<String> windowHandles = new ArrayList<>();
+  private static RemoteWebDriver remoteWebDriver = null;
+  private static List<String> windowHandles = Collections.synchronizedList(new ArrayList<>());
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
@@ -116,13 +121,13 @@ public class WdDriver extends SUTBase {
     String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
 
     if (driverPath.toLowerCase().contains("chrome")) {
-      webDriver = startChromeDriver(driverPath, extensionPath);
+    	remoteWebDriver = startChromeDriver(driverPath, extensionPath);
     }
     else if (driverPath.toLowerCase().contains("gecko")) {
-      webDriver = startGeckoDriver(driverPath, extensionPath);
+    	remoteWebDriver = startGeckoDriver(driverPath, extensionPath);
     }
     else if (driverPath.toLowerCase().contains("microsoft")) {
-      webDriver = startEdgeDriver(driverPath, extensionPath);
+    	remoteWebDriver = startEdgeDriver(driverPath, extensionPath);
     }
     else {
 		String msg = " \n ******** Not a valid webdriver Exception ********"
@@ -140,13 +145,13 @@ public class WdDriver extends SUTBase {
     }
 
     if (screenDimensions != null) {
-      webDriver.manage().window().setSize(screenDimensions);
+    	remoteWebDriver.manage().window().setSize(screenDimensions);
     }
     if (screenPosition != null) {
-      webDriver.manage().window().setPosition(screenPosition);
+    	remoteWebDriver.manage().window().setPosition(screenPosition);
     }
 
-    webDriver.get(url);
+    remoteWebDriver.get(url);
 
     CanvasDimensions.startThread();
 
@@ -160,12 +165,19 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
+
+    /** Enables TESTAR to read the browser logs **/
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.BROWSER, Level.ALL);
+    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
     if(fullScreen) {
     	options.addArguments("--start-maximized");
     }
     if(disableSecurity) {
+        options.addArguments("ignore-certificate-errors");
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }
@@ -307,9 +319,9 @@ public class WdDriver extends SUTBase {
 
   @Override
   public void stop() throws SystemStopException {
-    if (webDriver != null) {
-      webDriver.quit();
-      webDriver = null;
+    if (remoteWebDriver != null) {
+    	remoteWebDriver.quit();
+    	remoteWebDriver = null;
     }
 
     CanvasDimensions.stopThread();
@@ -318,7 +330,7 @@ public class WdDriver extends SUTBase {
   @Override
   public boolean isRunning() {
     try {
-      webDriver.getCurrentUrl();
+    	remoteWebDriver.getCurrentUrl();
     }
     catch (NullPointerException | WebDriverException ignored) {
       return false;
@@ -351,8 +363,8 @@ public class WdDriver extends SUTBase {
 
   public static WdDriver fromExecutable(String sutConnector)
       throws SystemStartException {
-    if (webDriver != null) {
-      webDriver.quit();
+    if (remoteWebDriver != null) {
+    	remoteWebDriver.quit();
     }
 
     return new WdDriver(sutConnector);
@@ -383,15 +395,15 @@ public class WdDriver extends SUTBase {
   }
 
   public static RemoteWebDriver getRemoteWebDriver() {
-    return webDriver;
+    return remoteWebDriver;
   }
 
   /*
    * Update the list of handles with added handles (new tabs)
    * Remove handles from closed tabs
    */
-  private static void updateHandlesList() {
-    Set<String> currentHandles = webDriver.getWindowHandles();
+  private synchronized static void updateHandlesList() {
+    Set<String> currentHandles = remoteWebDriver.getWindowHandles();
 
     // Remove handles not present anymore (closed tabs)
     for (String handle : new ArrayList<>(windowHandles)) {
@@ -420,16 +432,16 @@ public class WdDriver extends SUTBase {
 
     String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
     try {
-      webDriver.switchTo().window(handle);
+    	remoteWebDriver.switchTo().window(handle);
     }
     catch (NullPointerException | WebDriverException ignored) {
-      webDriver = null;
+    	remoteWebDriver = null;
     }
   }
 
   public static Set<String> getWindowHandles() {
     try {
-      return webDriver.getWindowHandles();
+      return remoteWebDriver.getWindowHandles();
     }
     catch (NullPointerException | WebDriverException ignored) {
       return new HashSet<>();
@@ -438,7 +450,7 @@ public class WdDriver extends SUTBase {
 
   public static String getCurrentUrl() {
     try {
-      return webDriver.getCurrentUrl();
+      return remoteWebDriver.getCurrentUrl();
     }
     catch (NullPointerException | WebDriverException ignored) {
       return "";
@@ -453,7 +465,7 @@ public class WdDriver extends SUTBase {
       // Wait until document is ready for script
       waitDocumentReady();
 
-      return webDriver.executeScript(script, args);
+      return remoteWebDriver.executeScript(script, args);
     }
     catch (NullPointerException | WebDriverException ignored) {
       // We need this for WdSubmitAction
@@ -466,9 +478,9 @@ public class WdDriver extends SUTBase {
   }
 
   public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait(webDriver, 60);
+    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
     ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
-      Object result = webDriver.executeScript("return document.readyState");
+      Object result = remoteWebDriver.executeScript("return document.readyState");
       return result != null && result.equals("complete");
     };
     wait.until(documentReady);
@@ -480,9 +492,9 @@ public class WdDriver extends SUTBase {
       activate();
 
       // Add the canvas if the page doesn't have one
-      webDriver.executeScript("addCanvasTestar()");
+      remoteWebDriver.executeScript("addCanvasTestar()");
 
-      webDriver.executeScript(script, args);
+      remoteWebDriver.executeScript(script, args);
     }
     catch (NullPointerException | WebDriverException ignored) {
 

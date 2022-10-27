@@ -119,8 +119,9 @@ public class AnalysisManager {
                 }
             }
             resultSet.close();
+        } finally {
+        	checkShutDown();
         }
-        checkShutDown();
         return abstractStateModels;
     }
 

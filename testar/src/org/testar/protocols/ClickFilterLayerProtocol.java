@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -47,22 +47,14 @@ import org.testar.managers.DataManager;
 import org.testar.managers.FilteringManager;
 
 /**
- * Testing protocol enhancements to ease tester work.
- * 
- * To be developed: actions ordering
- *
+ * The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
+ * pressing CAPS-LOCK + SHIFT and clicking on the widget. 
  */
-
 public class ClickFilterLayerProtocol extends DefaultProtocol {
-
-	//The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
-	//pressing CAPS-LOCK + SHIFT and clicking on the widget
 
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
     private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
-    private boolean ctrlPressed = false;
-    private boolean altPressed = false;
     private boolean shiftPressed = false;
 
     private double mouseX = Double.MIN_VALUE;
@@ -98,12 +90,8 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
         	else if (key == KBKeys.VK_SHIFT)
         		shiftPressed = true;
 	    	else if (key == KBKeys.VK_CONTROL){
-	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
-	    	}
-	    	else if (key == KBKeys.VK_ALT){
-	    		altPressed = true;
 	    	}
         }
     }
@@ -117,11 +105,8 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
         	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
-	    		ctrlPressed = false;
 	    		whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == KBKeys.VK_ALT) {
-	    		altPressed = false;
 	    	}
         }
     }
