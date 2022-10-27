@@ -1,5 +1,6 @@
 package org.testar.oracles.log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.testar.monkey.ConfigTags;
@@ -19,6 +20,7 @@ import org.testar.oracles.Oracle;
 
 public class LogOracle implements Oracle {
     LogChecker checker;
+    List<String> errorsList = new ArrayList<>();
 
     public LogOracle (Settings settings) {
         String regex = settings.get(ConfigTags.LogOracleRegex);
@@ -33,13 +35,13 @@ public class LogOracle implements Oracle {
     }
 
     public Verdict getVerdict(State state) {
-        List<String> errors = checker.readAndCheck();
-        if ( errors.size() == 0  ) {
+        errorsList.addAll(checker.readAndCheck());
+        if ( errorsList.size() == 0  ) {
             return new Verdict(Verdict.SEVERITY_OK, "OK");
         }
         else {
-            System.out.println("LogOracle verdict ERROR" + String.join(";", errors) );
-            return new Verdict(Verdict.SEVERITY_SUSPICIOUS_LOG, String.join(";", errors));
+            System.out.println("LogOracle verdict ERROR" + String.join(";", errorsList) );
+            return new Verdict(Verdict.SEVERITY_SUSPICIOUS_LOG, String.join(";", errorsList));
         }
     }
 

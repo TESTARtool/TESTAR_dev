@@ -343,6 +343,15 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ProcessLogs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Oracles based on suspicious titles in SUT output files\n"
+					+"#################################################################\n"
+					+"\n"
+					+"LogOracleEnabled = " + Util.lineSep()
+					+"LogOracleRegex = " + Util.lineSep()
+					+"LogOracleCommands = " + Util.lineSep()
+					+"LogOracleFiles = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Actionfilter\n"
 					+"#\n"
 					+"# Regular expression and Tags to apply them.\n"
