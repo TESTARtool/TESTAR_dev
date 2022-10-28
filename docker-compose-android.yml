@@ -52,3 +52,9 @@ services:
       - MOBILE_WEB_TEST=true
       - AUTO_RECORD=true
       #- RELAXED_SECURITY=true
+
+  testar:
+    image: testar
+    build:
+      context: ./
+      dockerfile: ./DockerfileAndroid

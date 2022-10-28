@@ -1,0 +1,6 @@
+#!/bin/sh
+cat /README.Docker
+sleep 2
+cd /testar/bin
+./testar
+#sh -c "while true; do sleep 1; done"
