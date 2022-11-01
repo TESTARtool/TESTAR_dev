@@ -2,5 +2,5 @@
 cat /README.Docker
 sleep 2
 cd /testar/bin
-./testar
+./testar sse=android_generic ShowVisualSettingsDialogOnStartup=false ApplicationName="Android_generic" ApplicationVersion=1 Sequences=2 SequenceLength=5 StateModelEnabled=false Mode=Generate > debug_android_generic.txt
 #sh -c "while true; do sleep 1; done"

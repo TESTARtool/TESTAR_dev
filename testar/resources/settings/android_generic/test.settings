@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = ./settings/android_generic/DesiredCapabilities.json
+SUTConnectorValue = ./settings/android_generic/DesiredCapabilitiesDockerEmulator.json
 
 #################################################################
 # Sequences

@@ -58,3 +58,10 @@ services:
     build:
       context: ./
       dockerfile: ./DockerfileAndroid
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - type: bind
+        source: /home/testar/output
+        target: /testar/bin/output
+    environment:
+      DISPLAY: $DISPLAY
