@@ -1,4 +1,4 @@
-package strategynodes.integeroperators;
+package strategynodes.operators.integeroperators;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;

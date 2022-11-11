@@ -9,6 +9,11 @@ import strategynodes.booloperators.*;
 import strategynodes.hierarchy.*;
 import strategynodes.numberofactions.*;
 import strategynodes.integeroperators.*;
+import strategynodes.operators.booloperators.AndOprNode;
+import strategynodes.operators.booloperators.NotOprNode;
+import strategynodes.operators.booloperators.OrOprNode;
+import strategynodes.operators.booloperators.XorOprNode;
+import strategynodes.operators.integeroperators.*;
 import strategynodes.statebools.*;
 import strategynodes.terminals.*;
 

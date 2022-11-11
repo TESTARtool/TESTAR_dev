@@ -1,4 +1,4 @@
-package strategynodes.booloperators;
+package strategynodes.operators.booloperators;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
