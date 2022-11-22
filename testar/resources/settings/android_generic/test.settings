@@ -167,3 +167,4 @@ MaxReward = 9999999
 Discount = .95
 
 UseSystemActions = False
+FlashFeedback = False
