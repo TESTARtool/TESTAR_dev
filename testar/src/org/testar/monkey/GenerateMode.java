@@ -129,7 +129,7 @@ public class GenerateMode {
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
 				//Copy sequence file into proper directory:
-				protocol.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, 
+				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.finalVerdict, 
 						protocol.generatedSequence, 
 						protocol.currentSeq);
 
