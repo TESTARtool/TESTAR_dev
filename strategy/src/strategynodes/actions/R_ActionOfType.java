@@ -2,20 +2,19 @@ package strategynodes.actions;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.basenodes.BaseActionNode;
-import strategynodes.terminals.ActionType;
+import parsing.treenodes.BaseAction_Node;
+import parsing.treenodes.ActionType;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class R_ActionOfType extends BaseActionNode
+public class R_ActionOfType extends BaseAction_Node
 {
     private final ActionType actionType;
     
-    public R_ActionOfType(int weight, String name, ActionType actionType)
+    public R_ActionOfType(int weight, ActionType actionType)
     {
-        this.name = name;
         this.WEIGHT = weight;
         this.actionType = actionType;
     }
@@ -42,5 +41,5 @@ public class R_ActionOfType extends BaseActionNode
     }
     
     @Override
-    public String toString() {return WEIGHT + " " + name + " " + actionType.toString();}
+    public String toString() {return WEIGHT + " " + actionType.toString();}
 }

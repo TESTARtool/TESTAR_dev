@@ -1,23 +1,20 @@
-package strategynodes.basenodes;
+package parsing.treenodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import strategynodes.basenodes.BaseStrategyNode;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public abstract class BaseActionNode extends BaseStrategyNode<Action>
+public abstract class BaseAction_Node extends BaseStrategyNode<Action>
 {
-    protected String name;
     protected int WEIGHT;
     
     @Override
     public abstract Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
-    
-    @Override
-    public String toString() {return WEIGHT + " " + name;}
     
     public int GetWeight() {return WEIGHT;}
     

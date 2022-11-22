@@ -1,4 +1,4 @@
-package strategynodes.operators.booloperators;
+package parsing.treenodes.operators.booloperators;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;

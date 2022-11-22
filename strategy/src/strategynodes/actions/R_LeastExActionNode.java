@@ -3,18 +3,17 @@ package strategynodes.actions;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.basenodes.BaseActionNode;
+import parsing.treenodes.BaseAction_Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class R_LeastExActionNode extends BaseActionNode
+public class R_LeastExActionNode extends BaseAction_Node
 {
     public R_LeastExActionNode(int weight, String name)
     {
-        this.name = name;
         this.WEIGHT = weight;
     }
     
@@ -60,5 +59,11 @@ public class R_LeastExActionNode extends BaseActionNode
             else
                 return selectRandomAction(filteredActions);
         }
+    }
+    
+    @Override
+    public String toString()
+    {
+        return null;
     }
 }

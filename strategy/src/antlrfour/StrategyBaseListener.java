@@ -40,18 +40,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterBaseBool(StrategyParser.BaseBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -76,42 +64,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLessThanExpr(StrategyParser.LessThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLessThanExpr(StrategyParser.LessThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNotEqualExpr(StrategyParser.NotEqualExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNotEqualExpr(StrategyParser.NotEqualExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterStateBool(StrategyParser.StateBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -124,61 +76,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOrExpr(StrategyParser.OrExprContext ctx) { }
+	@Override public void enterBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOrExpr(StrategyParser.OrExprContext ctx) { }
+	@Override public void exitBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx) { }
+	@Override public void enterNumberOprExpr(StrategyParser.NumberOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterXorExpr(StrategyParser.XorExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitXorExpr(StrategyParser.XorExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAndExpr(StrategyParser.AndExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAndExpr(StrategyParser.AndExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterEqualExpr(StrategyParser.EqualExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEqualExpr(StrategyParser.EqualExprContext ctx) { }
+	@Override public void exitNumberOprExpr(StrategyParser.NumberOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -196,37 +112,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAction_expr(StrategyParser.Action_exprContext ctx) { }
+	@Override public void enterNumber_of_actions(StrategyParser.Number_of_actionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAction_expr(StrategyParser.Action_exprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSutType(StrategyParser.SutTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
+	@Override public void exitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -244,265 +136,253 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx) { }
+	@Override public void enterAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx) { }
+	@Override public void exitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterChildActionExists(StrategyParser.ChildActionExistsContext ctx) { }
+	@Override public void enterSutType(StrategyParser.SutTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitChildActionExists(StrategyParser.ChildActionExistsContext ctx) { }
+	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx) { }
+	@Override public void enterRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx) { }
+	@Override public void exitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTnActions(StrategyParser.TnActionsContext ctx) { }
+	@Override public void enterSubStrategy(StrategyParser.SubStrategyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTnActions(StrategyParser.TnActionsContext ctx) { }
+	@Override public void exitSubStrategy(StrategyParser.SubStrategyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTnUnexActions(StrategyParser.TnUnexActionsContext ctx) { }
+	@Override public void enterActionList(StrategyParser.ActionListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTnUnexActions(StrategyParser.TnUnexActionsContext ctx) { }
+	@Override public void exitActionList(StrategyParser.ActionListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTnExActions(StrategyParser.TnExActionsContext ctx) { }
+	@Override public void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTnExActions(StrategyParser.TnExActionsContext ctx) { }
+	@Override public void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNActionsOfType(StrategyParser.NActionsOfTypeContext ctx) { }
+	@Override public void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx) { }
+	@Override public void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNExecActions(StrategyParser.NExecActionsContext ctx) { }
+	@Override public void enterSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNExecActions(StrategyParser.NExecActionsContext ctx) { }
+	@Override public void exitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx) { }
+	@Override public void enterSiblingAction(StrategyParser.SiblingActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx) { }
+	@Override public void exitSiblingAction(StrategyParser.SiblingActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRAction(StrategyParser.RActionContext ctx) { }
+	@Override public void enterChildAction(StrategyParser.ChildActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRAction(StrategyParser.RActionContext ctx) { }
+	@Override public void exitChildAction(StrategyParser.ChildActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrevAction(StrategyParser.PrevActionContext ctx) { }
+	@Override public void enterChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPrevAction(StrategyParser.PrevActionContext ctx) { }
+	@Override public void exitChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRUnexAction(StrategyParser.RUnexActionContext ctx) { }
+	@Override public void enterWindows(StrategyParser.WindowsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRUnexAction(StrategyParser.RUnexActionContext ctx) { }
+	@Override public void exitWindows(StrategyParser.WindowsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRLeastExAction(StrategyParser.RLeastExActionContext ctx) { }
+	@Override public void enterLinux(StrategyParser.LinuxContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRLeastExAction(StrategyParser.RLeastExActionContext ctx) { }
+	@Override public void exitLinux(StrategyParser.LinuxContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRMostExAction(StrategyParser.RMostExActionContext ctx) { }
+	@Override public void enterAndroid(StrategyParser.AndroidContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRMostExAction(StrategyParser.RMostExActionContext ctx) { }
+	@Override public void exitAndroid(StrategyParser.AndroidContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRActionOfType(StrategyParser.RActionOfTypeContext ctx) { }
+	@Override public void enterWeb(StrategyParser.WebContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRActionOfType(StrategyParser.RActionOfTypeContext ctx) { }
+	@Override public void exitWeb(StrategyParser.WebContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx) { }
+	@Override public void enterClick(StrategyParser.ClickContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx) { }
+	@Override public void exitClick(StrategyParser.ClickContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRActionNotType(StrategyParser.RActionNotTypeContext ctx) { }
+	@Override public void enterTyping(StrategyParser.TypingContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRActionNotType(StrategyParser.RActionNotTypeContext ctx) { }
+	@Override public void exitTyping(StrategyParser.TypingContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx) { }
+	@Override public void enterDrag(StrategyParser.DragContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx) { }
+	@Override public void exitDrag(StrategyParser.DragContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSSubmitAction(StrategyParser.SSubmitActionContext ctx) { }
+	@Override public void enterScroll(StrategyParser.ScrollContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSSubmitAction(StrategyParser.SSubmitActionContext ctx) { }
+	@Override public void exitScroll(StrategyParser.ScrollContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSSiblingAction(StrategyParser.SSiblingActionContext ctx) { }
+	@Override public void enterHitKey(StrategyParser.HitKeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSSiblingAction(StrategyParser.SSiblingActionContext ctx) { }
+	@Override public void exitHitKey(StrategyParser.HitKeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSChildAction(StrategyParser.SChildActionContext ctx) { }
+	@Override public void enterInput(StrategyParser.InputContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSChildAction(StrategyParser.SChildActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx) { }
+	@Override public void exitInput(StrategyParser.InputContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

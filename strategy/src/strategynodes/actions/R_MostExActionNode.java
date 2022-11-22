@@ -3,18 +3,17 @@ package strategynodes.actions;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.basenodes.BaseActionNode;
+import parsing.treenodes.BaseAction_Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class R_MostExActionNode extends BaseActionNode
+public class R_MostExActionNode extends BaseAction_Node
 {
     public R_MostExActionNode(int weight, String name)
     {
-        this.name = name;
         this.WEIGHT = weight;
     }
     
@@ -50,5 +49,11 @@ public class R_MostExActionNode extends BaseActionNode
         }
         else
             return selectRandomAction(actions);
+    }
+    
+    @Override
+    public String toString()
+    {
+        return null;
     }
 }

@@ -31,13 +31,6 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitBaseBool(StrategyParser.BaseBoolContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -52,27 +45,6 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLessThanExpr(StrategyParser.LessThanExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitNotEqualExpr(StrategyParser.NotEqualExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitStateBool(StrategyParser.StateBoolContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -80,35 +52,14 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitOrExpr(StrategyParser.OrExprContext ctx) { return visitChildren(ctx); }
+	@Override public T visitBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitXorExpr(StrategyParser.XorExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitAndExpr(StrategyParser.AndExprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitEqualExpr(StrategyParser.EqualExprContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -122,21 +73,7 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAction_expr(StrategyParser.Action_exprContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSutType(StrategyParser.SutTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -150,152 +87,145 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitChildActionExists(StrategyParser.ChildActionExistsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSutType(StrategyParser.SutTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTnActions(StrategyParser.TnActionsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSubStrategy(StrategyParser.SubStrategyContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTnUnexActions(StrategyParser.TnUnexActionsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitActionList(StrategyParser.ActionListContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTnExActions(StrategyParser.TnExActionsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNExecActions(StrategyParser.NExecActionsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSiblingAction(StrategyParser.SiblingActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRAction(StrategyParser.RActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitChildAction(StrategyParser.ChildActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPrevAction(StrategyParser.PrevActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRUnexAction(StrategyParser.RUnexActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWindows(StrategyParser.WindowsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRLeastExAction(StrategyParser.RLeastExActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLinux(StrategyParser.LinuxContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRMostExAction(StrategyParser.RMostExActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAndroid(StrategyParser.AndroidContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRActionOfType(StrategyParser.RActionOfTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWeb(StrategyParser.WebContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitClick(StrategyParser.ClickContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRActionNotType(StrategyParser.RActionNotTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitTyping(StrategyParser.TypingContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDrag(StrategyParser.DragContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSSubmitAction(StrategyParser.SSubmitActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitScroll(StrategyParser.ScrollContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSSiblingAction(StrategyParser.SSiblingActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitHitKey(StrategyParser.HitKeyContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSChildAction(StrategyParser.SChildActionContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitInput(StrategyParser.InputContext ctx) { return visitChildren(ctx); }
 }

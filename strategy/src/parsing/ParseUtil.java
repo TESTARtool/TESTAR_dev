@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.StrategyNode;
+import parsing.treenodes.Strategy_Node;
 
 import java.io.IOException;
 import java.util.Map;
@@ -15,8 +15,8 @@ import java.util.Set;
 
 public class ParseUtil
 {
-    private StrategyNode primaryASTTree;
-    private StrategyNode secondaryASTTree = null;
+    private Strategy_Node primaryASTTree;
+    private Strategy_Node secondaryASTTree = null;
     
     public ParseUtil(String filePath)
     {
@@ -54,7 +54,7 @@ public class ParseUtil
         return chars;
     }
     
-    private StrategyNode BuildAST(CharStream chars)
+    private Strategy_Node BuildAST(CharStream chars)
     {
         StrategyLexer                       lexer  = new StrategyLexer(chars);
         CommonTokenStream                   tokens = new CommonTokenStream(lexer);

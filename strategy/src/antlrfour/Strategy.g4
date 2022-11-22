@@ -4,73 +4,110 @@ strategy_file:      strategy EOF;
 
 strategy:           IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
 
-bool_expr:
-                            NOT             expr=bool_expr              #notExpr
-|   LP                      NOT             expr=bool_expr      RP      #notExpr
-|       left=bool_expr      AND             right=bool_expr             #andExpr
-|   LP  left=bool_expr      AND             right=bool_expr     RP      #andExpr
-|       left=bool_expr      XOR             right=bool_expr             #xorExpr
-|   LP  left=bool_expr      XOR             right=bool_expr     RP      #xorExpr
-|       left=bool_expr      OR              right=bool_expr             #orExpr
-|   LP  left=bool_expr      OR              right=bool_expr     RP      #orExpr
-|       left=number_expr    GT              right=number_expr           #greaterThanExpr
-|   LP  left=number_expr    GT              right=number_expr   RP      #greaterThanExpr
-|       left=number_expr    GE              right=number_expr           #greaterEqualThanExpr
-|   LP  left=number_expr    GE              right=number_expr   RP      #greaterEqualThanExpr
-|       left=number_expr    LT              right=number_expr           #lessThanExpr
-|   LP  left=number_expr    LT              right=number_expr   RP      #lessThanExpr
-|       left=number_expr    LE              right=number_expr           #lessEqualThanExpr
-|   LP  left=number_expr    LE              right=number_expr   RP      #lessEqualThanExpr
-|       left=number_expr    EQ              right=number_expr           #equalExpr
-|   LP  left=number_expr    EQ              right=number_expr   RP      #equalExpr
-|       left=number_expr    NE              right=number_expr           #notEqualExpr
-|   LP  left=number_expr    NE              right=number_expr   RP      #notEqualExpr
-|                           state_boolean                               #stateBool
-|   LP                      state_boolean                       RP      #stateBool
-|                           BOOLEAN                                     #baseBool
+/////////////////////
+// IF parser rules //
+/////////////////////
+
+//bool_expr:                  NOT             expr=bool_expr              #notExpr
+//|   LP                      NOT             expr=bool_expr      RP      #notExpr
+//|       left=bool_expr      bool_opr        right=bool_expr             #boolOprExpr
+//|   LP  left=bool_expr      bool_opr        right=bool_expr     RP      #boolOprExpr
+//|       left=number_expr    number_opr      right=number_expr           #numberOprExpr
+//|   LP  left=number_expr    number_opr      right=number_expr   RP      #numberOprExpr
+//|                           state_boolean                               #stateBool
+//|   LP                      state_boolean                       RP      #stateBool
+//|                           BOOLEAN                                     #baseBool
+//;
+//
+//bool_opr:       AND     #andExpr
+//|               XOR     #xorExpr
+//|               OR      #orExpr
+//;
+//
+//number_opr:     LT      #lessThanExpr
+//|               LE      #lessEqualThanExpr
+//|               GT      #greaterThanExpr
+//|               GE      #greaterEqualThanExpr
+//|               EQ      #equalExpr
+//|               NE      #notEqualExpr
+//;
+
+bool_expr:                        NOT                               expr=bool_expr              #notExpr
+|   LP                            NOT                               expr=bool_expr      RP      #notExpr
+|       left=bool_expr      opr=( AND | XOR | OR )                  right=bool_expr             #boolOprExpr
+|   LP  left=bool_expr      opr=( AND | XOR | OR )                  right=bool_expr     RP      #boolOprExpr
+|       left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr           #numberOprExpr
+|   LP  left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr   RP      #numberOprExpr
+|                           state_boolean                                                       #stateBool
+|   LP                      state_boolean                                               RP      #stateBool
+|                           BOOLEAN                                                             #baseBool
 ;
 
-number_expr:        number_of_actions | NUMBER;
 
-action_expr:        strategy | action+;
+number_expr:         number_of_actions | NUMBER;
 
-state_boolean:
-    'available-actions-of-type'     ACTION_TYPE         #availableActionsOftype
-|   'sut-type-is'                   SUT_TYPE            #sutType
-|   'state-changed'                                     #stateChanged
-|   'sibling-action-exists'                             #siblingActionExists
-|   'child-action-exists'                               #childActionExists
-|   'child-or-sibling-action-exists'                    #childOrSiblingActionExists
-|   'sibling-or-child-action-exists'                    #childOrSiblingActionExists
+number_of_actions:  'n-actions'      ACTION_VISITED?    (FILTER     action_type)?;
+
+state_boolean:      'state-changed'                                             #stateChanged
+|                   'any-actions'   (FILTER     action_type)?       EXIST       #anyActionsExists
+|                   'sut'            FILTER     sut_type                        #sutType
+|                    related_action  EXIST                                      #relatedActionExists
 ;
 
-number_of_actions:  'total-n-actions'                                       #tnActions
-|                   'total-n-unexecuted-actions'                            #tnUnexActions
-|                   'total-n-executed-actions'                              #tnExActions
-|                   'n-actions-of-type'                     ACTION_TYPE     #nActionsOfType
-|                   'n-executed-actions-of-type'            ACTION_TYPE     #nExecActions
-|                   'n-unexecuted-actions-of-type'          ACTION_TYPE     #nUnexActionsOfType
+////////////////////////////////
+// THEN and ELSE parser rules //
+////////////////////////////////
+
+action_expr:        strategy        #subStrategy
+|                   action+         #actionList;
+
+action: NUMBER?     'select-previous-action'                                                #selectPreviousAction
+|       NUMBER?     'select-random'             ACTION_VISITED?     (FILTER action_type)?   #selectRandomAction
+|       NUMBER?     'select-by-relation'        related_action                              #selectRelatedAction
 ;
 
-action: NUMBER?     'random-action'                                            #rAction
-|       NUMBER?     'previous-action'                                          #prevAction
-|       NUMBER?     'r-unexecuted-action'                                      #rUnexAction
-|       NUMBER?     'r-least-executed-action'                                  #rLeastExAction
-|       NUMBER?     'r-most-executed-action'                                   #rMostExAction
-|       NUMBER?     'r-action-of-type'                         ACTION_TYPE     #rActionOfType
-|       NUMBER?     'r-unexecuted-action-of-type'              ACTION_TYPE     #rUnexActionOfType
-|       NUMBER?     'r-action-not-of-type'                     ACTION_TYPE     #rActionNotType
-|       NUMBER?     'r-unexecuted-action-not-of-type'          ACTION_TYPE     #rUnexActionNotType
-|       NUMBER?     'select-submit-action'                                     #sSubmitAction
-|       NUMBER?     'select-sibling-action'                                    #sSiblingAction
-|       NUMBER?     'select-child-action'                                      #sChildAction
-|       NUMBER?     'select-child-or-sibling-action'                           #sChildOrSiblingAction
-|       NUMBER?     'select-sibling-or-child-action'                           #sChildOrSiblingAction
+ACTION_VISITED:     'visited' | 'unvisited' | 'most-visited' | 'least-visited';
+//action_visited:     'visited' | 'unvisited' | 'most-visited' | 'least-visited';
+
+
+//action_visited:     'visited'                   #visited
+//|                   'unvisited'                 #unvisited
+//|                   'most-visited'              #mostVisited
+//|                   'least-visited'             #leastVisited
+//;
+
+/////////////////////////
+// common parser rules //
+/////////////////////////
+
+related_action:     'sibling-action'            #siblingAction
+|                   'child-action'              #childAction
+|                   'sibling-or-child-action'   #childOrSiblingAction
 ;
 
-SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
+sut_type:           'windows'                   #windows
+|                   'linux'                     #linux
+|                   'android'                   #android
+|                   'web'                       #web
+;
 
-ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action' | 'input-action';
+action_type:        'click-action'              #click
+|                   'type-action'               #typing
+|                   'drag-action'               #drag
+|                   'scroll-action'             #scroll
+|                   'hit-key-action'            #hitKey
+|                   'input-action'              #input
+;
+
+/////////////////
+// lexer rules //
+/////////////////
+
+EXIST:              'exist' | 'exists';
+FILTER:             'of-type' | 'not-of-type';
+
+//SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
+//ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action' | 'input-action';
 
 NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';

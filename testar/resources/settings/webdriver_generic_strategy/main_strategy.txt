@@ -1,6 +1,11 @@
 IF
-    total-n-unexecuted-actions < 3
+    any-actions unvisited of-type input-action
 THEN
-    previous-action
+    select-random unvisited of-type input-action
 ELSE
-    r-least-executed-action
+    IF
+       any-actions unvisited of-type scroll-action
+    THEN
+        select-random unvisited of-type scroll-action
+    ELSE
+        select-random of-type submit-action

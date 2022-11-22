@@ -3,7 +3,7 @@ package strategynodes.statebools;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.basenodes.BaseBooleanNode;
-import strategynodes.terminals.ActionType;
+import parsing.treenodes.ActionType;
 
 import java.util.Map;
 import java.util.Set;

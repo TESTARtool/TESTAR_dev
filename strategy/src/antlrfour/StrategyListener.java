@@ -28,18 +28,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code greaterThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code greaterThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code baseBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -64,42 +52,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitNotExpr(StrategyParser.NotExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code lessThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterLessThanExpr(StrategyParser.LessThanExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code lessThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitLessThanExpr(StrategyParser.LessThanExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code greaterEqualThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code greaterEqualThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code notEqualExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterNotEqualExpr(StrategyParser.NotEqualExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code notEqualExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitNotEqualExpr(StrategyParser.NotEqualExprContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code stateBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -112,65 +64,29 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStateBool(StrategyParser.StateBoolContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code orExpr}
+	 * Enter a parse tree produced by the {@code boolOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterOrExpr(StrategyParser.OrExprContext ctx);
+	void enterBoolOprExpr(StrategyParser.BoolOprExprContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code orExpr}
+	 * Exit a parse tree produced by the {@code boolOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitOrExpr(StrategyParser.OrExprContext ctx);
+	void exitBoolOprExpr(StrategyParser.BoolOprExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code lessEqualThanExpr}
+	 * Enter a parse tree produced by the {@code numberOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx);
+	void enterNumberOprExpr(StrategyParser.NumberOprExprContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code lessEqualThanExpr}
+	 * Exit a parse tree produced by the {@code numberOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code xorExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterXorExpr(StrategyParser.XorExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code xorExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitXorExpr(StrategyParser.XorExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code andExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAndExpr(StrategyParser.AndExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code andExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAndExpr(StrategyParser.AndExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterEqualExpr(StrategyParser.EqualExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitEqualExpr(StrategyParser.EqualExprContext ctx);
+	void exitNumberOprExpr(StrategyParser.NumberOprExprContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link StrategyParser#number_expr}.
 	 * @param ctx the parse tree
@@ -182,39 +98,15 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitNumber_expr(StrategyParser.Number_exprContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link StrategyParser#action_expr}.
+	 * Enter a parse tree produced by {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 */
-	void enterAction_expr(StrategyParser.Action_exprContext ctx);
+	void enterNumber_of_actions(StrategyParser.Number_of_actionsContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link StrategyParser#action_expr}.
+	 * Exit a parse tree produced by {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 */
-	void exitAction_expr(StrategyParser.Action_exprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code availableActionsOftype}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void enterAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code availableActionsOftype}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void exitAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void enterSutType(StrategyParser.SutTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void exitSutType(StrategyParser.SutTypeContext ctx);
+	void exitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code stateChanged}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -228,267 +120,255 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code siblingActionExists}
+	 * Enter a parse tree produced by the {@code anyActionsExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	void enterAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code siblingActionExists}
+	 * Exit a parse tree produced by the {@code anyActionsExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	void exitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code childActionExists}
+	 * Enter a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	void enterSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code childActionExists}
+	 * Exit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	void exitSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code childOrSiblingActionExists}
+	 * Enter a parse tree produced by the {@code relatedActionExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	void enterRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code childOrSiblingActionExists}
+	 * Exit a parse tree produced by the {@code relatedActionExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	void exitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code tnActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Enter a parse tree produced by the {@code subStrategy}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterTnActions(StrategyParser.TnActionsContext ctx);
+	void enterSubStrategy(StrategyParser.SubStrategyContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code tnActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Exit a parse tree produced by the {@code subStrategy}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitTnActions(StrategyParser.TnActionsContext ctx);
+	void exitSubStrategy(StrategyParser.SubStrategyContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code tnUnexActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Enter a parse tree produced by the {@code actionList}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
+	void enterActionList(StrategyParser.ActionListContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code tnUnexActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Exit a parse tree produced by the {@code actionList}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
+	void exitActionList(StrategyParser.ActionListContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code tnExActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void enterTnExActions(StrategyParser.TnExActionsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code tnExActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void exitTnExActions(StrategyParser.TnExActionsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code nActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void enterNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code nActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void exitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code nExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void enterNExecActions(StrategyParser.NExecActionsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code nExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void exitNExecActions(StrategyParser.NExecActionsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code nUnexActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void enterNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code nUnexActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 */
-	void exitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code rAction}
+	 * Enter a parse tree produced by the {@code selectPreviousAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void enterRAction(StrategyParser.RActionContext ctx);
+	void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rAction}
+	 * Exit a parse tree produced by the {@code selectPreviousAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void exitRAction(StrategyParser.RActionContext ctx);
+	void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code prevAction}
+	 * Enter a parse tree produced by the {@code selectRandomAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void enterPrevAction(StrategyParser.PrevActionContext ctx);
+	void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code prevAction}
+	 * Exit a parse tree produced by the {@code selectRandomAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void exitPrevAction(StrategyParser.PrevActionContext ctx);
+	void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rUnexAction}
+	 * Enter a parse tree produced by the {@code selectRelatedAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void enterRUnexAction(StrategyParser.RUnexActionContext ctx);
+	void enterSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rUnexAction}
+	 * Exit a parse tree produced by the {@code selectRelatedAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void exitRUnexAction(StrategyParser.RUnexActionContext ctx);
+	void exitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rLeastExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code siblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void enterRLeastExAction(StrategyParser.RLeastExActionContext ctx);
+	void enterSiblingAction(StrategyParser.SiblingActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rLeastExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code siblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void exitRLeastExAction(StrategyParser.RLeastExActionContext ctx);
+	void exitSiblingAction(StrategyParser.SiblingActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rMostExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code childAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void enterRMostExAction(StrategyParser.RMostExActionContext ctx);
+	void enterChildAction(StrategyParser.ChildActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rMostExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code childAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void exitRMostExAction(StrategyParser.RMostExActionContext ctx);
+	void exitChildAction(StrategyParser.ChildActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code childOrSiblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void enterRActionOfType(StrategyParser.RActionOfTypeContext ctx);
+	void enterChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code childOrSiblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 */
-	void exitRActionOfType(StrategyParser.RActionOfTypeContext ctx);
+	void exitChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rUnexActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code windows}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx);
+	void enterWindows(StrategyParser.WindowsContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rUnexActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code windows}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx);
+	void exitWindows(StrategyParser.WindowsContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code linux}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterRActionNotType(StrategyParser.RActionNotTypeContext ctx);
+	void enterLinux(StrategyParser.LinuxContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code linux}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitRActionNotType(StrategyParser.RActionNotTypeContext ctx);
+	void exitLinux(StrategyParser.LinuxContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code rUnexActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code android}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx);
+	void enterAndroid(StrategyParser.AndroidContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code rUnexActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code android}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx);
+	void exitAndroid(StrategyParser.AndroidContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code sSubmitAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code web}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterSSubmitAction(StrategyParser.SSubmitActionContext ctx);
+	void enterWeb(StrategyParser.WebContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code sSubmitAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code web}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitSSubmitAction(StrategyParser.SSubmitActionContext ctx);
+	void exitWeb(StrategyParser.WebContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code sSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code click}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterSSiblingAction(StrategyParser.SSiblingActionContext ctx);
+	void enterClick(StrategyParser.ClickContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code sSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code click}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitSSiblingAction(StrategyParser.SSiblingActionContext ctx);
+	void exitClick(StrategyParser.ClickContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code sChildAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code typing}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterSChildAction(StrategyParser.SChildActionContext ctx);
+	void enterTyping(StrategyParser.TypingContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code sChildAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code typing}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitSChildAction(StrategyParser.SChildActionContext ctx);
+	void exitTyping(StrategyParser.TypingContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code sChildOrSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code drag}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void enterSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx);
+	void enterDrag(StrategyParser.DragContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code sChildOrSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code drag}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 */
-	void exitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx);
+	void exitDrag(StrategyParser.DragContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code scroll}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterScroll(StrategyParser.ScrollContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code scroll}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitScroll(StrategyParser.ScrollContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code hitKey}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterHitKey(StrategyParser.HitKeyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code hitKey}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitHitKey(StrategyParser.HitKeyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code input}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterInput(StrategyParser.InputContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code input}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitInput(StrategyParser.InputContext ctx);
 }

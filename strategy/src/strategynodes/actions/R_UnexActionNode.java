@@ -3,17 +3,16 @@ package strategynodes.actions;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.basenodes.BaseActionNode;
+import parsing.treenodes.BaseAction_Node;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class R_UnexActionNode extends BaseActionNode
+public class R_UnexActionNode extends BaseAction_Node
 {
     public R_UnexActionNode(int weight, String name)
     {
-        this.name = name;
         this.WEIGHT = weight;
     }
     
@@ -38,5 +37,11 @@ public class R_UnexActionNode extends BaseActionNode
             return new ArrayList<>(actions).get(0);
         else
             return selectRandomAction(filteredActions);
+    }
+    
+    @Override
+    public String toString()
+    {
+        return null;
     }
 }

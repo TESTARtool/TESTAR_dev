@@ -3,16 +3,15 @@ package strategynodes.actions;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import strategynodes.basenodes.BaseActionNode;
+import parsing.treenodes.BaseAction_Node;
 
 import java.util.Map;
 import java.util.Set;
 
-public class S_SubmitAction extends BaseActionNode
+public class S_SubmitAction extends BaseAction_Node
 {
     public S_SubmitAction(int weight, String name)
     {
-        this.name = name;
         this.WEIGHT = weight;
     }
     
@@ -29,6 +28,12 @@ public class S_SubmitAction extends BaseActionNode
                 return action;
         }
         return selectRandomAction(actions); // if there is no submit action, pick randomly
+    }
+    
+    @Override
+    public String toString()
+    {
+        return null;
     }
 }
 //    private static Boolean isSubmitButton(Widget submit_widget){

@@ -8,21 +8,22 @@ import strategynodes.basenodes.BaseIntegerNode;
 import java.util.Map;
 import java.util.Set;
 
-public class Total_N_UnexActionsNode extends BaseIntegerNode
+public class Total_N_VisitedActionsNode extends BaseIntegerNode
 {
     private String name;
     
-    public Total_N_UnexActionsNode(String name)
+    public Total_N_VisitedActionsNode(String name)
     {
         this.name = name;
     }
+    
     @Override
     public Integer GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
         int count = 0;
         for(Action action : actions)
         {
-            if(!actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
+            if(actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)))
                 count++;
         }
         return count;

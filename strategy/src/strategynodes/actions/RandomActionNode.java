@@ -2,16 +2,15 @@ package strategynodes.actions;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.basenodes.BaseActionNode;
+import parsing.treenodes.BaseAction_Node;
 
 import java.util.Map;
 import java.util.Set;
 
-public class RandomActionNode extends BaseActionNode
+public class RandomActionNode extends BaseAction_Node
 {
-    public RandomActionNode(int weight, String name)
+    public RandomActionNode(int weight)
     {
-        this.name = name;
         this.WEIGHT = weight;
     }
     @Override
@@ -21,5 +20,11 @@ public class RandomActionNode extends BaseActionNode
 //        Random rnd       = new Random(graphTime);
 //        return new ArrayList<>(actions).get(rnd.nextInt(actions.size())); //return a random action
         return selectRandomAction(actions);
+    }
+    
+    @Override
+    public String toString()
+    {
+        return null;
     }
 }

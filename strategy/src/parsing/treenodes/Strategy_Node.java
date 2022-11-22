@@ -1,4 +1,4 @@
-package strategynodes;
+package parsing.treenodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -8,13 +8,13 @@ import strategynodes.basenodes.BaseStrategyNode;
 import java.util.Map;
 import java.util.Set;
 
-public class StrategyNode extends BaseStrategyNode<Action>
+public class Strategy_Node extends BaseStrategyNode<Action>
 {
     private BaseBooleanNode  ifChild;
     private BaseStrategyNode thenChild; //StrategyNode or ActionListNode
     private BaseStrategyNode elseChild; //StrategyNode or ActionListNode
     
-    public StrategyNode(BaseBooleanNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
+    public Strategy_Node(BaseBooleanNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
     {
         this.ifChild = ifChild;
         this.thenChild = thenChild;

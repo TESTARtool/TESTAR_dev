@@ -1,17 +1,16 @@
-package strategynodes;
+package parsing.treenodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.basenodes.BaseActionNode;
 import strategynodes.basenodes.BaseStrategyNode;
 
 import java.util.*;
 
-public class ActionListNode extends BaseStrategyNode<Action>
+public class ActionList_Node extends BaseStrategyNode<Action>
 {
-    private List<BaseActionNode> actionStrategies = new ArrayList<BaseActionNode>();
+    private List<BaseAction_Node> actionStrategies = new ArrayList<BaseAction_Node>();
     
-    public ActionListNode(List<BaseActionNode> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
+    public ActionList_Node(List<BaseAction_Node> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
     
     @Override
     public Action GetResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
@@ -21,11 +20,11 @@ public class ActionListNode extends BaseStrategyNode<Action>
         else
         {
             int totalWeights = 0;
-            for(BaseActionNode action : this.actionStrategies)
+            for(BaseAction_Node action : this.actionStrategies)
                 totalWeights += action.GetWeight();
             Random r = new Random();
             int t = totalWeights;
-            for(BaseActionNode actionStrategy : this.actionStrategies)
+            for(BaseAction_Node actionStrategy : this.actionStrategies)
             {
                 int i = r.nextInt(totalWeights);
                 if(i >= actionStrategy.GetWeight())
@@ -41,7 +40,7 @@ public class ActionListNode extends BaseStrategyNode<Action>
     public String toString()
     {
         StringJoiner actionJoiner = new StringJoiner(" ");
-        for(BaseActionNode actionStrategy : this.actionStrategies)
+        for(BaseAction_Node actionStrategy : this.actionStrategies)
             actionJoiner.add(actionStrategy.toString());
         return actionJoiner.toString();
     }

@@ -182,7 +182,8 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive)); //clone the action
+        //clone the action
+        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive));
         
         Widget selectedWidget = selectedAction.get(Tags.OriginWidget, null);
         

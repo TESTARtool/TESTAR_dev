@@ -23,13 +23,6 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code greaterThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGreaterThanExpr(StrategyParser.GreaterThanExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code baseBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -44,27 +37,6 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNotExpr(StrategyParser.NotExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code lessThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLessThanExpr(StrategyParser.LessThanExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code greaterEqualThanExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGreaterEqualThanExpr(StrategyParser.GreaterEqualThanExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code notEqualExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNotEqualExpr(StrategyParser.NotEqualExprContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code stateBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -72,40 +44,19 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStateBool(StrategyParser.StateBoolContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code orExpr}
+	 * Visit a parse tree produced by the {@code boolOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOrExpr(StrategyParser.OrExprContext ctx);
+	T visitBoolOprExpr(StrategyParser.BoolOprExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code lessEqualThanExpr}
+	 * Visit a parse tree produced by the {@code numberOprExpr}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLessEqualThanExpr(StrategyParser.LessEqualThanExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code xorExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitXorExpr(StrategyParser.XorExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code andExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpr(StrategyParser.AndExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code equalExpr}
-	 * labeled alternative in {@link StrategyParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualExpr(StrategyParser.EqualExprContext ctx);
+	T visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link StrategyParser#number_expr}.
 	 * @param ctx the parse tree
@@ -113,25 +64,11 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNumber_expr(StrategyParser.Number_exprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link StrategyParser#action_expr}.
+	 * Visit a parse tree produced by {@link StrategyParser#number_of_actions}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAction_expr(StrategyParser.Action_exprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code availableActionsOftype}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAvailableActionsOftype(StrategyParser.AvailableActionsOftypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSutType(StrategyParser.SutTypeContext ctx);
+	T visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code stateChanged}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -140,157 +77,150 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code siblingActionExists}
+	 * Visit a parse tree produced by the {@code anyActionsExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSiblingActionExists(StrategyParser.SiblingActionExistsContext ctx);
+	T visitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code childActionExists}
+	 * Visit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitChildActionExists(StrategyParser.ChildActionExistsContext ctx);
+	T visitSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code childOrSiblingActionExists}
+	 * Visit a parse tree produced by the {@code relatedActionExists}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitChildOrSiblingActionExists(StrategyParser.ChildOrSiblingActionExistsContext ctx);
+	T visitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code tnActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Visit a parse tree produced by the {@code subStrategy}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTnActions(StrategyParser.TnActionsContext ctx);
+	T visitSubStrategy(StrategyParser.SubStrategyContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code tnUnexActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
+	 * Visit a parse tree produced by the {@code actionList}
+	 * labeled alternative in {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTnUnexActions(StrategyParser.TnUnexActionsContext ctx);
+	T visitActionList(StrategyParser.ActionListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code tnExActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTnExActions(StrategyParser.TnExActionsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code nActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNActionsOfType(StrategyParser.NActionsOfTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code nExecActions}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNExecActions(StrategyParser.NExecActionsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code nUnexActionsOfType}
-	 * labeled alternative in {@link StrategyParser#number_of_actions}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNUnexActionsOfType(StrategyParser.NUnexActionsOfTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code rAction}
+	 * Visit a parse tree produced by the {@code selectPreviousAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRAction(StrategyParser.RActionContext ctx);
+	T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code prevAction}
+	 * Visit a parse tree produced by the {@code selectRandomAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPrevAction(StrategyParser.PrevActionContext ctx);
+	T visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rUnexAction}
+	 * Visit a parse tree produced by the {@code selectRelatedAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRUnexAction(StrategyParser.RUnexActionContext ctx);
+	T visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rLeastExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code siblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRLeastExAction(StrategyParser.RLeastExActionContext ctx);
+	T visitSiblingAction(StrategyParser.SiblingActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rMostExAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code childAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRMostExAction(StrategyParser.RMostExActionContext ctx);
+	T visitChildAction(StrategyParser.ChildActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code childOrSiblingAction}
+	 * labeled alternative in {@link StrategyParser#related_action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRActionOfType(StrategyParser.RActionOfTypeContext ctx);
+	T visitChildOrSiblingAction(StrategyParser.ChildOrSiblingActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rUnexActionOfType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code windows}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRUnexActionOfType(StrategyParser.RUnexActionOfTypeContext ctx);
+	T visitWindows(StrategyParser.WindowsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code linux}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRActionNotType(StrategyParser.RActionNotTypeContext ctx);
+	T visitLinux(StrategyParser.LinuxContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code rUnexActionNotType}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code android}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRUnexActionNotType(StrategyParser.RUnexActionNotTypeContext ctx);
+	T visitAndroid(StrategyParser.AndroidContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code sSubmitAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code web}
+	 * labeled alternative in {@link StrategyParser#sut_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSSubmitAction(StrategyParser.SSubmitActionContext ctx);
+	T visitWeb(StrategyParser.WebContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code sSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code click}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSSiblingAction(StrategyParser.SSiblingActionContext ctx);
+	T visitClick(StrategyParser.ClickContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code sChildAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code typing}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSChildAction(StrategyParser.SChildActionContext ctx);
+	T visitTyping(StrategyParser.TypingContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code sChildOrSiblingAction}
-	 * labeled alternative in {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code drag}
+	 * labeled alternative in {@link StrategyParser#action_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSChildOrSiblingAction(StrategyParser.SChildOrSiblingActionContext ctx);
+	T visitDrag(StrategyParser.DragContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code scroll}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitScroll(StrategyParser.ScrollContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code hitKey}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHitKey(StrategyParser.HitKeyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code input}
+	 * labeled alternative in {@link StrategyParser#action_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInput(StrategyParser.InputContext ctx);
 }

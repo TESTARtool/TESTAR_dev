@@ -214,7 +214,7 @@ public class CodingManager {
 					action -> {
 						updateRoleCounter(action, roleCounter);
 						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
+							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter) + action.get(Tags.Role)));
 				}
 		);
 	}
