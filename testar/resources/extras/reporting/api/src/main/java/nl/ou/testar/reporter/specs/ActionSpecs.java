@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class ActionSpecs {
-    public static Specification<ActionEntity> forIteration(long iterationId) {
+    public static Specification<ActionEntity> forIteration(Integer iterationId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ActionEntity_.iteration)
                 .get(IterationEntity_.id), iterationId));
     }
-    public static Specification<ActionEntity> forIterations(Collection<Long> iterationIds) {
+    public static Specification<ActionEntity> forIterations(Collection<Integer> iterationIds) {
         return ((root, query, criteriaBuilder) -> root.get(ActionEntity_.iteration).in(iterationIds));
     }
-    public static Specification<ActionEntity> forState(long stateId) {
+    public static Specification<ActionEntity> forState(Integer stateId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ActionEntity_.sequenceItem)
         .get(SequenceItemEntity_.id), stateId));
     }
-    public static Specification<ActionEntity> forStates(Collection<Long> stateIds) {
+    public static Specification<ActionEntity> forStates(Collection<Integer> stateIds) {
         return ((root, query, criteriaBuilder) -> root.get(ActionEntity_.sequenceItem).get(SequenceItemEntity_.id)
             .in(stateIds));
     }
@@ -52,6 +52,9 @@ public class ActionSpecs {
     }
     public static Specification<ActionEntity> selected(boolean selected) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ActionEntity_.selected), selected));
+    }
+    public static Specification<ActionEntity> visited(boolean visited) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ActionEntity_.visited), visited));
     }
     public static  Specification<ActionEntity> startedAt(LocalDateTime time) {
         return((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(ActionEntity_.startTime), Timestamp.valueOf(time)));

@@ -74,8 +74,8 @@ public class ReportEntity extends BaseEntity {
         super();
     }
 
-    public ReportEntity(Long id, String tag, Timestamp time, String url, int actionsPerSequence,
-                        int totalSequences, List<IterationEntity> iterations) {
+    public ReportEntity(Integer id, String tag, Timestamp time, String url, Integer actionsPerSequence,
+                        Integer totalSequences, List<IterationEntity> iterations) {
         super(id);
         this.tag = tag;
         this.time = time;

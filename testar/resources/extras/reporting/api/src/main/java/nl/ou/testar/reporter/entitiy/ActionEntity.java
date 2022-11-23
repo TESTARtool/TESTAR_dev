@@ -13,6 +13,7 @@ public class ActionEntity extends BaseEntity {
     private String status;
     private String screenshot;
     private boolean selected;
+    private boolean visited;
 
     @Column(name = "start_time")
     private Timestamp startTime;
@@ -20,13 +21,17 @@ public class ActionEntity extends BaseEntity {
     @Column(name = "widget_path")
     private String widgetPath;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iteration_id")
     private IterationEntity iteration;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sequence_item_id")
     private SequenceItemEntity sequenceItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_sequence_item_id")
+    private SequenceItemEntity targetSequenceItem;
 
     public String getName() {
         return name;
@@ -68,6 +73,14 @@ public class ActionEntity extends BaseEntity {
         this.selected = selected;
     }
 
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
+
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -100,11 +113,19 @@ public class ActionEntity extends BaseEntity {
         this.sequenceItem = sequenceItem;
     }
 
+    public SequenceItemEntity getTargetSequenceItem() {
+        return targetSequenceItem;
+    }
+
+    public void setTargetSequenceItem(SequenceItemEntity targetSequenceItem) {
+        this.targetSequenceItem = targetSequenceItem;
+    }
+
     public ActionEntity() {
         super();
     };
 
-    public ActionEntity(Long id, String name, String description, String status, String screenshot,
+    public ActionEntity(Integer id, String name, String description, String status, String screenshot,
                         boolean selected, Timestamp startTime, String widgetPath, IterationEntity iteration,
                         SequenceItemEntity sequenceItem) {
         super(id);

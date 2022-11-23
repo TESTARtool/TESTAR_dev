@@ -10,16 +10,18 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class Action extends RepresentationModel<Action> {
-    private Long id;
+    private Integer id;
 
     private String name;
     private String description;
     private String status;
     private String screenshot;
-    private boolean selected;
+    private Boolean selected;
+    private Boolean visited;
     private LocalDateTime startTime;
     private String widgetPath;
 
-    private Long iterationId;
-    private Long sequenceItemId;
+    private Integer iterationId;
+    private Integer sequenceItemId;
+	private Integer targetSequenceItemId;
 }

@@ -8,20 +8,20 @@ import javax.persistence.MappedSuperclass;
 public class BaseEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    private Integer id;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     public BaseEntity() {
     }
 
-    public BaseEntity(Long id) {
+    public BaseEntity(Integer id) {
         this.id = id;
     }
 }

@@ -12,15 +12,15 @@ import java.util.List;
 @Data
 @Builder
 public class Report extends RepresentationModel<Report> {
-    private Long id;
+    private Integer id;
 
     private String tag;
     private LocalDateTime time;
     private String url;
-    private int actionsPerSequence;
-    private int totalSequences;
+    private Integer actionsPerSequence;
+    private Integer totalSequences;
 
     // One of next values should be defined
-    private List<Long> iterationIds;
+    private List<Integer> iterationIds;
     private List<Iteration> iterations;
 }

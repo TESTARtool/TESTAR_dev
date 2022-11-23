@@ -10,21 +10,21 @@ import java.util.List;
 @Data
 @Builder
 public class Iteration extends RepresentationModel<Iteration> {
-    private long id;
+    private Integer id;
     private String info;
-    private int severity;
+    private Double severity;
 
-    private long reportId;
+    private Integer reportId;
 
     // One of next values should be defined
-    private List<Long> actionIds;
+    private List<Integer> actionIds;
     private List<Action> actions;
 
     // One of next values should be defined
-    private Long lastExecutedActionId;
+    private Integer lastExecutedActionId;
     private Action lastExecutedAction;
 
     // One of next values should be defined
-    private Long lastStateId;
+    private Integer lastStateId;
     private SequenceItem lastState;
 }

@@ -16,10 +16,12 @@ public class ActionAssembler implements RepresentationModelAssembler<ActionEntit
                 .status(entity.getStatus())
                 .screenshot(entity.getScreenshot())
                 .selected(entity.isSelected())
-                .startTime(entity.getStartTime().toLocalDateTime())
+                .visited(entity.isVisited())
+			    .startTime(entity.getStartTime() == null ? null : entity.getStartTime().toLocalDateTime())
                 .widgetPath(entity.getWidgetPath())
-                .iterationId(entity.getIteration().getId())
-                .sequenceItemId(entity.getSequenceItem().getId())
+			    .iterationId(entity.getIteration() == null ? null : entity.getIteration().getId())
+			    .sequenceItemId(entity.getSequenceItem() == null ? null : entity.getSequenceItem().getId())
+			    .targetSequenceItemId(entity.getTargetSequenceItem() == null ? null : entity.getTargetSequenceItem().getId())
                 .build();
     }
 }

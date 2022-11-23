@@ -9,11 +9,11 @@ import java.util.Collection;
 
 public class BasicSpecs {
 
-    public static <T extends BaseEntity> Specification<T> byId(long id/*, Class<T> clazz*/) {
+    public static <T extends BaseEntity> Specification<T> byId(Integer id/*, Class<T> clazz*/) {
         return ((root, query, cb) -> cb.equal(root.get(BaseEntity_.id), id));
     }
 
-    public static <T extends BaseEntity> Specification<T> byIds(Collection<Long> ids/*, Class<T> clazz*/) {
+    public static <T extends BaseEntity> Specification<T> byIds(Collection<Integer> ids/*, Class<T> clazz*/) {
         return ((root, query, cb) -> root.get(BaseEntity_.id).in(ids));
     }
 

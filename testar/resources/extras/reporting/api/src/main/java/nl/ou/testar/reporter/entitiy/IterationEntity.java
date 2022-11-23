@@ -9,17 +9,17 @@ import java.util.List;
 public class IterationEntity extends BaseEntity {
 
     private String info;
-    private int severity;
+    private Double severity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id")
     private ReportEntity report;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_executed_action_id")
     private ActionEntity lastExecutedAction;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_state_id")
     private SequenceItemEntity lastState;
 
@@ -34,11 +34,11 @@ public class IterationEntity extends BaseEntity {
         this.info = info;
     }
 
-    public int getSeverity() {
+    public Double getSeverity() {
         return severity;
     }
 
-    public void setSeverity(int severity) {
+    public void setSeverity(Double severity) {
         this.severity = severity;
     }
 
@@ -78,7 +78,7 @@ public class IterationEntity extends BaseEntity {
         super();
     }
 
-    public IterationEntity(Long id, String info, int severity, ReportEntity report,
+    public IterationEntity(Integer id, String info, Double severity, ReportEntity report,
                            ActionEntity lastExecutedAction, SequenceItemEntity lastState,
                            List<ActionEntity> actions) {
         super(id);

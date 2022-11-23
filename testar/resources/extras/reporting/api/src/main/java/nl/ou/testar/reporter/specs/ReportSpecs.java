@@ -75,7 +75,7 @@ public class ReportSpecs {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.le(root.get(ReportEntity_.totalSequences),
                 totalSequences));
     }
-    public static Specification<ReportEntity> containingIteration(long iterationId) {
+    public static Specification<ReportEntity> containingIteration(Integer iterationId) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<ReportEntity, IterationEntity> join = root.join(ReportEntity_.iterations);
             query.distinct(true);
@@ -83,7 +83,7 @@ public class ReportSpecs {
             return criteriaBuilder.equal(join.get(IterationEntity_.id), iterationId);
         });
     }
-    public static Specification<ReportEntity> containingIterations(Collection<Long> iterationIds) {
+    public static Specification<ReportEntity> containingIterations(Collection<Integer> iterationIds) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<ReportEntity, IterationEntity> join = root.join(ReportEntity_.iterations);
             query.distinct(true);
@@ -91,7 +91,7 @@ public class ReportSpecs {
             return join.get(IterationEntity_.id).in(iterationIds);
         });
     }
-    public static Specification<ReportEntity> containingAction(long actionId) {
+    public static Specification<ReportEntity> containingAction(Integer actionId) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<IterationEntity, ActionEntity> join = root.join(ReportEntity_.iterations).join(IterationEntity_.actions);
             query.distinct(true);
@@ -99,7 +99,7 @@ public class ReportSpecs {
             return criteriaBuilder.equal(join.get(ActionEntity_.id), actionId);
         });
     }
-    public static Specification<ReportEntity> containingActions(Collection<Long> actionIds) {
+    public static Specification<ReportEntity> containingActions(Collection<Integer> actionIds) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<IterationEntity, ActionEntity> join = root.join(ReportEntity_.iterations).join(IterationEntity_.actions);
             query.distinct(true);

@@ -1,6 +1,8 @@
 package nl.ou.testar.reporter.service;
 
 import nl.ou.testar.reporter.entitiy.ReportEntity;
+import nl.ou.testar.reporter.exceptions.SaveEntityException;
+import nl.ou.testar.reporter.model.PostEntityResponse;
 import nl.ou.testar.reporter.model.Report;
 import nl.ou.testar.reporter.model.assembler.AssemblingFlags;
 import nl.ou.testar.reporter.model.assembler.ReportAssembler;
@@ -15,8 +17,11 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class ReportService {
@@ -36,8 +41,73 @@ public class ReportService {
 //        this.resourceAssembler = resourceAssembler;
 //    }
 
+    public PostEntityResponse createReport(
+            String tag,
+            Timestamp time,
+            Integer actionsPerSequence,
+            Integer totalSequences,
+            String url) throws SaveEntityException {
+        if (reportRepo.findByTag(tag).size() > 0) {
+            throw new SaveEntityException(String.format("A report with tag \"%s\" already exists", tag));
+        }
+        ReportEntity reportEntity = new ReportEntity();
+
+        Integer reportId = storeReportEntity(reportEntity, tag, time, actionsPerSequence, totalSequences, url).getId();
+        return PostEntityResponse.builder().id(reportId).build();
+    }
+
+    public void updateReport(
+            Integer reportId,
+            String tag,
+            Timestamp time,
+            Integer actionsPerSequence,
+            Integer totalSequences,
+            String url) throws SaveEntityException {
+
+        Optional<ReportEntity> report = reportRepo.findById(reportId);
+        if (report.isEmpty()) {
+            throw new SaveEntityException(String.format("Cannot find report with ID %d", reportId));
+        }
+        storeReportEntity(report.get(), tag, time, actionsPerSequence, totalSequences, url);
+    }
+
+    public void deleteReport(Integer reportId) throws SaveEntityException {
+        Optional<ReportEntity> report = reportRepo.findById(reportId);
+        if (report.isEmpty()) {
+            throw new SaveEntityException(String.format("Cannot find report with ID %d", reportId));
+        }
+        reportRepo.delete(report.get());
+    }
+
+    private ReportEntity storeReportEntity(
+            ReportEntity reportEntity,
+            String tag,
+            Timestamp time,
+            Integer actionsPerSequence,
+            Integer totalSequences,
+            String url) throws SaveEntityException {
+
+        if (tag != null) {
+            reportEntity.setTag(tag);
+        }
+        if (time != null) {
+            reportEntity.setTime(Timestamp.from(Instant.now()));
+        }
+        if (actionsPerSequence != null) {
+            reportEntity.setActionsPerSequence(actionsPerSequence);
+        }
+        if (totalSequences != null) {
+            reportEntity.setTotalSequences(totalSequences);
+        }
+        if (url != null) {
+            reportEntity.setUrl(url);
+        }
+
+        return reportRepo.save(reportEntity);
+    }
+
     public PagedModel<Report> getAllReports(
-            Collection<Long> ids,
+            Collection<Integer> ids,
             String tag,
             String tagLike,
             LocalDateTime reportedAt,
@@ -55,8 +125,8 @@ public class ReportService {
             Integer totalSequencesGreaterThanOrEqual,
             Integer totalSequencesLessThan,
             Integer totalSequencesLessThanOrEqual,
-            Collection<Long> iterationIds,
-            Collection<Long> actionIds,
+            Collection<Integer> iterationIds,
+            Collection<Integer> actionIds,
             Integer pageNo, Integer pageSize,
             boolean expandIterations, boolean expandActions,
             boolean expandLastExecutedAction, boolean expandLastState,

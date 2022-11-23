@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class SequenceItem extends RepresentationModel<SequenceItem> {
-    private Long id;
+    private Integer id;
 
     private String concreteId;
     private String abstractId;
@@ -18,6 +18,6 @@ public class SequenceItem extends RepresentationModel<SequenceItem> {
     private String abstractRTPId;
 
     // One of next values should be defined
-    private List<Long> actionIds;
+    private List<Integer> actionIds;
     private List<Action> actions;
 }

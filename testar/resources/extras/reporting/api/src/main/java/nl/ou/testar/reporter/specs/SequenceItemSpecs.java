@@ -11,6 +11,13 @@ import javax.persistence.criteria.ListJoin;
 import java.util.Collection;
 
 public class SequenceItemSpecs {
+    public static Specification byConcreteId(String concreteId) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(SequenceItemEntity_.concreteId),
+                concreteId));
+    }
+    public static Specification byConcreteIds(Collection<String> concreteIds) {
+        return((root, query, criteriaBuilder) -> root.get(SequenceItemEntity_.concreteId).in(concreteIds));
+    }
     public static Specification byAbstractId(String abstractId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(SequenceItemEntity_.abstractId),
                 abstractId));
@@ -39,7 +46,7 @@ public class SequenceItemSpecs {
     public static Specification byAbstractRTPIds(Collection<String> abstractRTPIds) {
         return((root, query, criteriaBuilder) -> root.get(SequenceItemEntity_.abstractRTPId).in(abstractRTPIds));
     }
-    public static Specification byAction(long actionId) {
+    public static Specification byAction(Integer actionId) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<SequenceItemEntity, ActionEntity> join = root.join(SequenceItemEntity_.actions, JoinType.INNER);
             query.distinct(true);
@@ -47,7 +54,7 @@ public class SequenceItemSpecs {
             return criteriaBuilder.equal(join.get(ActionEntity_.id), actionId);
         });
     }
-    public static Specification byActions(Collection<Long> actionIds) {
+    public static Specification byActions(Collection<Integer> actionIds) {
         return((root, query, criteriaBuilder) -> {
             ListJoin<SequenceItemEntity, ActionEntity> join = root.join(SequenceItemEntity_.actions, JoinType.INNER);
             query.distinct(true);

@@ -8,11 +8,17 @@ import javax.persistence.criteria.ListJoin;
 import java.util.Collection;
 
 public class IterationSpecs {
-    public static Specification<IterationEntity> byReport(long reportId) {
+    public static <T extends BaseEntity> Specification<T> byIdGreaterThan(Integer id) {
+        return ((root, query, cb) -> cb.greaterThan(root.get(BaseEntity_.id), id));
+    }
+    public static <T extends BaseEntity> Specification<T> byIdLessThan(Integer id) {
+        return ((root, query, cb) -> cb.lessThan(root.get(BaseEntity_.id), id));
+    }
+    public static Specification<IterationEntity> byReport(Integer reportId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(IterationEntity_.report)
                 .get(ReportEntity_.id), reportId));
     }
-    public static Specification<IterationEntity> byReports(Collection<Long> reportIds) {
+    public static Specification<IterationEntity> byReports(Collection<Integer> reportIds) {
         return ((root, query, criteriaBuilder) -> root.get(IterationEntity_.report).get(ReportEntity_.id)
                 .in(reportIds));
     }
@@ -37,23 +43,23 @@ public class IterationSpecs {
     public static Specification<IterationEntity> withSeverityGreaterThanOrEqual(int severity) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.ge(root.get(IterationEntity_.severity), severity));
     }
-    public static Specification<IterationEntity> byLastExecutedAction(long actionId) {
+    public static Specification<IterationEntity> byLastExecutedAction(Integer actionId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(IterationEntity_.lastExecutedAction)
             .get(ActionEntity_.id), actionId));
     }
-    public static Specification<IterationEntity> byLastExecutedActions(Collection<Long> actionIds) {
+    public static Specification<IterationEntity> byLastExecutedActions(Collection<Integer> actionIds) {
         return ((root, query, criteriaBuilder) -> root.get(IterationEntity_.lastExecutedAction).get(ActionEntity_.id)
                 .in(actionIds));
     }
-    public static Specification<IterationEntity> byLastState(long lastStateId) {
+    public static Specification<IterationEntity> byLastState(Integer lastStateId) {
         return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(IterationEntity_.lastState)
             .get(SequenceItemEntity_.id), lastStateId));
     }
-    public static Specification<IterationEntity> byLastStates(Collection<Long> lastStateIds) {
+    public static Specification<IterationEntity> byLastStates(Collection<Integer> lastStateIds) {
         return ((root, query, criteriaBuilder) -> root.get(IterationEntity_.lastState).get(SequenceItemEntity_.id)
                 .in(lastStateIds));
     }
-    public static Specification<IterationEntity> containingAction(long actionId) {
+    public static Specification<IterationEntity> containingAction(Integer actionId) {
         return ((root, query, criteriaBuilder) -> {
             ListJoin<IterationEntity, ActionEntity> join = root.join(IterationEntity_.actions, JoinType.INNER);
             query.distinct(true);
@@ -61,7 +67,7 @@ public class IterationSpecs {
             return criteriaBuilder.equal(join.get(ActionEntity_.id), actionId);
         });
     }
-    public static Specification<IterationEntity> containingActions(Collection<Long> actionIds) {
+    public static Specification<IterationEntity> containingActions(Collection<Integer> actionIds) {
         return ((root, query, criteriaBuilder) -> {
             ListJoin<IterationEntity, ActionEntity> join = root.join(IterationEntity_.actions, JoinType.INNER);
             query.distinct(true);

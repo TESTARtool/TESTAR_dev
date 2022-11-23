@@ -28,17 +28,17 @@ public class IterationAssembler implements RepresentationModelAssembler<Iteratio
                 .info(entity.getInfo())
                 .severity(entity.getSeverity())
                 .actionIds(assemblingFlags.isExpandActions() ? null :
-                        entity.getActions().stream().map(ActionEntity::getId).collect(Collectors.toList()))
+                           entity.getActions().stream().map(ActionEntity::getId).collect(Collectors.toList()))
                 .actions(assemblingFlags.isExpandActions() ?
                         entity.getActions().stream().map(actionEntity -> actionAssembler.toModel(actionEntity))
                                 .collect(Collectors.toList()) :
                         null)
-                .lastExecutedActionId(assemblingFlags.isExpandLastExecutedAction() ? null :
+			.lastExecutedActionId(assemblingFlags.isExpandLastExecutedAction() || entity.getLastExecutedAction() == null ? null :
                         entity.getLastExecutedAction().getId())
-                .lastExecutedAction(assemblingFlags.isExpandLastExecutedAction() ?
+			.lastExecutedAction(assemblingFlags.isExpandLastExecutedAction() && entity.getLastExecutedAction() != null ?
                         actionAssembler.toModel(entity.getLastExecutedAction()) : null)
-                .lastStateId(assemblingFlags.isExpandLastState() ? null : entity.getLastState().getId())
-                .lastState(assemblingFlags.isExpandLastState() ? sequenceItemAssembler.toModel(entity.getLastState(), false) :
+			.lastStateId(assemblingFlags.isExpandLastState() || entity.getLastState() == null ? null : entity.getLastState().getId())
+			.lastState(assemblingFlags.isExpandLastState() && entity.getLastState() != null ? sequenceItemAssembler.toModel(entity.getLastState(), false) :
                         null)
                 .build();
     }

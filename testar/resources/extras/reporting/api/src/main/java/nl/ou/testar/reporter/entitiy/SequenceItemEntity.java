@@ -7,10 +7,6 @@ import java.util.List;
 @Table(name = "sequence_items")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class SequenceItemEntity extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
-
     @Column(name = "concrete_id")
     private String concreteId;
 
@@ -28,14 +24,6 @@ public class SequenceItemEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "sequenceItem")
     private List<ActionEntity> actions;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getConcreteId() {
         return concreteId;
@@ -89,7 +77,7 @@ public class SequenceItemEntity extends BaseEntity {
         super();
     }
 
-    public SequenceItemEntity(Long id, String concreteId, String abstractId, String abstractRId,
+    public SequenceItemEntity(Integer id, String concreteId, String abstractId, String abstractRId,
                               String abstractRTId, String abstractRTPId, List<ActionEntity> actions) {
         super(id);
         this.concreteId = concreteId;
