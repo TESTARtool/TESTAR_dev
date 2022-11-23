@@ -33,6 +33,7 @@ CREATE TABLE `actions` (
     `screenshot` varchar(255),
     `start_time` datetime,
     `selected` boolean,
+    `visited` boolean,
     `sequence_item_id` int,
     `target_sequence_item_id` int,
     `widget_path` varchar (2048),

@@ -11,7 +11,7 @@
 	<groupId>nl.ou.testar</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>reporter</name>
 	<description>Testar Reporting Service</description>
 	<properties>
