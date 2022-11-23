@@ -8,11 +8,17 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
+    hibernate:
+      use-new-id-generator-mappings: false
   jackson:
     default-property-inclusion: non_null
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 #  ldap:
 #    urls: ldap://ldap:1389
 #    embedded:

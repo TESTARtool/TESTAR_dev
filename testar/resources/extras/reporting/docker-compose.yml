@@ -1,44 +1,40 @@
-version: "3.8"
+version: "3"
 services:
-  mysql:
-    image: bitnami/mysql:latest
+  db:
+    image: mysql:latest
     ports:
-      - "3306:13306"
-    volumes:
-      - ./db-init:/docker-entrypoint-initdb.d
-  api:
-    build:
-      context: ./api
-    depends_on:
-      - mysql
-  app:
-    build:
-      context: ./app
-        #    ports:
-        #      - "80:8000"
-        #    volumes:
-        #      - ./webserver:/usr/app
-        #      - /home/anon/Projects/TESTAR_dev/testar/target/install/testar/bin/output:/usr/app/static/output/
+      - 13306:3306
     environment:
-      FLASK_DEBUG: 1
-      FLASK_ENV: development
-      TESTING: 1
-      ADAPTER: MYSQL
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: testar
-      MYSQL_PASSWORD: testar
-      MYSQL_DATABASE: testar
-      MYSQL_WAIT: 2
-      ORIENTDB_ENABLED: "true"
-      ORIENTDB_HOST: orientdb
-      ORIENTDB_USER: "root"
-      ORIENTDB_PASSWORD: "testar"
-      ORIENTDB_DATABASE: "testar"
-      ORIENTDB_PORT: 2424
-    networks:
-      testar_reporting: {}
-networks:
-  testar_reporting:
-    external: true
-    name: testar_reporting
+      MYSQL_ROOT_PASSWORD: 'testar'
+      MYSQL_DATABASE: 'testar'
+      MYSQL_USER: 'testar'
+      MYSQL_PASSWORD: 'testar'
+    command:
+      --lower_case_table_names=2
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+  ldap:
+    image: bitnami/openldap:2
+    ports:
+      - 1389:1389
+      - 1636:1636
+    environment:
+      - LDAP_ROOT=dc=testar,dc=ou,dc=nl
+      - LDAP_USERS=testuser
+      - LDAP_PASSWORDS=$$2a$$12$$wMjxu/Z8NLkUWgSPrJtyfOz.P9kA2e/JbcZ4CZjUeouKe/H7V05ra
+    volumes:
+      - ./openldap_data:/bitnami/openldap
+  api:
+    build: ./api
+    ports:
+      - 8888:8080
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USERNAME: testar
+      DB_PASSWORD: testar
+    links:
+      - db:mysql
+    depends_on:
+      - db
+

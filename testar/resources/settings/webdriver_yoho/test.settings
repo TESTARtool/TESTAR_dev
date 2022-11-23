@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://app.yohoapp.io/app/login"
+SUTConnectorValue = "/home/michaelt/Downloads/chromedriver" "1920x900+0+0" "https://app.yohoapp.io/app/login"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 30
+Sequences = 2
+SequenceLength = 3
 
 #################################################################
 # Oracles based on suspicious titles
@@ -202,8 +202,10 @@ RefreshSpyCanvas = 1.0
 SonarDockerize = true
 SonarProjectName = Demo
 SonarProjectKey = demo
-GitUrl = https://github.com/crystal-lang/crystal
-GitAuthRequired = false
+GitUrl = https://stash.marviq.com/scm/yoho/yoho-fe-app-web.git
+GitAuthRequired = true
+GitUsername = michael.tikhonenko
+GitToken = secret # here should be a password
 
 ApplicationName = yoho
 ApplicationVersion = 1.0
@@ -216,5 +218,6 @@ ForcedLoginUsernameInputName = usernameValue
 ForcedLoginUsername = +48500000002
 ForcedLoginPasswordInputName = passwordValue
 ForcedLoginPassword = yohopin2022
+ReportApiUrl = http://tst.yoho.testar.marviq.net/api
 
 FaultThreshold = 0.1
