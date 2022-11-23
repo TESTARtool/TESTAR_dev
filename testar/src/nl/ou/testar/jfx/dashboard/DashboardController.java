@@ -103,8 +103,6 @@ public class DashboardController extends ViewController {
 		if (!new File(settings.get(ConfigTags.TempDir)).exists()) {
 			throw new IllegalStateException("Temp Directory does not exist!");
 		}
-//
-//        settingPanels.forEach((k,v) -> v.right().checkSettings());
 	}
 
 	@Override
@@ -138,14 +136,5 @@ public class DashboardController extends ViewController {
 		btnViewReports.setOnAction(event -> {
 			startTesting(view, RuntimeControlsProtocol.Modes.View);
 		});
-
-		HBox carouselBox = (HBox) view.lookup("#carouselBox");
-		final String imagePaths[] = { "/logos/ing.png", "/logos/marviq.png", "/logos/open_university.png",
-				"/logos/philips.png", "/logos/sogeti.png" };
-		final Image images[] = Arrays.stream(imagePaths).map(path -> new Image(path)).toArray(Image[]::new);
-		DisplayShelf carouselView = new DisplayShelf(images);
-		carouselBox.getChildren().add(carouselView);
-		carouselView.prefWidthProperty().bind(carouselBox.widthProperty());
-		carouselView.prefHeightProperty().bind(carouselBox.heightProperty());
 	}
 }

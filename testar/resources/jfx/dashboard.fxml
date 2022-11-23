@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" style="-fx-background-color: #4d8acb #4d8acb;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label id="titleLabel" maxWidth="1.7976931348623157E308" prefHeight="64.0" text="Dashboard" textFill="WHITE" VBox.vgrow="NEVER">
          <font>
@@ -95,7 +95,7 @@
                   <Font name="Arial Bold" size="13.0" />
                </font>
             </JFXButton>
-            <JFXButton id="btnUpdate" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Update software">
+            <JFXButton id="btnUpdate" alignment="CENTER" buttonType="RAISED" prefHeight="36.0" prefWidth="160.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 18;" text="Update software">
                <font>
                   <Font name="Arial Bold" size="13.0" />
                </font>
@@ -106,16 +106,10 @@
                </font>
             </JFXButton>
          </children>
+         <padding>
+            <Insets top="24.0" />
+         </padding>
       </HBox>
-      <HBox alignment="CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0" VBox.vgrow="ALWAYS">
-         <children>
-            <Label text="Our partners" textFill="WHITE">
-               <font>
-                  <Font name="Arial Bold" size="18.0" />
-               </font>
-            </Label>
-         </children>
-      </HBox>
-      <HBox id="carouselBox" alignment="CENTER" minHeight="60.0" prefHeight="120.0" VBox.vgrow="NEVER" />
+      <HBox alignment="CENTER" minHeight="23.0" prefHeight="23.0" prefWidth="736.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
