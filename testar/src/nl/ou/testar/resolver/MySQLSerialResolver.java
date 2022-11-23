@@ -3,7 +3,7 @@ package nl.ou.testar.resolver;
 import nl.ou.testar.ActionResolver;
 import nl.ou.testar.parser.ActionParseException;
 import nl.ou.testar.parser.ActionParser;
-import org.fruit.monkey.mysql.MySqlService;
+import nl.ou.testar.report.ReportDataAccess;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
@@ -12,21 +12,21 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import java.sql.SQLException;
 import java.util.*;
 
-public class MySQLSerialResolver extends SerialResolver<MySqlService> {
+public class MySQLSerialResolver extends SerialResolver<ReportDataAccess> {
 
     private ActionResolver nextResolver;
-    private int reportId = -1;
+    private int reportId = 0;
 
-    private MySqlService.ActionData currentActionData = null;
+    private ReportDataAccess.ActionData currentActionData = null;
 
     private final ActionParser parser = new ActionParser();
 
-    private List<MySqlService.IterationData> iterations = null;
-    private List<MySqlService.ActionData> actions = null;
-    private Iterator<MySqlService.IterationData> outerIterator = null;
-    private Iterator<MySqlService.ActionData> innerIterator = null;
+    private List<ReportDataAccess.IterationData> iterations = null;
+    private List<ReportDataAccess.ActionData> actions = null;
+    private Iterator<ReportDataAccess.IterationData> outerIterator = null;
+    private Iterator<ReportDataAccess.ActionData> innerIterator = null;
 
-    public MySQLSerialResolver(MySqlService service, Settings settings) {
+    public MySQLSerialResolver(ReportDataAccess service, Settings settings) {
         super(service, settings);
     }
 
@@ -44,7 +44,7 @@ public class MySQLSerialResolver extends SerialResolver<MySqlService> {
         if(!innerIterator.hasNext()) {
             return null;
         }
-        final MySqlService.ActionData currentActionData = innerIterator.next();
+        final ReportDataAccess.ActionData currentActionData = innerIterator.next();
         if (currentActionData == null) {
             return null;
         }
@@ -88,7 +88,7 @@ public class MySQLSerialResolver extends SerialResolver<MySqlService> {
         if (outerIterator == null || !outerIterator.hasNext()) {
             return false;
         }
-        MySqlService.IterationData iterationData = outerIterator.next();
+        ReportDataAccess.IterationData iterationData = outerIterator.next();
         try {
             actions = service.getSelectedActions(iterationData.getId());
             innerIterator = actions.listIterator();

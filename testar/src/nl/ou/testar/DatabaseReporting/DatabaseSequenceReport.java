@@ -1,7 +1,7 @@
 package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.SequenceReport;
-import org.fruit.monkey.mysql.MySqlService;
+import nl.ou.testar.report.ReportDataAccess;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -12,9 +12,9 @@ import java.util.Set;
 
 public class DatabaseSequenceReport implements SequenceReport {
 
-    private MySqlService sqlService;
+    private ReportDataAccess sqlService;
 
-    public DatabaseSequenceReport(MySqlService sqlService) {
+    public DatabaseSequenceReport(ReportDataAccess sqlService) {
         this.sqlService = sqlService;
     }
 
@@ -23,14 +23,14 @@ public class DatabaseSequenceReport implements SequenceReport {
         String concreteIdCustom = state.get(Tags.ConcreteIDCustom);
         String abstractId = state.get(Tags.AbstractID);
         try {
-            if (sqlService.findState(concreteIdCustom, abstractId) < 0) {
-                sqlService.registerState(concreteIdCustom, abstractId,
+			int searchResult = sqlService.findState(concreteIdCustom, abstractId);
+            if (searchResult == 0) {
+                int stateId = sqlService.registerState(concreteIdCustom, abstractId,
                         state.get(Tags.Abstract_R_ID), state.get(Tags.Abstract_R_T_ID),
                         state.get(Tags.Abstract_R_T_P_ID));
             }
         }
         catch (SQLException e) {
-            System.err.println("Could not add a state: " + e.getMessage());
             e.printStackTrace();
         }
     }

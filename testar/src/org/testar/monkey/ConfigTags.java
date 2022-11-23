@@ -170,6 +170,7 @@ public final class ConfigTags {
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
   public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class);
   public static final Tag<String> GitUrl = Tag.from("GitUrl", String.class);
+  public static final Tag<String> ReportApiUrl = Tag.from("ReportApiUrl", String.class);
   public static final Tag<String> GitUsername = Tag.from("GitUsername", String.class);
   public static final Tag<String> GitToken = Tag.from("GitToken", String.class);
   public static final Tag<String> GitBranch = Tag.from("GitBranch", String.class);

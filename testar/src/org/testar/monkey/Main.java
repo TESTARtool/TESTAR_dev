@@ -730,6 +730,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
 
+			defaults.add(Pair.from(GitAuthRequired, false));
+			defaults.add(Pair.from(SonarDockerize, false));
+
 			/*
 			 * //TODO web driver settings for login feature defaults.add(Pair.from(Login,
 			 * null)); // null = feature not enabled // login =

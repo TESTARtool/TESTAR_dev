@@ -1,7 +1,7 @@
 package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.TestReport;
-import org.fruit.monkey.mysql.MySqlService;
+import nl.ou.testar.report.ReportDataAccess;
 import org.testar.monkey.alayer.*;
 
 import java.sql.SQLException;
@@ -13,11 +13,11 @@ import java.util.Set;
 
 public class DatabaseTestReport implements TestReport {
 
-    private MySqlService sqlService;
+    private ReportDataAccess sqlService;
 
     private State latestState = null;
-    private int reportId = -1;
-    private int iterationId = -1;
+    private int reportId = 0;
+    private int iterationId = 0;
 
     private Map<Action, Integer> actionIds;
     private Map<State, Integer> stateIds;
@@ -28,7 +28,7 @@ public class DatabaseTestReport implements TestReport {
 
     private boolean isFirstFailure;
 
-    public DatabaseTestReport(MySqlService sqlService, String reportTag) {
+    public DatabaseTestReport(ReportDataAccess sqlService, String reportTag) {
         this.sqlService = sqlService;
 
         actionIds = new HashMap<>();
@@ -89,7 +89,7 @@ public class DatabaseTestReport implements TestReport {
                 actionIds.put(pendingAction, actionId);
             }
 
-            int actionId = -1;
+            int actionId = 0;
             if (action != null) {
                 Integer storedActionId = actionIds.get(action);
                 if (storedActionId != null) {
@@ -97,7 +97,7 @@ public class DatabaseTestReport implements TestReport {
                     actionId = storedActionId;
                 }
             }
-            int stateId = -1;
+            int stateId = 0;
             if (state != null) {
                 Integer storedStateId = stateIds.get(state);
                 if (storedStateId != null) {
@@ -148,7 +148,7 @@ public class DatabaseTestReport implements TestReport {
         }
 
         // TODO: optimize actions saving
-        int targetStateId = -1;
+        int targetStateId = 0;
         State targetState = actionTargets.get(action);
         if (targetState != null) {
             targetStateId = stateIds.get(targetState);

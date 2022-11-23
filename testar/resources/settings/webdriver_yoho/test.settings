@@ -205,7 +205,7 @@ SonarProjectKey = demo
 GitUrl = https://stash.marviq.com/scm/yoho/yoho-fe-app-web.git
 GitAuthRequired = true
 GitUsername = michael.tikhonenko
-GitToken = secret # here should be a password
+GitToken = not_allowed_to_publish
 
 ApplicationName = yoho
 ApplicationVersion = 1.0

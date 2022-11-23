@@ -134,7 +134,7 @@ public class MySqlServiceImpl implements MySqlService {
 
     public synchronized int registerIteration(int reportId) throws SQLException {
         PreparedStatement addSequenceStatement = connection.prepareStatement("INSERT INTO iterations (report_id) VALUES (?)");
-        addSequenceStatement.setInt(1, reportId);
+        addSequenceStatement.setObject(1, reportId == 0 ? null : new Integer(reportId));
         addSequenceStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -162,9 +162,10 @@ public class MySqlServiceImpl implements MySqlService {
         addActionStatement.setString(4, screenshot);
         addActionStatement.setTimestamp(5, startTime);
         addActionStatement.setBoolean(6, selected);
-        addActionStatement.setInt(7, stateId);
-        addActionStatement.setInt(8, targetStateId);
+        addActionStatement.setObject(7, stateId == 0 ? null : new Integer(stateId));
+        addActionStatement.setObject(8, targetStateId == 0 ? null : targetStateId);
         addActionStatement.setString(9, widgetPath);
+
         addActionStatement.executeUpdate();
 
         final ResultSet resultSet = lastIdStatement.executeQuery();
@@ -182,8 +183,8 @@ public class MySqlServiceImpl implements MySqlService {
 
     public synchronized int registerStateAction(int stateId, int actionId, boolean visited) throws SQLException {
         PreparedStatement addStateActionStatement = connection.prepareStatement("INSERT INTO sequence_item_actions (sequence_item_id, action_id, visited) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE visited = ?");
-        addStateActionStatement.setInt(1, stateId);
-        addStateActionStatement.setInt(2, actionId);
+		addStateActionStatement.setObject(1, stateId == 0 ? null : new Integer(stateId));
+        addStateActionStatement.setObject(2, actionId == 0 ? null : new Integer(actionId));
         addStateActionStatement.setBoolean(3, visited);
         addStateActionStatement.setBoolean(4, visited);
 
@@ -202,9 +203,9 @@ public class MySqlServiceImpl implements MySqlService {
 
     public synchronized void setSelectionInIteration(int iterationId, int lastExecutedActionId, int lastStateId) throws SQLException {
         PreparedStatement setSelectionStatement = connection.prepareStatement("UPDATE iterations SET last_executed_action_id=?, last_state_id=? WHERE id=?");
-        setSelectionStatement.setInt(1, lastExecutedActionId);
-        setSelectionStatement.setInt(2, lastStateId);
-        setSelectionStatement.setInt(3, iterationId);
+        setSelectionStatement.setObject(1, lastExecutedActionId == 0 ? null : new Integer(lastExecutedActionId));
+        setSelectionStatement.setObject(2, lastStateId == 0 ? null: new Integer(lastStateId));
+        setSelectionStatement.setInt(3, iterationId == 0 ? null : new Integer(iterationId));
 
         setSelectionStatement.executeUpdate();
     }
@@ -232,7 +233,7 @@ public class MySqlServiceImpl implements MySqlService {
         if (resultSet.next()) {
             return resultSet.getInt(1);
         }
-        return -1;
+        return 0;
     }
 
     @Override
@@ -244,7 +245,7 @@ public class MySqlServiceImpl implements MySqlService {
         if (resultSet.next()) {
             return resultSet.getInt(1);
         }
-        return -1;
+        return 0;
     }
 
     @Override
@@ -312,7 +313,7 @@ public class MySqlServiceImpl implements MySqlService {
         if (resultSet.next()) {
             return resultSet.getInt(1);
         }
-        return -1;
+        return 0;
     }
 
     @Override
@@ -325,7 +326,7 @@ public class MySqlServiceImpl implements MySqlService {
         if (resultSet.next()) {
             return resultSet.getInt(1);
         }
-        return -1;
+        return 0;
     }
 
     @Override

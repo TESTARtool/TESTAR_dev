@@ -103,7 +103,6 @@ import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
@@ -116,6 +115,8 @@ import nl.ou.testar.TestReport;
 import nl.ou.testar.DatabaseReporting.DatabaseSequenceReport;
 import nl.ou.testar.DatabaseReporting.DatabaseTestReport;
 import nl.ou.testar.StateModel.Exception.StateModelException;
+import nl.ou.testar.report.ReportDataAccess;
+import nl.ou.testar.report.rest.RestReportDataAccess;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
@@ -141,7 +142,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected String loginPasswordInputName;
 	protected String loginPassword;
 
-	public MySqlService sqlService;
+	public ReportDataAccess dataAccess;
 
 	protected OrientDBService orientService;
 
@@ -245,7 +246,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		 if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
 		 	System.out.println("*** Create a new SQL service ***");
 			//TODO: warn and fallback to static HTML reporting if state model disabled or Docker isn't available
-				sqlService = new MySqlServiceImpl(Main.getReportingService(), settings);
+			dataAccess = new RestReportDataAccess(settings.get(ConfigTags.ReportApiUrl), settings);//new MySqlServiceImpl(Main.getReportingService(), settings);
 			final String databaseName = settings.get(ConfigTags.SQLReporting);
 			final String userName = settings.get(ConfigTags.SQLReportingUser);
 			final String userPassword = settings.get(ConfigTags.SQLReportingPassword);
@@ -254,36 +255,39 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 //			ProgressDialog progressDialog = new ProgressDialog();
 //			progressDialog.setStatusString("Starting database connection");
 
-			sqlService.setDelegate(new MySqlServiceDelegate() {
-				@Override
-				public void onStateChanged(State state, String description) {
+			 if (dataAccess instanceof MySqlService) {
+				 ((MySqlService) dataAccess).setDelegate(new MySqlServiceDelegate() {
+					 @Override
+					 public void onStateChanged(State state, String description) {
 
-					// TODO: Re-enable progress dialog
+						 // TODO: Re-enable progress dialog
 //					progressDialog.setStatusString(description);
-				}
+					 }
 
-				@Override
-				public void onServiceReady(String str) {
-					// TODO: Re-enable progress dialog
+					 @Override
+					 public void onServiceReady(String str) {
+						 // TODO: Re-enable progress dialog
 //					progressDialog.endProgress(null, true);
-				}
-			});
+					 }
+				 });
+			 }
 
 			 mysqlThread = new Thread() {
 				@Override
 				public void run() {
 					try {
-						if (settings.get(ConfigTags.SQLReportingType).equals("local")) {
-							sqlService.startLocalDatabase(databaseName, userName, userPassword);
-							isLocalDatabaseActive = true;
-						}
-						else {
-							sqlService.connectExternalDatabase(settings.get(ConfigTags.SQLReportingServer),
-									databaseName, userName, userPassword);
+						if (dataAccess instanceof  MySqlService) {
+							if (settings.get(ConfigTags.SQLReportingType).equals("local")) {
+								((MySqlService) dataAccess).startLocalDatabase(databaseName, userName, userPassword);
+								isLocalDatabaseActive = true;
+							} else {
+								((MySqlService) dataAccess).connectExternalDatabase(settings.get(ConfigTags.SQLReportingServer),
+										databaseName, userName, userPassword);
+							}
 						}
 //						ReportingWebService reportingService = new ReportingWebServiceImpl(sqlService.getDockerPoolService());
 //						reportingService.start(8888, 1080, "mysql", 3306, "testar", "testar", "testar");
-					} catch (ClassNotFoundException | IOException | SQLException | TestarServiceException e) {
+					} catch (Exception/*ClassNotFoundException | IOException | SQLException | TestarServiceException*/ e) {
 						final String errorMessage = "Cannot initialize a database";
 						delegate.endProgress();
 						delegate.popupMessage(errorMessage);
@@ -321,8 +325,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		delegate.updateStatus("Starting a web driver", 0);
 
 		// Initialize HTML Report (Dashboard)
-		if (sqlService != null) {
-			this.testReport = new DatabaseTestReport(sqlService, settings.get(ConfigTags.SQLReporting));
+		if (dataAccess != null) {
+			this.testReport = new DatabaseTestReport(dataAccess, settings.get(ConfigTags.SQLReporting));
 		}
 		else {
 			this.testReport = new HtmlTestReport();
@@ -368,7 +372,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
 		);
 
-		if (sqlService != null) {
+		if (dataAccess != null) {
 			final boolean dbEnabled = settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE);
 			final int port = settings.get(ConfigTags.ReportServicePort);
 			final String dbHostname = (isLocalDatabaseActive ? "mysql" : settings.get(ConfigTags.SQLReportingServer));
@@ -416,17 +420,19 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						}
 					}
 				});
-				new Thread() {
-					@Override
-					public void run() {
-						try {
-							reportingService.start();
-						} catch (IOException | TestarServiceException e) {
-							delegate.popupMessage(e.getMessage());
-							e.printStackTrace();
-						}
-					}
-				}.start();
+
+				//TODO: re-enable dockerized service
+//				new Thread() {
+//					@Override
+//					public void run() {
+//						try {
+//							reportingService.start();
+//						} catch (IOException | TestarServiceException e) {
+//							delegate.popupMessage(e.getMessage());
+//							e.printStackTrace();
+//						}
+//					}
+//				}.start();
 
 				// TODO: Re-enable progress dialog
 //				progressDialog.pack();
@@ -447,8 +453,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected void preSequencePreparations() {
 
         //initializing the HTML sequence report:
-		if (sqlService != null) {
-			sequenceReport = new DatabaseSequenceReport(sqlService);
+		if (dataAccess != null) {
+			sequenceReport = new DatabaseSequenceReport(dataAccess);
 		}
 		else {
 			sequenceReport = new HtmlSequenceReport();
@@ -609,6 +615,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	}
 
         //adding state to the HTML sequence report:
+		System.out.println("Adding state (webdriver protocol)");
         sequenceReport.addState(latestState);
         testReport.addState(latestState);
 
@@ -647,7 +654,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void saveDerivedActions(State state, Set<Action> actions) {
 		int stateId = -1;
 		try {
-			stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
+			stateId = dataAccess.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
 		} catch (SQLException e) {
 			System.err.println("Invalid state when saving actions: " + e.getMessage());
 		}
