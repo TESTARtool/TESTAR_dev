@@ -2,18 +2,9 @@ package parsing;
 
 import antlrfour.StrategyBaseVisitor;
 import antlrfour.StrategyParser;
-import parsing.treenodes.*;
-import parsing.treenodes.ActionType;
-import parsing.treenodes.Filter;
-import parsing.treenodes.SutType;
-import parsing.treenodes.operators.booloperators.AndOprNode;
-import parsing.treenodes.operators.booloperators.NotOprNode;
-import parsing.treenodes.operators.booloperators.OrOprNode;
-import parsing.treenodes.operators.booloperators.XorOprNode;
-import parsing.treenodes.operators.integeroperators.*;
-import strategynodes.basenodes.*;
-import strategynodes.terminals.BooleanNode;
-import strategynodes.terminals.IntegerNode;
+import strategynodes.*;
+import strategynodes.bool_expr.*;
+import strategynodes.action_expr.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,35 +20,26 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     {return (Strategy_Node) visit(ctx.strategy());}
     @Override
     public Strategy_Node visitStrategy(StrategyParser.StrategyContext ctx)
-    {return new Strategy_Node((BaseBooleanNode) visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr));}
+    {return new Strategy_Node(visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr));}
     
     /////////////////////////
     // boolean expressions //
     /////////////////////////
     
     @Override
-    public NotOprNode visitNotExpr(StrategyParser.NotExprContext ctx)
-    {return new NotOprNode((BaseBooleanNode) visit(ctx.expr));}
+    public BoolOprNode visitNotExpr(StrategyParser.NotExprContext ctx)
+    {return new BoolOprNode(null, BoolOperator.NOT, visit(ctx.expr));}
     
     @Override
-    public BaseStrategyNode visitBoolOprExpr(StrategyParser.BoolOprExprContext ctx)
+    public BoolOprNode visitBoolOprExpr(StrategyParser.BoolOprExprContext ctx)
     {
-        switch(ctx.getText().toUpperCase())
-        {
-            case "AND":
-                return new AndOprNode((BaseBooleanNode) visit(ctx.left), (BaseBooleanNode) visit(ctx.right));
-            case "XOR":
-                return new XorOprNode((BaseBooleanNode) visit(ctx.left), (BaseBooleanNode) visit(ctx.right));
-            case "OR":
-                return new OrOprNode((BaseBooleanNode) visit(ctx.left), (BaseBooleanNode) visit(ctx.right));
-        }
-        return null;
+        BoolOperator opr;
+        if(ctx.AND() != null)           opr = BoolOperator.AND;
+        else if (ctx.XOR() != null)     opr = BoolOperator.XOR;
+        else if (ctx.OR() != null)      opr = BoolOperator.OR;
+        else                            return null;
+        return new BoolOprNode(visit(ctx.left), opr, visit(ctx.right));
     }
-    
-    @Override
-    public BooleanNode visitBaseBool(StrategyParser.BaseBoolContext ctx)
-    {return new BooleanNode(Boolean.valueOf(ctx.BOOLEAN().getText()));}
-    
     
     ////////////////////////
     // number expressions //
@@ -67,7 +49,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     public BaseStrategyNode visitNumber_expr(StrategyParser.Number_exprContext ctx)
     {
         if(ctx.NUMBER() != null) //plain integer
-            return new IntegerNode(Integer.valueOf(ctx.NUMBER().getText()));
+            return visitChildren(ctx);
         else
             return visit(ctx.number_of_actions());
     }
@@ -75,23 +57,15 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public BaseStrategyNode visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx)
     {
-        switch(ctx.getText())
-        {
-            case ">":
-                return new GreaterThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-            case ">=":
-                return new GreaterEqualThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-            case "<":
-                return new LessThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-            case "<=":
-                return new LessEqualThanOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-            case "=":
-            case "==":
-                return new EqualOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-            case "!=":
-                return new NotEqualOprNode((BaseIntegerNode) visit(ctx.left), (BaseIntegerNode) visit(ctx.right));
-        }
-        return null;
+        IntOperator opr;
+        if(ctx.LT() != null)            opr = IntOperator.LT;
+        else if (ctx.LE() != null)      opr = IntOperator.LE;
+        else if (ctx.GT() != null)      opr = IntOperator.GT;
+        else if (ctx.GE() != null)      opr = IntOperator.GE;
+        else if (ctx.EQ() != null)      opr = IntOperator.EQ;
+        else if (ctx.NE() != null)      opr = IntOperator.NE;
+        else                            return null;
+        return new IntOprNode(visit(ctx.left), opr, (BaseStrategyNode) visit(ctx.right));
     }
     
     ///////////////////////
@@ -101,11 +75,11 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public NumberOfActions_Node visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx)
     {
-        Visited visited = (ctx.ACTION_VISITED() != null) ? Visited.stringToEnum(ctx.ACTION_VISITED().getText()) : null;
+//        VisitedModifier visitedModifier = (ctx.ACTION_VISITED() != null) ? VisitedModifier.stringToEnum(ctx.ACTION_VISITED().getText()) : null;
         return new NumberOfActions_Node(
-                Visited.stringToEnum(ctx.ACTION_VISITED().getText()),
+                VisitedModifier.stringToEnum(ctx.ACTION_VISITED().getText()),
                 Filter.stringToEnum(ctx.FILTER().getText()),
-                ActionType.stringToEnum(ctx.action_type().getText()));
+                ActionType.toEnum(ctx.ACTION_TYPE().getText()));
     }
     
     ////////////////////
@@ -119,36 +93,24 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     public AnyActionsExist_Node visitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx)
     {
         return new AnyActionsExist_Node(
+                VisitedModifier.stringToEnum(ctx.ACTION_VISITED().getText()),
                 Filter.stringToEnum(ctx.FILTER().getText()),
-                ActionType.stringToEnum(ctx.action_type().getText()));
+                ActionType.toEnum(ctx.ACTION_TYPE().getText()));
     }
     @Override
     public Sut_Node visitSutType(StrategyParser.SutTypeContext ctx)
     {
         return new Sut_Node(
                 Filter.stringToEnum(ctx.FILTER().getText()),
-                SutType.stringToEnum(ctx.sut_type().getText()));
+                SutType.stringToEnum(ctx.SUT_TYPE().getText()));
     }
     @Override
     public RelatedActionExists_Node visitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx)
-    { return new RelatedActionExists_Node(Relation.stringToEnum(ctx.related_action().getText())); }
+    { return new RelatedActionExists_Node(ActionRelation.stringToEnum(ctx.RELATED_ACTION().getText())); }
     
     ////////////////////////
     // action expressions //
     ////////////////////////
-    
-//    @Override
-//    public BaseStrategyNode visitAction_expr(StrategyParser.Action_exprContext ctx)
-//    {
-//        if(ctx.strategy() == null) //not a strategy node
-//        {
-//            List<BaseAction_Node> actionNodes = new ArrayList<>();
-//            for(int i = 0; i < ctx.getChildCount(); i++)
-//                actionNodes.add((BaseAction_Node) visit(ctx.action(i)));
-//            return new ActionList_Node(actionNodes);
-//        }
-//        else return visit(ctx.strategy());
-//    }
     
     @Override public BaseStrategyNode visitSubStrategy(StrategyParser.SubStrategyContext ctx)
     { return visit(ctx.strategy()); }
@@ -162,9 +124,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     }
     
     @Override
-    public PreviousAction_Node visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx)
+    public SelectPreviousAction_Node visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx)
     {
-        return new PreviousAction_Node(Integer.valueOf(ctx.NUMBER().getText()));
+        return new SelectPreviousAction_Node(Integer.valueOf(ctx.NUMBER().getText()));
     }
     @Override
     public SelectRandomAction_Node visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx)
@@ -172,14 +134,14 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
 //        int weight = ctx.NUMBER() == null ? 1 : Integer.valueOf(ctx.NUMBER().getText());
         return new SelectRandomAction_Node(
                 Integer.valueOf(ctx.NUMBER().getText()),
-                Visited.stringToEnum(ctx.ACTION_VISITED().getText()),
+                VisitedModifier.stringToEnum(ctx.ACTION_VISITED().getText()),
                 Filter.stringToEnum(ctx.FILTER().getText()),
-                ActionType.stringToEnum(ctx.action_type().getText()));
+                ActionType.toEnum(ctx.ACTION_TYPE().getText()));
     }
     @Override public SelectByRelation_Node visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx)
     {
         return new SelectByRelation_Node(
                 Integer.valueOf(ctx.NUMBER().getText()),
-                Relation.stringToEnum(ctx.related_action().getText()));
+                ActionRelation.stringToEnum(ctx.RELATED_ACTION().getText()));
     }
 }

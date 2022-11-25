@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import parsing.treenodes.Strategy_Node;
+import strategynodes.Strategy_Node;
 
 import java.io.IOException;
 import java.util.Map;
@@ -71,8 +71,8 @@ public class ParseUtil
     public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, boolean useSecondaryStrategy)
     {
         if(!useSecondaryStrategy || secondaryASTTree == null) //either the primary is preferred or there is no secondary strategy
-            return primaryASTTree.GetResult(state, actions, actionsExecuted);
+            return primaryASTTree.getResult(state, actions, actionsExecuted);
         else
-            return secondaryASTTree.GetResult(state, actions, actionsExecuted);
+            return secondaryASTTree.getResult(state, actions, actionsExecuted);
     }
 }

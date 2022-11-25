@@ -17,21 +17,19 @@ public class StrategyParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
-		T__17=18, T__18=19, T__19=20, ACTION_VISITED=21, EXIST=22, FILTER=23, 
-		NOT=24, AND=25, XOR=26, OR=27, GT=28, GE=29, LT=30, LE=31, EQ=32, NE=33, 
-		IF=34, THEN=35, ELSE=36, NUMBER=37, BOOLEAN=38, LP=39, RP=40, COMMENT=41, 
-		WHITESPACE=42, ANY=43;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, ACTION_VISITED=8, 
+		RELATED_ACTION=9, SUT_TYPE=10, ACTION_TYPE=11, EXIST=12, FILTER=13, NOT=14, 
+		AND=15, XOR=16, OR=17, GT=18, GE=19, LT=20, LE=21, EQ=22, NE=23, IF=24, 
+		THEN=25, ELSE=26, NUMBER=27, BOOLEAN=28, LP=29, RP=30, COMMENT=31, WHITESPACE=32, 
+		ANY=33;
 	public static final int
 		RULE_strategy_file = 0, RULE_strategy = 1, RULE_bool_expr = 2, RULE_number_expr = 3, 
 		RULE_number_of_actions = 4, RULE_state_boolean = 5, RULE_action_expr = 6, 
-		RULE_action = 7, RULE_related_action = 8, RULE_sut_type = 9, RULE_action_type = 10;
+		RULE_action = 7;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"strategy_file", "strategy", "bool_expr", "number_expr", "number_of_actions", 
-			"state_boolean", "action_expr", "action", "related_action", "sut_type", 
-			"action_type"
+			"state_boolean", "action_expr", "action"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -39,22 +37,18 @@ public class StrategyParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'n-actions'", "'state-changed'", "'any-actions'", "'sut'", "'select-previous-action'", 
-			"'select-random'", "'select-by-relation'", "'sibling-action'", "'child-action'", 
-			"'sibling-or-child-action'", "'windows'", "'linux'", "'android'", "'web'", 
-			"'click-action'", "'type-action'", "'drag-action'", "'scroll-action'", 
-			"'hit-key-action'", "'input-action'", null, null, null, null, null, null, 
-			null, "'>'", "'>='", "'<'", "'<='", null, "'!='", null, null, null, null, 
-			null, "'('", "')'"
+			"'select-random'", "'select-by-actionRelation'", null, null, null, null, 
+			null, null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, 
+			"'!='", null, null, null, null, null, "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, "ACTION_VISITED", 
-			"EXIST", "FILTER", "NOT", "AND", "XOR", "OR", "GT", "GE", "LT", "LE", 
-			"EQ", "NE", "IF", "THEN", "ELSE", "NUMBER", "BOOLEAN", "LP", "RP", "COMMENT", 
-			"WHITESPACE", "ANY"
+			null, null, null, null, null, null, null, null, "ACTION_VISITED", "RELATED_ACTION", 
+			"SUT_TYPE", "ACTION_TYPE", "EXIST", "FILTER", "NOT", "AND", "XOR", "OR", 
+			"GT", "GE", "LT", "LE", "EQ", "NE", "IF", "THEN", "ELSE", "NUMBER", "BOOLEAN", 
+			"LP", "RP", "COMMENT", "WHITESPACE", "ANY"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -138,9 +132,9 @@ public class StrategyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(22);
+			setState(16);
 			strategy();
-			setState(23);
+			setState(17);
 			match(EOF);
 			}
 		}
@@ -196,17 +190,17 @@ public class StrategyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(25);
+			setState(19);
 			match(IF);
-			setState(26);
+			setState(20);
 			((StrategyContext)_localctx).ifExpr = bool_expr(0);
-			setState(27);
+			setState(21);
 			match(THEN);
-			setState(28);
+			setState(22);
 			((StrategyContext)_localctx).thenExpr = action_expr();
-			setState(29);
+			setState(23);
 			match(ELSE);
-			setState(30);
+			setState(24);
 			((StrategyContext)_localctx).elseExpr = action_expr();
 			}
 		}
@@ -373,7 +367,7 @@ public class StrategyParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(62);
+			setState(56);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
 			case 1:
@@ -382,9 +376,9 @@ public class StrategyParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(33);
+				setState(27);
 				match(NOT);
-				setState(34);
+				setState(28);
 				((NotExprContext)_localctx).expr = bool_expr(9);
 				}
 				break;
@@ -393,13 +387,13 @@ public class StrategyParser extends Parser {
 				_localctx = new NotExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(35);
+				setState(29);
 				match(LP);
-				setState(36);
+				setState(30);
 				match(NOT);
-				setState(37);
+				setState(31);
 				((NotExprContext)_localctx).expr = bool_expr(0);
-				setState(38);
+				setState(32);
 				match(RP);
 				}
 				break;
@@ -408,11 +402,11 @@ public class StrategyParser extends Parser {
 				_localctx = new BoolOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(40);
+				setState(34);
 				match(LP);
-				setState(41);
+				setState(35);
 				((BoolOprExprContext)_localctx).left = bool_expr(0);
-				setState(42);
+				setState(36);
 				((BoolOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << AND) | (1L << XOR) | (1L << OR))) != 0)) ) {
@@ -423,9 +417,9 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(43);
+				setState(37);
 				((BoolOprExprContext)_localctx).right = bool_expr(0);
-				setState(44);
+				setState(38);
 				match(RP);
 				}
 				break;
@@ -434,9 +428,9 @@ public class StrategyParser extends Parser {
 				_localctx = new NumberOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(46);
+				setState(40);
 				((NumberOprExprContext)_localctx).left = number_expr();
-				setState(47);
+				setState(41);
 				((NumberOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE))) != 0)) ) {
@@ -447,7 +441,7 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(48);
+				setState(42);
 				((NumberOprExprContext)_localctx).right = number_expr();
 				}
 				break;
@@ -456,11 +450,11 @@ public class StrategyParser extends Parser {
 				_localctx = new NumberOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(50);
+				setState(44);
 				match(LP);
-				setState(51);
+				setState(45);
 				((NumberOprExprContext)_localctx).left = number_expr();
-				setState(52);
+				setState(46);
 				((NumberOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE))) != 0)) ) {
@@ -471,9 +465,9 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(53);
+				setState(47);
 				((NumberOprExprContext)_localctx).right = number_expr();
-				setState(54);
+				setState(48);
 				match(RP);
 				}
 				break;
@@ -482,7 +476,7 @@ public class StrategyParser extends Parser {
 				_localctx = new StateBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(56);
+				setState(50);
 				state_boolean();
 				}
 				break;
@@ -491,11 +485,11 @@ public class StrategyParser extends Parser {
 				_localctx = new StateBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(57);
+				setState(51);
 				match(LP);
-				setState(58);
+				setState(52);
 				state_boolean();
-				setState(59);
+				setState(53);
 				match(RP);
 				}
 				break;
@@ -504,13 +498,13 @@ public class StrategyParser extends Parser {
 				_localctx = new BaseBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(61);
+				setState(55);
 				match(BOOLEAN);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(69);
+			setState(63);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -522,9 +516,9 @@ public class StrategyParser extends Parser {
 					_localctx = new BoolOprExprContext(new Bool_exprContext(_parentctx, _parentState));
 					((BoolOprExprContext)_localctx).left = _prevctx;
 					pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-					setState(64);
+					setState(58);
 					if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
-					setState(65);
+					setState(59);
 					((BoolOprExprContext)_localctx).opr = _input.LT(1);
 					_la = _input.LA(1);
 					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << AND) | (1L << XOR) | (1L << OR))) != 0)) ) {
@@ -535,12 +529,12 @@ public class StrategyParser extends Parser {
 						_errHandler.reportMatch(this);
 						consume();
 					}
-					setState(66);
+					setState(60);
 					((BoolOprExprContext)_localctx).right = bool_expr(8);
 					}
 					} 
 				}
-				setState(71);
+				setState(65);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
 			}
@@ -585,20 +579,20 @@ public class StrategyParser extends Parser {
 		Number_exprContext _localctx = new Number_exprContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_number_expr);
 		try {
-			setState(74);
+			setState(68);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__0:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(72);
+				setState(66);
 				number_of_actions();
 				}
 				break;
 			case NUMBER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(73);
+				setState(67);
 				match(NUMBER);
 				}
 				break;
@@ -620,9 +614,7 @@ public class StrategyParser extends Parser {
 	public static class Number_of_actionsContext extends ParserRuleContext {
 		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
-		public Action_typeContext action_type() {
-			return getRuleContext(Action_typeContext.class,0);
-		}
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public Number_of_actionsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -648,27 +640,27 @@ public class StrategyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(76);
+			setState(70);
 			match(T__0);
-			setState(78);
+			setState(72);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				{
-				setState(77);
+				setState(71);
 				match(ACTION_VISITED);
 				}
 				break;
 			}
-			setState(82);
+			setState(76);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				{
-				setState(80);
+				setState(74);
 				match(FILTER);
-				setState(81);
-				action_type();
+				setState(75);
+				match(ACTION_TYPE);
 				}
 				break;
 			}
@@ -698,10 +690,9 @@ public class StrategyParser extends Parser {
 	}
 	public static class AnyActionsExistsContext extends State_booleanContext {
 		public TerminalNode EXIST() { return getToken(StrategyParser.EXIST, 0); }
+		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
-		public Action_typeContext action_type() {
-			return getRuleContext(Action_typeContext.class,0);
-		}
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public AnyActionsExistsContext(State_booleanContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -719,9 +710,7 @@ public class StrategyParser extends Parser {
 	}
 	public static class SutTypeContext extends State_booleanContext {
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
-		public Sut_typeContext sut_type() {
-			return getRuleContext(Sut_typeContext.class,0);
-		}
+		public TerminalNode SUT_TYPE() { return getToken(StrategyParser.SUT_TYPE, 0); }
 		public SutTypeContext(State_booleanContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -738,9 +727,7 @@ public class StrategyParser extends Parser {
 		}
 	}
 	public static class RelatedActionExistsContext extends State_booleanContext {
-		public Related_actionContext related_action() {
-			return getRuleContext(Related_actionContext.class,0);
-		}
+		public TerminalNode RELATED_ACTION() { return getToken(StrategyParser.RELATED_ACTION, 0); }
 		public TerminalNode EXIST() { return getToken(StrategyParser.EXIST, 0); }
 		public RelatedActionExistsContext(State_booleanContext ctx) { copyFrom(ctx); }
 		@Override
@@ -779,14 +766,14 @@ public class StrategyParser extends Parser {
 		enterRule(_localctx, 10, RULE_state_boolean);
 		int _la;
 		try {
-			setState(97);
+			setState(93);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__1:
 				_localctx = new StateChangedContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(84);
+				setState(78);
 				match(T__1);
 				}
 				break;
@@ -794,21 +781,31 @@ public class StrategyParser extends Parser {
 				_localctx = new AnyActionsExistsContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(85);
+				setState(79);
 				match(T__2);
-				setState(88);
+				setState(81);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==ACTION_VISITED) {
+					{
+					setState(80);
+					match(ACTION_VISITED);
+					}
+				}
+
+				setState(85);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==FILTER) {
 					{
-					setState(86);
+					setState(83);
 					match(FILTER);
-					setState(87);
-					action_type();
+					setState(84);
+					match(ACTION_TYPE);
 					}
 				}
 
-				setState(90);
+				setState(87);
 				match(EXIST);
 				}
 				break;
@@ -816,23 +813,21 @@ public class StrategyParser extends Parser {
 				_localctx = new SutTypeContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(91);
+				setState(88);
 				match(T__3);
-				setState(92);
+				setState(89);
 				match(FILTER);
-				setState(93);
-				sut_type();
+				setState(90);
+				match(SUT_TYPE);
 				}
 				break;
-			case T__7:
-			case T__8:
-			case T__9:
+			case RELATED_ACTION:
 				_localctx = new RelatedActionExistsContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(94);
-				related_action();
-				setState(95);
+				setState(91);
+				match(RELATED_ACTION);
+				setState(92);
 				match(EXIST);
 				}
 				break;
@@ -909,14 +904,14 @@ public class StrategyParser extends Parser {
 		enterRule(_localctx, 12, RULE_action_expr);
 		int _la;
 		try {
-			setState(105);
+			setState(101);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case IF:
 				_localctx = new SubStrategyContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(99);
+				setState(95);
 				strategy();
 				}
 				break;
@@ -927,17 +922,17 @@ public class StrategyParser extends Parser {
 				_localctx = new ActionListContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(101); 
+				setState(97); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(100);
+					setState(96);
 					action();
 					}
 					}
-					setState(103); 
+					setState(99); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << NUMBER))) != 0) );
@@ -970,9 +965,7 @@ public class StrategyParser extends Parser {
 		}
 	}
 	public static class SelectRelatedActionContext extends ActionContext {
-		public Related_actionContext related_action() {
-			return getRuleContext(Related_actionContext.class,0);
-		}
+		public TerminalNode RELATED_ACTION() { return getToken(StrategyParser.RELATED_ACTION, 0); }
 		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
 		public SelectRelatedActionContext(ActionContext ctx) { copyFrom(ctx); }
 		@Override
@@ -1010,9 +1003,7 @@ public class StrategyParser extends Parser {
 		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
 		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
-		public Action_typeContext action_type() {
-			return getRuleContext(Action_typeContext.class,0);
-		}
+		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public SelectRandomActionContext(ActionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1034,12 +1025,30 @@ public class StrategyParser extends Parser {
 		enterRule(_localctx, 14, RULE_action);
 		int _la;
 		try {
-			setState(127);
+			setState(123);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,15,_ctx) ) {
 			case 1:
 				_localctx = new SelectPreviousActionContext(_localctx);
 				enterOuterAlt(_localctx, 1);
+				{
+				setState(104);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NUMBER) {
+					{
+					setState(103);
+					match(NUMBER);
+					}
+				}
+
+				setState(106);
+				match(T__4);
+				}
+				break;
+			case 2:
+				_localctx = new SelectRandomActionContext(_localctx);
+				enterOuterAlt(_localctx, 2);
 				{
 				setState(108);
 				_errHandler.sync(this);
@@ -1052,44 +1061,26 @@ public class StrategyParser extends Parser {
 				}
 
 				setState(110);
-				match(T__4);
-				}
-				break;
-			case 2:
-				_localctx = new SelectRandomActionContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(112);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==NUMBER) {
-					{
-					setState(111);
-					match(NUMBER);
-					}
-				}
-
-				setState(114);
 				match(T__5);
-				setState(116);
+				setState(112);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==ACTION_VISITED) {
 					{
-					setState(115);
+					setState(111);
 					match(ACTION_VISITED);
 					}
 				}
 
-				setState(120);
+				setState(116);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==FILTER) {
 					{
-					setState(118);
+					setState(114);
 					match(FILTER);
-					setState(119);
-					action_type();
+					setState(115);
+					match(ACTION_TYPE);
 					}
 				}
 
@@ -1099,436 +1090,22 @@ public class StrategyParser extends Parser {
 				_localctx = new SelectRelatedActionContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(123);
+				setState(119);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==NUMBER) {
 					{
-					setState(122);
+					setState(118);
 					match(NUMBER);
 					}
 				}
 
-				setState(125);
+				setState(121);
 				match(T__6);
-				setState(126);
-				related_action();
+				setState(122);
+				match(RELATED_ACTION);
 				}
 				break;
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Related_actionContext extends ParserRuleContext {
-		public Related_actionContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_related_action; }
-	 
-		public Related_actionContext() { }
-		public void copyFrom(Related_actionContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class SiblingActionContext extends Related_actionContext {
-		public SiblingActionContext(Related_actionContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterSiblingAction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitSiblingAction(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitSiblingAction(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class ChildOrSiblingActionContext extends Related_actionContext {
-		public ChildOrSiblingActionContext(Related_actionContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterChildOrSiblingAction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitChildOrSiblingAction(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitChildOrSiblingAction(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class ChildActionContext extends Related_actionContext {
-		public ChildActionContext(Related_actionContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterChildAction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitChildAction(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitChildAction(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Related_actionContext related_action() throws RecognitionException {
-		Related_actionContext _localctx = new Related_actionContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_related_action);
-		try {
-			setState(132);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case T__7:
-				_localctx = new SiblingActionContext(_localctx);
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(129);
-				match(T__7);
-				}
-				break;
-			case T__8:
-				_localctx = new ChildActionContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(130);
-				match(T__8);
-				}
-				break;
-			case T__9:
-				_localctx = new ChildOrSiblingActionContext(_localctx);
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(131);
-				match(T__9);
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Sut_typeContext extends ParserRuleContext {
-		public Sut_typeContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_sut_type; }
-	 
-		public Sut_typeContext() { }
-		public void copyFrom(Sut_typeContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class WebContext extends Sut_typeContext {
-		public WebContext(Sut_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterWeb(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitWeb(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitWeb(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class LinuxContext extends Sut_typeContext {
-		public LinuxContext(Sut_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterLinux(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitLinux(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitLinux(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class AndroidContext extends Sut_typeContext {
-		public AndroidContext(Sut_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterAndroid(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitAndroid(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitAndroid(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class WindowsContext extends Sut_typeContext {
-		public WindowsContext(Sut_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterWindows(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitWindows(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitWindows(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Sut_typeContext sut_type() throws RecognitionException {
-		Sut_typeContext _localctx = new Sut_typeContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_sut_type);
-		try {
-			setState(138);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case T__10:
-				_localctx = new WindowsContext(_localctx);
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(134);
-				match(T__10);
-				}
-				break;
-			case T__11:
-				_localctx = new LinuxContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(135);
-				match(T__11);
-				}
-				break;
-			case T__12:
-				_localctx = new AndroidContext(_localctx);
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(136);
-				match(T__12);
-				}
-				break;
-			case T__13:
-				_localctx = new WebContext(_localctx);
-				enterOuterAlt(_localctx, 4);
-				{
-				setState(137);
-				match(T__13);
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Action_typeContext extends ParserRuleContext {
-		public Action_typeContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_action_type; }
-	 
-		public Action_typeContext() { }
-		public void copyFrom(Action_typeContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class InputContext extends Action_typeContext {
-		public InputContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterInput(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitInput(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitInput(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class TypingContext extends Action_typeContext {
-		public TypingContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterTyping(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitTyping(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitTyping(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class ScrollContext extends Action_typeContext {
-		public ScrollContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterScroll(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitScroll(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitScroll(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class HitKeyContext extends Action_typeContext {
-		public HitKeyContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterHitKey(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitHitKey(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitHitKey(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class DragContext extends Action_typeContext {
-		public DragContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterDrag(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitDrag(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitDrag(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class ClickContext extends Action_typeContext {
-		public ClickContext(Action_typeContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterClick(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitClick(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitClick(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Action_typeContext action_type() throws RecognitionException {
-		Action_typeContext _localctx = new Action_typeContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_action_type);
-		try {
-			setState(146);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case T__14:
-				_localctx = new ClickContext(_localctx);
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(140);
-				match(T__14);
-				}
-				break;
-			case T__15:
-				_localctx = new TypingContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(141);
-				match(T__15);
-				}
-				break;
-			case T__16:
-				_localctx = new DragContext(_localctx);
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(142);
-				match(T__16);
-				}
-				break;
-			case T__17:
-				_localctx = new ScrollContext(_localctx);
-				enterOuterAlt(_localctx, 4);
-				{
-				setState(143);
-				match(T__17);
-				}
-				break;
-			case T__18:
-				_localctx = new HitKeyContext(_localctx);
-				enterOuterAlt(_localctx, 5);
-				{
-				setState(144);
-				match(T__18);
-				}
-				break;
-			case T__19:
-				_localctx = new InputContext(_localctx);
-				enterOuterAlt(_localctx, 6);
-				{
-				setState(145);
-				match(T__19);
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1558,49 +1135,38 @@ public class StrategyParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3-\u0097\4\2\t\2\4"+
-		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
-		"\13\4\f\t\f\3\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3#\u0080\4\2\t\2\4"+
+		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\3\2\3\2\3\2\3\3"+
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
 		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4A\n\4\3\4\3\4\3\4\7\4F\n\4\f\4\16"+
-		"\4I\13\4\3\5\3\5\5\5M\n\5\3\6\3\6\5\6Q\n\6\3\6\3\6\5\6U\n\6\3\7\3\7\3"+
-		"\7\3\7\5\7[\n\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\5\7d\n\7\3\b\3\b\6\bh\n\b"+
-		"\r\b\16\bi\5\bl\n\b\3\t\5\to\n\t\3\t\3\t\5\ts\n\t\3\t\3\t\5\tw\n\t\3\t"+
-		"\3\t\5\t{\n\t\3\t\5\t~\n\t\3\t\3\t\5\t\u0082\n\t\3\n\3\n\3\n\5\n\u0087"+
-		"\n\n\3\13\3\13\3\13\3\13\5\13\u008d\n\13\3\f\3\f\3\f\3\f\3\f\3\f\5\f\u0095"+
-		"\n\f\3\f\2\3\6\r\2\4\6\b\n\f\16\20\22\24\26\2\4\3\2\33\35\3\2\36#\2\u00ad"+
-		"\2\30\3\2\2\2\4\33\3\2\2\2\6@\3\2\2\2\bL\3\2\2\2\nN\3\2\2\2\fc\3\2\2\2"+
-		"\16k\3\2\2\2\20\u0081\3\2\2\2\22\u0086\3\2\2\2\24\u008c\3\2\2\2\26\u0094"+
-		"\3\2\2\2\30\31\5\4\3\2\31\32\7\2\2\3\32\3\3\2\2\2\33\34\7$\2\2\34\35\5"+
-		"\6\4\2\35\36\7%\2\2\36\37\5\16\b\2\37 \7&\2\2 !\5\16\b\2!\5\3\2\2\2\""+
-		"#\b\4\1\2#$\7\32\2\2$A\5\6\4\13%&\7)\2\2&\'\7\32\2\2\'(\5\6\4\2()\7*\2"+
-		"\2)A\3\2\2\2*+\7)\2\2+,\5\6\4\2,-\t\2\2\2-.\5\6\4\2./\7*\2\2/A\3\2\2\2"+
-		"\60\61\5\b\5\2\61\62\t\3\2\2\62\63\5\b\5\2\63A\3\2\2\2\64\65\7)\2\2\65"+
-		"\66\5\b\5\2\66\67\t\3\2\2\678\5\b\5\289\7*\2\29A\3\2\2\2:A\5\f\7\2;<\7"+
-		")\2\2<=\5\f\7\2=>\7*\2\2>A\3\2\2\2?A\7(\2\2@\"\3\2\2\2@%\3\2\2\2@*\3\2"+
-		"\2\2@\60\3\2\2\2@\64\3\2\2\2@:\3\2\2\2@;\3\2\2\2@?\3\2\2\2AG\3\2\2\2B"+
-		"C\f\t\2\2CD\t\2\2\2DF\5\6\4\nEB\3\2\2\2FI\3\2\2\2GE\3\2\2\2GH\3\2\2\2"+
-		"H\7\3\2\2\2IG\3\2\2\2JM\5\n\6\2KM\7\'\2\2LJ\3\2\2\2LK\3\2\2\2M\t\3\2\2"+
-		"\2NP\7\3\2\2OQ\7\27\2\2PO\3\2\2\2PQ\3\2\2\2QT\3\2\2\2RS\7\31\2\2SU\5\26"+
-		"\f\2TR\3\2\2\2TU\3\2\2\2U\13\3\2\2\2Vd\7\4\2\2WZ\7\5\2\2XY\7\31\2\2Y["+
-		"\5\26\f\2ZX\3\2\2\2Z[\3\2\2\2[\\\3\2\2\2\\d\7\30\2\2]^\7\6\2\2^_\7\31"+
-		"\2\2_d\5\24\13\2`a\5\22\n\2ab\7\30\2\2bd\3\2\2\2cV\3\2\2\2cW\3\2\2\2c"+
-		"]\3\2\2\2c`\3\2\2\2d\r\3\2\2\2el\5\4\3\2fh\5\20\t\2gf\3\2\2\2hi\3\2\2"+
-		"\2ig\3\2\2\2ij\3\2\2\2jl\3\2\2\2ke\3\2\2\2kg\3\2\2\2l\17\3\2\2\2mo\7\'"+
-		"\2\2nm\3\2\2\2no\3\2\2\2op\3\2\2\2p\u0082\7\7\2\2qs\7\'\2\2rq\3\2\2\2"+
-		"rs\3\2\2\2st\3\2\2\2tv\7\b\2\2uw\7\27\2\2vu\3\2\2\2vw\3\2\2\2wz\3\2\2"+
-		"\2xy\7\31\2\2y{\5\26\f\2zx\3\2\2\2z{\3\2\2\2{\u0082\3\2\2\2|~\7\'\2\2"+
-		"}|\3\2\2\2}~\3\2\2\2~\177\3\2\2\2\177\u0080\7\t\2\2\u0080\u0082\5\22\n"+
-		"\2\u0081n\3\2\2\2\u0081r\3\2\2\2\u0081}\3\2\2\2\u0082\21\3\2\2\2\u0083"+
-		"\u0087\7\n\2\2\u0084\u0087\7\13\2\2\u0085\u0087\7\f\2\2\u0086\u0083\3"+
-		"\2\2\2\u0086\u0084\3\2\2\2\u0086\u0085\3\2\2\2\u0087\23\3\2\2\2\u0088"+
-		"\u008d\7\r\2\2\u0089\u008d\7\16\2\2\u008a\u008d\7\17\2\2\u008b\u008d\7"+
-		"\20\2\2\u008c\u0088\3\2\2\2\u008c\u0089\3\2\2\2\u008c\u008a\3\2\2\2\u008c"+
-		"\u008b\3\2\2\2\u008d\25\3\2\2\2\u008e\u0095\7\21\2\2\u008f\u0095\7\22"+
-		"\2\2\u0090\u0095\7\23\2\2\u0091\u0095\7\24\2\2\u0092\u0095\7\25\2\2\u0093"+
-		"\u0095\7\26\2\2\u0094\u008e\3\2\2\2\u0094\u008f\3\2\2\2\u0094\u0090\3"+
-		"\2\2\2\u0094\u0091\3\2\2\2\u0094\u0092\3\2\2\2\u0094\u0093\3\2\2\2\u0095"+
-		"\27\3\2\2\2\24@GLPTZciknrvz}\u0081\u0086\u008c\u0094";
+		"\3\4\5\4;\n\4\3\4\3\4\3\4\7\4@\n\4\f\4\16\4C\13\4\3\5\3\5\5\5G\n\5\3\6"+
+		"\3\6\5\6K\n\6\3\6\3\6\5\6O\n\6\3\7\3\7\3\7\5\7T\n\7\3\7\3\7\5\7X\n\7\3"+
+		"\7\3\7\3\7\3\7\3\7\3\7\5\7`\n\7\3\b\3\b\6\bd\n\b\r\b\16\be\5\bh\n\b\3"+
+		"\t\5\tk\n\t\3\t\3\t\5\to\n\t\3\t\3\t\5\ts\n\t\3\t\3\t\5\tw\n\t\3\t\5\t"+
+		"z\n\t\3\t\3\t\5\t~\n\t\3\t\2\3\6\n\2\4\6\b\n\f\16\20\2\4\3\2\21\23\3\2"+
+		"\24\31\2\u0090\2\22\3\2\2\2\4\25\3\2\2\2\6:\3\2\2\2\bF\3\2\2\2\nH\3\2"+
+		"\2\2\f_\3\2\2\2\16g\3\2\2\2\20}\3\2\2\2\22\23\5\4\3\2\23\24\7\2\2\3\24"+
+		"\3\3\2\2\2\25\26\7\32\2\2\26\27\5\6\4\2\27\30\7\33\2\2\30\31\5\16\b\2"+
+		"\31\32\7\34\2\2\32\33\5\16\b\2\33\5\3\2\2\2\34\35\b\4\1\2\35\36\7\20\2"+
+		"\2\36;\5\6\4\13\37 \7\37\2\2 !\7\20\2\2!\"\5\6\4\2\"#\7 \2\2#;\3\2\2\2"+
+		"$%\7\37\2\2%&\5\6\4\2&\'\t\2\2\2\'(\5\6\4\2()\7 \2\2);\3\2\2\2*+\5\b\5"+
+		"\2+,\t\3\2\2,-\5\b\5\2-;\3\2\2\2./\7\37\2\2/\60\5\b\5\2\60\61\t\3\2\2"+
+		"\61\62\5\b\5\2\62\63\7 \2\2\63;\3\2\2\2\64;\5\f\7\2\65\66\7\37\2\2\66"+
+		"\67\5\f\7\2\678\7 \2\28;\3\2\2\29;\7\36\2\2:\34\3\2\2\2:\37\3\2\2\2:$"+
+		"\3\2\2\2:*\3\2\2\2:.\3\2\2\2:\64\3\2\2\2:\65\3\2\2\2:9\3\2\2\2;A\3\2\2"+
+		"\2<=\f\t\2\2=>\t\2\2\2>@\5\6\4\n?<\3\2\2\2@C\3\2\2\2A?\3\2\2\2AB\3\2\2"+
+		"\2B\7\3\2\2\2CA\3\2\2\2DG\5\n\6\2EG\7\35\2\2FD\3\2\2\2FE\3\2\2\2G\t\3"+
+		"\2\2\2HJ\7\3\2\2IK\7\n\2\2JI\3\2\2\2JK\3\2\2\2KN\3\2\2\2LM\7\17\2\2MO"+
+		"\7\r\2\2NL\3\2\2\2NO\3\2\2\2O\13\3\2\2\2P`\7\4\2\2QS\7\5\2\2RT\7\n\2\2"+
+		"SR\3\2\2\2ST\3\2\2\2TW\3\2\2\2UV\7\17\2\2VX\7\r\2\2WU\3\2\2\2WX\3\2\2"+
+		"\2XY\3\2\2\2Y`\7\16\2\2Z[\7\6\2\2[\\\7\17\2\2\\`\7\f\2\2]^\7\13\2\2^`"+
+		"\7\16\2\2_P\3\2\2\2_Q\3\2\2\2_Z\3\2\2\2_]\3\2\2\2`\r\3\2\2\2ah\5\4\3\2"+
+		"bd\5\20\t\2cb\3\2\2\2de\3\2\2\2ec\3\2\2\2ef\3\2\2\2fh\3\2\2\2ga\3\2\2"+
+		"\2gc\3\2\2\2h\17\3\2\2\2ik\7\35\2\2ji\3\2\2\2jk\3\2\2\2kl\3\2\2\2l~\7"+
+		"\7\2\2mo\7\35\2\2nm\3\2\2\2no\3\2\2\2op\3\2\2\2pr\7\b\2\2qs\7\n\2\2rq"+
+		"\3\2\2\2rs\3\2\2\2sv\3\2\2\2tu\7\17\2\2uw\7\r\2\2vt\3\2\2\2vw\3\2\2\2"+
+		"w~\3\2\2\2xz\7\35\2\2yx\3\2\2\2yz\3\2\2\2z{\3\2\2\2{|\7\t\2\2|~\7\13\2"+
+		"\2}j\3\2\2\2}n\3\2\2\2}y\3\2\2\2~\21\3\2\2\2\22:AFJNSW_egjnrvy}";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

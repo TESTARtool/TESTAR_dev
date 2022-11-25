@@ -1,10 +1,10 @@
 IF
-    any-actions unvisited of-type input-action
+    any-actions unvisited of-type input-action exist
 THEN
     select-random unvisited of-type input-action
 ELSE
     IF
-       any-actions unvisited of-type scroll-action
+       any-actions unvisited of-type scroll-action exist
     THEN
         select-random unvisited of-type scroll-action
     ELSE
