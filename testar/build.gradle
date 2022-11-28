@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     id "de.undercouch.download" version "4.1.1"
     id "io.freefair.lombok" version "6.5.0.3"
@@ -36,14 +37,21 @@ sourceSets {
     }
 }
 
+Properties properties = new Properties()
+properties.load(project.file('local.properties').newDataInputStream())
+
 /**
  * Task to run TESTAR using gradle
  * This task set the working directory to the install folder and runs testar.bat
  */
 task runTestar(type: Exec) {
-    def jfxHome = System.getenv('PATH_TO_FX')
+    //def jfxHome = "/usr/lib/jvm/java-19-openjfx/lib"//System.getenv('PATH_TO_FX')
+    def jfxHome = properties.getProperty('javafx.path')
     if (jfxHome == null) {
-        throw new GradleException("Cannot locate JavaFX runtime: PATH_TO_JAVAFX not defined")
+        jfxHome = System.getenv('PATH_TO_FX')
+    }
+    if (jfxHome == null) {
+        throw new GradleException("Cannot locate JavaFX runtime. Either make sure that PATH_TO_FX variable defined in your system or put javafx.path into your testar/local.properties")
     }
 
     // Make sure temp dir exists on case-sensitive OSs

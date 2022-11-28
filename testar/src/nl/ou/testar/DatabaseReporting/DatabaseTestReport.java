@@ -2,6 +2,9 @@ package nl.ou.testar.DatabaseReporting;
 
 import nl.ou.testar.TestReport;
 import nl.ou.testar.report.ReportDataAccess;
+import nl.ou.testar.report.ReportDataException;
+
+import org.fruit.monkey.ProtocolDelegate;
 import org.testar.monkey.alayer.*;
 
 import java.sql.SQLException;
@@ -28,6 +31,16 @@ public class DatabaseTestReport implements TestReport {
 
     private boolean isFirstFailure;
 
+    protected ProtocolDelegate delegate;
+
+    public ProtocolDelegate getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(ProtocolDelegate delegate) {
+        this.delegate = delegate;
+    }
+
     public DatabaseTestReport(ReportDataAccess sqlService, String reportTag) {
         this.sqlService = sqlService;
 
@@ -43,9 +56,12 @@ public class DatabaseTestReport implements TestReport {
         try {
             reportId = sqlService.registerReport(reportTag);
         }
-        catch (SQLException e) {
+        catch (ReportDataException e) {
             System.err.println("Could not add a report");
             e.printStackTrace();
+            if (delegate != null) {
+                delegate.popupMessage(e.getMessage());
+            }
         }
     }
 
@@ -55,9 +71,12 @@ public class DatabaseTestReport implements TestReport {
         try {
             stateIds.put(state, sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID)));
         }
-        catch (SQLException e) {
+        catch (ReportDataException e) {
             System.err.println("Could not add a state: " + e.getMessage());
             e.printStackTrace();
+            if (delegate != null) {
+                delegate.popupMessage(e.getMessage());
+            }
         }
     }
 
@@ -117,9 +136,12 @@ public class DatabaseTestReport implements TestReport {
 //                sqlService.addActionToIteration(actionIds.get(pendingEntry.getKey()), stateIds.get(pendingEntry.getValue()));
 //            }
         }
-        catch (SQLException e) {
+        catch (ReportDataException e) {
             System.err.println("Could not add a test verdict");
             e.printStackTrace();
+            if (delegate != null) {
+                delegate.popupMessage(e.getMessage());
+            }
         }
         finally {
             pendingActions.clear();
@@ -132,13 +154,16 @@ public class DatabaseTestReport implements TestReport {
         try {
             sqlService.finalizeReport(reportId, actionsPerSequence, totalSequences, url);
         }
-        catch (SQLException e) {
+        catch (ReportDataException e) {
             System.err.println("Cannot finalize report: " + e.getMessage());
             e.printStackTrace();
+            if (delegate != null) {
+                delegate.popupMessage(e.getMessage());
+            }
         }
     }
 
-    private int addAction(State state, Action action, boolean selected) throws SQLException {
+    private int addAction(State state, Action action, boolean selected) throws ReportDataException {
 
         int stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
 

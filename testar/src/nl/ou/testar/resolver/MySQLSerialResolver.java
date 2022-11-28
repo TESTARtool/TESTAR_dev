@@ -4,6 +4,8 @@ import nl.ou.testar.ActionResolver;
 import nl.ou.testar.parser.ActionParseException;
 import nl.ou.testar.parser.ActionParser;
 import nl.ou.testar.report.ReportDataAccess;
+import nl.ou.testar.report.ReportDataException;
+
 import org.testar.monkey.Pair;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
@@ -93,8 +95,9 @@ public class MySQLSerialResolver extends SerialResolver<ReportDataAccess> {
             actions = service.getSelectedActions(iterationData.getId());
             innerIterator = actions.listIterator();
         }
-        catch (SQLException e) {
-            System.out.println(e.getMessage());
+        catch (ReportDataException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         return true;
