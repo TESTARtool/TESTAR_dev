@@ -10,13 +10,13 @@ import strategynodes.VisitedModifier;
 import java.util.Map;
 import java.util.Set;
 
-public class AnyActionsExist_Node extends BaseStrategyNode<Boolean>
+public class AnyActionsExistNode extends BaseStrategyNode<Boolean>
 {
     private final VisitedModifier   VISITED_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTIONTYPE;
     
-    public AnyActionsExist_Node(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public AnyActionsExistNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.VISITED_MODIFIER = visitedModifier;
         this.FILTER           = filter;
@@ -24,7 +24,7 @@ public class AnyActionsExist_Node extends BaseStrategyNode<Boolean>
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it work
+    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
         boolean available = false;
         for(Action action : actions)

@@ -7,11 +7,11 @@ import org.testar.monkey.alayer.Tags;
 import java.util.Map;
 import java.util.Set;
 
-public class SelectPreviousAction_Node extends BaseAction_Node
+public class SelectPreviousActionNode extends BaseActionNode
 {
     private Integer WEIGHT;
     
-    public SelectPreviousAction_Node(Integer weight)
+    public SelectPreviousActionNode(Integer weight)
     { this.WEIGHT = (weight != null || weight > 0) ? weight : 1; }
     
     @Override

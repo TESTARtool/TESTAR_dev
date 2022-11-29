@@ -6,11 +6,11 @@ import strategynodes.BaseStrategyNode;
 
 import java.util.*;
 
-public class ActionList_Node extends BaseStrategyNode<Action>
+public class ActionListNode extends BaseStrategyNode<Action>
 {
-    private List<BaseAction_Node> actionStrategies = new ArrayList<BaseAction_Node>();
+    private List<BaseActionNode> actionStrategies = new ArrayList<BaseActionNode>();
     
-    public ActionList_Node(List<BaseAction_Node> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
+    public ActionListNode(List<BaseActionNode> actionStrategies) {this.actionStrategies.addAll(actionStrategies);}
     
     @Override
     public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
@@ -20,11 +20,11 @@ public class ActionList_Node extends BaseStrategyNode<Action>
         else
         {
             int totalWeights = 0;
-            for(BaseAction_Node action : this.actionStrategies)
+            for(BaseActionNode action : this.actionStrategies)
                 totalWeights += action.GetWeight();
             Random r = new Random();
             int t = totalWeights;
-            for(BaseAction_Node actionStrategy : this.actionStrategies)
+            for(BaseActionNode actionStrategy : this.actionStrategies)
             {
                 int i = r.nextInt(totalWeights);
                 if(i >= actionStrategy.GetWeight())
@@ -40,7 +40,7 @@ public class ActionList_Node extends BaseStrategyNode<Action>
     public String toString()
     {
         StringJoiner actionJoiner = new StringJoiner(" ");
-        for(BaseAction_Node actionStrategy : this.actionStrategies)
+        for(BaseActionNode actionStrategy : this.actionStrategies)
             actionJoiner.add(actionStrategy.toString());
         return actionJoiner.toString();
     }

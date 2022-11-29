@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class SelectRandomAction_Node extends BaseAction_Node
+public class SelectRandomActionNode extends BaseActionNode
 {
     private final VisitedModifier   VISITED_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
     
-    public SelectRandomAction_Node(Integer weight, VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public SelectRandomActionNode(Integer weight, VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.WEIGHT             = (weight != null || weight > 0) ? weight : 1;
         this.VISITED_MODIFIER   = visitedModifier;

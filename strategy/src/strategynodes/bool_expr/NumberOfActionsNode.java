@@ -10,13 +10,13 @@ import strategynodes.VisitedModifier;
 
 import java.util.*;
 
-public class NumberOfActions_Node extends BaseStrategyNode<Integer>
+public class NumberOfActionsNode extends BaseStrategyNode<Integer>
 {
     private final VisitedModifier   VISITED_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
     
-    public NumberOfActions_Node(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public NumberOfActionsNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.VISITED_MODIFIER   = visitedModifier;
         this.FILTER             = filter;

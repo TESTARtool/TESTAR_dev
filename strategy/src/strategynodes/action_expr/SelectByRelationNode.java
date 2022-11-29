@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class SelectByRelation_Node extends BaseAction_Node
+public class SelectByRelationNode extends BaseActionNode
 {
     private final ActionRelation ACTION_RELATION;
     
-    public SelectByRelation_Node(Integer weight, ActionRelation actionRelation)
+    public SelectByRelationNode(Integer weight, ActionRelation actionRelation)
     {
         this.WEIGHT          = (weight != null || weight > 0) ? weight : 1;
         this.ACTION_RELATION = actionRelation;

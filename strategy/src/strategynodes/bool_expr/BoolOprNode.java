@@ -9,12 +9,12 @@ import java.util.Set;
 
 public class BoolOprNode extends BaseStrategyNode<Boolean>
 {
-    private BaseStrategyNode<Boolean>   left; //can be null if operator is NOT
-    private BoolOperator                operator;
-    private BaseStrategyNode<Boolean>   right;
+    private BaseStrategyNode<Boolean> left; //can be null if operator is NOT
+    private BooleanOperator           operator;
+    private BaseStrategyNode<Boolean> right;
     
     
-    public BoolOprNode(BaseStrategyNode left, BoolOperator operator, BaseStrategyNode right)
+    public BoolOprNode(BaseStrategyNode left, BooleanOperator operator, BaseStrategyNode right)
     {
         this.left = left;
         this.operator = operator;
@@ -24,7 +24,7 @@ public class BoolOprNode extends BaseStrategyNode<Boolean>
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        if(operator == BoolOperator.NOT)
+        if(operator == BooleanOperator.NOT)
             return operator.getResult(null, right.getResult(state, actions, actionsExecuted));
         else
             return operator.getResult(left.getResult(state, actions, actionsExecuted), right.getResult(state, actions, actionsExecuted));
@@ -33,7 +33,7 @@ public class BoolOprNode extends BaseStrategyNode<Boolean>
     @Override
     public String toString()
     {
-        if(operator == BoolOperator.NOT)
+        if(operator == BooleanOperator.NOT)
             return "(" + operator + " " + right.toString() + ")";
         else
             return "(" + left.toString() + " " + operator.toString() + " " + right.toString() + ")";

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum BoolOperator
+public enum BooleanOperator
 {
     NOT ("NOT")
             {
@@ -33,13 +33,13 @@ public enum BoolOperator
     
     public abstract boolean getResult(Boolean left, Boolean right);
     
-    public final String                            string;
-    private static final Map<String, BoolOperator> FROM_STRING = new HashMap<>();
+    public final String                               string;
+    private static final Map<String, BooleanOperator> FROM_STRING = new HashMap<>();
     
-    BoolOperator(String string)                      {this.string = string;}
+    BooleanOperator(String string)                      {this.string = string;}
     
-    public static BoolOperator toEnum(String string) { return FROM_STRING.get(string); }
-    public String toString()                         { return this.string; }
+    public static BooleanOperator toEnum(String string) { return FROM_STRING.get(string); }
+    public String toString()                            { return this.string; }
     
     static
     { Arrays.stream(values()).forEach(e -> FROM_STRING.put(e.string, e)); }

@@ -10,15 +10,15 @@ import java.util.Set;
 public class IntOprNode extends BaseStrategyNode<Boolean>
 {
     private BaseStrategyNode<Integer>   left;
-    private Integer                     leftInt;
-    private IntOperator                 operator;
-    private BaseStrategyNode<Integer>   right;
+    private Integer                   leftInt;
+    private IntegerOperator           operator;
+    private BaseStrategyNode<Integer> right;
     private Integer                     rightInt;
     
     private boolean leftIsInt = false;
     private boolean rightIsInt = false;
     
-    public IntOprNode(Object left, IntOperator operator, Object right)
+    public IntOprNode(Object left, IntegerOperator operator, Object right)
     {
         if(left instanceof BaseStrategyNode)
             this.left = (BaseStrategyNode<Integer>) left;

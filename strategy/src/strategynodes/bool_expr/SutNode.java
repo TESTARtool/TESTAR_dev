@@ -8,12 +8,12 @@ import strategynodes.Filter;
 import java.util.Map;
 import java.util.Set;
 
-public class Sut_Node extends BaseStrategyNode<Boolean>
+public class SutNode extends BaseStrategyNode<Boolean>
 {
     private final Filter  FILTER;
     private final SutType SUT_TYPE;
     
-    public Sut_Node(Filter filter, SutType sutType)
+    public SutNode(Filter filter, SutType sutType)
     {
         this.FILTER = filter;
         this.SUT_TYPE = sutType;

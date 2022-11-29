@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum IntOperator
+public enum IntegerOperator
 {
     LT ("<")
             {
@@ -45,13 +45,13 @@ public enum IntOperator
     
     public abstract boolean getResult(Integer left, Integer right);
     
-    public final String string;
-    private static final Map<String, IntOperator> FROM_STRING = new HashMap<>();
+    public final String                               string;
+    private static final Map<String, IntegerOperator> FROM_STRING = new HashMap<>();
     
-    IntOperator(String string)                      {this.string = string;}
+    IntegerOperator(String string)                      {this.string = string;}
     
-    public static IntOperator toEnum(String string) { return FROM_STRING.get(string); }
-    public String toString()                         { return this.string; }
+    public static IntegerOperator toEnum(String string) { return FROM_STRING.get(string); }
+    public String toString()                            { return this.string; }
     
     static
     { Arrays.stream(values()).forEach(e -> FROM_STRING.put(e.string, e)); }

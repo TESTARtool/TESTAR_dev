@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public abstract class BaseAction_Node extends BaseStrategyNode<Action>
+public abstract class BaseActionNode extends BaseStrategyNode<Action>
 {
     protected int WEIGHT;
     

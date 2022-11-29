@@ -8,7 +8,7 @@ import strategynodes.BaseStrategyNode;
 import java.util.Map;
 import java.util.Set;
 
-public class StateChanged_Node extends BaseStrategyNode<Boolean>
+public class StateChangedNode extends BaseStrategyNode<Boolean>
 {
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
