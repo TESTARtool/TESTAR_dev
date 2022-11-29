@@ -17,7 +17,7 @@ public class StrategyParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, ACTION_VISITED=8, 
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, VISIT_MODIFIER=8, 
 		RELATED_ACTION=9, SUT_TYPE=10, ACTION_TYPE=11, EXIST=12, FILTER=13, NOT=14, 
 		AND=15, XOR=16, OR=17, GT=18, GE=19, LT=20, LE=21, EQ=22, NE=23, IF=24, 
 		THEN=25, ELSE=26, NUMBER=27, BOOLEAN=28, LP=29, RP=30, COMMENT=31, WHITESPACE=32, 
@@ -37,7 +37,7 @@ public class StrategyParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'n-actions'", "'state-changed'", "'any-actions'", "'sut'", "'select-previous-action'", 
-			"'select-random'", "'select-by-actionRelation'", null, null, null, null, 
+			"'select-random'", "'select-by-relatedAction'", null, null, null, null, 
 			null, null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, 
 			"'!='", null, null, null, null, null, "'('", "')'"
 		};
@@ -45,7 +45,7 @@ public class StrategyParser extends Parser {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, "ACTION_VISITED", "RELATED_ACTION", 
+			null, null, null, null, null, null, null, null, "VISIT_MODIFIER", "RELATED_ACTION", 
 			"SUT_TYPE", "ACTION_TYPE", "EXIST", "FILTER", "NOT", "AND", "XOR", "OR", 
 			"GT", "GE", "LT", "LE", "EQ", "NE", "IF", "THEN", "ELSE", "NUMBER", "BOOLEAN", 
 			"LP", "RP", "COMMENT", "WHITESPACE", "ANY"
@@ -612,7 +612,7 @@ public class StrategyParser extends Parser {
 	}
 
 	public static class Number_of_actionsContext extends ParserRuleContext {
-		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
+		public TerminalNode VISIT_MODIFIER() { return getToken(StrategyParser.VISIT_MODIFIER, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
 		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public Number_of_actionsContext(ParserRuleContext parent, int invokingState) {
@@ -648,7 +648,7 @@ public class StrategyParser extends Parser {
 			case 1:
 				{
 				setState(71);
-				match(ACTION_VISITED);
+				match(VISIT_MODIFIER);
 				}
 				break;
 			}
@@ -690,7 +690,7 @@ public class StrategyParser extends Parser {
 	}
 	public static class AnyActionsExistsContext extends State_booleanContext {
 		public TerminalNode EXIST() { return getToken(StrategyParser.EXIST, 0); }
-		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
+		public TerminalNode VISIT_MODIFIER() { return getToken(StrategyParser.VISIT_MODIFIER, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
 		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public AnyActionsExistsContext(State_booleanContext ctx) { copyFrom(ctx); }
@@ -786,10 +786,10 @@ public class StrategyParser extends Parser {
 				setState(81);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==ACTION_VISITED) {
+				if (_la==VISIT_MODIFIER) {
 					{
 					setState(80);
-					match(ACTION_VISITED);
+					match(VISIT_MODIFIER);
 					}
 				}
 
@@ -1001,7 +1001,7 @@ public class StrategyParser extends Parser {
 	}
 	public static class SelectRandomActionContext extends ActionContext {
 		public TerminalNode NUMBER() { return getToken(StrategyParser.NUMBER, 0); }
-		public TerminalNode ACTION_VISITED() { return getToken(StrategyParser.ACTION_VISITED, 0); }
+		public TerminalNode VISIT_MODIFIER() { return getToken(StrategyParser.VISIT_MODIFIER, 0); }
 		public TerminalNode FILTER() { return getToken(StrategyParser.FILTER, 0); }
 		public TerminalNode ACTION_TYPE() { return getToken(StrategyParser.ACTION_TYPE, 0); }
 		public SelectRandomActionContext(ActionContext ctx) { copyFrom(ctx); }
@@ -1065,10 +1065,10 @@ public class StrategyParser extends Parser {
 				setState(112);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==ACTION_VISITED) {
+				if (_la==VISIT_MODIFIER) {
 					{
 					setState(111);
-					match(ACTION_VISITED);
+					match(VISIT_MODIFIER);
 					}
 				}
 

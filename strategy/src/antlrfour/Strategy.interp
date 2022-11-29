@@ -6,7 +6,7 @@ null
 'sut'
 'select-previous-action'
 'select-random'
-'select-by-actionRelation'
+'select-by-relatedAction'
 null
 null
 null
@@ -43,7 +43,7 @@ null
 null
 null
 null
-ACTION_VISITED
+VISIT_MODIFIER
 RELATED_ACTION
 SUT_TYPE
 ACTION_TYPE

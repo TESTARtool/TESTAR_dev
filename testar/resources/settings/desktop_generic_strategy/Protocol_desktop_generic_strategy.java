@@ -99,11 +99,6 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		Action prevAction = state.get(Tags.PreviousAction, null);
 		state.set(Tags.PreviousAction, selectedAction);
 		
-		if(prevAction != null)
-			System.out.println("Previous action: " + prevAction.get(Tags.AbstractIDCustom) + ", current action: " + selectedAction.get(Tags.AbstractIDCustom));
-		else
-			System.out.println("Previous action is null, current action: " + selectedAction.get(Tags.AbstractIDCustom));
-		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
 		actionsExecuted.put(actionID, timesUsed + 1); //increase by one

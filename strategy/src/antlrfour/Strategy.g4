@@ -22,11 +22,11 @@ bool_expr:                        NOT                               expr=bool_ex
 
 number_expr:         number_of_actions | NUMBER;
 
-number_of_actions:  'n-actions'      ACTION_VISITED?    (FILTER     ACTION_TYPE)?;
+number_of_actions:  'n-actions'      VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?;
 
 state_boolean:      'state-changed'                                                             #stateChanged
-|                   'any-actions'    ACTION_VISITED?     (FILTER     ACTION_TYPE)?      EXIST   #anyActionsExists
-|                   'sut'            FILTER     SUT_TYPE                                        #sutType
+|                   'any-actions'    VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?      EXIST     #anyActionsExists
+|                   'sut'            FILTER             SUT_TYPE                                #sutType
 |                    RELATED_ACTION  EXIST                                                      #relatedActionExists
 ;
 
@@ -38,8 +38,8 @@ action_expr:        strategy        #subStrategy
 |                   action+         #actionList;
 
 action: NUMBER?     'select-previous-action'                                                #selectPreviousAction
-|       NUMBER?     'select-random'             ACTION_VISITED?     (FILTER ACTION_TYPE)?   #selectRandomAction
-|       NUMBER?     'select-by-actionRelation'        RELATED_ACTION                              #selectRelatedAction
+|       NUMBER?     'select-random'             VISIT_MODIFIER?     (FILTER ACTION_TYPE)?   #selectRandomAction
+|       NUMBER?     'select-by-relatedAction'   RELATED_ACTION                              #selectRelatedAction
 ;
 
 
@@ -47,7 +47,7 @@ action: NUMBER?     'select-previous-action'                                    
 // common lexer rules //
 ////////////////////////
 
-ACTION_VISITED:     'visitedModifier' | 'unvisited' | 'most-visitedModifier' | 'least-visitedModifier';
+VISIT_MODIFIER:     'visited' | 'unvisited' | 'most-visited' | 'least-visited';
 
 RELATED_ACTION:     'sibling-action' | 'child-action' | 'sibling-or-child-action';
 

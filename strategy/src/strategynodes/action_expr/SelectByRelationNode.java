@@ -4,7 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import strategynodes.ActionRelation;
+import strategynodes.RelatedAction;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,12 +12,12 @@ import java.util.Set;
 
 public class SelectByRelationNode extends BaseActionNode
 {
-    private final ActionRelation ACTION_RELATION;
+    private final RelatedAction RELATED_ACTION;
     
-    public SelectByRelationNode(Integer weight, ActionRelation actionRelation)
+    public SelectByRelationNode(Integer weight, RelatedAction relatedAction)
     {
-        this.WEIGHT          = (weight != null || weight > 0) ? weight : 1;
-        this.ACTION_RELATION = actionRelation;
+        this.WEIGHT         = (weight != null || weight > 0) ? weight : 1;
+        this.RELATED_ACTION = relatedAction;
     }
     
     private boolean WidgetsAreParentAndChild(Widget parent, Widget child)
@@ -38,9 +38,9 @@ public class SelectByRelationNode extends BaseActionNode
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);
-            if((ACTION_RELATION == ActionRelation.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
-               (ACTION_RELATION == ActionRelation.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
-               (ACTION_RELATION == ActionRelation.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
+            if((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
+               (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
+               (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
                 filteredActions.add(action);
         }
         
@@ -52,5 +52,5 @@ public class SelectByRelationNode extends BaseActionNode
     
     @Override
     public String toString()
-    { return WEIGHT + " select-by-relation " + ACTION_RELATION.toString(); }
+    { return WEIGHT + " select-by-relation " + RELATED_ACTION.toString(); }
 }

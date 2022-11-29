@@ -20,7 +20,7 @@ public class AnyActionsExistNode extends BaseStrategyNode<Boolean>
     {
         this.VISITED_MODIFIER = visitedModifier;
         this.FILTER           = filter;
-        this.ACTIONTYPE      = actionType;
+        this.ACTIONTYPE       = actionType;
     }
     
     @Override
@@ -42,6 +42,7 @@ public class AnyActionsExistNode extends BaseStrategyNode<Boolean>
     public String toString()
     {
         String string = " any-actions ";
+        if(VISITED_MODIFIER != null) string += VISITED_MODIFIER.toString();
         if(FILTER != null) string += FILTER.toString() + " " + ACTIONTYPE.toString();
         string += " exist";
         return string;

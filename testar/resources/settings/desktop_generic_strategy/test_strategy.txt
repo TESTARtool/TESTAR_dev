@@ -1,6 +1,6 @@
 IF
-    5 > 3
+    any-actions of-type click-action exist
 THEN
-    previous-action
+    select-previous-action
 ELSE
-    r-least-executed-action
+    select-random least-visited

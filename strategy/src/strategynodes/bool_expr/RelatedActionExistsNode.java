@@ -4,7 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import strategynodes.ActionRelation;
+import strategynodes.RelatedAction;
 import strategynodes.BaseStrategyNode;
 
 import java.util.Map;
@@ -12,11 +12,11 @@ import java.util.Set;
 
 public class RelatedActionExistsNode extends BaseStrategyNode<Boolean>
 {
-    private final ActionRelation ACTION_RELATION;
+    private final RelatedAction RELATED_ACTION;
     
-    public RelatedActionExistsNode(ActionRelation actionRelation)
+    public RelatedActionExistsNode(RelatedAction relatedAction)
     {
-        this.ACTION_RELATION = actionRelation;
+        this.RELATED_ACTION = relatedAction;
     }
     
     private boolean WidgetsAreParentAndChild(Widget parent, Widget child)
@@ -33,9 +33,9 @@ public class RelatedActionExistsNode extends BaseStrategyNode<Boolean>
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);
-            if((ACTION_RELATION == ActionRelation.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
-               (ACTION_RELATION == ActionRelation.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
-               (ACTION_RELATION == ActionRelation.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
+            if((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
+               (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
+               (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
                 return true; //if one is found, no need to search further
         }
         return false;
@@ -43,5 +43,5 @@ public class RelatedActionExistsNode extends BaseStrategyNode<Boolean>
     
     @Override
     public String toString()
-    { return ACTION_RELATION.toString() + " exist"; }
+    { return RELATED_ACTION.toString() + " exist"; }
 }

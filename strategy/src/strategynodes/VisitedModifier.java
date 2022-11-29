@@ -13,9 +13,9 @@ public enum VisitedModifier
     public final String                               plainText;
     private static final Map<String, VisitedModifier> FROM_PLAIN_TEXT = new HashMap<>();
     
-    private VisitedModifier(String plainText)                    {this.plainText = plainText;}
+    private VisitedModifier(String plainText)                   {this.plainText = plainText;}
     
-    public static VisitedModifier stringToEnum(String plainText) {return FROM_PLAIN_TEXT.get(plainText);}
+    public static VisitedModifier toEnum(String plainText)      {return FROM_PLAIN_TEXT.get(plainText);}
     
     static {for (VisitedModifier e: values()) {FROM_PLAIN_TEXT.put(e.plainText, e);}}
     
