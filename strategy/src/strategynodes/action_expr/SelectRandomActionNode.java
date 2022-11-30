@@ -47,7 +47,7 @@ public class SelectRandomActionNode extends BaseActionNode
             {
                 int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
                 
-                if(filterActionTypes && !actionAllowedByFilter(action)) //check if action is rejected by filter
+                if(filterActionTypes && !actionAllowedByFilter(action, FILTER, ACTION_TYPE)) //check if action is rejected by filter
                     break; //if yes, move on to the next action
                 
                 if(count == targetCount) //both least and most
@@ -66,7 +66,7 @@ public class SelectRandomActionNode extends BaseActionNode
             {
                 boolean actionIsVisited = (actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)));
                 
-                if(filterActionTypes && (!actionAllowedByFilter(action))) //check if action is rejected by filter
+                if(filterActionTypes && (!actionAllowedByFilter(action, FILTER, ACTION_TYPE))) //check if action is rejected by filter
                     break; //if yes, move on to the next action
                 
                 if(filterVisited &&
@@ -83,16 +83,6 @@ public class SelectRandomActionNode extends BaseActionNode
             return new ArrayList<>(actions).get(0);
         else
             return selectRandomAction(filteredActions); //pick randomly from the filtered list
-    }
-    
-    private boolean actionAllowedByFilter(Action action)
-    {
-        boolean actionIsOfType = (ACTION_TYPE.actionIsThisType(action));
-        
-        return (
-                (FILTER == Filter.INCLUDE && actionIsOfType) ||
-                (FILTER == Filter.EXCLUDE && (!actionIsOfType))
-        );
     }
     
     @Override

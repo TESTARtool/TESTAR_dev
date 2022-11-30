@@ -44,16 +44,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     ////////////////////////
     // number expressions //
     ////////////////////////
-    
-//    @Override
-//    public BaseStrategyNode visitNumber_expr(StrategyParser.Number_exprContext ctx)
-//    {
-//        if(ctx.NUMBER() != null) //plain integer
-//            return visitChildren(ctx);
-//        else
-//            return visit(ctx.number_of_actions());
-//    }
-    
+
     @Override
     public BaseStrategyNode visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx)
     {

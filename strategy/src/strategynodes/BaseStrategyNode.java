@@ -12,4 +12,14 @@ public abstract class BaseStrategyNode<T>
     
     @Override
     public abstract String toString();
+    
+    protected boolean actionAllowedByFilter(Action action, Filter filter, ActionType actionType)
+    {
+        boolean actionIsOfType = (actionType.actionIsThisType(action));
+        
+        return (
+                (filter == Filter.INCLUDE && actionIsOfType) ||
+                (filter == Filter.EXCLUDE && (!actionIsOfType))
+        );
+    }
 }
