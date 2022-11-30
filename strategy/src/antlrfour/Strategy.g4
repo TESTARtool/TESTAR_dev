@@ -39,7 +39,7 @@ action_expr:        strategy        #subStrategy
 
 action: NUMBER?     'select-previous-action'                                                #selectPreviousAction
 |       NUMBER?     'select-random'             VISIT_MODIFIER?     (FILTER ACTION_TYPE)?   #selectRandomAction
-|       NUMBER?     'select-by-relatedAction'   RELATED_ACTION                              #selectRelatedAction
+|       NUMBER?     'select-by-related'         RELATED_ACTION                              #selectRelatedAction
 ;
 
 

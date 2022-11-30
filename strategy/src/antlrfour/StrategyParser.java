@@ -37,9 +37,9 @@ public class StrategyParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'n-actions'", "'state-changed'", "'any-actions'", "'sut'", "'select-previous-action'", 
-			"'select-random'", "'select-by-relatedAction'", null, null, null, null, 
-			null, null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, 
-			"'!='", null, null, null, null, null, "'('", "')'"
+			"'select-random'", "'select-by-related'", null, null, null, null, null, 
+			null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, "'!='", 
+			null, null, null, null, null, "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();

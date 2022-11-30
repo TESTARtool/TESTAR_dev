@@ -1,6 +1,6 @@
 IF
-    child-or-sibling-action-exists
+    sibling-or-child-action exists
 THEN
-    select-child-or-sibling-action
+    select-by-related sibling-or-child-action
 ELSE
-    random-action
+    select-random
