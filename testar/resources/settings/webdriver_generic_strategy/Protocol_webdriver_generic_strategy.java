@@ -54,19 +54,19 @@
 {
     private ParseUtil               parseUtil;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
-    private boolean                 useSecondaryStrategy;
-    private boolean                 formStrategyActive = false;
-    private double                  formModeProbability;
+//    private boolean                 useSecondaryStrategy;
+//    private boolean                 formStrategyActive = false;
+//    private double                  formModeProbability;
     
     @Override
     protected void initialize(Settings settings)
     {
         super.initialize(settings);
-        parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile), settings.get(ConfigTags.SecondaryStrategyFile));
+        parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
         
         //for detecting forms and switching to form filling mode with some probability
-        useSecondaryStrategy = settings.get(ConfigTags.UseSecondaryStrategy);
-        formModeProbability = settings.get(ConfigTags.FormModeProbability);
+//        useSecondaryStrategy = settings.get(ConfigTags.UseSecondaryStrategy);
+//        formModeProbability = settings.get(ConfigTags.FormModeProbability);
     }
     
     @Override
@@ -102,17 +102,17 @@
         // iterate through all widgets
         for (Widget widget : state)
         {
-            if(useSecondaryStrategy && !formStrategyActive)
-            {
-                if(isAtBrowserCanvas(widget) && isForm(widget))
-                {
-                    if(Math.random() <= formModeProbability)
-                    {
-                        formStrategyActive = true;
-                        System.out.println("Form filling mode ON");
-                    }
-                }
-            }
+//            if(useSecondaryStrategy && !formStrategyActive)
+//            {
+//                if(isAtBrowserCanvas(widget) && isForm(widget))
+//                {
+//                    if(Math.random() <= formModeProbability)
+//                    {
+//                        formStrategyActive = true;
+//                        System.out.println("Form filling mode ON");
+//                    }
+//                }
+//            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
@@ -183,16 +183,16 @@
     protected Action selectAction(State state, Set<Action> actions)
     {
         //clone the action
-        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted, formStrategyActive));
+        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
         
         Widget selectedWidget = selectedAction.get(Tags.OriginWidget, null);
         
         //if statement to switch back to regular strategy
-        if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
-        {
-            formStrategyActive = false;
-            System.out.println("Form filling mode OFF");
-        }
+//        if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
+//        {
+//            formStrategyActive = false;
+//            System.out.println("Form filling mode OFF");
+//        }
         
         if(DefaultProtocol.lastExecutedAction != null)
             state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
@@ -204,11 +204,11 @@
         return selectedAction;
     }
     
-    private Boolean isSubmitButton(Widget submit_widget)
-    {
-        if(submit_widget == null)
-            return false;
-        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
-        return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
-    }
+//    private Boolean isSubmitButton(Widget submit_widget)
+//    {
+//        if(submit_widget == null)
+//            return false;
+//        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
+//        return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
+//    }
 }

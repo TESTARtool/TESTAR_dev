@@ -15,29 +15,12 @@ import java.util.Set;
 
 public class ParseUtil
 {
-    private StrategyNode primaryASTTree;
-    private StrategyNode secondaryASTTree = null;
+    private StrategyNode StrategyTree;
     
     public ParseUtil(String filePath)
     {
         CharStream chars  = PathToCharstream(filePath);
-        primaryASTTree = BuildAST(chars);
-        
-        System.out.println("Debug:");
-        System.out.println(primaryASTTree.toString());
-    }
-    
-    public ParseUtil(String primaryFilePath, String secondaryFilePath)
-    {
-        CharStream chars1  = PathToCharstream(primaryFilePath);
-        primaryASTTree = BuildAST(chars1);
-        CharStream chars2  = PathToCharstream(secondaryFilePath);
-        secondaryASTTree = BuildAST(chars2);
-        
-        System.out.println("Debug:");
-        System.out.println(primaryASTTree.toString());
-        System.out.println("---");
-        System.out.println(secondaryASTTree.toString());
+        StrategyTree = BuildAST(chars);
     }
     
     private CharStream PathToCharstream(String filePath)
@@ -66,13 +49,13 @@ public class ParseUtil
     }
     
     public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
-    {return selectAction(state, actions, actionsExecuted, false);}
-    
-    public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, boolean useSecondaryStrategy)
     {
-        if(!useSecondaryStrategy || secondaryASTTree == null) //either the primary is preferred or there is no secondary strategy
-            return primaryASTTree.getResult(state, actions, actionsExecuted);
-        else
-            return secondaryASTTree.getResult(state, actions, actionsExecuted);
+        return StrategyTree.getResult(state, actions, actionsExecuted);
+    }
+    
+    public void printStrategy()
+    {
+        System.out.println("Strategy:");
+        System.out.println(StrategyTree.toString());
     }
 }
