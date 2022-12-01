@@ -144,7 +144,7 @@ public class ReplayMode {
 				}
 
 				// Derive Actions of the current State
-				Set<Action> actions = protocol.deriveActions(system,state);
+				Set<Action> actions = protocol.actionResolver.deriveActions(system,state);
 				protocol.buildStateActionsIdentifiers(state, actions);
 
 				// notify to state model the current state
@@ -249,7 +249,7 @@ public class ReplayMode {
 			}
 
 			// notify to state model the last state
-			Set<Action> actions = protocol.deriveActions(system, state);
+			Set<Action> actions = protocol.actionResolver.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)

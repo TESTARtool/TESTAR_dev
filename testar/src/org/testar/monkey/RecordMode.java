@@ -106,7 +106,7 @@ public class RecordMode {
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
 
-			Set<Action> actions = protocol.deriveActions(system,state);
+			Set<Action> actions = protocol.actionResolver.deriveActions(system,state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 
 			//notify the state model manager of the new state
@@ -223,7 +223,7 @@ public class RecordMode {
 						state);
 			}
 
-			Set<Action> actions = protocol.deriveActions(system, state);
+			Set<Action> actions = protocol.actionResolver.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:

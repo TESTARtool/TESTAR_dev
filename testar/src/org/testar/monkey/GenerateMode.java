@@ -68,7 +68,7 @@ public class GenerateMode {
 		/*
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
-		while (protocol.mode() != Modes.Quit && protocol.moreSequences()) {
+		while (protocol.mode() != Modes.Quit && protocol.actionResolver.moreSequences()) {
 			exceptionThrown = false;
 
 			synchronized(this){
@@ -191,7 +191,7 @@ public class GenerateMode {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (protocol.mode() != Modes.Quit && protocol.moreActions(state)) {
+		while (protocol.mode() != Modes.Quit && protocol.actionResolver.moreActions(state)) {
 
 			if (protocol.mode() == Modes.Record) {
 				new RecordMode().runRecordLoop(protocol, system);
@@ -203,7 +203,7 @@ public class GenerateMode {
 			Util.clear(protocol.cv);
 
 			//Deriving actions from the state:
-			Set<Action> actions = protocol.deriveActions(system, state);
+			Set<Action> actions = protocol.actionResolver.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 			for(Action a : actions)
 				if(a.get(Tags.AbstractIDCustom, null) == null)
@@ -221,7 +221,7 @@ public class GenerateMode {
 			}
 
 			//Selecting one of the available actions:
-			Action action = protocol.selectAction(system, state, actions);
+			Action action = protocol.actionResolver.selectAction(system, state, actions);
 
 			//Showing the red dot if visualization is on:
 			if(protocol.visualizationOn) {
@@ -248,7 +248,7 @@ public class GenerateMode {
 		}
 
 		// notify to state model the last state
-		Set<Action> actions = protocol.deriveActions(system, state);
+		Set<Action> actions = protocol.actionResolver.deriveActions(system, state);
 		protocol.buildStateActionsIdentifiers(state, actions);
 		for(Action a : actions)
 			if(a.get(Tags.AbstractIDCustom, null) == null)

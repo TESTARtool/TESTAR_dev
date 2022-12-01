@@ -244,7 +244,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         }
 
         if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
-            System.out.println("*** Create a new SQL service ***");
             // TODO: warn and fallback to static HTML reporting if state model disabled or
             // Docker isn't available
             dataAccess = new RestReportDataAccess(settings.get(ConfigTags.ReportApiUrl), settings);// new
@@ -740,7 +739,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
         // If Web Console Warning Oracle is enabled and we have some pattern to match
         if (settings.get(ConfigTags.WebConsoleWarningOracle, false)
-                && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
+            && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
+
             // Load the web console warning pattern
             Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern),
                     Pattern.UNICODE_CHARACTER_CLASS);
@@ -836,8 +836,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         String status = "";
         String statusInfo = "";
 
-        System.out.println("*** Postprocessing a sequence ***");
-
         String sequencesPath = getGeneratedSequenceName();
         try {
             sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
@@ -854,13 +852,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         statusInfo = (getVerdict(latestState).join(processVerdict)).info();
 
         if (mode() == Modes.Replay || mode() == Modes.ReplayModel) {
-            System.out.println("*** Adding a test verdict from replay ***");
             sequenceReport.addTestVerdict(getReplayVerdict().join(processVerdict));
             testReport.addTestVerdict(getReplayVerdict().join(processVerdict), lastExecutedAction, latestState);
             status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         } else {
-            System.out.println("*** Adding a test verdict ***");
             sequenceReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
             testReport.addTestVerdict(getVerdict(latestState), lastExecutedAction, latestState);
             status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
@@ -945,7 +941,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
         if (forcedActions != null) {
             for (Action action : forcedActions) {
-                System.out.println(String.format("*** Action %s is forced ***", action.toShortString()));
                 action.set(WdTags.WebIsForced, true);
             }
         }
@@ -1341,7 +1336,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     protected void runTestLoop(Modes mode, SUT system) throws StateModelException {
-        if (resolversSupported() && mode == Modes.Replay && orientService != null) {
+
+        //TODO: check if OrientDB service is available
+        if (resolversSupported() && mode == Modes.Replay/* && orientService != null*/) {
             new ResolverFeaturedReplayMode().runReplayLoop(this, orientService);
         } else {
             super.runTestLoop(mode, system);

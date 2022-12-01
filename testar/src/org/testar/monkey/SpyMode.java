@@ -58,7 +58,7 @@ public class SpyMode {
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
 
-			Set<Action> actions = protocol.deriveActions(system, state);
+			Set<Action> actions = protocol.actionResolver.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
