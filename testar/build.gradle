@@ -38,7 +38,7 @@ sourceSets {
 }
 
 Properties properties = new Properties()
-properties.load(project.file('local.properties').newDataInputStream())
+File localPropertiesFile = project.file('local.properties')
 
 /**
  * Task to run TESTAR using gradle
@@ -46,7 +46,11 @@ properties.load(project.file('local.properties').newDataInputStream())
  */
 task runTestar(type: Exec) {
     //def jfxHome = "/usr/lib/jvm/java-19-openjfx/lib"//System.getenv('PATH_TO_FX')
-    def jfxHome = properties.getProperty('javafx.path')
+    def jfxHome = null;
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.newDataInputStream())
+        jfxHome = properties.getProperty('javafx.path')
+    }
     if (jfxHome == null) {
         jfxHome = System.getenv('PATH_TO_FX')
     }
