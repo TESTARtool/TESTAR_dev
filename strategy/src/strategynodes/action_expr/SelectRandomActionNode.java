@@ -91,7 +91,6 @@ public class SelectRandomActionNode extends BaseActionNode
         String string = WEIGHT + " select-random";
         if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER.toString();
         if(FILTER != null) string += " " + FILTER.toString() + " " + ACTION_TYPE.toString();
-        string += " exist";
         return string;
     }
 }
