@@ -104,7 +104,7 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 		if(retAction==null) {
 			System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
-			retAction = RandomActionSelector.selectAction(actions);
+			retAction = getActionSelector().selectAction(state, actions);
 		}
 		return retAction;
 	}

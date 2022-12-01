@@ -30,14 +30,15 @@
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomActionSelector {
+public class RandomActionSelector implements ActionSelector {
 
-    public static Action selectAction(Set<Action> actions) {
+    public Action selectAction(State state, Set<Action> actions) {
         long graphTime = System.currentTimeMillis();
         Random rnd = new Random(graphTime);
         return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));

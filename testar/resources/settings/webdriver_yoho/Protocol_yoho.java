@@ -1,5 +1,6 @@
 import nl.ou.testar.resolver.MySQLSerialResolver;
 import nl.ou.testar.resolver.OrientDBSerialResolver;
+import org.testar.ActionSelector;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -14,6 +15,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.simplestategraph.QLearningActionSelector;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,6 +37,8 @@ public class Protocol_yoho extends WebdriverProtocol {
     // protected MySQLSerialResolver databaseReplayResolver;
     // protected OrientDBSerialResolver orientDbSerialResolver;
 
+    protected QLearningActionSelector qlActionSelector;
+
     @Override
     protected void initialize(Settings settings) {
         // isTestReportEnabled = true;
@@ -44,120 +48,135 @@ public class Protocol_yoho extends WebdriverProtocol {
 
         super.initialize(settings);
 
+        qlActionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),
+                settings.get(ConfigTags.Discount));
+
         // List of atributes to identify and close policy popups
         // Set to null to disable this feature
-        policyAttributes = new HashMap<String, String>() {{
-            put("id", "sncmp-banner-btn-agree");
-        }};
+        policyAttributes = new HashMap<String, String>() {
+            {
+                put("id", "sncmp-banner-btn-agree");
+            }
+        };
     }
 
     // Jam logging if disabled
 
-//     @Override
-//     protected String getAndStoreGeneratedSequence() {
-//         if (!isLogSerializerEnabled) {
-//             return null;
-//         }
-//         return super.getAndStoreGeneratedSequence();
-//     }
+    // @Override
+    // protected String getAndStoreGeneratedSequence() {
+    // if (!isLogSerializerEnabled) {
+    // return null;
+    // }
+    // return super.getAndStoreGeneratedSequence();
+    // }
 
-//     @Override
-//     protected File getAndStoreSequenceFile() {
-//         if (!isLogSerializerEnabled) {
-//             return null;
-//         }
-//         return super.getAndStoreSequenceFile();
-//     }
+    // @Override
+    // protected File getAndStoreSequenceFile() {
+    // if (!isLogSerializerEnabled) {
+    // return null;
+    // }
+    // return super.getAndStoreSequenceFile();
+    // }
 
-//     @Override
-//     protected void saveActionInfoInLogs(State state, Action action, String actionMode) {
-//         if (!isLogSerializerEnabled) {
-//             return;
-//         }
-//         super.saveActionInfoInLogs(state, action, actionMode);
-//     }
+    // @Override
+    // protected void saveActionInfoInLogs(State state, Action action, String
+    // actionMode) {
+    // if (!isLogSerializerEnabled) {
+    // return;
+    // }
+    // super.saveActionInfoInLogs(state, action, actionMode);
+    // }
 
-//     @Override
-//     protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq) {
-//         if (!isLogSerializerEnabled) {
-//             return;
-//         }
-//         super.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
-//     }
+    // @Override
+    // protected void classifyAndCopySequenceIntoAppropriateDirectory(Verdict
+    // finalVerdict, String generatedSequence, File currentSeq) {
+    // if (!isLogSerializerEnabled) {
+    // return;
+    // }
+    // super.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,
+    // generatedSequence, currentSeq);
+    // }
 
-//     // Jam recording if disabled
+    // // Jam recording if disabled
 
-//     @Override
-//     protected void initFragmentForReplayableSequence(State state) {
-//         if (!isPlayableRecordEnabled) {
-//             return;
-//         }
-//         super.initFragmentForReplayableSequence(state);
-//     }
+    // @Override
+    // protected void initFragmentForReplayableSequence(State state) {
+    // if (!isPlayableRecordEnabled) {
+    // return;
+    // }
+    // super.initFragmentForReplayableSequence(state);
+    // }
 
-//     @Override
-//     protected void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
-//         if (!isPlayableRecordEnabled) {
-//             return;
-//         }
-//         super.saveActionIntoFragmentForReplayableSequence(action, state, actions);
-//     }
+    // @Override
+    // protected void saveActionIntoFragmentForReplayableSequence(Action action,
+    // State state, Set<Action> actions) {
+    // if (!isPlayableRecordEnabled) {
+    // return;
+    // }
+    // super.saveActionIntoFragmentForReplayableSequence(action, state, actions);
+    // }
 
-//     @Override
-//     protected void saveStateIntoFragmentForReplayableSequence(State state) {
-//         if (isPlayableRecordEnabled) {
-//             return;
-//         }
-//         super.saveStateIntoFragmentForReplayableSequence(state);
-//     }
+    // @Override
+    // protected void saveStateIntoFragmentForReplayableSequence(State state) {
+    // if (isPlayableRecordEnabled) {
+    // return;
+    // }
+    // super.saveStateIntoFragmentForReplayableSequence(state);
+    // }
 
-//     @Override
-//     protected void writeAndCloseFragmentForReplayableSequence() {
-//         if (isPlayableRecordEnabled) {
-//             return;
-//         }
-//         super.writeAndCloseFragmentForReplayableSequence();
-//     }
+    // @Override
+    // protected void writeAndCloseFragmentForReplayableSequence() {
+    // if (isPlayableRecordEnabled) {
+    // return;
+    // }
+    // super.writeAndCloseFragmentForReplayableSequence();
+    // }
 
-//     @Override
-//     protected void runReplayLoop() {
-//         if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE)) {
-//             System.out.println(String.format("-= Trying to replay from a database %s =-", sqlService));
-//             isTestReportEnabled = true;
-//             isSequenceReportEnabled = true;
-//             isLogSerializerEnabled = true;
-//             isPlayableRecordEnabled = true;
+    // @Override
+    // protected void runReplayLoop() {
+    // if (settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE))
+    // {
+    // System.out.println(String.format("-= Trying to replay from a database %s =-",
+    // sqlService));
+    // isTestReportEnabled = true;
+    // isSequenceReportEnabled = true;
+    // isLogSerializerEnabled = true;
+    // isPlayableRecordEnabled = true;
 
-//             System.out.println(String.format("-= Service is now %s =-", sqlService));
-//             databaseReplayResolver = new MySQLSerialResolver(sqlService, settings);
-//             orientDbSerialResolver = new OrientDBSerialResolver(orientService, settings, stateModelManager);
+    // System.out.println(String.format("-= Service is now %s =-", sqlService));
+    // databaseReplayResolver = new MySQLSerialResolver(sqlService, settings);
+    // orientDbSerialResolver = new OrientDBSerialResolver(orientService, settings,
+    // stateModelManager);
 
-//             try {
-//                 orientDbSerialResolver.startReplay(settings.get(ConfigTags.SQLReporting));
-//                 assignActionResolver(orientDbSerialResolver);
-// //                databaseReplayResolver.startReplay(settings.get(ConfigTags.SQLReporting));
-// //                assignActionResolver(databaseReplayResolver);
-//                 runGenerateOuterLoop(null);
-//                 resignActionResolver();
-//             }
-//             catch (Exception e) {
-//                 System.err.println("Failed to replay from a database");
-//                 e.printStackTrace();
-//             }
-//         }
-//         else {
-//             System.out.println("-= No database available - falling back =-");
-//             System.out.println(settings.get(ConfigTags.ReportType));
-//             super.runReplayLoop();
-//         }
-//     }
-
+    // try {
+    // orientDbSerialResolver.startReplay(settings.get(ConfigTags.SQLReporting));
+    // assignActionResolver(orientDbSerialResolver);
+    // // databaseReplayResolver.startReplay(settings.get(ConfigTags.SQLReporting));
+    // // assignActionResolver(databaseReplayResolver);
+    // runGenerateOuterLoop(null);
+    // resignActionResolver();
+    // }
+    // catch (Exception e) {
+    // System.err.println("Failed to replay from a database");
+    // e.printStackTrace();
+    // }
+    // }
+    // else {
+    // System.out.println("-= No database available - falling back =-");
+    // System.out.println(settings.get(ConfigTags.ReportType));
+    // super.runReplayLoop();
+    // }
+    // }
 
     /**
-     * This method is used by TESTAR to determine the set of currently available actions.
-     * You can use the SUT's current state, analyze the widgets and their properties to create
-     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+     * This method is used by TESTAR to determine the set of currently available
+     * actions.
+     * You can use the SUT's current state, analyze the widgets and their properties
+     * to create
+     * a set of sensible actions, such as: "Click every Button which is enabled"
+     * etc.
+     * The return value is supposed to be non-null. If the returned set is empty,
+     * TESTAR
      * will stop generation of the current action and continue with the next one.
      *
      * @param system the SUT
@@ -183,10 +202,11 @@ public class Protocol_yoho extends WebdriverProtocol {
             if (!widget.get(Enabled, true)) {
                 continue;
             }
-            // The blackListed widgets are those that have been filtered during the SPY mode with the
-            //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-            if(blackListed(widget)){
-                if(isTypeable(widget)){
+            // The blackListed widgets are those that have been filtered during the SPY mode
+            // with the
+            // CAPS_LOCK + SHIFT + Click clickfilter functionality.
+            if (blackListed(widget)) {
+                if (isTypeable(widget)) {
                     filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
                 } else {
                     filteredActions.add(ac.leftClickAt(widget));
@@ -204,9 +224,9 @@ public class Protocol_yoho extends WebdriverProtocol {
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                if(whiteListed(widget) || isUnfiltered(widget)){
+                if (whiteListed(widget) || isUnfiltered(widget)) {
                     actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
-                }else{
+                } else {
                     // filtered and not white listed:
                     filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
                 }
@@ -214,23 +234,23 @@ public class Protocol_yoho extends WebdriverProtocol {
 
             // left clicks, but ignore links outside domain
             if (isAtBrowserCanvas(widget) && isClickable(widget)) {
-                if(whiteListed(widget) || isUnfiltered(widget)){
+                if (whiteListed(widget) || isUnfiltered(widget)) {
                     if (!isLinkDenied(widget)) {
                         actions.add(ac.leftClickAt(widget));
-                    }else{
+                    } else {
                         // link denied:
                         filteredActions.add(ac.leftClickAt(widget));
                     }
-                }else{
+                } else {
                     // filtered and not white listed:
                     filteredActions.add(ac.leftClickAt(widget));
                 }
             }
         }
 
-        //if(actions.isEmpty()) {
-        //	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-        //}
+        // if(actions.isEmpty()) {
+        // return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+        // }
 
         // If we have forced actions, prioritize and filter the other ones
         if (forcedActions != null && forcedActions.size() > 0) {
@@ -239,8 +259,9 @@ public class Protocol_yoho extends WebdriverProtocol {
             actions = forcedActions;
         }
 
-        //Showing the grey dots for filtered actions if visualization is on:
-        if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+        // Showing the grey dots for filtered actions if visualization is on:
+        if (visualizationOn || mode() == Modes.Spy)
+            SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
         return actions;
     }
@@ -287,13 +308,14 @@ public class Protocol_yoho extends WebdriverProtocol {
      * Locate and press Ionic button with "Sign in" caption
      */
     protected Action generateCustomLoginAction(State state, WidgetActionCompiler ac) {
-        for (Widget widget: state) {
+        for (Widget widget : state) {
             if (!WdWidget.class.isInstance(widget)) {
                 continue;
             }
             WdWidget wdWidget = (WdWidget) widget;
-//            System.out.println(String.format("??? %s ???", wdWidget.get(WdTags.WebItemType)));
-            if("ion-button".equals(wdWidget.element.tagName) &&
+            // System.out.println(String.format("??? %s ???",
+            // wdWidget.get(WdTags.WebItemType)));
+            if ("ion-button".equals(wdWidget.element.tagName) &&
                     wdWidget.element.textContent.toLowerCase(Locale.ROOT).contains("sign in")) {
                 System.out.println("!!! Custom button found !!!");
                 return ac.leftClickAt(wdWidget);
@@ -302,7 +324,19 @@ public class Protocol_yoho extends WebdriverProtocol {
         return null;
     }
 
+    @Override
     protected boolean resolversSupported() {
         return true;
-   }
+    }
+
+    // @Override
+    // protected ActionSelector createActionSelector() {
+    // return new QLearningActionSelector(settings.get(ConfigTags.MaxReward),
+    // settings.get(ConfigTags.Discount));
+    // }
+
+    @Override
+    protected ActionSelector getActionSelector() {
+        return qlActionSelector;
+    }
 }

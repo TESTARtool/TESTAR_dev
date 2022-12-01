@@ -157,7 +157,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         Action retAction = preSelectAction(system, state, actions).stream().findAny().get();
         if (retAction == null) {
             //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
+            retAction = getActionSelector().selectAction(state, actions);
         }
         return retAction;
     }

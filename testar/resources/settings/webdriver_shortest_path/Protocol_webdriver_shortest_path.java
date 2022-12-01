@@ -191,7 +191,7 @@ public class Protocol_webdriver_shortest_path extends WebdriverProtocol {
 		if(retAction==null) {
 			System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, using random:
-			retAction = RandomActionSelector.selectAction(actions);
+			retAction = getActionSelector().selectAction(state, actions);
 		}
 		return retAction;
 	}

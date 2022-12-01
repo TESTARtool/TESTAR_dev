@@ -35,8 +35,8 @@ SUTConnectorValue = "/home/michaelt/Downloads/chromedriver" "1920x900+0+0" "http
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 50
+Sequences = 2
+SequenceLength = 3
 
 #################################################################
 # Oracles based on suspicious titles
@@ -218,6 +218,11 @@ ForcedLoginUsernameInputName = usernameValue
 ForcedLoginUsername = +48500000002
 ForcedLoginPasswordInputName = passwordValue
 ForcedLoginPassword = yohopin2022
-ReportApiUrl = http://tst.yoho.testar.marviq.net/api
+ReportApiUrl = http://localhost:8888/api
+
+WebConsoleErrorOracle = true
+WebConsoleErrorPattern = .*ERROR.*
+WebConsoleWarningOracle = true
+WebConsoleWarningPattern = .*Warning.*
 
 FaultThreshold = 0.1

@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/***************************************************************************************************ctionSel
  *
  * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
@@ -68,6 +68,7 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
 
@@ -101,6 +102,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     private State stateForClickFilterLayerProtocol;
 
     protected Reporting htmlReport;
+    protected RandomActionSelector randomActionSelector = new RandomActionSelector();
 
     // TODO: progress monitor shouldn't depend on JavaFX
     public State getStateForClickFilterLayerProtocol() {
@@ -1285,7 +1287,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     @Override
     public Action selectAction(SUT system, State state, Set<Action> actions) {
         Assert.isTrue(actions != null && !actions.isEmpty());
-        return RandomActionSelector.selectAction(actions);
+        return getActionSelector().selectAction(state, actions);
     }
 
     protected String getRandomText(Widget w) {
@@ -1631,7 +1633,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
                 double actionDelay = settings.get(ConfigTags.TimeToWaitAfterAction, 1.0);
                 double actionDuration = settings.get(ConfigTags.ActionDuration, 1.0);
-
                 cv.begin();
                 Util.clear(cv);
                 cv.end();
@@ -1747,4 +1748,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
         return actionToReplay;
     }
 
+    protected ActionSelector getActionSelector() {
+        return randomActionSelector;
+    }
 }

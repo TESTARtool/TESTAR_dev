@@ -46,8 +46,11 @@ public class GuiStateGraphWithVisitedActions {
     protected String previousStateAbstractCustomId;
     protected String previousActionAbstractCustomId;
 
+    private RandomActionSelector randomActionSelector;
+
     public GuiStateGraphWithVisitedActions() {
         idBasedGuiStates = new HashSet<IdBasedGuiState>();
+        randomActionSelector = new RandomActionSelector();
     }
 
     public Set<String> getAbstractCustomIdsOfUnvisitedActions(State state){
@@ -88,7 +91,7 @@ public class GuiStateGraphWithVisitedActions {
         if(currentIdBasedGuiState.getUnvisitedActionIds().size()==actions.size()){
             // all actions unvisited -> new state -> randomly select action:
             System.out.println(this.getClass()+": new state, selecting randomly from "+actions.size()+" available actions");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = randomActionSelector.selectAction(state, actions);
         }else{
             // already visited state
             if(currentIdBasedGuiState.getUnvisitedActionIds().size()==0){
@@ -108,7 +111,7 @@ public class GuiStateGraphWithVisitedActions {
         if(returnAction==null){
             // backup if action selection did not find an action:
             System.out.println(this.getClass()+": selectAction(): no unvisited actions found! Getting purely random action.");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = randomActionSelector.selectAction(state, actions);
         }
         //updating the list of states:
         idBasedGuiStates.remove(currentIdBasedGuiState); // should not be a problem if state not there (new state)?

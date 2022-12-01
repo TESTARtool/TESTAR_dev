@@ -30,6 +30,7 @@
 
 package org.testar.simplestategraph;
 
+import org.testar.ActionSelector;
 import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -39,16 +40,18 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class QLearningActionSelector {
+public class QLearningActionSelector implements ActionSelector {
     private double R_MAX;
     private double gammaDiscount;
     private GuiStateGraphForQlearning graph;
+    private RandomActionSelector randomActionSelector;
 
     public QLearningActionSelector(double R_MAX, double gammaDiscount){
         System.out.println("DEBUG: creating Q-learning action selector, R-MAX="+R_MAX+", gammaDiscount="+gammaDiscount);
         this.R_MAX = R_MAX;
         this.gammaDiscount=gammaDiscount;
         graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
+        randomActionSelector = new RandomActionSelector();
     }
 
     public void resetGraphForNewTestSequence(){
@@ -96,7 +99,7 @@ public class QLearningActionSelector {
         ArrayList<String> actionIdsWithMaxQvalue = currentQlearningGuiState.getActionsIdsWithMaxQvalue(actions);
         if(actionIdsWithMaxQvalue.size()==0){
             System.out.println("ERROR: Qlearning did not find actions with max Q value!");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = randomActionSelector.selectAction(state, actions);
         }else{
             //selecting randomly of the actionIDs that have max Q value:
             System.out.println("DEBUG: IDs of actions with max Q value:");
@@ -114,7 +117,7 @@ public class QLearningActionSelector {
         if(returnAction==null){
             // backup if action selection did not find an action:
             System.out.println("ERROR: QlearningActionSelector.selectAction(): no action found! Getting purely random action.");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = randomActionSelector.selectAction(state, actions);
         }
         //updating the list of states:
         graph.qlearningGuiStates.remove(currentQlearningGuiState); // should not be a problem if state not there (new state)?
