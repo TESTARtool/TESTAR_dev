@@ -87,9 +87,10 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
     @Override
     public String toString()
     {
-        String string = "n-actions ";
-        if(VISITED_MODIFIER != null) string += VISITED_MODIFIER.toString();
-        if(FILTER != null) string += FILTER.toString() + " " + ACTION_TYPE.toString();
+        String string = "n-actions";
+        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER.toString();
+        if(FILTER != null) string += " " + FILTER.toString() + " " + ACTION_TYPE.toString();
+        string += " exist";
         return string;
     }
 }

@@ -1,11 +1,11 @@
 IF
-    n-unvisited-actions-of-type input-action > 0
+    any-actions unvisited of-type input-action exist
 THEN
-    r-unvisited-action-of-type input-action
+    select-random unvisited of-type input-action
 ELSE
     IF
-       n-unvisited-actions-of-type scroll-action > 0
+       any-actions of-type scroll-action exist
     THEN
-        r-action-of-type scroll-action
+        select-random of-type scroll-action
     ELSE
-        select-submit-action
+        select-random of-type submit-action

@@ -6,13 +6,13 @@ import org.testar.monkey.alayer.State;
 import java.util.Map;
 import java.util.Set;
 
-public class Strategy_Node extends BaseStrategyNode<Action>
+public class StrategyNode extends BaseStrategyNode<Action>
 {
     private BaseStrategyNode<Boolean> ifChild;
     private BaseStrategyNode<Action> thenChild; //StrategyNode or ActionListNode
     private BaseStrategyNode<Action> elseChild; //StrategyNode or ActionListNode
     
-    public Strategy_Node(BaseStrategyNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
+    public StrategyNode(BaseStrategyNode ifChild, BaseStrategyNode thenChild, BaseStrategyNode elseChild)
     {
         this.ifChild = ifChild;
         this.thenChild = thenChild;
