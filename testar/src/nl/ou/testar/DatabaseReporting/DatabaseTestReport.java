@@ -97,12 +97,10 @@ public class DatabaseTestReport implements TestReport {
             iterationId = sqlService.registerIteration(reportId, verdict.info(), verdict.severity());
 
             for (Action pendingAction: pendingActions) {
-                System.out.println("*** Storing regular action ***");
                 int actionId = addAction(state, pendingAction, false);
                 actionIds.put(pendingAction, actionId);
             }
             for (Map.Entry<Action, State> pendingEntry: pendingSelectedActions.entrySet()) {
-                System.out.println("*** Storing selected action ***");
                 Action pendingAction = pendingEntry.getKey();
                 int actionId = addAction(pendingEntry.getValue(), pendingAction, true);
                 actionIds.put(pendingAction, actionId);
@@ -179,7 +177,6 @@ public class DatabaseTestReport implements TestReport {
             targetStateId = stateIds.get(targetState);
         }
         String widgetPath = "";
-        System.out.println(String.format("*** Action: %s ***", action.getClass().getSimpleName()));
         final Widget widget = action.get(Tags.OriginWidget, null);
         if (widget != null) {
             widgetPath = widget.get(Tags.Path, "");
@@ -187,7 +184,6 @@ public class DatabaseTestReport implements TestReport {
         int actionId = sqlService.registerAction(action.toShortString(), action.toString(),
                     state.get(Tags.OracleVerdict).verdictSeverityTitle(), state.get(Tags.ScreenshotPath, null),
                     timestamp, selected, stateId, targetStateId, widgetPath);
-        System.out.println("Action added");
         sqlService.addActionToIteration(actionId, iterationId);
         return actionId;
     }
